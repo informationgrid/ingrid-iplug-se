@@ -2,7 +2,7 @@
     <pomVersion>3</pomVersion>
     <artifactId>ingrid-iplug-se</artifactId>
     <name>ingrid-iplug-se</name>
-    <groupId>ingrid-iplug-se</groupId>
+    <groupId>ingrid</groupId>
     <currentVersion>0.1</currentVersion>
     <inceptionYear>2005</inceptionYear>
     <logo>/images/logo.gif</logo>
