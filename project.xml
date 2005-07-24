@@ -3,7 +3,7 @@
     <artifactId>ingrid-iplug-se</artifactId>
     <name>ingrid-iplug-se</name>
     <groupId>ingrid</groupId>
-    <currentVersion>0.1</currentVersion>
+    <currentVersion>0.1-SNAPSHOT</currentVersion>
     <inceptionYear>2005</inceptionYear>
     <logo>/images/logo.gif</logo>
     <mailingLists>
@@ -14,6 +14,9 @@
             <name>${pom.name} User List</name>
         </mailingList>
     </mailingLists>
+    <repository>
+        <connection>scm:svn:http://torwald.gistec-online.de/svn/ingrid:ingrid-iplug-se</connection>
+    </repository>
     <build>
         <sourceDirectory>src/java</sourceDirectory>
         <unitTestSourceDirectory>src/test</unitTestSourceDirectory>
