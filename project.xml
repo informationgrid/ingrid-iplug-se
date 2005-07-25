@@ -8,8 +8,8 @@
     <logo>/images/logo.gif</logo>
     <shortDescription>short description</shortDescription>
     <issueTrackingUrl>http://jira.media-style.com/browse/INGRID</issueTrackingUrl>
-    <siteAddress>http://torwald.gistec-online.de/~ms/ingrid-iplug-se</siteAddress>
-    <siteDirectory>/home/ms/public_html/ingrid-iplug-se</siteDirectory>
+    <siteAddress>http://torwald.gistec-online.de/ingrid/ingrid-iplug-se</siteAddress>
+    <siteDirectory>/srv/www/htdocs/ingrid/ingrid-iplug-se</siteDirectory>
     <mailingLists>
         <mailingList>
             <name>${pom.name} Dev List</name>
