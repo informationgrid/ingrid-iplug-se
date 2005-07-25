@@ -19,7 +19,7 @@
         </mailingList>
     </mailingLists>
     <repository>
-        <connection>scm:svn:http://torwald.gistec-online.de/svn/ingrid:ingrid-iplug-se</connection>
+        <connection>scm:cvs:svn:http://torwald.gistec-online.de/svn/ingrid:ingrid-iplug-se</connection>
     </repository>
     <build>
         <sourceDirectory>src/java</sourceDirectory>
