@@ -18,16 +18,65 @@
             <name>${pom.name} User List</name>
         </mailingList>
     </mailingLists>
+	<developers>
+    <developer>
+      <id>0</id>
+      <name>Sefan Groschupf</name>
+      <email>sg(at)media-style.com</email>
+      <organization>media style GmbH</organization>
+      <organizationUrl>http://www.media-style.com</organizationUrl>
+      <roles>
+		  <role>project leader</role>
+		  <role>developer</role>
+	  </roles>
+    </developer>
+	<developer>
+      <id>1</id>
+      <name>Frank Henze</name>
+      <email>fh(at)media-style.com</email>
+      <organization>media style GmbH</organization>
+      <organizationUrl>http://www.media-style.com</organizationUrl>
+      <roles>
+		  <role>project leader</role>
+		  <role>developer</role>
+	  </roles>
+    </developer>
+	<developer>
+      <id>2</id>
+      <name>Holger Schulze</name>
+      <email>hs(at)media-style.com</email>
+      <organization>media style GmbH</organization>
+      <organizationUrl>http://www.media-style.com</organizationUrl>
+      <roles>
+		  <role>developer</role>
+	  </roles>
+    </developer>
+	<developer>
+      <id>3</id>
+      <name>Marko Bauhardt</name>
+      <email>mb(at)media-style.com</email>
+      <organization>media style GmbH</organization>
+      <organizationUrl>http://www.media-style.com</organizationUrl>
+      <roles>
+		  <role>developer</role>
+	  </roles>
+    </developer>
+  </developers>
+    <shortDescription>todo short description</shortDescription>
+    <issueTrackingUrl>http://jira.media-style.com/browse/INGRID</issueTrackingUrl>
+	<siteAddress>http://torwald.gistec-online.de/ingrid/ingrid-iplug-se</siteAddress>
+    <siteDirectory>/srv/www/htdocs/ingrid/ingrid-iplug-se</siteDirectory>
     <repository>
         <connection>scm:svn:http://torwald.gistec-online.de/svn/ingrid:ingrid-iplug-se</connection>
     </repository>
 	<dependencies>
-    <dependency>
-      <groupId>ingrid</groupId>
-      <artifactId>ingrid-dsc</artifactId>
-      <version>0.1-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
+	  <dependency>
+         <groupId>ingrid</groupId>
+         <artifactId>ingrid-dsc</artifactId>
+         <version>0.1-SNAPSHOT</version>
+	     <url>http://torwald.gistec-online.de/ingrid/maven/ingrid/jars/ingrid-dsc-0.1-SNAPSHOT.jar<url>
+       </dependency>
+	</dependencies>
     <build>
         <sourceDirectory>src/java</sourceDirectory>
         <unitTestSourceDirectory>src/test</unitTestSourceDirectory>
