@@ -21,6 +21,13 @@
     <repository>
         <connection>scm:svn:http://torwald.gistec-online.de/svn/ingrid:ingrid-iplug-se</connection>
     </repository>
+	<dependencies>
+    <dependency>
+      <groupId>ingrid</groupId>
+      <artifactId>ingrid-dsc</artifactId>
+      <version>0.1-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
     <build>
         <sourceDirectory>src/java</sourceDirectory>
         <unitTestSourceDirectory>src/test</unitTestSourceDirectory>
