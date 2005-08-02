@@ -1,7 +1,19 @@
 <project xmlns:j="jelly:core">
-	<goal name="jar:jar">
+	
+	<goal name="jar">
 		<j:set var="testmatchpattern" value="**/*"/>
 		<j:set var="testnotmatchpattern" value="**/v*/*"/>
+		<attainGoal name="jar:jar"/>		
+	</goal>
+
+	<goal name="site:generate">
+		<j:set var="testmatchpattern" value="**/*"/>
+		<j:set var="testnotmatchpattern" value=""/>
+		<attainGoal name="site"/>
+	</goal>
+	
+	<goal name="test:test">
 		<attainGoal name="test:match" />	
 	</goal>
+	
 </project>
