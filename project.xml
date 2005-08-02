@@ -77,7 +77,15 @@
          <version>0.1-SNAPSHOT</version>
 	     <url>http://torwald.gistec-online.de/ingrid/maven/ingrid/jars/ingrid-iplug-dsc-0.1-SNAPSHOT.jar</url>
        </dependency>
-	</dependencies>
+		<dependency>
+        <groupId>weta</groupId>
+        <artifactId>weta-g</artifactId>
+        <version>latest</version>
+        <type>zip</type>
+        <url>http://weta-group.net/maven</url>
+        <properties/>
+      	</dependency>
+  	</dependencies>
     <build>
         <sourceDirectory>src/java</sourceDirectory>
         <unitTestSourceDirectory>src/test</unitTestSourceDirectory>
