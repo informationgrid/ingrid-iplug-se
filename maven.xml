@@ -1,4 +1,5 @@
-<project xmlns:j="jelly:core">
+<project xmlns:j="jelly:core"
+         xmlns:deploy="deploy">
 	
 	<goal name="jar">
 		<j:set var="testmatchpattern" value="**/*"/>
@@ -15,5 +16,62 @@
 	<goal name="test:test">
 		<attainGoal name="test:match" />	
 	</goal>
+	
+	<!-- builds a car archive from the project by collecting the built jar, 
+	     the deployment descriptor and the required jars to a folder -->
+	<goal name="build-component">
+		<j:set var="car" value="${maven.build.dir}/${pom.artifactId}-${pom.currentVersion}.car" />
+		<mkdir dir="${car}" />
+		<copy toDir="${car}" >
+			<fileset dir="${basedir}/src/conf" includes="descriptor.xml" />
+			<fileset dir="${maven.build.dir}" includes="${pom.artifactId}-${pom.currentVersion}.jar" />
+		</copy>
+		<deploy:copy-deps todir="${car}" excludes="weta-g" />
+	</goal>
+	
+	<preGoal name="build-component">
+		<attainGoal name="jar" />
+	</preGoal>	
+	
+	<!--copies the built weta-g component archive and all containing files to the deploy folder
+		of the unpacked weta-g server-->
+	<goal name="deploy">
+		<copy toDir="${maven.build.dir}/work/weta-g-latest/deploy">
+    		<fileset dir="${maven.build.dir}">
+    			<include name="${pom.artifactId}-${pom.currentVersion}.car" />
+    			<include name="${pom.artifactId}-${pom.currentVersion}.car/*" />
+    		</fileset>
+    	</copy>
+    </goal>
+    
+	<preGoal name="deploy">
+		<attainGoal name="build-component" />
+		<attainGoal name="prepare-server" />
+	</preGoal>
+	    
+	<!--unpacks the weta-g server available from the local repository under the folder
+		specified by the property maven.build.dir  -->    
+	<goal name="prepare-server">
+    	<unzip src="${maven.repo.local}/weta-g/zips/${weta.server.name}${weta.server.suffix}"
+             dest="${maven.build.dir}/${weta.server.destination}">
+        </unzip>
+    </goal>
+    
+    <!--starts the unpacked weta-g server with the deployed component archive-->
+	<goal name="run-weta-g">
+		 <j:set var = "server.home" value="${maven.build.dir}/${weta.server.destination}/${weta.server.name}" />
+		 <java classname="net.weta.boot.WetaServerApplication" fork="true" failonerror="true" maxmemory="128M">
+		    <classpath>
+		    	<fileset dir="${server.home}/lib">
+			  <include name="*.jar"/>
+			</fileset>
+			<pathelement path="${server.home}/conf" />	
+		    </classpath>
+		 </java>
+	</goal>
+	
+	<preGoal name="run-weta-g">
+		<attainGoal name="deploy" />
+	</preGoal>
 	
 </project>
