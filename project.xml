@@ -75,7 +75,7 @@
          <groupId>ingrid</groupId>
          <artifactId>ingrid-dsc</artifactId>
          <version>0.1-SNAPSHOT</version>
-	     <url>http://torwald.gistec-online.de/ingrid/maven/ingrid/jars/ingrid-dsc-0.1-SNAPSHOT.jar</url>
+	     <url>http://torwald.gistec-online.de/ingrid/maven/ingrid/jars/ingrid-iplug-dsc-0.1-SNAPSHOT.jar</url>
        </dependency>
 	</dependencies>
     <build>
