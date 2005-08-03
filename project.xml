@@ -96,7 +96,9 @@
     </build>
 	<reports>
 		<report>maven-junit-report-plugin</report>
-        <report>maven-jcoverage-plugin</report>
+        <!--
+		<report>maven-jcoverage-plugin</report>
+			-->
         <report>maven-tasklist-plugin</report>
 	</reports>
     <properties/>
