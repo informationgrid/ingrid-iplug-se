@@ -17,6 +17,14 @@
 		<attainGoal name="test:match" />	
 	</goal>
 	
+	<preGoal name="maven-jcoverage-plugin:report">
+		<j:set var="maven.test.failure.ignore" value="true"/>
+	</preGoal>
+	
+	<postGoal name="maven-jcoverage-plugin:report">
+		<j:set var="maven.test.failure.ignore" value="false"/>
+	</postGoal>
+	
 	<!-- builds a car archive from the project by collecting the built jar, 
 	     the deployment descriptor and the required jars to a folder -->
 	<goal name="build-component">
