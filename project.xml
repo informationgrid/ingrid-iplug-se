@@ -73,15 +73,17 @@
 	<dependencies>
 	  <dependency>
          <groupId>ingrid</groupId>
-         <artifactId>ingrid-dsc</artifactId>
+         <artifactId>ingrid-iplug-dsc</artifactId>
          <version>0.1-SNAPSHOT</version>
-	     <url>http://torwald.gistec-online.de/ingrid/maven/ingrid/jars/ingrid-iplug-dsc-0.1-SNAPSHOT.jar</url>
+		 <type>jar</type>
+	     <url>http://torwald.gistec-online.de/ingrid/maven</url>
        </dependency>
 		<dependency>
         <groupId>weta</groupId>
         <artifactId>weta-g</artifactId>
         <version>latest</version>
         <type>zip</type>
+		<url>http://www.weta-group.net/maven</url>
         <properties/>
       	</dependency>
   	</dependencies>
