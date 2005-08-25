@@ -15,15 +15,21 @@ import junit.framework.TestCase;
  * @author hs
  */
 public class NutchIndexTest extends TestCase {
-
+    /**
+     * 
+     */
 	public void testVariousIndexFields(){
 		fail("INGRID-92 not yet implemented");
 	}
-	
+	/**
+     * 
+     */
 	public void testParseSeveralFormats(){
 		fail("INGRID-93 not yet implemented");
 	}
-	
+	/**
+     * 
+     */
 	public void testConditionedReindexing(){
 		fail("INGRID-94 not yet implemented");
 	}
