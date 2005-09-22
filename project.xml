@@ -78,6 +78,7 @@
 		 <type>jar</type>
 	     <url>http://torwald.gistec-online.de/ingrid/maven</url>
        </dependency>
+		<dependency>
             <groupId>weta</groupId>
             <artifactId>weta-g</artifactId>
             <version>SNAPSHOT</version>
