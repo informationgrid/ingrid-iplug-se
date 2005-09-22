@@ -7,6 +7,7 @@ package de.ingrid.iplug.se.v02;
 
 import junit.framework.TestCase;
 
+
 /**
  * Test for nutch-backend-feature (INGRID-14).
  * created on 21.07.2005 <p>
