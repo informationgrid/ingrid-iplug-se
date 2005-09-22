@@ -78,13 +78,10 @@
 		 <type>jar</type>
 	     <url>http://torwald.gistec-online.de/ingrid/maven</url>
        </dependency>
-		<dependency>
-        <groupId>weta</groupId>
-        <artifactId>weta-g</artifactId>
-        <version>latest</version>
-        <type>zip</type>
-		<url>http://www.weta-group.net/maven</url>
-        <properties/>
+            <groupId>weta</groupId>
+            <artifactId>weta-g</artifactId>
+            <version>SNAPSHOT</version>
+            <type>zip</type>
       	</dependency>
   	</dependencies>
     <build>
