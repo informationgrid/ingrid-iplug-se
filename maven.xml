@@ -7,8 +7,10 @@
 		<attainGoal name="jar:jar"/>		
 	</goal>
 
-	<goal name="site:generate">
-		<j:set var="testmatchpattern" value="**/*"/>
+	<!-- create website with feature tests -->
+	<goal name="site:feature">
+		<j:set var="faeturetests" value="true"/>
+		<j:set var="testmatchpattern" value="**/*Test.java"/>
 		<j:set var="testnotmatchpattern" value=""/>
 		<attainGoal name="site"/>
 	</goal>
