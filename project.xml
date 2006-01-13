@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance.xsd" xsi:noNamespaceSchemaLocation="http://maven.apache.org/xsd/maven-project-3.0.0.xsd">
     <pomVersion>3</pomVersion>
-    <artifactId>ingrid-iplug-se</artifactId>
-    <name>ingrid-iplug-se</name>
+    <artifactId>ingrid-iplug-nutch</artifactId>
+    <name>ingrid-iplug-nutch</name>
     <groupId>ingrid</groupId>
     <currentVersion>0.1-SNAPSHOT</currentVersion>
     <inceptionYear>2005</inceptionYear>
     <logo>/images/logo.gif</logo>
-    <shortDescription>short description</shortDescription>
-    <issueTrackingUrl>http://jira.media-style.com/browse/INGRID</issueTrackingUrl>
-    <siteAddress>http://torwald.gistec-online.de/ingrid/ingrid-iplug-se</siteAddress>
-    <siteDirectory>/srv/www/htdocs/ingrid/ingrid-iplug-se</siteDirectory>
     <mailingLists>
         <mailingList>
             <name>${pom.name} Dev List</name>
@@ -19,82 +15,103 @@
             <name>${pom.name} User List</name>
         </mailingList>
     </mailingLists>
-	<developers>
-    <developer>
-      <id>sg</id>
-      <name>Sefan Groschupf</name>
-      <email>sg(at)media-style.com</email>
-      <organization>media style GmbH</organization>
-      <organizationUrl>http://www.media-style.com</organizationUrl>
-      <roles>
-		  <role>project leader</role>
-		  <role>developer</role>
-	  </roles>
-    </developer>
-	<developer>
-      <id>fh</id>
-      <name>Frank Henze</name>
-      <email>fh(at)media-style.com</email>
-      <organization>media style GmbH</organization>
-      <organizationUrl>http://www.media-style.com</organizationUrl>
-      <roles>
-		  <role>project leader</role>
-		  <role>developer</role>
-	  </roles>
-    </developer>
-	<developer>
-      <id>hs</id>
-      <name>Holger Schulze</name>
-      <email>hs(at)media-style.com</email>
-      <organization>media style GmbH</organization>
-      <organizationUrl>http://www.media-style.com</organizationUrl>
-      <roles>
-		  <role>developer</role>
-	  </roles>
-    </developer>
-	<developer>
-      <id>mb</id>
-      <name>Marko Bauhardt</name>
-      <email>mb(at)media-style.com</email>
-      <organization>media style GmbH</organization>
-      <organizationUrl>http://www.media-style.com</organizationUrl>
-      <roles>
-		  <role>developer</role>
-	  </roles>
-    </developer>
-    <developer>
-      <id>ms</id>
-      <name>Martin Schaaf</name>
-      <email>ms(at)media(stripe)style(dot)com</email>
-      <organization>media style GmbH</organization>
-      <organizationUrl>http://www.media-style.com</organizationUrl>
-      <roles>
-		  <role>developer</role>
-	  </roles>
-    </developer>
-  </developers>
-    <shortDescription>todo short description</shortDescription>
+    <developers>
+        <developer>
+            <id>sg</id>
+            <name>Sefan Groschupf</name>
+            <email>sg(at)media-style.com</email>
+            <organization>media style GmbH</organization>
+            <organizationUrl>http://www.media-style.com</organizationUrl>
+            <roles>
+                <role>project leader</role>
+                <role>developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>fh</id>
+            <name>Frank Henze</name>
+            <email>fh(at)media-style.com</email>
+            <organization>media style GmbH</organization>
+            <organizationUrl>http://www.media-style.com</organizationUrl>
+            <roles>
+                <role>project leader</role>
+                <role>developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>mb</id>
+            <name>Marko Bauhardt</name>
+            <email>mb(at)media-style.com</email>
+            <organization>media style GmbH</organization>
+            <organizationUrl>http://www.media-style.com</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>ms</id>
+            <name>Martin Schaaf</name>
+            <email>ms(at)media(stripe)style(dot)com</email>
+            <organization>media style GmbH</organization>
+            <organizationUrl>http://www.media-style.com</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
+    </developers>
+    <shortDescription>nutch iplug</shortDescription>
     <issueTrackingUrl>http://jira.media-style.com/browse/INGRID</issueTrackingUrl>
-	<siteAddress>http://torwald.gistec-online.de/ingrid/ingrid-iplug-se</siteAddress>
-    <siteDirectory>/srv/www/htdocs/ingrid/ingrid-iplug-se</siteDirectory>
+    <siteAddress>http://torwald.gistec-online.de/ingrid/ingrid-iplug-dsc</siteAddress>
+    <siteDirectory>/srv/www/htdocs/ingrid/ingrid-iplug-dsc</siteDirectory>
     <repository>
-        <connection>scm:svn:http://torwald.gistec-online.de/svn/ingrid:ingrid-iplug-se</connection>
+        <connection>scm:svn:http://torwald.gistec-online.de/svn/ingrid:ingrid-iplug-dsc</connection>
     </repository>
-	<dependencies>
-	  <dependency>
-         <groupId>ingrid</groupId>
-         <artifactId>ingrid-iplug-dsc</artifactId>
-         <version>0.1-SNAPSHOT</version>
-		 <type>jar</type>
-	     <url>http://torwald.gistec-online.de/ingrid/maven</url>
-       </dependency>
-		<dependency>
+    <dependencies>
+        <dependency>
+            <groupId>ingrid</groupId>
+            <artifactId>ingrid-iplug</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <url>http://torwald.gistec-online.de/ingrid/maven</url>
+            <type>jar</type>
+        </dependency>
+        <dependency>
             <groupId>weta</groupId>
             <artifactId>weta-g</artifactId>
             <version>SNAPSHOT</version>
             <type>zip</type>
-      	</dependency>
-  	</dependencies>
+        </dependency>
+        <dependency>
+            <groupId>ingrid</groupId>
+            <artifactId>ingrid-utils</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>lucene</groupId>
+            <artifactId>lucene</artifactId>
+            <version>1.4.3</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.0.2</version>
+            <type>jar</type>
+            <url>http://jakarta.apache.org/commons/logging/</url>
+        </dependency>
+        <dependency>
+            <groupId>xpp3</groupId>
+            <artifactId>xpp3</artifactId>
+            <version>1.1.2a</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.1.2</version>
+            <type>jar</type>
+        </dependency>
+    </dependencies>
     <build>
         <sourceDirectory>src/java</sourceDirectory>
         <unitTestSourceDirectory>src/test</unitTestSourceDirectory>
@@ -103,10 +120,16 @@
                 <include>**/*Test.java</include>
             </includes>
         </unitTest>
+        <resources>
+            <resource>
+                <directory>src/conf</directory>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
     </build>
-	<reports>
-		<report>maven-junit-report-plugin</report>
-        <!--report>maven-jcoverage-plugin</report-->
+    <reports>
+        <report>maven-junit-report-plugin</report>
+        <report>maven-jcoverage-plugin</report>
         <report>maven-simian-plugin</report>
         <report>maven-javadoc-plugin</report>
         <report>maven-pmd-plugin</report>
@@ -118,8 +141,7 @@
         <report>maven-license-plugin</report>
         <report>maven-checkstyle-plugin</report>
         <report>maven-jxr-plugin</report>
-        <report>maven-changelog-plugin</report>        
-	</reports>
-    <properties/>
+        <report>maven-changelog-plugin</report>
+    </reports>
 </project>
 
