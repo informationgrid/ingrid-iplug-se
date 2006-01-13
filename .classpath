@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/java"/>
+	<classpathentry kind="src" path="src/conf"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="src" path="src/test"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ingrid-ibus"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ingrid-iplug"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ingrid-iplug-dsc"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ingrid-utils"/>
 	<classpathentry kind="var" path="MAVEN_REPO/xstream/jars/xstream-1.1.2.jar"/>
 	<classpathentry kind="var" path="MAVEN_REPO/xpp3/jars/xpp3-1.1.2a.jar"/>
 	<classpathentry kind="var" path="MAVEN_REPO/weta/zips/weta-g-SNAPSHOT.zip"/>
 	<classpathentry kind="var" path="MAVEN_REPO/junit/jars/junit-3.8.1.jar"/>
 	<classpathentry kind="var" path="MAVEN_REPO/commons-logging/jars/commons-logging-1.0.2.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/nutch"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/nutch-trunk"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

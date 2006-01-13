@@ -2,7 +2,7 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance.xsd" xsi:noNamespaceSchemaLocation="http://maven.apache.org/xsd/maven-project-3.0.0.xsd">
     <pomVersion>3</pomVersion>
     <artifactId>ingrid-iplug-nutch</artifactId>
-    <name>ingrid-iplug-nutch</name>
+    <name>ingrid-iplug-se</name>
     <groupId>ingrid</groupId>
     <currentVersion>0.1-SNAPSHOT</currentVersion>
     <inceptionYear>2005</inceptionYear>
@@ -68,6 +68,13 @@
     </repository>
     <dependencies>
         <dependency>
+            <groupId>nutch</groupId>
+            <artifactId>nutch</artifactId>
+            <version>0.8-dev</version>
+            <url>http://torwald.gistec-online.de/ingrid/maven</url>
+            <type>jar</type>
+        </dependency>
+        <dependency>
             <groupId>ingrid</groupId>
             <artifactId>ingrid-iplug</artifactId>
             <version>0.1-SNAPSHOT</version>
@@ -88,8 +95,14 @@
         </dependency>
         <dependency>
             <groupId>lucene</groupId>
-            <artifactId>lucene</artifactId>
-            <version>1.4.3</version>
+            <artifactId>lucene-core</artifactId>
+            <version>1.9-rc1-dev</version>
+            <type>jar</type>
+        </dependency>
+         <dependency>
+            <groupId>lucene</groupId>
+            <artifactId>lucene-misc</artifactId>
+            <version>1.9-rc1-dev</version>
             <type>jar</type>
         </dependency>
         <dependency>
