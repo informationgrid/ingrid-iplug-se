@@ -11,6 +11,7 @@ import org.apache.nutch.searcher.NutchBean;
 import org.apache.nutch.searcher.Query;
 
 import de.ingrid.iplug.IPlug;
+import de.ingrid.iplug.PlugDescription;
 import de.ingrid.utils.IDetailer;
 import de.ingrid.utils.IngridDocument;
 import de.ingrid.utils.IngridHit;
@@ -32,10 +33,32 @@ public class NutchSearcher implements IPlug, IDetailer {
 
     private String fProviderId;
 
+    /**
+     * default constructor...
+     */
+    public NutchSearcher() {
+        // nothing to do..
+    }
+
+    /**
+     * JUST FOR TESTING...
+     * 
+     * @param indexFolder
+     * @param providerId
+     * @throws IOException
+     */
     public NutchSearcher(File indexFolder, String providerId)
             throws IOException {
         fNutchBean = new NutchBean(indexFolder);
         fProviderId = providerId;
+    }
+
+    public void configure(PlugDescription plugDescription) throws Exception {
+        fNutchBean = new NutchBean(new File(plugDescription
+                .getWorkinDirectory(), "nutch"));
+        fProviderId = fProviderId = plugDescription.getIPlugClass()
+                + plugDescription.getOraganisation();
+
     }
 
     /*
@@ -171,4 +194,5 @@ public class NutchSearcher implements IPlug, IDetailer {
         }
 
     }
+
 }
