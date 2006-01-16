@@ -57,7 +57,7 @@ public class NutchSearcher implements IPlug, IDetailer {
         this.fNutchBean = new NutchBean(new File(plugDescription
                 .getWorkinDirectory(), "nutch"));
         this.fProviderId = plugDescription.getIPlugClass()
-                + plugDescription.getOraganisation();
+                + plugDescription.getOrganisation();
     }
 
     /*
