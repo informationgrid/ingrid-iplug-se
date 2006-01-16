@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance.xsd" xsi:noNamespaceSchemaLocation="http://maven.apache.org/xsd/maven-project-3.0.0.xsd">
     <pomVersion>3</pomVersion>
     <artifactId>ingrid-iplug-nutch</artifactId>
@@ -99,7 +99,7 @@
             <version>1.9-rc1-dev</version>
             <type>jar</type>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>lucene</groupId>
             <artifactId>lucene-misc</artifactId>
             <version>1.9-rc1-dev</version>
@@ -157,4 +157,3 @@
         <report>maven-changelog-plugin</report>
     </reports>
 </project>
-
