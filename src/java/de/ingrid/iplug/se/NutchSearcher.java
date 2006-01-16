@@ -49,16 +49,15 @@ public class NutchSearcher implements IPlug, IDetailer {
      */
     public NutchSearcher(File indexFolder, String providerId)
             throws IOException {
-        fNutchBean = new NutchBean(indexFolder);
-        fProviderId = providerId;
+        this.fNutchBean = new NutchBean(indexFolder);
+        this.fProviderId = providerId;
     }
 
     public void configure(PlugDescription plugDescription) throws Exception {
-        fNutchBean = new NutchBean(new File(plugDescription
+        this.fNutchBean = new NutchBean(new File(plugDescription
                 .getWorkinDirectory(), "nutch"));
-        fProviderId = fProviderId = plugDescription.getIPlugClass()
+        this.fProviderId = plugDescription.getIPlugClass()
                 + plugDescription.getOraganisation();
-
     }
 
     /*
@@ -74,7 +73,7 @@ public class NutchSearcher implements IPlug, IDetailer {
         }
         Query nutchQuery = new Query();
         buildNutchQuery(query, nutchQuery);
-        Hits hits = fNutchBean.search(nutchQuery, lenght);
+        Hits hits = this.fNutchBean.search(nutchQuery, lenght);
         return translateHits(hits, start, lenght);
     }
 
