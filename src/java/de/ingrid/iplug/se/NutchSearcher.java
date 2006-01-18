@@ -47,55 +47,64 @@ public class NutchSearcher implements IPlug, IDetailer {
      * @param providerId
      * @throws IOException
      */
-    public NutchSearcher(File indexFolder, String providerId)
-            throws IOException {
+    public NutchSearcher(File indexFolder, String providerId) throws IOException {
         this.fNutchBean = new NutchBean(indexFolder);
         this.fProviderId = providerId;
     }
 
     public void configure(PlugDescription plugDescription) throws Exception {
-        this.fNutchBean = new NutchBean(new File(plugDescription
-                .getWorkinDirectory(), "nutch"));
-        this.fProviderId = plugDescription.getIPlugClass()
-                + plugDescription.getOrganisation();
+        this.fNutchBean = new NutchBean(new File(plugDescription.getWorkinDirectory(), "nutch"));
+        this.fProviderId = plugDescription.getIPlugClass() + plugDescription.getOrganisation();
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see de.ingrid.utils.ISearcher#search(de.ingrid.utils.query.IngridQuery,
-     *      int, int)
+     * @see de.ingrid.utils.ISearcher#search(de.ingrid.utils.query.IngridQuery, int, int)
      */
-    public IngridHits search(IngridQuery query, int start, int lenght)
-            throws Exception {
-        if (start < 1) {
-            start = 1;
-        }
+    public IngridHits search(IngridQuery query, int start, final int length) throws Exception {
         Query nutchQuery = new Query();
         buildNutchQuery(query, nutchQuery);
-        Hits hits = this.fNutchBean.search(nutchQuery, lenght);
-        return translateHits(hits, start, lenght);
+        Hits hits = this.fNutchBean.search(nutchQuery, length);
+
+        int count = length - start;
+        count = Math.min(count, hits.getLength());
+
+        String[] content = getSummary(hits, start, count, nutchQuery);
+
+        return translateHits(hits, content, count);
     }
 
     /**
+     * Translates the Nutch-Hits to IngridHits.
+     * 
      * @param hits
-     * @param start
+     * @param content
      * @param length
-     * @return ingridHits translated from nutch hits
+     * @return IngridHits translated from nutch hits.
      */
-    private IngridHits translateHits(Hits hits, int start, int length) {
-        int count = length - start;
-        count = Math.min(count, hits.getLength());
-        IngridHit[] ingridHits = new IngridHit[count];
-        for (int i = 0; i < count; i++) {
+    private IngridHits translateHits(Hits hits, String[] content, int length) {
+        IngridHit[] ingridHits = new IngridHit[length];
+        for (int i = 0; i < length; i++) {
             Hit hit = hits.getHit(i);
-            float score = ((FloatWritable) hit.getSortValue()).get();
-            ingridHits[i] = new IngridHit(this.fProviderId,
-                    hit.getIndexDocNo(), hit.getIndexNo(), score);
+            final float score = ((FloatWritable) hit.getSortValue()).get();
+            final int documentId = hit.getIndexDocNo();
+            final int datasourceId = hit.getIndexNo();
 
+            IngridHit ingridHit = new IngridHit(this.fProviderId, documentId, datasourceId, score);
+            ingridHit.put(IngridDocument.DOCUMENT_CONTENT, content[i]);
+            ingridHits[i] = ingridHit;
         }
 
-        return new IngridHits(fProviderId, hits.getTotal(), ingridHits);
+        return new IngridHits(this.fProviderId, hits.getTotal(), ingridHits);
+    }
+
+    private String[] getSummary(final Hits hits, final int start, final int length, Query nutchQuery)
+            throws IOException {
+        Hit[] hitArray = hits.getHits(start, length);
+        HitDetails[] hitDetailsArray = this.fNutchBean.getDetails(hitArray);
+
+        return this.fNutchBean.getSummary(hitDetailsArray, nutchQuery);
     }
 
     /**
@@ -111,14 +120,13 @@ public class NutchSearcher implements IPlug, IDetailer {
             TermQuery termQuery = terms[i];
             boolean prohibited = termQuery.getOperation() == IngridQuery.NOT;
             boolean required = termQuery.getOperation() == IngridQuery.AND;
-            boolean optonal = termQuery.getOperation() == IngridQuery.OR;
+            boolean optional = termQuery.getOperation() == IngridQuery.OR;
             if (required) {
                 out.addRequiredTerm(termQuery.getTerm());
             } else if (prohibited) {
                 out.addProhibitedTerm(termQuery.getTerm());
-            } else if (optonal) {
-                throw new UnsupportedOperationException(
-                        "'non required' actually not implemented, INGRID-455");
+            } else if (optional) {
+                throw new UnsupportedOperationException("'non required' actually not implemented, INGRID-455");
             }
 
         }
@@ -130,14 +138,11 @@ public class NutchSearcher implements IPlug, IDetailer {
             boolean required = fieldQuery.getOperation() == IngridQuery.AND;
             boolean optonal = fieldQuery.getOperation() == IngridQuery.OR;
             if (required) {
-                out.addRequiredTerm(fieldQuery.getFieldValue(), fieldQuery
-                        .getFieldName());
+                out.addRequiredTerm(fieldQuery.getFieldValue(), fieldQuery.getFieldName());
             } else if (prohibited) {
-                out.addProhibitedTerm(fieldQuery.getFieldValue(), fieldQuery
-                        .getFieldName());
+                out.addProhibitedTerm(fieldQuery.getFieldValue(), fieldQuery.getFieldName());
             } else if (optonal) {
-                throw new UnsupportedOperationException(
-                        "'non required' actually not implemented, INGRID-455");
+                throw new UnsupportedOperationException("'non required' actually not implemented, INGRID-455");
             }
 
         }
@@ -146,8 +151,7 @@ public class NutchSearcher implements IPlug, IDetailer {
 
         ClauseQuery[] clauses = query.getClauses();
         for (int i = 0; i < clauses.length; i++) {
-            throw new UnsupportedOperationException(
-                    "'sub Clauses' actually not implemented, INGRID-455");
+            throw new UnsupportedOperationException("'sub Clauses' actually not implemented, INGRID-455");
         }
 
     }
@@ -158,9 +162,8 @@ public class NutchSearcher implements IPlug, IDetailer {
      * @see de.ingrid.utils.IDetailer#getDetails(de.ingrid.utils.IngridHit)
      */
     public IngridDocument getDetails(IngridHit ingridHit) throws Exception {
-        Hit hit = new Hit(ingridHit.getDataSourceId(), ingridHit
-                .getDocumentId());
-        HitDetails details = fNutchBean.getDetails(hit);
+        Hit hit = new Hit(ingridHit.getDataSourceId(), ingridHit.getDocumentId());
+        HitDetails details = this.fNutchBean.getDetails(hit);
         IngridDocument document = new IngridDocument();
         int fieldCount = details.getLength();
         for (int i = 0; i < fieldCount; i++) {
@@ -170,18 +173,21 @@ public class NutchSearcher implements IPlug, IDetailer {
         return document;
     }
 
+    /**
+     * @param args
+     * @throws ParseException
+     * @throws Exception
+     */
     public static void main(String[] args) throws ParseException, Exception {
         String usage = "-d FolderToNutchIndex -q query";
-        if (args.length < 4 || !args[0].startsWith("-d")
-                || !args[2].startsWith("-q")) {
+        if (args.length < 4 || !args[0].startsWith("-d") || !args[2].startsWith("-q")) {
             System.err.println(usage);
             System.exit(-1);
         }
         File indexFolder = new File(args[1]);
         String query = args[3];
         NutchSearcher searcher = new NutchSearcher(indexFolder, "aTestId");
-        IngridHits hits = searcher
-                .search(QueryStringParser.parse(query), 0, 10);
+        IngridHits hits = searcher.search(QueryStringParser.parse(query), 0, 10);
         System.out.println("Results: " + hits.length());
         System.out.println();
         IngridHit[] ingridHits = hits.getHits();
@@ -191,7 +197,5 @@ public class NutchSearcher implements IPlug, IDetailer {
             System.out.println("details:");
             System.out.println(searcher.getDetails(hit).toString());
         }
-
     }
-
 }
