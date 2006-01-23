@@ -65,14 +65,17 @@ public class NutchSearcher implements IPlug, IDetailer {
     public IngridHits search(IngridQuery query, int start, final int length) throws Exception {
         Query nutchQuery = new Query();
         buildNutchQuery(query, nutchQuery);
-        Hits hits = this.fNutchBean.search(nutchQuery, length);
+        Hits hits = this.fNutchBean.search(nutchQuery, start + length);
 
-        int count = length - start;
-        count = Math.min(count, hits.getLength());
+        int count = hits.getLength();
+        int max = 0;
+        final int countMinusStart = count - start;
+        if (countMinusStart >= 0) {
+            max = Math.min(length, countMinusStart);
+        }
+        String[] content = getSummary(hits, start, max, nutchQuery);
 
-        String[] content = getSummary(hits, start, count, nutchQuery);
-
-        return translateHits(hits, content, count);
+        return translateHits(hits, content, start, max);
     }
 
     /**
@@ -83,17 +86,17 @@ public class NutchSearcher implements IPlug, IDetailer {
      * @param length
      * @return IngridHits translated from nutch hits.
      */
-    private IngridHits translateHits(Hits hits, String[] content, int length) {
+    private IngridHits translateHits(Hits hits, String[] content, int start, int length) {
         IngridHit[] ingridHits = new IngridHit[length];
-        for (int i = 0; i < length; i++) {
+        for (int i = start; i < (length + start); i++) {
             Hit hit = hits.getHit(i);
             final float score = ((FloatWritable) hit.getSortValue()).get();
             final int documentId = hit.getIndexDocNo();
             final int datasourceId = hit.getIndexNo();
 
             IngridHit ingridHit = new IngridHit(this.fProviderId, documentId, datasourceId, score);
-            ingridHit.put(IngridDocument.DOCUMENT_CONTENT, content[i]);
-            ingridHits[i] = ingridHit;
+            ingridHit.put(IngridDocument.DOCUMENT_CONTENT, content[i - start]);
+            ingridHits[i - start] = ingridHit;
         }
 
         return new IngridHits(this.fProviderId, hits.getTotal(), ingridHits);
@@ -153,7 +156,6 @@ public class NutchSearcher implements IPlug, IDetailer {
         for (int i = 0; i < clauses.length; i++) {
             throw new UnsupportedOperationException("'sub Clauses' actually not implemented, INGRID-455");
         }
-
     }
 
     /*
