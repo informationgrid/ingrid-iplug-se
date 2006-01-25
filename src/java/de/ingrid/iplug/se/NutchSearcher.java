@@ -24,8 +24,7 @@ import de.ingrid.utils.queryparser.ParseException;
 import de.ingrid.utils.queryparser.QueryStringParser;
 
 /**
- * A nutch Iplug
- * 
+ * A nutch Iplug.
  */
 public class NutchSearcher implements IPlug, IDetailer {
 
@@ -34,7 +33,7 @@ public class NutchSearcher implements IPlug, IDetailer {
     private String fProviderId;
 
     /**
-     * default constructor...
+     * The default constructor.
      */
     public NutchSearcher() {
         // nothing to do..
@@ -73,41 +72,33 @@ public class NutchSearcher implements IPlug, IDetailer {
         if (countMinusStart >= 0) {
             max = Math.min(length, countMinusStart);
         }
-        String[] content = getSummary(hits, start, max, nutchQuery);
 
-        return translateHits(hits, content, start, max);
+        return translateHits(hits, start, max);
     }
 
     /**
      * Translates the Nutch-Hits to IngridHits.
      * 
      * @param hits
-     * @param content
+     * @param start
      * @param length
      * @return IngridHits translated from nutch hits.
      */
-    private IngridHits translateHits(Hits hits, String[] content, int start, int length) {
+    private IngridHits translateHits(Hits hits, int start, int length) {
         IngridHit[] ingridHits = new IngridHit[length];
         for (int i = start; i < (length + start); i++) {
             Hit hit = hits.getHit(i);
             final float score = ((FloatWritable) hit.getSortValue()).get();
+            //normalize score
+            
             final int documentId = hit.getIndexDocNo();
             final int datasourceId = hit.getIndexNo();
 
             IngridHit ingridHit = new IngridHit(this.fProviderId, documentId, datasourceId, score);
-            ingridHit.put(IngridDocument.DOCUMENT_CONTENT, content[i - start]);
             ingridHits[i - start] = ingridHit;
         }
 
         return new IngridHits(this.fProviderId, hits.getTotal(), ingridHits);
-    }
-
-    private String[] getSummary(final Hits hits, final int start, final int length, Query nutchQuery)
-            throws IOException {
-        Hit[] hitArray = hits.getHits(start, length);
-        HitDetails[] hitDetailsArray = this.fNutchBean.getDetails(hitArray);
-
-        return this.fNutchBean.getSummary(hitDetailsArray, nutchQuery);
     }
 
     /**
@@ -151,7 +142,6 @@ public class NutchSearcher implements IPlug, IDetailer {
         }
 
         // subclauses
-
         ClauseQuery[] clauses = query.getClauses();
         for (int i = 0; i < clauses.length; i++) {
             throw new UnsupportedOperationException("'sub Clauses' actually not implemented, INGRID-455");
@@ -199,5 +189,10 @@ public class NutchSearcher implements IPlug, IDetailer {
             System.out.println("details:");
             System.out.println(searcher.getDetails(hit).toString());
         }
+    }
+
+    private float normalize(float value, float min, float max) {
+        // new_value = ((value - min_value) / (max_value - min_value)) * (new_max_value - new_min_value) + new_min_value
+        return ((value - min) / (max - min));
     }
 }
