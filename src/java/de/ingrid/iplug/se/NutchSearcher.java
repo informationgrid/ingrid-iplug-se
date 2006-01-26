@@ -14,7 +14,6 @@ import org.apache.nutch.searcher.Query;
 
 import de.ingrid.iplug.IPlug;
 import de.ingrid.iplug.PlugDescription;
-import de.ingrid.utils.IDetailer;
 import de.ingrid.utils.IngridDocument;
 import de.ingrid.utils.IngridHit;
 import de.ingrid.utils.IngridHits;
@@ -28,7 +27,7 @@ import de.ingrid.utils.queryparser.QueryStringParser;
 /**
  * A nutch IPlug.
  */
-public class NutchSearcher implements IPlug, IDetailer {
+public class NutchSearcher implements IPlug {
 
     private Log fLogger = LogFactory.getLog(this.getClass());
 
