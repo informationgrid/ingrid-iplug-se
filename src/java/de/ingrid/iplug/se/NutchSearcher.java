@@ -3,6 +3,8 @@ package de.ingrid.iplug.se;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.nutch.io.FloatWritable;
 import org.apache.nutch.searcher.Hit;
 import org.apache.nutch.searcher.HitDetails;
@@ -24,10 +26,12 @@ import de.ingrid.utils.queryparser.ParseException;
 import de.ingrid.utils.queryparser.QueryStringParser;
 
 /**
- * A nutch Iplug.
+ * A nutch IPlug.
  */
 public class NutchSearcher implements IPlug, IDetailer {
 
+    private Log fLogger = LogFactory.getLog(this.getClass());
+    
     private NutchBean fNutchBean;
 
     private String fProviderId;
@@ -82,19 +86,23 @@ public class NutchSearcher implements IPlug, IDetailer {
      * @param hits
      * @param start
      * @param length
-     * @return IngridHits translated from nutch hits.
+     * @return IngridHits The hits translated from nutch hits.
      */
     private IngridHits translateHits(Hits hits, int start, int length) {
         IngridHit[] ingridHits = new IngridHit[length];
         for (int i = start; i < (length + start); i++) {
             Hit hit = hits.getHit(i);
             final float score = ((FloatWritable) hit.getSortValue()).get();
-            //normalize score
-            
+            //FIXME: Find the max value of the score.
+            //final float normScore = normalize(score, 0, 1000);
+            final float normScore = score;
+            if (this.fLogger.isDebugEnabled()) {
+                this.fLogger.debug("The nutch score: " + score + " and mormalized score: " + normScore);
+            }
             final int documentId = hit.getIndexDocNo();
             final int datasourceId = hit.getIndexNo();
 
-            IngridHit ingridHit = new IngridHit(this.fProviderId, documentId, datasourceId, score);
+            IngridHit ingridHit = new IngridHit(this.fProviderId, documentId, datasourceId, normScore);
             ingridHits[i - start] = ingridHit;
         }
 
@@ -162,6 +170,7 @@ public class NutchSearcher implements IPlug, IDetailer {
             String field = details.getField(i);
             document.put(field, details.getValue(field));
         }
+
         return document;
     }
 
