@@ -33,7 +33,6 @@ public class NutchSearcher implements IPlug {
 
     private NutchBean fNutchBean;
 
-    private String fProviderId;
 
     private String fPlugId;
 
@@ -48,18 +47,17 @@ public class NutchSearcher implements IPlug {
      * JUST FOR TESTING...
      * 
      * @param indexFolder
-     * @param providerId
+     * @param plugId
      * @throws IOException
      */
-    public NutchSearcher(File indexFolder, String providerId) throws IOException {
+    public NutchSearcher(File indexFolder, String plugId) throws IOException {
         this.fNutchBean = new NutchBean(indexFolder);
-        this.fProviderId = providerId;
+        this.fPlugId = plugId;
     }
 
     public void configure(PlugDescription plugDescription) throws Exception {
         this.fPlugId = plugDescription.getPlugId();
         this.fNutchBean = new NutchBean(new File(plugDescription.getWorkinDirectory(), "nutch"));
-        this.fProviderId = plugDescription.getIPlugClass() + plugDescription.getOrganisation();
     }
 
     /*
@@ -103,12 +101,11 @@ public class NutchSearcher implements IPlug {
             final int documentId = hit.getIndexDocNo();
             final int datasourceId = hit.getIndexNo();
 
-            IngridHit ingridHit = new IngridHit(this.fProviderId, documentId, datasourceId, normScore);
-            ingridHit.setIPlugId(this.fPlugId);
+            IngridHit ingridHit = new IngridHit(this.fPlugId, documentId, datasourceId, normScore);
             ingridHits[i - start] = ingridHit;
         }
 
-        return new IngridHits(this.fProviderId, hits.getTotal(), ingridHits);
+        return new IngridHits(this.fPlugId, hits.getTotal(), ingridHits);
     }
 
     /**
