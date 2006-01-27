@@ -35,6 +35,8 @@ public class NutchSearcher implements IPlug {
 
     private String fProviderId;
 
+    private String fPlugId;
+
     /**
      * The default constructor.
      */
@@ -55,6 +57,7 @@ public class NutchSearcher implements IPlug {
     }
 
     public void configure(PlugDescription plugDescription) throws Exception {
+        this.fPlugId = plugDescription.getPlugId();
         this.fNutchBean = new NutchBean(new File(plugDescription.getWorkinDirectory(), "nutch"));
         this.fProviderId = plugDescription.getIPlugClass() + plugDescription.getOrganisation();
     }
@@ -101,6 +104,7 @@ public class NutchSearcher implements IPlug {
             final int datasourceId = hit.getIndexNo();
 
             IngridHit ingridHit = new IngridHit(this.fProviderId, documentId, datasourceId, normScore);
+            ingridHit.setIPlugId(this.fPlugId);
             ingridHits[i - start] = ingridHit;
         }
 
