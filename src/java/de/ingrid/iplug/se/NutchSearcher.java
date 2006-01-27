@@ -14,8 +14,8 @@ import org.apache.nutch.searcher.Query;
 
 import de.ingrid.iplug.IPlug;
 import de.ingrid.iplug.PlugDescription;
-import de.ingrid.utils.IngridDocument;
 import de.ingrid.utils.IngridHit;
+import de.ingrid.utils.IngridHitDetail;
 import de.ingrid.utils.IngridHits;
 import de.ingrid.utils.query.ClauseQuery;
 import de.ingrid.utils.query.FieldQuery;
@@ -160,16 +160,22 @@ public class NutchSearcher implements IPlug {
      * 
      * @see de.ingrid.utils.IDetailer#getDetails(de.ingrid.utils.IngridHit)
      */
-    public IngridDocument getDetails(IngridHit ingridHit) throws Exception {
+    public IngridHitDetail getDetails(IngridHit ingridHit, IngridQuery ingridQuery) throws Exception {
+        // query required for summary caculation
+        Query nutchQuery = new Query();
+        buildNutchQuery(ingridQuery, nutchQuery);
+        // nutch hit detail
         Hit hit = new Hit(ingridHit.getDataSourceId(), ingridHit.getDocumentId());
         HitDetails details = this.fNutchBean.getDetails(hit);
-        IngridDocument document = new IngridDocument();
+        String title = details.getValue("title");
+        String summary  = this.fNutchBean.getSummary(details, nutchQuery);
+        // push values into hit detail
+        IngridHitDetail document = new IngridHitDetail(ingridHit, title, summary);
         int fieldCount = details.getLength();
         for (int i = 0; i < fieldCount; i++) {
             String field = details.getField(i);
             document.put(field, details.getValue(field));
         }
-
         return document;
     }
 
@@ -195,7 +201,7 @@ public class NutchSearcher implements IPlug {
             IngridHit hit = ingridHits[i];
             System.out.println("hist: " + hit.toString());
             System.out.println("details:");
-            System.out.println(searcher.getDetails(hit).toString());
+            System.out.println(searcher.getDetails(hit, QueryStringParser.parse(query)).toString());
         }
     }
 
