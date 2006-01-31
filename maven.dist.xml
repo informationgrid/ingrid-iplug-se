@@ -1,0 +1,19 @@
+<project xmlns:deploy="deploy">
+    
+    <goal name="binary">
+        <attainGoal name="jar" />
+		<mkdir dir="${maven.build.dir}/binary/${pom.artifactId}-${pom.currentVersion}" />
+		<mkdir dir="${maven.build.dir}/binary/${pom.artifactId}-${pom.currentVersion}/lib" />
+		<mkdir dir="${maven.build.dir}/binary/${pom.artifactId}-${pom.currentVersion}/conf" />
+        <!-- copy the shell script -->
+        <copy tofile="${maven.build.dir}/binary/${pom.artifactId}-${pom.currentVersion}/start.sh" file="${basedir}/src/scripts/start.sh"/>
+        <!-- copy the project jar -->
+        <copy tofile="${maven.build.dir}/binary/${pom.artifactId}-${pom.currentVersion}/lib/${pom.artifactId}-${pom.currentVersion}.jar" file="${maven.build.dir}/${pom.artifactId}-${pom.currentVersion}.jar"/>
+        <!-- copy the conf -->
+        <copy todir="${maven.build.dir}/binary/${pom.artifactId}-${pom.currentVersion}/conf">
+		    <fileset dir="${basedir}/src/conf" />
+  		</copy>
+        <!-- copy the dependencies -->
+        <deploy:copy-deps todir="${maven.build.dir}/binary/${pom.artifactId}-${pom.currentVersion}/lib" />
+    </goal>
+</project>
