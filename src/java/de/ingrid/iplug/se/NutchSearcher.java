@@ -2,9 +2,11 @@ package de.ingrid.iplug.se;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.nutch.io.FloatWritable;
 import org.apache.nutch.searcher.Hit;
 import org.apache.nutch.searcher.HitDetails;
@@ -113,8 +115,9 @@ public class NutchSearcher implements IPlug {
      * 
      * @param query
      * @param out
+     * @throws IOException 
      */
-    private void buildNutchQuery(IngridQuery query, Query out) {
+    private void buildNutchQuery(IngridQuery query, Query out) throws IOException {
         // term queries
         TermQuery[] terms = query.getTerms();
         for (int i = 0; i < terms.length; i++) {
@@ -123,9 +126,9 @@ public class NutchSearcher implements IPlug {
             boolean required = termQuery.getOperation() == IngridQuery.AND;
             boolean optional = termQuery.getOperation() == IngridQuery.OR;
             if (required) {
-                out.addRequiredTerm(termQuery.getTerm());
+                out.addRequiredTerm(filterTerm(termQuery.getTerm()));
             } else if (prohibited) {
-                out.addProhibitedTerm(termQuery.getTerm());
+                out.addProhibitedTerm(filterTerm(termQuery.getTerm()));
             } else if (optional) {
                 throw new UnsupportedOperationException("'non required' actually not implemented, INGRID-455");
             }
@@ -139,9 +142,9 @@ public class NutchSearcher implements IPlug {
             boolean required = fieldQuery.getOperation() == IngridQuery.AND;
             boolean optonal = fieldQuery.getOperation() == IngridQuery.OR;
             if (required) {
-                out.addRequiredTerm(fieldQuery.getFieldValue(), fieldQuery.getFieldName());
+                out.addRequiredTerm(filterTerm(fieldQuery.getFieldValue()), fieldQuery.getFieldName());
             } else if (prohibited) {
-                out.addProhibitedTerm(fieldQuery.getFieldValue(), fieldQuery.getFieldName());
+                out.addProhibitedTerm(filterTerm(fieldQuery.getFieldValue()), fieldQuery.getFieldName());
             } else if (optonal) {
                 throw new UnsupportedOperationException("'non required' actually not implemented, INGRID-455");
             }
@@ -153,6 +156,11 @@ public class NutchSearcher implements IPlug {
         for (int i = 0; i < clauses.length; i++) {
             throw new UnsupportedOperationException("'sub Clauses' actually not implemented, INGRID-455");
         }
+    }
+    
+
+    private String filterTerm(String term) throws IOException {
+        return new StandardAnalyzer().tokenStream(null, new StringReader(term)).next().termText();
     }
 
     /*
