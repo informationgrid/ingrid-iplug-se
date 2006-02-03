@@ -223,5 +223,4 @@ public class NutchSearcher implements IPlug {
 
         return ((value - min) / (max - min));
     }
-    
 }
