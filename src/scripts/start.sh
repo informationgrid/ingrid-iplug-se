@@ -26,6 +26,10 @@ done
 THIS_DIR=`dirname "$THIS"`
 INGRID_HOME=`cd "$THIS_DIR" ; pwd`
 
+# first sync libs
+echo '... syncronize libs from repository'
+rsync -av --update --existing $INGRID_HOME/../repository/ $INGRID_HOME/lib/
+
 # some Java parameters
 if [ "$INGRID_JAVA_HOME" != "" ]; then
   #echo "run java in $INGRID_JAVA_HOME"
