@@ -126,7 +126,7 @@ public class NutchSearcher implements IPlug {
             ingridHits[i - start] = ingridHit;
         }
 
-        return new IngridHits(this.fPlugId, hits.getTotal(), ingridHits);
+        return new IngridHits(this.fPlugId, hits.getTotal(), ingridHits, true);
     }
 
     /**
