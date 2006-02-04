@@ -114,10 +114,10 @@ public class NutchSearcher implements IPlug {
             final float score = ((FloatWritable) hit.getSortValue()).get();
             // FIXME: Find the max value of the score.
             final float normScore = normalize(score, 0, 50);
-            if (this.fLogger.isDebugEnabled()) {
-                this.fLogger.debug("The nutch score: " + score
-                        + " and mormalized score: " + normScore);
-            }
+//            if (this.fLogger.isDebugEnabled()) {
+//                this.fLogger.debug("The nutch score: " + score
+//                        + " and mormalized score: " + normScore);
+//            }
             final int documentId = hit.getIndexDocNo();
             final int datasourceId = hit.getIndexNo();
 
