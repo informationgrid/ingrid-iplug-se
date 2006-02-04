@@ -59,6 +59,7 @@ public class NutchSearcher implements IPlug {
             throws IOException {
         this.fNutchBean = new NutchBean(conf, indexFolder);
         this.fPlugId = plugId;
+        this.fNutchConf = conf;
     }
 
     public void configure(PlugDescription plugDescription) throws Exception {
@@ -81,6 +82,7 @@ public class NutchSearcher implements IPlug {
         }
         Query nutchQuery = new Query(this.fNutchConf);
         buildNutchQuery(query, nutchQuery);
+        System.out.println(nutchQuery.toString());
         if (fLogger.isDebugEnabled()) {
             fLogger.debug("nutch query: " + nutchQuery.toString());
         }
@@ -136,6 +138,11 @@ public class NutchSearcher implements IPlug {
      */
     private void buildNutchQuery(IngridQuery query, Query out)
             throws IOException {
+        // first we add the datatype in case there is one setted
+        if (query.getDataType() != null) {
+            out.addRequiredTerm(query.getDataType(), "datatype");
+        }
+
         // term queries
         TermQuery[] terms = query.getTerms();
         for (int i = 0; i < terms.length; i++) {
@@ -228,7 +235,8 @@ public class NutchSearcher implements IPlug {
         }
         File indexFolder = new File(args[1]);
         String query = args[3];
-        NutchSearcher searcher = new NutchSearcher(indexFolder, "aTestId", new NutchConf());
+        NutchSearcher searcher = new NutchSearcher(indexFolder, "aTestId",
+                new NutchConf());
         IngridHits hits = searcher
                 .search(QueryStringParser.parse(query), 0, 10);
         System.out.println("Results: " + hits.length());
