@@ -113,7 +113,7 @@ public class NutchSearcher implements IPlug {
             Hit hit = hits.getHit(i);
             final float score = ((FloatWritable) hit.getSortValue()).get();
             // FIXME: Find the max value of the score.
-            final float normScore = normalize(score, 0, 50);
+//            final float normScore = normalize(score, 0, 50);
 //            if (this.fLogger.isDebugEnabled()) {
 //                this.fLogger.debug("The nutch score: " + score
 //                        + " and mormalized score: " + normScore);
@@ -122,7 +122,7 @@ public class NutchSearcher implements IPlug {
             final int datasourceId = hit.getIndexNo();
 
             IngridHit ingridHit = new IngridHit(this.fPlugId, documentId,
-                    datasourceId, normScore);
+                    datasourceId, score);
             ingridHits[i - start] = ingridHit;
         }
 
@@ -251,13 +251,13 @@ public class NutchSearcher implements IPlug {
         }
     }
 
-    private float normalize(float value, float min, float max) {
-        // new_value = ((value - min_value) / (max_value - min_value)) *
-        // (new_max_value - new_min_value) + new_min_value
-        if (value > max) {
-            value = max;
-        }
-
-        return ((value - min) / (max - min));
-    }
+//    private float normalize(float value, float min, float max) {
+//        // new_value = ((value - min_value) / (max_value - min_value)) *
+//        // (new_max_value - new_min_value) + new_min_value
+//        if (value > max) {
+//            value = max;
+//        }
+//
+//        return ((value - min) / (max - min));
+//    }
 }
