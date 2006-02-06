@@ -34,11 +34,11 @@ public class NutchSearcher implements IPlug {
 
     private Log fLogger = LogFactory.getLog(this.getClass());
 
-    private NutchBean fNutchBean;
+    private static NutchBean fNutchBean;
 
     private String fPlugId;
 
-    private NutchConf fNutchConf;
+    private static NutchConf fNutchConf;
 
     /**
      * The default constructor.
@@ -64,9 +64,13 @@ public class NutchSearcher implements IPlug {
 
     public void configure(PlugDescription plugDescription) throws Exception {
         this.fPlugId = plugDescription.getPlugId();
-        this.fNutchConf = new NutchConf();
-        this.fNutchBean = new NutchBean(this.fNutchConf, new File(
-                plugDescription.getWorkinDirectory(), "nutch"));
+        if(fNutchConf==null){
+            this.fNutchConf = new NutchConf();
+        }
+        if (fNutchBean == null) {
+            this.fNutchBean = new NutchBean(this.fNutchConf, new File(plugDescription.getWorkinDirectory(), "nutch"));
+        }
+      
     }
 
     /*
