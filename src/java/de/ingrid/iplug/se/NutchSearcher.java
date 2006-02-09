@@ -144,6 +144,8 @@ public class NutchSearcher implements IPlug {
      */
     private void buildNutchQuery(IngridQuery query, Query out)
             throws IOException {
+        
+        // FIXME handling DEFAUL datatype, handling exception datatype:default + datatype:research 
         // first we add the datatype in case there is one setted
         FieldQuery[] dataTypes = query.getDataTypes();
         int count = dataTypes.length;
