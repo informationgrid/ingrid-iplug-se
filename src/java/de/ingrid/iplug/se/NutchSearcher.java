@@ -70,7 +70,7 @@ public class NutchSearcher implements IPlug {
             this.fNutchConf = new NutchConf();
         }
         if (fNutchBean == null) {
-            this.fNutchBean = new NutchBean(this.fNutchConf, new File(plugDescription.getWorkinDirectory(), "nutch"));
+            this.fNutchBean = new NutchBean(this.fNutchConf, plugDescription.getWorkinDirectory());
         }
       
     }
