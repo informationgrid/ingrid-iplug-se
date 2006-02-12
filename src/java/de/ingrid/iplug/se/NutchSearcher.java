@@ -15,11 +15,11 @@ import org.apache.nutch.searcher.NutchBean;
 import org.apache.nutch.searcher.Query;
 import org.apache.nutch.util.NutchConf;
 
-import de.ingrid.iplug.IPlug;
-import de.ingrid.iplug.PlugDescription;
+import de.ingrid.utils.IPlug;
 import de.ingrid.utils.IngridHit;
 import de.ingrid.utils.IngridHitDetail;
 import de.ingrid.utils.IngridHits;
+import de.ingrid.utils.PlugDescription;
 import de.ingrid.utils.query.ClauseQuery;
 import de.ingrid.utils.query.FieldQuery;
 import de.ingrid.utils.query.IngridQuery;
@@ -57,8 +57,7 @@ public class NutchSearcher implements IPlug {
      * @param conf
      * @throws IOException
      */
-    public NutchSearcher(File indexFolder, String plugId, NutchConf conf)
-            throws IOException {
+    public NutchSearcher(File indexFolder, String plugId, NutchConf conf) throws IOException {
         this.fNutchBean = new NutchBean(conf, indexFolder);
         this.fPlugId = plugId;
         this.fNutchConf = conf;
@@ -66,13 +65,13 @@ public class NutchSearcher implements IPlug {
 
     public void configure(PlugDescription plugDescription) throws Exception {
         this.fPlugId = plugDescription.getPlugId();
-        if(fNutchConf==null){
+        if (fNutchConf == null) {
             this.fNutchConf = new NutchConf();
         }
         if (fNutchBean == null) {
             this.fNutchBean = new NutchBean(this.fNutchConf, plugDescription.getWorkinDirectory());
         }
-      
+
     }
 
     /*
@@ -81,8 +80,7 @@ public class NutchSearcher implements IPlug {
      * @see de.ingrid.utils.ISearcher#search(de.ingrid.utils.query.IngridQuery,
      *      int, int)
      */
-    public IngridHits search(IngridQuery query, int start, final int length)
-            throws Exception {
+    public IngridHits search(IngridQuery query, int start, final int length) throws Exception {
         if (fLogger.isDebugEnabled()) {
             fLogger.debug("incomming query: " + query.toString());
         }
@@ -119,16 +117,15 @@ public class NutchSearcher implements IPlug {
             Hit hit = hits.getHit(i);
             final float score = ((FloatWritable) hit.getSortValue()).get();
             // FIXME: Find the max value of the score.
-//            final float normScore = normalize(score, 0, 50);
-//            if (this.fLogger.isDebugEnabled()) {
-//                this.fLogger.debug("The nutch score: " + score
-//                        + " and mormalized score: " + normScore);
-//            }
+            // final float normScore = normalize(score, 0, 50);
+            // if (this.fLogger.isDebugEnabled()) {
+            // this.fLogger.debug("The nutch score: " + score
+            // + " and mormalized score: " + normScore);
+            // }
             final int documentId = hit.getIndexDocNo();
             final int datasourceId = hit.getIndexNo();
 
-            IngridHit ingridHit = new IngridHit(this.fPlugId, documentId,
-                    datasourceId, score);
+            IngridHit ingridHit = new IngridHit(this.fPlugId, documentId, datasourceId, score);
             ingridHits[i - start] = ingridHit;
         }
 
@@ -142,10 +139,10 @@ public class NutchSearcher implements IPlug {
      * @param out
      * @throws IOException
      */
-    private void buildNutchQuery(IngridQuery query, Query out)
-            throws IOException {
-        
-        // FIXME handling DEFAUL datatype, handling exception datatype:default + datatype:research 
+    private void buildNutchQuery(IngridQuery query, Query out) throws IOException {
+
+        // FIXME handling DEFAUL datatype, handling exception datatype:default +
+        // datatype:research
         // first we add the datatype in case there is one setted
         FieldQuery[] dataTypes = query.getDataTypes();
         int count = dataTypes.length;
@@ -154,12 +151,11 @@ public class NutchSearcher implements IPlug {
             boolean required = dataType.isRequred();
             boolean prohibited = dataType.isProhibited();
             if (required) {
-                out.addRequiredTerm(dataType.getFieldValue(),DATATYPE);
+                out.addRequiredTerm(dataType.getFieldValue(), DATATYPE);
             } else if (prohibited) {
-                out.addProhibitedTerm(dataType.getFieldValue(),DATATYPE);
+                out.addProhibitedTerm(dataType.getFieldValue(), DATATYPE);
             } else if (!required) {
-                throw new UnsupportedOperationException(
-                        "'non required' actually not implemented, INGRID-455");
+                throw new UnsupportedOperationException("'non required' actually not implemented, INGRID-455");
             }
         }
 
@@ -169,14 +165,13 @@ public class NutchSearcher implements IPlug {
             TermQuery termQuery = terms[i];
             boolean prohibited = termQuery.isProhibited();
             boolean required = termQuery.isRequred();
-//            boolean optional = termQuery.getOperation() == IngridQuery.OR;
+            // boolean optional = termQuery.getOperation() == IngridQuery.OR;
             if (required) {
                 out.addRequiredTerm(filterTerm(termQuery.getTerm()));
             } else if (prohibited) {
                 out.addProhibitedTerm(filterTerm(termQuery.getTerm()));
             } else if (!required) {
-                throw new UnsupportedOperationException(
-                        "'non required' actually not implemented, INGRID-455");
+                throw new UnsupportedOperationException("'non required' actually not implemented, INGRID-455");
             }
 
         }
@@ -186,16 +181,13 @@ public class NutchSearcher implements IPlug {
             FieldQuery fieldQuery = fields[i];
             boolean prohibited = fieldQuery.isProhibited();
             boolean required = fieldQuery.isRequred();
-            
+
             if (required) {
-                out.addRequiredTerm(filterTerm(fieldQuery.getFieldValue()),
-                        fieldQuery.getFieldName());
+                out.addRequiredTerm(filterTerm(fieldQuery.getFieldValue()), fieldQuery.getFieldName());
             } else if (prohibited) {
-                out.addProhibitedTerm(filterTerm(fieldQuery.getFieldValue()),
-                        fieldQuery.getFieldName());
+                out.addProhibitedTerm(filterTerm(fieldQuery.getFieldValue()), fieldQuery.getFieldName());
             } else if (!required) {
-                throw new UnsupportedOperationException(
-                        "'non required' actually not implemented, INGRID-455");
+                throw new UnsupportedOperationException("'non required' actually not implemented, INGRID-455");
             }
 
         }
@@ -203,14 +195,12 @@ public class NutchSearcher implements IPlug {
         // subclauses
         ClauseQuery[] clauses = query.getClauses();
         for (int i = 0; i < clauses.length; i++) {
-            throw new UnsupportedOperationException(
-                    "'sub Clauses' actually not implemented, INGRID-455");
+            throw new UnsupportedOperationException("'sub Clauses' actually not implemented, INGRID-455");
         }
     }
 
     private String filterTerm(String term) throws IOException {
-        return new StandardAnalyzer().tokenStream(null, new StringReader(term))
-                .next().termText();
+        return new StandardAnalyzer().tokenStream(null, new StringReader(term)).next().termText();
     }
 
     /*
@@ -218,26 +208,37 @@ public class NutchSearcher implements IPlug {
      * 
      * @see de.ingrid.utils.IDetailer#getDetails(de.ingrid.utils.IngridHit)
      */
-    public IngridHitDetail getDetail(IngridHit ingridHit,
-            IngridQuery ingridQuery) throws Exception {
+    public IngridHitDetail getDetail(IngridHit ingridHit, IngridQuery ingridQuery, String[] fields) throws Exception {
         // query required for summary caculation
         Query nutchQuery = new Query(this.fNutchConf);
         buildNutchQuery(ingridQuery, nutchQuery);
         // nutch hit detail
-        Hit hit = new Hit(ingridHit.getDataSourceId(), ingridHit
-                .getDocumentId());
+        Hit hit = new Hit(ingridHit.getDataSourceId(), ingridHit.getDocumentId());
         HitDetails details = this.fNutchBean.getDetails(hit);
         String title = details.getValue("title");
         String summary = this.fNutchBean.getSummary(details, nutchQuery);
         // push values into hit detail
-        IngridHitDetail document = new IngridHitDetail(ingridHit, title,
-                summary);
-        int fieldCount = details.getLength();
-        for (int i = 0; i < fieldCount; i++) {
-            String field = details.getField(i);
-            document.put(field, details.getValue(field));
+        IngridHitDetail ingridDetail = new IngridHitDetail(ingridHit, title, summary);
+
+        for (int i = 0; i < fields.length; i++) {
+            String string = fields[i];
+            String value = details.getValue(fields[i]);
+            if (value != null) {
+                ingridDetail.put(fields[i], value);
+            }
         }
-        return document;
+        return ingridDetail;
+    }
+    
+    /* (non-Javadoc)
+     * @see de.ingrid.utils.IDetailer#getDetails(de.ingrid.utils.IngridHit[], de.ingrid.utils.query.IngridQuery, java.lang.String[])
+     */
+    public IngridHitDetail[] getDetails(IngridHit[] hits, IngridQuery query, String[] requestedFields) throws Exception {
+        IngridHitDetail[] hitDetails = new IngridHitDetail[hits.length];
+        for (int i = 0; i < hits.length; i++) {
+            hitDetails[i] = getDetail(hits[i], query, requestedFields);
+        }
+        return hitDetails;
     }
 
     /**
@@ -248,17 +249,14 @@ public class NutchSearcher implements IPlug {
     public static void main(String[] args) throws ParseException, Exception {
 
         String usage = "-d FolderToNutchIndex -q query";
-        if (args.length < 4 || !args[0].startsWith("-d")
-                || !args[2].startsWith("-q")) {
+        if (args.length < 4 || !args[0].startsWith("-d") || !args[2].startsWith("-q")) {
             System.err.println(usage);
             System.exit(-1);
         }
         File indexFolder = new File(args[1]);
         String query = args[3];
-        NutchSearcher searcher = new NutchSearcher(indexFolder, "aTestId",
-                new NutchConf());
-        IngridHits hits = searcher
-                .search(QueryStringParser.parse(query), 0, 10);
+        NutchSearcher searcher = new NutchSearcher(indexFolder, "aTestId", new NutchConf());
+        IngridHits hits = searcher.search(QueryStringParser.parse(query), 0, 10);
         System.out.println("Results: " + hits.length());
         System.out.println();
         IngridHit[] ingridHits = hits.getHits();
@@ -266,18 +264,17 @@ public class NutchSearcher implements IPlug {
             IngridHit hit = ingridHits[i];
             System.out.println("hist: " + hit.toString());
             System.out.println("details:");
-            System.out.println(searcher.getDetail(hit,
-                    QueryStringParser.parse(query)).toString());
+            System.out.println(searcher.getDetail(hit, QueryStringParser.parse(query), new String[0] ).toString());
         }
     }
 
-//    private float normalize(float value, float min, float max) {
-//        // new_value = ((value - min_value) / (max_value - min_value)) *
-//        // (new_max_value - new_min_value) + new_min_value
-//        if (value > max) {
-//            value = max;
-//        }
-//
-//        return ((value - min) / (max - min));
-//    }
+    // private float normalize(float value, float min, float max) {
+    // // new_value = ((value - min_value) / (max_value - min_value)) *
+    // // (new_max_value - new_min_value) + new_min_value
+    // if (value > max) {
+    // value = max;
+    // }
+    //
+    // return ((value - min) / (max - min));
+    // }
 }
