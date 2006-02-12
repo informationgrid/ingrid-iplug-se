@@ -218,7 +218,7 @@ public class NutchSearcher implements IPlug {
      * 
      * @see de.ingrid.utils.IDetailer#getDetails(de.ingrid.utils.IngridHit)
      */
-    public IngridHitDetail getDetails(IngridHit ingridHit,
+    public IngridHitDetail getDetail(IngridHit ingridHit,
             IngridQuery ingridQuery) throws Exception {
         // query required for summary caculation
         Query nutchQuery = new Query(this.fNutchConf);
@@ -266,7 +266,7 @@ public class NutchSearcher implements IPlug {
             IngridHit hit = ingridHits[i];
             System.out.println("hist: " + hit.toString());
             System.out.println("details:");
-            System.out.println(searcher.getDetails(hit,
+            System.out.println(searcher.getDetail(hit,
                     QueryStringParser.parse(query)).toString());
         }
     }
