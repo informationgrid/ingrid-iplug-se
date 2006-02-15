@@ -216,12 +216,15 @@ public class NutchSearcher implements IPlug {
         Hit hit = new Hit(ingridHit.getDataSourceId(), ingridHit.getDocumentId());
         HitDetails details = this.fNutchBean.getDetails(hit);
         String title = details.getValue("title");
-        String summary = this.fNutchBean.getSummary(details, nutchQuery);
+        String summary;
+        synchronized (NutchSearcher.class) {
+             summary = this.fNutchBean.getSummary(details, nutchQuery);
+        }
+        
         // push values into hit detail
         IngridHitDetail ingridDetail = new IngridHitDetail(ingridHit, title, summary);
 
         for (int i = 0; i < fields.length; i++) {
-            String string = fields[i];
             String value = details.getValue(fields[i]);
             if (value != null) {
                 ingridDetail.put(fields[i], value);
