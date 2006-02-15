@@ -220,10 +220,10 @@ public class NutchSearcher implements IPlug {
         synchronized (NutchSearcher.class) {
              summary = this.fNutchBean.getSummary(details, nutchQuery);
         }
-        
+       
         // push values into hit detail
         IngridHitDetail ingridDetail = new IngridHitDetail(ingridHit, title, summary);
-
+        ingridDetail.put("url", details.getValue("url")); // TODO should that be a default value?
         for (int i = 0; i < fields.length; i++) {
             String value = details.getValue(fields[i]);
             if (value != null) {
