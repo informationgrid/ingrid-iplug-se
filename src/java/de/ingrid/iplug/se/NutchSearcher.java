@@ -6,6 +6,7 @@ import java.io.StringReader;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.nutch.io.FloatWritable;
 import org.apache.nutch.searcher.Hit;
@@ -200,7 +201,8 @@ public class NutchSearcher implements IPlug {
     }
 
     private String filterTerm(String term) throws IOException {
-        return new StandardAnalyzer().tokenStream(null, new StringReader(term)).next().termText();
+    	// FIXME DO WE REALLY NEED THIS`????
+        return new SimpleAnalyzer().tokenStream(null, new StringReader(term)).next().termText();
     }
 
     /*
