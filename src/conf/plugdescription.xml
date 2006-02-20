@@ -1,4 +1,4 @@
-<de.ingrid.iplug.PlugDescription>
+<de.ingrid.utils.PlugDescription>
   <int>13</int>
   <string>personPhone</string>
   <string>0345 5222 702</string>
@@ -21,9 +21,9 @@
   <string>personSureName</string>
   <string>Henze</string>
   <string>dataSourceDescription</string>
-  <string>Das ist eine Kurzbeschreibung für meine Webseiten</string>
+  <string>Das ist eine Kurzbeschreibung fï¿½r meine Webseiten</string>
   <string>personMail</string>
   <string>fh@media-style.com</string>
   <string>organisation</string>
-  <string>Meine Behörde</string>
-</de.ingrid.iplug.PlugDescription>
+  <string>Meine Behï¿½rde</string>
+</de.ingrid.utils.PlugDescription>
