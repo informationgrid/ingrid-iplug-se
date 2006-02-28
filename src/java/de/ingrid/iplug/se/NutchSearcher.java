@@ -7,7 +7,6 @@ import java.io.StringReader;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.SimpleAnalyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.nutch.io.FloatWritable;
 import org.apache.nutch.searcher.Hit;
 import org.apache.nutch.searcher.HitDetails;
@@ -210,34 +209,49 @@ public class NutchSearcher implements IPlug {
      * 
      * @see de.ingrid.utils.IDetailer#getDetails(de.ingrid.utils.IngridHit)
      */
-    public IngridHitDetail getDetail(IngridHit ingridHit, IngridQuery ingridQuery, String[] fields) throws Exception {
-        // query required for summary caculation
-        Query nutchQuery = new Query(this.fNutchConf);
-        buildNutchQuery(ingridQuery, nutchQuery);
-        // nutch hit detail
-        Hit hit = new Hit(ingridHit.getDataSourceId(), ingridHit.getDocumentId());
-        HitDetails details = this.fNutchBean.getDetails(hit);
-        String title = details.getValue("title");
-        String summary;
-        synchronized (NutchSearcher.class) {
-             summary = this.fNutchBean.getSummary(details, nutchQuery);
-        }
-       
-        // push values into hit detail
-        IngridHitDetail ingridDetail = new IngridHitDetail(ingridHit, title, summary);
-        ingridDetail.put("url", details.getValue("url")); // TODO should that be a default value?
-        for (int i = 0; i < fields.length; i++) {
-            String value = details.getValue(fields[i]);
-            if (value != null) {
-                ingridDetail.put(fields[i], value);
-            }
-        }
-        return ingridDetail;
-    }
+    public IngridHitDetail getDetail(IngridHit ingridHit,
+			IngridQuery ingridQuery, String[] fields) throws Exception {
+		// query required for summary caculation
+		Query nutchQuery = new Query(this.fNutchConf);
+		buildNutchQuery(ingridQuery, nutchQuery);
+		// nutch hit detail
+		Hit hit = new Hit(ingridHit.getDataSourceId(), ingridHit
+				.getDocumentId());
+		HitDetails details = null;
+		synchronized (NutchSearcher.class) {
+			details = this.fNutchBean.getDetails(hit);
+		}
+		if (details != null) {
+			String title = details.getValue("title");
+			String summary;
+			synchronized (NutchSearcher.class) {
+				summary = this.fNutchBean.getSummary(details, nutchQuery);
+			}
+
+			// push values into hit detail
+			IngridHitDetail ingridDetail = new IngridHitDetail(ingridHit,
+					title, summary);
+			ingridDetail.put("url", details.getValue("url")); // TODO should
+			// that be a
+			// default
+			// value?
+			for (int i = 0; i < fields.length; i++) {
+				String value = details.getValue(fields[i]);
+				if (value != null) {
+					ingridDetail.put(fields[i], value);
+				}
+			}
+			return ingridDetail;
+		}
+		return null;
+	}
     
-    /* (non-Javadoc)
-     * @see de.ingrid.utils.IDetailer#getDetails(de.ingrid.utils.IngridHit[], de.ingrid.utils.query.IngridQuery, java.lang.String[])
-     */
+    /*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.ingrid.utils.IDetailer#getDetails(de.ingrid.utils.IngridHit[],
+	 *      de.ingrid.utils.query.IngridQuery, java.lang.String[])
+	 */
     public IngridHitDetail[] getDetails(IngridHit[] hits, IngridQuery query, String[] requestedFields) throws Exception {
         IngridHitDetail[] hitDetails = new IngridHitDetail[hits.length];
         for (int i = 0; i < hits.length; i++) {
