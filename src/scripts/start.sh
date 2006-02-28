@@ -65,6 +65,10 @@ IFS=
 for f in $INGRID_HOME/lib/*.jar; do
   CLASSPATH=${CLASSPATH}:$f;
 done
+# add plugins to classpath
+if [ -d "$INGRID_HOME/plugins" ]; then
+  CLASSPATH=${INGRID_HOME}:${CLASSPATH}
+fi
 
 # restore ordinary behaviour
 unset IFS
