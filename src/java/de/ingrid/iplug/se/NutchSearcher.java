@@ -70,7 +70,7 @@ public class NutchSearcher implements IPlug {
         }
         if (fNutchBean == null) {
             this.fNutchBean = new NutchBean(this.fNutchConf, plugDescription.getWorkinDirectory());
-        }
+        } 
 
     }
 
@@ -232,15 +232,25 @@ public class NutchSearcher implements IPlug {
 			IngridHitDetail ingridDetail = new IngridHitDetail(ingridHit,
 					title, summary);
 			ingridDetail.put("url", details.getValue("url")); // TODO should
-			// that be a
-			// default
-			// value?
-			for (int i = 0; i < fields.length; i++) {
-				String value = details.getValue(fields[i]);
-				if (value != null) {
-					ingridDetail.put(fields[i], value);
+			
+			int length = details.getLength();
+			for (int i = 0; i < length; i++) {
+				String field = details.getField(i);
+				for (int j = 0; j < fields.length; j++) {
+					if(field.toLowerCase().equals(fields[j].toLowerCase())){
+						ingridDetail.addToList(fields[i], details.getValue(i));
+					}
 				}
 			}
+//			// that be a
+//			// default
+//			// value?
+//			for (int i = 0; i < fields.length; i++) {
+//				String value = details.getValue(fields[i]);
+//				if (value != null) {
+//					ingridDetail.addToList(fields[i], value);
+//				}
+//			}
 			return ingridDetail;
 		}
 		return null;
