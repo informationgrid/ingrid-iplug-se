@@ -238,7 +238,7 @@ public class NutchSearcher implements IPlug {
 				String field = details.getField(i);
 				for (int j = 0; j < fields.length; j++) {
 					if(field.toLowerCase().equals(fields[j].toLowerCase())){
-						ingridDetail.addToList(fields[i], details.getValue(i));
+						ingridDetail.addToList(fields[j], details.getValue(j));
 					}
 				}
 			}
