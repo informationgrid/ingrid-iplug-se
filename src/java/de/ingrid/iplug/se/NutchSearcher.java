@@ -210,7 +210,7 @@ public class NutchSearcher implements IPlug {
      * @see de.ingrid.utils.IDetailer#getDetails(de.ingrid.utils.IngridHit)
      */
     public IngridHitDetail getDetail(IngridHit ingridHit,
-			IngridQuery ingridQuery, String[] fields) throws Exception {
+			IngridQuery ingridQuery, String[] requestedFields) throws Exception {
 		// query required for summary caculation
 		Query nutchQuery = new Query(this.fNutchConf);
 		buildNutchQuery(ingridQuery, nutchQuery);
@@ -235,10 +235,11 @@ public class NutchSearcher implements IPlug {
 			
 			int length = details.getLength();
 			for (int i = 0; i < length; i++) {
-				String field = details.getField(i);
-				for (int j = 0; j < fields.length; j++) {
-					if(field.toLowerCase().equals(fields[j].toLowerCase())){
-						ingridDetail.addToList(fields[j], details.getValue(j));
+				String luceneField = details.getField(i);
+				
+				for (int j = 0; j < requestedFields.length; j++) {
+					if(luceneField.toLowerCase().equals(requestedFields[j].toLowerCase())){
+						ingridDetail.addToList(luceneField, details.getValue(i));
 					}
 				}
 			}
