@@ -218,13 +218,13 @@ public class NutchSearcher implements IPlug {
 		Hit hit = new Hit(ingridHit.getDataSourceId(), ingridHit
 				.getDocumentId());
 		HitDetails details = null;
-		synchronized (NutchSearcher.class) {
+		synchronized ( this.fNutchBean) {
 			details = this.fNutchBean.getDetails(hit);
 		}
 		if (details != null) {
 			String title = details.getValue("title");
 			String summary;
-			synchronized (NutchSearcher.class) {
+			synchronized ( this.fNutchBean) {
 				summary = this.fNutchBean.getSummary(details, nutchQuery);
 			}
 
