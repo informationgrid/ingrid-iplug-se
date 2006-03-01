@@ -242,15 +242,7 @@ public class NutchSearcher implements IPlug {
 					}
 				}
 			}
-//			// that be a
-//			// default
-//			// value?
-//			for (int i = 0; i < fields.length; i++) {
-//				String value = details.getValue(fields[i]);
-//				if (value != null) {
-//					ingridDetail.addToList(fields[i], value);
-//				}
-//			}
+
 			return ingridDetail;
 		}
 		return null;
