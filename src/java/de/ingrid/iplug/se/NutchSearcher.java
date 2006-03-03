@@ -229,7 +229,6 @@ public class NutchSearcher implements IPlug {
 			synchronized ( this.fNutchBean) {
 				summary = this.fNutchBean.getSummary(details, nutchQuery);
 			}
-
 			// push values into hit detail
 			IngridHitDetail ingridDetail = new IngridHitDetail(ingridHit,
 					title, summary);
