@@ -76,6 +76,13 @@
             <type>jar</type>
         </dependency>
         <dependency>
+            <groupId>nutch</groupId>
+            <artifactId>hadoop</artifactId>
+            <version>0.1-dev</version>
+            <url>http://torwald.gistec-online.de/ingrid/maven</url>
+            <type>jar</type>
+        </dependency>
+        <dependency>
             <groupId>ingrid</groupId>
             <artifactId>ingrid-iplug</artifactId>
             <version>0.1-SNAPSHOT</version>
