@@ -190,7 +190,6 @@ public class NutchSearcher implements IPlug {
             } else if (!required) {
                 throw new UnsupportedOperationException("'non required' actually not implemented, INGRID-455");
             }
-
         }
 
         // subclauses
