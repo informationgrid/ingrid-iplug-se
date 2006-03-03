@@ -8,19 +8,20 @@ package de.ingrid.iplug.se;
 
 import java.io.File;
 
-import org.apache.nutch.util.NutchConf;
+import junit.framework.TestCase;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.nutch.util.NutchConfiguration;
 
 import de.ingrid.utils.IngridHits;
 import de.ingrid.utils.query.IngridQuery;
 import de.ingrid.utils.queryparser.QueryStringParser;
 
-import junit.framework.TestCase;
-
 public class TestNutchSearch extends TestCase {
 
     public void testSearch() throws Exception {
         File file = new File("./testIndex");
-        NutchConf conf = new NutchConf();
+        Configuration conf = NutchConfiguration.create();
 
         conf.set("plugin.folders",
                 "/Users/joa23/Documents/workspace/nutch-trunk/src/plugin");

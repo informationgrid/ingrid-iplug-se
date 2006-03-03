@@ -6,14 +6,15 @@ import java.io.StringReader;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.io.FloatWritable;
 import org.apache.lucene.analysis.SimpleAnalyzer;
-import org.apache.nutch.io.FloatWritable;
 import org.apache.nutch.searcher.Hit;
 import org.apache.nutch.searcher.HitDetails;
 import org.apache.nutch.searcher.Hits;
 import org.apache.nutch.searcher.NutchBean;
 import org.apache.nutch.searcher.Query;
-import org.apache.nutch.util.NutchConf;
+import org.apache.nutch.util.NutchConfiguration;
 
 import de.ingrid.utils.IPlug;
 import de.ingrid.utils.IngridHit;
@@ -40,7 +41,7 @@ public class NutchSearcher implements IPlug {
 
     private String fPlugId;
 
-    private static NutchConf fNutchConf;
+    private static Configuration fNutchConf;
 
     /**
      * The default constructor.
@@ -57,7 +58,7 @@ public class NutchSearcher implements IPlug {
      * @param conf
      * @throws IOException
      */
-    public NutchSearcher(File indexFolder, String plugId, NutchConf conf) throws IOException {
+    public NutchSearcher(File indexFolder, String plugId, Configuration conf) throws IOException {
         this.fNutchBean = new NutchBean(conf, indexFolder);
         this.fPlugId = plugId;
         this.fNutchConf = conf;
@@ -66,7 +67,7 @@ public class NutchSearcher implements IPlug {
     public void configure(PlugDescription plugDescription) throws Exception {
         this.fPlugId = plugDescription.getPlugId();
         if (fNutchConf == null) {
-            this.fNutchConf = new NutchConf();
+            this.fNutchConf = NutchConfiguration.create();
         }
         if (fNutchBean == null) {
             this.fNutchBean = new NutchBean(this.fNutchConf, plugDescription.getWorkinDirectory());
@@ -211,6 +212,7 @@ public class NutchSearcher implements IPlug {
      */
     public IngridHitDetail getDetail(IngridHit ingridHit,
 			IngridQuery ingridQuery, String[] requestedFields) throws Exception {
+    		fLogger.debug("creating details for: " + ingridHit.toString());
 		// query required for summary caculation
 		Query nutchQuery = new Query(this.fNutchConf);
 		buildNutchQuery(ingridQuery, nutchQuery);
@@ -277,7 +279,7 @@ public class NutchSearcher implements IPlug {
         }
         File indexFolder = new File(args[1]);
         String query = args[3];
-        NutchSearcher searcher = new NutchSearcher(indexFolder, "aTestId", new NutchConf());
+        NutchSearcher searcher = new NutchSearcher(indexFolder, "aTestId", NutchConfiguration.create());
         IngridHits hits = searcher.search(QueryStringParser.parse(query), 0, 10);
         System.out.println("Results: " + hits.length());
         System.out.println();
