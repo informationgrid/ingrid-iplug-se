@@ -3,6 +3,7 @@ package de.ingrid.iplug.se;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -254,14 +255,15 @@ public class NutchSearcher implements IPlug {
 			int length = details.getLength();
 			for (int i = 0; i < length; i++) {
 				String luceneField = details.getField(i);
-
+				ArrayList arrayList = new ArrayList();
 				for (int j = 0; j < requestedFields.length; j++) {
 					if (luceneField.toLowerCase().equals(
 							requestedFields[j].toLowerCase())) {
-						ingridDetail
-								.addToList(luceneField, details.getValue(i));
+						arrayList.add(details.getValue(i));
 					}
 				}
+				ingridDetail.addToList(luceneField, (String[]) arrayList
+						.toArray(new String[arrayList.size()]));
 			}
 			return ingridDetail;
 		}
@@ -314,13 +316,13 @@ public class NutchSearcher implements IPlug {
 		}
 	}
 
-	// private float normalize(float value, float min, float max) {
-	// // new_value = ((value - min_value) / (max_value - min_value)) *
-	// // (new_max_value - new_min_value) + new_min_value
-	// if (value > max) {
-	// value = max;
-	// }
-	//
-	// return ((value - min) / (max - min));
-	// }
+	public void close() throws IOException {
+		synchronized (this.fNutchBean) {
+			if (this.fNutchBean != null) {
+				this.fNutchBean.close();
+			}
+			this.fNutchBean = null;
+		}
+
+	}
 }
