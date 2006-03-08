@@ -34,6 +34,8 @@ import de.ingrid.utils.queryparser.QueryStringParser;
  */
 public class NutchSearcher implements IPlug {
 
+	public static final Object mutex = new Object();
+
 	private static final String DATATYPE = "datatype";
 
 	private Log fLogger = LogFactory.getLog(this.getClass());
@@ -68,7 +70,7 @@ public class NutchSearcher implements IPlug {
 
 	public void configure(PlugDescription plugDescription) throws Exception {
 		this.fPlugId = plugDescription.getPlugId();
-		synchronized (NutchSearcher.class) {
+		synchronized (mutex) {
 			if (fNutchConf == null) {
 				this.fNutchConf = NutchConfiguration.create();
 			}
@@ -238,13 +240,13 @@ public class NutchSearcher implements IPlug {
 		Hit hit = new Hit(ingridHit.getDataSourceId(), ingridHit
 				.getDocumentId());
 		HitDetails details = null;
-		synchronized (this.fNutchBean) {
+		synchronized (mutex) {
 			details = this.fNutchBean.getDetails(hit);
 		}
 		if (details != null) {
 			String title = details.getValue("title");
 			String summary;
-			synchronized (this.fNutchBean) {
+			synchronized (mutex) {
 				summary = this.fNutchBean.getSummary(details, nutchQuery);
 			}
 			// push values into hit detail
@@ -262,8 +264,11 @@ public class NutchSearcher implements IPlug {
 						arrayList.add(details.getValue(i));
 					}
 				}
-				ingridDetail.addToList(luceneField, (String[]) arrayList
-						.toArray(new String[arrayList.size()]));
+				if (!luceneField.toLowerCase().equals("url")
+						&& !luceneField.toLowerCase().equals("title")) {
+					ingridDetail.addToList(luceneField, (String[]) arrayList
+							.toArray(new String[arrayList.size()]));
+				}
 			}
 			return ingridDetail;
 		}
@@ -317,7 +322,7 @@ public class NutchSearcher implements IPlug {
 	}
 
 	public void close() throws IOException {
-		synchronized (this.fNutchBean) {
+		synchronized (mutex) {
 			if (this.fNutchBean != null) {
 				this.fNutchBean.close();
 			}
