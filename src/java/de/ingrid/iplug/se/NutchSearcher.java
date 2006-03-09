@@ -331,4 +331,10 @@ public class NutchSearcher implements IPlug {
 		// }
 
 	}
+
+	protected void finalize() throws Throwable {
+		if (this.fNutchBean != null) {
+			this.fNutchBean.close();
+		}
+	}
 }
