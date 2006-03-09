@@ -322,12 +322,13 @@ public class NutchSearcher implements IPlug {
 	}
 
 	public void close() throws IOException {
-		synchronized (mutex) {
-			if (this.fNutchBean != null) {
-				this.fNutchBean.close();
-			}
-			this.fNutchBean = null;
-		}
+		// FIXME normally we do not want to close the search at all.
+		// synchronized (mutex) {
+		// if (this.fNutchBean != null) {
+		// this.fNutchBean.close();
+		// }
+		// this.fNutchBean = null;
+		// }
 
 	}
 }
