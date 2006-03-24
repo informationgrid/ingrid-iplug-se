@@ -255,21 +255,23 @@ public class NutchSearcher implements IPlug {
 			ingridDetail.put("url", details.getValue("url")); // TODO should
 
 			int length = details.getLength();
-			for (int i = 0; i < length; i++) {
-				String luceneField = details.getField(i);
+
+			for (int j = 0; j < requestedFields.length; j++) {
 				ArrayList arrayList = new ArrayList();
-				for (int j = 0; j < requestedFields.length; j++) {
+				for (int i = 0; i < length; i++) {
+					String luceneField = details.getField(i);
 					if (luceneField.toLowerCase().equals(
-							requestedFields[j].toLowerCase())) {
+							requestedFields[j].toLowerCase())
+							&& !luceneField.toLowerCase().equals("url")
+							&& !luceneField.toLowerCase().equals("title")) {
 						arrayList.add(details.getValue(i));
 					}
 				}
-				if (!luceneField.toLowerCase().equals("url")
-						&& !luceneField.toLowerCase().equals("title")) {
-					ingridDetail.addToList(luceneField, (String[]) arrayList
-							.toArray(new String[arrayList.size()]));
-				}
+				ingridDetail.put(requestedFields[j], (String[]) arrayList
+						.toArray(new String[arrayList.size()]));
+
 			}
+
 			return ingridDetail;
 		}
 		return null;
