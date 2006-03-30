@@ -104,8 +104,8 @@ public class NutchSearcher implements IPlug {
 			fLogger.debug("nutch query: " + nutchQuery.toString());
 		}
 
-		Hits hits = this.fNutchBean.search(nutchQuery, start + length, "partner", "date", false);
-
+		//Hits hits = this.fNutchBean.search(nutchQuery, start + length, "partner", "date", false);
+    Hits hits = this.fNutchBean.search(nutchQuery, start + length);
 		int count = hits.getLength();
 		int max = 0;
 		final int countMinusStart = count - start;
@@ -163,6 +163,9 @@ public class NutchSearcher implements IPlug {
 		int count = dataTypes.length;
 		for (int i = 0; i < count; i++) {
 			FieldQuery dataType = dataTypes[i];
+      if("default".equals(dataType.getFieldValue()) || "research".equals(dataType.getFieldValue())) {
+        continue;
+      }
 			boolean required = dataType.isRequred();
 			boolean prohibited = dataType.isProhibited();
 			if (required) {
