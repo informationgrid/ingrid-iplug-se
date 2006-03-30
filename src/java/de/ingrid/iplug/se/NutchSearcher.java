@@ -104,7 +104,7 @@ public class NutchSearcher implements IPlug {
 			fLogger.debug("nutch query: " + nutchQuery.toString());
 		}
 
-		Hits hits = this.fNutchBean.search(nutchQuery, start + length);
+		Hits hits = this.fNutchBean.search(nutchQuery, start + length, "partner", "date", false);
 
 		int count = hits.getLength();
 		int max = 0;
