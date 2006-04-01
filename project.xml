@@ -63,9 +63,9 @@
     <shortDescription>se iplug</shortDescription>
     <issueTrackingUrl>http://jira.media-style.com/browse/INGRID</issueTrackingUrl>
     <siteAddress>http://torwald.gistec-online.de/ingrid/ingrid-iplug-se</siteAddress>
-    <siteDirectory>/srv/www/htdocs/ingrid/ingrid-iplug-dsc</siteDirectory>
+    <siteDirectory>/srv/www/htdocs/ingrid/ingrid-iplug-se</siteDirectory>
     <repository>
-        <connection>scm:svn:http://torwald.gistec-online.de/svn/ingrid:ingrid-iplug-dsc</connection>
+        <connection>scm:svn:http://torwald.gistec-online.de/svn/ingrid:ingrid-iplug-se</connection>
     </repository>
     <dependencies>
         <dependency>
