@@ -262,7 +262,8 @@ public class NutchSearcher implements IPlug {
     for (int i = 0; i < termQueries.length; i++) {
       TermQuery query = termQueries[i];
       String term = query.getTerm();
-      nutchClause.addClause(new Query.Clause(new Query.Term(term), query.isRequred(), query.isProhibited(), this.fNutchConf));
+      nutchClause.addClause(new Query.Clause(new Query.Term(term), query
+          .isRequred(), query.isProhibited(), this.fNutchConf));
     }
   }
 
