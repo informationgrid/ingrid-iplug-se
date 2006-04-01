@@ -15,6 +15,7 @@ import org.apache.nutch.searcher.HitDetails;
 import org.apache.nutch.searcher.Hits;
 import org.apache.nutch.searcher.NutchBean;
 import org.apache.nutch.searcher.Query;
+import org.apache.nutch.searcher.Query.Clause;
 import org.apache.nutch.util.NutchConfiguration;
 
 import de.ingrid.utils.IPlug;
@@ -156,8 +157,6 @@ public class NutchSearcher implements IPlug {
 	private void buildNutchQuery(IngridQuery query, Query out)
 			throws IOException {
 
-		// FIXME handling DEFAUL datatype, handling exception datatype:default +
-		// datatype:research
 		// first we add the datatype in case there is one setted
 		FieldQuery[] dataTypes = query.getDataTypes();
 		int count = dataTypes.length;
@@ -173,8 +172,7 @@ public class NutchSearcher implements IPlug {
 			} else if (prohibited) {
 				out.addProhibitedTerm(dataType.getFieldValue(), DATATYPE);
 			} else if (!required) {
-				throw new UnsupportedOperationException(
-						"'non required' actually not implemented, INGRID-455");
+				out.addNonRequiredTerm(dataType.getFieldValue(), DATATYPE);
 			}
 		}
 
@@ -190,8 +188,7 @@ public class NutchSearcher implements IPlug {
 			} else if (prohibited) {
 				out.addProhibitedTerm(filterTerm(termQuery.getTerm()));
 			} else if (!required) {
-				throw new UnsupportedOperationException(
-						"'non required' actually not implemented, INGRID-455");
+				out.addNonRequiredTerm(filterTerm(termQuery.getTerm()));
 			}
 
 		}
@@ -209,20 +206,67 @@ public class NutchSearcher implements IPlug {
 				out.addProhibitedTerm(filterTerm(fieldQuery.getFieldValue()),
 						fieldQuery.getFieldName());
 			} else if (!required) {
-				throw new UnsupportedOperationException(
-						"'non required' actually not implemented, INGRID-455");
+				out.addNonRequiredTerm(filterTerm(fieldQuery.getFieldValue()),
+             fieldQuery.getFieldName());
 			}
 		}
 
 		// subclauses
 		ClauseQuery[] clauses = query.getClauses();
 		for (int i = 0; i < clauses.length; i++) {
-			throw new UnsupportedOperationException(
-					"'sub Clauses' actually not implemented, INGRID-455");
+			ClauseQuery clauseQuery = clauses[i];
+      boolean prohibited = clauseQuery.isProhibited();
+      boolean required = clauseQuery.isRequred();
+      
+      //todo get NutchClause from IngridClause
+      TermQuery[] termQueries = clauseQuery.getTerms();
+      FieldQuery[] fieldQueries = clauseQuery.getFields();
+      
+      Query.Clause nutchClause = new Query.Clause();
+      addQueriesToNutchClause(termQueries, nutchClause);
+      addQueriesToNutchClause(fieldQueries, nutchClause);
+      
+      if(required) {
+        out.addRequiredClause(nutchClause);
+      } else if(prohibited) {
+        out.addProhibitedClause(nutchClause);
+      } else if(!required) {
+        out.addNonRequiredClause(nutchClause);
+      }
 		}
 	}
 
-	private String filterTerm(String term) throws IOException {
+	/**
+   * @param fieldQueries
+   * @param nutchClause
+	 * @throws IOException 
+   */
+  private void addQueriesToNutchClause(FieldQuery[] fieldQueries, Clause nutchClause) throws IOException {
+    for (int i = 0; i < fieldQueries.length; i++) {
+      FieldQuery query = fieldQueries[i];
+      String filteredFieldName = filterTerm(query.getFieldName());
+      String fieldValue = query.getFieldValue();
+      
+      nutchClause
+          .addClause(new Query.Clause(new Query.Term(filteredFieldName),
+              fieldValue, query.isRequred(), query.isProhibited(),
+              this.fNutchConf));
+    }
+  }
+
+  /**
+   * @param termQueries
+   * @param nutchClause
+   */
+  private void addQueriesToNutchClause(TermQuery[] termQueries, Clause nutchClause) {
+    for (int i = 0; i < termQueries.length; i++) {
+      TermQuery query = termQueries[i];
+      String term = query.getTerm();
+      nutchClause.addClause(new Query.Clause(new Query.Term(term), query.isRequred(), query.isProhibited(), this.fNutchConf));
+    }
+  }
+
+  private String filterTerm(String term) throws IOException {
 		// FIXME DO WE REALLY NEED THIS`????
 		return new SimpleAnalyzer().tokenStream(null, new StringReader(term))
 				.next().termText();
