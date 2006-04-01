@@ -387,4 +387,3 @@ public class NutchSearcher implements IPlug {
 		}
 	}
 }
-
