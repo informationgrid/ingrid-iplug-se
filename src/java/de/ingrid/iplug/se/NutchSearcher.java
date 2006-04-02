@@ -215,20 +215,21 @@ public class NutchSearcher implements IPlug {
     RangeQuery[] rangeQueries = query.getRangeQueries();
     for (int i = 0; i < rangeQueries.length; i++) {
       RangeQuery rangeQuery = rangeQueries[i];
+      System.out.println("RA: " + rangeQuery.toString());
       boolean isProhibitet = rangeQuery.isProhibited();
       boolean isRequired = rangeQuery.isRequred();
       String rangeName = rangeQuery.getRangeName();
       String from = rangeQuery.getRangeFrom();
       String to = rangeQuery.getRangeTo();
-      
+      //FIXME? method filterTerm does not work with rangequery like: foo:[1 TO 2]
       if (isRequired) {
-        out.addRequiredTerm(filterTerm("[" + from + " TO "+ to +"]"),
+        out.addRequiredTerm("[" + from + " TO "+ to +"]",
             rangeName);
       } else if (isProhibitet) {
-        out.addProhibitedTerm(filterTerm("[" + from + " TO "+ to +"]"),
+        out.addProhibitedTerm("[" + from + " TO "+ to +"]",
             rangeName);
       } else if (!isRequired) {
-        out.addNonRequiredTerm(filterTerm("[" + from + " TO "+ to +"]"),
+        out.addNonRequiredTerm("[" + from + " TO "+ to +"]",
             rangeName);
       }
     }
