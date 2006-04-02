@@ -26,6 +26,7 @@ import de.ingrid.utils.PlugDescription;
 import de.ingrid.utils.query.ClauseQuery;
 import de.ingrid.utils.query.FieldQuery;
 import de.ingrid.utils.query.IngridQuery;
+import de.ingrid.utils.query.RangeQuery;
 import de.ingrid.utils.query.TermQuery;
 import de.ingrid.utils.queryparser.ParseException;
 import de.ingrid.utils.queryparser.QueryStringParser;
@@ -211,7 +212,28 @@ public class NutchSearcher implements IPlug {
 			}
 		}
 
-		// subclauses
+    RangeQuery[] rangeQueries = query.getRangeQueries();
+    for (int i = 0; i < rangeQueries.length; i++) {
+      RangeQuery rangeQuery = rangeQueries[i];
+      boolean isProhibitet = rangeQuery.isProhibited();
+      boolean isRequired = rangeQuery.isRequred();
+      String rangeName = rangeQuery.getRangeName();
+      String from = rangeQuery.getRangeFrom();
+      String to = rangeQuery.getRangeTo();
+      
+      if (isRequired) {
+        out.addRequiredTerm(filterTerm("[" + from + " TO "+ to +"]"),
+            rangeName);
+      } else if (isProhibitet) {
+        out.addProhibitedTerm(filterTerm("[" + from + " TO "+ to +"]"),
+            rangeName);
+      } else if (!isRequired) {
+        out.addNonRequiredTerm(filterTerm("[" + from + " TO "+ to +"]"),
+            rangeName);
+      }
+    }
+    
+    // subclauses
 		ClauseQuery[] clauses = query.getClauses();
 		for (int i = 0; i < clauses.length; i++) {
 			ClauseQuery clauseQuery = clauses[i];
