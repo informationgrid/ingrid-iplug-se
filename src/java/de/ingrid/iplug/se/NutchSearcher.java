@@ -215,7 +215,6 @@ public class NutchSearcher implements IPlug {
     RangeQuery[] rangeQueries = query.getRangeQueries();
     for (int i = 0; i < rangeQueries.length; i++) {
       RangeQuery rangeQuery = rangeQueries[i];
-      System.out.println("RA: " + rangeQuery.toString());
       boolean isProhibitet = rangeQuery.isProhibited();
       boolean isRequired = rangeQuery.isRequred();
       String rangeName = rangeQuery.getRangeName();
