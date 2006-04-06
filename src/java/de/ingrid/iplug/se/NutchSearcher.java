@@ -244,17 +244,18 @@ public class NutchSearcher implements IPlug {
       TermQuery[] termQueries = clauseQuery.getTerms();
       FieldQuery[] fieldQueries = clauseQuery.getFields();
       
-      Query.Clause nutchClause = new Query.Clause();
+      Query.Clause nutchClause = new Query.Clause(new Query.Term(""), required, prohibited, this.fNutchConf);
       addQueriesToNutchClause(termQueries, nutchClause);
       addQueriesToNutchClause(fieldQueries, nutchClause);
       
-      if(required) {
-        out.addRequiredClause(nutchClause);
-      } else if(prohibited) {
-        out.addProhibitedClause(nutchClause);
-      } else if(!required) {
-        out.addNonRequiredClause(nutchClause);
-      }
+      out.addClause(nutchClause);
+//      if(required) {
+//        out.addRequiredClause(nutchClause);
+//      } else if(prohibited) {
+//        out.addProhibitedClause(nutchClause);
+//      } else if(!required) {
+//        out.addNonRequiredClause(nutchClause);
+//      }
 		}
 	}
 
@@ -268,10 +269,9 @@ public class NutchSearcher implements IPlug {
       FieldQuery query = fieldQueries[i];
       String filteredFieldName = filterTerm(query.getFieldName());
       String fieldValue = query.getFieldValue();
-      
       nutchClause
-          .addClause(new Query.Clause(new Query.Term(filteredFieldName),
-              fieldValue, query.isRequred(), query.isProhibited(),
+          .addClause(new Query.Clause(new Query.Term(fieldValue),
+              filteredFieldName, query.isRequred(), query.isProhibited(),
               this.fNutchConf));
     }
   }
