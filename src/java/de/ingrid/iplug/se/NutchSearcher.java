@@ -248,6 +248,7 @@ public class NutchSearcher implements IPlug {
       addQueriesToNutchClause(termQueries, nutchClause);
       addQueriesToNutchClause(fieldQueries, nutchClause);
       
+      
       out.addClause(nutchClause);
 //      if(required) {
 //        out.addRequiredClause(nutchClause);
