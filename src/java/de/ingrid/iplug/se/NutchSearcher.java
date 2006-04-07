@@ -289,7 +289,7 @@ public class NutchSearcher implements IPlug {
   private void addQueriesToNutchClause(FieldQuery[] fieldQueries, NutchClause nutchClause) throws IOException {
     for (int i = 0; i < fieldQueries.length; i++) {
       FieldQuery query = fieldQueries[i];
-      String filteredFieldName = filterTerm(query.getFieldName());
+      String filteredFieldName = query.getFieldName().toLowerCase();
       String fieldValue = query.getFieldValue();
       Query.Clause clause = new Query.Clause(new Query.Term(fieldValue),
           filteredFieldName, query.isRequred(), query.isProhibited(),
