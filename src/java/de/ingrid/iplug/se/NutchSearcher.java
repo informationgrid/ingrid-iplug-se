@@ -16,6 +16,7 @@ import org.apache.nutch.searcher.Hits;
 import org.apache.nutch.searcher.NutchBean;
 import org.apache.nutch.searcher.Query;
 import org.apache.nutch.searcher.Query.Clause;
+import org.apache.nutch.searcher.Query.NutchClause;
 import org.apache.nutch.util.NutchConfiguration;
 
 import de.ingrid.utils.IPlug;
@@ -239,41 +240,61 @@ public class NutchSearcher implements IPlug {
 			ClauseQuery clauseQuery = clauses[i];
       boolean prohibited = clauseQuery.isProhibited();
       boolean required = clauseQuery.isRequred();
+      Query.NutchClause nutchClause = new Query.NutchClause(required, prohibited);
       
-      //todo get NutchClause from IngridClause
+      ClauseQuery[] subClauses = clauseQuery.getClauses();
+      addSubClauses(subClauses, nutchClause);
+      
+      
       TermQuery[] termQueries = clauseQuery.getTerms();
       FieldQuery[] fieldQueries = clauseQuery.getFields();
       
-      Query.Clause nutchClause = new Query.Clause(new Query.Term(""), required, prohibited, this.fNutchConf);
-      addQueriesToNutchClause(termQueries, nutchClause);
+      
+     
       addQueriesToNutchClause(fieldQueries, nutchClause);
-      
-      
-      out.addClause(nutchClause);
-//      if(required) {
-//        out.addRequiredClause(nutchClause);
-//      } else if(prohibited) {
-//        out.addProhibitedClause(nutchClause);
-//      } else if(!required) {
-//        out.addNonRequiredClause(nutchClause);
-//      }
+      addQueriesToNutchClause(termQueries, nutchClause);      
+      out.addNutchClause(nutchClause);
 		}
 	}
 
 	/**
+   * @param subClauses
+   * @param nutchClause
+	 * @throws IOException 
+   */
+  private void addSubClauses(ClauseQuery[] subClauses, NutchClause nutchClause) throws IOException {
+    for (int i = 0; i < subClauses.length; i++) {
+      ClauseQuery subClause = subClauses[i];
+      boolean prohibited = subClause.isProhibited();
+      boolean required = subClause.isRequred();
+      Query.NutchClause nextClause = new Query.NutchClause(required, prohibited);
+      addSubClauses(subClause.getClauses(), nextClause);
+      
+
+      TermQuery[] termQueries = subClause.getTerms();
+      FieldQuery[] fieldQueries = subClause.getFields();
+     
+      addQueriesToNutchClause(fieldQueries, nextClause);
+      addQueriesToNutchClause(termQueries, nextClause);
+      nutchClause.addNutchClause(nextClause);
+    }
+    
+  }
+
+  /**
    * @param fieldQueries
    * @param nutchClause
 	 * @throws IOException 
    */
-  private void addQueriesToNutchClause(FieldQuery[] fieldQueries, Clause nutchClause) throws IOException {
+  private void addQueriesToNutchClause(FieldQuery[] fieldQueries, NutchClause nutchClause) throws IOException {
     for (int i = 0; i < fieldQueries.length; i++) {
       FieldQuery query = fieldQueries[i];
       String filteredFieldName = filterTerm(query.getFieldName());
       String fieldValue = query.getFieldValue();
-      nutchClause
-          .addClause(new Query.Clause(new Query.Term(fieldValue),
-              filteredFieldName, query.isRequred(), query.isProhibited(),
-              this.fNutchConf));
+      Query.Clause clause = new Query.Clause(new Query.Term(fieldValue),
+          filteredFieldName, query.isRequred(), query.isProhibited(),
+          this.fNutchConf);
+      nutchClause.addClause(clause);
     }
   }
 
@@ -281,12 +302,14 @@ public class NutchSearcher implements IPlug {
    * @param termQueries
    * @param nutchClause
    */
-  private void addQueriesToNutchClause(TermQuery[] termQueries, Clause nutchClause) {
+  private void addQueriesToNutchClause(TermQuery[] termQueries, NutchClause nutchClause) {
     for (int i = 0; i < termQueries.length; i++) {
       TermQuery query = termQueries[i];
       String term = query.getTerm();
-      nutchClause.addClause(new Query.Clause(new Query.Term(term), query
-          .isRequred(), query.isProhibited(), this.fNutchConf));
+      Query.Clause clause = new Query.Clause(new Query.Term(term),
+          query.isRequred(), query.isProhibited(),
+          this.fNutchConf);
+      nutchClause.addClause(clause);
     }
   }
 
