@@ -9,13 +9,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.FloatWritable;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.WritableComparable;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.nutch.searcher.Hit;
 import org.apache.nutch.searcher.HitDetails;
 import org.apache.nutch.searcher.Hits;
 import org.apache.nutch.searcher.NutchBean;
 import org.apache.nutch.searcher.Query;
-import org.apache.nutch.searcher.Query.Clause;
 import org.apache.nutch.searcher.Query.NutchClause;
 import org.apache.nutch.util.NutchConfiguration;
 
@@ -69,6 +70,7 @@ public class NutchSearcher implements IPlug {
 		this.fNutchBean = new NutchBean(conf, indexFolder);
 		this.fPlugId = plugId;
 		this.fNutchConf = conf;
+    
 	}
 
 	public void configure(PlugDescription plugDescription) throws Exception {
@@ -107,8 +109,14 @@ public class NutchSearcher implements IPlug {
 			fLogger.debug("nutch query: " + nutchQuery.toString());
 		}
 
-		//Hits hits = this.fNutchBean.search(nutchQuery, start + length, "partner", "date", false);
-    Hits hits = this.fNutchBean.search(nutchQuery, start + length);
+    Hits hits = null;
+    if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
+      hits = this.fNutchBean.search(nutchQuery, start + length, null,
+          "date", false);
+    } else {
+      hits = this.fNutchBean.search(nutchQuery, start + length);
+    }
+		
 		int count = hits.getLength();
 		int max = 0;
 		final int countMinusStart = count - start;
@@ -116,7 +124,8 @@ public class NutchSearcher implements IPlug {
 			max = Math.min(length, countMinusStart);
 		}
 
-		return translateHits(hits, start, max);
+    boolean groupByPartner = IngridQuery.GROUPED_BY_PARTNER.equalsIgnoreCase(query.getGrouped()) ? true : false;
+		return translateHits(hits, start, max, groupByPartner);
 	}
 
 	/**
@@ -125,24 +134,43 @@ public class NutchSearcher implements IPlug {
 	 * @param hits
 	 * @param start
 	 * @param length
+	 * @param groupByPartner 
 	 * @return IngridHits The hits translated from nutch hits.
+	 * @throws IOException 
 	 */
-	private IngridHits translateHits(Hits hits, int start, int length) {
+	private IngridHits translateHits(Hits hits, int start, int length, boolean groupByPartner) throws IOException {
 		IngridHit[] ingridHits = new IngridHit[length];
 		for (int i = start; i < (length + start); i++) {
 			Hit hit = hits.getHit(i);
-			final float score = ((FloatWritable) hit.getSortValue()).get();
 			// FIXME: Find the max value of the score.
-			// final float normScore = normalize(score, 0, 50);
-			// if (this.fLogger.isDebugEnabled()) {
-			// this.fLogger.debug("The nutch score: " + score
-			// + " and mormalized score: " + normScore);
-			// }
-			final int documentId = hit.getIndexDocNo();
-			final int datasourceId = hit.getIndexNo();
-
-			IngridHit ingridHit = new IngridHit(this.fPlugId, documentId,
-					datasourceId, score);
+      // final float normScore = normalize(score, 0, 50);
+      // if (this.fLogger.isDebugEnabled()) {
+      // this.fLogger.debug("The nutch score: " + score
+      // + " and mormalized score: " + normScore);
+      // }
+      final int documentId = hit.getIndexDocNo();
+      final int datasourceId = hit.getIndexNo();
+      IngridHit ingridHit = null;
+      WritableComparable sortValue = hit.getSortValue();
+      if(sortValue instanceof FloatWritable) {
+        final float score = ((FloatWritable) hit.getSortValue()).get();
+        ingridHit = new IngridHit(this.fPlugId, documentId,
+            datasourceId, score);
+      } else if(sortValue instanceof IntWritable) {
+        final int date = ((IntWritable) hit.getSortValue()).get();
+        ingridHit = new IngridHit(this.fPlugId, documentId,
+            datasourceId, date);
+      }
+      
+      
+      if(groupByPartner) {
+          HitDetails details = this.fNutchBean.getDetails(hit);
+          String partner = details.getValue("partner");
+          if(partner != null) {
+            ingridHit.addGroupedField(partner);  
+          }
+      }
+      
 			ingridHits[i - start] = ingridHit;
 		}
 
