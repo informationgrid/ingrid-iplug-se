@@ -87,6 +87,32 @@ public class TestNutchSearch extends TestCase {
     }
   }
   
+  /**
+   * @throws Exception
+   */
+  public void testOrFieldQueryClause() throws Exception {
+    NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId",
+        this.fConfiguration);
+
+    IngridQuery query = new IngridQuery();
+    query.addTerm(new TermQuery(true, false, "wasser"));
+    query.addField(new FieldQuery(true, false, "datatype", "topics"));
+    ClauseQuery cq = new ClauseQuery(true, false);
+    cq.addField(new FieldQuery(false, false, "topic", "gentechnik"));
+    cq.addField(new FieldQuery(false, false, "topic", "abfall"));
+    query.addClause(cq);
+
+
+    IngridHits hits = searcher.search(query, 0, 100);
+    assertTrue(hits.length() > 0);
+    IngridHit[] hits2 = hits.getHits();
+    for (int i = 0; i < hits2.length; i++) {
+      IngridHit hit = hits2[i];
+      System.out.println(hit);
+    }
+  }
+
+  
   public void testOrFieldQuery2() throws Exception {
 
     NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId",
