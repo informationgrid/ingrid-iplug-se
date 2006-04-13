@@ -12,6 +12,8 @@ import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.WritableComparable;
 import org.apache.lucene.analysis.SimpleAnalyzer;
+import org.apache.lucene.analysis.Token;
+import org.apache.lucene.analysis.TokenStream;
 import org.apache.nutch.searcher.Hit;
 import org.apache.nutch.searcher.HitDetails;
 import org.apache.nutch.searcher.Hits;
@@ -342,9 +344,7 @@ public class NutchSearcher implements IPlug {
   }
 
   private String filterTerm(String term) throws IOException {
-		// FIXME DO WE REALLY NEED THIS`????
-		return new SimpleAnalyzer().tokenStream(null, new StringReader(term))
-				.next().termText();
+		return term.toLowerCase();
 	}
 
 	/*
