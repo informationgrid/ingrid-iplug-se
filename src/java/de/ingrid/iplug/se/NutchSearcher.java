@@ -186,106 +186,109 @@ public class NutchSearcher implements IPlug {
 	 * @param out
 	 * @throws IOException
 	 */
-	private void buildNutchQuery(IngridQuery query, Query out)
-			throws IOException {
+	private void buildNutchQuery(IngridQuery query, Query out) throws IOException {
 
-		// first we add the datatype in case there is one setted
-		FieldQuery[] dataTypes = query.getDataTypes();
-		int count = dataTypes.length;
-		for (int i = 0; i < count; i++) {
-			FieldQuery dataType = dataTypes[i];
-      if("default".equals(dataType.getFieldValue()) || "research".equals(dataType.getFieldValue())) {
-        continue;
-      }
-			boolean required = dataType.isRequred();
-			boolean prohibited = dataType.isProhibited();
-			if (required) {
-				out.addRequiredTerm(dataType.getFieldValue(), DATATYPE);
-			} else if (prohibited) {
-				out.addProhibitedTerm(dataType.getFieldValue(), DATATYPE);
-			} else if (!required) {
-				out.addNonRequiredTerm(dataType.getFieldValue(), DATATYPE);
-			}
-		}
+        // first we add the datatype in case there is one setted
+        FieldQuery[] dataTypes = query.getDataTypes();
+        int count = dataTypes.length;
+        for (int i = 0; i < count; i++) {
+            FieldQuery dataType = dataTypes[i];
+            if ("default".equals(dataType.getFieldValue()) || "research".equals(dataType.getFieldValue())) {
+                continue;
+            }
+            boolean required = dataType.isRequred();
+            boolean prohibited = dataType.isProhibited();
+            if (required) {
+                out.addRequiredTerm(dataType.getFieldValue(), DATATYPE);
+            } else if (prohibited) {
+                out.addProhibitedTerm(dataType.getFieldValue(), DATATYPE);
+            } else if (!required) {
+                out.addNonRequiredTerm(dataType.getFieldValue(), DATATYPE);
+            }
+        }
 
-		// term queries
-		TermQuery[] terms = query.getTerms();
-		for (int i = 0; i < terms.length; i++) {
-			TermQuery termQuery = terms[i];
-			boolean prohibited = termQuery.isProhibited();
-			boolean required = termQuery.isRequred();
-			// boolean optional = termQuery.getOperation() == IngridQuery.OR;
-			if (required) {
-				out.addRequiredTerm(filterTerm(termQuery.getTerm()));
-			} else if (prohibited) {
-				out.addProhibitedTerm(filterTerm(termQuery.getTerm()));
-			} else if (!required) {
-				out.addNonRequiredTerm(filterTerm(termQuery.getTerm()));
-			}
+        // term queries
+        TermQuery[] terms = query.getTerms();
+        for (int i = 0; i < terms.length; i++) {
+            TermQuery termQuery = terms[i];
+            boolean prohibited = termQuery.isProhibited();
+            boolean required = termQuery.isRequred();
+            // boolean optional = termQuery.getOperation() == IngridQuery.OR;
+            if (required) {
+                out.addRequiredTerm(filterTerm(termQuery.getTerm()));
+            } else if (prohibited) {
+                out.addProhibitedTerm(filterTerm(termQuery.getTerm()));
+            } else if (!required) {
+                out.addNonRequiredTerm(filterTerm(termQuery.getTerm()));
+            }
 
-		}
-		// field queries
-		FieldQuery[] fields = query.getFields();
-		for (int i = 0; i < fields.length; i++) {
-			FieldQuery fieldQuery = fields[i];
-			boolean prohibited = fieldQuery.isProhibited();
-			boolean required = fieldQuery.isRequred();
+        }
+        // field queries
+        FieldQuery[] fields = query.getFields();
+        for (int i = 0; i < fields.length; i++) {
+            FieldQuery fieldQuery = fields[i];
+            boolean prohibited = fieldQuery.isProhibited();
+            boolean required = fieldQuery.isRequred();
 
-			if (required) {
-				out.addRequiredTerm(filterTerm(fieldQuery.getFieldValue()),
-						fieldQuery.getFieldName());
-			} else if (prohibited) {
-				out.addProhibitedTerm(filterTerm(fieldQuery.getFieldValue()),
-						fieldQuery.getFieldName());
-			} else if (!required) {
-				out.addNonRequiredTerm(filterTerm(fieldQuery.getFieldValue()),
-             fieldQuery.getFieldName());
-			}
-		}
+            if (required) {
+                out.addRequiredTerm(filterTerm(fieldQuery.getFieldValue()), fieldQuery.getFieldName());
+            } else if (prohibited) {
+                out.addProhibitedTerm(filterTerm(fieldQuery.getFieldValue()), fieldQuery.getFieldName());
+            } else if (!required) {
+                out.addNonRequiredTerm(filterTerm(fieldQuery.getFieldValue()), fieldQuery.getFieldName());
+            }
+        }
 
-    RangeQuery[] rangeQueries = query.getRangeQueries();
-    for (int i = 0; i < rangeQueries.length; i++) {
-      RangeQuery rangeQuery = rangeQueries[i];
-      boolean isProhibitet = rangeQuery.isProhibited();
-      boolean isRequired = rangeQuery.isRequred();
-      String rangeName = rangeQuery.getRangeName();
-      String from = rangeQuery.getRangeFrom();
-      String to = rangeQuery.getRangeTo();
-      //FIXME? method filterTerm does not work with rangequery like: foo:[1 TO 2]
-      if (isRequired) {
-        out.addRequiredTerm("[" + from + " TO "+ to +"]",
-            rangeName);
-      } else if (isProhibitet) {
-        out.addProhibitedTerm("[" + from + " TO "+ to +"]",
-            rangeName);
-      } else if (!isRequired) {
-        out.addNonRequiredTerm("[" + from + " TO "+ to +"]",
-            rangeName);
-      }
+        RangeQuery[] rangeQueries = query.getRangeQueries();
+        for (int i = 0; i < rangeQueries.length; i++) {
+            RangeQuery rangeQuery = rangeQueries[i];
+            boolean isProhibitet = rangeQuery.isProhibited();
+            boolean isRequired = rangeQuery.isRequred();
+            String rangeName = rangeQuery.getRangeName();
+            String from = rangeQuery.getRangeFrom();
+            String to = rangeQuery.getRangeTo();
+            // FIXME? method filterTerm does not work with rangequery like:
+            // foo:[1 TO 2]
+            if (isRequired) {
+                out.addRequiredTerm("[" + from + " TO " + to + "]", rangeName);
+            } else if (isProhibitet) {
+                out.addProhibitedTerm("[" + from + " TO " + to + "]", rangeName);
+            } else if (!isRequired) {
+                out.addNonRequiredTerm("[" + from + " TO " + to + "]", rangeName);
+            }
+        }
+
+        // subclauses
+        ClauseQuery[] clauses = query.getClauses();
+        for (int i = 0; i < clauses.length; i++) {
+            ClauseQuery clauseQuery = clauses[i];
+            boolean prohibited = clauseQuery.isProhibited();
+            boolean required = clauseQuery.isRequred();
+            Query.NutchClause nutchClause = new Query.NutchClause(required, prohibited);
+
+            ClauseQuery[] subClauses = clauseQuery.getClauses();
+            addSubClauses(subClauses, nutchClause);
+
+            TermQuery[] termQueries = clauseQuery.getTerms();
+            FieldQuery[] fieldQueries = clauseQuery.getFields();
+
+            addQueriesToNutchClause(fieldQueries, nutchClause);
+            addQueriesToNutchClause(termQueries, nutchClause);
+            out.addNutchClause(nutchClause);
+        }
+        
+        // provider
+        
+        String[] providers = query.getPositiveProvider();
+        for (int i = 0; i < providers.length; i++) {
+            out.addRequiredTerm(filterTerm(providers[i]), "provider");
+        }
+        providers = query.getNegativeProvider();
+        for (int i = 0; i < providers.length; i++) {
+            out.addProhibitedTerm(filterTerm(providers[i]), "provider");
+        }
+        
     }
-    
-    // subclauses
-		ClauseQuery[] clauses = query.getClauses();
-		for (int i = 0; i < clauses.length; i++) {
-			ClauseQuery clauseQuery = clauses[i];
-      boolean prohibited = clauseQuery.isProhibited();
-      boolean required = clauseQuery.isRequred();
-      Query.NutchClause nutchClause = new Query.NutchClause(required, prohibited);
-      
-      ClauseQuery[] subClauses = clauseQuery.getClauses();
-      addSubClauses(subClauses, nutchClause);
-      
-      
-      TermQuery[] termQueries = clauseQuery.getTerms();
-      FieldQuery[] fieldQueries = clauseQuery.getFields();
-      
-      
-     
-      addQueriesToNutchClause(fieldQueries, nutchClause);
-      addQueriesToNutchClause(termQueries, nutchClause);      
-      out.addNutchClause(nutchClause);
-		}
-	}
 
 	/**
    * @param subClauses
