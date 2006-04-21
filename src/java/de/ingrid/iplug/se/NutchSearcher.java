@@ -106,7 +106,6 @@ public class NutchSearcher implements IPlug {
 		}
 		Query nutchQuery = new Query(this.fNutchConf);
 		buildNutchQuery(query, nutchQuery);
-		System.out.println(nutchQuery.toString());
 		if (fLogger.isDebugEnabled()) {
 			fLogger.debug("nutch query: " + nutchQuery.toString());
 		}
