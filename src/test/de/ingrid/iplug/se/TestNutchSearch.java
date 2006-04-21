@@ -31,13 +31,14 @@ public class TestNutchSearch extends TestCase {
     //this.fConfiguration.set("plugin.folders",
     //"/Users/joa23/Documents/workspace/nutch-trunk/src/plugin");
     this.fConfiguration.set("plugin.folders",
-        "/Users/mb/develop/workspace/nutch/src/plugin");
+        "/Users/mb/develop/workspace/ingrid-nutch-plugins/src/plugin");
     this.fConfiguration
         .set(
             "plugin.includes",
-            "protocol-http|urlfilter-regex|parse-(text|html|js)|index-basic|query-(basic|ingrid-se)");
+            "protocol-http|urlfilter-regex|parse-(text|html|js)|index-(basic|sns)|query-(basic|ingrid-se)");
     //this.fIndex = new File("./testIndex");
-    this.fIndex = new File("/Users/mb/segments");
+    //this.fIndex = new File("/Users/mb/segments");
+    this.fIndex = new File("./test-resources");
   }
 
   protected void tearDown() throws Exception {
@@ -186,5 +187,113 @@ public class TestNutchSearch extends TestCase {
     assertTrue(loopTwo);
   }
   
+  
+  public void testTime() throws Exception {
+    IngridQuery query = new IngridQuery();
+    query.addField(new FieldQuery(true, false, "t0",
+        "2006-01-01"));
+    NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId",
+        this.fConfiguration);
+    IngridHits hits = searcher.search(query, 0, 100);
+    IngridHit[] hits2 = hits.getHits();
+  }
+  
+  
+  public void testRankingDate() throws Exception {
+    
+    IngridQuery query = new IngridQuery();
+    query.addField(new FieldQuery(true, false, "datatype", "topics"));
+    query.put("ranking", "date");
+    NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId",
+        this.fConfiguration);
+    IngridHits hits = searcher.search(query, 0, 100);
+    IngridHit[] hits2 = hits.getHits();
+    for (int i = 0; i < hits2.length; i++) {
+      IngridHit hit = hits2[i];
+      System.out.println(hit.toString());
+      System.out.println(hit.getScore());
+    }
+  }
+  
+  public void testOrClause() throws Exception {
+    IngridQuery query = QueryStringParser.parse("(wasser OR erde)");
+    NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId",
+        this.fConfiguration);
+    IngridHits hits = searcher.search(query, 0, 100);
+    IngridHit[] hits2 = hits.getHits();
+    assertEquals(100, hits2.length);
+    for (int i = 0; i < hits2.length; i++) {
+      IngridHit hit = hits2[i];
+      System.out.println(hit.toString());
+    }
+  }
+  
+  public void testOr() throws Exception {
+    IngridQuery query = QueryStringParser.parse("wasser OR erde");
+    NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId",
+        this.fConfiguration);
+    IngridHits hits = searcher.search(query, 0, 100);
+    IngridHit[] hits2 = hits.getHits();
+    assertEquals(100, hits2.length);
+    for (int i = 0; i < hits2.length; i++) {
+      IngridHit hit = hits2[i];
+      System.out.println(hit.toString());
+    }
+  }
+  
+  public void testPhrase() throws Exception {
+    IngridQuery query = QueryStringParser.parse("wasser erde");
+    NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId",
+        this.fConfiguration);
+    IngridHits hits = searcher.search(query, 0, 100);
+    IngridHit[] hits2 = hits.getHits();
+    assertEquals(100, hits2.length);
+    for (int i = 0; i < hits2.length; i++) {
+      IngridHit hit = hits2[i];
+      System.out.println(hit.toString());
+    }
+  }
+  
+  public void testGeoIntersect() throws Exception {
+    IngridQuery query = QueryStringParser.parse("HVZ coord:intersect x1:1 x2:20 y1:10 y2:60");
+    NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId",
+        this.fConfiguration);
+    IngridHits hits = searcher.search(query, 0, 100);
+    IngridHit[] hits2 = hits.getHits();
+    assertTrue(hits.length() == 0);
+    
+    query = QueryStringParser.parse("HVZ coord:intersect x1:9 x2:12 y1:50.1 y2:51");
+    searcher = new NutchSearcher(this.fIndex, "testId",
+        this.fConfiguration);
+    hits = searcher.search(query, 0, 100);
+    hits2 = hits.getHits();
+    assertTrue(hits.length() > 0);
 
+    query = QueryStringParser.parse("HVZ coord:intersect x1:11.2 x2:11.8 y1:50.1 y2:50.6");
+    searcher = new NutchSearcher(this.fIndex, "testId",
+        this.fConfiguration);
+    hits = searcher.search(query, 0, 100);
+    hits2 = hits.getHits();
+    assertTrue(hits.length() == 0);
+    
+  }
+  
+  public void testGeoInside() throws Exception {
+    IngridQuery query = QueryStringParser.parse("HVZ coord:inside x1:9 x2:16 y1:45 y2:60");
+    NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId",
+        this.fConfiguration);
+    IngridHits hits = searcher.search(query, 0, 100);
+    IngridHit[] hits2 = hits.getHits();
+    assertTrue(hits.length() > 0);
+  }
+
+  public void testGeoInclude() throws Exception {
+    IngridQuery query = QueryStringParser.parse("HVZ coord:include x1:10.5 x2:10.7 y1:50.5 y2:51.3");
+    NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId",
+        this.fConfiguration);
+    IngridHits hits = searcher.search(query, 0, 100);
+    IngridHit[] hits2 = hits.getHits();
+    assertTrue(hits.length() > 0);
+  }
+  
 }
