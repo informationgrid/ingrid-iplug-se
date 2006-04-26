@@ -14,6 +14,7 @@ import org.apache.hadoop.io.WritableComparable;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.nutch.searcher.Hit;
 import org.apache.nutch.searcher.HitDetails;
 import org.apache.nutch.searcher.Hits;
@@ -32,6 +33,7 @@ import de.ingrid.utils.query.FieldQuery;
 import de.ingrid.utils.query.IngridQuery;
 import de.ingrid.utils.query.RangeQuery;
 import de.ingrid.utils.query.TermQuery;
+import de.ingrid.utils.query.WildCardQuery;
 import de.ingrid.utils.queryparser.ParseException;
 import de.ingrid.utils.queryparser.QueryStringParser;
 
@@ -117,7 +119,7 @@ public class NutchSearcher implements IPlug {
     } else {
       hits = this.fNutchBean.search(nutchQuery, start + length);
     }
-		
+
 		int count = hits.getLength();
 		int max = 0;
 		final int countMinusStart = count - start;
@@ -274,6 +276,23 @@ public class NutchSearcher implements IPlug {
             addQueriesToNutchClause(fieldQueries, nutchClause);
             addQueriesToNutchClause(termQueries, nutchClause);
             out.addNutchClause(nutchClause);
+        }
+        
+        
+        WildCardQuery[] wildCardQueries = query.getWildCardQueries();
+        for (int i = 0; i < wildCardQueries.length; i++) {
+           WildCardQuery wildCardQuery = wildCardQueries[i];
+           String fieldName = wildCardQuery.getFieldName();
+           String fieldValue = wildCardQuery.getFieldValue();
+           boolean prohibited = wildCardQuery.isProhibited();
+           boolean required = wildCardQuery.isRequred();
+           if (required) {
+             out.addRequiredTerm(fieldValue, fieldName);
+           } else if (prohibited) {
+             out.addProhibitedTerm(fieldValue, fieldName);
+           } else if (!required) {
+             out.addNonRequiredTerm(fieldValue, fieldName);
+           }
         }
         
         // provider
