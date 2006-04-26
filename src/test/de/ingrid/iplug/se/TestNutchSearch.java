@@ -38,7 +38,7 @@ public class TestNutchSearch extends TestCase {
             "protocol-http|urlfilter-regex|parse-(text|html|js)|index-(basic|sns)|query-(basic|ingrid-se)");
     //this.fIndex = new File("./testIndex");
     //this.fIndex = new File("/Users/mb/segments");
-    this.fIndex = new File("./test-resources");
+    this.fIndex = new File("./test-resources/instances");
   }
 
   protected void tearDown() throws Exception {
@@ -82,6 +82,7 @@ public class TestNutchSearch extends TestCase {
     IngridHits hits = searcher.search(query, 0, 100);
     assertTrue(hits.length() > 0);
     IngridHit[] hits2 = hits.getHits();
+    
     for (int i = 0; i < hits2.length; i++) {
       IngridHit hit = hits2[i];
       System.out.println(hit);
@@ -247,7 +248,7 @@ public class TestNutchSearch extends TestCase {
         this.fConfiguration);
     IngridHits hits = searcher.search(query, 0, 100);
     IngridHit[] hits2 = hits.getHits();
-    assertEquals(100, hits2.length);
+    assertTrue(hits2.length > 0);
     for (int i = 0; i < hits2.length; i++) {
       IngridHit hit = hits2[i];
       System.out.println(hit.toString());
@@ -295,5 +296,24 @@ public class TestNutchSearch extends TestCase {
     IngridHit[] hits2 = hits.getHits();
     assertTrue(hits.length() > 0);
   }
+  
+  public void testWildCardQuery() throws Exception {
+    IngridQuery query = QueryStringParser.parse("HVZ code:1234567*");
+    NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId",
+        this.fConfiguration);
+    IngridHits hits = searcher.search(query, 0, 100);
+    IngridHit[] hits2 = hits.getHits();
+    assertTrue(hits.length() > 0);
+  }
+  
+  public void testWildCardQuery2() throws Exception {
+    IngridQuery query = QueryStringParser.parse("H*");
+    NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId",
+        this.fConfiguration);
+    IngridHits hits = searcher.search(query, 0, 100);
+    IngridHit[] hits2 = hits.getHits();
+    assertTrue(hits.length() > 0);
+  }
+  
   
 }
