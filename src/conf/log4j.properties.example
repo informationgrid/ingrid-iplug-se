@@ -1,0 +1,14 @@
+log4j.category.com.jcoverage = Info, jcoverage
+log4j.appender.jcoverage=org.apache.log4j.ConsoleAppender
+log4j.appender.jcoverage.layout=org.apache.log4j.PatternLayout
+log4j.appender.jcoverage.layout.ConversionPattern=%5p %d [%t] (%F:%L) - %m%n
+
+log4j.category.net.jxta = Error, console
+log4j.category.net.weta = DEBUG, console
+log4j.category.de.ingrid = INFO, console
+
+#console appender
+log4j.appender.console=org.apache.log4j.ConsoleAppender
+log4j.appender.console.Threshold=Debug
+log4j.appender.console.layout=org.apache.log4j.PatternLayout
+log4j.appender.console.layout.ConversionPattern=%5p [%d] (%F:%L) - %m%n
