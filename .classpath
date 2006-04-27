@@ -12,9 +12,9 @@
 	<classpathentry kind="var" path="MAVEN_REPO/weta/zips/weta-g-SNAPSHOT.zip"/>
 	<classpathentry kind="var" path="MAVEN_REPO/junit/jars/junit-3.8.1.jar"/>
 	<classpathentry kind="var" path="MAVEN_REPO/commons-logging/jars/commons-logging-1.0.2.jar"/>
-	<classpathentry kind="var" path="MAVEN_REPO/nutch/jars/nutch-0.8-dev.jar"/>
 	<classpathentry kind="var" path="MAVEN_REPO/lucene/jars/lucene-core-1.9-rc1-dev.jar"/>
 	<classpathentry kind="var" path="MAVEN_REPO/lucene/jars/lucene-misc-1.9-rc1-dev.jar"/>
 	<classpathentry kind="var" path="MAVEN_REPO/nutch/jars/hadoop-0.1-dev.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ingrid-nutch-plugins"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
