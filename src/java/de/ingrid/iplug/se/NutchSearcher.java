@@ -104,7 +104,7 @@ public class NutchSearcher implements IPlug {
 	public IngridHits search(IngridQuery query, int start, final int length)
 			throws Exception {
 		if (fLogger.isDebugEnabled()) {
-			fLogger.debug("incomming query: " + query.toString());
+			fLogger.debug("incomming query: " + query.toString() + " start:" + start + " length:" + length);
 		}
 		Query nutchQuery = new Query(this.fNutchConf);
 		buildNutchQuery(query, nutchQuery);
