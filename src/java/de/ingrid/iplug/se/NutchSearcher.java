@@ -119,7 +119,6 @@ public class NutchSearcher implements IPlug {
     } else {
       hits = this.fNutchBean.search(nutchQuery, start + length);
     }
-
 		int count = hits.getLength();
 		int max = 0;
 		final int countMinusStart = count - start;
@@ -142,7 +141,8 @@ public class NutchSearcher implements IPlug {
 	 * @throws IOException 
 	 */
 	private IngridHits translateHits(Hits hits, int start, int length, boolean groupByPartner) throws IOException {
-		IngridHit[] ingridHits = new IngridHit[length];
+		
+    IngridHit[] ingridHits = new IngridHit[length];
 		for (int i = start; i < (length + start); i++) {
 			Hit hit = hits.getHit(i);
 			// FIXME: Find the max value of the score.
@@ -387,11 +387,24 @@ public class NutchSearcher implements IPlug {
 			details = this.fNutchBean.getDetails(hit);
 		}
 		if (details != null) {
-			String title = details.getValue("title");
-			String summary;
+      
+      String summary=null;
+			String title=details.getValue("title");
 			synchronized (mutex) {
 				summary = this.fNutchBean.getSummary(details, nutchQuery);
 			}
+      
+      for (int i = 0; i < details.getLength(); i++) {
+        String field = details.getField(i);
+        
+        if("alt_summary".equals(field)) {
+          summary = details.getValue(i).equals("null") ? "" : details.getValue(i);
+        }
+        
+        if("alt_title".equals(field)) {
+          title = details.getValue(i);
+        }
+      }
 			// push values into hit detail
 			IngridHitDetail ingridDetail = new IngridHitDetail(ingridHit,
 					title, summary);
