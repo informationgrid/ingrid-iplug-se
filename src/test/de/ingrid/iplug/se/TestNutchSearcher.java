@@ -85,7 +85,6 @@ public class TestNutchSearcher extends TestCase {
     
     for (int i = 0; i < hits2.length; i++) {
       IngridHit hit = hits2[i];
-      System.out.println(hit);
     }
   }
   
@@ -108,10 +107,6 @@ public class TestNutchSearcher extends TestCase {
     IngridHits hits = searcher.search(query, 0, 100);
     assertTrue(hits.length() > 0);
     IngridHit[] hits2 = hits.getHits();
-    for (int i = 0; i < hits2.length; i++) {
-      IngridHit hit = hits2[i];
-      System.out.println(hit);
-    }
   }
 
   
@@ -139,10 +134,7 @@ public class TestNutchSearcher extends TestCase {
     IngridHits hits = searcher.search(query, 0, 100);
     assertTrue(hits.length() > 0);
     IngridHit[] hits2 = hits.getHits();
-    for (int i = 0; i < hits2.length; i++) {
-      IngridHit hit = hits2[i];
-      System.out.println(hit);
-    }
+   
   }
   
   public void testFunctCategory() throws Exception {
@@ -209,11 +201,7 @@ public class TestNutchSearcher extends TestCase {
         this.fConfiguration);
     IngridHits hits = searcher.search(query, 0, 100);
     IngridHit[] hits2 = hits.getHits();
-    for (int i = 0; i < hits2.length; i++) {
-      IngridHit hit = hits2[i];
-      System.out.println(hit.toString());
-      System.out.println(hit.getScore());
-    }
+    
   }
   
   public void testOrClause() throws Exception {
@@ -223,10 +211,7 @@ public class TestNutchSearcher extends TestCase {
     IngridHits hits = searcher.search(query, 0, 100);
     IngridHit[] hits2 = hits.getHits();
     assertEquals(100, hits2.length);
-    for (int i = 0; i < hits2.length; i++) {
-      IngridHit hit = hits2[i];
-      System.out.println(hit.toString());
-    }
+   
   }
   
   public void testOr() throws Exception {
@@ -236,10 +221,6 @@ public class TestNutchSearcher extends TestCase {
     IngridHits hits = searcher.search(query, 0, 100);
     IngridHit[] hits2 = hits.getHits();
     assertEquals(100, hits2.length);
-    for (int i = 0; i < hits2.length; i++) {
-      IngridHit hit = hits2[i];
-      System.out.println(hit.toString());
-    }
   }
   
   public void testPhrase() throws Exception {
@@ -249,10 +230,6 @@ public class TestNutchSearcher extends TestCase {
     IngridHits hits = searcher.search(query, 0, 100);
     IngridHit[] hits2 = hits.getHits();
     assertTrue(hits2.length > 0);
-    for (int i = 0; i < hits2.length; i++) {
-      IngridHit hit = hits2[i];
-      System.out.println(hit.toString());
-    }
   }
   
   public void testGeoIntersect() throws Exception {
@@ -313,6 +290,36 @@ public class TestNutchSearcher extends TestCase {
     IngridHits hits = searcher.search(query, 0, 100);
     IngridHit[] hits2 = hits.getHits();
     assertTrue(hits.length() > 0);
+  }
+  
+  
+  
+
+  public void testAltTitle() throws Exception {
+    IngridQuery query = QueryStringParser.parse("datatype:topics funct_category:Rechtliches topic:Strahlung provider:sn_smul");
+    NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId",
+        this.fConfiguration);
+    IngridHits hits = searcher.search(query, 0, 10);
+    IngridHit[] hits2 = hits.getHits();
+    assertTrue(hits2.length>0);
+    for (int i = 0; i < hits2.length; i++) {
+      IngridHit hit = hits2[i];
+      System.out.println(searcher.getDetail(hit, query, new String[0]));
+    }
+  }
+  
+  public void testAltTitle2() throws Exception {
+    //IngridQuery query = QueryStringParser.parse("naturschutzpoliti");
+    IngridQuery query = QueryStringParser.parse("Verwertung oder Entsorgung");
+    NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId",
+        this.fConfiguration);
+    IngridHits hits = searcher.search(query, 0, 10);
+    IngridHit[] hits2 = hits.getHits();
+    assertTrue(hits2.length>0);
+    for (int i = 0; i < hits2.length; i++) {
+      IngridHit hit = hits2[i];
+      System.out.println(searcher.getDetail(hit, query, new String[0]));
+    }
   }
   
   
