@@ -398,7 +398,7 @@ public class NutchSearcher implements IPlug {
         String field = details.getField(i);
         
         if("alt_summary".equals(field)) {
-          summary = details.getValue(i).equals("null") ? "" : details.getValue(i);
+          summary = details.getValue(i).equals("no_alt_summary") ? "" : details.getValue(i);
         }
         
         if("alt_title".equals(field)) {
