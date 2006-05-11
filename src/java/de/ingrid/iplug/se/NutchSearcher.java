@@ -53,7 +53,7 @@ public class NutchSearcher implements IPlug {
 	private String fPlugId;
 
 	private static Configuration fNutchConf;
-
+  
 	/**
 	 * The default constructor.
 	 */
@@ -126,8 +126,7 @@ public class NutchSearcher implements IPlug {
 			max = Math.min(length, countMinusStart);
 		}
 
-    boolean groupByPartner = IngridQuery.GROUPED_BY_PARTNER.equalsIgnoreCase(query.getGrouped()) ? true : false;
-		return translateHits(hits, start, max, groupByPartner);
+		return translateHits(hits, start, max, query.getGrouped());
 	}
 
 	/**
@@ -140,7 +139,7 @@ public class NutchSearcher implements IPlug {
 	 * @return IngridHits The hits translated from nutch hits.
 	 * @throws IOException 
 	 */
-	private IngridHits translateHits(Hits hits, int start, int length, boolean groupByPartner) throws IOException {
+	private IngridHits translateHits(Hits hits, int start, int length, String groupBy) throws IOException {
 		
     IngridHit[] ingridHits = new IngridHit[length];
 		for (int i = start; i < (length + start); i++) {
@@ -165,13 +164,17 @@ public class NutchSearcher implements IPlug {
             datasourceId, date);
       }
       
+      String groupValue = null;
+      HitDetails details = this.fNutchBean.getDetails(hit);
       
-      if(groupByPartner) {
-          HitDetails details = this.fNutchBean.getDetails(hit);
-          String partner = details.getValue("partner");
-          if(partner != null) {
-            ingridHit.addGroupedField(partner);  
-          }
+      if (IngridQuery.GROUPED_BY_PARTNER.equalsIgnoreCase(groupBy)) {
+        groupValue = details.getValue("partner");
+      } else if (IngridQuery.GROUPED_BY_ORGANISATION.equalsIgnoreCase(groupBy)) {
+        groupValue = details.getValue("provider");
+      }
+
+      if (groupValue != null) {
+        ingridHit.addGroupedField(groupValue);
       }
       
 			ingridHits[i - start] = ingridHit;
