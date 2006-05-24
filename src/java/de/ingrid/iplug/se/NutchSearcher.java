@@ -362,14 +362,14 @@ public class NutchSearcher implements IPlug {
         Query.Clause clause = new Query.Clause(new Query.Term(partner[j]),
             "partner", required, prohibited,
             this.fNutchConf);
-        nutchClause.addClause(clause);
+        nextClause.addClause(clause);
       }
       partner = subClause.getNegativeProvider();
       for (int j = 0; j < partner.length; j++) {
         Query.Clause clause = new Query.Clause(new Query.Term(partner[j]),
             "partner", required, prohibited,
             this.fNutchConf);
-        nutchClause.addClause(clause);
+        nextClause.addClause(clause);
 
       }
       
