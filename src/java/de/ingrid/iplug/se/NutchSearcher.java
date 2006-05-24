@@ -256,16 +256,12 @@ public class NutchSearcher implements IPlug {
 
             TermQuery[] termQueries = clauseQuery.getTerms();
             FieldQuery[] fieldQueries = clauseQuery.getFields();
-            
+
             addQueriesToNutchClause(fieldQueries, nutchClause);
             addQueriesToNutchClause(termQueries, nutchClause);
-            if(clauseQuery.containsKey("partner")){
-                addQueriesToNutchClause((FieldQuery[]) clauseQuery.getArray("partner"), nutchClause);
-            }
-            if(clauseQuery.containsKey("provider")){
-                addQueriesToNutchClause((FieldQuery[]) clauseQuery.getArray("provider"), nutchClause);
-            }
-            
+            addQueriesToNutchClause(getFields(clauseQuery, "partner"), nutchClause);
+            addQueriesToNutchClause(getFields(clauseQuery, "provider"), nutchClause);
+
             out.addNutchClause(nutchClause);
         }
 
@@ -287,12 +283,8 @@ public class NutchSearcher implements IPlug {
 
         // field queries
         addFielQueriesToNutchQuery(out, query.getFields());
-        if(query.containsKey("partner")){
-            addFielQueriesToNutchQuery(out, (FieldQuery[]) query.getArray("partner"));
-        }
-        if(query.containsKey("provider")){
-            addFielQueriesToNutchQuery(out, (FieldQuery[]) query.getArray("provider"));
-        }
+        addFielQueriesToNutchQuery(out, getFields(query, "partner"));
+        addFielQueriesToNutchQuery(out, getFields(query, "partner"));
     }
 
     private void addFielQueriesToNutchQuery(Query query, FieldQuery[] fieldQueries) throws IOException {
@@ -329,15 +321,18 @@ public class NutchSearcher implements IPlug {
 
             addQueriesToNutchClause(fieldQueries, nextClause);
             addQueriesToNutchClause(termQueries, nextClause);
-            if(subClause.containsKey("partner")){
-                addQueriesToNutchClause((FieldQuery[]) subClause.getArray("partner"), nutchClause);
-            }
-            if(subClause.containsKey("provider")){
-                addQueriesToNutchClause((FieldQuery[]) subClause.getArray("provider"), nutchClause);
-            }
+            addQueriesToNutchClause(getFields(subClause, "partner"), nutchClause);
+            addQueriesToNutchClause(getFields(subClause, "provider"), nutchClause);
             nutchClause.addNutchClause(nextClause);
         }
+    }
 
+    private static FieldQuery[] getFields(IngridQuery ingridQuery, String key) {
+        ArrayList fields = ingridQuery.getArrayList(key);
+        if (fields == null) {
+            return new FieldQuery[0];
+        }
+        return (FieldQuery[]) fields.toArray(new FieldQuery[fields.size()]);
     }
 
     /**
