@@ -42,157 +42,151 @@ import de.ingrid.utils.queryparser.QueryStringParser;
  */
 public class NutchSearcher implements IPlug {
 
-	public static final Object mutex = new Object();
+    public static final Object mutex = new Object();
 
-	private static final String DATATYPE = "datatype";
+    private static final String DATATYPE = "datatype";
 
-	private Log fLogger = LogFactory.getLog(this.getClass());
+    private Log fLogger = LogFactory.getLog(this.getClass());
 
-	private static NutchBean fNutchBean;
+    private static NutchBean fNutchBean;
 
-	private String fPlugId;
+    private String fPlugId;
 
-	private static Configuration fNutchConf;
-  
-	/**
-	 * The default constructor.
-	 */
-	public NutchSearcher() {
-		// nothing to do..
-	}
+    private static Configuration fNutchConf;
 
-	/**
-	 * JUST FOR TESTING...
-	 * 
-	 * @param indexFolder
-	 * @param plugId
-	 * @param conf
-	 * @throws IOException
-	 */
-	public NutchSearcher(File indexFolder, String plugId, Configuration conf)
-			throws IOException {
-		this.fNutchBean = new NutchBean(conf, indexFolder);
-		this.fPlugId = plugId;
-		this.fNutchConf = conf;
-    
-	}
-
-	public void configure(PlugDescription plugDescription) throws Exception {
-		this.fPlugId = plugDescription.getPlugId();
-		synchronized (mutex) {
-			if (fNutchConf == null) {
-				this.fNutchConf = NutchConfiguration.create();
-			}
-			if (fNutchBean == null) {
-				this.fNutchBean = new NutchBean(this.fNutchConf,
-						plugDescription.getWorkinDirectory());
-			} else {
-				this.fNutchBean.close();
-				this.fNutchBean = new NutchBean(this.fNutchConf,
-						plugDescription.getWorkinDirectory());
-			}
-		}
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ingrid.utils.ISearcher#search(de.ingrid.utils.query.IngridQuery,
-	 *      int, int)
-	 */
-	public IngridHits search(IngridQuery query, int start, final int length)
-			throws Exception {
-		if (fLogger.isDebugEnabled()) {
-			fLogger.debug("incomming query: " + query.toString() + " start:" + start + " length:" + length);
-		}
-		Query nutchQuery = new Query(this.fNutchConf);
-		buildNutchQuery(query, nutchQuery);
-		if (fLogger.isDebugEnabled()) {
-			fLogger.debug("nutch query: " + nutchQuery.toString());
-		}
-
-    Hits hits = null;
-    if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
-      hits = this.fNutchBean.search(nutchQuery, start + length, null,
-          "date", false);
-    } else {
-      hits = this.fNutchBean.search(nutchQuery, start + length);
+    /**
+     * The default constructor.
+     */
+    public NutchSearcher() {
+        // nothing to do..
     }
-		int count = hits.getLength();
-		int max = 0;
-		final int countMinusStart = count - start;
-		if (countMinusStart >= 0) {
-			max = Math.min(length, countMinusStart);
-		}
 
-		return translateHits(hits, start, max, query.getGrouped());
-	}
+    /**
+     * JUST FOR TESTING...
+     * 
+     * @param indexFolder
+     * @param plugId
+     * @param conf
+     * @throws IOException
+     */
+    public NutchSearcher(File indexFolder, String plugId, Configuration conf) throws IOException {
+        this.fNutchBean = new NutchBean(conf, indexFolder);
+        this.fPlugId = plugId;
+        this.fNutchConf = conf;
 
-	/**
-	 * Translates the Nutch-Hits to IngridHits.
-	 * 
-	 * @param hits
-	 * @param start
-	 * @param length
-	 * @param groupByPartner 
-	 * @return IngridHits The hits translated from nutch hits.
-	 * @throws IOException 
-	 */
-	private IngridHits translateHits(Hits hits, int start, int length, String groupBy) throws IOException {
-		
-    IngridHit[] ingridHits = new IngridHit[length];
-		for (int i = start; i < (length + start); i++) {
-			Hit hit = hits.getHit(i);
-			// FIXME: Find the max value of the score.
-      // final float normScore = normalize(score, 0, 50);
-      // if (this.fLogger.isDebugEnabled()) {
-      // this.fLogger.debug("The nutch score: " + score
-      // + " and mormalized score: " + normScore);
-      // }
-      final int documentId = hit.getIndexDocNo();
-      final int datasourceId = hit.getIndexNo();
-      IngridHit ingridHit = null;
-      WritableComparable sortValue = hit.getSortValue();
-      if(sortValue instanceof FloatWritable) {
-        final float score = ((FloatWritable) hit.getSortValue()).get();
-        ingridHit = new IngridHit(this.fPlugId, documentId,
-            datasourceId, score);
-      } else if(sortValue instanceof IntWritable) {
-        final int date = ((IntWritable) hit.getSortValue()).get();
-        ingridHit = new IngridHit(this.fPlugId, documentId,
-            datasourceId, date);
-      }
-      
-      String groupValue = null;
-      HitDetails details = this.fNutchBean.getDetails(hit);
-      
-      if (IngridQuery.GROUPED_BY_PARTNER.equalsIgnoreCase(groupBy)) {
-        groupValue = details.getValue("partner");
-      } else if (IngridQuery.GROUPED_BY_ORGANISATION.equalsIgnoreCase(groupBy)) {
-        groupValue = details.getValue("provider");
-      }
+    }
 
-      if (groupValue != null) {
-        ingridHit.addGroupedField(groupValue);
-      } else {
-        //fLogger.warn("No Group Value for \"" + groupBy + "\" found: " + hit.getIndexDocNo() + ": " + details.getValue("url"));
-      } 
-      
-			ingridHits[i - start] = ingridHit;
-		}
+    public void configure(PlugDescription plugDescription) throws Exception {
+        this.fPlugId = plugDescription.getPlugId();
+        synchronized (mutex) {
+            if (fNutchConf == null) {
+                this.fNutchConf = NutchConfiguration.create();
+            }
+            if (fNutchBean == null) {
+                this.fNutchBean = new NutchBean(this.fNutchConf, plugDescription.getWorkinDirectory());
+            } else {
+                this.fNutchBean.close();
+                this.fNutchBean = new NutchBean(this.fNutchConf, plugDescription.getWorkinDirectory());
+            }
+        }
 
-		return new IngridHits(this.fPlugId, hits.getTotal(), ingridHits, true);
-	}
+    }
 
-	/**
-	 * builds a nutch query
-	 * 
-	 * @param query
-	 * @param out
-	 * @throws IOException
-	 */
-	private void buildNutchQuery(IngridQuery query, Query out) throws IOException {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.ingrid.utils.ISearcher#search(de.ingrid.utils.query.IngridQuery,
+     *      int, int)
+     */
+    public IngridHits search(IngridQuery query, int start, final int length) throws Exception {
+        if (fLogger.isDebugEnabled()) {
+            fLogger.debug("incomming query: " + query.toString() + " start:" + start + " length:" + length);
+        }
+        Query nutchQuery = new Query(this.fNutchConf);
+        buildNutchQuery(query, nutchQuery);
+        if (fLogger.isDebugEnabled()) {
+            fLogger.debug("nutch query: " + nutchQuery.toString());
+        }
+
+        Hits hits = null;
+        if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
+            hits = this.fNutchBean.search(nutchQuery, start + length, null, "date", false);
+        } else {
+            hits = this.fNutchBean.search(nutchQuery, start + length);
+        }
+        int count = hits.getLength();
+        int max = 0;
+        final int countMinusStart = count - start;
+        if (countMinusStart >= 0) {
+            max = Math.min(length, countMinusStart);
+        }
+
+        return translateHits(hits, start, max, query.getGrouped());
+    }
+
+    /**
+     * Translates the Nutch-Hits to IngridHits.
+     * 
+     * @param hits
+     * @param start
+     * @param length
+     * @param groupByPartner
+     * @return IngridHits The hits translated from nutch hits.
+     * @throws IOException
+     */
+    private IngridHits translateHits(Hits hits, int start, int length, String groupBy) throws IOException {
+
+        IngridHit[] ingridHits = new IngridHit[length];
+        for (int i = start; i < (length + start); i++) {
+            Hit hit = hits.getHit(i);
+            // FIXME: Find the max value of the score.
+            // final float normScore = normalize(score, 0, 50);
+            // if (this.fLogger.isDebugEnabled()) {
+            // this.fLogger.debug("The nutch score: " + score
+            // + " and mormalized score: " + normScore);
+            // }
+            final int documentId = hit.getIndexDocNo();
+            final int datasourceId = hit.getIndexNo();
+            IngridHit ingridHit = null;
+            WritableComparable sortValue = hit.getSortValue();
+            if (sortValue instanceof FloatWritable) {
+                final float score = ((FloatWritable) hit.getSortValue()).get();
+                ingridHit = new IngridHit(this.fPlugId, documentId, datasourceId, score);
+            } else if (sortValue instanceof IntWritable) {
+                final int date = ((IntWritable) hit.getSortValue()).get();
+                ingridHit = new IngridHit(this.fPlugId, documentId, datasourceId, date);
+            }
+
+            String groupValue = null;
+            HitDetails details = this.fNutchBean.getDetails(hit);
+
+            if (IngridQuery.GROUPED_BY_PARTNER.equalsIgnoreCase(groupBy)) {
+                groupValue = details.getValue("partner");
+            } else if (IngridQuery.GROUPED_BY_ORGANISATION.equalsIgnoreCase(groupBy)) {
+                groupValue = details.getValue("provider");
+            }
+
+            if (groupValue != null) {
+                ingridHit.addGroupedField(groupValue);
+            } else {
+                // fLogger.warn("No Group Value for \"" + groupBy + "\" found: "
+                // + hit.getIndexDocNo() + ": " + details.getValue("url"));
+            }
+
+            ingridHits[i - start] = ingridHit;
+        }
+
+        return new IngridHits(this.fPlugId, hits.getTotal(), ingridHits, true);
+    }
+
+    /**
+     * builds a nutch query
+     * 
+     * @param query
+     * @param out
+     * @throws IOException
+     */
+    private void buildNutchQuery(IngridQuery query, Query out) throws IOException {
 
         // first we add the datatype in case there is one setted
         FieldQuery[] dataTypes = query.getDataTypes();
@@ -229,21 +223,6 @@ public class NutchSearcher implements IPlug {
             }
 
         }
-        // field queries
-        FieldQuery[] fields = query.getFields();
-        for (int i = 0; i < fields.length; i++) {
-            FieldQuery fieldQuery = fields[i];
-            boolean prohibited = fieldQuery.isProhibited();
-            boolean required = fieldQuery.isRequred();
-
-            if (required) {
-                out.addRequiredTerm(filterTerm(fieldQuery.getFieldValue()), fieldQuery.getFieldName());
-            } else if (prohibited) {
-                out.addProhibitedTerm(filterTerm(fieldQuery.getFieldValue()), fieldQuery.getFieldName());
-            } else if (!required) {
-                out.addNonRequiredTerm(filterTerm(fieldQuery.getFieldValue()), fieldQuery.getFieldName());
-            }
-        }
 
         RangeQuery[] rangeQueries = query.getRangeQueries();
         for (int i = 0; i < rangeQueries.length; i++) {
@@ -278,270 +257,226 @@ public class NutchSearcher implements IPlug {
             TermQuery[] termQueries = clauseQuery.getTerms();
             FieldQuery[] fieldQueries = clauseQuery.getFields();
             
-            String[] partner = clauseQuery.getPositivePartner();
-            for (int j = 0; j < partner.length; j++) {
-              Query.Clause clause = new Query.Clause(new Query.Term(partner[j]),
-                  "partner", required, prohibited,
-                  this.fNutchConf);
-              nutchClause.addClause(clause);
-            }
-            partner = clauseQuery.getNegativeProvider();
-            for (int j = 0; j < partner.length; j++) {
-              Query.Clause clause = new Query.Clause(new Query.Term(partner[j]),
-                  "partner", required, prohibited,
-                  this.fNutchConf);
-              nutchClause.addClause(clause);
-
-            }
-            
-            
             addQueriesToNutchClause(fieldQueries, nutchClause);
             addQueriesToNutchClause(termQueries, nutchClause);
-            
+            addQueriesToNutchClause((FieldQuery[]) clauseQuery.getArray("partner"), nutchClause);
+            addQueriesToNutchClause((FieldQuery[]) clauseQuery.getArray("provider"), nutchClause);
             out.addNutchClause(nutchClause);
         }
-        
-        
+
         WildCardFieldQuery[] wildCardQueries = query.getWildCardFieldQueries();
         for (int i = 0; i < wildCardQueries.length; i++) {
-           WildCardFieldQuery wildCardQuery = wildCardQueries[i];
-           String fieldName = wildCardQuery.getFieldName();
-           String fieldValue = wildCardQuery.getFieldValue();
-           boolean prohibited = wildCardQuery.isProhibited();
-           boolean required = wildCardQuery.isRequred();
-           if (required) {
-             out.addRequiredTerm(fieldValue, fieldName);
-           } else if (prohibited) {
-             out.addProhibitedTerm(fieldValue, fieldName);
-           } else if (!required) {
-             out.addNonRequiredTerm(fieldValue, fieldName);
-           }
+            WildCardFieldQuery wildCardQuery = wildCardQueries[i];
+            String fieldName = wildCardQuery.getFieldName();
+            String fieldValue = wildCardQuery.getFieldValue();
+            boolean prohibited = wildCardQuery.isProhibited();
+            boolean required = wildCardQuery.isRequred();
+            if (required) {
+                out.addRequiredTerm(fieldValue, fieldName);
+            } else if (prohibited) {
+                out.addProhibitedTerm(fieldValue, fieldName);
+            } else if (!required) {
+                out.addNonRequiredTerm(fieldValue, fieldName);
+            }
         }
-        
-        
-        String[] partner = query.getPositivePartner();
-        for (int i = 0; i < partner.length; i++) {
-            out.addRequiredTerm(filterTerm(partner[i]), "partner");
-        }
-        partner = query.getNegativeProvider();
-        for (int i = 0; i < partner.length; i++) {
-            out.addProhibitedTerm(filterTerm(partner[i]), "partner");
-        }
-        
-        
-        String[] providers = query.getPositiveProvider();
-        for (int i = 0; i < providers.length; i++) {
-            out.addRequiredTerm(filterTerm(providers[i]), "provider");
-        }
-        providers = query.getNegativeProvider();
-        for (int i = 0; i < providers.length; i++) {
-            out.addProhibitedTerm(filterTerm(providers[i]), "provider");
-        }
-        
+
+        // field queries
+        addFielQueriesToNutchQuery(out, query.getFields());
+        addFielQueriesToNutchQuery(out, (FieldQuery[]) query.getArray("partner"));
+        addFielQueriesToNutchQuery(out, (FieldQuery[]) query.getArray("provider"));
     }
 
-	/**
-   * @param subClauses
-   * @param nutchClause
-	 * @throws IOException 
-   */
-  private void addSubClauses(ClauseQuery[] subClauses, NutchClause nutchClause) throws IOException {
-    for (int i = 0; i < subClauses.length; i++) {
-      ClauseQuery subClause = subClauses[i];
-      boolean prohibited = subClause.isProhibited();
-      boolean required = subClause.isRequred();
-      Query.NutchClause nextClause = new Query.NutchClause(required, prohibited);
-      addSubClauses(subClause.getClauses(), nextClause);
-      
+    private void addFielQueriesToNutchQuery(Query query, FieldQuery[] fieldQueries) throws IOException {
+        for (int i = 0; i < fieldQueries.length; i++) {
+            FieldQuery fieldQuery = fieldQueries[i];
+            boolean prohibited = fieldQuery.isProhibited();
+            boolean required = fieldQuery.isRequred();
 
-      TermQuery[] termQueries = subClause.getTerms();
-      FieldQuery[] fieldQueries = subClause.getFields();
-     
-      String[] partner = subClause.getPositivePartner();
-      for (int j = 0; j < partner.length; j++) {
-        Query.Clause clause = new Query.Clause(new Query.Term(partner[j]),
-            "partner", required, prohibited,
-            this.fNutchConf);
-        nextClause.addClause(clause);
-      }
-      partner = subClause.getNegativeProvider();
-      for (int j = 0; j < partner.length; j++) {
-        Query.Clause clause = new Query.Clause(new Query.Term(partner[j]),
-            "partner", required, prohibited,
-            this.fNutchConf);
-        nextClause.addClause(clause);
-
-      }
-      
-      addQueriesToNutchClause(fieldQueries, nextClause);
-      addQueriesToNutchClause(termQueries, nextClause);
-      nutchClause.addNutchClause(nextClause);
-    }
-    
-  }
-
-  /**
-   * @param fieldQueries
-   * @param nutchClause
-	 * @throws IOException 
-   */
-  private void addQueriesToNutchClause(FieldQuery[] fieldQueries, NutchClause nutchClause) throws IOException {
-    for (int i = 0; i < fieldQueries.length; i++) {
-      FieldQuery query = fieldQueries[i];
-      
-      String filteredFieldName = query.getFieldName().toLowerCase();
-      String fieldValue = query.getFieldValue();
-      Query.Clause clause = new Query.Clause(new Query.Term(fieldValue),
-          filteredFieldName, query.isRequred(), query.isProhibited(),
-          this.fNutchConf);
-      nutchClause.addClause(clause);
-    }
-  }
-
-  /**
-   * @param termQueries
-   * @param nutchClause
-   */
-  private void addQueriesToNutchClause(TermQuery[] termQueries, NutchClause nutchClause) {
-    for (int i = 0; i < termQueries.length; i++) {
-      TermQuery query = termQueries[i];
-      String term = query.getTerm();
-      Query.Clause clause = new Query.Clause(new Query.Term(term),
-          query.isRequred(), query.isProhibited(),
-          this.fNutchConf);
-      nutchClause.addClause(clause);
-    }
-  }
-
-  private String filterTerm(String term) throws IOException {
-		return term.toLowerCase();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ingrid.utils.IDetailer#getDetails(de.ingrid.utils.IngridHit)
-	 */
-	public IngridHitDetail getDetail(IngridHit ingridHit,
-			IngridQuery ingridQuery, String[] requestedFields) throws Exception {
-		fLogger.debug("creating details for: " + ingridHit.toString());
-		// query required for summary caculation
-		Query nutchQuery = new Query(this.fNutchConf);
-		buildNutchQuery(ingridQuery, nutchQuery);
-		// nutch hit detail
-		Hit hit = new Hit(ingridHit.getDataSourceId(), ingridHit
-				.getDocumentId());
-		HitDetails details = null;
-		synchronized (mutex) {
-			details = this.fNutchBean.getDetails(hit);
-		}
-		if (details != null) {
-      
-      String summary=null;
-			String title=details.getValue("title");
-			synchronized (mutex) {
-				summary = this.fNutchBean.getSummary(details, nutchQuery);
-			}
-      
-      for (int i = 0; i < details.getLength(); i++) {
-        String field = details.getField(i);
-        
-        if("alt_summary".equals(field)) {
-          summary = details.getValue(i).equals("no_alt_summary") ? "" : details.getValue(i);
+            if (required) {
+                query.addRequiredTerm(filterTerm(fieldQuery.getFieldValue()), fieldQuery.getFieldName());
+            } else if (prohibited) {
+                query.addProhibitedTerm(filterTerm(fieldQuery.getFieldValue()), fieldQuery.getFieldName());
+            } else if (!required) {
+                query.addNonRequiredTerm(filterTerm(fieldQuery.getFieldValue()), fieldQuery.getFieldName());
+            }
         }
-        
-        if("alt_title".equals(field)) {
-          title = details.getValue(i);
+    }
+
+    /**
+     * @param subClauses
+     * @param nutchClause
+     * @throws IOException
+     */
+    private void addSubClauses(ClauseQuery[] subClauses, NutchClause nutchClause) throws IOException {
+        for (int i = 0; i < subClauses.length; i++) {
+            ClauseQuery subClause = subClauses[i];
+            boolean prohibited = subClause.isProhibited();
+            boolean required = subClause.isRequred();
+            Query.NutchClause nextClause = new Query.NutchClause(required, prohibited);
+            addSubClauses(subClause.getClauses(), nextClause);
+
+            TermQuery[] termQueries = subClause.getTerms();
+            FieldQuery[] fieldQueries = subClause.getFields();
+
+            addQueriesToNutchClause(fieldQueries, nextClause);
+            addQueriesToNutchClause(termQueries, nextClause);
+            addQueriesToNutchClause((FieldQuery[]) subClause.getArray("partner"), nextClause);
+            addQueriesToNutchClause((FieldQuery[]) subClause.getArray("provider"), nextClause);
+            nutchClause.addNutchClause(nextClause);
         }
-      }
-			// push values into hit detail
-			IngridHitDetail ingridDetail = new IngridHitDetail(ingridHit,
-					title, summary);
-			ingridDetail.put("url", details.getValue("url")); // TODO should
 
-			int length = details.getLength();
+    }
 
-			for (int j = 0; j < requestedFields.length; j++) {
-				ArrayList arrayList = new ArrayList();
-				for (int i = 0; i < length; i++) {
-					String luceneField = details.getField(i);
-					if (luceneField.toLowerCase().equals(
-							requestedFields[j].toLowerCase())
-							&& !luceneField.toLowerCase().equals("url")
-							&& !luceneField.toLowerCase().equals("title")) {
-						arrayList.add(details.getValue(i));
-					}
-				}
-				ingridDetail.put(requestedFields[j], (String[]) arrayList
-						.toArray(new String[arrayList.size()]));
+    /**
+     * @param fieldQueries
+     * @param nutchClause
+     * @throws IOException
+     */
+    private void addQueriesToNutchClause(FieldQuery[] fieldQueries, NutchClause nutchClause) throws IOException {
+        for (int i = 0; i < fieldQueries.length; i++) {
+            FieldQuery query = fieldQueries[i];
 
-			}
+            String filteredFieldName = query.getFieldName().toLowerCase();
+            String fieldValue = query.getFieldValue();
+            Query.Clause clause = new Query.Clause(new Query.Term(fieldValue), filteredFieldName, query.isRequred(),
+                    query.isProhibited(), this.fNutchConf);
+            nutchClause.addClause(clause);
+        }
+    }
 
-			return ingridDetail;
-		}
-		return null;
-	}
+    /**
+     * @param termQueries
+     * @param nutchClause
+     */
+    private void addQueriesToNutchClause(TermQuery[] termQueries, NutchClause nutchClause) {
+        for (int i = 0; i < termQueries.length; i++) {
+            TermQuery query = termQueries[i];
+            String term = query.getTerm();
+            Query.Clause clause = new Query.Clause(new Query.Term(term), query.isRequred(), query.isProhibited(),
+                    this.fNutchConf);
+            nutchClause.addClause(clause);
+        }
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.ingrid.utils.IDetailer#getDetails(de.ingrid.utils.IngridHit[],
-	 *      de.ingrid.utils.query.IngridQuery, java.lang.String[])
-	 */
-	public IngridHitDetail[] getDetails(IngridHit[] hits, IngridQuery query,
-			String[] requestedFields) throws Exception {
-		IngridHitDetail[] hitDetails = new IngridHitDetail[hits.length];
-		for (int i = 0; i < hits.length; i++) {
-			hitDetails[i] = getDetail(hits[i], query, requestedFields);
-		}
-		return hitDetails;
-	}
+    private String filterTerm(String term) throws IOException {
+        return term.toLowerCase();
+    }
 
-	/**
-	 * @param args
-	 * @throws ParseException
-	 * @throws Exception
-	 */
-	public static void main(String[] args) throws ParseException, Exception {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.ingrid.utils.IDetailer#getDetails(de.ingrid.utils.IngridHit)
+     */
+    public IngridHitDetail getDetail(IngridHit ingridHit, IngridQuery ingridQuery, String[] requestedFields)
+            throws Exception {
+        fLogger.debug("creating details for: " + ingridHit.toString());
+        // query required for summary caculation
+        Query nutchQuery = new Query(this.fNutchConf);
+        buildNutchQuery(ingridQuery, nutchQuery);
+        // nutch hit detail
+        Hit hit = new Hit(ingridHit.getDataSourceId(), ingridHit.getDocumentId());
+        HitDetails details = null;
+        synchronized (mutex) {
+            details = this.fNutchBean.getDetails(hit);
+        }
+        if (details != null) {
 
-		String usage = "-d FolderToNutchIndex -q query";
-		if (args.length < 4 || !args[0].startsWith("-d")
-				|| !args[2].startsWith("-q")) {
-			System.err.println(usage);
-			System.exit(-1);
-		}
-		File indexFolder = new File(args[1]);
-		String query = args[3];
-		NutchSearcher searcher = new NutchSearcher(indexFolder, "aTestId",
-				NutchConfiguration.create());
-		IngridHits hits = searcher
-				.search(QueryStringParser.parse(query), 0, 10);
-		System.out.println("Results: " + hits.length());
-		System.out.println();
-		IngridHit[] ingridHits = hits.getHits();
-		for (int i = 0; i < ingridHits.length; i++) {
-			IngridHit hit = ingridHits[i];
-			System.out.println("hist: " + hit.toString());
-			System.out.println("details:");
-			System.out.println(searcher.getDetail(hit,
-					QueryStringParser.parse(query), new String[0]).toString());
-		}
-	}
+            String summary = null;
+            String title = details.getValue("title");
+            synchronized (mutex) {
+                summary = this.fNutchBean.getSummary(details, nutchQuery);
+            }
 
-	public void close() throws IOException {
-		// FIXME normally we do not want to close the search at all.
-		// synchronized (mutex) {
-		// if (this.fNutchBean != null) {
-		// this.fNutchBean.close();
-		// }
-		// this.fNutchBean = null;
-		// }
+            for (int i = 0; i < details.getLength(); i++) {
+                String field = details.getField(i);
 
-	}
+                if ("alt_summary".equals(field)) {
+                    summary = details.getValue(i).equals("no_alt_summary") ? "" : details.getValue(i);
+                }
 
-	protected void finalize() throws Throwable {
-		if (this.fNutchBean != null) {
-			this.fNutchBean.close();
-		}
-	}
+                if ("alt_title".equals(field)) {
+                    title = details.getValue(i);
+                }
+            }
+            // push values into hit detail
+            IngridHitDetail ingridDetail = new IngridHitDetail(ingridHit, title, summary);
+            ingridDetail.put("url", details.getValue("url")); // TODO should
+
+            int length = details.getLength();
+
+            for (int j = 0; j < requestedFields.length; j++) {
+                ArrayList arrayList = new ArrayList();
+                for (int i = 0; i < length; i++) {
+                    String luceneField = details.getField(i);
+                    if (luceneField.toLowerCase().equals(requestedFields[j].toLowerCase())
+                            && !luceneField.toLowerCase().equals("url") && !luceneField.toLowerCase().equals("title")) {
+                        arrayList.add(details.getValue(i));
+                    }
+                }
+                ingridDetail.put(requestedFields[j], (String[]) arrayList.toArray(new String[arrayList.size()]));
+
+            }
+
+            return ingridDetail;
+        }
+        return null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.ingrid.utils.IDetailer#getDetails(de.ingrid.utils.IngridHit[],
+     *      de.ingrid.utils.query.IngridQuery, java.lang.String[])
+     */
+    public IngridHitDetail[] getDetails(IngridHit[] hits, IngridQuery query, String[] requestedFields) throws Exception {
+        IngridHitDetail[] hitDetails = new IngridHitDetail[hits.length];
+        for (int i = 0; i < hits.length; i++) {
+            hitDetails[i] = getDetail(hits[i], query, requestedFields);
+        }
+        return hitDetails;
+    }
+
+    /**
+     * @param args
+     * @throws ParseException
+     * @throws Exception
+     */
+    public static void main(String[] args) throws ParseException, Exception {
+
+        String usage = "-d FolderToNutchIndex -q query";
+        if (args.length < 4 || !args[0].startsWith("-d") || !args[2].startsWith("-q")) {
+            System.err.println(usage);
+            System.exit(-1);
+        }
+        File indexFolder = new File(args[1]);
+        String query = args[3];
+        NutchSearcher searcher = new NutchSearcher(indexFolder, "aTestId", NutchConfiguration.create());
+        IngridHits hits = searcher.search(QueryStringParser.parse(query), 0, 10);
+        System.out.println("Results: " + hits.length());
+        System.out.println();
+        IngridHit[] ingridHits = hits.getHits();
+        for (int i = 0; i < ingridHits.length; i++) {
+            IngridHit hit = ingridHits[i];
+            System.out.println("hist: " + hit.toString());
+            System.out.println("details:");
+            System.out.println(searcher.getDetail(hit, QueryStringParser.parse(query), new String[0]).toString());
+        }
+    }
+
+    public void close() throws IOException {
+        // FIXME normally we do not want to close the search at all.
+        // synchronized (mutex) {
+        // if (this.fNutchBean != null) {
+        // this.fNutchBean.close();
+        // }
+        // this.fNutchBean = null;
+        // }
+
+    }
+
+    protected void finalize() throws Throwable {
+        if (this.fNutchBean != null) {
+            this.fNutchBean.close();
+        }
+    }
 }
