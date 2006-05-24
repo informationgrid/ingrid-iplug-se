@@ -259,8 +259,13 @@ public class NutchSearcher implements IPlug {
             
             addQueriesToNutchClause(fieldQueries, nutchClause);
             addQueriesToNutchClause(termQueries, nutchClause);
-            addQueriesToNutchClause((FieldQuery[]) clauseQuery.getArray("partner"), nutchClause);
-            addQueriesToNutchClause((FieldQuery[]) clauseQuery.getArray("provider"), nutchClause);
+            if(clauseQuery.containsKey("partner")){
+                addQueriesToNutchClause((FieldQuery[]) clauseQuery.getArray("partner"), nutchClause);
+            }
+            if(clauseQuery.containsKey("provider")){
+                addQueriesToNutchClause((FieldQuery[]) clauseQuery.getArray("provider"), nutchClause);
+            }
+            
             out.addNutchClause(nutchClause);
         }
 
@@ -282,8 +287,12 @@ public class NutchSearcher implements IPlug {
 
         // field queries
         addFielQueriesToNutchQuery(out, query.getFields());
-        addFielQueriesToNutchQuery(out, (FieldQuery[]) query.getArray("partner"));
-        addFielQueriesToNutchQuery(out, (FieldQuery[]) query.getArray("provider"));
+        if(query.containsKey("partner")){
+            addFielQueriesToNutchQuery(out, (FieldQuery[]) query.getArray("partner"));
+        }
+        if(query.containsKey("provider")){
+            addFielQueriesToNutchQuery(out, (FieldQuery[]) query.getArray("provider"));
+        }
     }
 
     private void addFielQueriesToNutchQuery(Query query, FieldQuery[] fieldQueries) throws IOException {
@@ -320,8 +329,12 @@ public class NutchSearcher implements IPlug {
 
             addQueriesToNutchClause(fieldQueries, nextClause);
             addQueriesToNutchClause(termQueries, nextClause);
-            addQueriesToNutchClause((FieldQuery[]) subClause.getArray("partner"), nextClause);
-            addQueriesToNutchClause((FieldQuery[]) subClause.getArray("provider"), nextClause);
+            if(subClause.containsKey("partner")){
+                addQueriesToNutchClause((FieldQuery[]) subClause.getArray("partner"), nutchClause);
+            }
+            if(subClause.containsKey("provider")){
+                addQueriesToNutchClause((FieldQuery[]) subClause.getArray("provider"), nutchClause);
+            }
             nutchClause.addNutchClause(nextClause);
         }
 
