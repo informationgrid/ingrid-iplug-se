@@ -175,7 +175,9 @@ public class NutchSearcher implements IPlug {
 
       if (groupValue != null) {
         ingridHit.addGroupedField(groupValue);
-      }
+      } else {
+        //fLogger.warn("No Group Value for \"" + groupBy + "\" found: " + hit.getIndexDocNo() + ": " + details.getValue("url"));
+      } 
       
 			ingridHits[i - start] = ingridHit;
 		}
@@ -298,7 +300,16 @@ public class NutchSearcher implements IPlug {
            }
         }
         
-        // provider
+        
+        String[] partner = query.getPositivePartner();
+        for (int i = 0; i < partner.length; i++) {
+            out.addRequiredTerm(filterTerm(partner[i]), "partner");
+        }
+        partner = query.getNegativeProvider();
+        for (int i = 0; i < partner.length; i++) {
+            out.addProhibitedTerm(filterTerm(partner[i]), "partner");
+        }
+        
         
         String[] providers = query.getPositiveProvider();
         for (int i = 0; i < providers.length; i++) {
