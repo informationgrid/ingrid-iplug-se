@@ -277,9 +277,27 @@ public class NutchSearcher implements IPlug {
 
             TermQuery[] termQueries = clauseQuery.getTerms();
             FieldQuery[] fieldQueries = clauseQuery.getFields();
+            
+            String[] partner = clauseQuery.getPositivePartner();
+            for (int j = 0; j < partner.length; j++) {
+              Query.Clause clause = new Query.Clause(new Query.Term(partner[j]),
+                  "partner", required, prohibited,
+                  this.fNutchConf);
+              nutchClause.addClause(clause);
+            }
+            partner = clauseQuery.getNegativeProvider();
+            for (int j = 0; j < partner.length; j++) {
+              Query.Clause clause = new Query.Clause(new Query.Term(partner[j]),
+                  "partner", required, prohibited,
+                  this.fNutchConf);
+              nutchClause.addClause(clause);
 
+            }
+            
+            
             addQueriesToNutchClause(fieldQueries, nutchClause);
             addQueriesToNutchClause(termQueries, nutchClause);
+            
             out.addNutchClause(nutchClause);
         }
         
@@ -339,6 +357,22 @@ public class NutchSearcher implements IPlug {
       TermQuery[] termQueries = subClause.getTerms();
       FieldQuery[] fieldQueries = subClause.getFields();
      
+      String[] partner = subClause.getPositivePartner();
+      for (int j = 0; j < partner.length; j++) {
+        Query.Clause clause = new Query.Clause(new Query.Term(partner[j]),
+            "partner", required, prohibited,
+            this.fNutchConf);
+        nutchClause.addClause(clause);
+      }
+      partner = subClause.getNegativeProvider();
+      for (int j = 0; j < partner.length; j++) {
+        Query.Clause clause = new Query.Clause(new Query.Term(partner[j]),
+            "partner", required, prohibited,
+            this.fNutchConf);
+        nutchClause.addClause(clause);
+
+      }
+      
       addQueriesToNutchClause(fieldQueries, nextClause);
       addQueriesToNutchClause(termQueries, nextClause);
       nutchClause.addNutchClause(nextClause);
@@ -354,6 +388,7 @@ public class NutchSearcher implements IPlug {
   private void addQueriesToNutchClause(FieldQuery[] fieldQueries, NutchClause nutchClause) throws IOException {
     for (int i = 0; i < fieldQueries.length; i++) {
       FieldQuery query = fieldQueries[i];
+      
       String filteredFieldName = query.getFieldName().toLowerCase();
       String fieldValue = query.getFieldValue();
       Query.Clause clause = new Query.Clause(new Query.Term(fieldValue),
