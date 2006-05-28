@@ -284,7 +284,7 @@ public class NutchSearcher implements IPlug {
         // field queries
         addFielQueriesToNutchQuery(out, query.getFields());
         addFielQueriesToNutchQuery(out, getFields(query, "partner"));
-        addFielQueriesToNutchQuery(out, getFields(query, "partner"));
+        addFielQueriesToNutchQuery(out, getFields(query, "provider"));
     }
 
     private void addFielQueriesToNutchQuery(Query query, FieldQuery[] fieldQueries) throws IOException {
