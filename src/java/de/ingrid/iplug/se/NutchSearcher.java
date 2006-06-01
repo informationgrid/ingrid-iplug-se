@@ -37,6 +37,9 @@ import de.ingrid.utils.queryparser.QueryStringParser;
  */
 public class NutchSearcher implements IPlug {
 
+    
+    public static final String EXPLANATION = "explanation";
+    
     public static final Object mutex = new Object();
 
     private static final String DATATYPE = "datatype";
@@ -459,6 +462,11 @@ public class NutchSearcher implements IPlug {
                 ingridDetail.put(requestedFields[j], (String[]) arrayList
                         .toArray(new String[arrayList.size()]));
 
+                if(requestedFields[j].equals(EXPLANATION)) {
+                  String detailString = details.toHtml();
+                  String hitExplanation = this.fNutchBean.getExplanation(nutchQuery, hit);
+                  ingridDetail.put(EXPLANATION, detailString+" " + hitExplanation);
+                }
             }
 
             return ingridDetail;
