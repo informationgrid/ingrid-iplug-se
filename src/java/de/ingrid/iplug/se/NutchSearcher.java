@@ -191,7 +191,7 @@ public class NutchSearcher implements IPlug {
         int count = dataTypes.length;
         for (int i = 0; i < count; i++) {
             FieldQuery dataType = dataTypes[i];
-            if ("default".equals(dataType.getFieldValue()) || "www".equals(dataType.getFieldValue())) {
+            if ("default".equals(dataType.getFieldValue())) {
                 continue;
             }
             boolean required = dataType.isRequred();
