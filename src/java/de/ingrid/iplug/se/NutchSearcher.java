@@ -217,7 +217,7 @@ public class NutchSearcher implements IPlug {
                 termQuery = new TermQuery(required, prohibited, "\"" + termQuery.getTerm() + "\"");
             }
             if (required) {
-                out.addNonRequiredTerm(filterTerm(termQuery.getTerm()));
+                out.addRequiredTerm(filterTerm(termQuery.getTerm()));
             } else if (prohibited) {
                 out.addProhibitedTerm(filterTerm(termQuery.getTerm()));
             } else if (!required) {
