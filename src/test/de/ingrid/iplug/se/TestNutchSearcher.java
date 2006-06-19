@@ -199,7 +199,23 @@ public class TestNutchSearcher extends TestCase {
         assertEquals(100, hits2.length);
 
     }
+    
+    public void testNotAndClause() throws Exception {
+        IngridQuery query = QueryStringParser.parse("wasser AND (NOT erde)");
+        NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId", this.fConfiguration);
+        IngridHits hits = searcher.search(query, 0, 100);
+        IngridHit[] hits2 = hits.getHits();
+        assertEquals(100, hits2.length);
+    }
 
+    public void testNotOrClause() throws Exception {
+        IngridQuery query = QueryStringParser.parse("wasser OR (NOT erde)");
+        NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId", this.fConfiguration);
+        IngridHits hits = searcher.search(query, 0, 100);
+        IngridHit[] hits2 = hits.getHits();
+        assertEquals(100, hits2.length);
+    }
+    
     public void testOr() throws Exception {
         IngridQuery query = QueryStringParser.parse("wasser OR erde");
         NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId", this.fConfiguration);

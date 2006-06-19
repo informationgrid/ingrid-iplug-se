@@ -196,11 +196,12 @@ public class NutchSearcher implements IPlug {
             }
             boolean required = dataType.isRequred();
             boolean prohibited = dataType.isProhibited();
-            if (required) {
-                out.addRequiredTerm(dataType.getFieldValue(), DATATYPE);
-            } else if (prohibited) {
+            
+            if (prohibited) {
                 out.addProhibitedTerm(dataType.getFieldValue(), DATATYPE);
-            } else if (!required) {
+            } else if (required) {
+                out.addRequiredTerm(dataType.getFieldValue(), DATATYPE);
+            } else {
                 out.addNonRequiredTerm(dataType.getFieldValue(), DATATYPE);
             }
         }
@@ -216,14 +217,13 @@ public class NutchSearcher implements IPlug {
             if (terms[i].getTerm().indexOf(" ") != -1) {
                 termQuery = new TermQuery(required, prohibited, "\"" + termQuery.getTerm() + "\"");
             }
-            if (required) {
-                out.addRequiredTerm(filterTerm(termQuery.getTerm()));
-            } else if (prohibited) {
+            if (prohibited) {
                 out.addProhibitedTerm(filterTerm(termQuery.getTerm()));
-            } else if (!required) {
+            } else if (required) {
+                out.addRequiredTerm(filterTerm(termQuery.getTerm()));
+            } else {
                 out.addNonRequiredTerm(filterTerm(termQuery.getTerm()));
             }
-
         }
 
         RangeQuery[] rangeQueries = query.getRangeQueries();
@@ -236,11 +236,11 @@ public class NutchSearcher implements IPlug {
             String to = rangeQuery.getRangeTo();
             // FIXME? method filterTerm does not work with rangequery like:
             // foo:[1 TO 2]
-            if (isRequired) {
-                out.addRequiredTerm("[" + from + " TO " + to + "]", rangeName);
-            } else if (isProhibitet) {
+            if (isProhibitet) {
                 out.addProhibitedTerm("[" + from + " TO " + to + "]", rangeName);
-            } else if (!isRequired) {
+            } else if (isRequired) {
+                out.addRequiredTerm("[" + from + " TO " + to + "]", rangeName);
+            } else {
                 out.addNonRequiredTerm("[" + from + " TO " + to + "]", rangeName);
             }
         }
@@ -275,11 +275,11 @@ public class NutchSearcher implements IPlug {
             String fieldValue = wildCardQuery.getFieldValue();
             boolean prohibited = wildCardQuery.isProhibited();
             boolean required = wildCardQuery.isRequred();
-            if (required) {
-                out.addRequiredTerm(fieldValue, fieldName);
-            } else if (prohibited) {
+            if (prohibited) {
                 out.addProhibitedTerm(fieldValue, fieldName);
-            } else if (!required) {
+            } else if (required) {
+                out.addRequiredTerm(fieldValue, fieldName);
+            } else {
                 out.addNonRequiredTerm(fieldValue, fieldName);
             }
         }
@@ -288,11 +288,11 @@ public class NutchSearcher implements IPlug {
         WildCardTermQuery[] wildCardTermQueries = query.getWildCardTermQueries();
         for (int i = 0; i < wildCardTermQueries.length; i++) {
             WildCardTermQuery wildCardTermQuery = wildCardTermQueries[i];
-            if (wildCardTermQuery.isRequred()) {
-                out.addRequiredTerm(filterTerm(wildCardTermQuery.getTerm()));
-            } else if (wildCardTermQuery.isProhibited()) {
+            if (wildCardTermQuery.isProhibited()) {
                 out.addProhibitedTerm(filterTerm(wildCardTermQuery.getTerm()));
-            } else if (!wildCardTermQuery.isRequred()) {
+            } else if (wildCardTermQuery.isRequred()) {
+                out.addRequiredTerm(filterTerm(wildCardTermQuery.getTerm()));
+            } else {
                 out.addNonRequiredTerm(filterTerm(wildCardTermQuery.getTerm()));
             }
         }
@@ -302,11 +302,11 @@ public class NutchSearcher implements IPlug {
         for (int i = 0; i < fuzzyFieldQueries.length; i++) {
             FuzzyFieldQuery fuzzyFieldQuery = fuzzyFieldQueries[i];
             String fieldValue = filterTerm(fuzzyFieldQuery.getFieldValue()) + '~';
-            if (fuzzyFieldQuery.isRequred()) {
-                out.addRequiredTerm(fieldValue, fuzzyFieldQuery.getFieldName());
-            } else if (fuzzyFieldQuery.isProhibited()) {
+            if (fuzzyFieldQuery.isProhibited()) {
                 out.addProhibitedTerm(fieldValue, fuzzyFieldQuery.getFieldName());
-            } else if (!fuzzyFieldQuery.isRequred()) {
+            } else if (fuzzyFieldQuery.isRequred()) {
+                out.addRequiredTerm(fieldValue, fuzzyFieldQuery.getFieldName());
+            } else {
                 out.addNonRequiredTerm(fieldValue, fuzzyFieldQuery.getFieldName());
             }
         }
@@ -316,11 +316,11 @@ public class NutchSearcher implements IPlug {
         for (int i = 0; i < fuzzyTermQueries.length; i++) {
             FuzzyTermQuery fuzzyTermQuery = fuzzyTermQueries[i];
             String term = filterTerm(fuzzyTermQuery.getTerm()) + '~';
-            if (fuzzyTermQuery.isRequred()) {
-                out.addRequiredTerm(term);
-            } else if (fuzzyTermQuery.isProhibited()) {
+            if (fuzzyTermQuery.isProhibited()) {
                 out.addProhibitedTerm(filterTerm(term));
-            } else if (!fuzzyTermQuery.isRequred()) {
+            } else if (fuzzyTermQuery.isRequred()) {
+                out.addRequiredTerm(term);
+            } else {
                 out.addNonRequiredTerm(filterTerm(term));
             }
         }
@@ -337,11 +337,11 @@ public class NutchSearcher implements IPlug {
             boolean prohibited = fieldQuery.isProhibited();
             boolean required = fieldQuery.isRequred();
 
-            if (required) {
-                query.addRequiredTerm(filterTerm(fieldQuery.getFieldValue()), fieldQuery.getFieldName());
-            } else if (prohibited) {
+            if (prohibited) {
                 query.addProhibitedTerm(filterTerm(fieldQuery.getFieldValue()), fieldQuery.getFieldName());
-            } else if (!required) {
+            } else if (required) {
+                query.addRequiredTerm(filterTerm(fieldQuery.getFieldValue()), fieldQuery.getFieldName());
+            } else {
                 query.addNonRequiredTerm(filterTerm(fieldQuery.getFieldValue()), fieldQuery.getFieldName());
             }
         }
