@@ -1,9 +1,9 @@
 <de.ingrid.utils.PlugDescription>
-  <int>20</int>
+  <int>21</int>
   <string>personPhone</string>
-  <string>0345 5222 702</string>
+  <string>0511 120 3480</string>
   <string>personName</string>
-  <string>Frank</string>
+  <string>Fred</string>
   <string>ranking</string>
   <list>
     <string>score</string>
@@ -27,9 +27,9 @@
   <string>plugId</string>
   <string>iplug-se-kug-1234</string>
   <string>personTitle</string>
-  <string></string>
+  <string>Dr.</string>
   <string>workingDirectory</string>
-  <string>/opt/ingrid/nutch-gui-data</string>
+  <string>/opt/ingrid/nutch-gui-data-final</string>
   <string>fields</string>
   <list>
     <string>datatype</string>
@@ -50,25 +50,27 @@
     <string>buzzword</string>
     <string>areaid</string>
     <string>code</string>
+    <string>incl_meta</string>
   </list>  
   <string>personSureName</string>
-  <string>Henze</string>
+  <string>Kruse</string>
   <string>dataSourceDescription</string>
-  <string>Das ist eine Kurzbeschreibung der Webseiten</string>
+  <string>Webseiten von Bund und L?ndern</string>
   <string>organisationAbbr</string>
-  <string>bu_gein</string>
+  <string>bu_kug</string>
   <string>dataSourceName</string>
-  <string>Internet</string>
+  <string>PortalU-Internet-Suchmaschine</string>
   <string>iPlugClass</string>
   <string>de.ingrid.iplug.se.NutchSearcher</string>
   <string>personMail</string>
-  <string>fh@media-style.com</string>
+  <string>kst@portalu.de</string>
   <string>organisation</string>
-  <string>gein Information Broker (Webseiten aller Informationsanbieter)</string>
+  <string>Koordinierungsstelle PortalU</string>
   <string>motherIbusUrl</string>
   <string>j</string>
         <string>provider</string>
         <list>
+                <string>bu_stba</string>
                 <string>bb_mluv</string>
                 <string>be_senst</string>
                 <string>be_snb</string>
@@ -82,7 +84,7 @@
                 <string>bu_bgr</string>
                 <string>bu_bka</string>
                 <string>bu_bmbf</string>
-                <string>bu_bmevl</string>
+                <string>bu_bmelv</string>
                 <string>bu_bmf</string>
                 <string>bu_bmu</string>
                 <string>bu_bmz</string>
@@ -116,6 +118,7 @@
                 <string>bw_mlr</string>
                 <string>bw_um</string>
                 <string>bw_mi</string>
+<string>bw_fzk</string>
                 <string>by_brrhoen</string>
                 <string>by_gla</string>
                 <string>by_lfstad</string>
@@ -131,13 +134,19 @@
                 <string>hh_argeelbe</string>
                 <string>hh_su</string>
                 <string>hh_wa</string>
-                <string>mv_lfg</string>
                 <string>mv_lung</string>
                 <string>mv_npmueritz</string>
                 <string>mv_nvblmv</string>
                 <string>mv_schaalsee</string>
                 <string>mv_sm</string>
                 <string>mv_um</string>
+<string>mv_fhstr</string>
+<string>mv_uniro</string>
+<string>mv_unigr</string>
+<string>mv_fhnb</string>
+<string>mv_hswi</string>
+<string>mv_iow</string>
+<string>mv_lfmv</string>
                 <string>ni_gaa</string>
                 <string>ni_laves</string>
                 <string>ni_lbeg</string>
@@ -164,7 +173,7 @@
                 <string>rp_lfug</string>
                 <string>rp_lzu</string>
                 <string>rp_forst</string>
-                <string>rp_muf</string>
+                <string>rp_mufv</string>
                 <string>sh_kfue</string>
                 <string>sh_lanu</string>
                 <string>sh_luesh</string>
@@ -177,8 +186,10 @@
                 <string>st_lau</string>
                 <string>st_lue</string>
                 <string>st_mlu</string>
+<string>st_unimd</string>
                 <string>th_tlug</string>
                 <string>th_tmlnu</string>
+                <string>bu_kug</string>
         </list>
         <string>partner</string>
         <list>
@@ -198,5 +209,9 @@
                 <string>sn</string>
                 <string>st</string>
                 <string>th</string>
+        </list>
+        <string>busUrls</string>
+        <list>
+                <string>/kug-group:kug-ibus</string>
         </list>
 </de.ingrid.utils.PlugDescription>
