@@ -10,12 +10,14 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.WritableComparable;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.nutch.searcher.Hit;
 import org.apache.nutch.searcher.HitDetails;
 import org.apache.nutch.searcher.Hits;
 import org.apache.nutch.searcher.NutchBean;
 import org.apache.nutch.searcher.Query;
 import org.apache.nutch.searcher.Query.NutchClause;
+import org.apache.nutch.searcher.Query.Term;
 import org.apache.nutch.util.NutchConfiguration;
 
 import de.ingrid.utils.IPlug;
@@ -323,21 +325,39 @@ public class NutchSearcher implements IPlug {
         }
 
         // field queries
-        addFielQueriesToNutchQuery(out, query.getFields(), false);
-        addFielQueriesToNutchQuery(out, getFields(query, "partner"), true);
-        addFielQueriesToNutchQuery(out, getFields(query, "provider"), true);
+        addFielQueriesToNutchQuery(out, query.getFields());
+        
+        NutchClause partnerClause = new NutchClause(true, false);
+        NutchClause providerClause = new NutchClause(true, false);
+        addToClause(partnerClause, getFields(query, "partner"));
+        addToClause(providerClause, getFields(query, "provider"));
+        out.addNutchClause(partnerClause);
+        out.addNutchClause(providerClause);
     }
 
-    private void addFielQueriesToNutchQuery(Query query, FieldQuery[] fieldQueries, boolean partnerOrProvider) throws IOException {
+    /**
+     * @param clause 
+     * @param fieldQueries 
+     * @param partnerClause
+     * @param fields
+     * @throws IOException 
+     */
+    private void addToClause(NutchClause clause, FieldQuery[] fieldQueries) throws IOException {
+      for (int i = 0; i < fieldQueries.length; i++) {
+        FieldQuery fieldQuery = fieldQueries[i];
+        boolean prohibited = fieldQuery.isProhibited();
+        String fieldName = fieldQuery.getFieldName();
+        Term term = new Query.Term(filterTerm(fieldQuery.getFieldValue()));
+        clause.addClause(new Query.Clause(term, fieldName, false, prohibited, this.fNutchConf));
+      }
+    }
+
+    private void addFielQueriesToNutchQuery(Query query, FieldQuery[] fieldQueries) throws IOException {
         for (int i = 0; i < fieldQueries.length; i++) {
             FieldQuery fieldQuery = fieldQueries[i];
             
             boolean prohibited = fieldQuery.isProhibited();
-            boolean required = false; //partbner or provider must be OR linked
-            
-            if(!partnerOrProvider) {
-              required = fieldQuery.isRequred();
-            }
+            boolean required = fieldQuery.isRequred();
 
             if (prohibited) {
                 query.addProhibitedTerm(filterTerm(fieldQuery.getFieldValue()), fieldQuery.getFieldName());
