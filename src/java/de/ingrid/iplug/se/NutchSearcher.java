@@ -323,16 +323,21 @@ public class NutchSearcher implements IPlug {
         }
 
         // field queries
-        addFielQueriesToNutchQuery(out, query.getFields());
-        addFielQueriesToNutchQuery(out, getFields(query, "partner"));
-        addFielQueriesToNutchQuery(out, getFields(query, "provider"));
+        addFielQueriesToNutchQuery(out, query.getFields(), false);
+        addFielQueriesToNutchQuery(out, getFields(query, "partner"), true);
+        addFielQueriesToNutchQuery(out, getFields(query, "provider"), true);
     }
 
-    private void addFielQueriesToNutchQuery(Query query, FieldQuery[] fieldQueries) throws IOException {
+    private void addFielQueriesToNutchQuery(Query query, FieldQuery[] fieldQueries, boolean partnerOrProvider) throws IOException {
         for (int i = 0; i < fieldQueries.length; i++) {
             FieldQuery fieldQuery = fieldQueries[i];
+            
             boolean prohibited = fieldQuery.isProhibited();
-            boolean required = fieldQuery.isRequred();
+            boolean required = false; //partbner or provider must be OR linked
+            
+            if(!partnerOrProvider) {
+              required = fieldQuery.isRequred();
+            }
 
             if (prohibited) {
                 query.addProhibitedTerm(filterTerm(fieldQuery.getFieldValue()), fieldQuery.getFieldName());
