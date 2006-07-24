@@ -233,8 +233,9 @@ public class NutchSearcher implements IPlug {
             String rangeName = rangeQuery.getRangeName();
             String from = rangeQuery.getRangeFrom();
             String to = rangeQuery.getRangeTo();
-            // FIXME? method filterTerm does not work with rangequery like:
-            // foo:[1 TO 2]
+            // FIXME method filterTerm does not work with rangequeries like:
+            // foo:[1 TO 2]?
+            // filterTerm should only be used by term queries.
             if (isProhibitet) {
                 out.addProhibitedTerm("[" + from + " TO " + to + "]", rangeName);
             } else if (isRequired) {
@@ -246,8 +247,8 @@ public class NutchSearcher implements IPlug {
 
         // subclauses
         ClauseQuery[] clauses = query.getClauses();
-        NutchClause partnerClause2 = new NutchClause(true, false);
-        NutchClause providerClause2 = new NutchClause(true, false);
+        NutchClause partnerClause = new NutchClause(true, false);
+        NutchClause providerClause = new NutchClause(true, false);
     
         for (int i = 0; i < clauses.length; i++) {
             ClauseQuery clauseQuery = clauses[i];
@@ -261,19 +262,15 @@ public class NutchSearcher implements IPlug {
             TermQuery[] termQueries = clauseQuery.getTerms();
             FieldQuery[] fieldQueries = clauseQuery.getFields();
 
-            
             addQueriesToNutchClause(fieldQueries, nutchClause);
             addQueriesToNutchClause(termQueries, nutchClause);
             
-            addToClause(partnerClause2, getFields(clauseQuery, "partner"));
-            addToClause(providerClause2, getFields(clauseQuery, "provider"));
+            addToClause(partnerClause, getFields(clauseQuery, "partner"));
+            addToClause(providerClause, getFields(clauseQuery, "provider"));
             addQueriesToNutchClause(getFields(clauseQuery, "datatype"), nutchClause);
 
-            
             out.addNutchClause(nutchClause);
         }
-        out.addNutchClause(partnerClause2);
-        out.addNutchClause(providerClause2);
 
         // wildcard fields
         WildCardFieldQuery[] wildCardQueries = query.getWildCardFieldQueries();
@@ -336,8 +333,6 @@ public class NutchSearcher implements IPlug {
         // field queries
         addFielQueriesToNutchQuery(out, query.getFields());
         
-        NutchClause partnerClause = new NutchClause(true, false);
-        NutchClause providerClause = new NutchClause(true, false);
         addToClause(partnerClause, getFields(query, "partner"));
         addToClause(providerClause, getFields(query, "provider"));
         out.addNutchClause(partnerClause);
