@@ -246,6 +246,9 @@ public class NutchSearcher implements IPlug {
 
         // subclauses
         ClauseQuery[] clauses = query.getClauses();
+        NutchClause partnerClause2 = new NutchClause(true, false);
+        NutchClause providerClause2 = new NutchClause(true, false);
+    
         for (int i = 0; i < clauses.length; i++) {
             ClauseQuery clauseQuery = clauses[i];
             boolean prohibited = clauseQuery.isProhibited();
@@ -258,14 +261,19 @@ public class NutchSearcher implements IPlug {
             TermQuery[] termQueries = clauseQuery.getTerms();
             FieldQuery[] fieldQueries = clauseQuery.getFields();
 
+            
             addQueriesToNutchClause(fieldQueries, nutchClause);
             addQueriesToNutchClause(termQueries, nutchClause);
-            addQueriesToNutchClause(getFields(clauseQuery, "partner"), nutchClause);
-            addQueriesToNutchClause(getFields(clauseQuery, "provider"), nutchClause);
+            
+            addToClause(partnerClause2, getFields(clauseQuery, "partner"));
+            addToClause(providerClause2, getFields(clauseQuery, "provider"));
             addQueriesToNutchClause(getFields(clauseQuery, "datatype"), nutchClause);
 
+            
             out.addNutchClause(nutchClause);
         }
+        out.addNutchClause(partnerClause2);
+        out.addNutchClause(providerClause2);
 
         // wildcard fields
         WildCardFieldQuery[] wildCardQueries = query.getWildCardFieldQueries();
