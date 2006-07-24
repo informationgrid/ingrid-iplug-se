@@ -364,8 +364,6 @@ public class TestNutchSearcher extends TestCase {
         System.out.println(hits.length());
     }
 
-    
-
     public void testExplanation() throws Exception {
         IngridQuery query = QueryStringParser.parse("wasser");
         NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId", this.fConfiguration);
@@ -374,7 +372,5 @@ public class TestNutchSearcher extends TestCase {
         assertTrue(hits2.length > 0);
         IngridHitDetail detail = searcher.getDetail(hits2[0], query, new String[] { NutchSearcher.EXPLANATION });
         System.out.println(detail.get(NutchSearcher.EXPLANATION));
-
     }
-
 }
