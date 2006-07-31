@@ -187,20 +187,6 @@ public class NutchSearcher implements IPlug {
      * @throws IOException
      */
     private void buildNutchQuery(IngridQuery query, Query out) throws IOException {
-        // first we add the datatype in case there is one setted
-        FieldQuery[] dataTypes = query.getDataTypes();
-        int count = dataTypes.length;
-        for (int i = 0; i < count; i++) {
-            FieldQuery dataType = dataTypes[i];
-            final boolean prohibited = dataType.isProhibited();
-            
-            if (prohibited) {
-                out.addProhibitedTerm(dataType.getFieldValue(), DATATYPE);
-            } else {
-                out.addNonRequiredTerm(dataType.getFieldValue(), DATATYPE);
-            }
-        }
-
         // term queries
         TermQuery[] terms = query.getTerms();
         for (int i = 0; i < terms.length; i++) {
@@ -245,6 +231,7 @@ public class NutchSearcher implements IPlug {
         ClauseQuery[] clauses = query.getClauses();
         NutchClause partnerClause = new NutchClause(true, false);
         NutchClause providerClause = new NutchClause(true, false);
+        NutchClause datatypeClause = new NutchClause(true, false);
     
         for (int i = 0; i < clauses.length; i++) {
             ClauseQuery clauseQuery = clauses[i];
@@ -263,7 +250,7 @@ public class NutchSearcher implements IPlug {
             
             addToClause(partnerClause, getFields(clauseQuery, "partner"));
             addToClause(providerClause, getFields(clauseQuery, "provider"));
-            addQueriesToNutchClause(getFields(clauseQuery, "datatype"), nutchClause);
+            addToClause(datatypeClause, getFields(clauseQuery, "datatype"));
 
             out.addNutchClause(nutchClause);
         }
@@ -331,8 +318,10 @@ public class NutchSearcher implements IPlug {
         
         addToClause(partnerClause, getFields(query, "partner"));
         addToClause(providerClause, getFields(query, "provider"));
+        addToClause(datatypeClause, getFields(query, "datatype"));
         out.addNutchClause(partnerClause);
         out.addNutchClause(providerClause);
+        out.addNutchClause(datatypeClause);
     }
 
     /**
