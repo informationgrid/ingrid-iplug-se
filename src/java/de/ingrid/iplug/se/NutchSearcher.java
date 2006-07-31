@@ -378,6 +378,7 @@ public class NutchSearcher implements IPlug {
             addQueriesToNutchClause(termQueries, nextClause);
             addQueriesToNutchClause(getFields(subClause, "partner"), nutchClause);
             addQueriesToNutchClause(getFields(subClause, "provider"), nutchClause);
+            addQueriesToNutchClause(getFields(subClause, "datatype"), nutchClause);
             nutchClause.addNutchClause(nextClause);
         }
     }
