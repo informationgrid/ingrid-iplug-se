@@ -10,7 +10,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.WritableComparable;
-import org.apache.lucene.search.BooleanQuery;
 import org.apache.nutch.searcher.Hit;
 import org.apache.nutch.searcher.HitDetails;
 import org.apache.nutch.searcher.Hits;
@@ -193,13 +192,10 @@ public class NutchSearcher implements IPlug {
         int count = dataTypes.length;
         for (int i = 0; i < count; i++) {
             FieldQuery dataType = dataTypes[i];
-            boolean required = dataType.isRequred();
-            boolean prohibited = dataType.isProhibited();
+            final boolean prohibited = dataType.isProhibited();
             
             if (prohibited) {
                 out.addProhibitedTerm(dataType.getFieldValue(), DATATYPE);
-            } else if (required) {
-                out.addRequiredTerm(dataType.getFieldValue(), DATATYPE);
             } else {
                 out.addNonRequiredTerm(dataType.getFieldValue(), DATATYPE);
             }
@@ -210,8 +206,8 @@ public class NutchSearcher implements IPlug {
         for (int i = 0; i < terms.length; i++) {
             TermQuery termQuery = terms[i];
 
-            boolean prohibited = termQuery.isProhibited();
-            boolean required = termQuery.isRequred();
+            final boolean prohibited = termQuery.isProhibited();
+            final boolean required = termQuery.isRequred();
 
             if (terms[i].getTerm().indexOf(" ") != -1) {
                 termQuery = new TermQuery(required, prohibited, "\"" + termQuery.getTerm() + "\"");
@@ -228,8 +224,8 @@ public class NutchSearcher implements IPlug {
         RangeQuery[] rangeQueries = query.getRangeQueries();
         for (int i = 0; i < rangeQueries.length; i++) {
             RangeQuery rangeQuery = rangeQueries[i];
-            boolean isProhibitet = rangeQuery.isProhibited();
-            boolean isRequired = rangeQuery.isRequred();
+            final boolean isProhibitet = rangeQuery.isProhibited();
+            final boolean isRequired = rangeQuery.isRequred();
             String rangeName = rangeQuery.getRangeName();
             String from = rangeQuery.getRangeFrom();
             String to = rangeQuery.getRangeTo();
@@ -252,8 +248,8 @@ public class NutchSearcher implements IPlug {
     
         for (int i = 0; i < clauses.length; i++) {
             ClauseQuery clauseQuery = clauses[i];
-            boolean prohibited = clauseQuery.isProhibited();
-            boolean required = clauseQuery.isRequred();
+            final boolean prohibited = clauseQuery.isProhibited();
+            final boolean required = clauseQuery.isRequred();
             Query.NutchClause nutchClause = new Query.NutchClause(required, prohibited);
 
             ClauseQuery[] subClauses = clauseQuery.getClauses();
