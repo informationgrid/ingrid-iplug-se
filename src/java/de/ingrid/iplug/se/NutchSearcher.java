@@ -113,7 +113,7 @@ public class NutchSearcher implements IPlug {
             hits = this.fNutchBean.search(nutchQuery, start + length, null, "date", true);
             //hits = this.fNutchBean.searchAndDedupUrlByDate(nutchQuery, start + length, "date", true);
         } else {
-            hits = this.fNutchBean.search(nutchQuery, start + length);
+            hits = this.fNutchBean.search(nutchQuery, start + length, 1, "url");
           //hits = this.fNutchBean.searchAndDedupUrlByDate(nutchQuery, start + length, null, false);
         }
         int count = hits.getLength();
