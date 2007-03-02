@@ -145,6 +145,9 @@
             <resource>
                 <directory>src/conf</directory>
                 <filtering>false</filtering>
+                <excludes>
+                	<exclude>**/*</exclude>
+                </excludes>
             </resource>
         </resources>
     </build>
