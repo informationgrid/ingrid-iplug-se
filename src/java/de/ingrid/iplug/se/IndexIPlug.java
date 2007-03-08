@@ -9,23 +9,28 @@ import de.ingrid.utils.query.IngridQuery;
 
 public class IndexIPlug implements IPlug {
 
+    private static final IngridHitDetail detail = new IngridHitDetail();
+
     public void close() throws Exception {
-        // nothing todo
+    // nothing todo
     }
 
     public void configure(PlugDescription arg0) throws Exception {
-        // nothing todo
+    // nothing todo
     }
 
-    public IngridHits search(IngridQuery arg0, int arg1, int arg2) throws Exception {
-        return null;
+    public IngridHits search(IngridQuery arg0, int arg1, int arg2)
+            throws Exception {
+        return new IngridHits();
     }
 
-    public IngridHitDetail getDetail(IngridHit arg0, IngridQuery arg1, String[] arg2) throws Exception {
-        return null;
+    public IngridHitDetail getDetail(IngridHit arg0, IngridQuery arg1,
+            String[] arg2) throws Exception {
+        return detail;
     }
 
-    public IngridHitDetail[] getDetails(IngridHit[] arg0, IngridQuery arg1, String[] arg2) throws Exception {
-        return null;
+    public IngridHitDetail[] getDetails(IngridHit[] arg0, IngridQuery arg1,
+            String[] arg2) throws Exception {
+        return new IngridHitDetail[] {};
     }
 }
