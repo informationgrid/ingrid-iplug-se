@@ -6,7 +6,9 @@
 
 package de.ingrid.iplug.se;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.ObjectOutputStream;
 
 import junit.framework.TestCase;
 
@@ -47,7 +49,7 @@ public class TestNutchSearcher extends TestCase {
                 "protocol-http|urlfilter-regex|parse-(text|html|js)|index-(basic|sns)|query-(basic|ingrid-se)");
         // this.fIndex = new File("./testIndex");
         // this.fIndex = new File("/Users/mb/segments");
-        this.fIndex = new File("./test-resources/web-context");
+        this.fIndex = new File("./test-resources/instances");
     }
 
     protected void tearDown() throws Exception {
@@ -62,9 +64,18 @@ public class TestNutchSearcher extends TestCase {
     public void testSearch() throws Exception {
 
         NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId", this.fConfiguration);
-        IngridQuery query = QueryStringParser.parse("partner:bund");
-        IngridHits hits = searcher.search(query, 0, 100);
+        IngridQuery query = QueryStringParser.parse("http");
+        IngridHits hits = searcher.search(query, 0, 10);
         assertTrue(hits.size() > 0);
+        IngridHit[] hits2 = hits.getHits();
+        System.out.println(hits.length());
+        
+        ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream stream = new ObjectOutputStream(arrayOutputStream);
+        stream.writeObject(hits);
+        System.out.println(arrayOutputStream.toByteArray().length/1024.0);
+        arrayOutputStream.close();
+        stream.close();
     }
 
     /**
@@ -82,7 +93,7 @@ public class TestNutchSearcher extends TestCase {
 
         query.addClause(cq);
 
-        IngridHits hits = searcher.search(query, 0, 100);
+        IngridHits hits = searcher.search(query, 0, 1000);
         assertTrue(hits.length() > 0);
         IngridHit[] hits2 = hits.getHits();
 
@@ -372,5 +383,12 @@ public class TestNutchSearcher extends TestCase {
         assertTrue(hits2.length > 0);
         IngridHitDetail detail = searcher.getDetail(hits2[0], query, new String[] { NutchSearcher.EXPLANATION });
         System.out.println(detail.get(NutchSearcher.EXPLANATION));
+    }
+    
+    public void testParseProviderName() throws Exception {
+        IngridQuery query = QueryStringParser.parse("http provider:ni_lk-row");
+        assertEquals("ni_lk-row", query.getPositiveProvider()[0]);
+        NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId", this.fConfiguration);
+        searcher.search(query, 0, 10);
     }
 }
