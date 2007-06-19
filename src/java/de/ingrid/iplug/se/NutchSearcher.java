@@ -127,7 +127,6 @@ public class NutchSearcher implements IPlug {
         
         Element element = _cache.get(query);
         if(element != null) {
-            System.out.println("NutchSearcher.search()");
             Serializable value = element.getValue();
             IngridHits hits = (IngridHits) value;
             return hits;
