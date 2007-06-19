@@ -2,7 +2,13 @@ package de.ingrid.iplug.se;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
+
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheException;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,6 +59,8 @@ public class NutchSearcher implements IPlug {
 
     private String fPlugId;
 
+    private Cache _cache;
+
     private static Configuration fNutchConf;
 
     /**
@@ -74,6 +82,14 @@ public class NutchSearcher implements IPlug {
         fNutchBean = new NutchBean(conf, indexFolder);
         this.fPlugId = plugId;
         fNutchConf = conf;
+        try {
+            CacheManager manager1 = CacheManager.create();
+            _cache = manager1.getCache("sampleCache1");
+        } catch (CacheException e) {
+            throw new IOException(e.getMessage());
+        }
+        
+
     }
 
     public void configure(PlugDescription plugDescription) throws Exception {
@@ -102,6 +118,16 @@ public class NutchSearcher implements IPlug {
         if (fLogger.isDebugEnabled()) {
             fLogger.debug("incomming query: " + query.toString() + " start:" + start + " length:" + length);
         }
+        
+        
+        Element element = _cache.get(query);
+        if(element != null) {
+            System.out.println("NutchSearcher.search()");
+            Serializable value = element.getValue();
+            IngridHits hits = (IngridHits) value;
+            return hits;
+        }
+        
         Query nutchQuery = new Query(this.fNutchConf);
         buildNutchQuery(query, nutchQuery);
         if (fLogger.isDebugEnabled()) {
@@ -124,7 +150,10 @@ public class NutchSearcher implements IPlug {
             max = Math.min(length, countMinusStart);
         }
 
-        return translateHits(hits, start, max, query.getGrouped());
+        IngridHits ret = translateHits(hits, start, max, query.getGrouped());
+        Element element2 = new Element(query, ret);
+        _cache.put(element2);
+        return ret;
     }
 
     /**
