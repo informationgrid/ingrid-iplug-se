@@ -67,7 +67,12 @@ public class NutchSearcher implements IPlug {
      * The default constructor.
      */
     public NutchSearcher() {
-        // nothing to do..
+        try {
+            CacheManager manager1 = CacheManager.create();
+            _cache = manager1.getCache("sampleCache1");
+        } catch (CacheException e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     /**
