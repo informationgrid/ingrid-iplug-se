@@ -63,6 +63,8 @@ public class NutchSearcher implements IPlug {
 
     private static Configuration fNutchConf;
 
+    private static final String PREFIX = NutchSearcher.class.getName();
+    
     /**
      * The default constructor.
      */
@@ -124,14 +126,10 @@ public class NutchSearcher implements IPlug {
             fLogger.debug("incomming query: " + query.toString() + " start:" + start + " length:" + length);
         }
         
-        
-        Element element = _cache.get(query);
-        if(element != null) {
-            Serializable value = element.getValue();
-            IngridHits hits = (IngridHits) value;
-            return hits;
+        IngridHits ret = getCachedHits(query, start, length);
+        if(ret != null) {
+            return ret;
         }
-        
         Query nutchQuery = new Query(this.fNutchConf);
         buildNutchQuery(query, nutchQuery);
         if (fLogger.isDebugEnabled()) {
@@ -154,9 +152,23 @@ public class NutchSearcher implements IPlug {
             max = Math.min(length, countMinusStart);
         }
 
-        IngridHits ret = translateHits(hits, start, max, query.getGrouped());
+        ret = translateHits(hits, start, max, query.getGrouped());
         Element element2 = new Element(query, ret);
         _cache.put(element2);
+        return ret;
+    }
+
+    private IngridHits getCachedHits(IngridQuery query, int start, int length) throws Exception {
+        IngridHits ret = null;
+        
+        query.put(PREFIX+"_start", new Integer(start));
+        query.put(PREFIX+"_length", new Integer(length));
+        Element element = _cache.get(query);
+        if(element != null) {
+            Serializable value = element.getValue();
+            IngridHits hits = (IngridHits) value;
+            ret = hits;
+        }
         return ret;
     }
 
