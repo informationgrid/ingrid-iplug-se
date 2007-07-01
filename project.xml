@@ -65,7 +65,7 @@
     <siteAddress>http://torwald.gistec-online.de/ingrid/ingrid-iplug-se</siteAddress>
     <siteDirectory>/srv/www/htdocs/ingrid/ingrid-iplug-se</siteDirectory>
     <repository>
-        <connection>scm:svn:https://127.0.0.1:444/svn/ingrid/ingrid-iplug-se/trunk</connection>
+        <connection>scm:svn:https://127.0.0.1:444/svn/ingrid/ingrid-iplug-se/branches/ingrid-iplug-se-1.0.0</connection>
     </repository>
     <dependencies>
         <dependency>
@@ -85,7 +85,7 @@
         <dependency>
             <groupId>ingrid</groupId>
             <artifactId>ingrid-iplug</artifactId>
-            <version>1.0.0</version>
+            <version>${pom.currentVersion}</version>
             <url>http://torwald.gistec-online.de/ingrid/maven</url>
             <type>jar</type>
         </dependency>
@@ -98,7 +98,7 @@
         <dependency>
             <groupId>ingrid</groupId>
             <artifactId>ingrid-utils</artifactId>
-            <version>1.0.0</version>
+            <version>${pom.currentVersion}</version>
             <type>jar</type>
         </dependency>
         <dependency>
