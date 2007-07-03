@@ -2,13 +2,7 @@ package de.ingrid.iplug.se;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
-
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheException;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -59,22 +53,13 @@ public class NutchSearcher implements IPlug {
 
     private String fPlugId;
 
-    private Cache _cache;
-
     private static Configuration fNutchConf;
 
-    private static final String PREFIX = NutchSearcher.class.getName();
-    
     /**
      * The default constructor.
      */
     public NutchSearcher() {
-        try {
-            CacheManager manager1 = CacheManager.create();
-            _cache = manager1.getCache("sampleCache1");
-        } catch (CacheException e) {
-            throw new RuntimeException(e.getMessage());
-        }
+        // nothing to do..
     }
 
     /**
@@ -89,14 +74,6 @@ public class NutchSearcher implements IPlug {
         fNutchBean = new NutchBean(conf, indexFolder);
         this.fPlugId = plugId;
         fNutchConf = conf;
-        try {
-            CacheManager manager1 = CacheManager.create();
-            _cache = manager1.getCache("sampleCache1");
-        } catch (CacheException e) {
-            throw new IOException(e.getMessage());
-        }
-        
-
     }
 
     public void configure(PlugDescription plugDescription) throws Exception {
@@ -125,11 +102,6 @@ public class NutchSearcher implements IPlug {
         if (fLogger.isDebugEnabled()) {
             fLogger.debug("incomming query: " + query.toString() + " start:" + start + " length:" + length);
         }
-        
-        IngridHits ret = getCachedHits(query, start, length);
-        if(ret != null) {
-            return ret;
-        }
         Query nutchQuery = new Query(this.fNutchConf);
         buildNutchQuery(query, nutchQuery);
         if (fLogger.isDebugEnabled()) {
@@ -152,24 +124,7 @@ public class NutchSearcher implements IPlug {
             max = Math.min(length, countMinusStart);
         }
 
-        ret = translateHits(hits, start, max, query.getGrouped());
-        Element element2 = new Element(query, ret);
-        _cache.put(element2);
-        return ret;
-    }
-
-    private IngridHits getCachedHits(IngridQuery query, int start, int length) throws Exception {
-        IngridHits ret = null;
-        
-        query.put(PREFIX+"_start", new Integer(start));
-        query.put(PREFIX+"_length", new Integer(length));
-        Element element = _cache.get(query);
-        if(element != null) {
-            Serializable value = element.getValue();
-            IngridHits hits = (IngridHits) value;
-            ret = hits;
-        }
-        return ret;
+        return translateHits(hits, start, max, query.getGrouped());
     }
 
     /**
