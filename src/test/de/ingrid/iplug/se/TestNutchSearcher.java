@@ -172,7 +172,7 @@ public class TestNutchSearcher extends TestCase {
         for (int i = 0; i < hits2.length; i++) {
             loopOne = true;
             IngridHit hit = hits2[i];
-            String[] groupedFileds = hit.getGroupedFileds();
+            String[] groupedFileds = hit.getGroupedFields();
             for (int j = 0; j < groupedFileds.length; j++) {
                 loopTwo = true;
                 String string = groupedFileds[j];
