@@ -111,9 +111,9 @@ public class NutchSearcher implements IPlug {
         Hits hits = null;
         if (grouped != null && grouped.equals(IngridQuery.GROUPED_BY_DATASOURCE)) {
             if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
-                hits = this.fNutchBean.search(nutchQuery, start + length, 1, "host", "date", true);
+                hits = this.fNutchBean.search(nutchQuery, start + length, 1, "site", "date", true);
             } else {
-                hits = this.fNutchBean.search(nutchQuery, start + length, 1, "host");
+                hits = this.fNutchBean.search(nutchQuery, start + length, 1, "site");
             }
         } else {
             if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
