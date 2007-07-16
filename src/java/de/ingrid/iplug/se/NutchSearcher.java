@@ -95,8 +95,7 @@ public class NutchSearcher implements IPlug {
     /*
      * (non-Javadoc)
      * 
-     * @see de.ingrid.utils.ISearcher#search(de.ingrid.utils.query.IngridQuery,
-     *      int, int)
+     * @see de.ingrid.utils.ISearcher#search(de.ingrid.utils.query.IngridQuery, int, int)
      */
     public IngridHits search(IngridQuery query, int start, final int length) throws Exception {
         if (fLogger.isDebugEnabled()) {
@@ -108,14 +107,20 @@ public class NutchSearcher implements IPlug {
             fLogger.debug("nutch query: " + nutchQuery.toString());
         }
 
+        String grouped = query.getGrouped();
         Hits hits = null;
-        if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
-            hits = this.fNutchBean.search(nutchQuery, start + length, null, "date", true);
-            //hits = this.fNutchBean.searchAndDedupUrlByDate(nutchQuery, start + length, "date", true);
+        if (grouped != null && grouped.equals(IngridQuery.GROUPED_BY_DATASOURCE)) {
+            if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
+                hits = this.fNutchBean.search(nutchQuery, start + length, 1, "host", "date", true);
+            } else {
+                hits = this.fNutchBean.search(nutchQuery, start + length, 1, "host");
+            }
         } else {
-            //hits = this.fNutchBean.search(nutchQuery, start + length, 0, "url");
-            hits = this.fNutchBean.search(nutchQuery, start + length, 1, "urldigest");
-          //hits = this.fNutchBean.searchAndDedupUrlByDate(nutchQuery, start + length, null, false);
+            if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
+                hits = this.fNutchBean.search(nutchQuery, start + length, null, "date", true);
+            } else {
+                hits = this.fNutchBean.search(nutchQuery, start + length, 1, "urldigest");
+            }
         }
         int count = hits.getLength();
         int max = 0;
@@ -235,7 +240,7 @@ public class NutchSearcher implements IPlug {
         NutchClause partnerClause = new NutchClause(true, false);
         NutchClause providerClause = new NutchClause(true, false);
         NutchClause datatypeClause = new NutchClause(true, false);
-    
+
         for (int i = 0; i < clauses.length; i++) {
             ClauseQuery clauseQuery = clauses[i];
             final boolean prohibited = clauseQuery.isProhibited();
@@ -250,7 +255,7 @@ public class NutchSearcher implements IPlug {
 
             addQueriesToNutchClause(fieldQueries, nutchClause);
             addQueriesToNutchClause(termQueries, nutchClause);
-            
+
             addToClause(partnerClause, getFields(clauseQuery, "partner"));
             addToClause(providerClause, getFields(clauseQuery, "provider"));
             addToClause(datatypeClause, getFields(clauseQuery, "datatype"));
@@ -318,7 +323,7 @@ public class NutchSearcher implements IPlug {
 
         // field queries
         addFielQueriesToNutchQuery(out, query.getFields());
-        
+
         addToClause(partnerClause, getFields(query, "partner"));
         addToClause(providerClause, getFields(query, "provider"));
         addToClause(datatypeClause, getFields(query, "datatype"));
@@ -328,26 +333,26 @@ public class NutchSearcher implements IPlug {
     }
 
     /**
-     * @param clause 
-     * @param fieldQueries 
+     * @param clause
+     * @param fieldQueries
      * @param partnerClause
      * @param fields
-     * @throws IOException 
+     * @throws IOException
      */
     private void addToClause(NutchClause clause, FieldQuery[] fieldQueries) throws IOException {
-      for (int i = 0; i < fieldQueries.length; i++) {
-        FieldQuery fieldQuery = fieldQueries[i];
-        boolean prohibited = fieldQuery.isProhibited();
-        String fieldName = fieldQuery.getFieldName();
-        Term term = new Query.Term(filterTerm(fieldQuery.getFieldValue()));
-        clause.addClause(new Query.Clause(term, fieldName, false, prohibited, this.fNutchConf));
-      }
+        for (int i = 0; i < fieldQueries.length; i++) {
+            FieldQuery fieldQuery = fieldQueries[i];
+            boolean prohibited = fieldQuery.isProhibited();
+            String fieldName = fieldQuery.getFieldName();
+            Term term = new Query.Term(filterTerm(fieldQuery.getFieldValue()));
+            clause.addClause(new Query.Clause(term, fieldName, false, prohibited, this.fNutchConf));
+        }
     }
 
     private void addFielQueriesToNutchQuery(Query query, FieldQuery[] fieldQueries) throws IOException {
         for (int i = 0; i < fieldQueries.length; i++) {
             FieldQuery fieldQuery = fieldQueries[i];
-            
+
             boolean prohibited = fieldQuery.isProhibited();
             boolean required = fieldQuery.isRequred();
 
@@ -497,8 +502,8 @@ public class NutchSearcher implements IPlug {
     /*
      * (non-Javadoc)
      * 
-     * @see de.ingrid.utils.IDetailer#getDetails(de.ingrid.utils.IngridHit[],
-     *      de.ingrid.utils.query.IngridQuery, java.lang.String[])
+     * @see de.ingrid.utils.IDetailer#getDetails(de.ingrid.utils.IngridHit[], de.ingrid.utils.query.IngridQuery,
+     *      java.lang.String[])
      */
     public IngridHitDetail[] getDetails(IngridHit[] hits, IngridQuery query, String[] requestedFields) throws Exception {
         IngridHitDetail[] hitDetails = new IngridHitDetail[hits.length];
