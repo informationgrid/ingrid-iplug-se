@@ -25,14 +25,14 @@ import de.ingrid.utils.query.TermQuery;
 import de.ingrid.utils.queryparser.QueryStringParser;
 
 /**
- * TODO comment for TestNutchSearcher 
+ * TODO comment for TestNutchSearcher
  * 
  * <p/>created on 02.06.2006
  * 
  * @version $Revision: $
  * @author jz
  * @author $Author: ${lastedit}
- *  
+ * 
  */
 public class TestNutchSearcher extends TestCase {
 
@@ -46,7 +46,7 @@ public class TestNutchSearcher extends TestCase {
         // "/Users/joa23/Documents/workspace/nutch-trunk/src/plugin");
         this.fConfiguration.set("plugin.folders", "../ingrid-nutch-plugins/src/plugin");
         this.fConfiguration.set("plugin.includes",
-                "protocol-http|urlfilter-regex|parse-(text|html|js)|index-(basic|sns)|query-(basic|ingrid-se)");
+                "protocol-http|urlfilter-regex|parse-(text|html|js)|index-(basic|sns)|query-(site|basic|ingrid-se)");
         // this.fIndex = new File("./testIndex");
         // this.fIndex = new File("/Users/mb/segments");
         this.fIndex = new File("./test-resources/instances");
@@ -69,11 +69,11 @@ public class TestNutchSearcher extends TestCase {
         assertTrue(hits.size() > 0);
         IngridHit[] hits2 = hits.getHits();
         System.out.println(hits.length());
-        
+
         ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
         ObjectOutputStream stream = new ObjectOutputStream(arrayOutputStream);
         stream.writeObject(hits);
-        System.out.println(arrayOutputStream.toByteArray().length/1024.0);
+        System.out.println(arrayOutputStream.toByteArray().length / 1024.0);
         arrayOutputStream.close();
         stream.close();
     }
@@ -210,7 +210,7 @@ public class TestNutchSearcher extends TestCase {
         assertEquals(100, hits2.length);
 
     }
-    
+
     public void testNotAndClause() throws Exception {
         IngridQuery query = QueryStringParser.parse("wasser AND (NOT erde)");
         NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId", this.fConfiguration);
@@ -226,7 +226,7 @@ public class TestNutchSearcher extends TestCase {
         IngridHit[] hits2 = hits.getHits();
         assertEquals(100, hits2.length);
     }
-    
+
     public void testOr() throws Exception {
         IngridQuery query = QueryStringParser.parse("wasser OR erde");
         NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId", this.fConfiguration);
@@ -242,11 +242,11 @@ public class TestNutchSearcher extends TestCase {
         NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId", this.fConfiguration);
         IngridQuery query = QueryStringParser.parse("das wasser");
         assertTrue(searcher.search(query, 0, 100).getHits().length > 0);
-        
+
         query = QueryStringParser.parse("\"das wasser\"");
         assertTrue(searcher.search(query, 0, 100).getHits().length > 0);
     }
-    
+
     public void testGeoIntersect() throws Exception {
         IngridQuery query = QueryStringParser.parse("HVZ coord:intersect x1:1 x2:20 y1:10 y2:60");
         NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId", this.fConfiguration);
@@ -292,19 +292,20 @@ public class TestNutchSearcher extends TestCase {
         assertTrue(hits.getHits().length > 0);
     }
 
-//    /**
-//     * @throws Exception
-//     */
-//    public void testWildCardFieldQuery() throws Exception {
-//        NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId", this.fConfiguration);
-//        IngridQuery query = QueryStringParser.parse("HVZ code:1*3");
-//        assertEquals(1, query.getWildCardFieldQueries().length);
-//        assertTrue(searcher.search(query, 0, 100).getHits().length > 0);
-//
-//        query = QueryStringParser.parse("HVZ code:123?567*");
-//        assertEquals(1, query.getWildCardFieldQueries().length);
-//        assertTrue(searcher.search(query, 0, 100).getHits().length > 0);
-//    }
+    // /**
+    // * @throws Exception
+    // */
+    // public void testWildCardFieldQuery() throws Exception {
+    // NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId",
+    // this.fConfiguration);
+    // IngridQuery query = QueryStringParser.parse("HVZ code:1*3");
+    // assertEquals(1, query.getWildCardFieldQueries().length);
+    // assertTrue(searcher.search(query, 0, 100).getHits().length > 0);
+    //
+    // query = QueryStringParser.parse("HVZ code:123?567*");
+    // assertEquals(1, query.getWildCardFieldQueries().length);
+    // assertTrue(searcher.search(query, 0, 100).getHits().length > 0);
+    // }
 
     /**
      * @throws Exception
@@ -319,17 +320,17 @@ public class TestNutchSearcher extends TestCase {
         assertEquals(1, query.getWildCardTermQueries().length);
         assertTrue(searcher.search(query, 0, 100).getHits().length > 0);
     }
-    
+
     /**
      * @throws Exception
      */
     public void testFuzzyFieldQuery() throws Exception {
         NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId", this.fConfiguration);
         IngridQuery query = QueryStringParser.parse("topic:abfoll~");
-//        assertEquals(1, query.getFuzzyFieldQueries().length);
+        // assertEquals(1, query.getFuzzyFieldQueries().length);
         assertTrue(searcher.search(query, 0, 100).getHits().length > 0);
-    } 
-    
+    }
+
     /**
      * @throws Exception
      */
@@ -384,11 +385,22 @@ public class TestNutchSearcher extends TestCase {
         IngridHitDetail detail = searcher.getDetail(hits2[0], query, new String[] { NutchSearcher.EXPLANATION });
         System.out.println(detail.get(NutchSearcher.EXPLANATION));
     }
-    
+
     public void testParseProviderName() throws Exception {
         IngridQuery query = QueryStringParser.parse("http provider:ni_lk-row");
         assertEquals("ni_lk-row", query.getPositiveProvider()[0]);
         NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId", this.fConfiguration);
         searcher.search(query, 0, 10);
+    }
+
+    public void testGroupbyDataSource() throws Exception {
+        IngridQuery query = QueryStringParser.parse("http " + "grouped:" + IngridQuery.GROUPED_BY_DATASOURCE);
+        NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId", this.fConfiguration);
+        IngridHits hits = searcher.search(query, 0, 50);
+        IngridHit[] hits2 = hits.getHits();
+        for (int i = 0; i < hits2.length; i++) {
+            IngridHitDetail detail = searcher.getDetail(hits2[i], query, new String[0]);
+            System.out.println(detail.get("url"));
+        }
     }
 }

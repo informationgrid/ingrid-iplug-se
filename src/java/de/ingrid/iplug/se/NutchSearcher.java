@@ -2,7 +2,13 @@ package de.ingrid.iplug.se;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -95,7 +101,8 @@ public class NutchSearcher implements IPlug {
     /*
      * (non-Javadoc)
      * 
-     * @see de.ingrid.utils.ISearcher#search(de.ingrid.utils.query.IngridQuery, int, int)
+     * @see de.ingrid.utils.ISearcher#search(de.ingrid.utils.query.IngridQuery,
+     *      int, int)
      */
     public IngridHits search(IngridQuery query, int start, final int length) throws Exception {
         if (fLogger.isDebugEnabled()) {
@@ -111,9 +118,9 @@ public class NutchSearcher implements IPlug {
         Hits hits = null;
         if (grouped != null && grouped.equals(IngridQuery.GROUPED_BY_DATASOURCE)) {
             if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
-                hits = this.fNutchBean.search(nutchQuery, start + length, 1, "site", "date", true);
+                hits = this.fNutchBean.search(nutchQuery, start + length, 2, "site", "date", true);
             } else {
-                hits = this.fNutchBean.search(nutchQuery, start + length, 1, "site");
+                hits = this.fNutchBean.search(nutchQuery, start + length, 2, "site");
             }
         } else {
             if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
@@ -172,6 +179,8 @@ public class NutchSearcher implements IPlug {
                 groupValue = details.getValue("partner");
             } else if (IngridQuery.GROUPED_BY_ORGANISATION.equalsIgnoreCase(groupBy)) {
                 groupValue = details.getValue("provider");
+            } else if (IngridQuery.GROUPED_BY_DATASOURCE.equalsIgnoreCase(groupBy)) {
+                groupValue = details.getValue("url");
             }
 
             if (groupValue != null) {
@@ -184,7 +193,43 @@ public class NutchSearcher implements IPlug {
             ingridHits[i - start] = ingridHit;
         }
 
-        return new IngridHits(this.fPlugId, hits.getTotal(), ingridHits, true);
+        IngridHits ret = null;
+        if (IngridQuery.GROUPED_BY_DATASOURCE.equals(groupBy)) {
+            ret = groupByHost(hits, ingridHits);
+        } else {
+            ret = new IngridHits(this.fPlugId, hits.getTotal(), ingridHits, true);
+        }
+        return ret;
+    }
+
+    private IngridHits groupByHost(Hits hits, IngridHit[] ingridHits) throws MalformedURLException {
+        LinkedHashMap map = new LinkedHashMap();
+        for (int i = 0; i < ingridHits.length; i++) {
+            String[] groupedFields = ingridHits[i].getGroupedFields();
+            String urlString = groupedFields[0];
+            URL url = new URL(urlString);
+            String host = url.getHost();
+            if (!map.containsKey(host)) {
+                map.put(host, new ArrayList());
+            }
+            List urlList = (List) map.get(host);
+            urlList.add(ingridHits[i]);
+        }
+        Set keySet = map.keySet();
+        IngridHit[] groupedHits = new IngridHit[ingridHits.length];
+        int counter = 0;
+        for (Iterator iterator = keySet.iterator(); iterator.hasNext();) {
+            String host = (String) iterator.next();
+            List hitList = (List) map.get(host);
+            for (Iterator iterator2 = hitList.iterator(); iterator2.hasNext();) {
+                IngridHit hit = (IngridHit) iterator2.next();
+                groupedHits[counter] = hit;
+                counter++;
+                // FIXME: we dont know the next results for a host
+                hit.setGroupTotalHitLength(3);
+            }
+        }
+        return new IngridHits(this.fPlugId, hits.getTotal(), groupedHits, true);
     }
 
     /**
@@ -502,8 +547,8 @@ public class NutchSearcher implements IPlug {
     /*
      * (non-Javadoc)
      * 
-     * @see de.ingrid.utils.IDetailer#getDetails(de.ingrid.utils.IngridHit[], de.ingrid.utils.query.IngridQuery,
-     *      java.lang.String[])
+     * @see de.ingrid.utils.IDetailer#getDetails(de.ingrid.utils.IngridHit[],
+     *      de.ingrid.utils.query.IngridQuery, java.lang.String[])
      */
     public IngridHitDetail[] getDetails(IngridHit[] hits, IngridQuery query, String[] requestedFields) throws Exception {
         IngridHitDetail[] hitDetails = new IngridHitDetail[hits.length];
