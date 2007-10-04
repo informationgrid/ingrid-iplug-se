@@ -232,7 +232,7 @@ public class NutchSearcher implements IPlug {
         if(fLogger.isDebugEnabled()) {
             for (int i = 0; i < groupedHits.length; i++) {
                 IngridHit ingridHit = groupedHits[i];
-                fLogger.debug("grouped hit: " + ingridHit.getGroupedFields()[i]);
+                fLogger.debug("grouped hit: " + ingridHit.getGroupedFields()[0]);
             }
         }
         return new IngridHits(this.fPlugId, hits.getTotal(), groupedHits, true);
