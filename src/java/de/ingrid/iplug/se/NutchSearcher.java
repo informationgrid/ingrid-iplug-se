@@ -229,6 +229,9 @@ public class NutchSearcher implements IPlug {
                 hit.setGroupTotalHitLength(3);
             }
         }
+        if(fLogger.isDebugEnabled()) {
+            fLogger.debug("grouped hits: " + map.toString());
+        }
         return new IngridHits(this.fPlugId, hits.getTotal(), groupedHits, true);
     }
 
