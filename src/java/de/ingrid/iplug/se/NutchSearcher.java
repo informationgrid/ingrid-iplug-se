@@ -230,7 +230,10 @@ public class NutchSearcher implements IPlug {
             }
         }
         if(fLogger.isDebugEnabled()) {
-            fLogger.debug("grouped hits: " + map.toString());
+            for (int i = 0; i < groupedHits.length; i++) {
+                IngridHit ingridHit = groupedHits[i];
+                fLogger.debug("grouped hit: " + ingridHit.getGroupedFields()[i]);
+            }
         }
         return new IngridHits(this.fPlugId, hits.getTotal(), groupedHits, true);
     }
