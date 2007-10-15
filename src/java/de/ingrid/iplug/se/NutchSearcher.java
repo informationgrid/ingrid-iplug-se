@@ -231,6 +231,7 @@ public class NutchSearcher implements IPlug {
                 counter++;
                 // FIXME: we dont know the next results for a host
                 hit.setGroupTotalHitLength(3);
+                hit.addGroupedField(host);
             }
         }
         
