@@ -194,7 +194,7 @@ public class NutchSearcher implements IPlug {
         }
 
         IngridHits ret = null;
-        if (IngridQuery.GROUPED_BY_DATASOURCE.equals(groupBy)) {
+        if (IngridQuery.GROUPED_BY_DATASOURCE.equalsIgnoreCase(groupBy)) {
             ret = groupByHost(hits, ingridHits);
         } else {
             ret = new IngridHits(this.fPlugId, hits.getTotal(), ingridHits, true);
@@ -203,12 +203,14 @@ public class NutchSearcher implements IPlug {
     }
 
     private IngridHits groupByHost(Hits hits, IngridHit[] ingridHits) throws MalformedURLException {
+        System.out.println("NutchSearcher.groupByHost() *********");
         LinkedHashMap map = new LinkedHashMap();
         for (int i = 0; i < ingridHits.length; i++) {
             String[] groupedFields = ingridHits[i].getGroupedFields();
             String urlString = groupedFields[0];
             URL url = new URL(urlString);
             String host = url.getHost();
+            System.out.println(host);
             if (!map.containsKey(host)) {
                 map.put(host, new ArrayList());
             }
@@ -218,8 +220,10 @@ public class NutchSearcher implements IPlug {
         Set keySet = map.keySet();
         IngridHit[] groupedHits = new IngridHit[ingridHits.length];
         int counter = 0;
+        System.out.println("---");
         for (Iterator iterator = keySet.iterator(); iterator.hasNext();) {
             String host = (String) iterator.next();
+            System.out.println(host);
             List hitList = (List) map.get(host);
             for (Iterator iterator2 = hitList.iterator(); iterator2.hasNext();) {
                 IngridHit hit = (IngridHit) iterator2.next();
@@ -233,10 +237,12 @@ public class NutchSearcher implements IPlug {
         if(fLogger.isDebugEnabled()) {
             for (int i = 0; i < groupedHits.length; i++) {
                 IngridHit ingridHit = groupedHits[i];
+                System.out.println(i+": " + ingridHit.getGroupedFields()[0]);
                 fLogger.debug("grouped hit: " + ingridHit.getGroupedFields()[0]);
             }
         }
         
+        System.out.println("NutchSearcher.groupByHost() *********");
         return new IngridHits(this.fPlugId, hits.getTotal(), groupedHits, true);
     }
 
