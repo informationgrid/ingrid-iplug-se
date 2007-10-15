@@ -181,9 +181,11 @@ public class NutchSearcher implements IPlug {
                 groupValue = details.getValue("provider");
             } else if (IngridQuery.GROUPED_BY_DATASOURCE.equalsIgnoreCase(groupBy)) {
                 groupValue = details.getValue("url");
-                System.out.println("groupValue before: "+ groupValue);
-                groupValue = new URL(groupValue).getHost();
-                System.out.println("groupValue after: "+ groupValue);
+                try{
+                    groupValue = new URL(groupValue).getHost();
+                } catch (MalformedURLException e) {
+                    fLogger.warn("can not group url: " + groupValue, e);
+                }
             }
 
             if (groupValue != null) {
@@ -196,7 +198,7 @@ public class NutchSearcher implements IPlug {
             ingridHits[i - start] = ingridHit;
         }
 
-        //IngridHits ret = null;
+//        IngridHits ret = null;
 //        if (IngridQuery.GROUPED_BY_DATASOURCE.equalsIgnoreCase(groupBy)) {
 //            ret = groupByHost(hits, ingridHits);
 //        } else {
@@ -207,14 +209,12 @@ public class NutchSearcher implements IPlug {
     }
 
     private IngridHits groupByHost(Hits hits, IngridHit[] ingridHits) throws MalformedURLException {
-        System.out.println("NutchSearcher.groupByHost() *********");
         LinkedHashMap map = new LinkedHashMap();
         for (int i = 0; i < ingridHits.length; i++) {
             String[] groupedFields = ingridHits[i].getGroupedFields();
             String urlString = groupedFields[0];
             URL url = new URL(urlString);
             String host = url.getHost();
-            System.out.println(host);
             if (!map.containsKey(host)) {
                 map.put(host, new ArrayList());
             }
@@ -224,10 +224,8 @@ public class NutchSearcher implements IPlug {
         Set keySet = map.keySet();
         IngridHit[] groupedHits = new IngridHit[ingridHits.length];
         int counter = 0;
-        System.out.println("---");
         for (Iterator iterator = keySet.iterator(); iterator.hasNext();) {
             String host = (String) iterator.next();
-            System.out.println(host);
             List hitList = (List) map.get(host);
             for (Iterator iterator2 = hitList.iterator(); iterator2.hasNext();) {
                 IngridHit hit = (IngridHit) iterator2.next();
@@ -235,19 +233,16 @@ public class NutchSearcher implements IPlug {
                 counter++;
                 // FIXME: we dont know the next results for a host
                 hit.setGroupTotalHitLength(3);
-                hit.addGroupedField(host);
             }
         }
         
         if(fLogger.isDebugEnabled()) {
             for (int i = 0; i < groupedHits.length; i++) {
                 IngridHit ingridHit = groupedHits[i];
-                System.out.println(i+": " + ingridHit.getGroupedFields()[0]);
-                fLogger.debug("grouped hit: " + ingridHit.getGroupedFields()[0]);
+                fLogger.debug("grouped hit: " + ingridHit.getDocumentId() + "#" + ingridHit.getGroupedFields()[0]);
             }
         }
         
-        System.out.println("NutchSearcher.groupByHost() *********");
         return new IngridHits(this.fPlugId, hits.getTotal(), groupedHits, true);
     }
 
