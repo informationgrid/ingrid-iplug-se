@@ -198,52 +198,8 @@ public class NutchSearcher implements IPlug {
             ingridHits[i - start] = ingridHit;
         }
 
-//        IngridHits ret = null;
-//        if (IngridQuery.GROUPED_BY_DATASOURCE.equalsIgnoreCase(groupBy)) {
-//            ret = groupByHost(hits, ingridHits);
-//        } else {
-//            ret = new IngridHits(this.fPlugId, hits.getTotal(), ingridHits, true);
-//        }
         IngridHits ret = new IngridHits(this.fPlugId, hits.getTotal(), ingridHits, true);
         return ret;
-    }
-
-    private IngridHits groupByHost(Hits hits, IngridHit[] ingridHits) throws MalformedURLException {
-        LinkedHashMap map = new LinkedHashMap();
-        for (int i = 0; i < ingridHits.length; i++) {
-            String[] groupedFields = ingridHits[i].getGroupedFields();
-            String urlString = groupedFields[0];
-            URL url = new URL(urlString);
-            String host = url.getHost();
-            if (!map.containsKey(host)) {
-                map.put(host, new ArrayList());
-            }
-            List urlList = (List) map.get(host);
-            urlList.add(ingridHits[i]);
-        }
-        Set keySet = map.keySet();
-        IngridHit[] groupedHits = new IngridHit[ingridHits.length];
-        int counter = 0;
-        for (Iterator iterator = keySet.iterator(); iterator.hasNext();) {
-            String host = (String) iterator.next();
-            List hitList = (List) map.get(host);
-            for (Iterator iterator2 = hitList.iterator(); iterator2.hasNext();) {
-                IngridHit hit = (IngridHit) iterator2.next();
-                groupedHits[counter] = hit;
-                counter++;
-                // FIXME: we dont know the next results for a host
-                hit.setGroupTotalHitLength(3);
-            }
-        }
-        
-        if(fLogger.isDebugEnabled()) {
-            for (int i = 0; i < groupedHits.length; i++) {
-                IngridHit ingridHit = groupedHits[i];
-                fLogger.debug("grouped hit: " + ingridHit.getDocumentId() + "#" + ingridHit.getGroupedFields()[0]);
-            }
-        }
-        
-        return new IngridHits(this.fPlugId, hits.getTotal(), groupedHits, true);
     }
 
     /**
