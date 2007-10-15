@@ -181,6 +181,9 @@ public class NutchSearcher implements IPlug {
                 groupValue = details.getValue("provider");
             } else if (IngridQuery.GROUPED_BY_DATASOURCE.equalsIgnoreCase(groupBy)) {
                 groupValue = details.getValue("url");
+                System.out.println("groupValue before: "+ groupValue);
+                groupValue = new URL(groupValue).getHost();
+                System.out.println("groupValue after: "+ groupValue);
             }
 
             if (groupValue != null) {
@@ -193,12 +196,13 @@ public class NutchSearcher implements IPlug {
             ingridHits[i - start] = ingridHit;
         }
 
-        IngridHits ret = null;
-        if (IngridQuery.GROUPED_BY_DATASOURCE.equalsIgnoreCase(groupBy)) {
-            ret = groupByHost(hits, ingridHits);
-        } else {
-            ret = new IngridHits(this.fPlugId, hits.getTotal(), ingridHits, true);
-        }
+        //IngridHits ret = null;
+//        if (IngridQuery.GROUPED_BY_DATASOURCE.equalsIgnoreCase(groupBy)) {
+//            ret = groupByHost(hits, ingridHits);
+//        } else {
+//            ret = new IngridHits(this.fPlugId, hits.getTotal(), ingridHits, true);
+//        }
+        IngridHits ret = new IngridHits(this.fPlugId, hits.getTotal(), ingridHits, true);
         return ret;
     }
 
