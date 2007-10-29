@@ -1,7 +1,9 @@
 package de.ingrid.iplug.se;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -107,6 +109,7 @@ public class NutchSearcher implements IPlug {
     public IngridHits search(IngridQuery query, int start, final int length) throws Exception {
         if (fLogger.isDebugEnabled()) {
             fLogger.debug("incomming query: " + query.toString() + " start:" + start + " length:" + length);
+            printNumberOfOpenFiles();
         }
         Query nutchQuery = new Query(this.fNutchConf);
         buildNutchQuery(query, nutchQuery);
@@ -137,6 +140,24 @@ public class NutchSearcher implements IPlug {
         }
 
         return translateHits(hits, start, max, query.getGrouped());
+    }
+
+    private void printNumberOfOpenFiles() {
+        try {
+            String property = System.getProperty("pid");
+            Integer integer = new Integer(property);
+            String[] cmd = {"lsof", "-p", ""+integer};
+            Process proccess = Runtime.getRuntime().exec(cmd);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(proccess.getInputStream()));
+            int lineCount = 0;
+            while((bufferedReader.readLine()) != null) {
+                lineCount++;
+            }
+            fLogger.debug("Number of Open Files: " + lineCount);
+            bufferedReader.close();
+        } catch (Exception e) {
+            fLogger.error("can not parse process id: " + e.getMessage());
+        }
     }
 
     /**
