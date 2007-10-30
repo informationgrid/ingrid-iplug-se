@@ -119,19 +119,19 @@ public class NutchSearcher implements IPlug {
 
         String grouped = query.getGrouped();
         Hits hits = null;
-//        if (grouped != null && grouped.equals(IngridQuery.GROUPED_BY_DATASOURCE)) {
-//            if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
-//                hits = this.fNutchBean.search(nutchQuery, start + length, 2, "site", "date", true);
-//            } else {
-//                hits = this.fNutchBean.search(nutchQuery, start + length, 2, "site");
-//            }
-//        } else {
+        if (grouped != null && grouped.equals(IngridQuery.GROUPED_BY_DATASOURCE)) {
+            if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
+                hits = this.fNutchBean.search(nutchQuery, start + length, 2, "site", "date", true);
+            } else {
+                hits = this.fNutchBean.search(nutchQuery, start + length, 2, "site");
+            }
+        } else {
             if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
                 hits = this.fNutchBean.search(nutchQuery, start + length, null, "date", true);
             } else {
                 hits = this.fNutchBean.search(nutchQuery, start + length, 1, "urldigest");
             }
-        //}
+        }
         int count = hits.getLength();
         int max = 0;
         final int countMinusStart = count - start;
