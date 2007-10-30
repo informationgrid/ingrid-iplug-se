@@ -132,6 +132,11 @@ public class NutchSearcher implements IPlug {
                 hits = this.fNutchBean.search(nutchQuery, start + length, 1, "urldigest");
             }
         }
+        System.err.println("hits.hetLength() " + hits.getLength());
+        System.err.println("hits.getTotal() " + hits.getTotal());
+        System.err.println("start " + start);
+        System.err.println("length " + length);
+        System.err.println("min(length, getLength-start) " + Math.min(length, hits.getLength()-start));
         int count = hits.getLength();
         int max = 0;
         final int countMinusStart = count - start;
