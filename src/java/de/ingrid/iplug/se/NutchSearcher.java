@@ -206,12 +206,12 @@ public class NutchSearcher implements IPlug {
             } else if (IngridQuery.GROUPED_BY_ORGANISATION.equalsIgnoreCase(groupBy)) {
                 groupValue = details.getValue("provider");
             } else if (IngridQuery.GROUPED_BY_DATASOURCE.equalsIgnoreCase(groupBy)) {
-                groupValue = details.getValue("url");
-                try{
-                    groupValue = new URL(groupValue).getHost();
-                } catch (MalformedURLException e) {
-                    fLogger.warn("can not group url: " + groupValue, e);
-                }
+                groupValue = details.getValue("site");
+//                try{
+//                    groupValue = new URL(groupValue).getHost();
+//                } catch (MalformedURLException e) {
+//                    fLogger.warn("can not group url: " + groupValue, e);
+//                }
             }
 
             if (groupValue != null) {
@@ -224,7 +224,8 @@ public class NutchSearcher implements IPlug {
             ingridHits[i - start] = ingridHit;
         }
 
-        IngridHits ret = new IngridHits(this.fPlugId, hits.getTotal(), ingridHits, true);
+        long hitsLength = IngridQuery.GROUPED_BY_DATASOURCE.equalsIgnoreCase(groupBy) ? hits.getLength() : hits.getTotal();
+        IngridHits ret = new IngridHits(this.fPlugId, hitsLength, ingridHits, true);
         return ret;
     }
 
