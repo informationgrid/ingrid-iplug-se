@@ -115,11 +115,30 @@ public class NutchSearcher implements IPlug {
 
         String grouped = query.getGrouped();
         Hits hits = null;
-       
-        if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
-            hits = this.fNutchBean.search(nutchQuery, start + length, null, "date", true);
-        } else {
-            hits = this.fNutchBean.search(nutchQuery, start + length, 1, "urldigest");
+        if (grouped != null && grouped.equals(IngridQuery.GROUPED_BY_DATASOURCE)) {
+            if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
+                hits = this.fNutchBean.search(nutchQuery, start + length, 2, "site", "date", true);
+            } else {
+                hits = this.fNutchBean.search(nutchQuery, start + length, 2, "site");
+            }
+        }else if (grouped != null && grouped.equals(IngridQuery.GROUPED_BY_PARTNER)) {
+            if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
+                hits = this.fNutchBean.search(nutchQuery, start + length, 1, "partner", "date", true);
+            } else {
+                hits = this.fNutchBean.search(nutchQuery, start + length, 1, "partner");
+            }
+        }else if (grouped != null && grouped.equals(IngridQuery.GROUPED_BY_ORGANISATION)) {
+            if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
+                hits = this.fNutchBean.search(nutchQuery, start + length, 1, "provider", "date", true);
+            } else {
+                hits = this.fNutchBean.search(nutchQuery, start + length, 1, "provider");
+            }
+        }else {
+            if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
+                hits = this.fNutchBean.search(nutchQuery, start + length, null, "date", true);
+            } else {
+                hits = this.fNutchBean.search(nutchQuery, start + length, 1, "urldigest");
+            }
         }
         int count = hits.getLength();
         int max = 0;
@@ -205,7 +224,11 @@ public class NutchSearcher implements IPlug {
             ingridHits[i - start] = ingridHit;
         }
 
-        IngridHits ret = new IngridHits(this.fPlugId, hits.getTotal(), ingridHits, true);
+        boolean isNutchGrouping = IngridQuery.GROUPED_BY_DATASOURCE.equalsIgnoreCase(groupBy)
+                || IngridQuery.GROUPED_BY_PARTNER.equalsIgnoreCase(groupBy)
+                || IngridQuery.GROUPED_BY_ORGANISATION.equalsIgnoreCase(groupBy);
+        long hitsLength = isNutchGrouping  ? hits.getLength() : hits.getTotal();
+        IngridHits ret = new IngridHits(this.fPlugId, hitsLength, ingridHits, true);
         return ret;
     }
 
