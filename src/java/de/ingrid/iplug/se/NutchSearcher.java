@@ -116,18 +116,21 @@ public class NutchSearcher implements IPlug {
         String grouped = query.getGrouped();
         Hits hits = null;
         if (grouped != null && grouped.equals(IngridQuery.GROUPED_BY_DATASOURCE)) {
+            length = length * 10;
             if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
                 hits = this.fNutchBean.search(nutchQuery, start + length, 2, "site", "date", true);
             } else {
                 hits = this.fNutchBean.search(nutchQuery, start + length, 2, "site");
             }
         }else if (grouped != null && grouped.equals(IngridQuery.GROUPED_BY_PARTNER)) {
+            length = length * 10;
             if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
                 hits = this.fNutchBean.search(nutchQuery, start + length, 1, "partner", "date", true);
             } else {
                 hits = this.fNutchBean.search(nutchQuery, start + length, 1, "partner");
             }
         }else if (grouped != null && grouped.equals(IngridQuery.GROUPED_BY_ORGANISATION)) {
+            length = length * 10;
             if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
                 hits = this.fNutchBean.search(nutchQuery, start + length, 1, "provider", "date", true);
             } else {
