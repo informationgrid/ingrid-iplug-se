@@ -224,6 +224,7 @@ public class NutchSearcher implements IPlug {
             ingridHits[i - start] = ingridHit;
         }
 
+        this.fLogger.debug("requestedLength: " + (start + length) + " hits.length:" + hits.getLength() +  " hits.total:" + hits.getTotal());
         boolean isNutchGrouping = IngridQuery.GROUPED_BY_DATASOURCE.equalsIgnoreCase(groupBy)
                 || IngridQuery.GROUPED_BY_PARTNER.equalsIgnoreCase(groupBy)
                 || IngridQuery.GROUPED_BY_ORGANISATION.equalsIgnoreCase(groupBy);
