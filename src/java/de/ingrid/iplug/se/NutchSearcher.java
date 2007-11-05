@@ -115,18 +115,11 @@ public class NutchSearcher implements IPlug {
 
         String grouped = query.getGrouped();
         Hits hits = null;
-        if (grouped != null && grouped.equals(IngridQuery.GROUPED_BY_DATASOURCE)) {
-            if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
-                hits = this.fNutchBean.search(nutchQuery, start + length, 2, "site", "date", true);
-            } else {
-                hits = this.fNutchBean.search(nutchQuery, start + length, 2, "site");
-            }
+       
+        if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
+            hits = this.fNutchBean.search(nutchQuery, start + length, null, "date", true);
         } else {
-            if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
-                hits = this.fNutchBean.search(nutchQuery, start + length, null, "date", true);
-            } else {
-                hits = this.fNutchBean.search(nutchQuery, start + length, 1, "urldigest");
-            }
+            hits = this.fNutchBean.search(nutchQuery, start + length, 1, "urldigest");
         }
         int count = hits.getLength();
         int max = 0;
@@ -212,8 +205,7 @@ public class NutchSearcher implements IPlug {
             ingridHits[i - start] = ingridHit;
         }
 
-        long hitsLength = IngridQuery.GROUPED_BY_DATASOURCE.equalsIgnoreCase(groupBy) ? hits.getLength() : hits.getTotal();
-        IngridHits ret = new IngridHits(this.fPlugId, hitsLength, ingridHits, true);
+        IngridHits ret = new IngridHits(this.fPlugId, hits.getTotal(), ingridHits, true);
         return ret;
     }
 
