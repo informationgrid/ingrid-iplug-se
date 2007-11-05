@@ -104,6 +104,7 @@ public class NutchSearcher implements IPlug {
      */
     public IngridHits search(IngridQuery query, int start, int length) throws Exception {
         length = length * 6 +start;
+        System.out.println("NutchSearcher.search(hgdfddddddddddddddddddddddddddddddddddddddddddd)");
         if (fLogger.isDebugEnabled()) {
             fLogger.debug("incomming query: " + query.toString() + " start:" + start + " length:" + length);
             printNumberOfOpenFiles();
