@@ -103,8 +103,7 @@ public class NutchSearcher implements IPlug {
      *      int, int)
      */
     public IngridHits search(IngridQuery query, int start, int length) throws Exception {
-        length = length * 6 +start;
-        System.out.println("NutchSearcher.search(hgdfddddddddddddddddddddddddddddddddddddddddddd)");
+        length = 1000;
         if (fLogger.isDebugEnabled()) {
             fLogger.debug("incomming query: " + query.toString() + " start:" + start + " length:" + length);
             printNumberOfOpenFiles();
@@ -142,6 +141,14 @@ public class NutchSearcher implements IPlug {
                 hits = this.fNutchBean.search(nutchQuery, start + length, 1, "urldigest");
             }
         }
+        
+        for (int i = 0; i < hits.getLength(); i++) {
+            Hit hit = hits.getHit(i);
+            String value = fNutchBean.getDetails(hit).getValue("url");
+            System.out.println(value);
+            
+        }
+        
         int count = hits.getLength();
         int max = 0;
         final int countMinusStart = count - start;
