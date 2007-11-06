@@ -157,9 +157,12 @@ public class NutchSearcher implements IPlug {
         System.out.println("show.leng:" + show.length);
         for (int i = 0; i < (end-start); i++) {
             System.out.println(show[i].getDedupValue());
-            System.out.println(details[i].getValue("url"));
         }
-        System.out.println("end-start:" + (end-start));
+        System.out.println(hits.totalIsExact());
+        if ((hits.totalIsExact() && end < hits.getTotal()) // more hits to show
+                || (!hits.totalIsExact() && (hits.getLength() > start+length))){
+              System.out.println("More Results");
+            }
         
         return translateHits(hits, start, max, query.getGrouped());
     }
