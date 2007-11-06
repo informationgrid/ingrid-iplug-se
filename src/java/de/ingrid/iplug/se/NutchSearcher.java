@@ -144,12 +144,6 @@ public class NutchSearcher implements IPlug {
             }
         }
         
-        for (int i = 0; i < hits.getLength(); i++) {
-            Hit hit = hits.getHit(i);
-            String value = fNutchBean.getDetails(hit).getValue("url");
-            System.out.println(value);
-            
-        }
         
         int count = hits.getLength();
         int max = 0;
@@ -214,6 +208,7 @@ public class NutchSearcher implements IPlug {
 
             String groupValue = null;
             HitDetails details = fNutchBean.getDetails(hit);
+            System.out.println(details.getValue("url"));
 
             if (IngridQuery.GROUPED_BY_PARTNER.equalsIgnoreCase(groupBy)) {
                 groupValue = details.getValue("partner");
