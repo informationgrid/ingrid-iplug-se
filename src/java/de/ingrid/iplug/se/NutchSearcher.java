@@ -149,6 +149,18 @@ public class NutchSearcher implements IPlug {
             max = Math.min(length, countMinusStart);
         }
         this.fLogger.debug("requestedLength: " + (start + length) + " hits.length:" + hits.getLength() +  " hits.total:" + hits.getTotal());
+        
+        int end = (int)Math.min(hits.getLength(), start + length);
+
+        Hit[] show = hits.getHits(start, end-start);
+        HitDetails[] details = this.fNutchBean.getDetails(show);
+        System.out.println("show.leng:" + show.length);
+        for (int i = 0; i < (end-start); i++) {
+            System.out.println(show[i].getDedupValue());
+            System.out.println(details[i].getValue("url"));
+        }
+        System.out.println("end-start:" + (end-start));
+        
         return translateHits(hits, start, max, query.getGrouped());
     }
 
@@ -182,12 +194,6 @@ public class NutchSearcher implements IPlug {
      */
     private IngridHits translateHits(Hits hits, int start, int length, String groupBy) throws IOException {
 
-        Hit[] hits2 = hits.getHits(start, start+length);
-        System.out.println(hits2.length);
-        for (int i = 0; i < hits2.length; i++) {
-            Hit hit = hits2[i];
-            System.out.println(hit.getDedupValue());
-        }
         IngridHit[] ingridHits = new IngridHit[length];
         for (int i = start; i < (length + start); i++) {
             Hit hit = hits.getHit(i);
