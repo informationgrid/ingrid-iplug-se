@@ -182,6 +182,12 @@ public class NutchSearcher implements IPlug {
      */
     private IngridHits translateHits(Hits hits, int start, int length, String groupBy) throws IOException {
 
+        Hit[] hits2 = hits.getHits(start, start+length);
+        System.out.println(hits2.length);
+        for (int i = 0; i < hits2.length; i++) {
+            Hit hit = hits2[i];
+            System.out.println(hit.getDedupValue());
+        }
         IngridHit[] ingridHits = new IngridHit[length];
         for (int i = start; i < (length + start); i++) {
             Hit hit = hits.getHit(i);
