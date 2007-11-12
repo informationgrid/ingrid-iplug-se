@@ -143,7 +143,7 @@ public class NutchSearcher implements IPlug {
         long reservedMemory = runtime.totalMemory();
         long used = reservedMemory - freeMemory;
         float percent = 100 * used / maxMemory;
-        System.out.println("Memory: [" + (used / (1024 * 1024)) + " MB used of " + (maxMemory / (1024 * 1024))
+        this.fLogger.info("Memory: [" + (used / (1024 * 1024)) + " MB used of " + (maxMemory / (1024 * 1024))
                 + " MB total (" + percent + " %)" + "]");
     }
 
@@ -158,7 +158,7 @@ public class NutchSearcher implements IPlug {
             while ((bufferedReader.readLine()) != null) {
                 lineCount++;
             }
-            System.out.println("Number of Open Files: " + lineCount);
+            this.fLogger.info("Number of Open Files: " + lineCount);
             bufferedReader.close();
         } catch (Exception e) {
             System.err.println("can not parse process id: " + e.getMessage());
