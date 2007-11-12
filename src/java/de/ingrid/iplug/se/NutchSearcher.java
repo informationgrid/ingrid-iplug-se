@@ -105,9 +105,14 @@ public class NutchSearcher implements IPlug {
     public IngridHits search(IngridQuery query, int start, int length) throws Exception {
         if (fLogger.isDebugEnabled()) {
             fLogger.debug("incomming query: " + query.toString() + " start:" + start + " length:" + length);
-            printNumberOfOpenFiles();
         }
         Query nutchQuery = new Query(this.fNutchConf);
+
+        if (nutchQuery.toString().equals("ingrid.profiling")) {
+            printMemoryStatus();
+            printNumberOfOpenFiles();
+        }
+
         buildNutchQuery(query, nutchQuery);
         if (fLogger.isDebugEnabled()) {
             fLogger.debug("nutch query: " + nutchQuery.toString());
@@ -119,32 +124,44 @@ public class NutchSearcher implements IPlug {
         } else {
             hits = this.fNutchBean.search(nutchQuery, start + length, 1, "urldigest");
         }
-        
+
         int count = hits.getLength();
         int max = 0;
         final int countMinusStart = count - start;
         if (countMinusStart >= 0) {
             max = Math.min(length, countMinusStart);
         }
-        this.fLogger.debug("requestedLength: " + (start + length) + " hits.length:" + hits.getLength() +  " hits.total:" + hits.getTotal());
+        this.fLogger.debug("requestedLength: " + (start + length) + " hits.length:" + hits.getLength() + " hits.total:"
+                + hits.getTotal());
         return translateHits(hits, start, max, query.getGrouped());
+    }
+
+    private void printMemoryStatus() {
+        Runtime runtime = Runtime.getRuntime();
+        long freeMemory = runtime.freeMemory();
+        long maxMemory = runtime.maxMemory();
+        long reservedMemory = runtime.totalMemory();
+        long used = reservedMemory - freeMemory;
+        float percent = 100 * used / maxMemory;
+        System.out.println("Memory: [" + (used / (1024 * 1024)) + " MB used of " + (maxMemory / (1024 * 1024))
+                + " MB total (" + percent + " %)" + "]");
     }
 
     private void printNumberOfOpenFiles() {
         try {
             String property = System.getProperty("pid");
             Integer integer = new Integer(property);
-            String[] cmd = {"lsof", "-p", ""+integer};
+            String[] cmd = { "lsof", "-p", "" + integer };
             Process proccess = Runtime.getRuntime().exec(cmd);
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(proccess.getInputStream()));
             int lineCount = 0;
-            while((bufferedReader.readLine()) != null) {
+            while ((bufferedReader.readLine()) != null) {
                 lineCount++;
             }
-            fLogger.debug("Number of Open Files: " + lineCount);
+            System.out.println("Number of Open Files: " + lineCount);
             bufferedReader.close();
         } catch (Exception e) {
-            fLogger.error("can not parse process id: " + e.getMessage());
+            System.err.println("can not parse process id: " + e.getMessage());
         }
     }
 
@@ -190,7 +207,7 @@ public class NutchSearcher implements IPlug {
                 groupValue = details.getValue("provider");
             } else if (IngridQuery.GROUPED_BY_DATASOURCE.equalsIgnoreCase(groupBy)) {
                 groupValue = details.getValue("url");
-                try{
+                try {
                     groupValue = new URL(groupValue).getHost();
                 } catch (MalformedURLException e) {
                     fLogger.warn("can not group url: " + groupValue, e);
@@ -199,7 +216,7 @@ public class NutchSearcher implements IPlug {
 
             if (groupValue != null) {
                 ingridHit.addGroupedField(groupValue);
-            } 
+            }
 
             ingridHits[i - start] = ingridHit;
         }
