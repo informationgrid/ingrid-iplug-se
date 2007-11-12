@@ -107,7 +107,7 @@ public class NutchSearcher implements IPlug {
             fLogger.debug("incomming query: " + query.toString() + " start:" + start + " length:" + length);
         }
         Query nutchQuery = new Query(this.fNutchConf);
-
+        System.out.println("#"+nutchQuery.toString()+"#");
         if (nutchQuery.toString().equals("ingrid.profiling")) {
             printMemoryStatus();
             printNumberOfOpenFiles();
