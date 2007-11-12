@@ -161,7 +161,7 @@ public class NutchSearcher implements IPlug {
             this.fLogger.info("Number of Open Files: " + lineCount);
             bufferedReader.close();
         } catch (Exception e) {
-            System.err.println("can not parse process id: " + e.getMessage());
+            this.fLogger.error("can not parse process id: " + e.getMessage());
         }
     }
 
