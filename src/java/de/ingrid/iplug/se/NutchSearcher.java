@@ -103,7 +103,8 @@ public class NutchSearcher implements IPlug {
      *      int, int)
      */
     public IngridHits search(IngridQuery query, int start, int length) throws Exception {
-        if (fLogger.isDebugEnabled()) {
+        long startTime = System.currentTimeMillis();
+		if (fLogger.isDebugEnabled()) {
             fLogger.debug("incomming query: " + query.toString() + " start:" + start + " length:" + length);
         }
         Query nutchQuery = new Query(this.fNutchConf);
@@ -133,7 +134,11 @@ public class NutchSearcher implements IPlug {
         }
         this.fLogger.debug("requestedLength: " + (start + length) + " hits.length:" + hits.getLength() + " hits.total:"
                 + hits.getTotal());
-        return translateHits(hits, start, max, query.getGrouped());
+        IngridHits translateHits = translateHits(hits, start, max, query
+				.getGrouped());
+		System.out.println("NutchSearcher.search(): "
+				+ (System.currentTimeMillis() - startTime) + " ms.");
+		return translateHits;
     }
 
     private void printMemoryStatus() {
@@ -479,6 +484,7 @@ public class NutchSearcher implements IPlug {
      */
     public IngridHitDetail getDetail(IngridHit ingridHit, IngridQuery ingridQuery, String[] requestedFields)
             throws Exception {
+    	long startTime = System.currentTimeMillis();
         fLogger.debug("creating details for: " + ingridHit.toString());
         // query required for summary caculation
         Query nutchQuery = new Query(this.fNutchConf);
@@ -532,8 +538,12 @@ public class NutchSearcher implements IPlug {
                 }
             }
 
+            System.out.println("NutchSearcher.getDetail(): "
+					+ (System.currentTimeMillis() - startTime) + " ms.");
             return ingridDetail;
         }
+        System.out.println("NutchSearcher.getDetail(): "
+				+ (System.currentTimeMillis() - startTime) + " ms.");
         return null;
     }
 
@@ -544,10 +554,13 @@ public class NutchSearcher implements IPlug {
      *      de.ingrid.utils.query.IngridQuery, java.lang.String[])
      */
     public IngridHitDetail[] getDetails(IngridHit[] hits, IngridQuery query, String[] requestedFields) throws Exception {
-        IngridHitDetail[] hitDetails = new IngridHitDetail[hits.length];
+        long startTime = System.currentTimeMillis();
+		IngridHitDetail[] hitDetails = new IngridHitDetail[hits.length];
         for (int i = 0; i < hits.length; i++) {
             hitDetails[i] = getDetail(hits[i], query, requestedFields);
         }
+        System.out.println("NutchSearcher.getDetails(): "
+				+ (System.currentTimeMillis() - startTime) + " ms.");
         return hitDetails;
     }
 
