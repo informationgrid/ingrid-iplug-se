@@ -138,6 +138,8 @@ public class NutchSearcher implements IPlug {
 				.getGrouped());
 		System.out.println("NutchSearcher.search(): "
 				+ (System.currentTimeMillis() - startTime) + " ms.");
+		printMemoryStatus();
+		printNumberOfOpenFiles();
 		return translateHits;
     }
 
