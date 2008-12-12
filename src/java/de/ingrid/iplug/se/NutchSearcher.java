@@ -79,7 +79,6 @@ public class NutchSearcher implements IPlug {
     }
 
     public void configure(PlugDescription plugDescription) throws Exception {
-		System.out.println("NutchSearcher.configure()");
 		this.fPlugId = plugDescription.getPlugId();
 		if (fNutchConf == null) {
 			fNutchConf = NutchConfiguration.create();
@@ -120,9 +119,9 @@ public class NutchSearcher implements IPlug {
         } else {
             hits = this.fNutchBean.search(nutchQuery, start + length, 1, "urldigest");
         }
-        System.out.println("NutchSearcher.beanSearch(): "
-				+ (System.currentTimeMillis() - beanStartTime) + " ms. - "
-				+ nutchQuery.toString());
+		// System.out.println("NutchSearcher.beanSearch(): "
+		// + (System.currentTimeMillis() - beanStartTime) + " ms. - "
+		// + nutchQuery.toString());
 
         int count = hits.getLength();
         int max = 0;
@@ -132,9 +131,9 @@ public class NutchSearcher implements IPlug {
         }
         IngridHits translateHits = translateHits(hits, start, max, query
 				.getGrouped());
-		System.out.println("NutchSearcher.search(): "
-				+ (System.currentTimeMillis() - startTime) + " ms. "
-				+ nutchQuery.toString());
+		// System.out.println("NutchSearcher.search(): "
+		// + (System.currentTimeMillis() - startTime) + " ms. "
+		// + nutchQuery.toString());
 		return translateHits;
     }
 
@@ -553,8 +552,6 @@ public class NutchSearcher implements IPlug {
         for (int i = 0; i < hits.length; i++) {
             hitDetails[i] = getDetail(hits[i], query, requestedFields);
         }
-        System.out.println("NutchSearcher.getDetails(): "
-				+ (System.currentTimeMillis() - startTime) + " ms.");
         return hitDetails;
     }
 
