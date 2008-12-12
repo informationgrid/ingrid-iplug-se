@@ -117,12 +117,16 @@ public class NutchSearcher implements IPlug {
             printNumberOfOpenFiles();
         }
 
+        
         Hits hits = null;
+        long beanStartTime = System.currentTimeMillis();
         if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
             hits = this.fNutchBean.search(nutchQuery, start + length, null, "date", true);
         } else {
             hits = this.fNutchBean.search(nutchQuery, start + length, 1, "urldigest");
         }
+        System.out.println("NutchSearcher.beanSearch(): "
+				+ (System.currentTimeMillis() - beanStartTime) + " ms.");
 
         int count = hits.getLength();
         int max = 0;
