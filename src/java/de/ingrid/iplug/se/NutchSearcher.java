@@ -102,22 +102,17 @@ public class NutchSearcher implements IPlug {
      */
     public IngridHits search(IngridQuery query, int start, int length) throws Exception {
         long startTime = System.currentTimeMillis();
-		if (fLogger.isDebugEnabled()) {
-            fLogger.debug("incomming query: " + query.toString() + " start:" + start + " length:" + length);
-        }
+		// if (fLogger.isDebugEnabled()) {
+		// fLogger.debug("incomming query: " + query.toString() + " start:" +
+		// start + " length:" + length);
+		// }
         Query nutchQuery = new Query(this.fNutchConf);
 
         buildNutchQuery(query, nutchQuery);
-        if (fLogger.isDebugEnabled()) {
-            fLogger.debug("nutch query: " + nutchQuery.toString());
-        }
+		// if (fLogger.isDebugEnabled()) {
+		// fLogger.debug("nutch query: " + nutchQuery.toString());
+		// }
 
-        if (nutchQuery.toString().equals("ingrid.profiling")) {
-            printMemoryStatus();
-            printNumberOfOpenFiles();
-        }
-
-        
         Hits hits = null;
         long beanStartTime = System.currentTimeMillis();
         if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
@@ -126,7 +121,8 @@ public class NutchSearcher implements IPlug {
             hits = this.fNutchBean.search(nutchQuery, start + length, 1, "urldigest");
         }
         System.out.println("NutchSearcher.beanSearch(): "
-				+ (System.currentTimeMillis() - beanStartTime) + " ms.");
+				+ (System.currentTimeMillis() - beanStartTime) + " ms. - "
+				+ nutchQuery.toString());
 
         int count = hits.getLength();
         int max = 0;
@@ -134,14 +130,11 @@ public class NutchSearcher implements IPlug {
         if (countMinusStart >= 0) {
             max = Math.min(length, countMinusStart);
         }
-        this.fLogger.debug("requestedLength: " + (start + length) + " hits.length:" + hits.getLength() + " hits.total:"
-                + hits.getTotal());
         IngridHits translateHits = translateHits(hits, start, max, query
 				.getGrouped());
 		System.out.println("NutchSearcher.search(): "
-				+ (System.currentTimeMillis() - startTime) + " ms.");
-		printMemoryStatus();
-		printNumberOfOpenFiles();
+				+ (System.currentTimeMillis() - startTime) + " ms. "
+				+ nutchQuery.toString());
 		return translateHits;
     }
 
@@ -186,7 +179,6 @@ public class NutchSearcher implements IPlug {
      */
     private IngridHits translateHits(Hits hits, int start, int length, String groupBy) throws IOException {
 
-    	long startTime = System.currentTimeMillis();
         IngridHit[] ingridHits = new IngridHit[length];
         for (int i = start; i < (length + start); i++) {
             Hit hit = hits.getHit(i);
@@ -232,8 +224,6 @@ public class NutchSearcher implements IPlug {
         }
 
         IngridHits ret = new IngridHits(this.fPlugId, hits.getTotal(), ingridHits, true);
-        System.out.println("NutchSearcher.translateHits(): "
-				+ (System.currentTimeMillis() - startTime) + " ms.");
         return ret;
     }
 
@@ -246,7 +236,6 @@ public class NutchSearcher implements IPlug {
      */
     private void buildNutchQuery(IngridQuery query, Query out) throws IOException {
         // term queries
-		long startTime = System.currentTimeMillis();
         TermQuery[] terms = query.getTerms();
         for (int i = 0; i < terms.length; i++) {
             TermQuery termQuery = terms[i];
@@ -382,8 +371,6 @@ public class NutchSearcher implements IPlug {
         out.addNutchClause(providerClause);
         out.addNutchClause(datatypeClause);
         
-        System.out.println("NutchSearcher.buildNutchQuery() :"
-				+ (System.currentTimeMillis() - startTime) + " ms.");
     }
 
     /**
@@ -545,12 +532,12 @@ public class NutchSearcher implements IPlug {
                 }
             }
 
-            System.out.println("NutchSearcher.getDetail(): "
-					+ (System.currentTimeMillis() - startTime) + " ms.");
+			// System.out.println("NutchSearcher.getDetail(): "
+			// + (System.currentTimeMillis() - startTime) + " ms.");
             return ingridDetail;
         }
-        System.out.println("NutchSearcher.getDetail(): "
-				+ (System.currentTimeMillis() - startTime) + " ms.");
+		// System.out.println("NutchSearcher.getDetail(): "
+		// + (System.currentTimeMillis() - startTime) + " ms.");
         return null;
     }
 
