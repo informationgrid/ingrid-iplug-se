@@ -47,8 +47,6 @@ public class NutchSearcher implements IPlug {
 
     public static final String EXPLANATION = "explanation";
 
-    public static final Object mutex = new Object();
-
     private static final String DATATYPE = "datatype";
 
     private Log fLogger = LogFactory.getLog(this.getClass());
@@ -81,20 +79,20 @@ public class NutchSearcher implements IPlug {
     }
 
     public void configure(PlugDescription plugDescription) throws Exception {
-        this.fPlugId = plugDescription.getPlugId();
-        synchronized (mutex) {
-            if (fNutchConf == null) {
-                fNutchConf = NutchConfiguration.create();
-            }
-            if (fNutchBean == null) {
-                fNutchBean = new NutchBean(fNutchConf, plugDescription.getWorkinDirectory());
-            } else {
-                fNutchBean.close();
-                fNutchBean = new NutchBean(fNutchConf, plugDescription.getWorkinDirectory());
-            }
-        }
-
-    }
+		System.out.println("NutchSearcher.configure()");
+		this.fPlugId = plugDescription.getPlugId();
+		if (fNutchConf == null) {
+			fNutchConf = NutchConfiguration.create();
+		}
+		if (fNutchBean == null) {
+			fNutchBean = new NutchBean(fNutchConf, plugDescription
+					.getWorkinDirectory());
+		} else {
+			fNutchBean.close();
+			fNutchBean = new NutchBean(fNutchConf, plugDescription
+					.getWorkinDirectory());
+		}
+	}
 
     /*
      * (non-Javadoc)
@@ -184,6 +182,7 @@ public class NutchSearcher implements IPlug {
      */
     private IngridHits translateHits(Hits hits, int start, int length, String groupBy) throws IOException {
 
+    	long startTime = System.currentTimeMillis();
         IngridHit[] ingridHits = new IngridHit[length];
         for (int i = start; i < (length + start); i++) {
             Hit hit = hits.getHit(i);
@@ -229,6 +228,8 @@ public class NutchSearcher implements IPlug {
         }
 
         IngridHits ret = new IngridHits(this.fPlugId, hits.getTotal(), ingridHits, true);
+        System.out.println("NutchSearcher.translateHits(): "
+				+ (System.currentTimeMillis() - startTime) + " ms.");
         return ret;
     }
 
@@ -241,6 +242,7 @@ public class NutchSearcher implements IPlug {
      */
     private void buildNutchQuery(IngridQuery query, Query out) throws IOException {
         // term queries
+		long startTime = System.currentTimeMillis();
         TermQuery[] terms = query.getTerms();
         for (int i = 0; i < terms.length; i++) {
             TermQuery termQuery = terms[i];
@@ -375,6 +377,9 @@ public class NutchSearcher implements IPlug {
         out.addNutchClause(partnerClause);
         out.addNutchClause(providerClause);
         out.addNutchClause(datatypeClause);
+        
+        System.out.println("NutchSearcher.buildNutchQuery() :"
+				+ (System.currentTimeMillis() - startTime) + " ms.");
     }
 
     /**
@@ -494,16 +499,12 @@ public class NutchSearcher implements IPlug {
         // nutch hit detail
         Hit hit = new Hit(ingridHit.getDataSourceId(), ingridHit.getDocumentId());
         HitDetails details = null;
-        synchronized (mutex) {
-            details = this.fNutchBean.getDetails(hit);
-        }
+        details = this.fNutchBean.getDetails(hit);
         if (details != null) {
 
             String summary = null;
             String title = details.getValue("title");
-            synchronized (mutex) {
-                summary = this.fNutchBean.getSummary(details, nutchQuery);
-            }
+            summary = this.fNutchBean.getSummary(details, nutchQuery);
 
             for (int i = 0; i < details.getLength(); i++) {
                 String field = details.getField(i);
