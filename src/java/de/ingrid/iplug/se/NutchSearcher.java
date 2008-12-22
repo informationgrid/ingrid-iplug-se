@@ -23,7 +23,7 @@ import org.apache.nutch.searcher.Query.NutchClause;
 import org.apache.nutch.searcher.Query.Term;
 import org.apache.nutch.util.NutchConfiguration;
 
-import de.ingrid.utils.IPlug;
+import de.ingrid.iplug.CacheSearcher;
 import de.ingrid.utils.IngridHit;
 import de.ingrid.utils.IngridHitDetail;
 import de.ingrid.utils.IngridHits;
@@ -43,7 +43,7 @@ import de.ingrid.utils.queryparser.QueryStringParser;
 /**
  * A nutch IPlug.
  */
-public class NutchSearcher implements IPlug {
+public class NutchSearcher extends CacheSearcher {
 
     public static final String EXPLANATION = "explanation";
 
@@ -79,6 +79,7 @@ public class NutchSearcher implements IPlug {
     }
 
     public void configure(PlugDescription plugDescription) throws Exception {
+    	super.configure(plugDescription);
 		this.fPlugId = plugDescription.getPlugId();
 		if (fNutchConf == null) {
 			fNutchConf = NutchConfiguration.create();
@@ -100,28 +101,20 @@ public class NutchSearcher implements IPlug {
      *      int, int)
      */
     public IngridHits search(IngridQuery query, int start, int length) throws Exception {
-        long startTime = System.currentTimeMillis();
-		// if (fLogger.isDebugEnabled()) {
-		// fLogger.debug("incomming query: " + query.toString() + " start:" +
-		// start + " length:" + length);
-		// }
+    	IngridHits cachedHits = super.search(query, start, length);
+		if (cachedHits != null) {
+			return cachedHits;
+		}
         Query nutchQuery = new Query(this.fNutchConf);
 
         buildNutchQuery(query, nutchQuery);
-		// if (fLogger.isDebugEnabled()) {
-		// fLogger.debug("nutch query: " + nutchQuery.toString());
-		// }
 
         Hits hits = null;
-        long beanStartTime = System.currentTimeMillis();
         if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
             hits = this.fNutchBean.search(nutchQuery, start + length, null, "date", true);
         } else {
             hits = this.fNutchBean.search(nutchQuery, start + length, 1, "urldigest");
         }
-		// System.out.println("NutchSearcher.beanSearch(): "
-		// + (System.currentTimeMillis() - beanStartTime) + " ms. - "
-		// + nutchQuery.toString());
 
         int count = hits.getLength();
         int max = 0;
@@ -131,9 +124,7 @@ public class NutchSearcher implements IPlug {
         }
         IngridHits translateHits = translateHits(hits, start, max, query
 				.getGrouped());
-		// System.out.println("NutchSearcher.search(): "
-		// + (System.currentTimeMillis() - startTime) + " ms. "
-		// + nutchQuery.toString());
+        super.addToCache(query, start, length, translateHits);
 		return translateHits;
     }
 
@@ -481,7 +472,13 @@ public class NutchSearcher implements IPlug {
      */
     public IngridHitDetail getDetail(IngridHit ingridHit, IngridQuery ingridQuery, String[] requestedFields)
             throws Exception {
-    	long startTime = System.currentTimeMillis();
+    	
+    	IngridHitDetail cachedDetails = super.getDetail(ingridHit, ingridQuery,
+				requestedFields);
+		if (cachedDetails != null) {
+			return cachedDetails;
+		}
+    	
         fLogger.debug("creating details for: " + ingridHit.toString());
         // query required for summary caculation
         Query nutchQuery = new Query(this.fNutchConf);
@@ -530,13 +527,9 @@ public class NutchSearcher implements IPlug {
                     ingridDetail.put(EXPLANATION, detailString + " " + hitExplanation);
                 }
             }
-
-			// System.out.println("NutchSearcher.getDetail(): "
-			// + (System.currentTimeMillis() - startTime) + " ms.");
+            super.addToCache(ingridHit, requestedFields, ingridDetail);
             return ingridDetail;
         }
-		// System.out.println("NutchSearcher.getDetail(): "
-		// + (System.currentTimeMillis() - startTime) + " ms.");
         return null;
     }
 
@@ -547,7 +540,6 @@ public class NutchSearcher implements IPlug {
      *      de.ingrid.utils.query.IngridQuery, java.lang.String[])
      */
     public IngridHitDetail[] getDetails(IngridHit[] hits, IngridQuery query, String[] requestedFields) throws Exception {
-        long startTime = System.currentTimeMillis();
 		IngridHitDetail[] hitDetails = new IngridHitDetail[hits.length];
         for (int i = 0; i < hits.length; i++) {
             hitDetails[i] = getDetail(hits[i], query, requestedFields);
