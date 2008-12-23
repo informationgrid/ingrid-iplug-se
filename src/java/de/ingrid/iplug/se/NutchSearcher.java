@@ -23,7 +23,7 @@ import org.apache.nutch.searcher.Query.NutchClause;
 import org.apache.nutch.searcher.Query.Term;
 import org.apache.nutch.util.NutchConfiguration;
 
-import de.ingrid.iplug.CacheSearcher;
+import de.ingrid.utils.IPlug;
 import de.ingrid.utils.IngridHit;
 import de.ingrid.utils.IngridHitDetail;
 import de.ingrid.utils.IngridHits;
@@ -43,7 +43,7 @@ import de.ingrid.utils.queryparser.QueryStringParser;
 /**
  * A nutch IPlug.
  */
-public class NutchSearcher extends CacheSearcher {
+public class NutchSearcher implements IPlug {
 
     public static final String EXPLANATION = "explanation";
 
@@ -79,7 +79,6 @@ public class NutchSearcher extends CacheSearcher {
     }
 
     public void configure(PlugDescription plugDescription) throws Exception {
-    	super.configure(plugDescription);
 		this.fPlugId = plugDescription.getPlugId();
 		if (fNutchConf == null) {
 			fNutchConf = NutchConfiguration.create();
@@ -101,10 +100,6 @@ public class NutchSearcher extends CacheSearcher {
      *      int, int)
      */
     public IngridHits search(IngridQuery query, int start, int length) throws Exception {
-    	IngridHits cachedHits = super.search(query, start, length);
-		if (cachedHits != null) {
-			return cachedHits;
-		}
         Query nutchQuery = new Query(this.fNutchConf);
 
         buildNutchQuery(query, nutchQuery);
@@ -124,7 +119,6 @@ public class NutchSearcher extends CacheSearcher {
         }
         IngridHits translateHits = translateHits(hits, start, max, query
 				.getGrouped());
-        super.addToCache(query, start, length, translateHits);
 		return translateHits;
     }
 
@@ -473,12 +467,6 @@ public class NutchSearcher extends CacheSearcher {
     public IngridHitDetail getDetail(IngridHit ingridHit, IngridQuery ingridQuery, String[] requestedFields)
             throws Exception {
     	
-    	IngridHitDetail cachedDetails = super.getDetail(ingridHit, ingridQuery,
-				requestedFields);
-		if (cachedDetails != null) {
-			return cachedDetails;
-		}
-    	
         fLogger.debug("creating details for: " + ingridHit.toString());
         // query required for summary caculation
         Query nutchQuery = new Query(this.fNutchConf);
@@ -527,7 +515,6 @@ public class NutchSearcher extends CacheSearcher {
                     ingridDetail.put(EXPLANATION, detailString + " " + hitExplanation);
                 }
             }
-            super.addToCache(ingridHit, requestedFields, ingridDetail);
             return ingridDetail;
         }
         return null;
