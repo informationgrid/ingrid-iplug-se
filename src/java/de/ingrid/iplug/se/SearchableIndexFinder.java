@@ -77,7 +77,7 @@ public class SearchableIndexFinder {
                     }
                     ret = searchDone.length == 1;
                     if (ret) {
-                        LOG.info("found search.done file: " + searchDone[0].getAbsolutePath());
+                        LOG.fine("found search.done file: " + searchDone[0].getAbsolutePath());
                     }
                 } catch (Exception e) {
                     LOG.warning(e.getMessage());
@@ -105,7 +105,7 @@ public class SearchableIndexFinder {
             }
         });
         for (File part : parts) {
-            LOG.info("found index-part: " + part.getAbsolutePath());
+            LOG.fine("found index-part: " + part.getAbsolutePath());
             indices.add(part);
         }
     }
