@@ -28,6 +28,8 @@ import de.ingrid.utils.IngridHit;
 import de.ingrid.utils.IngridHitDetail;
 import de.ingrid.utils.IngridHits;
 import de.ingrid.utils.PlugDescription;
+import de.ingrid.utils.processor.ProcessorPipe;
+import de.ingrid.utils.processor.ProcessorPipeFactory;
 import de.ingrid.utils.query.ClauseQuery;
 import de.ingrid.utils.query.FieldQuery;
 import de.ingrid.utils.query.FuzzyFieldQuery;
@@ -56,6 +58,8 @@ public class NutchSearcher implements IPlug {
     private String fPlugId;
 
     private static Configuration fNutchConf;
+
+    private ProcessorPipe _processorPipe;
 
     /**
      * The default constructor.
@@ -91,6 +95,8 @@ public class NutchSearcher implements IPlug {
 			fNutchBean = new NutchBean(fNutchConf, plugDescription
 					.getWorkinDirectory());
 		}
+		ProcessorPipeFactory processorPipeFactory = new ProcessorPipeFactory(plugDescription);
+        _processorPipe = processorPipeFactory.getProcessorPipe();
 	}
 
     /*
@@ -100,8 +106,8 @@ public class NutchSearcher implements IPlug {
      *      int, int)
      */
     public IngridHits search(IngridQuery query, int start, int length) throws Exception {
+        _processorPipe.preProcess(query);
         Query nutchQuery = new Query(this.fNutchConf);
-
         buildNutchQuery(query, nutchQuery);
 
         Hits hits = null;
@@ -117,8 +123,12 @@ public class NutchSearcher implements IPlug {
         if (countMinusStart >= 0) {
             max = Math.min(length, countMinusStart);
         }
+
         IngridHits translateHits = translateHits(hits, start, max, query
 				.getGrouped());
+        IngridHit[] ingridHits = translateHits.getHits();
+        _processorPipe.postProcess(query, ingridHits);
+        
 		return translateHits;
     }
 
