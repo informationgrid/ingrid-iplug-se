@@ -109,6 +109,9 @@ public class NutchSearcher implements IPlug {
         _processorPipe.preProcess(query);
         Query nutchQuery = new Query(this.fNutchConf);
         buildNutchQuery(query, nutchQuery);
+        if (this.fLogger.isDebugEnabled()) {
+            this.fLogger.debug("incoming nutch query: " + nutchQuery);
+        }
 
         Hits hits = null;
         if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
