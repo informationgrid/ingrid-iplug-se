@@ -59,7 +59,7 @@ public class NutchSearcher implements IPlug {
 
     private static Configuration fNutchConf;
 
-    private ProcessorPipe _processorPipe;
+    private ProcessorPipe _processorPipe = new ProcessorPipe();
 
     /**
      * The default constructor.
