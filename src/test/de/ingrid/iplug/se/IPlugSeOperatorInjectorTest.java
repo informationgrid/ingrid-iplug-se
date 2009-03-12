@@ -85,7 +85,7 @@ public class IPlugSeOperatorInjectorTest extends TestCase {
         }
 
         @Override
-        public IngridHitDetail[] searchAndDetail(IngridQuery arg0, int arg1, int arg2, int arg3, int arg4, String[] arg5) throws Exception {
+        public IngridHits searchAndDetail(IngridQuery arg0, int arg1, int arg2, int arg3, int arg4, String[] arg5) throws Exception {
             // TODO Auto-generated method stub
             return null;
         }
