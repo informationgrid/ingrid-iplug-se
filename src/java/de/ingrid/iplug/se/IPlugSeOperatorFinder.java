@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -15,7 +14,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiReader;
-import org.apache.lucene.search.FieldCache;
 
 import de.ingrid.utils.PlugDescription;
 import de.ingrid.utils.metadata.IPlugOperatorFinder;
@@ -63,10 +61,10 @@ public class IPlugSeOperatorFinder implements IPlugOperatorFinder {
             readers[i] = IndexReader.open(indices.get(i));
         }
         MultiReader multiReader = new MultiReader(readers);
-        String[] values = FieldCache.DEFAULT.getStrings(multiReader, indexFieldName);
+        
+        Set<String> valueSet = new HashSet<String>();
+        new IndexValueReader().pushValues(multiReader, indexFieldName, valueSet);
         multiReader.close();
-
-        Set<String> valueSet = new HashSet<String>(Arrays.asList(values));
         valueSet.remove(null);
         return valueSet;
     }
