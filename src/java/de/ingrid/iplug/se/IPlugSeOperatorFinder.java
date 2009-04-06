@@ -61,7 +61,6 @@ public class IPlugSeOperatorFinder implements IPlugOperatorFinder {
             readers[i] = IndexReader.open(indices.get(i));
         }
         MultiReader multiReader = new MultiReader(readers);
-        
         Set<String> valueSet = new HashSet<String>();
         new IndexValueReader().pushValues(multiReader, indexFieldName, valueSet);
         multiReader.close();
