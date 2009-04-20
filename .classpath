@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src/java"/>
-	<classpathentry kind="src" path="src/conf"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="src" path="src/test"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ingrid-ibus"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ingrid-iplug"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ingrid-utils"/>
@@ -16,5 +13,5 @@
 	<classpathentry kind="var" path="MAVEN_REPO/lucene/jars/lucene-misc-1.9-rc1-dev.jar"/>
 	<classpathentry kind="var" path="MAVEN_REPO/nutch/jars/hadoop-0.1-dev.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ingrid-nutch-plugins"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="output" path="eclipse-classes"/>
 </classpath>
