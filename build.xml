@@ -1,0 +1,44 @@
+<project>
+
+	<target name="init">
+		<mkdir dir="build" />
+	</target>
+
+	<target name="clean">
+		<delete dir="build" />
+	</target>
+
+
+	<target name="copy-nutch" depends="init">
+		<copy todir="build">
+			<fileset dir="nutch-1.0" />
+		</copy>
+	</target>
+
+
+	<target name="patch-nutch">
+		<patch patchfile="patches/opensource/build.xml.patch" dir="build/" strip="0" />
+	</target>
+
+	<target name="copy-administration-ui">
+		<copy todir="build/src/java">
+			<fileset dir="administration-ui/src/java" />
+		</copy>
+	</target>
+
+
+	<target name="copy-administration-plugins">
+		<antcall target="copy-admin-system" />
+	</target>
+
+	<target name="copy-admin-system">
+		<copy todir="build/src/plugin/admin-system">
+			<fileset dir="administration-ui/src/plugin/admin-system" />
+		</copy>
+	</target>
+
+
+	<target name="dist" depends="copy-nutch, patch-nutch, copy-administration-ui, copy-administration-plugins">
+		<ant antfile="build/build.xml" target="tar" />
+	</target>
+</project>

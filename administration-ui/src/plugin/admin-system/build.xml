@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<project name="admin-system">
+
+  <import file="../build-plugin.xml"/>
+
+</project>
