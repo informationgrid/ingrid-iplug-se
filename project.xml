@@ -65,7 +65,7 @@
     <siteAddress>http://torwald.gistec-online.de/ingrid/ingrid-iplug-se</siteAddress>
     <siteDirectory>/srv/www/htdocs/ingrid/ingrid-iplug-se</siteDirectory>
     <repository>
-        <connection>scm:svn:https://127.0.0.1:444/svn/ingrid/ingrid-iplug-se/trunk</connection>
+        <connection>scm:svn:https://127.0.0.1:444/svn/ingrid/ingrid-iplug-se/branches-1.2</connection>
     </repository>
     <dependencies>
         <dependency>
