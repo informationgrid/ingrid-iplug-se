@@ -1,6 +1,12 @@
 <?xml version="1.0"?>
-<project name="admin-system">
+<project name="admin-instance">
 
-  <import file="../build-plugin.xml"/>
+	<import file="../build-plugin.xml" />
+
+	<target name="deps-jar">
+		<copy todir="${deploy.dir}/src/webapp">
+			<fileset dir="${basedir}/src/webapp" />
+		</copy>
+	</target>
 
 </project>

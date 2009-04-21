@@ -1,0 +1,13 @@
+Index: src/plugin/nutch-extensionpoints/plugin.xml
+===================================================================
+--- src/plugin/nutch-extensionpoints/plugin.xml	(revision 766711)
++++ src/plugin/nutch-extensionpoints/plugin.xml	(working copy)
+@@ -80,4 +80,8 @@
+       id="org.apache.nutch.scoring.ScoringFilter"
+       name="Nutch Scoring"/>
+ 
++<extension-point
++      id="org.apache.nutch.admin.IGuiComponent"
++      name="Nutch Administration Gui Component"/>
++
+ </plugin>

@@ -8,6 +8,9 @@
 
    
    <runtime>
+     <library name="admin-instance.jar">
+        <export name="*"/>
+     </library>
      <library name="spring-webmvc.jar">
         <export name="*"/>
      </library>
