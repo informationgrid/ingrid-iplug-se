@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin
+   id="admin-instance"
+   name="Administration Nutch Instances"
+   version="1.0"
+   provider-name="org.apache.nutch">
+
+   
+   <runtime>
+     <library name="spring-webmvc.jar">
+        <export name="*"/>
+     </library>
+     <library name="spring.jar">
+        <export name="*"/>
+     </library>
+     <library name="commons-logging.jar">
+        <export name="*"/>
+     </library>
+     <library name="jstl-1.1.2.jar">
+        <export name="*"/>
+     </library>
+     <library name="standard-1.1.2.jar">
+        <export name="*"/>
+     </library>
+     <library name="conf">
+        <export name="*"/>
+     </library>
+   </runtime>
+
+   <extension point="org.apache.nutch.admin.IGuiComponent"
+              id="org.apache.nutch.admin.IGuiComponent"
+              name="Administration Instance">
+
+      <implementation class="org.apache.nutch.admin.DefaultGuiComponent"
+                      id="org.apache.nutch.admin.DefaultGuiComponent" >
+      	<parameter name="isGeneralComponent" value="true"/>
+      </implementation>
+   </extension>
+</plugin>

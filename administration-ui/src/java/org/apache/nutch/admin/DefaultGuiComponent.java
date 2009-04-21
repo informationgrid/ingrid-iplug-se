@@ -16,7 +16,7 @@ import org.apache.nutch.plugin.PluginClassLoader;
  * internationalized by property files availbe inside the plugin folder
  * 
  */
-public class DefaultGuiComponent implements GuiComponent {
+public class DefaultGuiComponent implements IGuiComponent {
 
   public static final Log LOG = LogFactory.getLog(DefaultGuiComponent.class);
 

@@ -1,5 +1,7 @@
 <project>
 
+	<property name="nutch-version" value="nutch-1.0" />
+	
 	<target name="init">
 		<mkdir dir="build" />
 	</target>
@@ -9,19 +11,17 @@
 	</target>
 
 
-	<target name="copy-nutch" depends="init">
-		<copy todir="build">
-			<fileset dir="nutch-1.0" />
-		</copy>
+	<target name="unzip-nutch" depends="init">
+		<unzip src="contrib/${nutch-version}.zip" dest="build" />
 	</target>
 
 
 	<target name="patch-nutch">
-		<patch patchfile="patches/opensource/build.xml.patch" dir="build/" strip="0" />
+		<patch patchfile="patches/opensource/build.xml.patch" dir="build/${nutch-version}" strip="0" />
 	</target>
 
 	<target name="copy-administration-ui">
-		<copy todir="build/src/java">
+		<copy todir="build/${nutch-version}/src/java">
 			<fileset dir="administration-ui/src/java" />
 		</copy>
 	</target>
@@ -32,13 +32,14 @@
 	</target>
 
 	<target name="copy-admin-system">
-		<copy todir="build/src/plugin/admin-system">
+		<copy todir="build/${nutch-version}/src/plugin/admin-system">
 			<fileset dir="administration-ui/src/plugin/admin-system" />
 		</copy>
 	</target>
 
 
-	<target name="dist" depends="copy-nutch, patch-nutch, copy-administration-ui, copy-administration-plugins">
-		<ant antfile="build/build.xml" target="tar" />
+	<target name="dist" depends="unzip-nutch, patch-nutch, copy-administration-ui, copy-administration-plugins">
+		<!--<ant antfile="build/${nutch-version}/build.xml" target="tar" />-->
 	</target>
+	
 </project>
