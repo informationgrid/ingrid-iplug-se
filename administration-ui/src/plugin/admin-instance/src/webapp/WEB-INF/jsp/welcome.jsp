@@ -9,6 +9,12 @@
 </head>
 
 <body>
-${foo}
+<% 
+System.out.println(application.getClass());
+System.out.println(application.getAttribute("foo"));
+%>
+<form action="welcome.html" method="post">
+	<input type="submit" value="Senden"/>
+</form> 
 </body>
 </html>

@@ -52,22 +52,6 @@ public class ConfigurationUtilTest extends TestCase {
     assertEquals(3, list.size());
   }
 
-  public void testLoadAllExcept() throws Exception {
-    ConfigurationUtil configurationUtil = new ConfigurationUtil(_folder);
-    configurationUtil.createNewConfiguration("foo");
-    configurationUtil.createNewConfiguration("bar");
-    configurationUtil.createNewConfiguration("foobar");
-
-    List<Configuration> list = configurationUtil.loadAll("bar");
-    assertEquals(2, list.size());
-
-    list = configurationUtil.loadAll("bar", "foo");
-    assertEquals(1, list.size());
-    assertEquals(list.get(0).get("nutch.instance.folder"), new File(_folder,
-        "foobar").getCanonicalPath());
-
-  }
-  
   public void testExists() throws Exception {
     ConfigurationUtil configurationUtil = new ConfigurationUtil(_folder);
     configurationUtil.createNewConfiguration("foo");

@@ -1,6 +1,8 @@
 package org.apache.nutch.admin;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.nutch.plugin.Extension;
 import org.mortbay.http.SocketListener;
@@ -11,6 +13,7 @@ public class HttpServer {
 
   private final int _port;
   private Server _server = new Server();
+  private Map<String, Object> _contextAttributes = new HashMap<String, Object>();
 
   public HttpServer(int port) {
     _port = port;
@@ -40,9 +43,14 @@ public class HttpServer {
         + extension.getDescriptor().getPluginId();
     String webApp = extension.getDescriptor().getPluginPath() + File.separator
         + "src/webapp" + File.separator;
-    WebApplicationContext webApplication = _server.addWebApplication(
+    WebApplicationContext context = _server.addWebApplication(
         contextPath, webApp);
-    webApplication.setClassLoader(extension.getDescriptor().getClassLoader());
-    webApplication.start();
+    context.setClassLoader(extension.getDescriptor().getClassLoader());
+    context.setAttributes(_contextAttributes);
+    context.start();
+  }
+
+  public void addContextAttribute(String key, Object value) {
+    _contextAttributes.put(key, value);
   }
 }

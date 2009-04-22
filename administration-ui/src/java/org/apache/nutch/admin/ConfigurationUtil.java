@@ -55,8 +55,7 @@ public class ConfigurationUtil {
     return configuration;
   }
 
-  public List<Configuration> loadAll(String... exceptFolderName)
-      throws IOException {
+  public List<Configuration> loadAll() throws IOException {
     List<Configuration> list = new ArrayList<Configuration>();
     File[] files = _workingDirectory.listFiles(new FileFilter() {
       @Override
@@ -67,16 +66,6 @@ public class ConfigurationUtil {
     });
     if (files != null) {
       for (File file : files) {
-        boolean found = false;
-        for (String except : exceptFolderName) {
-          if (file.getName().equalsIgnoreCase(except)) {
-            found = true;
-            continue;
-          }
-        }
-        if (found) {
-          continue;
-        }
         Configuration configuration = loadConfiguration(file.getName());
         list.add(configuration);
       }
