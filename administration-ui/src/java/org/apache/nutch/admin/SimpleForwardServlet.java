@@ -10,8 +10,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class SimpleForwardServlet extends HttpServlet {
 
+  public static final Log LOG = LogFactory.getLog(SimpleForwardServlet.class);
+  
   private static final long serialVersionUID = -3041945936755169584L;
 
   @Override
@@ -21,6 +26,7 @@ public class SimpleForwardServlet extends HttpServlet {
     String realPath = getServletContext().getRealPath(servletPath);
     File file = new File(realPath);
     if (!file.exists()) {
+      LOG.warn("file not found: " + file.getAbsolutePath());
       resp.sendError(404);
       return;
     }

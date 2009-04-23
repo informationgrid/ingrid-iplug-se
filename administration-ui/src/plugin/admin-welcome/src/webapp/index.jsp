@@ -1,4 +1,4 @@
 <%
-System.out.println("instance:"+request.getServletPath());
+System.out.println("welcome: "+request.getContextPath());
 response.sendRedirect(request.getContextPath()+"/index.html");
 %>

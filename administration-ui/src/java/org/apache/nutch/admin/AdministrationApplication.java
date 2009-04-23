@@ -13,7 +13,10 @@ public class AdministrationApplication {
 
     ConfigurationUtil configurationUtil = new ConfigurationUtil(
         workingDirectory);
-
+    if (!configurationUtil.existsConfiguration("general")) {
+      configurationUtil.createNewConfiguration("general");
+    }
+    
     httpServer.addContextAttribute("configurationUtil", configurationUtil);
 
     GuiComponentDeployer componentDeployer = new GuiComponentDeployer(

@@ -12,7 +12,7 @@
         <property name="suffix" value=".jsp"></property>
     </bean>
 
-    <context:component-scan base-package="org.apache.nutch.admin.instance"/>
+    <context:component-scan base-package="org.apache.nutch.admin.scheduling"/>
     
     <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource"> 
 		<property name="basenames"> 

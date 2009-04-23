@@ -41,11 +41,13 @@ public class GuiComponentDeployer extends Thread {
           return conf.exists() && conf.isDirectory() ? true : false;
         }
       });
-      for (File file : files) {
-        String name = file.getName();
-        if (!_cache.contains(name)) {
-          _cache.add(name);
-          _blockingQueue.add(file.getName());
+      if (files != null) {
+        for (File file : files) {
+          String name = file.getName();
+          if (!_cache.contains(name)) {
+            _cache.add(name);
+            _blockingQueue.add(file.getName());
+          }
         }
       }
     }

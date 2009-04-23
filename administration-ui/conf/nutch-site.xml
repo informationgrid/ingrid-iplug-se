@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<!-- Put site-specific property overrides in this file. -->
+
+<configuration>
+
+<property>
+  <name>plugin.folders</name>
+  <value>nutch-1.0/src/plugin,administration-ui/src/plugin</value>
+  <description>Directories where nutch plugins are located.  Each
+  element may be a relative or absolute path.  If absolute, it is used
+  as is.  If relative, it is searched for on the classpath.</description>
+</property>
+
+<property>
+  <name>plugin.includes</name>
+  <value>admin-.*|protocol-http|urlfilter-regex|parse-(text|html|js)|index-(basic|anchor)|query-(basic|site|url)|response-(json|xml)|summary-basic|scoring-opic|urlnormalizer-(pass|regex|basic)</value>
+  <description>Regular expression naming plugin directory names to
+  include.  Any plugin not matching this expression is excluded.
+  In any case you need at least include the nutch-extensionpoints plugin. By
+  default Nutch includes crawling just HTML and plain text via HTTP,
+  and basic indexing and search plugins. In order to use HTTPS please enable 
+  protocol-httpclient, but be aware of possible intermittent problems with the 
+  underlying commons-httpclient library.
+  </description>
+</property>
+
+
+
+</configuration>

@@ -57,6 +57,16 @@ public class ConfigurationUtil {
 
   public List<Configuration> loadAll() throws IOException {
     List<Configuration> list = new ArrayList<Configuration>();
+    String[] allNames = getAllNames();
+    for (String folderName : allNames) {
+      Configuration configuration = loadConfiguration(folderName);
+      list.add(configuration);
+    }
+    return list;
+  }
+
+  public String[] getAllNames() {
+    List<String> list = new ArrayList<String>();
     File[] files = _workingDirectory.listFiles(new FileFilter() {
       @Override
       public boolean accept(File pathname) {
@@ -66,11 +76,10 @@ public class ConfigurationUtil {
     });
     if (files != null) {
       for (File file : files) {
-        Configuration configuration = loadConfiguration(file.getName());
-        list.add(configuration);
+        list.add(file.getName());
       }
     }
-    return list;
+    return list.toArray(new String[list.size()]);
   }
 
   private void copyConfigurationFiles(File target)
