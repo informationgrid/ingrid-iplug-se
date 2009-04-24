@@ -1,7 +1,6 @@
 package org.apache.nutch.admin.instance;
 
 import java.io.IOException;
-import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
@@ -31,19 +30,19 @@ public class InstanceController extends NavigationSelector {
 
   @ModelAttribute("instances")
   public String[] referenceDataNames(HttpSession session) {
-    System.out.println("InstanceController.referenceDataNames()");
     ServletContext servletContext = session.getServletContext();
     ConfigurationUtil configurationUtil = (ConfigurationUtil) servletContext
         .getAttribute("configurationUtil");
-    return configurationUtil.getAllNames();
-  }
-
-  @SuppressWarnings("unchecked")
-  @ModelAttribute("contextNames")
-  public String[] referenceDataContextName(HttpSession session) {
-    Set<String> set = (Set<String>) session.getServletContext().getAttribute(
-        "contextNames");
-    return set.toArray(new String[set.size()]);
+    String[] allNames = configurationUtil.getAllNames();
+    String[] allInstancesNames = new String[allNames.length - 1];
+    int counter = 0;
+    for (String name : allNames) {
+      if (!name.equals("general")) {
+        allInstancesNames[counter] = name;
+        counter++;
+      }
+    }
+    return allInstancesNames;
   }
 
   @RequestMapping(method = RequestMethod.POST)

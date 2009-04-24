@@ -3,4 +3,10 @@
 
   <import file="../build-plugin.xml"/>
 
+	<target name="deps-jar">
+		<copy todir="${deploy.dir}/src/webapp">
+			<fileset dir="${basedir}/src/webapp" />
+		</copy>
+	</target>
+
 </project>

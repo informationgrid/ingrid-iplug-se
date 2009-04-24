@@ -1,0 +1,23 @@
+Index: src/plugin/build.xml
+===================================================================
+--- src/plugin/build.xml	(revision 766711)
++++ src/plugin/build.xml	(working copy)
+@@ -85,6 +85,9 @@
+      <ant dir="urlnormalizer-basic" target="deploy"/>
+      <ant dir="urlnormalizer-pass" target="deploy"/>
+      <ant dir="urlnormalizer-regex" target="deploy"/>
++     <ant dir="admin-instance" target="deploy"/>
++     <ant dir="admin-welcome" target="deploy"/>
++     <ant dir="admin-scheduling" target="deploy"/>
+   </target>
+ 
+   <!-- ====================================================== -->
+@@ -189,5 +192,8 @@
+     <ant dir="urlnormalizer-basic" target="clean"/>
+     <ant dir="urlnormalizer-pass" target="clean"/>
+     <ant dir="urlnormalizer-regex" target="clean"/>
++    <ant dir="admin-instance" target="clean"/>
++    <ant dir="admin-welcome" target="deploy"/>
++    <ant dir="admin-scheduling" target="deploy"/>
+   </target>
+ </project>

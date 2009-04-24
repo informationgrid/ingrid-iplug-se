@@ -18,6 +18,11 @@
 							<form:input path="folderName"/>
 							<input type="submit" value="Create" />
 						</form:form>
+						
+						<c:forEach items="${instances}" var="instance">
+							<a href="../${instance}">${instance}</a>
+						</c:forEach>
+						
 					</div>
 				</div>
 				<div class="yui-b">

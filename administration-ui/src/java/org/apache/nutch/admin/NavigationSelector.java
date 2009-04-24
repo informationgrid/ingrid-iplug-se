@@ -22,7 +22,7 @@ public abstract class NavigationSelector {
         "contextNames");
     String contextName = session.getServletContext().getServletContextName();
     int indexOf = contextName.indexOf("-");
-    contextName = indexOf > -1 ? contextName.substring(0, indexOf - 1)
+    contextName = indexOf > -1 ? contextName.substring(0, indexOf)
         : contextName;
     for (String string : set) {
       if (string.startsWith(contextName)) {
