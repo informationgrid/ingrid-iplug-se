@@ -1,19 +1,14 @@
-Index: src/plugin/build.xml
+Index: build.xml
 ===================================================================
---- src/plugin/build.xml	(revision 766711)
-+++ src/plugin/build.xml	(working copy)
-@@ -85,6 +85,7 @@
-      <ant dir="urlnormalizer-basic" target="deploy"/>
-      <ant dir="urlnormalizer-pass" target="deploy"/>
-      <ant dir="urlnormalizer-regex" target="deploy"/>
-+     <ant dir="admin-instance" target="deploy"/>
-   </target>
+--- build.xml	(revision 766711)
++++ build.xml	(working copy)
+@@ -30,6 +30,9 @@
+     <fileset dir="${lib.dir}">
+       <include name="*.jar" />
+     </fileset>
++    <fileset dir="${lib.dir}/admin-ui-ext">
++      <include name="*.jar" />
++    </fileset>
+   </path>
  
-   <!-- ====================================================== -->
-@@ -189,5 +190,6 @@
-     <ant dir="urlnormalizer-basic" target="clean"/>
-     <ant dir="urlnormalizer-pass" target="clean"/>
-     <ant dir="urlnormalizer-regex" target="clean"/>
-+    <ant dir="admin-instance" target="clean"/>
-   </target>
- </project>
+   <!-- the unit test classpath -->

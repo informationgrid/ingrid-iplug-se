@@ -11,21 +11,6 @@
      <library name="admin-scheduling.jar">
         <export name="*"/>
      </library>
-     <library name="spring-webmvc.jar">
-        <export name="*"/>
-     </library>
-     <library name="spring.jar">
-        <export name="*"/>
-     </library>
-     <library name="commons-logging.jar">
-        <export name="*"/>
-     </library>
-     <library name="jstl-1.1.2.jar">
-        <export name="*"/>
-     </library>
-     <library name="standard-1.1.2.jar">
-        <export name="*"/>
-     </library>
      <library name="conf">
         <export name="*"/>
      </library>
@@ -37,7 +22,7 @@
 
       <implementation class="org.apache.nutch.admin.DefaultGuiComponent"
                       id="org.apache.nutch.admin.DefaultGuiComponent" >
-	<parameter name="isInstanceComponent" value="true"/>
+			<parameter name="isInstanceComponent" value="true"/>
       </implementation>
    </extension>
 </plugin>

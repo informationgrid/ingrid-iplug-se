@@ -15,6 +15,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Nutch-Core-Libraries"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Nutch-Jetty-Ext-Libraries"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Admin-Instance-Libraries"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Admin-Ui-Libraries"/>
 	<classpathentry kind="output" path="eclipse-classes"/>
 </classpath>

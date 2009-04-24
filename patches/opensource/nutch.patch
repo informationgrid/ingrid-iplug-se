@@ -1,0 +1,32 @@
+Index: bin/nutch
+===================================================================
+--- bin/nutch	(revision 766711)
++++ bin/nutch	(working copy)
+@@ -54,6 +54,7 @@
+   echo "  solrdedup         remove duplicates from solr"
+   echo "  plugin            load a plugin and run one of its classes main()"
+   echo "  server            run a search server"
++  echo "  admin             run the administration ui"
+   echo " or"
+   echo "  CLASSNAME         run the class named CLASSNAME"
+   echo "Most commands print help when invoked w/o parameters."
+@@ -143,6 +144,10 @@
+   CLASSPATH=${CLASSPATH}:$f;
+ done
+ 
++for f in $NUTCH_HOME/lib/admin-ui-ext/*.jar; do
++  CLASSPATH=${CLASSPATH}:$f;
++done
++
+ # cygwin path translation
+ if $cygwin; then
+   CLASSPATH=`cygpath -p -w "$CLASSPATH"`
+@@ -243,6 +248,8 @@
+   CLASS=org.apache.nutch.plugin.PluginRepository
+ elif [ "$COMMAND" = "server" ] ; then
+   CLASS='org.apache.nutch.searcher.DistributedSearch$Server'
++elif [ "$COMMAND" = "admin" ] ; then
++  CLASS=org.apache.nutch.admin.AdministrationApplication
+ else
+   CLASS=$COMMAND
+ fi

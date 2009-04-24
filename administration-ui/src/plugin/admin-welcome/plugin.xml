@@ -2,28 +2,13 @@
 
 <plugin
    id="admin-welcome"
-   name="Administration Nutch Instances"
+   name="Administration Welcoome"
    version="1.0"
    provider-name="org.apache.nutch">
 
    
    <runtime>
      <library name="admin-welcome.jar">
-        <export name="*"/>
-     </library>
-     <library name="spring-webmvc.jar">
-        <export name="*"/>
-     </library>
-     <library name="spring.jar">
-        <export name="*"/>
-     </library>
-     <library name="commons-logging.jar">
-        <export name="*"/>
-     </library>
-     <library name="jstl-1.1.2.jar">
-        <export name="*"/>
-     </library>
-     <library name="standard-1.1.2.jar">
         <export name="*"/>
      </library>
      <library name="conf">
@@ -37,8 +22,8 @@
 
       <implementation class="org.apache.nutch.admin.DefaultGuiComponent"
                       id="org.apache.nutch.admin.DefaultGuiComponent" >
-      	<parameter name="isGeneralComponent" value="true"/>
-	<parameter name="isInstanceComponent" value="true"/>
+    	  	<parameter name="isGeneralComponent" value="true"/>
+			<parameter name="isInstanceComponent" value="true"/>
       </implementation>
    </extension>
 </plugin>

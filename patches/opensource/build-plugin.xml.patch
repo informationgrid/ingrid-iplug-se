@@ -1,0 +1,16 @@
+Index: src/plugin/build-plugin.xml
+===================================================================
+--- src/plugin/build-plugin.xml	(revision 766711)
++++ src/plugin/build-plugin.xml	(working copy)
+@@ -55,7 +55,10 @@
+     <fileset dir="${nutch.root}/lib">
+       <include name="*.jar" />
+     </fileset>
+-    <path refid="plugin.deps"/>
++    <fileset dir="${nutch.root}/lib/admin-ui-ext">
++      <include name="*.jar" />
++    </fileset>
++  	<path refid="plugin.deps"/>
+   </path>
+ 
+   <!-- the unit test classpath -->
