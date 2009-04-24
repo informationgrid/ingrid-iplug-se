@@ -7,26 +7,35 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.web.bind.annotation.ModelAttribute;
 
-public abstract class NavigationSelector {
+public class NavigationSelector {
 
+  @SuppressWarnings("unchecked")
   @ModelAttribute("navigations")
   public String[] referenceDataNavigations(HttpSession session) {
-    Set<String> set = selectNavigations(session);
+    String contextName = session.getServletContext().getServletContextName();
+    Set<String> contextNames = (Set<String>) session.getServletContext()
+        .getAttribute("contextNames");
+    Set<String> set = new HashSet<String>();
+    if (contextNames != null) {
+      set = selectNavigations(contextName, contextNames);
+      set.add(contextName);
+    }
     return set.toArray(new String[set.size()]);
   }
 
-  @SuppressWarnings("unchecked")
-  private Set<String> selectNavigations(HttpSession session) {
+  public Set<String> selectNavigations(String contextName,
+      Set<String> allContextNames) {
     Set<String> navigation = new HashSet<String>();
-    Set<String> set = (Set<String>) session.getServletContext().getAttribute(
-        "contextNames");
-    String contextName = session.getServletContext().getServletContextName();
+
     int indexOf = contextName.indexOf("-");
     contextName = indexOf > -1 ? contextName.substring(0, indexOf)
         : contextName;
-    for (String string : set) {
-      if (string.startsWith(contextName)) {
-        navigation.add(string);
+    for (String anotherContextName : allContextNames) {
+      int anotherIndexOf = anotherContextName.indexOf("-");
+      String tmpContextName = anotherIndexOf > -1 ? anotherContextName
+          .substring(0, anotherIndexOf) : anotherContextName;
+      if (tmpContextName.equals(contextName)) {
+        navigation.add(anotherContextName);
       }
     }
     return navigation;

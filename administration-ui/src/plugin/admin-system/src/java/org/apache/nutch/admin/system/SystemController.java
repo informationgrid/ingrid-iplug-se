@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.nutch.admin.NavigationSelector;
 import org.apache.nutch.admin.system.SystemTool.SystemInfo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-public class SystemController {
+public class SystemController extends NavigationSelector {
 
   @ModelAttribute("systemInfo")
   public SystemInfo referenceDataSystemCommand() {
@@ -31,7 +32,6 @@ public class SystemController {
   public void log(@RequestParam("file") String logFile,
       @RequestParam("lines") Integer lines, HttpServletResponse response)
       throws IOException {
-    System.out.println("SystemController.log()");
     List<String> list = SystemTool.tailLogFile(new File(logFile), lines);
     for (String line : list) {
       response.getWriter().println(line);
