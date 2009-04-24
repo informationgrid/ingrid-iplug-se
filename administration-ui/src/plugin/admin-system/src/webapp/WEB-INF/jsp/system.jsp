@@ -22,37 +22,40 @@
 						Max. Memory: ${systemInfo.maxMemory}
 						Used Memory in Percent: ${systemInfo.usedMemoryInPercent}
 						
-						<div id="logFileContainer"></div>
+						<pre>
+							<div id="logFileContainer"></div>
+						</pre>
 						
 						<script>
-var div = document.getElementById('logFileContainer');
-
-var handleSuccess = function(o){
-	if(o.responseText !== undefined){
-		div.innerHTML += "<li>Server response: " + o.responseText + "</li>";
-	}
-}
-
-var handleFailure = function(o){
-	if(o.responseText !== undefined){
-		div.innerHTML += "<li>Status code message: " + o.statusText + "</li></ul>";
-	}
-}
-
-var callback =
-{
-  success:handleSuccess,
-  failure:handleFailure,
-};
-
-var sUrl = "log.html?file=hadoop.log&lines=30";
-
-function makeRequest(){
-	var request = YAHOO.util.Connect.asyncRequest('GET', sUrl, callback);
-}
-
-</script>
-						<form><input type="button" value="Send a GET Request" onClick="makeRequest();"></form>
+						//TODO recall this method only on success response 
+							setInterval("makeRequest()", 5000);
+						
+							var div = document.getElementById('logFileContainer');
+							
+							var handleSuccess = function(o){
+								if(o.responseText !== undefined){
+									div.innerHTML = "<li>Server response: " + o.responseText + "</li>";
+								}
+							}
+							
+							var handleFailure = function(o){
+								if(o.responseText !== undefined){
+									div.innerHTML = "<li>Status code message: " + o.statusText + "</li></ul>";
+								}
+							}
+							
+							var callback =
+							{
+							  success:handleSuccess,
+							  failure:handleFailure,
+							};
+							
+							var sUrl = "log.html?file=hadoop.log&lines=30";
+							
+							function makeRequest(){
+								var request = YAHOO.util.Connect.asyncRequest('GET', sUrl, callback);
+							}
+						</script>
 					</div>
 				</div>
 				<div class="yui-b">
