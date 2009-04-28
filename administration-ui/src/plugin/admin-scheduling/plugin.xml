@@ -11,6 +11,9 @@
      <library name="admin-scheduling.jar">
         <export name="*"/>
      </library>
+     <library name="cron4j-1.1.6.jar">
+        <export name="*"/>
+     </library>
      <library name="conf">
         <export name="*"/>
      </library>

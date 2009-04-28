@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -68,7 +69,11 @@ public class HttpServer extends Thread {
     WebApplicationContext context = _server.addWebApplication(contextPath,
         webApp);
     context.setClassLoader(extension.getDescriptor().getClassLoader());
-    context.setAttributes(_contextAttributes);
+    context.setAttribute("nutchInstance", nutchInstance);
+    Set<Entry<String, Object>> entrySet = _contextAttributes.entrySet();
+    for (Entry<String, Object> entry : entrySet) {
+      context.setAttribute(entry.getKey(), entry.getValue());
+    }
     context.start();
 
     HttpContext[] contexts = _server.getContexts();
