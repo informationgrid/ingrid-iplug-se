@@ -23,7 +23,7 @@
 						Used Memory in Percent: ${systemInfo.usedMemoryInPercent}
 						
 						<pre>
-							<div id="logFileContainer"></div>
+							<div id="logFileContainer" style="height:400px; overflow:auto; background:#F4F4F4; border:1px solid #CCCCCC; font-size:10px"></div>
 						</pre>
 						
 						<script>
@@ -34,7 +34,7 @@
 							
 							var handleSuccess = function(o){
 								if(o.responseText !== undefined){
-									div.innerHTML = "<li>Server response: " + o.responseText + "</li>";
+									div.innerHTML = "<li>Server response: " + div.innerHTML + o.responseText + "</li>";
 								}
 							}
 							
