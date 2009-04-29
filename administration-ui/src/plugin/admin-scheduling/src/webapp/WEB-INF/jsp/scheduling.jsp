@@ -5,10 +5,24 @@
 <title>Admin Welcome</title>
 <!-- Source File -->
 <link rel="stylesheet" type="text/css" href="css/yui/build/reset-fonts-grids/reset-fonts-grids.css" />
+
+ 
+<link rel="stylesheet" type="text/css" href="css/yui/build/tabview/assets/skins/sam/tabview.css">
+<link rel="stylesheet" type="text/css" href="css/yui/build/button/assets/skins/sam/button.css">
+
+ 
+<script type="text/javascript" src="css/yui/build/yahoo-dom-event/yahoo-dom-event.js" ></script>
+<script type="text/javascript" src="css/yui/build/element/element-min.js" ></script>
+<script type="text/javascript" src="css/yui/build/tabview/tabview-min.js" ></script>
+<script type="text/javascript" src="css/yui/build/button/button-min.js" ></script>
+ 
+
+<!--  
 <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?2.7.0/build/tabview/assets/skins/sam/tabview.css">
 <script type="text/javascript" src="http://yui.yahooapis.com/combo?2.7.0/build/yahoo-dom-event/yahoo-dom-event.js&2.7.0/build/element/element-min.js&2.7.0/build/tabview/tabview-min.js"></script>
 <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?2.7.0/build/button/assets/skins/sam/button.css">
 <script type="text/javascript" src="http://yui.yahooapis.com/combo?2.7.0/build/yahoo-dom-event/yahoo-dom-event.js&2.7.0/build/element/element-min.js&2.7.0/build/button/button-min.js"></script>
+-->
 
 </head>
 <body class="yui-skin-sam">
@@ -23,7 +37,7 @@
 								<input type="submit" value="Delete">
 							</form>
 						</div>
-						<div id="demo" class="yui-navset">
+						<div id="schedulingTabs" class="yui-navset">
 						    <ul class="yui-nav">
 						        <li class="selected"><a href="#tab1"><em>Daily</em></a></li>
 						        <li><a href="#tab2"><em>Weekly</em></a></li>
@@ -138,9 +152,9 @@
 						        </div>
 						    </div>
 						</div>
-						<script>
+						<script  type="text/javascript">
 						(function() {
-						    var tabView = new YAHOO.widget.TabView('demo');
+						    var tabView = new YAHOO.widget.TabView('schedulingTabs');
 						})();
 						</script>
 					</div>
