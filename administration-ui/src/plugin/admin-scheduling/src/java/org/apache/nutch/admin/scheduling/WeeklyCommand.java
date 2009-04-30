@@ -6,7 +6,7 @@ import java.util.List;
 public class WeeklyCommand extends ClockCommand {
 
   public static enum Day {
-    MON, TUE, WED, THU, FRI, SAT, SUN
+    SUN, MON, TUE, WED, THU, FRI, SAT
   }
 
   private List<Day> _days = new ArrayList<Day>();

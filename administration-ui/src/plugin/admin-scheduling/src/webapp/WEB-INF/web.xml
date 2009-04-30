@@ -24,4 +24,10 @@ http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 		<servlet-name>forwarding</servlet-name>
 		<url-pattern>*.png</url-pattern>
 	</servlet-mapping>
+	<listener>
+    	<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+ 	<listener>
+ 		<listener-class>org.apache.nutch.admin.scheduling.ContextListener</listener-class>
+ 	</listener>
 </web-app>

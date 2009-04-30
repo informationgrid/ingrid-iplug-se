@@ -1,15 +1,9 @@
 package org.apache.nutch.admin.scheduling;
 
-import it.sauronsoftware.cron4j.Scheduler;
-
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
-
 import org.apache.nutch.admin.NavigationSelector;
-import org.apache.nutch.admin.NutchInstance;
 import org.apache.nutch.admin.scheduling.ClockCommand.Period;
 import org.apache.nutch.admin.scheduling.WeeklyCommand.Day;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,23 +16,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class SchedulingController extends NavigationSelector {
 
-  private Scheduler _scheduler;
   private final PatternPersistence _patternPersistence;
 
   @Autowired
   public SchedulingController(PatternPersistence patternPersistence) {
     _patternPersistence = patternPersistence;
-    _scheduler = new Scheduler();
   }
 
   @ModelAttribute("savedPattern")
-  public String pattern(HttpSession session) throws Exception {
-    NutchInstance nutchInstance = (NutchInstance) session.getServletContext()
-        .getAttribute("nutchInstance");
-    File instanceFolder = nutchInstance.getInstanceFolder();
-    return _patternPersistence.existsPattern(instanceFolder) ? _patternPersistence
-        .loadPattern(instanceFolder).getPattern()
-        : "";
+  public String pattern() throws Exception {
+    return _patternPersistence.existsPattern() ? _patternPersistence
+        .loadPattern().getPattern() : "";
   }
 
   @ModelAttribute("periods")
@@ -53,7 +41,7 @@ public class SchedulingController extends NavigationSelector {
 
   @ModelAttribute("hours")
   public Integer[] hours() {
-    return new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+    return new Integer[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
   }
 
   @ModelAttribute("days")
@@ -97,25 +85,21 @@ public class SchedulingController extends NavigationSelector {
 
   @RequestMapping(value = "/daily.html", method = RequestMethod.POST)
   public String postDaily(
-      @ModelAttribute("clockCommand") ClockCommand schedulingCommand,
-      HttpSession session) throws IOException {
+      @ModelAttribute("clockCommand") ClockCommand schedulingCommand)
+      throws IOException {
     Integer hour = schedulingCommand.getHour();
     Integer minute = schedulingCommand.getMinute();
     Period period = schedulingCommand.getPeriod();
     hour = period == Period.PM ? hour + 12 : hour;
-    String pattern = minute + " " + hour + " " + "* * 1-7";
-    NutchInstance nutchInstance = (NutchInstance) session.getServletContext()
-        .getAttribute("nutchInstance");
-    File instanceFolder = nutchInstance.getInstanceFolder();
-    _patternPersistence.savePattern(instanceFolder, pattern);
-
+    String pattern = minute + " " + hour + " " + "* * 0-6";
+    _patternPersistence.savePattern(pattern);
     return "redirect:/index.html";
   }
 
   @RequestMapping(value = "/weekly.html", method = RequestMethod.POST)
   public String postWeekly(
-      @ModelAttribute("weeklyCommand") WeeklyCommand weeklyCommand,
-      HttpSession session) throws IOException {
+      @ModelAttribute("weeklyCommand") WeeklyCommand weeklyCommand)
+      throws IOException {
     Integer hour = weeklyCommand.getHour();
     Integer minute = weeklyCommand.getMinute();
     Period period = weeklyCommand.getPeriod();
@@ -133,17 +117,14 @@ public class SchedulingController extends NavigationSelector {
       counter++;
     }
     String pattern = minute + " " + hour + " " + "* * " + dayPattern;
-    NutchInstance nutchInstance = (NutchInstance) session.getServletContext()
-        .getAttribute("nutchInstance");
-    File instanceFolder = nutchInstance.getInstanceFolder();
-    _patternPersistence.savePattern(instanceFolder, pattern);
+    _patternPersistence.savePattern(pattern);
     return "redirect:/index.html";
   }
 
   @RequestMapping(value = "/monthly.html", method = RequestMethod.POST)
   public String postMonthly(
-      @ModelAttribute("monthlyCommand") MonthlyCommand monthlyCommand,
-      HttpSession session) throws IOException {
+      @ModelAttribute("monthlyCommand") MonthlyCommand monthlyCommand)
+      throws IOException {
     Integer hour = monthlyCommand.getHour();
     Integer minute = monthlyCommand.getMinute();
     Period period = monthlyCommand.getPeriod();
@@ -161,32 +142,22 @@ public class SchedulingController extends NavigationSelector {
       counter++;
     }
     String pattern = minute + " " + hour + " " + dayPattern + " * *";
-    NutchInstance nutchInstance = (NutchInstance) session.getServletContext()
-        .getAttribute("nutchInstance");
-    File instanceFolder = nutchInstance.getInstanceFolder();
-    _patternPersistence.savePattern(instanceFolder, pattern);
-
+    _patternPersistence.savePattern(pattern);
     return "redirect:/index.html";
   }
 
   @RequestMapping(value = "/advanced.html", method = RequestMethod.POST)
   public String postAdvanced(
-      @ModelAttribute("advancedCommand") AdvancedCommand advancedCommand,
-      HttpSession session) throws IOException {
+      @ModelAttribute("advancedCommand") AdvancedCommand advancedCommand)
+      throws IOException {
     String pattern = advancedCommand.getPattern();
-    NutchInstance nutchInstance = (NutchInstance) session.getServletContext()
-        .getAttribute("nutchInstance");
-    File instanceFolder = nutchInstance.getInstanceFolder();
-    _patternPersistence.savePattern(instanceFolder, pattern);
+    _patternPersistence.savePattern(pattern);
     return "redirect:/index.html";
   }
 
   @RequestMapping(value = "/delete.html", method = RequestMethod.POST)
-  public String delete(HttpSession session) {
-    NutchInstance nutchInstance = (NutchInstance) session.getServletContext()
-        .getAttribute("nutchInstance");
-    File instanceFolder = nutchInstance.getInstanceFolder();
-    _patternPersistence.deletePattern(instanceFolder);
+  public String delete() {
+    _patternPersistence.deletePattern();
     return "redirect:/index.html";
   }
 

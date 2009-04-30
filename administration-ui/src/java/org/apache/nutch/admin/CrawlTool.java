@@ -1,13 +1,19 @@
 package org.apache.nutch.admin;
 
-import java.util.Date;
 
-import org.springframework.stereotype.Service;
-
-@Service
 public class CrawlTool {
 
+  public CrawlTool() {
+    System.out.println("CrawlTool.CrawlTool()");
+  }
+
   public void crawl() {
-    System.out.println("CrawlTool.crawl() " + new Date());
+    System.out.println("start crawl");
+    try {
+      Thread.sleep(1000 * 60 * 3);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+    System.out.println("end crawl");
   }
 }
