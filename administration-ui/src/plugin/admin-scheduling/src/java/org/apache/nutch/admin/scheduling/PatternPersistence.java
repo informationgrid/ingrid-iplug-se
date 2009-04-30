@@ -9,6 +9,7 @@ public class PatternPersistence extends Persistence<Pattern> {
 
   private Scheduler _scheduler;
   private final SchedulingRunnable _runnable;
+  private Object _scheduleId;
 
   public PatternPersistence(SchedulingRunnable runnable) {
     _runnable = runnable;
@@ -20,7 +21,12 @@ public class PatternPersistence extends Persistence<Pattern> {
     Pattern patternObject = new Pattern();
     patternObject.setPattern(pattern);
     makePersistent(patternObject);
-    _scheduler.schedule(pattern, _runnable);
+    if (_scheduleId == null) {
+      _scheduleId = _scheduler.schedule(pattern, _runnable);
+    } else {
+      _scheduler.reschedule(_scheduleId, pattern);
+    }
+
   }
 
   public Pattern loadPattern() throws Exception {
@@ -33,13 +39,15 @@ public class PatternPersistence extends Persistence<Pattern> {
 
   public void deletePattern() throws IOException {
     makeTransient(Pattern.class);
+    _scheduler.deschedule(_scheduleId);
+    _scheduleId = null;
   }
 
   public void setWorkingDirectory(File workingDirectory) throws Exception {
     super.setWorkingDirectory(workingDirectory);
     if (existsPattern()) {
       Pattern pattern = loadPattern();
-      _scheduler.schedule(pattern.getPattern(), _runnable);
+      _scheduleId = _scheduler.schedule(pattern.getPattern(), _runnable);
     }
   }
 }

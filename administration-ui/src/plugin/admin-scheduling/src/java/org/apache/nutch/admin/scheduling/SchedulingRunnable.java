@@ -1,7 +1,5 @@
 package org.apache.nutch.admin.scheduling;
 
-import java.io.File;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.nutch.admin.CrawlTool;
@@ -24,25 +22,33 @@ public class SchedulingRunnable implements Runnable {
   @Override
   public void run() {
 
-    LOG.info("try to get lock...");
+    CrawlData crawlData = null;
+    try {
+      crawlData = _crawlDataPersistence.loadCrawlData();
+    } catch (Exception e) {
+      LOG.error("can not load crawl data.", e);
+      return;
+    }
+    LOG.info("try to get lock for directory: "
+        + crawlData.getWorkingDirectory().getAbsolutePath());
     if (!LOCK) {
-      LOG.info("success...");
-      LOG.info("lock the scheduled crawl");
+      LOG.info("success.");
+      LOG.info("lock the scheduled crawl: "
+          + crawlData.getWorkingDirectory().getAbsolutePath());
       LOCK = true;
       try {
-        CrawlData crawlData = _crawlDataPersistence.loadCrawlData();
-        Integer depth = crawlData.getDepth();
-        Integer topn = crawlData.getTopn();
-        File workingDirectory = crawlData.getWorkingDirectory();
-        _crawlTool.crawl(workingDirectory, topn, depth);
+        _crawlTool.crawl(crawlData.getWorkingDirectory(), crawlData.getTopn(),
+            crawlData.getDepth());
       } catch (Throwable e) {
       } finally {
-        LOG.info("unlock the scheduled crawl");
+        LOG.info("unlock the scheduled crawl: "
+            + crawlData.getWorkingDirectory().getAbsolutePath());
         LOCK = false;
       }
     } else {
       LOG.info("fails...");
-      LOG.info("crawl is locked");
+      LOG.info("crawl is locked: "
+          + crawlData.getWorkingDirectory().getAbsolutePath());
     }
 
   }
