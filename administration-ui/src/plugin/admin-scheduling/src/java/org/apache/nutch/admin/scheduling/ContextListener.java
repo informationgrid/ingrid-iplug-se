@@ -21,9 +21,14 @@ public class ContextListener implements ServletContextListener {
     WebApplicationContext webApplicationContext = WebApplicationContextUtils
         .getWebApplicationContext(contextEvent.getServletContext());
     PatternPersistence patternPersistence = (PatternPersistence) webApplicationContext
-        .getBean("patternService");
+        .getBean("patternPersistence");
+    CrawlDataPersistence crawlDataPersistence = (CrawlDataPersistence) webApplicationContext
+        .getBean("crawlDataPersistence");
+
     try {
       patternPersistence.setWorkingDirectory(nutchInstance.getInstanceFolder());
+      crawlDataPersistence.setWorkingDirectory(nutchInstance
+          .getInstanceFolder());
     } catch (Exception e) {
       throw new RuntimeException("can not load pattern.", e);
     }

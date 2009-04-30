@@ -1,6 +1,6 @@
 package org.apache.nutch.admin.scheduling;
 
-public class ClockCommand {
+public class ClockCommand extends CrawlCommand {
 
   public static enum Period {
     AM, PM

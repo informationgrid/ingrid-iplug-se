@@ -5,9 +5,13 @@
                                 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
     
     
-    <bean id="schedulingRunnable" class="org.apache.nutch.admin.scheduling.SchedulingRunnable" /> 
+    <bean id="crawlDataPersistence" class="org.apache.nutch.admin.scheduling.CrawlDataPersistence" />
+    
+    <bean id="schedulingRunnable" class="org.apache.nutch.admin.scheduling.SchedulingRunnable" >
+    	<constructor-arg ref="crawlDataPersistence" />
+    </bean> 
 	
- 	<bean id="patternService" class="org.apache.nutch.admin.scheduling.PatternPersistence"> 
+ 	<bean id="patternPersistence" class="org.apache.nutch.admin.scheduling.PatternPersistence"> 
 		<constructor-arg ref="schedulingRunnable"/>		 
 	</bean>
 

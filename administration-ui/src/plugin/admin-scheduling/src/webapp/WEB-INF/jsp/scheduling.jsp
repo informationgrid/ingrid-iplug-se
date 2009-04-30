@@ -32,7 +32,12 @@
 				<div id="yui-main">
 					<div class="yui-b">
 						<div>
-							Current Pattern: ${savedPattern}
+							<p>
+								Current Pattern: ${savedPattern}
+							</p>
+							<p>
+								Current Crawl Data: ${savedCrawlData}
+							</p>
 							<form action="delete.html" method="post">
 								<input type="submit" value="Delete">
 							</form>
@@ -48,18 +53,30 @@
 						        <div id="tab1">
 						        	<p>
 						        		<form:form action="daily.html" method="post" commandName="clockCommand">
-						        			<form:label path="hour" >Hour</form:label>
-						        			<form:select path="hour">
-						        				<form:options items="${hours}"/>
-						        			</form:select>
-						        			<form:label path="minute" >Minute</form:label>
-						        			<form:select path="minute">
-						        				<form:options items="${minutes}"/>
-						        			</form:select>
-						        			<form:label path="period" >Period</form:label>
-						        			<form:select path="period">
-						        				<form:options items="${periods}"/>	
-						        			</form:select>
+						        			<fieldset>
+						        				<legend>Time</legend>
+							        			<form:label path="hour" >Hour</form:label>
+							        			<form:select path="hour">
+							        				<form:options items="${hours}"/>
+							        			</form:select>
+							        			<form:label path="minute" >Minute</form:label>
+							        			<form:select path="minute">
+							        				<form:options items="${minutes}"/>
+							        			</form:select>
+							        			<form:label path="period" >Period</form:label>
+							        			<form:select path="period">
+							        				<form:options items="${periods}"/>	
+							        			</form:select>
+						        			</fieldset>
+						        			<fieldset>
+						        				<legend>Crawl Parameters</legend>
+						        				<form:label path="depth" >Crawl Depth</form:label>
+							        			<form:select path="depth">
+							        				<form:options items="${depths}"/>
+							        			</form:select>
+						        				<form:label path="topn" >TopN</form:label>
+							        			<form:input path="topn" />
+						        			</fieldset>
 						        			<input type="submit" value="Save" />
 						        		</form:form>
 						        	</p>
@@ -86,6 +103,15 @@
 						        			<fieldset>
 						        				<legend>Day's</legend>
 						        				<form:checkboxes items="${days}" path="days"/>
+						        			</fieldset>
+						        			<fieldset>
+						        				<legend>Crawl Parameters</legend>
+						        				<form:label path="depth" >Crawl Depth</form:label>
+							        			<form:select path="depth">
+							        				<form:options items="${depths}"/>
+							        			</form:select>
+						        				<form:label path="topn" >TopN</form:label>
+							        			<form:input path="topn" />
 						        			</fieldset>
 						        			<input type="submit" value="Save" />
 						        		</form:form>
@@ -125,14 +151,21 @@
 							        				<form:options items="${periods}"/>	
 							        			</form:select>
 						        			</fieldset>
-										
         									<fieldset id="checkboxButtons">
-        										<label>Days of Month</label>
+        										<legend>Days of Month</legend>
         										<c:forEach items="${month}" var="dayOfMonth">
         											<input name="daysOfMonth" type="checkbox" id="daysOfMonth_${dayOfMonth}" value="${dayOfMonth}">
         										</c:forEach>
         									</fieldset>
-										    
+						        			<fieldset>
+						        				<legend>Crawl Parameters</legend>
+						        				<form:label path="depth" >Crawl Depth</form:label>
+							        			<form:select path="depth">
+							        				<form:options items="${depths}"/>
+							        			</form:select>
+						        				<form:label path="topn" >TopN</form:label>
+							        			<form:input path="topn" />
+						        			</fieldset>
 										    <div>
 										        <input type="reset" name="resetbutton" value="Reset Form">
 										        <input type="submit" name="submitbutton" value="Submit Form">
@@ -143,9 +176,21 @@
 						        </div>
 						        <div id="tab4">
 						        	<p>
-						        		<form:form action="advanced.html" method="post" commandName="advancedCommand">
-						        			<form:label path="pattern" >Pattern</form:label>
-						        			<form:input path="pattern" />
+							        	<form:form action="advanced.html" method="post" commandName="advancedCommand">
+							        		<fieldset>
+						        			<legend>Pattern</legend>
+							        			<form:label path="pattern" >Pattern</form:label>
+							        			<form:input path="pattern" />
+							        		</fieldset>
+						        			<fieldset>
+						        				<legend>Crawl Parameters</legend>
+						        				<form:label path="depth" >Crawl Depth</form:label>
+							        			<form:select path="depth">
+							        				<form:options items="${depths}"/>
+							        			</form:select>
+						        				<form:label path="topn" >TopN</form:label>
+							        			<form:input path="topn" />
+						        			</fieldset>
 						        			<input type="submit" value="Save" />
 						        		</form:form>
 						        	</p>

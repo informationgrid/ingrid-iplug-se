@@ -17,16 +17,25 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class SchedulingController extends NavigationSelector {
 
   private final PatternPersistence _patternPersistence;
+  private final CrawlDataPersistence _crawlDataPersistence;
 
   @Autowired
-  public SchedulingController(PatternPersistence patternPersistence) {
+  public SchedulingController(PatternPersistence patternPersistence,
+      CrawlDataPersistence crawlDataPersistence) {
     _patternPersistence = patternPersistence;
+    _crawlDataPersistence = crawlDataPersistence;
   }
 
   @ModelAttribute("savedPattern")
   public String pattern() throws Exception {
     return _patternPersistence.existsPattern() ? _patternPersistence
         .loadPattern().getPattern() : "";
+  }
+
+  @ModelAttribute("savedCrawlData")
+  public String crawlData() throws Exception {
+    return _crawlDataPersistence.existsCrawlData() ? _crawlDataPersistence
+        .loadCrawlData().toString() : "";
   }
 
   @ModelAttribute("periods")
@@ -53,6 +62,15 @@ public class SchedulingController extends NavigationSelector {
   public Integer[] month() {
     Integer[] month = new Integer[31];
     for (int i = 0; i < 31; i++) {
+      month[i] = i;
+    }
+    return month;
+  }
+
+  @ModelAttribute("depths")
+  public Integer[] depth() {
+    Integer[] month = new Integer[10];
+    for (int i = 0; i < month.length; i++) {
       month[i] = i;
     }
     return month;
@@ -85,14 +103,21 @@ public class SchedulingController extends NavigationSelector {
 
   @RequestMapping(value = "/daily.html", method = RequestMethod.POST)
   public String postDaily(
-      @ModelAttribute("clockCommand") ClockCommand schedulingCommand)
+      @ModelAttribute("clockCommand") ClockCommand clockCommand)
       throws IOException {
-    Integer hour = schedulingCommand.getHour();
-    Integer minute = schedulingCommand.getMinute();
-    Period period = schedulingCommand.getPeriod();
+
+    // persist scheduling
+    Integer hour = clockCommand.getHour();
+    Integer minute = clockCommand.getMinute();
+    Period period = clockCommand.getPeriod();
     hour = period == Period.PM ? hour + 12 : hour;
     String pattern = minute + " " + hour + " " + "* * 0-6";
     _patternPersistence.savePattern(pattern);
+
+    // persist crawldata
+    Integer depth = clockCommand.getDepth();
+    Integer topn = clockCommand.getTopn();
+    _crawlDataPersistence.saveCrawlData(depth, topn);
     return "redirect:/index.html";
   }
 
@@ -118,6 +143,11 @@ public class SchedulingController extends NavigationSelector {
     }
     String pattern = minute + " " + hour + " " + "* * " + dayPattern;
     _patternPersistence.savePattern(pattern);
+
+    // persist crawldata
+    Integer depth = weeklyCommand.getDepth();
+    Integer topn = weeklyCommand.getTopn();
+    _crawlDataPersistence.saveCrawlData(depth, topn);
     return "redirect:/index.html";
   }
 
@@ -143,6 +173,11 @@ public class SchedulingController extends NavigationSelector {
     }
     String pattern = minute + " " + hour + " " + dayPattern + " * *";
     _patternPersistence.savePattern(pattern);
+
+    // persist crawldata
+    Integer depth = monthlyCommand.getDepth();
+    Integer topn = monthlyCommand.getTopn();
+    _crawlDataPersistence.saveCrawlData(depth, topn);
     return "redirect:/index.html";
   }
 
@@ -152,12 +187,18 @@ public class SchedulingController extends NavigationSelector {
       throws IOException {
     String pattern = advancedCommand.getPattern();
     _patternPersistence.savePattern(pattern);
+
+    // persist crawldata
+    Integer depth = advancedCommand.getDepth();
+    Integer topn = advancedCommand.getTopn();
+    _crawlDataPersistence.saveCrawlData(depth, topn);
     return "redirect:/index.html";
   }
 
   @RequestMapping(value = "/delete.html", method = RequestMethod.POST)
-  public String delete() {
+  public String delete() throws IOException {
     _patternPersistence.deletePattern();
+    _crawlDataPersistence.deleteCrawlData();
     return "redirect:/index.html";
   }
 
