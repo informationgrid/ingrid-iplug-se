@@ -8,6 +8,10 @@ public class ConfigurationCommand {
 
   private String _description;
 
+  private int _position;
+
+  private String _finalValue;
+
   public String getName() {
     return _name;
   }
@@ -30,6 +34,22 @@ public class ConfigurationCommand {
 
   public void setDescription(String description) {
     _description = description;
+  }
+
+  public void setPosition(int position) {
+    _position = position;
+  }
+
+  public int getPosition() {
+    return _position;
+  }
+
+  public String getFinalValue() {
+    return _finalValue;
+  }
+
+  public void setFinalValue(String finalValue) {
+    _finalValue = finalValue;
   }
 
 }
