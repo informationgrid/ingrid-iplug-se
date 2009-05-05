@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="nutch-1.0/src/java"/>
+	<classpathentry kind="src" path="administration-ui/src/plugin/admin-configuration/src/java"/>
 	<classpathentry kind="src" path="administration-ui/src/plugin/admin-scheduling/src/conf"/>
 	<classpathentry kind="src" path="administration-ui/src/plugin/admin-scheduling/src/java"/>
 	<classpathentry kind="src" path="administration-ui/src/plugin/admin-welcome/src/java"/>
