@@ -1,0 +1,39 @@
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence persistence_1_0.xsd"
+	version="1.0">
+
+
+	<persistence-unit name="manager" transaction-type="RESOURCE_LOCAL">
+		<provider>org.eclipse.persistence.jpa.PersistenceProvider
+		</provider>
+		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.Url</class>
+		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.CatalogUrl</class>
+		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl</class>
+		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.LimitUrl</class>
+		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.ExcludeUrl</class>
+		
+		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.Partner</class>
+		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider</class>
+		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata</class>
+		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.Crawl</class>
+		<!--
+			<properties> <property name="eclipselink.dialect"
+			value="org.eclipselink.dialect.HSQLDialect"/> <property
+			name="eclipselink.connection.driver_class"
+			value="org.hsqldb.jdbcDriver"/> <property
+			name="eclipselink.connection.username" value="sa"/> <property
+			name="eclipselink.connection.password" value=""/> <property
+			name="eclipselink.connection.url" value="jdbc:hsqldb:."/> <property
+			name="eclipselink.max_fetch_depth" value="3"/> </properties>
+		-->
+		<properties>
+			<property name="eclipselink.jdbc.driver" value="com.mysql.jdbc.Driver" />
+			<property name="eclipselink.jdbc.user" value="root" />
+			<property name="eclipselink.jdbc.password" value="" />
+			<property name="eclipselink.jdbc.url" value="jdbc:mysql://localhost/iplugse" />
+			<property name="eclipselink.ddl-generation" value="create-tables"/>
+		</properties>
+	</persistence-unit>
+
+</persistence> 
