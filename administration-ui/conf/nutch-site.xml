@@ -7,7 +7,7 @@
 
 <property>
   <name>plugin.folders</name>
-  <value>nutch-1.0/src/plugin,administration-ui/src/plugin</value>
+  <value>nutch-1.0/src/plugin,administration-ui/src/plugin,plugins/opensource</value>
   <description>Directories where nutch plugins are located.  Each
   element may be a relative or absolute path.  If absolute, it is used
   as is.  If relative, it is searched for on the classpath.</description>
@@ -15,7 +15,7 @@
 
 <property>
   <name>plugin.includes</name>
-  <value>admin-.*|protocol-http|urlfilter-regex|parse-(text|html|js)|index-(basic|anchor)|query-(basic|site|url)|response-(json|xml)|summary-basic|scoring-opic|urlnormalizer-(pass|regex|basic)</value>
+  <value>admin-.*|protocol-http|urlfilter-regex|parse-(text|html|js)|index-(basic|anchor)|query-(basic|site|url)|response-(json|xml)|summary-basic|scoring-opic|urlnormalizer-(pass|regex|basic)|crawl-prepare-(crawldb)</value>
   <description>Regular expression naming plugin directory names to
   include.  Any plugin not matching this expression is excluded.
   In any case you need at least include the nutch-extensionpoints plugin. By

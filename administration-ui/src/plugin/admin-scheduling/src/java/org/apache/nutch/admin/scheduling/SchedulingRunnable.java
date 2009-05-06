@@ -1,12 +1,19 @@
 package org.apache.nutch.admin.scheduling;
 
+import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.nutch.admin.CrawlTool;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.nutch.admin.ConfigurationUtil;
+import org.apache.nutch.crawl.CrawlTool;
 
 public class SchedulingRunnable implements Runnable {
-
-  private final CrawlTool _crawlTool;
 
   private boolean LOCK = false;
 
@@ -14,9 +21,10 @@ public class SchedulingRunnable implements Runnable {
 
   private final CrawlDataPersistence _crawlDataPersistence;
 
+  private DateFormat _format = new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss");
+
   public SchedulingRunnable(CrawlDataPersistence crawlDataPersistence) {
     _crawlDataPersistence = crawlDataPersistence;
-    _crawlTool = new CrawlTool();
   }
 
   @Override
@@ -37,8 +45,21 @@ public class SchedulingRunnable implements Runnable {
           + crawlData.getWorkingDirectory().getAbsolutePath());
       LOCK = true;
       try {
-        _crawlTool.crawl(crawlData.getWorkingDirectory(), crawlData.getTopn(),
-            crawlData.getDepth());
+
+        File workingDirectory = crawlData.getWorkingDirectory();
+        Path path = new Path(workingDirectory.getAbsolutePath(),
+            "crawls");
+        ConfigurationUtil configurationUtil = new ConfigurationUtil(
+            workingDirectory);
+        Configuration configuration = configurationUtil
+            .loadConfiguration(workingDirectory.getName());
+        FileSystem fileSystem = FileSystem.get(configuration);
+        String folderName = "Crawl-" + _format.format(new Date());
+        Path crawlDir = new Path(path, folderName);
+        fileSystem.create(crawlDir);
+
+        CrawlTool crawlTool = new CrawlTool(configuration, crawlDir);
+        crawlTool.crawl(crawlData.getTopn(), crawlData.getDepth());
       } catch (Throwable e) {
       } finally {
         LOG.info("unlock the scheduled crawl: "
