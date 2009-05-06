@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="nutch-1.0/src/java"/>
+	<classpathentry kind="src" path="plugins/closedsource/admin-urlmaintenance/src/test"/>
+	<classpathentry kind="src" path="plugins/closedsource/admin-urlmaintenance/conf"/>
+	<classpathentry kind="src" path="plugins/closedsource/admin-urlmaintenance/src/java"/>
 	<classpathentry kind="src" path="plugins/opensource/crawl-prepare-crawldb/src/java"/>
 	<classpathentry kind="src" path="tools/opensource/crawl/src/java"/>
 	<classpathentry kind="src" path="administration-ui/src/plugin/admin-crawl/src/java"/>
@@ -21,5 +24,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Nutch-Jetty-Ext-Libraries"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Admin-Ui-Libraries"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Admin-Scheduling-Libraries"/>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Url-Maintenance-Libraries"/>
 	<classpathentry kind="output" path="eclipse-classes"/>
 </classpath>
