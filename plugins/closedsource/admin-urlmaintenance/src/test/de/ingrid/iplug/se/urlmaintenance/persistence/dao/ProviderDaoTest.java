@@ -10,12 +10,12 @@ public class ProviderDaoTest extends DaoTest {
 
   public void testCreateProvider() throws Exception {
     Partner partner = createPartner();
-    
+
     TransactionService transactionService = new TransactionService();
     transactionService.beginTransaction();
     PartnerDao partnerDao = new PartnerDao(transactionService);
     Partner byName = partnerDao.getByName(partner.getName());
-    
+
     Provider provider = new Provider();
     provider.setName("foo");
     provider.setPartner(byName);
@@ -33,12 +33,11 @@ public class ProviderDaoTest extends DaoTest {
 
   public void testDeleteProvider() throws Exception {
     Partner partner = createPartner();
-    
+
     TransactionService transactionService = new TransactionService();
     transactionService.beginTransaction();
     PartnerDao partnerDao = new PartnerDao(transactionService);
     Partner byName = partnerDao.getByName(partner.getName());
-
 
     Provider provider = new Provider();
     provider.setName("foo");
@@ -62,14 +61,12 @@ public class ProviderDaoTest extends DaoTest {
 
   public void testGetByName() throws Exception {
     Partner partner = createPartner();
-    
+
     TransactionService transactionService = new TransactionService();
     transactionService.beginTransaction();
-    
+
     PartnerDao partnerDao = new PartnerDao(transactionService);
     Partner byName = partnerDao.getByName(partner.getName());
-
-
 
     Provider provider = new Provider();
     provider.setName("foo");
@@ -83,18 +80,5 @@ public class ProviderDaoTest extends DaoTest {
     Provider provider2 = dao.getByName("foo");
     assertEquals(provider.getId(), provider2.getId());
   }
-  
-  private Partner createPartner() throws Exception {
-    TransactionService transactionService = new TransactionService();
-    transactionService.beginTransaction();
 
-    Partner partner = new Partner();
-    partner.setName("partner");
-    IPartnerDao dao = new PartnerDao(transactionService);
-    dao.makePersistent(partner);
-    transactionService.commitTransaction();
-    transactionService.close();
-
-    return partner;
-  }
 }
