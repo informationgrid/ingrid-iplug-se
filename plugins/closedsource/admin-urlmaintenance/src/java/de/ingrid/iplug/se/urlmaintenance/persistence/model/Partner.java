@@ -3,13 +3,17 @@ package de.ingrid.iplug.se.urlmaintenance.persistence.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 
 @Entity
+@NamedQuery(name = "getPartnerByName", query = "select p from Partner as p where p._name = :name")
 public class Partner extends IdBase {
 
+  @Column(nullable = false, unique = true)
   private String _name;
 
   @OneToMany

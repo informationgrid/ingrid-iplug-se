@@ -86,4 +86,10 @@ public class TransactionService {
     EntityManager entityManager = getEntityManager();
     return entityManager.createQuery(query);
   }
+  
+  public Query createNamedQuery(String name) {
+    EntityManager entityManager = getEntityManager();
+    return entityManager.createNamedQuery(name);
+  }
+  
 }

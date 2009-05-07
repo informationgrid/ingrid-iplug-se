@@ -11,7 +11,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
 public class Dao<T extends IdBase> implements IDao<T> {
 
   protected final Class<T> _clazz;
-  private final TransactionService _transactionService;
+  protected final TransactionService _transactionService;
 
   public Dao(Class<T> clazz, TransactionService transactionService) {
     _clazz = clazz;
