@@ -2,6 +2,7 @@ package de.ingrid.iplug.se.urlmaintenance.persistence.dao;
 
 import java.util.List;
 
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao.OrderBy;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.CatalogUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl;
@@ -38,11 +39,15 @@ public class StartUrlDaoTest extends DaoTest {
     transactionService.beginTransaction();
 
     byName = providerDao.getByName(provider.getName());
-    List<StartUrl> startUrls = startUrlDao.getByProvider(byName, 0, 11);
+    List<StartUrl> startUrls = startUrlDao.getByProvider(byName, 0, 11,
+        OrderBy.URL);
     assertEquals(11, startUrls.size());
-    startUrls = startUrlDao.getByProvider(byName, 11, 100);
+    startUrls = startUrlDao.getByProvider(byName, 11, 100, OrderBy.TIMESTAMP);
     assertEquals(12, startUrls.size());
 
+    Long count = startUrlDao.countByProvider(byName);
+    assertEquals(new Long(23), count);
+    
     transactionService.commitTransaction();
     transactionService.close();
 

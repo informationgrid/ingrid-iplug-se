@@ -23,7 +23,16 @@
 			<div id="bd">
 				<div id="yui-main">
 					<div class="yui-b">
-					Urlpflehe
+						<form:form action="index.html" commandName="partnerProviderCommand" method="post">
+							<fieldset>
+								<label>Choose Partner Provider</label>
+								<form:label path="partner">Partner</form:label>
+								<form:select path="partner" items="${partners}" />
+								<form:label path="provider">Provider</form:label>
+								<form:select path="provider" items="${providers}" />
+							</fieldset>
+							<input type="submit" value="Next"/>
+						</form:form>
 					</div>
 				</div>
 				<div class="yui-b">

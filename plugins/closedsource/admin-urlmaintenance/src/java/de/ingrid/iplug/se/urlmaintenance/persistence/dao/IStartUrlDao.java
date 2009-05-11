@@ -7,6 +7,13 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl;
 
 public interface IStartUrlDao extends IDao<StartUrl> {
 
-  List<StartUrl> getByProvider(Provider provider, int start, int length);
+  public static enum OrderBy {
+    TIMESTAMP, URL
+  }
+
+  Long countByProvider(Provider byName);
+
+  List<StartUrl> getByProvider(Provider provider, int start, int length,
+      OrderBy orderBy);
 
 }

@@ -1,6 +1,7 @@
 package de.ingrid.iplug.se.urlmaintenance.persistence.model;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.DiscriminatorColumn;
@@ -12,6 +13,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 @Entity
 @Table(name = "URL")
@@ -20,6 +23,9 @@ import javax.persistence.Table;
 public class Url extends IdBase {
 
   private String _url;
+  
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date _timeStamp;
 
   @ManyToMany
   private List<Metadata> _metadatas = new ArrayList<Metadata>();
@@ -52,4 +58,13 @@ public class Url extends IdBase {
     _provider = provider;
   }
 
+  public Date getTimeStamp() {
+    return _timeStamp;
+  }
+
+  public void setTimeStamp(Date timeStamp) {
+    _timeStamp = timeStamp;
+  }
+
+  
 }

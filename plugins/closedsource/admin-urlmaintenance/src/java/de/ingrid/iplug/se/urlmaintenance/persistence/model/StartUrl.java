@@ -6,12 +6,16 @@ import java.util.List;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 
 @Entity
 @DiscriminatorValue("START")
-@NamedQuery(name = "getAllUrlsByProvider", query = "select u from StartUrl as u where u._provider._id = :id")
+@NamedQueries(value = {
+    @NamedQuery(name = "getAllUrlsByProviderOrderByTimeStamp", query = "select u from StartUrl as u where u._provider._id = :id order by u._timeStamp"),
+    @NamedQuery(name = "getAllUrlsByProviderOrderByUrl", query = "select u from StartUrl as u where u._provider._id = :id order by u._url"),
+    @NamedQuery(name = "countByProvider", query = "select count(u) from StartUrl as u where u._provider._id = :id") })
 public class StartUrl extends WebUrl {
 
   @OneToMany
