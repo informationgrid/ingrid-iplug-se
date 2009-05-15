@@ -6,4 +6,6 @@ public interface IPartnerDao extends IDao<Partner> {
 
   Partner getByName(String string);
 
+  boolean exists(String name);
+
 }

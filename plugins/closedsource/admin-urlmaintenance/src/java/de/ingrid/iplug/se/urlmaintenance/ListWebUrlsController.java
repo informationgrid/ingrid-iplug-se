@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IMetadataDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IProviderDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao.OrderBy;
+import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl;
 
@@ -24,12 +26,25 @@ public class ListWebUrlsController {
 
   private final IStartUrlDao _startUrlDao;
   private final IProviderDao _providerDao;
+  private final IMetadataDao _metadataDao;
 
   @Autowired
   public ListWebUrlsController(IProviderDao providerDao,
-      IStartUrlDao startUrlDao) {
+      IStartUrlDao startUrlDao, IMetadataDao metadataDao) {
     _providerDao = providerDao;
     _startUrlDao = startUrlDao;
+    _metadataDao = metadataDao;
+  }
+
+  @ModelAttribute("metadatas")
+  public List<Metadata> injectMetadatas() {
+    List<Metadata> arrayList = new ArrayList<Metadata>();
+    arrayList.add(_metadataDao.getByKeyAndValue("datatype", "topics"));
+    arrayList.add(_metadataDao.getByKeyAndValue("datatype", "research"));
+    arrayList.add(_metadataDao.getByKeyAndValue("datatype", "law"));
+    arrayList.add(_metadataDao.getByKeyAndValue("lang", "de"));
+    arrayList.add(_metadataDao.getByKeyAndValue("lang", "en"));
+    return arrayList;
   }
 
   @RequestMapping(value = "/listWebUrls.html", method = RequestMethod.GET)
@@ -53,7 +68,6 @@ public class ListWebUrlsController {
     System.out.println();
     String providerString = partnerProviderCommand.getProvider();
     Provider byName = _providerDao.getByName(providerString);
-    List<String> list = new ArrayList<String>();
     Long count = 0L;
     if (byName != null) {
       count = _startUrlDao.countByProvider(byName);
@@ -61,7 +75,7 @@ public class ListWebUrlsController {
           length, orderBy);
       model.addAttribute("urls", startUrls);
     }
-    
+
     model.addAttribute("count", count);
 
     return "startUrlSubset";

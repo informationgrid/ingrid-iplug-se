@@ -27,9 +27,9 @@
 							<fieldset>
 								<label>Choose Partner Provider</label>
 								<form:label path="partner">Partner</form:label>
-								<form:select path="partner" items="${partners}" />
+								<form:select path="partner" items="${partners}" itemLabel="name" itemValue="name"/>
 								<form:label path="provider">Provider</form:label>
-								<form:select path="provider" items="${providers}" />
+								<form:select path="provider" items="${providers}" itemLabel="name" itemValue="name"/>
 							</fieldset>
 							<input type="submit" value="Next"/>
 						</form:form>

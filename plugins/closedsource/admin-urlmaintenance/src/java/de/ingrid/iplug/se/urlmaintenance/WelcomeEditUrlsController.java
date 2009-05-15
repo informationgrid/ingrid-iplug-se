@@ -14,8 +14,6 @@ public class WelcomeEditUrlsController {
   @RequestMapping(method = RequestMethod.GET)
   public String index(
       @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand) {
-    System.out.println("WelcomeEditUrlsController.index() "
-        + partnerProviderCommand.getProvider());
     return "welcomeEditUrls";
   }
 }

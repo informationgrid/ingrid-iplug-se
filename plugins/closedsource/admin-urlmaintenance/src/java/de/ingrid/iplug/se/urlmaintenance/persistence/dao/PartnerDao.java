@@ -23,4 +23,11 @@ public class PartnerDao extends Dao<Partner> implements IPartnerDao {
     return (Partner) query.getSingleResult();
   }
 
+  @Override
+  public boolean exists(String name) {
+    Query query = _transactionService.createNamedQuery("getPartnerByName");
+    query.setParameter("name", name);
+    return !query.getResultList().isEmpty();
+  }
+
 }

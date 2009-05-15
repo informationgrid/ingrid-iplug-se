@@ -21,7 +21,17 @@ public class MetadataDao extends Dao<Metadata> implements IMetadataDao {
         .createNamedQuery("getMetadataByKeyAndValue");
     query.setParameter("key", key);
     query.setParameter("value", value);
+    System.out.println(query.getResultList().isEmpty());
     return (Metadata) query.getSingleResult();
+  }
+
+  @Override
+  public boolean exists(String key, String value) {
+    Query query = _transactionService
+        .createNamedQuery("getMetadataByKeyAndValue");
+    query.setParameter("key", key);
+    query.setParameter("value", value);
+    return !query.getResultList().isEmpty();
   }
 
 }

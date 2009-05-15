@@ -22,6 +22,13 @@
 <script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/paginator/paginator-min.js"></script>
 <script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/datasource/datasource-min.js"></script>
 <script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/datatable/datatable-min.js"></script>
+
+<!-- Dependency --> 
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/yahoo/yahoo-min.js" ></script>
+
+<!-- Event source file -->
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/event/event-min.js" ></script>
+
 </head>
 <body class="yui-skin-sam">
 	<div id="doc" class="yui-t1">
@@ -38,6 +45,21 @@
 						    </ul>            
 						    <div class="yui-content">
 						        <div><p>Willkommen in der Web Urlpflege</p></div>
+						        
+						        <fieldset>
+						        	<label>Aktionen</label>
+						        	<c:forEach items="${metadatas}" var="metadata">
+						        	<div id="${metadata.metadataKey}_${metadata.metadataValue}">
+						        		${metadata}<input type="checkbox" >
+						        	</div>
+						        		<script>
+											function fnCallback(e) { alert("click"); }
+											YAHOO.util.Event.addListener("${metadata.metadataKey}_${metadata.metadataValue}", "click", fnCallback);
+										</script>
+						        	</c:forEach>
+						        	
+						        </fieldset>
+						        
 						        <div id="dynamicdata"></div>
 						        
 						        <script>

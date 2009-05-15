@@ -18,6 +18,14 @@ public class Metadata extends IdBase {
   @Column(nullable = false)
   private String _metadataValue;
 
+  public Metadata() {
+  }
+
+  public Metadata(String key, String value) {
+    _metadataKey = key;
+    _metadataValue = value;
+  }
+
   public String getMetadataKey() {
     return _metadataKey;
   }

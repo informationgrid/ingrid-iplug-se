@@ -23,16 +23,16 @@ import javax.persistence.TemporalType;
 public class Url extends IdBase {
 
   private String _url;
-  
-  @Temporal(TemporalType.TIMESTAMP)
-  private Date _timeStamp;
 
-  @ManyToMany
-  private List<Metadata> _metadatas = new ArrayList<Metadata>();
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date _timeStamp = new Date();
 
   @ManyToOne
   @JoinColumn(nullable = false, name = "provider_fk")
   private Provider _provider;
+
+  @ManyToMany
+  protected List<Metadata> _metadatas = new ArrayList<Metadata>();
 
   public String getUrl() {
     return _url;
@@ -40,14 +40,6 @@ public class Url extends IdBase {
 
   public void setUrl(String url) {
     _url = url;
-  }
-
-  public List<Metadata> getMetadatas() {
-    return _metadatas;
-  }
-
-  public void setMetadatas(List<Metadata> metadatas) {
-    _metadatas = metadatas;
   }
 
   public Provider getProvider() {
@@ -66,5 +58,4 @@ public class Url extends IdBase {
     _timeStamp = timeStamp;
   }
 
-  
 }

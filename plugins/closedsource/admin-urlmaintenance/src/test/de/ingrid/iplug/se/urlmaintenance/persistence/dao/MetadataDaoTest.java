@@ -56,5 +56,6 @@ public class MetadataDaoTest extends DaoTest {
     Metadata metadata2 = metadataDao.getByKeyAndValue("foo", "bar");
     assertEquals("foo", metadata2.getMetadataKey());
     assertEquals("bar", metadata2.getMetadataValue());
+    
   }
 }

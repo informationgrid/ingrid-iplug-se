@@ -76,4 +76,20 @@ public class DaoTest extends TestCase {
 
     return partner;
   }
+
+  protected Metadata createMetadata(String key, String value) {
+    TransactionService transactionService = new TransactionService();
+    transactionService.beginTransaction();
+
+    Metadata metadata = new Metadata();
+    metadata.setMetadataKey(key);
+    metadata.setMetadataValue(value);
+    IMetadataDao metadataDao = new MetadataDao(transactionService);
+    metadataDao.makePersistent(metadata);
+    
+    transactionService.commitTransaction();
+    transactionService.close();
+
+    return metadata;
+  }
 }
