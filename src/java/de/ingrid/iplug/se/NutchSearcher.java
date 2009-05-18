@@ -119,7 +119,7 @@ public class NutchSearcher implements IPlug {
         } else {
             // hits = this.fNutchBean.search(nutchQuery, start + length, 1,
 			// "urldigest");
-            hits = this.fNutchBean.search(nutchQuery, start + length, 1, null,
+			hits = this.fNutchBean.search(nutchQuery, start + length, -1, null,
 					null, false);
         }
 
