@@ -117,7 +117,10 @@ public class NutchSearcher implements IPlug {
         if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
             hits = this.fNutchBean.search(nutchQuery, start + length, null, "date", true);
         } else {
-            hits = this.fNutchBean.search(nutchQuery, start + length, 1, "urldigest");
+            // hits = this.fNutchBean.search(nutchQuery, start + length, 1,
+			// "urldigest");
+            hits = this.fNutchBean.search(nutchQuery, start + length, 1, null,
+					null, false);
         }
 
         int count = hits.getLength();
