@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import de.ingrid.iplug.se.urlmaintenance.commandObjects.StartUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IMetadataDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IProviderDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao;
@@ -21,7 +22,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl;
 
 @Controller
-@SessionAttributes(value = { "partnerProviderCommand" })
+@SessionAttributes(value = { "partnerProviderCommand", "startUrlCommand" })
 public class ListWebUrlsController {
 
   private final IStartUrlDao _startUrlDao;
@@ -50,6 +51,11 @@ public class ListWebUrlsController {
   @RequestMapping(value = "/listWebUrls.html", method = RequestMethod.GET)
   public String listWebUrls() {
     return "listWebUrls";
+  }
+
+  @ModelAttribute("startUrlCommand")
+  public StartUrlCommand injectStartUrlCommand() {
+    return new StartUrlCommand();
   }
 
   @RequestMapping(value = "/startUrlSubset.html", method = RequestMethod.GET)

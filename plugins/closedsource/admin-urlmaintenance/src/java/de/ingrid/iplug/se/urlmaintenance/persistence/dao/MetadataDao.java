@@ -1,5 +1,7 @@
 package de.ingrid.iplug.se.urlmaintenance.persistence.dao;
 
+import java.util.List;
+
 import javax.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,16 @@ public class MetadataDao extends Dao<Metadata> implements IMetadataDao {
     query.setParameter("key", key);
     query.setParameter("value", value);
     return !query.getResultList().isEmpty();
+  }
+
+  
+  @SuppressWarnings("unchecked")
+  @Override
+  public List<Metadata> getByKey(String key) {
+    Query query = _transactionService
+        .createNamedQuery("getMetadatasByKey");
+    query.setParameter("key", key);
+    return query.getResultList();
   }
 
 }

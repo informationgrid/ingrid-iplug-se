@@ -12,22 +12,15 @@
 
 
 
-<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.7.0/build/fonts/fonts-min.css" />
-<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.7.0/build/paginator/assets/skins/sam/paginator.css" />
-<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.7.0/build/datatable/assets/skins/sam/datatable.css" />
-<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/yahoo-dom-event/yahoo-dom-event.js"></script>
-<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/connection/connection-min.js"></script>
-<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/json/json-min.js"></script>
-<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/element/element-min.js"></script>
-<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/paginator/paginator-min.js"></script>
-<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/datasource/datasource-min.js"></script>
-<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/datatable/datatable-min.js"></script>
+<link rel="stylesheet" type="text/css" href="css/yui/build/paginator/assets/skins/sam/paginator.css" />
+<link rel="stylesheet" type="text/css" href="css/yui/build/datatable/assets/skins/sam/datatable.css" />
+<script type="text/javascript" src="css/yui/build/json/json-min.js"></script>
+<script type="text/javascript" src="css/yui/build/paginator/paginator-min.js"></script>
+<script type="text/javascript" src="css/yui/build/datasource/datasource-min.js"></script>
+<script type="text/javascript" src="css/yui/build/datatable/datatable-min.js"></script>
 
-<!-- Dependency --> 
-<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/yahoo/yahoo-min.js" ></script>
-
-<!-- Event source file -->
-<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/event/event-min.js" ></script>
+<script type="text/javascript" src="css/yui/build/yahoo/yahoo-min.js" ></script>
+<script type="text/javascript" src="css/yui/build/event/event-min.js" ></script>
 
 </head>
 <body class="yui-skin-sam">
@@ -48,6 +41,7 @@
 						        
 						        <fieldset>
 						        	<label>Aktionen</label>
+						        	<a href="createStartUrl.html">Neue Webseite</a>
 						        	<c:forEach items="${metadatas}" var="metadata">
 						        	<div id="${metadata.metadataKey}_${metadata.metadataValue}">
 						        		${metadata}<input type="checkbox" >
