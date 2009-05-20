@@ -2,9 +2,9 @@ package org.apache.nutch.admin;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
@@ -58,7 +58,7 @@ public class HttpServer extends Thread {
     String pluginId = extension.getDescriptor().getPluginId();
     String contextPath = "/" + nutchInstance.getInstanceName();
     if (!pluginId.equals("admin-welcome")) {
-      contextPath = contextPath + "-" + pluginId;
+      contextPath = contextPath + "/" + pluginId;
     }
 
     String webApp = new File(extension.getDescriptor().getPluginPath()
@@ -76,12 +76,15 @@ public class HttpServer extends Thread {
     }
     context.start();
 
+    Set<String> contextNames = new TreeSet<String>();
     HttpContext[] contexts = _server.getContexts();
-    Set<String> contextNames = new HashSet<String>();
     for (HttpContext httpContext : contexts) {
       contextNames.add(httpContext.getName());
     }
-    _contextAttributes.put("contextNames", contextNames);
+    for (HttpContext httpContext : contexts) {
+      httpContext.setAttribute("contextNames", contextNames);
+    }
+
   }
 
   public void addContextAttribute(String key, Object value) {

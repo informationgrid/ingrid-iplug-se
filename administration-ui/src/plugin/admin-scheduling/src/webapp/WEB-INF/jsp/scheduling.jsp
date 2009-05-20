@@ -16,13 +16,10 @@
 <script type="text/javascript" src="css/yui/build/tabview/tabview-min.js" ></script>
 <script type="text/javascript" src="css/yui/build/button/button-min.js" ></script>
  
+<link rel="stylesheet" type="text/css" href="css/yui/build/menu/assets/skins/sam/menu.css" />
+<script type="text/javascript" src="css/yui/build/container/container_core-min.js"></script>
+<script type="text/javascript" src="css/yui/build/menu/menu-min.js"></script>
 
-<!--  
-<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?2.7.0/build/tabview/assets/skins/sam/tabview.css">
-<script type="text/javascript" src="http://yui.yahooapis.com/combo?2.7.0/build/yahoo-dom-event/yahoo-dom-event.js&2.7.0/build/element/element-min.js&2.7.0/build/tabview/tabview-min.js"></script>
-<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?2.7.0/build/button/assets/skins/sam/button.css">
-<script type="text/javascript" src="http://yui.yahooapis.com/combo?2.7.0/build/yahoo-dom-event/yahoo-dom-event.js&2.7.0/build/element/element-min.js&2.7.0/build/button/button-min.js"></script>
--->
 
 </head>
 <body class="yui-skin-sam">
@@ -205,10 +202,32 @@
 					</div>
 				</div>
 				<div class="yui-b">
-				Welcome Navigation
-					<c:forEach items="${navigations}" var="navigation">
-						<a href="${navigation}">${navigation}</a>
-					</c:forEach>
+						<script type="text/javascript">
+						    YAHOO.util.Event.onContentReady("leftNav", function () {
+						        var oMenu = new YAHOO.widget.Menu("leftNav", { 
+						                                                position: "static", 
+						                                                hidedelay:  750, 
+						                                                lazyload: true });
+						        oMenu.render();            
+						    });
+						</script>					
+						
+						<div id="leftNav" class="yuimenu">
+					    <div class="bd">
+					        <h6>General Instances</h6>
+					        <ul>
+								<c:forEach items="${rootContexts}" var="rootContext">
+									<li class="yuimenuitem"><a class="yuimenuitemlabel" href="${rootContext}">${rootContext}</a></li>
+								</c:forEach>
+					        </ul>
+					        <h6 class="first-of-type">Instances</h6>
+					        <ul class="first-of-type">
+								<c:forEach items="${navigations}" var="navigation">
+									<li class="yuimenuitem"><a class="yuimenuitemlabel" href="${navigation}">${navigation}</a></li>
+								</c:forEach>
+					        </ul>
+					    </div>
+					</div>
 				</div>
 			</div>
 		<div id="ft">footer</div>
