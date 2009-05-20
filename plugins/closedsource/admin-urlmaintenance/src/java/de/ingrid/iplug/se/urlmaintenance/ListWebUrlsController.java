@@ -3,6 +3,8 @@ package de.ingrid.iplug.se.urlmaintenance;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -63,15 +65,16 @@ public class ListWebUrlsController {
       @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand,
       @RequestParam(value = "startIndex", required = false) Integer start,
       @RequestParam(value = "pageSize", required = false) Integer length,
-      @RequestParam(value = "sort", required = false) String sort, Model model) {
+      @RequestParam(value = "sort", required = false) String sort,
+      @RequestParam(value = "dir", required = false) String dir, Model model,
+      HttpServletRequest request) {
+    System.out.println(request.getParameterMap());
     start = start == null ? 0 : start;
     length = length == null ? 10 : length;
 
-    OrderBy orderBy = "url".equals(sort) ? OrderBy.URL : OrderBy.TIMESTAMP;
-    System.out.println(start);
-    System.out.println(length);
-    System.out.println(sort);
-    System.out.println();
+    OrderBy orderBy = "url".equals(sort) ? ("asc".equals(dir) ? OrderBy.URL_ASC
+        : OrderBy.URL_DESC) : ("asc".equals(dir) ? OrderBy.TIMESTAMP_ASC
+        : OrderBy.TIMESTAMP_DESC);
     String providerString = partnerProviderCommand.getProvider();
     Provider byName = _providerDao.getByName(providerString);
     Long count = 0L;

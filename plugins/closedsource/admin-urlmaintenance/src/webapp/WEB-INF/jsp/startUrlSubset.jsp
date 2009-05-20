@@ -7,10 +7,11 @@
     		{"url":"${url.url}", "timeStamp":"${url.timeStamp}"},
     		<c:forEach items="${url.limitUrls}" var="limitUrl">
 	    		{"url":"${limitUrl.url}", "timeStamp":"${limitUrl.timeStamp}"},
-	    		<c:forEach items="${url.excludeUrls}" var="excludeUrl">
-		    		{"url":"${excludeUrl.url}","timeStamp":"${excludeUrl.timeStamp}"},
-	    		</c:forEach>
     		</c:forEach>
+    		<c:forEach items="${url.excludeUrls}" var="excludeUrl">
+	    		{"url":"${excludeUrl.url}","timeStamp":"${excludeUrl.timeStamp}"},
+    		</c:forEach>
+    		
     		
     	</c:forEach>
     ]

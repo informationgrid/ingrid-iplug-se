@@ -46,8 +46,6 @@ public class AddLimitUrlController {
   @RequestMapping(value = "/addLimitUrl.html", method = RequestMethod.GET)
   public String addLimitUrl(
       @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand) {
-    System.out.println("AddLimitUrlController.addLimitUrl() "
-        + startUrlCommand.getLimitUrlCommands().size());
     return "addLimitUrl";
   }
 

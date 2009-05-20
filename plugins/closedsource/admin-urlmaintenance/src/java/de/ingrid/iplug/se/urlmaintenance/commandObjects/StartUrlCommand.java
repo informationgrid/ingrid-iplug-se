@@ -41,4 +41,8 @@ public class StartUrlCommand extends StartUrl {
     _limitUrlCommands.add(limitUrlCommand);
   }
 
+  public void addExcludeUrlCommand(ExcludeUrlCommand excludeUrlCommand) {
+    _excludeUrlCommands.add(excludeUrlCommand);
+  }
+
 }

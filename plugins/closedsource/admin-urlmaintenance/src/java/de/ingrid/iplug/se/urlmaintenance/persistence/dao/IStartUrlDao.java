@@ -9,7 +9,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl;
 public interface IStartUrlDao extends IDao<StartUrl> {
 
   public static enum OrderBy {
-    TIMESTAMP, URL
+    TIMESTAMP_ASC, TIMESTAMP_DESC, URL_ASC, URL_DESC
   }
 
   Long countByProvider(Provider provider);

@@ -8,7 +8,7 @@ import javax.persistence.Query;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.IdBase;
 import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
 
-public class Dao<T extends IdBase> implements IDao<T> {
+public abstract class Dao<T extends IdBase> implements IDao<T> {
 
   protected Class<T> _clazz;
   protected final TransactionService _transactionService;

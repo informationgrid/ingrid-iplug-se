@@ -24,4 +24,13 @@ http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 		<servlet-name>forwarding</servlet-name>
 		<url-pattern>*.png</url-pattern>
 	</servlet-mapping>
+  	<filter>
+        <filter-name>TransactionFilter</filter-name>
+        <filter-class>de.ingrid.iplug.se.urlmaintenance.persistence.TransactionFilter</filter-class>
+    </filter>
+     
+    <filter-mapping>
+        <filter-name>TransactionFilter</filter-name>
+        <url-pattern>*.html</url-pattern>
+    </filter-mapping>	
 </web-app>

@@ -22,8 +22,11 @@ public class TransactionService {
     }
   };
 
+  private static TransactionService INSTANCE;
+
   public TransactionService() {
     _entityManagerFactory = Persistence.createEntityManagerFactory("manager");
+    INSTANCE = this;
   }
 
   public void beginTransaction() {
@@ -86,10 +89,13 @@ public class TransactionService {
     EntityManager entityManager = getEntityManager();
     return entityManager.createQuery(query);
   }
-  
+
   public Query createNamedQuery(String name) {
     EntityManager entityManager = getEntityManager();
     return entityManager.createNamedQuery(name);
   }
-  
+
+  public static TransactionService getInstance() {
+    return INSTANCE;
+  }
 }

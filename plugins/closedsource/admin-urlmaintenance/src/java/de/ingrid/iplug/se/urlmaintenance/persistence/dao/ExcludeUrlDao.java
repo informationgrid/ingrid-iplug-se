@@ -7,7 +7,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.ExcludeUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
 
 @Service
-public class ExcludeUrlDao extends Dao<ExcludeUrl> implements IExcludeDao {
+public class ExcludeUrlDao extends Dao<ExcludeUrl> implements IExcludeUrlDao {
 
   @Autowired
   public ExcludeUrlDao(TransactionService transactionService) {

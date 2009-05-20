@@ -28,11 +28,17 @@ public class StartUrlDao extends Dao<StartUrl> implements IStartUrlDao {
       OrderBy orderBy) {
     String namedQuery = null;
     switch (orderBy) {
-    case TIMESTAMP:
-      namedQuery = "getAllUrlsByProviderOrderByTimeStamp";
+    case TIMESTAMP_ASC:
+      namedQuery = "getAllUrlsByProviderOrderByTimeStampAsc";
       break;
-    case URL:
-      namedQuery = "getAllUrlsByProviderOrderByUrl";
+    case TIMESTAMP_DESC:
+      namedQuery = "getAllUrlsByProviderOrderByTimeStampDesc";
+      break;
+    case URL_ASC:
+      namedQuery = "getAllUrlsByProviderOrderByUrlAsc";
+      break;
+    case URL_DESC:
+      namedQuery = "getAllUrlsByProviderOrderByUrlDesc";
       break;
     default:
       break;
@@ -53,11 +59,17 @@ public class StartUrlDao extends Dao<StartUrl> implements IStartUrlDao {
     // the dao
     String orderQuery = null;
     switch (orderBy) {
-    case TIMESTAMP:
-      orderQuery = "ORDER BY su._timeStamp";
+    case TIMESTAMP_ASC:
+      orderQuery = "ORDER BY su._timeStamp asc";
       break;
-    case URL:
-      orderQuery = "ORDER BY su._url";
+    case TIMESTAMP_DESC:
+      orderQuery = "ORDER BY su._timeStamp desc";
+      break;
+    case URL_ASC:
+      orderQuery = "ORDER BY su._url asc";
+      break;
+    case URL_DESC:
+      orderQuery = "ORDER BY su._url desc";
       break;
     default:
       break;

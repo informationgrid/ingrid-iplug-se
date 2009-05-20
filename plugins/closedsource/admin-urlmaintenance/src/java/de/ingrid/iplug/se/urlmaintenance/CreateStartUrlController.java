@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import de.ingrid.iplug.se.urlmaintenance.commandObjects.ExcludeUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.LimitUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.StartUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao;
@@ -30,15 +31,19 @@ public class CreateStartUrlController {
     if (id != null) {
       // TODO set url etc.
     }
-    // add limit url to fill out
-    startUrlCommand.addLimitUrlCommand(new LimitUrlCommand());
     return "createStartUrl";
   }
 
   @RequestMapping(value = "/createStartUrl.html", method = RequestMethod.POST)
   public String postCreateStartUrl(
-      @ModelAttribute("webUrlCommand") WebUrlCommand webUrlCommand) {
+      @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand) {
 
+    if (startUrlCommand.getLimitUrlCommands().isEmpty()) {
+      startUrlCommand.addLimitUrlCommand(new LimitUrlCommand());
+    }
+    if (startUrlCommand.getExcludeUrlCommands().isEmpty()) {
+      startUrlCommand.getExcludeUrlCommands().add(new ExcludeUrlCommand());
+    }
     return "redirect:addLimitUrl.html";
   }
 }
