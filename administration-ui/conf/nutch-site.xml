@@ -7,7 +7,7 @@
 
 <property>
   <name>plugin.folders</name>
-  <value>nutch-1.0/src/plugin,administration-ui/src/plugin,plugins/opensource,plugins/closedsource</value>
+  <value>nutch-1.0/src/plugin,plugins/opensource,plugins/closedsource</value>
   <description>Directories where nutch plugins are located.  Each
   element may be a relative or absolute path.  If absolute, it is used
   as is.  If relative, it is searched for on the classpath.</description>

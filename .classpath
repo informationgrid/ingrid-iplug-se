@@ -1,24 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="nutch-1.0/src/java"/>
+	<classpathentry kind="src" path="plugins/opensource/admin-crawl/src/java"/>
+	<classpathentry kind="src" path="plugins/opensource/admin-welcome/src/java"/>
+	<classpathentry kind="src" path="plugins/opensource/admin-scheduling/src/java"/>
+	<classpathentry kind="src" path="plugins/opensource/admin-configuration/src/java"/>
+	<classpathentry kind="src" path="plugins/opensource/admin-instance/src/java"/>
+	<classpathentry kind="src" path="plugins/opensource/admin-system/src/java"/>
 	<classpathentry kind="src" path="plugins/closedsource/admin-urlmaintenance/src/test"/>
 	<classpathentry kind="src" path="plugins/closedsource/admin-urlmaintenance/conf"/>
 	<classpathentry kind="src" path="plugins/closedsource/admin-urlmaintenance/src/java"/>
 	<classpathentry kind="src" path="plugins/opensource/crawl-prepare-crawldb/src/java"/>
 	<classpathentry kind="src" path="tools/opensource/crawl/src/java"/>
-	<classpathentry kind="src" path="administration-ui/src/plugin/admin-crawl/src/java"/>
-	<classpathentry kind="src" path="administration-ui/src/plugin/admin-configuration/src/java"/>
-	<classpathentry kind="src" path="administration-ui/src/plugin/admin-scheduling/src/conf"/>
-	<classpathentry kind="src" path="administration-ui/src/plugin/admin-scheduling/src/java"/>
-	<classpathentry kind="src" path="administration-ui/src/plugin/admin-welcome/src/java"/>
-	<classpathentry kind="src" path="administration-ui/src/plugin/admin-welcome/src/conf"/>
 	<classpathentry kind="src" path="administration-ui/src/java"/>
-	<classpathentry kind="src" path="administration-ui/src/plugin/admin-system/src/java"/>
 	<classpathentry kind="src" path="administration-ui/src/test"/>
 	<classpathentry kind="src" path="nutch-1.0/conf"/>
 	<classpathentry kind="src" path="administration-ui/conf"/>
-	<classpathentry kind="src" path="administration-ui/src/plugin/admin-instance/src/java"/>
-	<classpathentry kind="src" path="administration-ui/src/plugin/admin-instance/conf"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Nutch-Core-Libraries"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Nutch-Jetty-Ext-Libraries"/>
