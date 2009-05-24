@@ -1,7 +1,7 @@
 package org.apache.nutch.admin;
 
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpSession;
 
@@ -9,65 +9,141 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 public class NavigationSelector {
 
-  @SuppressWarnings("unchecked")
-  @ModelAttribute("navigations")
-  public String[] referenceDataNavigations(HttpSession session) {
+  public static class Navigation implements Comparable<Navigation> {
+
+    private String _link;
+    private String _name;
+
+    public Navigation(String link, String name) {
+      _link = link;
+      _name = name;
+    }
+
+    public String getLink() {
+      return _link;
+    }
+
+    public void setLink(String link) {
+      _link = link;
+    }
+
+    public String getName() {
+      return _name;
+    }
+
+    public void setName(String name) {
+      _name = name;
+    }
+
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((_link == null) ? 0 : _link.hashCode());
+      result = prime * result + ((_name == null) ? 0 : _name.hashCode());
+      return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
+      Navigation other = (Navigation) obj;
+      if (_link == null) {
+        if (other._link != null)
+          return false;
+      } else if (!_link.equals(other._link))
+        return false;
+      if (_name == null) {
+        if (other._name != null)
+          return false;
+      } else if (!_name.equals(other._name))
+        return false;
+      return true;
+    }
+
+    @Override
+    public int compareTo(Navigation o) {
+      return _name.compareTo(o._name);
+    }
+
+    @Override
+    public String toString() {
+      return _link + "#" + _name;
+    }
+
+  }
+
+  @ModelAttribute("selectedInstance")
+  public String referenceSelectedInstance(HttpSession session) {
     String contextName = session.getServletContext().getServletContextName();
-    Set<String> contextNames = (Set<String>) session.getServletContext()
-        .getAttribute("contextNames");
-    Set<String> set = new HashSet<String>();
-    if (contextNames != null) {
-      set = selectNavigations(contextName, contextNames);
-    }
-    System.out.println(set);
-    return set.toArray(new String[set.size()]);
+    String[] split = contextName.split("/");
+    return split[1];
   }
 
-  @SuppressWarnings("unchecked")
-  @ModelAttribute("rootContexts")
-  public String[] referenceDataInstances(HttpSession session) {
-    Set<String> contextNames = (Set<String>) session.getServletContext()
-        .getAttribute("contextNames");
-    Set<String> set = selectRootContexts(contextNames);
-    return set.toArray(new String[set.size()]);
-  }
-
-  public Set<String> selectRootContexts(Set<String> contextNames) {
-    Set<String> set = new HashSet<String>();
-    for (String name : contextNames) {
-      int indexOf = name.lastIndexOf("/");
-      if (indexOf == 0) {
-        set.add(name);
-      }
-    }
-    return set;
-  }
-
-  public Set<String> selectNavigations(String contextName,
-      Set<String> allContextNames) {
-    contextName = normalize(contextName);
-    Set<String> navigation = new HashSet<String>();
-    int indexOf = contextName.lastIndexOf("/");
-    contextName = indexOf > 0 ? contextName.substring(0, indexOf) : contextName;
-    for (String anotherContextName : allContextNames) {
-      anotherContextName = normalize(anotherContextName);
-      int anotherIndexOf = anotherContextName.lastIndexOf("/");
-      String tmpContextName = anotherIndexOf > 0 ? anotherContextName
-          .substring(0, anotherIndexOf) : anotherContextName;
-      if (tmpContextName.equals(contextName)) {
-        navigation.add(anotherContextName);
-      }
-    }
-    return navigation;
-  }
-
-  private String normalize(String contextName) {
-    int indexOf = contextName.lastIndexOf("/");
-    if (indexOf == contextName.length() - 1) {
-      System.out.println(contextName);
-      contextName = contextName.substring(0, contextName.length() - 1);
+  @ModelAttribute("selectedComponent")
+  public String referenceSelectedComponent(HttpSession session) {
+    String contextName = session.getServletContext().getServletContextName();
+    String[] split = contextName.split("/");
+    contextName = split[1];
+    if (split.length > 2) {
+      contextName = split[2];
     }
     return contextName;
+  }
+
+  @SuppressWarnings("unchecked")
+  @ModelAttribute("componentNavigation")
+  public Set<Navigation> referenceComponents(HttpSession session) {
+    String contextPrefix = session.getServletContext().getServletContextName()
+        .split("/")[1];
+    Set<String> contextNames = (Set<String>) session.getServletContext()
+        .getAttribute("contextNames");
+    return selectComponentNavigation(contextPrefix, contextNames);
+  }
+
+  public Set<Navigation> selectComponentNavigation(String contextPrefix,
+      Set<String> contextNames) {
+    Set<Navigation> ret = new TreeSet<Navigation>();
+    for (String contextName : contextNames) {
+      String[] split = contextName.split("/");
+      String prefix = split[1];
+      // e.g. /general/admin-system
+      if (split.length > 2) {
+        String component = split[2];
+        if (prefix.equals(contextPrefix)) {
+          Navigation navigation = new Navigation(contextName, component);
+          ret.add(navigation);
+        }
+      }
+    }
+    return ret;
+  }
+
+  @SuppressWarnings("unchecked")
+  @ModelAttribute("instanceNavigation")
+  public Set<Navigation> referenceGeneralComponents(HttpSession session) {
+    Set<String> contextNames = (Set<String>) session.getServletContext()
+        .getAttribute("contextNames");
+    return selectInstanceNavigation(contextNames);
+  }
+
+  public Set<Navigation> selectInstanceNavigation(Set<String> contextNames) {
+    Set<Navigation> ret = new TreeSet<Navigation>();
+    for (String contextName : contextNames) {
+      String[] split = contextName.split("/");
+      // e.g. /general
+      if (split.length == 2) {
+        String component = split[1];
+        Navigation navigation = new Navigation(contextName, component);
+        ret.add(navigation);
+      }
+    }
+    return ret;
   }
 
 }
