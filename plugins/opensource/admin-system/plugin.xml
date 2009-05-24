@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin
+   id="admin-system"
+   name="Administration System"
+   version="1.0"
+   provider-name="org.apache.nutch">
+
+   
+   <runtime>
+     <library name="admin-system.jar">
+        <export name="*"/>
+     </library>
+     <library name="conf">
+        <export name="*"/>
+     </library>
+   </runtime>
+
+   <extension point="org.apache.nutch.admin.IGuiComponent"
+              id="org.apache.nutch.admin.IGuiComponent"
+              name="Administration System">
+
+      <implementation class="org.apache.nutch.admin.DefaultGuiComponent"
+                      id="org.apache.nutch.admin.DefaultGuiComponent" >
+			<parameter name="isGeneralComponent" value="true"/>
+      </implementation>
+   </extension>
+</plugin>
