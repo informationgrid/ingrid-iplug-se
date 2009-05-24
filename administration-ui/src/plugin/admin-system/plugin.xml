@@ -22,7 +22,7 @@
 
       <implementation class="org.apache.nutch.admin.DefaultGuiComponent"
                       id="org.apache.nutch.admin.DefaultGuiComponent" >
-			<parameter name="isInstanceComponent" value="true"/>
+			<parameter name="isGeneralComponent" value="true"/>
       </implementation>
    </extension>
 </plugin>
