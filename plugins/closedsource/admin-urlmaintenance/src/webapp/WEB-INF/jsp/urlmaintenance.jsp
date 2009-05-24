@@ -36,10 +36,22 @@
 					</div>
 				</div>
 				<div class="yui-b">
-				Welcome Navigation
-					<c:forEach items="${navigations}" var="navigation">
-						<a href="${navigation}">${navigation}</a>
-					</c:forEach>
+					<div id="leftNav" class="yuimenu">
+					    <div class="bd">
+					        <h6>General Components</h6>
+					        <ul>
+								<c:forEach items="${generalComponents}" var="component">
+									<li class="yuimenuitem"><a class="yuimenuitemlabel" href="${component.link}">${component.name}</a></li>
+								</c:forEach>
+					        </ul>
+					        <h6 class="first-of-type">Components</h6>
+					        <ul class="first-of-type">
+								<c:forEach items="${components}" var="component">
+									<li class="yuimenuitem"><a class="yuimenuitemlabel" href="${component.link}">${component.name}</a></li>
+								</c:forEach>
+					        </ul>
+					    </div>
+					</div>
 				</div>
 			</div>
 		<div id="ft">footer</div>
