@@ -1,4 +1,4 @@
-package de.ingrid.iplug.se.urlmaintenance;
+package de.ingrid.iplug.se.urlmaintenance.web;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import de.ingrid.iplug.se.urlmaintenance.PartnerProviderCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.StartUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IMetadataDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IProviderDao;
@@ -52,7 +53,7 @@ public class ListWebUrlsController {
 
   @RequestMapping(value = "/listWebUrls.html", method = RequestMethod.GET)
   public String listWebUrls() {
-    return "listWebUrls";
+    return "web/listWebUrls";
   }
 
   @ModelAttribute("startUrlCommand")
@@ -87,6 +88,6 @@ public class ListWebUrlsController {
 
     model.addAttribute("count", count);
 
-    return "startUrlSubset";
+    return "web/startUrlSubset";
   }
 }

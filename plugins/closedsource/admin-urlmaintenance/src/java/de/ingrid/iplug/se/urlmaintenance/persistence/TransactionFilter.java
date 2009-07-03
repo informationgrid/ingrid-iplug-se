@@ -21,7 +21,6 @@ public class TransactionFilter implements Filter {
 
     TransactionService transactionService = TransactionService.getInstance();
     try {
-      System.out.println("TransactionFilter.doFilter()");
       transactionService.beginTransaction();
       chain.doFilter(request, response);
       transactionService.commitTransaction();

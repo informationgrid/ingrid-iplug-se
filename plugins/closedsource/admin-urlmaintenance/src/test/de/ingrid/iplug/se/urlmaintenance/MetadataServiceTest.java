@@ -4,6 +4,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
+import de.ingrid.iplug.se.urlmaintenance.service.MetadataService;
 
 public class MetadataServiceTest extends TestCase {
 

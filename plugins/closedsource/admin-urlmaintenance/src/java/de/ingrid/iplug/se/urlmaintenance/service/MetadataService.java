@@ -1,4 +1,4 @@
-package de.ingrid.iplug.se.urlmaintenance;
+package de.ingrid.iplug.se.urlmaintenance.service;
 
 import java.io.IOException;
 import java.io.InputStream;

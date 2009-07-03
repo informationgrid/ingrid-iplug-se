@@ -1,4 +1,4 @@
-package de.ingrid.iplug.se.urlmaintenance;
+package de.ingrid.iplug.se.urlmaintenance.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -31,7 +31,7 @@ public class CreateStartUrlController {
     if (id != null) {
       // TODO set url etc.
     }
-    return "createStartUrl";
+    return "web/createStartUrl";
   }
 
   @RequestMapping(value = "/createStartUrl.html", method = RequestMethod.POST)

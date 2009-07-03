@@ -1,4 +1,4 @@
-package de.ingrid.iplug.se.urlmaintenance;
+package de.ingrid.iplug.se.urlmaintenance.web;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ public class AddExcludeUrlController {
   @RequestMapping(value = "/addExcludeUrl.html", method = RequestMethod.GET)
   public String addExcludeUrl(
       @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand) {
-    return "addExcludeUrl";
+    return "web/addExcludeUrl";
   }
 
   @RequestMapping(value = "/addExcludeUrl.html", method = RequestMethod.POST)

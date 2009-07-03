@@ -1,4 +1,4 @@
-package de.ingrid.iplug.se.urlmaintenance;
+package de.ingrid.iplug.se.urlmaintenance.web;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import de.ingrid.iplug.se.urlmaintenance.PartnerProviderCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.ExcludeUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.LimitUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.StartUrlCommand;
@@ -49,9 +50,9 @@ public class FinishAddWebUrlController {
         .getLimitUrlCommands();
     List<ExcludeUrlCommand> excludeUrlCommands = startUrlCommand
         .getExcludeUrlCommands();
-    cleanupLimitUrls(limitUrlCommands);
-    cleanupLimitUrls(excludeUrlCommands);
-    return "finishWebUrl";
+    cleanupEmptyUrls(limitUrlCommands);
+    cleanupEmptyUrls(excludeUrlCommands);
+    return "web/finishWebUrl";
   }
 
   @RequestMapping(value = "/finishWebUrl.html", method = RequestMethod.POST)
@@ -94,7 +95,7 @@ public class FinishAddWebUrlController {
   }
 
   @SuppressWarnings("unchecked")
-  private void cleanupLimitUrls(List<? extends Url> list) {
+  private void cleanupEmptyUrls(List<? extends Url> list) {
     Iterator<Url> iterator = (Iterator<Url>) list.iterator();
     while (iterator.hasNext()) {
       Url url = (Url) iterator.next();

@@ -12,6 +12,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Partner;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
+import de.ingrid.iplug.se.urlmaintenance.service.MetadataService;
 
 @Service
 public class DataInjector {
