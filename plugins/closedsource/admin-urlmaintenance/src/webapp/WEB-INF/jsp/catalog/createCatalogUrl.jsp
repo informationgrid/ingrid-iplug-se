@@ -30,42 +30,23 @@
 				<div id="yui-main">
 					<div class="yui-b">
 						Welcome -${partnerProviderCommand.provider}-
-						<c:set var="maxLimitUrls" value="${fn:length(startUrlCommand.limitUrlCommands)}"/>
-						<c:set var="limitUrlCounter" value="-1"/>
-						<c:forEach items="${startUrlCommand.limitUrlCommands}" var="limitUrl">
-							<c:set var="limitUrlCounter" value="${limitUrlCounter+1}"/>
-							<c:choose>
-								<c:when test="${limitUrlCounter < maxLimitUrls-1}">
-									<form:form action="removeLimitUrl.html" method="post" modelAttribute="startUrlCommand">
-										<form:label path="limitUrlCommands[${limitUrlCounter}].url">${startUrlCommand.limitUrlCommands[limitUrlCounter].url}</form:label>
-										<input type="hidden" name="index" value="${limitUrlCounter}" />
-										<input type="submit" value="Delete"/>
-									</form:form>
-								</c:when>
-								<c:otherwise>
-									<form:form action="addLimitUrl.html" method="post" modelAttribute="startUrlCommand">
-										<fieldset>
-											<legend>Url</legend>
-											<form:input path="limitUrlCommands[${limitUrlCounter}].url"/>
-										</fieldset>
-										<fieldset>
-											<legend>Sprache</legend>
-											<form:select path="limitUrlCommands[${limitUrlCounter}].metadatas">
-												<form:options itemLabel="metadataValue" itemValue="id" items="${langs}"/>
-											</form:select>
-										</fieldset>
-										<fieldset>
-											<legend>Datatypes</legend>
-											<form:checkboxes path="limitUrlCommands[${limitUrlCounter}].metadatas" items="${datatypes}" itemLabel="metadataValue" itemValue="id"/>
-										</fieldset>
-										<input type="submit" value="Add"/>
-									</form:form>
-								</c:otherwise>
-							</c:choose>
-						</c:forEach>
-						<a href="addExcludeUrl.html" >Weiter</a>
-						
-						
+						<form:form action="createCatalogUrl.html" method="post" modelAttribute="catalogUrlCommand">
+							<fieldset>
+								<legend>Catalog</legend>
+								<form:label path="url">Url</form:label>
+								<form:input path="url"/>
+							</fieldset>
+							<c:forEach items="${metadatas}" var="metadata">
+								<fieldset>
+									<label>${metadata.key}</label>
+									<form:checkboxes items="${metadata.value}" path="metadatas" itemLabel="metadataValue" itemValue="id"/>	
+								</fieldset> 
+							</c:forEach>
+							<input type="submit" value="Weiter"/>
+							<input type="hidden" name="type" value="${type}">
+							<form:hidden items="${catalogUrlCommand.metadatas}" value="1" path="metadatas" />
+						</form:form>
+						 
 					</div>
 				</div>
 				<div class="yui-b">

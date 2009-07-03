@@ -59,7 +59,7 @@
 						            // Column definitions
 						            var myColumnDefs = [ // sortable:true enables sorting
 						                {key:"url", label:"Url", sortable:true},
-						                {key:"timeStamp", label:"Timestamp", sortable:true},
+						                {key:"created", label:"Erstellt", sortable:true},
 						            ];
 
 						            
@@ -70,7 +70,7 @@
 						                resultsList: "records",
 						                fields: [
 						                    {key:"url"},
-						                    {key:"timeStamp"},
+						                    {key:"created"},
 						                ],
 						                metaFields: {
 						                    totalRecords: "totalRecords" // Access to value in the server response
@@ -81,7 +81,7 @@
 						            var myConfigs = {
 						                initialRequest: "startIndex=0&pageSize=10", // Initial request for first page of data
 						                dynamicData: true, // Enables dynamic server-driven data
-						                sortedBy : {key:"timeStamp", dir:YAHOO.widget.DataTable.CLASS_ASC}, // Sets UI initial sort arrow
+						                sortedBy : {key:"created", dir:YAHOO.widget.DataTable.CLASS_ASC}, // Sets UI initial sort arrow
 						                paginator: new YAHOO.widget.Paginator({ rowsPerPage:10 }) // Enables pagination 
 						            };
 						            

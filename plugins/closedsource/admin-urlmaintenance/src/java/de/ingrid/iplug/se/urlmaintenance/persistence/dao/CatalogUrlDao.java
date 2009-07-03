@@ -47,10 +47,10 @@ public class CatalogUrlDao extends Dao<CatalogUrl> implements ICatalogUrlDao {
     String orderQuery = null;
     switch (orderBy) {
     case TIMESTAMP_ASC:
-      orderQuery = "ORDER BY cu._timeStamp asc";
+      orderQuery = "ORDER BY cu._created asc";
       break;
     case TIMESTAMP_DESC:
-      orderQuery = "ORDER BY cu._timeStamp desc";
+      orderQuery = "ORDER BY cu._created desc";
       break;
     case URL_ASC:
       orderQuery = "ORDER BY cu._url asc";

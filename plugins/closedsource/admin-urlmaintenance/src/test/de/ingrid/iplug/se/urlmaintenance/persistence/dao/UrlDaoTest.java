@@ -33,22 +33,22 @@ public class UrlDaoTest extends DaoTest {
     long start = System.currentTimeMillis();
     StartUrl startUrl = new StartUrl();
     startUrl.setUrl("http://www.start.com");
-    startUrl.setTimeStamp(new Date(start));
+    startUrl.setCreated(new Date(start));
     startUrl.setProvider(byName);
 
     LimitUrl limitUrl = new LimitUrl();
     limitUrl.setUrl("http://www.limit.com");
-    limitUrl.setTimeStamp(new Date(start - (1000 * 60 * 60 * 24)));
+    limitUrl.setCreated(new Date(start - (1000 * 60 * 60 * 24)));
     limitUrl.setProvider(byName);
 
     ExcludeUrl excludeUrl = new ExcludeUrl();
     excludeUrl.setUrl("http://www.exclude.com");
-    excludeUrl.setTimeStamp(new Date(start - ((1000 * 60 * 60 * 24) * 2)));
+    excludeUrl.setCreated(new Date(start - ((1000 * 60 * 60 * 24) * 2)));
     excludeUrl.setProvider(byName);
 
     CatalogUrl catalogUrl = new CatalogUrl();
     catalogUrl.setUrl("http://www.catalog.com");
-    catalogUrl.setTimeStamp(new Date(start - ((1000 * 60 * 60 * 24) * 3)));
+    catalogUrl.setCreated(new Date(start - ((1000 * 60 * 60 * 24) * 3)));
     catalogUrl.setProvider(byName);
 
     startUrlDao.makePersistent(startUrl);

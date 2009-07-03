@@ -27,22 +27,12 @@
 						        </thead>
 						        <tbody>
 						            <tr>
-						                <td>${startUrlCommand.url}</td>
+						                <td>${catalogUrlCommand.url}</td>
 						            </tr>
-						            <c:forEach items="${startUrlCommand.limitUrlCommands}" var="limitUrl">
-							            <tr>
-							                <td>${limitUrl.url}</td>
-							            </tr>
-						            </c:forEach>
-						            <c:forEach items="${startUrlCommand.excludeUrlCommands}" var="excludeUrl">
-							            <tr>
-							                <td>${excludeUrl.url}</td>
-							            </tr>
-						            </c:forEach>
 						        </tbody>
 						    </table>
 						</div>
-						<form action="finishWebUrl.html" method="post">
+						<form action="saveCatalogUrl.html" method="post">
 							<input type="submit" value="Speichern">
 						</form>	
 						<script type="text/javascript">
@@ -59,7 +49,7 @@
 						        };
 						
 						        var myDataTable = new YAHOO.widget.DataTable("markup", myColumnDefs, myDataSource,
-						                {caption:"Start/Limit/Exclude Urls"}
+						                {caption:"Catalog Urls"}
 						        );
 						        
 						        return {

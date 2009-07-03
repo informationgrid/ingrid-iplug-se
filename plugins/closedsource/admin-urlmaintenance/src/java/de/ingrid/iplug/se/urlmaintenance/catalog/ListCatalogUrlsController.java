@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import de.ingrid.iplug.se.urlmaintenance.PartnerProviderCommand;
+import de.ingrid.iplug.se.urlmaintenance.commandObjects.CatalogUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ICatalogUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IMetadataDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IProviderDao;
@@ -23,6 +25,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 
 @Controller
+@SessionAttributes(value = { "partnerProviderCommand", "catalogUrlCommand" })
 public class ListCatalogUrlsController {
 
   private final ICatalogUrlDao _catalogUrlDao;
@@ -35,6 +38,16 @@ public class ListCatalogUrlsController {
     _providerDao = providerDao;
     _catalogUrlDao = catalogUrlDao;
     _metadataDao = metadataDao;
+  }
+
+  @ModelAttribute("catalogUrlCommand")
+  public CatalogUrlCommand injectCatalogUrlCommand(
+      @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand) {
+    Provider provider = _providerDao.getByName(partnerProviderCommand
+        .getProvider());
+    CatalogUrlCommand command = new CatalogUrlCommand();
+    command.setProvider(provider);
+    return command;
   }
 
   @RequestMapping(value = "/listCatalogUrls.html", method = RequestMethod.GET)
@@ -111,12 +124,14 @@ public class ListCatalogUrlsController {
         : OrderBy.URL_DESC) : ("asc".equals(dir) ? OrderBy.TIMESTAMP_ASC
         : OrderBy.TIMESTAMP_DESC);
     Long count = 0L;
+    List<CatalogUrl> catalogUrls = new ArrayList<CatalogUrl>();
     if (byName != null) {
       count = _catalogUrlDao.countByProviderAndMetadatas(byName, metadatas);
-      List<CatalogUrl> catalogUrls = _catalogUrlDao.getByProviderAndMetadatas(
-          byName, metadatas, start, length, orderBy);
-      model.addAttribute("urls", catalogUrls);
+      catalogUrls = _catalogUrlDao.getByProviderAndMetadatas(byName, metadatas,
+          start, length, orderBy);
     }
+    model.addAttribute("urls", catalogUrls);
     model.addAttribute("count", count);
   }
+
 }

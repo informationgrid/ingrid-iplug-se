@@ -60,10 +60,10 @@ public class StartUrlDao extends Dao<StartUrl> implements IStartUrlDao {
     String orderQuery = null;
     switch (orderBy) {
     case TIMESTAMP_ASC:
-      orderQuery = "ORDER BY su._timeStamp asc";
+      orderQuery = "ORDER BY su._created asc";
       break;
     case TIMESTAMP_DESC:
-      orderQuery = "ORDER BY su._timeStamp desc";
+      orderQuery = "ORDER BY su._created desc";
       break;
     case URL_ASC:
       orderQuery = "ORDER BY su._url asc";

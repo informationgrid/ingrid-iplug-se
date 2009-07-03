@@ -25,7 +25,10 @@ public class Url extends IdBase {
   private String _url;
 
   @Temporal(TemporalType.TIMESTAMP)
-  private Date _timeStamp = new Date();
+  private Date _created = new Date();
+
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date _edited = new Date();
 
   @ManyToOne
   @JoinColumn(nullable = false, name = "provider_fk")
@@ -50,12 +53,20 @@ public class Url extends IdBase {
     _provider = provider;
   }
 
-  public Date getTimeStamp() {
-    return _timeStamp;
+  public Date getCreated() {
+    return _created;
   }
 
-  public void setTimeStamp(Date timeStamp) {
-    _timeStamp = timeStamp;
+  public void setCreated(Date timeStamp) {
+    _created = timeStamp;
+  }
+
+  public Date getEdited() {
+    return _edited;
+  }
+
+  public void setEdited(Date edited) {
+    _edited = edited;
   }
 
 }
