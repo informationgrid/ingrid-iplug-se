@@ -44,7 +44,6 @@
 							</c:forEach>
 							<input type="submit" value="Weiter"/>
 							<input type="hidden" name="type" value="${type}">
-							<form:hidden items="${catalogUrlCommand.metadatas}" value="1" path="metadatas" />
 						</form:form>
 						 
 					</div>

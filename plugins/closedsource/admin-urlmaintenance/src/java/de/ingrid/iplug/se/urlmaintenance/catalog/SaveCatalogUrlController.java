@@ -35,7 +35,7 @@ public class SaveCatalogUrlController {
   public String postSaveCatalogUrl(
       @ModelAttribute("catalogUrlCommand") CatalogUrlCommand catalogUrlCommand,
       @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand) {
-    
+
     CatalogUrl catalogUrl = new CatalogUrl();
     if (catalogUrlCommand.getId() > -1) {
       catalogUrl = _catalogUrlDao.getById(catalogUrlCommand.getId());
@@ -44,8 +44,8 @@ public class SaveCatalogUrlController {
       _catalogUrlDao.makePersistent(catalogUrl);
     }
     catalogUrl.setUrl(catalogUrlCommand.getUrl());
-    catalogUrl.setMetadatas(catalogUrlCommand.getMetadatas());
     catalogUrl.setEdited(new Date());
+    catalogUrl.setMetadatas(catalogUrlCommand.getMetadatas());
 
     return "redirect:/listCatalogUrls.html";
   }

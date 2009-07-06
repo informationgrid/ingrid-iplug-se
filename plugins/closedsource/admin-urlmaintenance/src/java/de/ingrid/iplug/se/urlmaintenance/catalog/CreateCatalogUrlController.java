@@ -41,13 +41,31 @@ public class CreateCatalogUrlController {
     binder.registerCustomEditor(Metadata.class, new EntityEditor(_metadataDao));
   }
 
+  @ModelAttribute("metadatas")
+  public Map<String, List<Metadata>> injectMetadatas(
+      @RequestParam(value = "type", required = true) String type) {
+    Map<String, List<Metadata>> metadatas = new HashMap<String, List<Metadata>>();
+    if (type.equals("topics")) {
+      // push all topics into view
+      metadatas.put("topics", _metadataDao.getByKey("topics"));
+      // push funct category into view
+      metadatas.put("funct_category", _metadataDao.getByKey("funct_category"));
+    } else if (type.equals("service")) {
+      // push all rubrics into view
+      metadatas.put("rubric", _metadataDao.getByKey("service"));
+    } else if (type.equals("measure")) {
+      // push all rubrics into view
+      metadatas.put("rubric", _metadataDao.getByKey("measure"));
+    }
+    return metadatas;
+  }
+
   @RequestMapping(value = "/createCatalogUrl.html", method = RequestMethod.GET)
   public String editCatalogUrl(Model model,
       @ModelAttribute("catalogUrlCommand") CatalogUrlCommand catalogUrlCommand,
       @RequestParam(value = "id", required = false) Long id,
       @RequestParam(value = "type", required = true) String type) {
 
-    Map<String, List<Metadata>> metadatas = new HashMap<String, List<Metadata>>();
     if (id != null) {
       // load url and fill out command
       CatalogUrl byId = _catalogUrlDao.getById(id);
@@ -56,51 +74,28 @@ public class CreateCatalogUrlController {
       catalogUrlCommand.setMetadatas(byId.getMetadatas());
       catalogUrlCommand.setProvider(byId.getProvider());
       catalogUrlCommand.setCreated(byId.getCreated());
-    } else {
-      // create new command
-      if (type.equals("topics")) {
-        Metadata metadata = _metadataDao.getByKeyAndValue("datatype", "topics");
-        Metadata defaultMetadata = _metadataDao.getByKeyAndValue("datatype",
-            "default");
-        catalogUrlCommand.addMetadata(metadata);
-        catalogUrlCommand.addMetadata(defaultMetadata);
-
-        // push more metadatas into vew
-        // push all topics into view
-        metadatas.put("topics", _metadataDao.getByKey("topics"));
-        // push funct category into view
-        metadatas
-            .put("funct_category", _metadataDao.getByKey("funct_category"));
-      } else if (type.equals("service")) {
-        Metadata metadata = _metadataDao
-            .getByKeyAndValue("datatype", "service");
-        Metadata defaultMetadata = _metadataDao.getByKeyAndValue("datatype",
-            "default");
-        catalogUrlCommand.addMetadata(defaultMetadata);
-
-        // push more metadatas into vew
-        // push all rubrics into view
-        metadatas.put("rubric", _metadataDao.getByKey("service"));
-      } else if (type.equals("measure")) {
-        Metadata metadata = _metadataDao
-            .getByKeyAndValue("datatype", "measure");
-        Metadata defaultMetadata = _metadataDao.getByKeyAndValue("datatype",
-            "default");
-        catalogUrlCommand.addMetadata(metadata);
-        catalogUrlCommand.addMetadata(defaultMetadata);
-
-        // push more metadatas into vew
-        // push all rubrics into view
-        metadatas.put("rubric", _metadataDao.getByKey("measure"));
-      }
-      model.addAttribute("metadatas", metadatas);
     }
+    model.addAttribute("type", type);
     return "catalog/createCatalogUrl";
   }
 
   @RequestMapping(value = "/createCatalogUrl.html", method = RequestMethod.POST)
   public String anotherPostEditCatalogUrl(
-      @ModelAttribute("catalogUrlCommand") CatalogUrlCommand catalogUrlCommand) {
+      @ModelAttribute("catalogUrlCommand") CatalogUrlCommand catalogUrlCommand,
+      @RequestParam(value = "type", required = true) String type) {
+
+    Metadata defaultMetadata = _metadataDao.getByKeyAndValue("datatype",
+        "default");
+    catalogUrlCommand.addMetadata(defaultMetadata);
+    Metadata datatypeMetadata = null;
+    if (type.equals("topics")) {
+      datatypeMetadata = _metadataDao.getByKeyAndValue("datatype", "topics");
+    } else if (type.equals("service")) {
+      datatypeMetadata = _metadataDao.getByKeyAndValue("datatype", "service");
+    } else if (type.equals("measure")) {
+      datatypeMetadata = _metadataDao.getByKeyAndValue("datatype", "measure");
+    }
+    catalogUrlCommand.addMetadata(datatypeMetadata);
     return "redirect:/saveCatalogUrl.html";
   }
 }
