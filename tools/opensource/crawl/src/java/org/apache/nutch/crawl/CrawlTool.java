@@ -24,11 +24,6 @@ public class CrawlTool {
   public void crawl(Integer topn, Integer depth) throws IOException {
     System.out.println("start crawl");
 
-    Path crawlDb = new Path(_crawlDir, "crawldb");
-    Path urlDir = new Path(_crawlDir, "urls/start");
-    Injector injector = new Injector(_configuration);
-    injector.inject(crawlDb, urlDir);
-
     System.out.println("end crawl");
   }
 
