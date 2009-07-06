@@ -56,9 +56,10 @@ public class SchedulingRunnable implements Runnable {
         FileSystem fileSystem = FileSystem.get(configuration);
         String folderName = "Crawl-" + _format.format(new Date());
         Path crawlDir = new Path(path, folderName);
-        fileSystem.create(crawlDir);
+        fileSystem.mkdirs(crawlDir);
 
         CrawlTool crawlTool = new CrawlTool(configuration, crawlDir);
+        crawlTool.preCrawl();
         crawlTool.crawl(crawlData.getTopn(), crawlData.getDepth());
       } catch (Throwable e) {
       } finally {

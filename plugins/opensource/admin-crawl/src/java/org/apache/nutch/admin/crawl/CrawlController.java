@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class CrawlController extends NavigationSelector {
 
   private DateFormat _format = new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss");
-  
+
   @ModelAttribute("crawlPaths")
   public CrawlPath[] referenceDataCrawlFolders(HttpSession session)
       throws IOException {
@@ -45,7 +45,8 @@ public class CrawlController extends NavigationSelector {
     int counter = 0;
     for (FileStatus fileStatus : fileStatusArray) {
       Path fileStatusPath = fileStatus.getPath();
-      ContentSummary contentSummary = fileSystem.getContentSummary(fileStatusPath);
+      ContentSummary contentSummary = fileSystem
+          .getContentSummary(fileStatusPath);
       long len = contentSummary.getLength();
       len = (len / 1024) / 1024;
       crawlPathArray[counter] = new CrawlPath();
@@ -70,7 +71,7 @@ public class CrawlController extends NavigationSelector {
   public String crawl() {
     return "createCrawl";
   }
-  
+
   @RequestMapping(value = "/createCrawl.html", method = RequestMethod.POST)
   public String createCrawl(HttpSession session) throws IOException {
     ServletContext servletContext = session.getServletContext();
@@ -85,9 +86,12 @@ public class CrawlController extends NavigationSelector {
     FileSystem fileSystem = FileSystem.get(configuration);
     String folderName = "Crawl-" + _format.format(new Date());
     Path crawlDir = new Path(path, folderName);
-    fileSystem.create(crawlDir);
-    new CrawlTool(configuration, crawlDir).crawl(10, 10);
+    fileSystem.mkdirs(crawlDir);
+    CrawlTool crawlTool = new CrawlTool(configuration, crawlDir);
+    crawlTool.preCrawl();
+    // TODO use correct params
+    crawlTool.crawl(10, 10);
     return "redirect:/index.html";
   }
-  
+
 }

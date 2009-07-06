@@ -25,7 +25,9 @@ public class TransactionService {
   private static TransactionService INSTANCE;
 
   public TransactionService() {
-    _entityManagerFactory = Persistence.createEntityManagerFactory("manager");
+    String manager = "hsql".equals(System.getProperty("ingrid.urlmaintenance")) ? "hsql"
+        : "mysql";
+    _entityManagerFactory = Persistence.createEntityManagerFactory(manager);
     INSTANCE = this;
   }
 

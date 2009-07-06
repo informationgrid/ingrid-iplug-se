@@ -17,10 +17,17 @@ public class CrawlTool {
     _preCrawls = new PreCrawls(configuration);
   }
 
+  public void preCrawl() throws IOException {
+    _preCrawls.preCrawl(_crawlDir);
+  }
+  
   public void crawl(Integer topn, Integer depth) throws IOException {
     System.out.println("start crawl");
 
-    _preCrawls.preCrawl(_crawlDir);
+    Path crawlDb = new Path(_crawlDir, "crawldb");
+    Path urlDir = new Path(_crawlDir, "urls/start");
+    Injector injector = new Injector(_configuration);
+    injector.inject(crawlDb, urlDir);
 
     System.out.println("end crawl");
   }

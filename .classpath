@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="nutch-1.0/src/java"/>
+	<classpathentry kind="src" path="nutch-1.0/src/plugin/scoring-opic/src/java"/>
+	<classpathentry kind="src" path="nutch-1.0/src/plugin/lib-regex-filter/src/java"/>
+	<classpathentry kind="src" path="nutch-1.0/src/plugin/lib-regex-filter/src/test"/>
+	<classpathentry kind="src" path="nutch-1.0/src/plugin/urlfilter-regex/src/test"/>
+	<classpathentry kind="src" path="nutch-1.0/src/plugin/urlfilter-regex/src/java"/>
+	<classpathentry kind="src" path="nutch-1.0/src/plugin/urlnormalizer-regex/src/test"/>
+	<classpathentry kind="src" path="nutch-1.0/src/plugin/urlnormalizer-pass/src/test"/>
+	<classpathentry kind="src" path="nutch-1.0/src/plugin/urlnormalizer-pass/src/java"/>
+	<classpathentry kind="src" path="nutch-1.0/src/plugin/urlnormalizer-basic/src/test"/>
+	<classpathentry kind="src" path="nutch-1.0/src/plugin/urlnormalizer-basic/src/java"/>
+	<classpathentry kind="src" path="nutch-1.0/src/plugin/urlnormalizer-regex/src/java"/>
 	<classpathentry kind="src" path="plugins/opensource/admin-crawl/src/java"/>
 	<classpathentry kind="src" path="plugins/opensource/admin-welcome/src/java"/>
 	<classpathentry kind="src" path="plugins/opensource/admin-scheduling/src/java"/>

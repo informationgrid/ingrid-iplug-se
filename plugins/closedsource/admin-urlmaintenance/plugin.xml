@@ -26,4 +26,14 @@
 			<parameter name="isGeneralComponent" value="true"/>
       </implementation>
    </extension>
+   
+   <extension point="org.apache.nutch.crawl.IPreCrawl"
+              id="org.apache.nutch.crawl.IPreCrawl"
+              name="Pre Crawl">
+
+      <implementation class="de.ingrid.iplug.se.urlmaintenance.DatabaseExport"
+                      id="de.ingrid.iplug.se.urlmaintenance.DatabaseExport" >
+      </implementation>
+   </extension>   
+   
 </plugin>

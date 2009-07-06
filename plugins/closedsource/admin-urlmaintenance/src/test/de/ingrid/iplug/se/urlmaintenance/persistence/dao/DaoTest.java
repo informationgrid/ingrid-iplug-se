@@ -86,7 +86,7 @@ public class DaoTest extends TestCase {
     metadata.setMetadataValue(value);
     IMetadataDao metadataDao = new MetadataDao(transactionService);
     metadataDao.makePersistent(metadata);
-    
+
     transactionService.commitTransaction();
     transactionService.close();
 

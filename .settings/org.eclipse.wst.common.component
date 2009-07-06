@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-modules id="moduleCoreId" project-version="1.5.0">
+<wb-module deploy-name="ingrid-iplug-se">
+<wb-resource deploy-path="/" source-path="/nutch-1.0/src/java"/>
+<wb-resource deploy-path="/" source-path="/plugins/closedsource/admin-urlmaintenance/src/java"/>
+<wb-resource deploy-path="/" source-path="/plugins/opensource/crawl-prepare-crawldb/src/java"/>
+<wb-resource deploy-path="/" source-path="/tools/opensource/crawl/src/java"/>
+<wb-resource deploy-path="/" source-path="/administration-ui/src/plugin/admin-crawl/src/java"/>
+<wb-resource deploy-path="/" source-path="/administration-ui/src/plugin/admin-configuration/src/java"/>
+<wb-resource deploy-path="/" source-path="/administration-ui/src/plugin/admin-scheduling/src/conf"/>
+<wb-resource deploy-path="/" source-path="/administration-ui/src/plugin/admin-scheduling/src/java"/>
+<wb-resource deploy-path="/" source-path="/administration-ui/src/plugin/admin-welcome/src/java"/>
+<wb-resource deploy-path="/" source-path="/administration-ui/src/plugin/admin-welcome/src/conf"/>
+<wb-resource deploy-path="/" source-path="/administration-ui/src/java"/>
+<wb-resource deploy-path="/" source-path="/administration-ui/src/plugin/admin-system/src/java"/>
+<wb-resource deploy-path="/" source-path="/administration-ui/src/test"/>
+<wb-resource deploy-path="/" source-path="/nutch-1.0/conf"/>
+<wb-resource deploy-path="/" source-path="/administration-ui/conf"/>
+<wb-resource deploy-path="/" source-path="/administration-ui/src/plugin/admin-instance/src/java"/>
+<wb-resource deploy-path="/" source-path="/administration-ui/src/plugin/admin-instance/conf"/>
+<wb-resource deploy-path="/" source-path="/plugins/closedsource/admin-urlmaintenance/conf"/>
+<wb-resource deploy-path="/" source-path="/plugins/closedsource/admin-urlmaintenance/src/test"/>
+<wb-resource deploy-path="/" source-path="/plugins/opensource/admin-crawl/src/java"/>
+<wb-resource deploy-path="/" source-path="/plugins/opensource/admin-welcome/src/java"/>
+<wb-resource deploy-path="/" source-path="/plugins/opensource/admin-scheduling/src/java"/>
+<wb-resource deploy-path="/" source-path="/plugins/opensource/admin-configuration/src/java"/>
+<wb-resource deploy-path="/" source-path="/plugins/opensource/admin-instance/src/java"/>
+<wb-resource deploy-path="/" source-path="/plugins/opensource/admin-system/src/java"/>
+<wb-resource deploy-path="/" source-path="/plugins/closedsource/crawl-prepare-dbexport/src/java"/>
+<wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/urlnormalizer-regex/src/test"/>
+<wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/urlnormalizer-pass/src/test"/>
+<wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/urlnormalizer-pass/src/java"/>
+<wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/urlnormalizer-basic/src/test"/>
+<wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/urlnormalizer-basic/src/java"/>
+<wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/urlnormalizer-regex/src/java"/>
+<wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/urlfilter-regex/src/test"/>
+<wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/urlfilter-regex/src/java"/>
+<wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/lib-regex-filter/src/java"/>
+<wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/lib-regex-filter/src/test"/>
+<wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/scoring-opic/src/java"/>
+</wb-module>
+</project-modules>

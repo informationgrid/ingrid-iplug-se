@@ -59,7 +59,7 @@
 			    </ul>
 			</div>
 			<div id="markup">
-			    <table id="configurations">
+			    <table id="crawls">
 			        <thead>
 			            <tr>
 			            	<th>Path</th>
@@ -84,7 +84,7 @@
 			            {key:"size",label:"Size in Mb", sortable:true},
 			        ];
 			
-			        var myDataSource = new YAHOO.util.DataSource(YAHOO.util.Dom.get("configurations"));
+			        var myDataSource = new YAHOO.util.DataSource(YAHOO.util.Dom.get("crawls"));
 			        myDataSource.responseType = YAHOO.util.DataSource.TYPE_HTMLTABLE;
 			        myDataSource.responseSchema = {
 			            fields: [{key:"path"},
