@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <plugin
-   id="crawl-prepare-crawldb"
-   name="Crawl Prepare Inject Crawldb"
+   id="crawl-prepare-bwdb"
+   name="Crawl Prepare Inject Bwdb"
    version="1.0"
    provider-name="org.apache.nutch">
 
    
    <runtime>
-     <library name="crawl-prepare-crawldb.jar">
+     <library name="crawl-prepare-bwdb.jar">
         <export name="*"/>
      </library>
      <library name="conf">
@@ -20,8 +20,8 @@
               id="org.apache.nutch.crawl.IPreCrawl"
               name="Pre Crawl">
 
-      <implementation class="org.apache.nutch.crawl.prepare.CrawldbPrepare"
-                      id="org.apache.nutch.crawl.prepare.CrawldbPrepare" >
+      <implementation class="org.apache.nutch.crawl.prepare.BwdbPrepare"
+                      id="org.apache.nutch.crawl.prepare.BwdbPrepare" >
       </implementation>
    </extension>   
    

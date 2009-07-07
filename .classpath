@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="nutch-1.0/src/java"/>
+	<classpathentry kind="src" path="plugins/opensource/crawl-prepare-bwdb/src/java"/>
 	<classpathentry kind="src" path="plugins/opensource/crawl-prepare-crawldb/src/java"/>
 	<classpathentry kind="src" path="nutch-1.0/src/plugin/scoring-opic/src/java"/>
 	<classpathentry kind="src" path="nutch-1.0/src/plugin/lib-regex-filter/src/java"/>

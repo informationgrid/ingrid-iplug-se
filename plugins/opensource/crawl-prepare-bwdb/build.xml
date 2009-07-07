@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="crawl-prepare-crawldb">
+<project name="crawl-prepare-bwdb">
 
   <import file="../build-plugin.xml"/>
 

@@ -15,7 +15,7 @@
 
 <property>
   <name>plugin.includes</name>
-  <value>admin-.*|protocol-http|urlfilter-regex|parse-(text|html|js)|index-(basic|anchor)|query-(basic|site|url)|response-(json|xml)|summary-basic|scoring-opic|urlnormalizer-(pass|regex|basic)|crawl-prepare-(dbexport)</value>
+  <value>admin-.*|protocol-http|urlfilter-regex|parse-(text|html|js)|index-(basic|anchor)|query-(basic|site|url)|response-(json|xml)|summary-basic|scoring-opic|urlnormalizer-(pass|regex|basic)|crawl-prepare-(dbexport|crawldb|bwdb)</value>
   <description>Regular expression naming plugin directory names to
   include.  Any plugin not matching this expression is excluded.
   In any case you need at least include the nutch-extensionpoints plugin. By
@@ -24,6 +24,12 @@
   protocol-httpclient, but be aware of possible intermittent problems with the 
   underlying commons-httpclient library.
   </description>
+</property>
+
+<property>
+  <name>crawl-prepare.order</name>
+  <value>de.ingrid.iplug.se.urlmaintenance.DatabaseExport org.apache.nutch.crawl.prepare.CrawldbPrepare org.apache.nutch.crawl.prepare.BwdbPrepare</value>
+  <description>space delimited list of IPreCrawl Implementations to execute these classes in order</description>
 </property>
 
 <property>
