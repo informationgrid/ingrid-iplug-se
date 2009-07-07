@@ -185,9 +185,7 @@ public class BWInjector extends Configured {
     job.setJobName("merge bwDb " + bwDb);
 
     Path current = new Path(bwDb, "current");
-    LOG.warn("EXISTS " + FileSystem.get(job).exists(current));
     if (FileSystem.get(job).exists(current)) {
-      System.out.println("exists: " + current);
       FileInputFormat.addInputPath(job, current);
     }
     FileInputFormat.addInputPath(job, tempDir);

@@ -52,4 +52,14 @@ public class ConfigurationCommand {
     _finalValue = finalValue;
   }
 
+  @Override
+  public int hashCode() {
+    return _name.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    ConfigurationCommand command = (ConfigurationCommand) obj;
+    return _name.equals(command._name);
+  }
 }

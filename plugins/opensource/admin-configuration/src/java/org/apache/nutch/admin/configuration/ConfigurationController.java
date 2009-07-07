@@ -49,11 +49,21 @@ public class ConfigurationController extends NavigationSelector {
     List<ConfigurationCommand> defaultList = loadConfigurationCommands(defaultXml);
     List<ConfigurationCommand> siteList = loadConfigurationCommands(siteXml);
 
+    // overwrite default values
     for (ConfigurationCommand defaultCommand : defaultList) {
       for (ConfigurationCommand siteCommand : siteList) {
         if (defaultCommand.getName().equals(siteCommand.getName())) {
           defaultCommand.setFinalValue(siteCommand.getValue());
         }
+      }
+    }
+
+    // add properties from site.xml which is not in default.xml
+    for (ConfigurationCommand configurationCommand : siteList) {
+      if (!defaultList.contains(configurationCommand)) {
+        ConfigurationCommand last = defaultList.get(defaultList.size() - 1);
+        configurationCommand.setPosition(last.getPosition() + 1);
+        defaultList.add(configurationCommand);
       }
     }
 
