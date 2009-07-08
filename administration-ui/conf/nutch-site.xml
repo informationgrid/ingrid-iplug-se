@@ -38,5 +38,57 @@
   <description>catalog or web</description>
 </property>
 
+<property>
+  <name>http.agent.name</name>
+  <value>iplug-se</value>
+  <description>HTTP 'User-Agent' request header. MUST NOT be empty - 
+  please set this to a single word uniquely related to your organization.
+
+  NOTE: You should also check other related properties:
+
+	http.robots.agents
+	http.agent.description
+	http.agent.url
+	http.agent.email
+	http.agent.version
+
+  and set their values appropriately.
+
+  </description>
+</property>
+
+<property>
+  <name>http.agent.description</name>
+  <value>PortalU Bot (Nutch)</value>
+  <description>Further description of our bot- this text is used in
+  the User-Agent header.  It appears in parenthesis after the agent name.
+  </description>
+</property>
+
+<property>
+  <name>http.agent.url</name>
+  <value>http://www.portalu.de</value>
+  <description>A URL to advertise in the User-Agent header.  This will 
+   appear in parenthesis after the agent name. Custom dictates that this
+   should be a URL of a page explaining the purpose and behavior of this
+   crawler.
+  </description>
+</property>
+
+<property>
+  <name>http.agent.email</name>
+  <value>crawler@portalu.de</value>
+  <description>An email address to advertise in the HTTP 'From' request
+   header and User-Agent header. A good practice is to mangle this
+   address (e.g. 'info at example dot com') to avoid spamming.
+  </description>
+</property>
+
+<property>
+  <name>http.agent.version</name>
+  <value>Nutch-1.0</value>
+  <description>A version string to advertise in the User-Agent 
+   header.</description>
+</property>
 
 </configuration>

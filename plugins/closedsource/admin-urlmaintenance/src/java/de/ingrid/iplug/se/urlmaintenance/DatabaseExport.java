@@ -41,7 +41,6 @@ public class DatabaseExport implements IPreCrawl {
   private IStartUrlDao _startUrlDao;
   private ILimitUrlDao _limitUrlDao;
   private IExcludeUrlDao _excludeUrlDao;
-  private String _urlType;
   private static final Log LOG = LogFactory.getLog(DatabaseExport.class);
 
   @Override
@@ -64,8 +63,9 @@ public class DatabaseExport implements IPreCrawl {
     File metadata = new File(tmpFolder, "urls/metadata");
     metadata.mkdirs();
 
+    String urlType = _conf.get("url.type");
     // write urls
-    if ("web".equalsIgnoreCase(_urlType)) {
+    if ("web".equalsIgnoreCase(urlType)) {
       // export web urls
       LOG.info("export web start urls");
       printUrls(new File(start, "urls.txt"), _startUrlDao);
@@ -75,7 +75,7 @@ public class DatabaseExport implements IPreCrawl {
       printUrls(new File(exclude, "urls.txt"), _excludeUrlDao);
       LOG.info("export web metadata urls");
       printMetadatas(new File(metadata, "urls.txt"), _limitUrlDao);
-    } else if ("catalog".equalsIgnoreCase(_urlType)) {
+    } else if ("catalog".equalsIgnoreCase(urlType)) {
       // export catalog urls
       LOG.info("export catalog start urls");
       printUrls(new File(start, "urls.txt"), _catalogUrlDao);
@@ -121,7 +121,6 @@ public class DatabaseExport implements IPreCrawl {
     _startUrlDao = new StartUrlDao(transactionService);
     _limitUrlDao = new LimitUrlDao(transactionService);
     _excludeUrlDao = new ExcludeUrlDao(transactionService);
-    _urlType = conf.get("url.type");
   }
 
   private void printMetadatas(File file, IDao<? extends Url> urlDao)

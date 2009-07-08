@@ -19,6 +19,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.nutch.admin.NavigationSelector;
 import org.apache.nutch.admin.NutchInstance;
 import org.springframework.stereotype.Controller;
@@ -84,6 +85,7 @@ public class ConfigurationController extends NavigationSelector {
     ServletContext servletContext = session.getServletContext();
     NutchInstance nutchInstance = (NutchInstance) servletContext
         .getAttribute("nutchInstance");
+    
     File instanceFolder = nutchInstance.getInstanceFolder();
     File file = new File(instanceFolder, "conf/nutch-site.xml");
     DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
@@ -93,6 +95,7 @@ public class ConfigurationController extends NavigationSelector {
     Document document = documentBuilder.parse(file);
     Element documentElement = document.getDocumentElement();
 
+    // update site.xml
     boolean update = false;
     NodeList nodeList = documentElement.getElementsByTagName("name");
     for (int i = 0; i < nodeList.getLength(); i++) {
@@ -107,6 +110,7 @@ public class ConfigurationController extends NavigationSelector {
       }
     }
 
+    // create new property in site.xml
     if (!update) {
       Element propertyElement = document.createElement("property");
       Element nameElement = document.createElement("name");
@@ -118,12 +122,18 @@ public class ConfigurationController extends NavigationSelector {
       documentElement.appendChild(propertyElement);
     }
 
+    // write site.xml
     Source xmlSource = new DOMSource(document);
     Result result = new StreamResult(new FileOutputStream(file));
     TransformerFactory transformerFactory = TransformerFactory.newInstance();
     Transformer transformer = transformerFactory.newTransformer();
     transformer.setOutputProperty("indent", "yes");
     transformer.transform(xmlSource, result);
+    
+    // update configuration
+    Configuration configuration = nutchInstance.getConfiguration();
+    configuration.set(name, value);
+    
     return "redirect:/index.hmtl";
   }
 
