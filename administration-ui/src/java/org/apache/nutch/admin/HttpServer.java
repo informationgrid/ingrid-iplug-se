@@ -70,6 +70,12 @@ public class HttpServer extends Thread {
         webApp);
     context.setClassLoader(extension.getDescriptor().getClassLoader());
     context.setAttribute("nutchInstance", nutchInstance);
+    
+    // add theme into view to load different css files
+    String theme = System.getProperty("theme", "default");
+    context.setAttribute("theme", theme);
+    
+    
     Set<Entry<String, Object>> entrySet = _contextAttributes.entrySet();
     for (Entry<String, Object> entry : entrySet) {
       context.setAttribute(entry.getKey(), entry.getValue());
