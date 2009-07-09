@@ -38,5 +38,6 @@
 <wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/lib-regex-filter/src/java"/>
 <wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/lib-regex-filter/src/test"/>
 <wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/scoring-opic/src/java"/>
+<wb-resource deploy-path="/" source-path="/plugins/opensource/crawl-prepare-bwdb/src/java"/>
 </wb-module>
 </project-modules>
