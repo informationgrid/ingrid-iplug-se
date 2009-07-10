@@ -6,6 +6,8 @@ public class CrawlCommand {
 
   private Integer _topn;
 
+  private String _crawlFolder;
+
   public Integer getDepth() {
     return _depth;
   }
@@ -20,6 +22,14 @@ public class CrawlCommand {
 
   public void setTopn(Integer topn) {
     _topn = topn;
+  }
+
+  public String getCrawlFolder() {
+    return _crawlFolder;
+  }
+
+  public void setCrawlFolder(String crawlFolder) {
+    _crawlFolder = crawlFolder;
   }
 
 }

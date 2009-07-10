@@ -18,9 +18,11 @@ import org.apache.nutch.admin.NavigationSelector;
 import org.apache.nutch.admin.NutchInstance;
 import org.apache.nutch.crawl.CrawlTool;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class CrawlController extends NavigationSelector {
@@ -40,6 +42,12 @@ public class CrawlController extends NavigationSelector {
     Path path = new Path(instanceFolder.getAbsolutePath(), "crawls");
     Configuration configuration = nutchInstance.getConfiguration();
     FileSystem fileSystem = FileSystem.get(configuration);
+    CrawlPath[] crawlPathArray = listPaths(path, fileSystem);
+    return crawlPathArray;
+  }
+
+  private CrawlPath[] listPaths(Path path, FileSystem fileSystem)
+      throws IOException {
     FileStatus[] fileStatusArray = fileSystem.listStatus(path);
     CrawlPath[] crawlPathArray = new CrawlPath[fileStatusArray.length];
     int counter = 0;
@@ -77,7 +85,6 @@ public class CrawlController extends NavigationSelector {
     ServletContext servletContext = session.getServletContext();
     NutchInstance nutchInstance = (NutchInstance) servletContext
         .getAttribute("nutchInstance");
-
     // local folder for configuration files
     File instanceFolder = nutchInstance.getInstanceFolder();
     // look in the same path in hdfs
@@ -89,9 +96,45 @@ public class CrawlController extends NavigationSelector {
     fileSystem.mkdirs(crawlDir);
     CrawlTool crawlTool = new CrawlTool(configuration, crawlDir);
     crawlTool.preCrawl();
-    // TODO use correct params
-    crawlTool.crawl(10, 10);
     return "redirect:/index.html";
   }
 
+  @RequestMapping(value = "/startCrawl.html", method = RequestMethod.GET)
+  public String startCrawl(Model model,
+      @RequestParam(value = "crawlFolder", required = true) String crawlFolder,
+      HttpSession session) throws IOException {
+    ServletContext servletContext = session.getServletContext();
+    NutchInstance nutchInstance = (NutchInstance) servletContext
+        .getAttribute("nutchInstance");
+    // local folder for configuration files
+    File instanceFolder = nutchInstance.getInstanceFolder();
+    // look in the same path in hdfs
+    Path path = new Path(instanceFolder.getAbsolutePath(), "crawls/segments");
+    Path crawlPath = new Path(path, crawlFolder);
+    Configuration configuration = nutchInstance.getConfiguration();
+    FileSystem fileSystem = FileSystem.get(configuration);
+    CrawlPath[] listPaths = listPaths(crawlPath, fileSystem);
+    model.addAttribute("crawlPaths", listPaths);
+    model.addAttribute("crawlFolder", crawlFolder);
+    return "startCrawl";
+  }
+
+  @RequestMapping(value = "/startCrawl.html", method = RequestMethod.POST)
+  public String postStartCrawl(
+      @ModelAttribute("crawlCommand") CrawlCommand crawlCommand,
+      HttpSession session) throws IOException {
+    ServletContext servletContext = session.getServletContext();
+    NutchInstance nutchInstance = (NutchInstance) servletContext
+        .getAttribute("nutchInstance");
+
+    // local folder for configuration files
+    File instanceFolder = nutchInstance.getInstanceFolder();
+    // look in the same path in hdfs
+    Path path = new Path(instanceFolder.getAbsolutePath(), "crawls");
+    Configuration configuration = nutchInstance.getConfiguration();
+    Path crawlDir = new Path(path, crawlCommand.getCrawlFolder());
+    CrawlTool crawlTool = new CrawlTool(configuration, crawlDir);
+    crawlTool.crawl(crawlCommand.getTopn(), crawlCommand.getDepth());
+    return "redirect:/index.html";
+  }
 }

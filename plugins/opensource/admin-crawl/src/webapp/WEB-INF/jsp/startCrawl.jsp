@@ -62,14 +62,14 @@
 			    <table id="crawls">
 			        <thead>
 			            <tr>
-			            	<th>Path</th>
+			            	<th>Segments</th>
 			                <th>Size in Mb</th>
 			            </tr>
 			        </thead>
 			        <tbody>
 						<c:forEach items="${crawlPaths}" var="crawlPath">
 				            <tr>
-				            	<td><a href="startCrawl.html?crawlFolder=${crawlPath.path.name}">${crawlPath.path}</a></td>
+				            	<td>${crawlPath.path}</td>
 				                <td>${crawlPath.size}</td>
 				            </tr>
 						</c:forEach>
@@ -80,7 +80,7 @@
 			YAHOO.util.Event.addListener(window, "load", function() {
 			    YAHOO.example.EnhanceFromMarkup = function() {
 			        var myColumnDefs = [
-						{key:"path",label:"Path", sortable:true},
+						{key:"path",label:"Segments", sortable:true},
 			            {key:"size",label:"Size in Mb", sortable:true},
 			        ];
 			
@@ -88,7 +88,7 @@
 			        myDataSource.responseType = YAHOO.util.DataSource.TYPE_HTMLTABLE;
 			        myDataSource.responseSchema = {
 			            fields: [{key:"path"},
-						        {key:"size", parser:"number"},
+						        {key:"size", parser:"number"}
 			            ]
 			        };
 			
@@ -105,42 +105,17 @@
 			});
 			</script>						
 		
-			<a href="#" id="showCreateCrawl">Create New Crawl</a>
-			<script>
-				YAHOO.namespace("example.container");
-				function initCreateCrawl() {
-					var handleYes = function() {
-					    this.form.submit();
-					};
-					
-					var handleNo = function() {
-					    this.hide();
-					};
-					
-					YAHOO.example.container.createCrawl = 
-					    new YAHOO.widget.SimpleDialog("createCrawl", 
-					             { width: "300px",
-					               fixedcenter: true,
-					               visible: false,
-					               draggable: false,
-					               close: true,
-					               text: "Do you want to continue?",
-					               icon: YAHOO.widget.SimpleDialog.ICON_HELP,
-					               constraintoviewport: true,
-					               buttons: [ { text:"Yes", handler:handleYes, isDefault:true },
-					                          { text:"No",  handler:handleNo } ]
-					             } );
-					YAHOO.example.container.createCrawl.setHeader("Are you sure?");
-					YAHOO.example.container.createCrawl.render();
-					YAHOO.util.Event.addListener("showCreateCrawl", "click", YAHOO.example.container.createCrawl.show, YAHOO.example.container.createCrawl, true);
-				}
-				YAHOO.util.Event.onDOMReady(initCreateCrawl);             
-			</script>
-				
-			<div id="createCrawl">
-				<form:form method="post" action="createCrawl.html">
-				</form:form>
-			</div>
+			<form:form action="startCrawl.html" method="post" modelAttribute="crawlCommand">
+				<fieldset>
+					<legend>Crawl Parameters</legend>
+					<form:label path="depth">Depth</form:label>
+					<form:select path="depth" items="${depths}"/>
+					<form:label path="topn">Top Pages</form:label>
+					<form:input path="topn"/>
+					<input type="hidden" name="crawlFolder" value="${crawlFolder}"/>
+					<input type="submit" value="Start">	
+				</fieldset>
+			</form:form>
 
 		
 		</p>
