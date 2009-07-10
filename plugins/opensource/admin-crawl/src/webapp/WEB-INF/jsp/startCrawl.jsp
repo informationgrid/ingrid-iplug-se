@@ -69,7 +69,7 @@
 			        <tbody>
 						<c:forEach items="${crawlPaths}" var="crawlPath">
 				            <tr>
-				            	<td>${crawlPath.path}</td>
+				            	<td>${crawlPath.path.name}</td>
 				                <td>${crawlPath.size}</td>
 				            </tr>
 						</c:forEach>

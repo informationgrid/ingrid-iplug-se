@@ -69,7 +69,7 @@
 			        <tbody>
 						<c:forEach items="${crawlPaths}" var="crawlPath">
 				            <tr>
-				            	<td><a href="startCrawl.html?crawlFolder=${crawlPath.path.name}">${crawlPath.path}</a></td>
+				            	<td><a href="startCrawl.html?crawlFolder=${crawlPath.path.name}">${crawlPath.path.name}</a></td>
 				                <td>${crawlPath.size}</td>
 				            </tr>
 						</c:forEach>

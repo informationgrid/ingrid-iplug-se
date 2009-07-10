@@ -39,5 +39,18 @@
 <wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/lib-regex-filter/src/test"/>
 <wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/scoring-opic/src/java"/>
 <wb-resource deploy-path="/" source-path="/plugins/opensource/crawl-prepare-bwdb/src/java"/>
+<wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/lib-http/src/java"/>
+<wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/lib-http/src/test"/>
+<wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/parse-html/src/java"/>
+<wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/parse-text/src/java"/>
+<wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/protocol-http/src/test"/>
+<wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/parse-html/src/test"/>
+<wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/protocol-http/src/java"/>
+<wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/parse-js/src/java"/>
+<wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/index-more/src/java"/>
+<wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/index-more/src/test"/>
+<wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/index-basic/src/java"/>
+<wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/index-anchor/src/java"/>
+<wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/field-basic/src/java"/>
 </wb-module>
 </project-modules>

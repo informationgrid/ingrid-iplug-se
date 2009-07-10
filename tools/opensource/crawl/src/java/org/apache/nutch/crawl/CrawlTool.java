@@ -48,9 +48,9 @@ public class CrawlTool {
 
     Path crawlDb = new Path(_crawlDir, "crawldb");
     Path linkDb = new Path(_crawlDir, "linkdb");
-    Path segments = new Path(_crawlDir + "segments");
-    Path indexes = new Path(_crawlDir + "indexes");
-    Path index = new Path(_crawlDir + "index");
+    Path segments = new Path(_crawlDir, "segments");
+    Path indexes = new Path(_crawlDir, "indexes");
+    Path index = new Path(_crawlDir, "index");
 
     Generator generator = new Generator(_configuration);
     Fetcher fetcher = new Fetcher(_configuration);

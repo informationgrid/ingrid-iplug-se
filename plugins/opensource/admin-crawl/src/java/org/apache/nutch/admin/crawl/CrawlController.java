@@ -109,11 +109,11 @@ public class CrawlController extends NavigationSelector {
     // local folder for configuration files
     File instanceFolder = nutchInstance.getInstanceFolder();
     // look in the same path in hdfs
-    Path path = new Path(instanceFolder.getAbsolutePath(), "crawls/segments");
-    Path crawlPath = new Path(path, crawlFolder);
+    Path crawlsPath = new Path(instanceFolder.getAbsolutePath(), "crawls");
+    Path segmentsPath = new Path(crawlsPath, new Path(crawlFolder, "segments"));
     Configuration configuration = nutchInstance.getConfiguration();
     FileSystem fileSystem = FileSystem.get(configuration);
-    CrawlPath[] listPaths = listPaths(crawlPath, fileSystem);
+    CrawlPath[] listPaths = listPaths(segmentsPath, fileSystem);
     model.addAttribute("crawlPaths", listPaths);
     model.addAttribute("crawlFolder", crawlFolder);
     return "startCrawl";
