@@ -73,7 +73,7 @@ public class HttpServer extends Thread {
     
     // add theme into view to load different css files
     String theme = System.getProperty("nutch.gui.theme", "default");
-    context.setAttribute("nutch.gui.theme", theme);
+    context.setAttribute("theme", theme);
     
     
     Set<Entry<String, Object>> entrySet = _contextAttributes.entrySet();
