@@ -1,0 +1,91 @@
+a {color:#1B78B1}
+a:hover {color:#68A5D2}
+
+#hd{
+	background:#68A5D2;
+}
+
+#ft{
+	background:#F4F4F4;
+	font-size:77%;
+	text-align:center;
+	color:#666;
+	padding:2px;
+}
+
+.nav {
+	background:#1B78B1;
+	clear:both;
+	height:30px;
+	padding:5px 0 0 0px;
+}
+
+#subnav {
+	background:#DDE9BD;
+	clear:both;
+	height:20px;
+	padding-left:10px;
+}
+
+#subnav li {padding:0; margin:0 15px 0 0; float:left}
+#subnav li a {text-decoration:none; color:#000; font-size:93%}
+#subnav li a:hover {text-decoration:underline;}
+#subnav li.selected a {font-weight:bold}
+
+#bd {padding: 20px 10px 10px 10px}
+
+/* Fonts */
+.yui-b h3 {font-size:123.1%; color:#68A5D2}
+
+/* Forms */
+fieldset {
+   /**
+    border-color:#E5E5E5 -moz-use-text-color -moz-use-text-color;
+    border-style:solid none none;
+    border-width:1px medium medium;
+    **/
+    border: 1px solid #CCCCCC;
+    margin:8px 0px 30px 0px;
+    padding: 16px 45px;
+    position:relative;
+}
+
+fieldset.undecorated {
+    border: none;
+    margin-top:-20px;
+}
+
+fieldset legend {
+    color:#000000;
+    font-size:1.077em;
+    font-weight:bold;
+    margin:0 0 0 -10px;
+    padding:0 10px;
+}
+
+label {
+    width:150px;
+    float:left;
+}
+
+field {
+    float:left;
+}
+
+desc {
+    margin-left:20px;
+    color:#959595;
+    font-size:12px;
+    font-style:italic;
+    clear:both;
+}
+
+row {
+    float:left;
+    clear: left;
+    min-height:50px;
+    margin-bottom:15px;
+    width:100%;
+}
+
+div.error {color:#ED171F}
