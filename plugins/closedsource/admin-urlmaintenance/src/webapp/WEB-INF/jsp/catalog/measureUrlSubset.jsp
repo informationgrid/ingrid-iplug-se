@@ -1,4 +1,4 @@
-<%@ include file="/WEB-INF/jsp/include.jsp" %>
+<%@ include file="/WEB-INF/jsp/includes/include.jsp" %>
 {"recordsReturned":${fn:length(urls)},
     "totalRecords":${count},
     "records":[
