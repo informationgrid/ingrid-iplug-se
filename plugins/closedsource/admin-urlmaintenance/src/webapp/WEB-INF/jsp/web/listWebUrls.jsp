@@ -64,7 +64,7 @@
 		<div id="bd">
 			<div id="yui-main">
 				<div class="yui-b">
-					<h3>Willkommen ${partnerProviderCommand.provider}</h3> // missing provider
+					<h3>Web URLs</h3>
 					
 					<div id="demo" class="yui-navset">
 					    <ul class="yui-nav">
@@ -74,10 +74,7 @@
 					</div>
 					
 					<div>
-						<div>
-							<label>Aktionen:</label>
-							<img src="${theme}/gfx/add.png" align="absmiddle"/> <b><a href="createStartUrl.html">Neue Webseite anlegen</a></b>
-						</div>
+						
 						<div>	
 							<label>Filter:</label>
 							<c:forEach items="${metadatas}" var="metadata">
@@ -90,6 +87,10 @@
 						</div>
 					        
 					    <div style="margin-top:25px"></div>
+					    
+					    <div>
+							<img src="${theme}/gfx/add.png" align="absmiddle"/> <b><a href="createStartUrl.html">Neue Webseite anlegen</a></b>
+						</div>
 					        
 				        <div id="dynamicdata"></div>
 				        <div id="paging"></div>

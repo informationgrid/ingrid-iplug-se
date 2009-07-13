@@ -64,180 +64,205 @@
 		<div id="bd">
 			<div id="yui-main">
 				<div class="yui-b">
-					Welcome -${partnerProviderCommand.provider}-
+					<h3>Katalog URLs</h3>
 					
 					<div id="demo" class="yui-navset">
 					    <ul class="yui-nav">
-					        <li class="selected"><a href="listCatalogUrls.html"><em>List Catalog Url's</em></a></li>
-					        <li><a href="listWebUrls.html"><em>List Web Url</em></a></li>
+					        <li class="selected"><a href="listCatalogUrls.html"><em>Katalog Url's</em></a></li>
+					        <li><a href="listWebUrls.html"><em>Web Url's</em></a></li>
 					    </ul>            
-					    <div class="yui-content">
-					        <div><p>Willkommen in der Catalog Urlpflege</p></div>
-					        
-					        
-					        <hr/>
-					        <!-- Themenseite -->
-							<div id="topicUrls"></div>
-					        
-					        <script>
-					        YAHOO.example.DynamicDataTopics = function() {
-					            // Column definitions
-					            var myColumnDefs = [ // sortable:true enables sorting
-					                {key:"url", label:"Url", sortable:true},
-					                {key:"created", label:"Erstellt", sortable:true},
-					            ];
+					</div>   
+				    <div>
+				        <!-- Themenseite -->
+						<div style="margin-top:25px"></div>
+						<div>
+							<img src="${theme}/gfx/add.png" align="absmiddle"/> <b><a href="createCatalogUrl.html?type=topics">Neue Themen Seite</a></b>
+						</div>
+						<div id="topicUrls"></div>
+						<div id="topicPagination"></div>
+				        
+				        <script>
+				        YAHOO.example.DynamicDataTopics = function() {
+				            // Column definitions
+				            var myColumnDefs = [ // sortable:true enables sorting
+				                {key:"url", label:"Url", sortable:true},
+				                {key:"created", label:"Erstellt", sortable:true},
+				            ];
 
-					            
-					            // DataSource instance
-					            var myDataSource = new YAHOO.util.DataSource("topicsUrlSubset.html?");
-					            myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-					            myDataSource.responseSchema = {
-					                resultsList: "records",
-					                fields: [
-					                    {key:"url"},
-					                    {key:"created"},
-					                ],
-					                metaFields: {
-					                    totalRecords: "totalRecords" // Access to value in the server response
-					                }
-					            };
-					            
-					            // DataTable configuration
-					            var myConfigs = {
-					                initialRequest: "startIndex=0&pageSize=10", // Initial request for first page of data
-					                dynamicData: true, // Enables dynamic server-driven data
-					                sortedBy : {key:"created", dir:YAHOO.widget.DataTable.CLASS_ASC}, // Sets UI initial sort arrow
-					                paginator: new YAHOO.widget.Paginator({ rowsPerPage:10 }), // Enables pagination
-					                caption:"<a href=\"createCatalogUrl.html?type=topics\">Neue Themen Seite</a>" 
-					            };
-					            
-					            // DataTable instance
-					            var myDataTable = new YAHOO.widget.DataTable("topicUrls", myColumnDefs, myDataSource, myConfigs);
-					            // Update totalRecords on the fly with value from server
-					            myDataTable.handleDataReturnPayload = function(oRequest, oResponse, oPayload) {
-					                oPayload.totalRecords = oResponse.meta.totalRecords;
-					                return oPayload;
-					            }
-					            
-					            return {
-					                ds: myDataSource,
-					                dt: myDataTable
-					            };
-					                
-					        }();						        
-							</script>
-					        <hr/>
+				            
+				            // DataSource instance
+				            var myDataSource = new YAHOO.util.DataSource("topicsUrlSubset.html?");
+				            myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
+				            myDataSource.responseSchema = {
+				                resultsList: "records",
+				                fields: [
+				                    {key:"url"},
+				                    {key:"created"},
+				                ],
+				                metaFields: {
+				                    totalRecords: "totalRecords" // Access to value in the server response
+				                }
+				            };
+				            
+				            // DataTable configuration
+				            var myConfigs = {
+				                initialRequest: "startIndex=0&pageSize=10", // Initial request for first page of data
+				                dynamicData: true, // Enables dynamic server-driven data
+				                sortedBy : {key:"created", dir:YAHOO.widget.DataTable.CLASS_ASC}, // Sets UI initial sort arrow
+				                paginator: new YAHOO.widget.Paginator({ 
+					                rowsPerPage:10,
+					                containers : [ "topicPagination" ], 
+					                firstPageLinkLabel : "&lt;&lt; Anfang",
+					                lastPageLinkLabel : "Ende &gt;&gt;",
+					                nextPageLinkLabel : "Nächste &gt;",
+					                previousPageLinkLabel : "&lt; Vorherige"
+						                 }), // Enables pagination
+				            };
+				            
+				            // DataTable instance
+				            var myDataTable = new YAHOO.widget.DataTable("topicUrls", myColumnDefs, myDataSource, myConfigs);
+				            // Update totalRecords on the fly with value from server
+				            myDataTable.handleDataReturnPayload = function(oRequest, oResponse, oPayload) {
+				                oPayload.totalRecords = oResponse.meta.totalRecords;
+				                return oPayload;
+				            }
+				            
+				            return {
+				                ds: myDataSource,
+				                dt: myDataTable
+				            };
+				                
+				        }();						        
+						</script>
 
 
 
-					        <!-- Service Seite -->
-							<div id="serviceUrls"></div>
-					        
-					        <script>
-					        YAHOO.example.DynamicDataTopics = function() {
-					            // Column definitions
-					            var myColumnDefs = [ // sortable:true enables sorting
-					                {key:"url", label:"Url", sortable:true},
-					                {key:"created", label:"Erstellt", sortable:true},
-					            ];
+				        <!-- Service Seite -->
+						<div style="margin-top:25px"></div>
+						<div>
+							<img src="${theme}/gfx/add.png" align="absmiddle"/> <b><a href="createCatalogUrl.html?type=service">Neue Service Seite</a></b>
+						</div>
+						<div id="serviceUrls"></div>
+						<div id="servicePagination"></div>
+				        
+				        <script>
+				        YAHOO.example.DynamicDataTopics = function() {
+				            // Column definitions
+				            var myColumnDefs = [ // sortable:true enables sorting
+				                {key:"url", label:"Url", sortable:true},
+				                {key:"created", label:"Erstellt", sortable:true},
+				            ];
 
-					            
-					            // DataSource instance
-					            var myDataSource = new YAHOO.util.DataSource("serviceUrlSubset.html?");
-					            myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-					            myDataSource.responseSchema = {
-					                resultsList: "records",
-					                fields: [
-					                    {key:"url"},
-					                    {key:"created"},
-					                ],
-					                metaFields: {
-					                    totalRecords: "totalRecords" // Access to value in the server response
-					                }
-					            };
-					            
-					            // DataTable configuration
-					            var myConfigs = {
-					                initialRequest: "startIndex=0&pageSize=10", // Initial request for first page of data
-					                dynamicData: true, // Enables dynamic server-driven data
-					                sortedBy : {key:"created", dir:YAHOO.widget.DataTable.CLASS_ASC}, // Sets UI initial sort arrow
-					                paginator: new YAHOO.widget.Paginator({ rowsPerPage:10 }), // Enables pagination
-					                caption:"<a href=\"createCatalogUrl.html?type=service\">Neue Service Seite</a>" 
-					            };
-					            
-					            // DataTable instance
-					            var myDataTable = new YAHOO.widget.DataTable("serviceUrls", myColumnDefs, myDataSource, myConfigs);
-					            // Update totalRecords on the fly with value from server
-					            myDataTable.handleDataReturnPayload = function(oRequest, oResponse, oPayload) {
-					                oPayload.totalRecords = oResponse.meta.totalRecords;
-					                return oPayload;
-					            }
-					            
-					            return {
-					                ds: myDataSource,
-					                dt: myDataTable
-					            };
-					                
-					        }();						        
-							</script>
-					        
-					        
-					       <hr/> 
-					       
-					        <!-- Measure Seiten -->
-							<div id="measureUrls"></div>
-					        
-					        <script>
-					        YAHOO.example.DynamicDataTopics = function() {
-					            // Column definitions
-					            var myColumnDefs = [ // sortable:true enables sorting
-					                {key:"url", label:"Url", sortable:true},
-					                {key:"created", label:"Erstellt", sortable:true},
-					            ];
+				            
+				            // DataSource instance
+				            var myDataSource = new YAHOO.util.DataSource("serviceUrlSubset.html?");
+				            myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
+				            myDataSource.responseSchema = {
+				                resultsList: "records",
+				                fields: [
+				                    {key:"url"},
+				                    {key:"created"},
+				                ],
+				                metaFields: {
+				                    totalRecords: "totalRecords" // Access to value in the server response
+				                }
+				            };
+				            
+				            // DataTable configuration
+				            var myConfigs = {
+				                initialRequest: "startIndex=0&pageSize=10", // Initial request for first page of data
+				                dynamicData: true, // Enables dynamic server-driven data
+				                sortedBy : {key:"created", dir:YAHOO.widget.DataTable.CLASS_ASC}, // Sets UI initial sort arrow
+				                paginator: new YAHOO.widget.Paginator({ 
+					                rowsPerPage:10,
+					                containers : [ "servicePagination" ], 
+					                firstPageLinkLabel : "&lt;&lt; Anfang",
+					                lastPageLinkLabel : "Ende &gt;&gt;",
+					                nextPageLinkLabel : "Nächste &gt;",
+					                previousPageLinkLabel : "&lt; Vorherige" }), // Enables pagination
+				            };
+				            
+				            // DataTable instance
+				            var myDataTable = new YAHOO.widget.DataTable("serviceUrls", myColumnDefs, myDataSource, myConfigs);
+				            // Update totalRecords on the fly with value from server
+				            myDataTable.handleDataReturnPayload = function(oRequest, oResponse, oPayload) {
+				                oPayload.totalRecords = oResponse.meta.totalRecords;
+				                return oPayload;
+				            }
+				            
+				            return {
+				                ds: myDataSource,
+				                dt: myDataTable
+				            };
+				                
+				        }();						        
+						</script>
+				        
+				        
+				       
+				        <!-- Measure Seiten -->
+						<div style="margin-top:25px"></div>
+						<div>
+							<img src="${theme}/gfx/add.png" align="absmiddle"/> <b><a href="createCatalogUrl.html?type=measure">Neue Messwert Seite</a></b>
+						</div>
+						<div id="measureUrls"></div>
+						<div id="measurePagination"></div>
+				        
+				        <script>
+				        YAHOO.example.DynamicDataTopics = function() {
+				            // Column definitions
+				            var myColumnDefs = [ // sortable:true enables sorting
+				                {key:"url", label:"Url", sortable:true},
+				                {key:"created", label:"Erstellt", sortable:true},
+				            ];
 
-					            
-					            // DataSource instance
-					            var myDataSource = new YAHOO.util.DataSource("measureUrlSubset.html?");
-					            myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-					            myDataSource.responseSchema = {
-					                resultsList: "records",
-					                fields: [
-					                    {key:"url"},
-					                    {key:"created"},
-					                ],
-					                metaFields: {
-					                    totalRecords: "totalRecords" // Access to value in the server response
-					                }
-					            };
-					            
-					            // DataTable configuration
-					            var myConfigs = {
-					                initialRequest: "startIndex=0&pageSize=10", // Initial request for first page of data
-					                dynamicData: true, // Enables dynamic server-driven data
-					                sortedBy : {key:"created", dir:YAHOO.widget.DataTable.CLASS_ASC}, // Sets UI initial sort arrow
-					                paginator: new YAHOO.widget.Paginator({ rowsPerPage:10 }), // Enables pagination
-					                caption:"<a href=\"createCatalogUrl.html?type=measure\">Neue Messwert Seite</a>" 
-					            };
-					            
-					            // DataTable instance
-					            var myDataTable = new YAHOO.widget.DataTable("measureUrls", myColumnDefs, myDataSource, myConfigs);
-					            // Update totalRecords on the fly with value from server
-					            myDataTable.handleDataReturnPayload = function(oRequest, oResponse, oPayload) {
-					                oPayload.totalRecords = oResponse.meta.totalRecords;
-					                return oPayload;
-					            }
-					            
-					            return {
-					                ds: myDataSource,
-					                dt: myDataTable
-					            };
-					                
-					        }();						        
-							</script>
-					        <hr/>
-					        
-					    </div>
-					</div>						
+				            
+				            // DataSource instance
+				            var myDataSource = new YAHOO.util.DataSource("measureUrlSubset.html?");
+				            myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
+				            myDataSource.responseSchema = {
+				                resultsList: "records",
+				                fields: [
+				                    {key:"url"},
+				                    {key:"created"},
+				                ],
+				                metaFields: {
+				                    totalRecords: "totalRecords" // Access to value in the server response
+				                }
+				            };
+				            
+				            // DataTable configuration
+				            var myConfigs = {
+				                initialRequest: "startIndex=0&pageSize=10", // Initial request for first page of data
+				                dynamicData: true, // Enables dynamic server-driven data
+				                sortedBy : {key:"created", dir:YAHOO.widget.DataTable.CLASS_ASC}, // Sets UI initial sort arrow
+				                paginator: new YAHOO.widget.Paginator({ 
+					                rowsPerPage:10,
+					                containers : [ "measurePagination" ], 
+					                firstPageLinkLabel : "&lt;&lt; Anfang",
+					                lastPageLinkLabel : "Ende &gt;&gt;",
+					                nextPageLinkLabel : "Nächste &gt;",
+					                previousPageLinkLabel : "&lt; Vorherige" }), // Enables pagination
+				            };
+				            
+				            // DataTable instance
+				            var myDataTable = new YAHOO.widget.DataTable("measureUrls", myColumnDefs, myDataSource, myConfigs);
+				            // Update totalRecords on the fly with value from server
+				            myDataTable.handleDataReturnPayload = function(oRequest, oResponse, oPayload) {
+				                oPayload.totalRecords = oResponse.meta.totalRecords;
+				                return oPayload;
+				            }
+				            
+				            return {
+				                ds: myDataSource,
+				                dt: myDataTable
+				            };
+				                
+				        }();						        
+						</script>
+				        <hr/>
+				        
+				    </div>
 				</div>
 			</div>
 		</div>
