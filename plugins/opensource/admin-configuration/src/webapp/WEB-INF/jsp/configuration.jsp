@@ -20,6 +20,9 @@
 	<script type="text/javascript" src="${theme}/js/yui/build/yahoo/yahoo-min.js" ></script>
 	<script type="text/javascript" src="${theme}/js/yui/build/event/event-min.js" ></script>
 	<link rel="stylesheet" type="text/css" href="${theme}/css/style.css" />
+	<style type="text/css">
+		.yui-dt-liner {font-size:11px}
+	</style>
 </head>
 <body class="yui-skin-sam">
 	<div id="doc2">
@@ -64,7 +67,9 @@
 			<div id="yui-main">
 				<div class="yui-b">
 				<h3>Konfiguration</h3>
-				
+				<p>
+					Um Standardwerte zu überschreiben, klicken Sie in das Feld "Eigener Wert".
+				</p>
 				<div id="markup">
 				    <table id="configurations">
 				        <thead>
@@ -92,11 +97,11 @@
 				YAHOO.util.Event.addListener(window, "load", function() {
 				    YAHOO.example.EnhanceFromMarkup = function() {
 				        var myColumnDefs = [
-							{key:"position",label:"Position", sortable:true},
+							{key:"position",label:"Pos", sortable:true},
 				            {key:"name",label:"Name", sortable:true},
-				            {key:"description",label:"Description", sortable:true, maxAutoWidth:210},
-				            {key:"value",label:"Value", sortable:true, maxAutoWidth:160},
-				            {key:"finalValue",label:"Final Value", sortable:true, maxAutoWidth:160, editor: new YAHOO.widget.TextareaCellEditor()}
+				            {key:"description",label:"Beschreibung", sortable:true, maxAutoWidth:210},
+				            {key:"value",label:"Standard Wert", sortable:true, maxAutoWidth:180},
+				            {key:"finalValue",label:"Eigener Wert", sortable:true, maxAutoWidth:170, editor: new YAHOO.widget.TextareaCellEditor()}
 				        ];
 				
 				        var myDataSource = new YAHOO.util.DataSource(YAHOO.util.Dom.get("configurations"));
@@ -142,5 +147,6 @@
 			<%@ include file="/WEB-INF/jsp/includes/footer.jsp" %>
 		</div>
 	</div>
+</div>	
 </body>
 </html>
