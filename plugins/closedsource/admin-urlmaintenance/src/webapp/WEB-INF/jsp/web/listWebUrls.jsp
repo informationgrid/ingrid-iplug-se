@@ -88,10 +88,10 @@
 					        
 					    <div style="margin-top:25px"></div>
 					    
-					    <div>
-							<img src="${theme}/gfx/add.png" align="absmiddle"/> <b><a href="createStartUrl.html">Neue Webseite anlegen</a></b>
+					    <div style="float:right">
+							<img src="${theme}/gfx/add.png" align="absmiddle"/> <b><a href="createStartUrl.html">Neue Webseite</a></b>
 						</div>
-					        
+					    <h3>Web Seiten</h3>
 				        <div id="dynamicdata"></div>
 				        <div id="paging"></div>
 					        

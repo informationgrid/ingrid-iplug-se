@@ -75,9 +75,10 @@
 				    <div>
 				        <!-- Themenseite -->
 						<div style="margin-top:25px"></div>
-						<div>
+						<div style="float:right">
 							<img src="${theme}/gfx/add.png" align="absmiddle"/> <b><a href="createCatalogUrl.html?type=topics">Neue Themen Seite</a></b>
 						</div>
+						<h3>Themen Seiten</h3>
 						<div id="topicUrls"></div>
 						<div id="topicPagination"></div>
 				        
@@ -139,9 +140,10 @@
 
 				        <!-- Service Seite -->
 						<div style="margin-top:25px"></div>
-						<div>
+						<div style="float:right">
 							<img src="${theme}/gfx/add.png" align="absmiddle"/> <b><a href="createCatalogUrl.html?type=service">Neue Service Seite</a></b>
 						</div>
+						<h3>Service Seiten</h3>
 						<div id="serviceUrls"></div>
 						<div id="servicePagination"></div>
 				        
@@ -202,9 +204,10 @@
 				       
 				        <!-- Measure Seiten -->
 						<div style="margin-top:25px"></div>
-						<div>
+						<div style="float:right">
 							<img src="${theme}/gfx/add.png" align="absmiddle"/> <b><a href="createCatalogUrl.html?type=measure">Neue Messwert Seite</a></b>
 						</div>
+						<h3>Messwert Seiten</h3>
 						<div id="measureUrls"></div>
 						<div id="measurePagination"></div>
 				        

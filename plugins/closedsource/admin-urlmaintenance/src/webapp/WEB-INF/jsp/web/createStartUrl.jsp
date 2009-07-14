@@ -56,7 +56,7 @@
 		<div id="bd">
 			<div id="yui-main">
 				<div class="yui-b">
-					<h3>Willkommen ${partnerProviderCommand.provider}</h3>
+					<h3>Web URLs</h3>
 					<form:form action="createStartUrl.html" method="post" modelAttribute="startUrlCommand">
 						<fieldset>
 							<legend>Web URL anlegen</legend>
