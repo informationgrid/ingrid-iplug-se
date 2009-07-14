@@ -62,7 +62,7 @@
 					    </ul>            
 					</div>						
 
-				    <div class="yui-content">
+				    <div>
 				        <div>
 				        	<p>&nbsp;</p>
 				        	<p>Willkommen in der Urlpflege. Bitte treffen Sie eine Auswahl.</p>

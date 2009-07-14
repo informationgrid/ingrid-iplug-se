@@ -1,54 +1,71 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<%@ include file="/WEB-INF/jsp/include.jsp" %>
+<%@ include file="/WEB-INF/jsp/includes/include.jsp" %>
 <html>
 <head>
-	<title>Welcome</title>
-
-	<link rel="stylesheet" type="text/css" href="css/yui/build/reset-fonts-grids/reset-fonts-grids.css" />
-	
-	<link rel="stylesheet" type="text/css" href="css/yui/build/reset-fonts-grids/reset-fonts-grids.css" />
-	<link rel="stylesheet" type="text/css" href="css/yui/build/tabview/assets/skins/sam/tabview.css" />
-	<script type="text/javascript" src="css/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
-	<script type="text/javascript" src="css/yui/build/element/element-min.js"></script>
-	<script type="text/javascript" src="css/yui/build/tabview/tabview-min.js"></script>
-	 
+<title>Admin URL Pflege - Welcome</title>
+	<link rel="stylesheet" type="text/css" href="${theme}/css/reset-fonts-grids.css" />
+	<link rel="stylesheet" type="text/css" href="${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css" />
+	<script type="text/javascript" src="${theme}/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+	<script type="text/javascript" src="${theme}/js/yui/build/element/element-min.js"></script>
+	<script type="text/javascript" src="${theme}/js/yui/build/tabview/tabview-min.js"></script>
+	<link rel="stylesheet" type="text/css" href="${theme}/css/style.css" />
 </head>
-
 <body class="yui-skin-sam">
-<div id="doc">					
-	<div id="hd">
-		<p>Header</p>
-	</div>
-	<div id="bd">
-		<p>
-			<div id="instanceNavigation" class="yui-navset">
-			    <ul class="yui-nav">
-					<c:forEach items="${instanceNavigation}" var="navigation">
-						<c:choose>
+	<div id="doc2">					
+		<div id="hd">
+			<%@ include file="/WEB-INF/jsp/includes/header.jsp" %>
+		</div>
+		
+		<c:if test="${!empty instanceNavigation}">
+		<div class="yui-navset nav">
+		    <ul class="yui-nav">
+				<c:forEach items="${instanceNavigation}" var="navigation">
+					<c:choose>
 						<c:when test="${navigation.name == selectedInstance}">
 							<li class="selected"><a href="${navigation.link}"><em>${navigation.name}</em></a></li>
 						</c:when>
 						<c:otherwise>
 							<li><a href="${navigation.link}"><em>${navigation.name}</em></a></li>
 						</c:otherwise>
-						</c:choose>
-						
-						
-					</c:forEach>
-			    </ul>
-			</div>
-			<div id="componentNavigation" class="yui-navset">
-			    <ul class="yui-nav">
-					<c:forEach items="${componentNavigation}" var="navigation">
-						<li><a href="${navigation.link}"><em>${navigation.name}</em></a></li>
-					</c:forEach>
-			    </ul>
-			</div>
+					</c:choose>
+				</c:forEach>
+		    </ul>
+		</div>
+		</c:if>
 		
-		</p>
-	</div>
-	<div id="ft">
-		<p>Footer</p>
+		<c:if test="${!empty componentNavigation}">
+		<div id="subnav">
+		    <ul>
+				<c:forEach items="${componentNavigation}" var="navigation">
+					<c:choose>
+						<c:when test="${navigation.name == selectedComponent}">
+							<li class="selected"><a href="${navigation.link}"><em>${navigation.name}</em></a></li>
+						</c:when>
+						<c:otherwise>
+							<li><a href="${navigation.link}"><em>${navigation.name}</em></a></li>
+						</c:otherwise>
+					</c:choose>
+				</c:forEach>
+		    </ul>
+		</div>
+		</c:if>
+		
+		<div id="bd">
+			<div id="yui-main">
+				<div class="yui-b">
+					<h3>Willkommen ${partnerProviderCommand.provider}</h3>
+					<div>
+				        <div>
+				        	<p>&nbsp;</p>
+				        	<p>Bitte treffen Sie eine Auswahl.</p>
+				        </div>
+				    </div>
+				</div>
+			</div>
+		</div>		
+		<div id="ft">
+			<p>Footer</p>
+		</div>
 	</div>
 </div>
 </body>
