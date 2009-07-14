@@ -65,7 +65,6 @@
 				<div class="yui-b">
 				<h3>Konfiguration</h3>
 				
-				<div style="margin-top:25px"></div>
 				<div id="markup">
 				    <table id="configurations">
 				        <thead>
