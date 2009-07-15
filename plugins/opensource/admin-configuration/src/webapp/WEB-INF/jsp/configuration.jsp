@@ -100,8 +100,8 @@
 							{key:"position",label:"Pos", sortable:true},
 				            {key:"name",label:"Name", sortable:true},
 				            {key:"description",label:"Beschreibung", sortable:true, maxAutoWidth:210},
-				            {key:"value",label:"Standard Wert", sortable:true, maxAutoWidth:180},
-				            {key:"finalValue",label:"Eigener Wert", sortable:true, maxAutoWidth:170, editor: new YAHOO.widget.TextareaCellEditor()}
+				            {key:"value",label:"Standard Wert", sortable:true, maxAutoWidth:190},
+				            {key:"finalValue",label:"Eigener Wert", sortable:true, maxAutoWidth:190, editor: new YAHOO.widget.TextareaCellEditor()}
 				        ];
 				
 				        var myDataSource = new YAHOO.util.DataSource(YAHOO.util.Dom.get("configurations"));

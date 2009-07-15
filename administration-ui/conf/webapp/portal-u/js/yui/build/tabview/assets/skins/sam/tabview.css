@@ -192,13 +192,13 @@ version: 2.7.0
 }
 
 .yui-skin-sam .yui-navset .yui-content {
-	background: #edf5ff;
+	/*background: #edf5ff;*/
 }
 
 .yui-skin-sam .yui-navset .yui-content,.yui-skin-sam .yui-navset .yui-navset-top .yui-content
 	{
-	border: 1px solid #808080;
-	border-top-color: #243356;
+	/*border: 1px solid #808080;
+	border-top-color: #243356;*/
 	padding: .25em .5em;
 }
 

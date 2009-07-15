@@ -52,6 +52,7 @@
 	<div id="bd"> 
 		<div id="yui-main"> 
 			<div class="yui-b">
+				<h3>Instanzen</h3>
 				<form:form commandName="createInstance" action="index.html" method="post">
 				<fieldset>
 				    <legend>Neue Instanz anlegen</legend>

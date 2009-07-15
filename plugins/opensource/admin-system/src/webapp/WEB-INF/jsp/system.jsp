@@ -55,12 +55,20 @@
 	<div id="bd"> 
 		<div id="yui-main"> 
 			<div class="yui-b">
+				<h3>System Übersicht</h3>
 				<div>
-					<label>RAM (benutzt):</label> ${systemInfo.usedMemory} MB<br/>
-					<label>RAM (verfügbar):</label> ${systemInfo.maxMemory} MB<br/>
-					<label>Auslastung:</label> ${systemInfo.usedMemoryInPercent}%<br/><br/>
+					<div style="border-bottom:1px dotted #CCCCCC; padding:10px 0 10px 0">
+						<label>RAM (benutzt):</label> ${systemInfo.usedMemory} MB
+					</div>
+					<div style="border-bottom:1px dotted #CCCCCC; padding:10px 0 10px 0">
+						<label>RAM (verfügbar):</label> ${systemInfo.maxMemory} MB
+					</div>
+					<div style="border-bottom:1px dotted #CCCCCC; padding:10px 0 10px 0">
+						<label>Auslastung:</label> ${systemInfo.usedMemoryInPercent}%
+					</div>
 				</div>	
-			
+				
+				<div style="margin-top:25px"></div>
 				<h3>Log Datei</h3>
 				<pre>
 					<div id="logFileContainer" style="height:400px; overflow:auto; background:#F4F4F4; border:1px solid #CCCCCC; font-size:10px"></div>

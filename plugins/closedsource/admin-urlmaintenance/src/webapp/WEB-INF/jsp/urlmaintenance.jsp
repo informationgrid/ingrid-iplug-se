@@ -49,6 +49,7 @@
 		<div id="bd">
 			<div id="yui-main">
 				<div class="yui-b">
+					<h3>URL Pflege</h3>
 					<form:form action="index.html" commandName="partnerProviderCommand" method="post">
 						<fieldset>
 						    <legend>Partner und Provider auswählen</legend>

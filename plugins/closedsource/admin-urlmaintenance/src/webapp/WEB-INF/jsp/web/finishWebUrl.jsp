@@ -60,7 +60,7 @@
 		<div id="bd">
 			<div id="yui-main">
 				<div class="yui-b">
-					<h3>Willkommen ${partnerProviderCommand.provider}</h3>
+					<h3>Web URLs</h3>
 					<fieldset>
 					<legend>Überprüfen und Speichern</legend>
 					<div id="markup">
