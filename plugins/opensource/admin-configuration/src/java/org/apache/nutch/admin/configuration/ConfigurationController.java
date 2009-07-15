@@ -64,6 +64,7 @@ public class ConfigurationController extends NavigationSelector {
       if (!defaultList.contains(configurationCommand)) {
         ConfigurationCommand last = defaultList.get(defaultList.size() - 1);
         configurationCommand.setPosition(last.getPosition() + 1);
+        configurationCommand.setFinalValue(configurationCommand.getValue());
         defaultList.add(configurationCommand);
       }
     }

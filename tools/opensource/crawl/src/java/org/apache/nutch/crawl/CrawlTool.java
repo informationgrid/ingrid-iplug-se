@@ -1,9 +1,7 @@
 package org.apache.nutch.crawl;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -11,6 +9,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.nutch.crawl.bw.BWUpdateDb;
 import org.apache.nutch.fetcher.Fetcher;
 import org.apache.nutch.indexer.DeleteDuplicates;
 import org.apache.nutch.indexer.IndexMerger;
@@ -23,12 +22,15 @@ public class CrawlTool {
   private final Configuration _configuration;
   private final Path _crawlDir;
   private PreCrawls _preCrawls;
+  private FileSystem _fileSystem;
   private static final Log LOG = LogFactory.getLog(CrawlTool.class);
 
-  public CrawlTool(Configuration configuration, Path crawlDir) {
+  public CrawlTool(Configuration configuration, Path crawlDir)
+      throws IOException {
     _configuration = configuration;
     _crawlDir = crawlDir;
     _preCrawls = new PreCrawls(configuration);
+    _fileSystem = FileSystem.get(_configuration);
   }
 
   public void preCrawl() throws IOException {
@@ -39,14 +41,13 @@ public class CrawlTool {
 
     int threads = _configuration.getInt("fetcher.threads.fetch", 10);
 
-    FileSystem fs = FileSystem.get(_configuration);
-
     LOG.info("crawl started in: " + _crawlDir);
     LOG.info("threads = " + threads);
     LOG.info("depth = " + depth);
     LOG.info("topN = " + topn);
 
     Path crawlDb = new Path(_crawlDir, "crawldb");
+    Path bwDb = new Path(_crawlDir, "bwdb");
     Path linkDb = new Path(_crawlDir, "linkdb");
     Path segments = new Path(_crawlDir, "segments");
     Path indexes = new Path(_crawlDir, "indexes");
@@ -55,7 +56,7 @@ public class CrawlTool {
     Generator generator = new Generator(_configuration);
     Fetcher fetcher = new Fetcher(_configuration);
     ParseSegment parseSegment = new ParseSegment(_configuration);
-    CrawlDb crawlDbTool = new CrawlDb(_configuration);
+    BWUpdateDb bwUpdateDb = new BWUpdateDb(_configuration);
     LinkDb linkDbTool = new LinkDb(_configuration);
     Indexer indexer = new Indexer(_configuration);
     DeleteDuplicates dedup = new DeleteDuplicates(_configuration);
@@ -74,7 +75,7 @@ public class CrawlTool {
       if (!Fetcher.isParsing(_configuration)) {
         parseSegment.parse(segment); // parse it, if needed
       }
-      crawlDbTool.update(crawlDb, new Path[] { segment }, true, true); // update
+      bwUpdateDb.update(crawlDb, bwDb, new Path[] { segment }, true, true); // update
       // crawldb
     }
     if (i > 0) {
@@ -82,27 +83,27 @@ public class CrawlTool {
 
       if (indexes != null) {
         // Delete old indexes
-        if (fs.exists(indexes)) {
+        if (_fileSystem.exists(indexes)) {
           LOG.info("Deleting old indexes: " + indexes);
-          fs.delete(indexes, true);
+          _fileSystem.delete(indexes, true);
         }
 
         // Delete old index
-        if (fs.exists(index)) {
+        if (_fileSystem.exists(index)) {
           LOG.info("Deleting old merged index: " + index);
-          fs.delete(index, true);
+          _fileSystem.delete(index, true);
         }
       }
 
       // index, dedup & merge
-      FileStatus[] fstats = fs.listStatus(segments, HadoopFSUtil
-          .getPassDirectoriesFilter(fs));
+      FileStatus[] fstats = _fileSystem.listStatus(segments, HadoopFSUtil
+          .getPassDirectoriesFilter(_fileSystem));
       indexer.index(indexes, crawlDb, linkDb, Arrays.asList(HadoopFSUtil
           .getPaths(fstats)));
       if (indexes != null) {
         dedup.dedup(new Path[] { indexes });
-        fstats = fs.listStatus(indexes, HadoopFSUtil
-            .getPassDirectoriesFilter(fs));
+        fstats = _fileSystem.listStatus(indexes, HadoopFSUtil
+            .getPassDirectoriesFilter(_fileSystem));
         Path tmpDir = new Path(_configuration.get("mapred.temp.dir", ".")
             + CrawlTool.class.getName() + "_mergeIndex");
         merger.merge(HadoopFSUtil.getPaths(fstats), index, tmpDir);
@@ -116,9 +117,16 @@ public class CrawlTool {
 
   }
 
-  private static String getDate() {
-    return new SimpleDateFormat("yyyyMMddHHmmss").format(new Date(System
-        .currentTimeMillis()));
+  public FileSystem getFileSystem() {
+    return _fileSystem;
+  }
+
+  public Configuration getConfiguration() {
+    return _configuration;
+  }
+
+  public Path getCrawlDir() {
+    return _crawlDir;
   }
 
 }

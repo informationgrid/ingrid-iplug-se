@@ -20,6 +20,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Random;
 
@@ -201,11 +202,14 @@ public class BWUpdateDb extends Configured {
     super(conf);
   }
 
-  public void update(Path crawlDb, Path bwdb, Path segment) throws IOException {
+  // TODO use normalize and filter inside the bw-job? and not only in the
+  // crawldb-job.
+  public void update(Path crawlDb, Path bwdb, Path[] segments,
+      boolean normalize, boolean filter) throws IOException {
     LOG.info("bw update: starting");
     LOG.info("bw update: db: " + crawlDb);
     LOG.info("bw update: bwdb: " + bwdb);
-    LOG.info("bw update: segment: " + segment);
+    LOG.info("bw update: segments: " + Arrays.asList(segments));
 
     // wrapping
 
@@ -214,16 +218,18 @@ public class BWUpdateDb extends Configured {
     Path wrappedSegOutput = new Path(crawlDb, name);
 
     JobConf job = new NutchJob(getConf());
-    job.setJobName("bw update: wrap segment: " + segment);
+    job.setJobName("bw update: wrap segment: " + Arrays.asList(segments));
 
     job.setInputFormat(SequenceFileInputFormat.class);
     // job.setInputKeyClass(Text.class);
     // job.setInputValueClass(CrawlDatum.class);
 
-    FileInputFormat.addInputPath(job, new Path(segment,
-        CrawlDatum.FETCH_DIR_NAME)); // ??
-    FileInputFormat.addInputPath(job, new Path(segment,
-        CrawlDatum.PARSE_DIR_NAME));
+    for (Path segment : segments) {
+      FileInputFormat.addInputPath(job, new Path(segment,
+          CrawlDatum.FETCH_DIR_NAME)); // ??
+      FileInputFormat.addInputPath(job, new Path(segment,
+          CrawlDatum.PARSE_DIR_NAME));
+    }
 
     job.setMapperClass(BWMapper.class);
 
@@ -273,25 +279,22 @@ public class BWUpdateDb extends Configured {
 
     // 
     FileSystem.get(job).delete(tmpMergedDb, true);
-    // update existing crawlDb
-    JobConf updateJob = CrawlDb.createJob(getConf(), crawlDb);
-    FileInputFormat.addInputPath(updateJob, tmpFormatOut);
-    LOG.info("bw update: Merging bw filtered segment data into db.");
-    JobClient.runJob(updateJob);
-    FileSystem.get(job).delete(tmpFormatOut, true);
 
-    CrawlDb.install(updateJob, crawlDb);
+    CrawlDb crawlDbTool = new CrawlDb(getConf());
+    crawlDbTool.update(crawlDb, new Path[] { tmpFormatOut }, normalize, filter);
     LOG.info("bw update: done");
 
   }
 
   public static void main(String[] args) throws Exception {
-    BWUpdateDb crawlDb = new BWUpdateDb(NutchConfiguration.create());
-    if (args.length < 3) {
-      System.err.println("Usage: <crawldb> <bwdb> <segment>");
+    BWUpdateDb bwDb = new BWUpdateDb(NutchConfiguration.create());
+    if (args.length != 5) {
+      System.err
+          .println("Usage: <crawldb> <bwdb> <segment> <normalize> <filter>");
       return;
     }
-    crawlDb.update(new Path(args[0]), new Path(args[1]), new Path(args[2]));
+    bwDb.update(new Path(args[0]), new Path(args[1]), new Path[] { new Path(
+        args[2]) }, Boolean.valueOf(args[3]), Boolean.valueOf(args[4]));
   }
 
 }

@@ -94,8 +94,13 @@ public class CrawlController extends NavigationSelector {
     String folderName = "Crawl-" + _format.format(new Date());
     Path crawlDir = new Path(path, folderName);
     fileSystem.mkdirs(crawlDir);
+
     CrawlTool crawlTool = new CrawlTool(configuration, crawlDir);
-    crawlTool.preCrawl();
+
+    PreCrawlRunnable runnable = new PreCrawlRunnable(crawlTool);
+    Thread thread = new Thread(runnable);
+    thread.setDaemon(true);
+    thread.start();
     return "redirect:/index.html";
   }
 
@@ -134,7 +139,13 @@ public class CrawlController extends NavigationSelector {
     Configuration configuration = nutchInstance.getConfiguration();
     Path crawlDir = new Path(path, crawlCommand.getCrawlFolder());
     CrawlTool crawlTool = new CrawlTool(configuration, crawlDir);
-    crawlTool.crawl(crawlCommand.getTopn(), crawlCommand.getDepth());
+
+    Integer topn = crawlCommand.getTopn();
+    Integer depth = crawlCommand.getDepth();
+    Runnable runnable = new StartCrawlRunnable(crawlTool, topn, depth);
+    Thread thread = new Thread(runnable);
+    thread.setDaemon(true);
+    thread.start();
     return "redirect:/index.html";
   }
 }
