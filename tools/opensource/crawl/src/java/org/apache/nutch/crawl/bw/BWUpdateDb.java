@@ -235,7 +235,6 @@ public class BWUpdateDb extends Configured {
     LOG.info("bw update: segments: " + Arrays.asList(segments));
 
     // wrapping
-
     LOG.info("bw update: wrapping started.");
     String name = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
     Path wrappedSegOutput = new Path(crawlDb, name);

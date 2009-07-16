@@ -190,8 +190,6 @@ public class BWInjector extends Configured {
     }
     FileInputFormat.addInputPath(job, tempDir);
     job.setInputFormat(SequenceFileInputFormat.class);
-    // job.setInputKeyClass(HostTypeKey.class);
-    // job.setInputValueClass(BWPatterns.class);
 
     job.setReducerClass(BWInjectReducer.class);
     FileOutputFormat.setOutputPath(job, newDb);
