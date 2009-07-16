@@ -45,6 +45,7 @@ import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.crawl.CrawlDb;
+import org.apache.nutch.crawl.CrawlDbFilter;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
 
@@ -57,37 +58,61 @@ public class BWUpdateDb extends Configured {
 
   public static final Log LOG = LogFactory.getLog(BWUpdateDb.class);
 
+  public static class ObjectWritableMapper implements
+      Mapper<HostTypeKey, Writable, HostTypeKey, ObjectWritable> {
+
+    @Override
+    public void map(HostTypeKey key, Writable value,
+        OutputCollector<HostTypeKey, ObjectWritable> collector,
+        Reporter reporter) throws IOException {
+      ObjectWritable objectWritable = new ObjectWritable(value);
+      collector.collect(key, objectWritable);
+    }
+
+    @Override
+    public void configure(JobConf jobConf) {
+
+    }
+
+    @Override
+    public void close() throws IOException {
+
+    }
+
+  }
+
   /**
    * url-crawlDatum tuple
    */
   public static class Entry implements Writable {
-    public Text url;
 
-    public CrawlDatum crawlDatum;
+    private Text _url;
+
+    private CrawlDatum _crawlDatum;
 
     public Entry() {
     }
 
     public Entry(Text url, CrawlDatum crawlDatum) {
-      this.url = url;
-      this.crawlDatum = crawlDatum;
+      _url = url;
+      _crawlDatum = crawlDatum;
     }
 
     public void write(DataOutput out) throws IOException {
-      this.url.write(out);
-      this.crawlDatum.write(out);
+      _url.write(out);
+      _crawlDatum.write(out);
 
     }
 
     public void readFields(DataInput in) throws IOException {
-      this.url = new Text();
-      this.url.readFields(in);
-      this.crawlDatum = new CrawlDatum();
-      this.crawlDatum.readFields(in);
+      _url = new Text();
+      _url.readFields(in);
+      _crawlDatum = new CrawlDatum();
+      _crawlDatum.readFields(in);
     }
 
     public String toString() {
-      return url.toString() + "\n " + crawlDatum.toString();
+      return _url.toString() + "\n " + _crawlDatum.toString();
     }
 
   }
@@ -123,7 +148,7 @@ public class BWUpdateDb extends Configured {
   public static class BwReducer implements
       Reducer<HostTypeKey, ObjectWritable, HostTypeKey, ObjectWritable> {
 
-    private BWPatterns patterns;
+    private BWPatterns _patterns;
 
     public void reduce(HostTypeKey key, Iterator<ObjectWritable> values,
         OutputCollector<HostTypeKey, ObjectWritable> out, Reporter report)
@@ -135,31 +160,31 @@ public class BWUpdateDb extends Configured {
         ObjectWritable obj = (ObjectWritable) values.next();
         Object value = obj.get(); // unwrap
         if (value instanceof BWPatterns) {
-          patterns = (BWPatterns) value;
+          _patterns = (BWPatterns) value;
           // next values should be a list of entries
           return;
         }
 
-        if (patterns == null) {
+        if (_patterns == null) {
           return;
         }
 
         boolean negativeMatch = false;
-        Text url = ((Entry) value).url;
-        int count = patterns._negative.length;
+        Text url = ((Entry) value)._url;
+        int count = _patterns._negative.length;
         for (int i = 0; i < count; i++) {
           if (url.toString().toLowerCase().startsWith(
-              patterns._negative[i].toString().toLowerCase())) {
+              _patterns._negative[i].toString().toLowerCase())) {
             negativeMatch = true;
             break;
             // match a black list entry
           }
         }
         if (!negativeMatch) {
-          count = patterns._positive.length;
+          count = _patterns._positive.length;
           for (int i = 0; i < count; i++) {
             if (url.toString().toLowerCase().startsWith(
-                patterns._positive[i].toString().toLowerCase())) {
+                _patterns._positive[i].toString().toLowerCase())) {
               // match a white list entry
               out.collect(key, obj);
               break;
@@ -188,7 +213,7 @@ public class BWUpdateDb extends Configured {
     public void map(HostTypeKey key, ObjectWritable value,
         OutputCollector<Text, CrawlDatum> out, Reporter rep) throws IOException {
       Entry entry = (Entry) value.get();
-      out.collect(entry.url, entry.crawlDatum);
+      out.collect(entry._url, entry._crawlDatum);
     }
 
     public void configure(JobConf arg0) {
@@ -221,8 +246,6 @@ public class BWUpdateDb extends Configured {
     job.setJobName("bw update: wrap segment: " + Arrays.asList(segments));
 
     job.setInputFormat(SequenceFileInputFormat.class);
-    // job.setInputKeyClass(Text.class);
-    // job.setInputValueClass(CrawlDatum.class);
 
     for (Path segment : segments) {
       FileInputFormat.addInputPath(job, new Path(segment,
@@ -247,12 +270,11 @@ public class BWUpdateDb extends Configured {
     filterJob.setJobName("filtering: " + wrappedSegOutput + bwdb);
     filterJob.setInputFormat(SequenceFileInputFormat.class);
 
-    // filterJob.setInputKeyClass(HostTypeKey.class);
-    // filterJob.setInputValueClass(ObjectWritable.class);
     FileInputFormat.addInputPath(filterJob, wrappedSegOutput);
     FileInputFormat.addInputPath(filterJob, new Path(bwdb, "current"));
     FileOutputFormat.setOutputPath(filterJob, tmpMergedDb);
     filterJob.setReducerClass(BwReducer.class);
+    filterJob.setMapperClass(ObjectWritableMapper.class);
     filterJob.setOutputFormat(MapFileOutputFormat.class);
     filterJob.setOutputKeyClass(HostTypeKey.class);
     filterJob.setOutputValueClass(ObjectWritable.class);
@@ -268,20 +290,30 @@ public class BWUpdateDb extends Configured {
     convertJob.setJobName("format converting: " + tmpMergedDb);
     FileInputFormat.addInputPath(convertJob, tmpMergedDb);
     convertJob.setInputFormat(SequenceFileInputFormat.class);
-    // convertJob.setInputKeyClass(HostTypeKey.class);
-    // convertJob.setInputValueClass(ObjectWritable.class);
     convertJob.setMapperClass(FormatConverter.class);
     FileOutputFormat.setOutputPath(convertJob, tmpFormatOut);
-    convertJob.setOutputKeyClass(Text.class);
     convertJob.setOutputFormat(MapFileOutputFormat.class);
+    convertJob.setOutputKeyClass(Text.class);
     convertJob.setOutputValueClass(CrawlDatum.class);
     JobClient.runJob(convertJob);
 
     // 
     FileSystem.get(job).delete(tmpMergedDb, true);
 
-    CrawlDb crawlDbTool = new CrawlDb(getConf());
-    crawlDbTool.update(crawlDb, new Path[] { tmpFormatOut }, normalize, filter);
+    JobConf updateJob = CrawlDb.createJob(getConf(), crawlDb);
+    boolean additionsAllowed = getConf().getBoolean(
+        CrawlDb.CRAWLDB_ADDITIONS_ALLOWED, true);
+    updateJob.setBoolean(CrawlDb.CRAWLDB_ADDITIONS_ALLOWED, additionsAllowed);
+    updateJob.setBoolean(CrawlDbFilter.URL_FILTERING, filter);
+    updateJob.setBoolean(CrawlDbFilter.URL_NORMALIZING, normalize);
+
+    FileInputFormat.addInputPath(updateJob, tmpFormatOut);
+    LOG.info("bw update: Merging bw filtered segment data into db.");
+    JobClient.runJob(updateJob);
+    FileSystem.get(job).delete(tmpFormatOut, true);
+
+    LOG.info("install crawldb");
+    CrawlDb.install(updateJob, crawlDb);
     LOG.info("bw update: done");
 
   }

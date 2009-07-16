@@ -67,7 +67,7 @@ public class BWInjector extends Configured {
    * line.
    */
   public static class BWInjectMapper implements
-      Mapper<WritableComparable, Text, HostTypeKey, BWPatterns> {
+      Mapper<WritableComparable<Object>, Text, HostTypeKey, BWPatterns> {
 
     private URLNormalizers _urlNormalizers;
 
@@ -82,7 +82,7 @@ public class BWInjector extends Configured {
     }
 
     @Override
-    public void map(WritableComparable key, Text val,
+    public void map(WritableComparable<Object> key, Text val,
         OutputCollector<HostTypeKey, BWPatterns> output, Reporter reporter)
         throws IOException {
 
