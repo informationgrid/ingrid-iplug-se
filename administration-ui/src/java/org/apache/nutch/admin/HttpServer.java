@@ -31,7 +31,7 @@ public class HttpServer extends Thread {
     try {
       _server.start();
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error("can not start server.", e);
     }
   }
 

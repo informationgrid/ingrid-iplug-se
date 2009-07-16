@@ -16,6 +16,9 @@ public class AdministrationApplication {
     if (!configurationUtil.existsConfiguration("general")) {
       configurationUtil.createNewConfiguration("general");
     }
+    if (!configurationUtil.existsConfiguration("welcome")) {
+      configurationUtil.createNewConfiguration("welcome");
+    }
     
     httpServer.addContextAttribute("configurationUtil", configurationUtil);
 

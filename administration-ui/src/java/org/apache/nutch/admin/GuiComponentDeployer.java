@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Timer;
@@ -17,6 +18,10 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.nutch.plugin.Extension;
 
 public class GuiComponentDeployer extends Thread {
+
+  public static enum InstanceType {
+    DEFAULT, WELCOME, GENERAL
+  }
 
   private static final Log LOG = LogFactory.getLog(GuiComponentDeployer.class);
 
@@ -74,13 +79,14 @@ public class GuiComponentDeployer extends Thread {
         LOG.info("load configuration: " + name);
         Configuration configuration = _configurationUtil
             .loadConfiguration(name);
-        boolean general = name.equals("general") ? true : false;
+        InstanceType type = name.equals("general") ? InstanceType.GENERAL
+            : name.equals("welcome") ? InstanceType.WELCOME
+                : InstanceType.DEFAULT;
         String folder = configuration.get("nutch.instance.folder");
         GuiComponentExtensionContainer instanceGuiComponentContainer = new GuiComponentExtensionContainer(
             configuration);
-        List<Extension> extensions = general ? instanceGuiComponentContainer
-            .getGeneralGuiComponentExtensions() : instanceGuiComponentContainer
-            .getInstanceGuiComponentExtensions();
+        List<Extension> extensions = getExtensions(type,
+            instanceGuiComponentContainer);
         for (Extension extension : extensions) {
           File instanceFolder = new File(folder);
           NutchInstance nutchInstance = new NutchInstance(instanceFolder
@@ -98,4 +104,31 @@ public class GuiComponentDeployer extends Thread {
     }
   }
 
+  private List<Extension> getExtensions(InstanceType type,
+      GuiComponentExtensionContainer instanceGuiComponentContainer) {
+    List<Extension> extensions = null;
+    switch (type) {
+    case WELCOME:
+      extensions = instanceGuiComponentContainer
+          .getGeneralGuiComponentExtensions();
+      Iterator<Extension> iterator = extensions.iterator();
+      while (iterator.hasNext()) {
+        Extension extension = (Extension) iterator.next();
+        String pluginId = extension.getDescriptor().getPluginId();
+        if (!pluginId.equals("admin-welcome")) {
+          iterator.remove();
+        }
+      }
+      break;
+    case GENERAL:
+      extensions = instanceGuiComponentContainer
+          .getGeneralGuiComponentExtensions();
+      break;
+    default:
+      extensions = instanceGuiComponentContainer
+          .getInstanceGuiComponentExtensions();
+      break;
+    }
+    return extensions;
+  }
 }
