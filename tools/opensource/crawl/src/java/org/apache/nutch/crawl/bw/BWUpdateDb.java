@@ -154,8 +154,6 @@ public class BWUpdateDb extends Configured {
         OutputCollector<HostTypeKey, ObjectWritable> out, Reporter report)
         throws IOException {
 
-      // System.out.println(key.toString());
-
       while (values.hasNext()) {
         ObjectWritable obj = (ObjectWritable) values.next();
         Object value = obj.get(); // unwrap
