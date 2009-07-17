@@ -1,7 +1,10 @@
 package org.apache.nutch.crawl.metadata;
 
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -13,6 +16,7 @@ import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
@@ -36,6 +40,48 @@ public class MetadataInjector extends Configured {
 
   private static final Log LOG = LogFactory.getLog(MetadataInjector.class);
 
+  public static class MetadataContainer implements Writable {
+
+    private List<Metadata> _metadatas = new ArrayList<Metadata>();
+
+    public MetadataContainer() {
+    }
+
+    public MetadataContainer(Metadata... metadatas) {
+      for (Metadata metadata : metadatas) {
+        _metadatas.add(metadata);
+      }
+    }
+
+    public void addMetadata(Metadata metadata) {
+      _metadatas.add(metadata);
+    }
+
+    public List<Metadata> getMetadatas() {
+      return _metadatas;
+    }
+
+    @Override
+    public void readFields(DataInput in) throws IOException {
+      int size = in.readInt();
+      for (int i = 0; i < size; i++) {
+        Metadata metadata = new Metadata();
+        metadata.readFields(in);
+        _metadatas.add(metadata);
+      }
+
+    }
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+      out.writeInt(_metadatas.size());
+      for (Metadata metadata : _metadatas) {
+        metadata.write(out);
+      }
+    }
+
+  }
+
   public MetadataInjector(Configuration conf) {
     super(conf);
   }
@@ -45,7 +91,7 @@ public class MetadataInjector extends Configured {
    * line.
    */
   public static class MetadataInjectMapper implements
-      Mapper<WritableComparable<Object>, Text, Text, MetadataContainer> {
+      Mapper<WritableComparable<Object>, Text, HostType, MetadataContainer> {
 
     private URLNormalizers _urlNormalizers;
 
@@ -58,7 +104,7 @@ public class MetadataInjector extends Configured {
 
     @Override
     public void map(WritableComparable<Object> key, Text val,
-        OutputCollector<Text, MetadataContainer> output, Reporter reporter)
+        OutputCollector<HostType, MetadataContainer> output, Reporter reporter)
         throws IOException {
 
       String line = val.toString();
@@ -94,7 +140,10 @@ public class MetadataInjector extends Configured {
         System.out.println(host);
         System.out.println(metadata);
         System.out.println("++++");
-        output.collect(new Text(host), new MetadataContainer(metadata));
+        HostType hostType = new HostType(new Text(host),
+            HostType.METADATA_CONTAINER);
+        MetadataContainer metadataContainer = new MetadataContainer(metadata);
+        output.collect(hostType, metadataContainer);
       }
     }
 
@@ -104,7 +153,7 @@ public class MetadataInjector extends Configured {
    * Reduces {@link HostTypeKey} - {@link BWPatterns} tuples
    */
   public static class MetadataInjectReducer implements
-      Reducer<Text, MetadataContainer, Text, MetadataContainer> {
+      Reducer<HostType, MetadataContainer, HostType, MetadataContainer> {
     public void configure(JobConf job) {
     }
 
@@ -112,8 +161,8 @@ public class MetadataInjector extends Configured {
     }
 
     @Override
-    public void reduce(Text key, Iterator<MetadataContainer> values,
-        OutputCollector<Text, MetadataContainer> output, Reporter reporter)
+    public void reduce(HostType key, Iterator<MetadataContainer> values,
+        OutputCollector<HostType, MetadataContainer> output, Reporter reporter)
         throws IOException {
       MetadataContainer metadataContainer = new MetadataContainer();
       while (values.hasNext()) {
@@ -145,7 +194,7 @@ public class MetadataInjector extends Configured {
 
     FileOutputFormat.setOutputPath(sortJob, tempDir);
     sortJob.setOutputFormat(SequenceFileOutputFormat.class);
-    sortJob.setOutputKeyClass(Text.class);
+    sortJob.setOutputKeyClass(HostType.class);
     sortJob.setOutputValueClass(MetadataContainer.class);
     JobClient.runJob(sortJob);
 
@@ -168,7 +217,7 @@ public class MetadataInjector extends Configured {
     job.setReducerClass(MetadataInjectReducer.class);
     FileOutputFormat.setOutputPath(job, newDb);
     job.setOutputFormat(MapFileOutputFormat.class);
-    job.setOutputKeyClass(Text.class);
+    job.setOutputKeyClass(HostType.class);
     job.setOutputValueClass(MetadataContainer.class);
     JobClient.runJob(job);
 

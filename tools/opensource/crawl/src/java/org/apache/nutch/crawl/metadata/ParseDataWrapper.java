@@ -72,17 +72,19 @@ public class ParseDataWrapper extends Configured {
   }
 
   public static class ParseDataWrapperMapper implements
-      Mapper<Text, ParseData, Text, UrlParseDataContainer> {
+      Mapper<Text, ParseData, HostType, UrlParseDataContainer> {
 
     @Override
     public void map(Text key, ParseData value,
-        OutputCollector<Text, UrlParseDataContainer> collector,
+        OutputCollector<HostType, UrlParseDataContainer> collector,
         Reporter reporter) throws IOException {
       String url = key.toString();
       String host = new URL(url).getHost();
       UrlParseDataContainer container = new UrlParseDataContainer(
           new Text(url), value);
-      collector.collect(new Text(host), container);
+      HostType hostType = new HostType(new Text(host),
+          HostType.URL_PARSEDATA_CONTAINER);
+      collector.collect(hostType, container);
     }
 
     @Override
@@ -100,7 +102,7 @@ public class ParseDataWrapper extends Configured {
   public void wrap(Path segment, Path out) throws IOException {
 
     JobConf job = new NutchJob(getConf());
-    job.setJobName("wrap segment: " + segment);
+    job.setJobName("wrap parse data from segment: " + segment);
 
     job.setInputFormat(SequenceFileInputFormat.class);
 
@@ -110,7 +112,7 @@ public class ParseDataWrapper extends Configured {
 
     FileOutputFormat.setOutputPath(job, out);
     job.setOutputFormat(MapFileOutputFormat.class);
-    job.setOutputKeyClass(Text.class);
+    job.setOutputKeyClass(HostType.class);
     job.setOutputValueClass(UrlParseDataContainer.class);
     JobClient.runJob(job);
   }
