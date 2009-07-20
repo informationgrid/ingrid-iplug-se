@@ -14,6 +14,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.WritableComparable;
+import org.apache.lucene.store.FSDirectory;
 import org.apache.nutch.searcher.Hit;
 import org.apache.nutch.searcher.HitDetails;
 import org.apache.nutch.searcher.Hits;
@@ -83,6 +84,7 @@ public class NutchSearcher implements IPlug {
     }
 
     public void configure(PlugDescription plugDescription) throws Exception {
+		FSDirectory.setDisableLocks(false);
 		this.fPlugId = plugDescription.getPlugId();
 		if (fNutchConf == null) {
 			fNutchConf = NutchConfiguration.create();
