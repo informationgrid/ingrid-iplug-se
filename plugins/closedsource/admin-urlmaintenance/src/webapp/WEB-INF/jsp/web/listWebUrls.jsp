@@ -92,40 +92,64 @@
 							<img src="${theme}/gfx/add.png" align="absmiddle"/> <b><a href="createStartUrl.html">Neue Webseite</a></b>
 						</div>
 					    <h3>Web Seiten</h3>
-				        <div id="dynamicdata"></div>
+				        <ul>
+				        	<li style="float:left; list-style-type:square; color:black; margin-left:20px">Start URL</li>
+				        	<li style="float:left; list-style-type:square; color:green; margin-left:20px">Limit URL</li>
+				        	<li style="float:left; list-style-type:square; color:red; margin-left:20px">Exclude URL</li>
+				        	<li style="float:left; list-style-type:square; color:#666666; margin-left:50px">RV = Rechtsvorschriften</li>
+				        	<li style="float:left; list-style-type:square; color:#666666; margin-left:20px">FS = Forschungsseite</li>
+				        	<li style="float:left; list-style-type:square; color:#666666; margin-left:20px">UT = Umweltthema</li>
+				        </ul>
+				        <div id="dynamicdata" style="clear:both"></div>
 				        <div id="paging"></div>
 					        
 				        <script>
 				        YAHOO.example.DynamicData = function() {
 				            // Column definitions
 				            var myColumnDefs = [ // sortable:true enables sorting
-				                {key:"url", label:"Url", sortable:true},
+				 				{key:"url", label:"Url", sortable:true},
 				                {key:"created", label:"Erstellt", sortable:true},
+				                {key:"edited", label:"Geändert", sortable:true},
+				                {key:"isLaw", label:"RV"},
+				                {key:"isResearch", label:"FS"},
+				                {key:"isWWW", label:"UT"},
+				                {key:"lang", label:"Sprache"},
+				                {key:"action", label:"Aktion"},
 				            ];
 
 				            
 				            // DataSource instance
-				            var myDataSource = new YAHOO.util.DataSource("startUrlSubset.html?");
+				            var myDataSource = new YAHOO.util.DataSource("startUrlSubset.html?pageSize=10");
 				            myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
 				            myDataSource.responseSchema = {
 				                resultsList: "records",
 				                fields: [
 				                    {key:"url"},
 				                    {key:"created"},
+				                    {key:"edited"},
+				                    {key:"isLaw"},
+				                    {key:"isResearch"},
+				                    {key:"isWWW"},
+				                    {key:"lang"},
+				                    {key:"action"}
 				                ],
 				                metaFields: {
 				                    totalRecords: "totalRecords" // Access to value in the server response
 				                }
+				            	
 				            };
+				           
+	
+
 				            
 				            // DataTable configuration
 				            
 				            var myConfigs = {
-				                initialRequest: "startIndex=0&pageSize=10", // Initial request for first page of data
+				                initialRequest: "&startIndex=0", // Initial request for first page of data
 				                dynamicData: true, // Enables dynamic server-driven data
 				                sortedBy : {key:"created", dir:YAHOO.widget.DataTable.CLASS_ASC}, // Sets UI initial sort arrow
 				                paginator: new YAHOO.widget.Paginator({ 
-					                rowsPerPage:10 , 
+					                rowsPerPage:10,
 					                containers : [ "paging" ], 
 					                firstPageLinkLabel : "&lt;&lt; Anfang",
 					                lastPageLinkLabel : "Ende &gt;&gt;",
@@ -134,6 +158,7 @@
 				            };
 				            
 				            // DataTable instance
+				            
 				            var myDataTable = new YAHOO.widget.DataTable("dynamicdata", myColumnDefs, myDataSource, myConfigs);
 				            // Update totalRecords on the fly with value from server
 				            myDataTable.handleDataReturnPayload = function(oRequest, oResponse, oPayload) {

@@ -151,7 +151,7 @@
 						var handleNo = function() {
 						    this.hide();
 						};
-						
+					
 						YAHOO.example.container.createCrawl = 
 						    new YAHOO.widget.SimpleDialog("createCrawl", 
 						             { width: "300px",

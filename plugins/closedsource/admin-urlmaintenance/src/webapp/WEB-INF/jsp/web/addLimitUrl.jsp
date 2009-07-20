@@ -89,7 +89,7 @@
 									    <row>
 									        <label>Sprache:</label>
 									        <field>
-									           <select path="limitUrlCommands[${limitUrlCounter}].metadatas" >
+									           <select name="limitUrlCommands[${limitUrlCounter}].metadatas" >
 													<c:forEach var="lang" items="${langs}">
 														<option value="${lang.id}">${lang.metadataValue }</option>
 													</c:forEach>

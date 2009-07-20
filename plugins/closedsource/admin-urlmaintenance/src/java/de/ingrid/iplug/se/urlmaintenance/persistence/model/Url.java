@@ -7,6 +7,7 @@ import java.util.List;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
@@ -34,7 +35,7 @@ public class Url extends IdBase {
   @JoinColumn(nullable = false, name = "provider_fk")
   private Provider _provider;
 
-  @ManyToMany
+  @ManyToMany(fetch=FetchType.EAGER)
   protected List<Metadata> _metadatas = new ArrayList<Metadata>();
 
   public String getUrl() {
