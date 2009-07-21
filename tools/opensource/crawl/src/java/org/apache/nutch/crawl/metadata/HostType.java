@@ -51,4 +51,8 @@ public class HostType implements WritableComparable<HostType> {
     return i;
   }
 
+  public Text getHost() {
+    return _host;
+  }
+
 }

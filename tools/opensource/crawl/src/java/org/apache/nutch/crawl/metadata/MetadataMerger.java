@@ -8,6 +8,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.ObjectWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
@@ -20,6 +21,9 @@ import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.nutch.crawl.metadata.MetadataInjector.MetadataContainer;
+import org.apache.nutch.crawl.metadata.ParseDataWrapper.UrlParseDataContainer;
+import org.apache.nutch.metadata.Metadata;
+import org.apache.nutch.parse.ParseData;
 import org.apache.nutch.util.NutchJob;
 
 public class MetadataMerger extends Configured {
@@ -47,33 +51,48 @@ public class MetadataMerger extends Configured {
 
   }
 
-  public static class BwReducer implements
+  public static class MetadataReducer implements
       Reducer<HostType, ObjectWritable, HostType, ObjectWritable> {
 
-    private MetadataContainer _patterns;
+    private MetadataContainer _metadataContainer;
 
     public void reduce(HostType key, Iterator<ObjectWritable> values,
         OutputCollector<HostType, ObjectWritable> out, Reporter report)
         throws IOException {
 
-      System.out.println("MetadataMerger.BwReducer.reduce() NEW");
+      System.out.println("KEY: " + key.getHost());
+
       while (values.hasNext()) {
         ObjectWritable obj = (ObjectWritable) values.next();
         Object value = obj.get(); // unwrap
-
-        System.out.println("MetadataMerger.BwReducer.reduce(): "
-            + value.getClass());
-        // if (value instanceof MetadataContainer) {
-        // _patterns = (MetadataContainer) value;
-        // // next values should be a list of entries
-        // return;
-        // }
+        
+        if(value instanceof MetadataContainer) {
+          _metadataContainer = (MetadataContainer) value;
+          return;
+        }
+        
+        UrlParseDataContainer urlParseDataContainer = (UrlParseDataContainer) value;
+        System.out.println("parse: " + urlParseDataContainer.getUrl());
+        Text url = urlParseDataContainer.getUrl();
+        ParseData parseData = urlParseDataContainer.getParseData();
+        Metadata metadataFromSegment = parseData.getParseMeta();
         //
-        // if (_patterns == null) {
-        // return;
-        // }
 
+        for (Metadata metadata : _metadataContainer.getMetadatas()) {
+          String pattern = metadata.get("pattern");
+          if (url.toString().startsWith(pattern)) {
+            String[] names = metadata.names();
+            for (String name : names) {
+              String[] metadataValues = metadata.getValues(name);
+              for (String metadataValue : metadataValues) {
+                metadataFromSegment.add(name, metadataValue);
+              }
+            }
+          }
+        }
 
+        System.out.println("collect: " + key + ": " + obj);
+        out.collect(key, obj);
 
       }
     }
@@ -97,7 +116,7 @@ public class MetadataMerger extends Configured {
     FileInputFormat.addInputPath(mergeJob, wrappedParseData);
     FileOutputFormat.setOutputPath(mergeJob, out);
     mergeJob.setMapperClass(ObjectWritableMapper.class);
-    mergeJob.setReducerClass(BwReducer.class);
+    mergeJob.setReducerClass(MetadataReducer.class);
     mergeJob.setOutputFormat(MapFileOutputFormat.class);
     mergeJob.setOutputKeyClass(HostType.class);
     mergeJob.setOutputValueClass(ObjectWritable.class);
