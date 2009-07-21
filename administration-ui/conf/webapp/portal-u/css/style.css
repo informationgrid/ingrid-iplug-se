@@ -102,8 +102,8 @@ form input[type='submit']:hover, form input[type='button']:hover, button:hover {
 .tumblerOff {width:50px; height:30px; background-image:url('../gfx/tumbler_off.jpg'); background-repeat:no-repeat;cursor:pointer; color:#999; padding:7px 0 0 9px; font-weight:bold}
 
 /* Paging */
-.activePageTd {background:#FF9600; border: 1px solid #FF9600}
-.inactivePageTd {border:1px solid #FFFFFF} 
-.activePage {color:#FFFFFF; text-decoration:none}
-.inactivePage {color:#FFFFFF;text-decoration:none}
-.activePage:hover {color:#000000}
+#paging .activePage {background:#1B78B1; float:left; ; margin-left:1px}
+#paging .inactivePage {background:#DDE9BD; float:left;margin-left:1px}
+#paging .activePage a , #paging .inactivePage a {color:#FFFFFF; text-decoration:none; padding:2px}
+#paging .activePage:hover, #paging .inactivePage:hover {background:#68A5D2}
+#paging .meta {padding:2px; color:#AAAAAA} 

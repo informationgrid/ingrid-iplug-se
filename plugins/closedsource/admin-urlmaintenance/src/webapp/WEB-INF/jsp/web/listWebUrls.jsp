@@ -98,9 +98,9 @@
 				        	<li style="float:left; list-style-type:square; color:black; margin-left:20px">Start URL</li>
 				        	<li style="float:left; list-style-type:square; color:green; margin-left:20px">Limit URL</li>
 				        	<li style="float:left; list-style-type:square; color:red; margin-left:20px">Exclude URL</li>
-				        	<li style="float:left; list-style-type:square; color:#666666; margin-left:50px">RV = Rechtsvorschriften</li>
-				        	<li style="float:left; list-style-type:square; color:#666666; margin-left:20px">FS = Forschungsseite</li>
-				        	<li style="float:left; list-style-type:square; color:#666666; margin-left:20px">UT = Umweltthema</li>
+				        	<li style="float:left; list-style-type:circle; color:#666666; margin-left:50px">RV = Rechtsvorschriften</li>
+				        	<li style="float:left; list-style-type:circle; color:#666666; margin-left:20px">FS = Forschungsseite</li>
+				        	<li style="float:left; list-style-type:circle; color:#666666; margin-left:20px">UT = Umweltthema</li>
 				        </ul>
 				        <div id="dynamicdata" style="clear:both">
 					       <table id="myTable">
@@ -119,7 +119,7 @@
 					       	<tbody>
 					       		<c:forEach var="url" items="${urls}">
 					       		<tr>
-					       			<td>${url.url}</td>
+					       			<td><a href="${url.url}" target="_blank" style="color:black">${url.url}</a></td>
 						       		<td><fmt:formatDate value="${url.created}" pattern="yyyy-MM-dd"/></td>
 						       		<td><fmt:formatDate value="${url.edited}" pattern="yyyy-MM-dd"/></td>
 						       		<td>&nbsp;</td>
@@ -134,7 +134,7 @@
 					       		</tr>
 					       		<c:forEach var="limitUrl" items="${url.limitUrls}">
 					       		<tr>
-					       			<td><font style="color:green">"${limitUrl.url}</font></td>
+					       			<td><font style="color:green; font-size:11px; margin-left:10px">${limitUrl.url}</font></td>
 						       		<td><fmt:formatDate value="${limitUrl.created}" pattern="yyyy-MM-dd"/></td>
 						       		<td><fmt:formatDate value="${limitUrl.edited}" pattern="yyyy-MM-dd"/></td>
 						       		<td>
@@ -154,7 +154,7 @@
 					       		</c:forEach>
 					       		<c:forEach var="excludeUrl" items="${url.excludeUrls}">
 					       		<tr>
-					       			<td><font style="color:red">"${excludeUrl.url}</font></td>
+					       			<td><font style="color:red; font-size:11px; margin-left:10px">${excludeUrl.url}</font></td>
 						       		<td><fmt:formatDate value="${excludeUrl.created}" pattern="yyyy-MM-dd"/></td>
 						       		<td><fmt:formatDate value="${excludeUrl.edited}" pattern="yyyy-MM-dd"/></td>
 						       		<td>&nbsp;</td>
@@ -179,28 +179,8 @@
 					       </table>
 					   </div>
 						
-					    <div id="paging">
-					   		<c:set var="hitsPerPage" value="2"/>
-					   		<table border="0" cellpadding="1" cellspacing="2" align="center">
-						        <tr>
-						        <c:forEach items="${paging.pages}" var="page" >
-						        <c:choose>
-									<c:when test="${page.currentPage}">
-										<td class="activePageTd">
-										<a href="?page=${page.page}&hitsPerPage=${hitsPerPage}" class="activePage">&nbsp;${page.label}&nbsp;</a>
-										</td>
-									</c:when>
-									<c:otherwise>
-											<td class="inactivePageTd">
-											<a href="?page=${page.page}&hitsPerPage=${hitsPerPage}" class="inactivePage">&nbsp;${page.label}&nbsp;</a>
-											</td>
-										</c:otherwise>
-								</c:choose>
-						 		</c:forEach>	
-						 		<td class="text" style="white-space:nowrap">&nbsp; <fmt:formatNumber value="${paging.totalHits}" pattern="#,###"/> Start URLs</td>
-						 		</tr>
-					  		</table>
-					   </div>    
+					   <c:set var="label" value="URLs" scope="request"/>
+					   <%@ include file="/WEB-INF/jsp/includes/paging.jsp" %>     
 						
 				       <script type="text/javascript">
 						var myDataSource = new YAHOO.util.DataSource(YAHOO.util.Dom.get("myTable"));
@@ -229,8 +209,8 @@
 							{key:"action", label:"Aktion"},
 						];
 						var myConfig = {
-								sortedBy : {key:"created", dir:YAHOO.widget.DataTable.CLASS_ASC}
-								}
+							sortedBy : {key:"created", dir:YAHOO.widget.DataTable.CLASS_ASC}
+						}
 						var myDataTable = new YAHOO.widget.DataTable("dynamicdata", myColumnDefs, myDataSource, myConfig);
 						</script>
 					</div>
