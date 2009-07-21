@@ -134,7 +134,7 @@
 					       		</tr>
 					       		<c:forEach var="limitUrl" items="${url.limitUrls}">
 					       		<tr>
-					       			<td><font style="color:green; font-size:11px; margin-left:10px">${limitUrl.url}</font></td>
+					       			<td><a href="${limitUrl.url}" target="_blank" style="color:green; font-size:11px; margin-left:10px; text-decoration:none">${limitUrl.url}</a></td>
 						       		<td><fmt:formatDate value="${limitUrl.created}" pattern="yyyy-MM-dd"/></td>
 						       		<td><fmt:formatDate value="${limitUrl.edited}" pattern="yyyy-MM-dd"/></td>
 						       		<td>
@@ -154,7 +154,7 @@
 					       		</c:forEach>
 					       		<c:forEach var="excludeUrl" items="${url.excludeUrls}">
 					       		<tr>
-					       			<td><font style="color:red; font-size:11px; margin-left:10px">${excludeUrl.url}</font></td>
+					       			<td><a href="${excludeUrl.url}" target="_blank" style="color:red; font-size:11px; margin-left:10px; text-decoration:none">${excludeUrl.url}</a></td>
 						       		<td><fmt:formatDate value="${excludeUrl.created}" pattern="yyyy-MM-dd"/></td>
 						       		<td><fmt:formatDate value="${excludeUrl.edited}" pattern="yyyy-MM-dd"/></td>
 						       		<td>&nbsp;</td>
