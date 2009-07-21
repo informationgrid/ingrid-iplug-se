@@ -52,24 +52,12 @@ public class ListWebUrlsController {
   }
 
   @RequestMapping(value = "/listWebUrls.html", method = RequestMethod.GET)
-  public String listWebUrls() {
-    return "web/listWebUrls";
-  }
-
-  @ModelAttribute("startUrlCommand")
-  public StartUrlCommand injectStartUrlCommand() {
-    return new StartUrlCommand();
-  }
-
-  @RequestMapping(value = "/startUrlSubset.html", method = RequestMethod.GET)
-  public String startUrlSubset(
-      @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand,
+  public String listWebUrls( @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand,
       @RequestParam(value = "startIndex", required = false) Integer start,
       @RequestParam(value = "pageSize", required = false) Integer length,
       @RequestParam(value = "sort", required = false) String sort,
       @RequestParam(value = "dir", required = false) String dir, Model model,
       HttpServletRequest request) {
-    System.out.println(request.getParameterMap());
     start = start == null ? 0 : start;
     length = length == null ? 10 : length;
 
@@ -85,9 +73,41 @@ public class ListWebUrlsController {
           length, orderBy);
       model.addAttribute("urls", startUrls);
     }
-
-    model.addAttribute("count", count);
-
-    return "web/startUrlSubset";
+    return "web/listWebUrls";
   }
+
+  @ModelAttribute("startUrlCommand")
+  public StartUrlCommand injectStartUrlCommand() {
+    return new StartUrlCommand();
+  }
+
+//  @RequestMapping(value = "/startUrlSubset.html", method = RequestMethod.GET)
+//  public String startUrlSubset(
+//      @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand,
+//      @RequestParam(value = "startIndex", required = false) Integer start,
+//      @RequestParam(value = "pageSize", required = false) Integer length,
+//      @RequestParam(value = "sort", required = false) String sort,
+//      @RequestParam(value = "dir", required = false) String dir, Model model,
+//      HttpServletRequest request) {
+//    System.out.println(request.getParameterMap());
+//    start = start == null ? 0 : start;
+//    length = length == null ? 10 : length;
+//
+//    OrderBy orderBy = "url".equals(sort) ? ("asc".equals(dir) ? OrderBy.URL_ASC
+//        : OrderBy.URL_DESC) : ("asc".equals(dir) ? OrderBy.TIMESTAMP_ASC
+//        : OrderBy.TIMESTAMP_DESC);
+//    String providerString = partnerProviderCommand.getProvider();
+//    Provider byName = _providerDao.getByName(providerString);
+//    Long count = 0L;
+//    if (byName != null) {
+//      count = _startUrlDao.countByProvider(byName);
+//      List<StartUrl> startUrls = _startUrlDao.getByProvider(byName, start,
+//          length, orderBy);
+//      model.addAttribute("urls", startUrls);
+//    }
+//
+//    model.addAttribute("count", count);
+//
+//    return "web/startUrlSubset";
+//  }
 }
