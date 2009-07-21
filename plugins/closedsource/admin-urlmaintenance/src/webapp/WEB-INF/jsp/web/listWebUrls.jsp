@@ -77,13 +77,15 @@
 						
 						<div>	
 							<label>Filter:</label>
-							<c:forEach items="${metadatas}" var="metadata">
-								<input type="checkbox" id="${metadata.metadataKey}_${metadata.metadataValue}" value=""> ${metadata.metadataKey}:${metadata.metadataValue}&nbsp;&nbsp;
-								<script>
-									function fnCallback(e) { alert("not yet implemented"); }
-									YAHOO.util.Event.addListener("${metadata.metadataKey}_${metadata.metadataValue}", "click", fnCallback);
-								</script>
-							</c:forEach>
+							<form method="get" action="" id="filter">
+								<c:forEach items="${metadatas}" var="metadata">
+									<input type="checkbox" id="${metadata.metadataKey}_${metadata.metadataValue}" name="${metadata.metadataKey}" value="${metadata.metadataValue}"> ${metadata.metadataKey}:${metadata.metadataValue}&nbsp;&nbsp;
+									<script>
+										function fnCallback(e) { document.getElementById('filter').submit() }
+										YAHOO.util.Event.addListener("${metadata.metadataKey}_${metadata.metadataValue}", "click", fnCallback);
+									</script>
+								</c:forEach>
+							</form>
 						</div>
 					        
 					    <div style="margin-top:25px"></div>
@@ -100,30 +102,111 @@
 				        	<li style="float:left; list-style-type:square; color:#666666; margin-left:20px">FS = Forschungsseite</li>
 				        	<li style="float:left; list-style-type:square; color:#666666; margin-left:20px">UT = Umweltthema</li>
 				        </ul>
-				        <div id="dynamicdata" style="clear:both"></div>
-				        <div id="paging"></div>
-					        
-				        <script>
-				        YAHOO.example.DynamicData = function() {
-				            // Column definitions
-				            var myColumnDefs = [ // sortable:true enables sorting
-				 				{key:"url", label:"Url", sortable:true},
-				                {key:"created", label:"Erstellt", sortable:true},
-				                {key:"edited", label:"Geändert", sortable:true},
-				                {key:"isLaw", label:"RV"},
-				                {key:"isResearch", label:"FS"},
-				                {key:"isWWW", label:"UT"},
-				                {key:"lang", label:"Sprache"},
-				                {key:"action", label:"Aktion"},
-				            ];
-
-				            
-				            // DataSource instance
-				            var myDataSource = new YAHOO.util.DataSource("startUrlSubset.html?pageSize=10");
-				            myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-				            myDataSource.responseSchema = {
-				                resultsList: "records",
-				                fields: [
+				        <div id="dynamicdata" style="clear:both">
+					       <table id="myTable">
+					       	<thead>
+					       		<tr>
+						       		<td>URL</td>
+						       		<td>Erstellt</td>
+						       		<td>Geändert</td>
+						       		<td>RV</td>
+						       		<td>FS</td>
+						       		<td>UT</td>
+						       		<td>Sprache</td>
+						       		<td>Aktion</td>
+					       		</tr>
+					       	</thead>
+					       	<tbody>
+					       		<c:forEach var="url" items="${urls}">
+					       		<tr>
+					       			<td>${url.url}</td>
+						       		<td><fmt:formatDate value="${url.created}" pattern="yyyy-MM-dd"/></td>
+						       		<td><fmt:formatDate value="${url.edited}" pattern="yyyy-MM-dd"/></td>
+						       		<td>&nbsp;</td>
+						       		<td>&nbsp;</td>
+						       		<td>&nbsp;</td>
+						       		<td>&nbsp;</td>
+						       		<td>
+						       			<a href="edit.html?id=${url.id}">EDIT</a>
+						       			<a href="delete.html?id=${url.id}">DEL</a>
+						       			<a href="test.html?id=${url.id}">TEST</a>
+						       		</td>
+					       		</tr>
+					       		<c:forEach var="limitUrl" items="${url.limitUrls}">
+					       		<tr>
+					       			<td><font style="color:green">"${limitUrl.url}</font></td>
+						       		<td><fmt:formatDate value="${limitUrl.created}" pattern="yyyy-MM-dd"/></td>
+						       		<td><fmt:formatDate value="${limitUrl.edited}" pattern="yyyy-MM-dd"/></td>
+						       		<td>
+						       			&nbsp;<c:if test="${fn:contains(limitUrl.metadatas,'law')}"><img src="${theme}/gfx/ok.png"/></c:if>&nbsp;
+						       		</td>
+						       		<td>
+						       			&nbsp;<c:if test="${fn:contains(limitUrl.metadatas,'research')}"><img src="${theme}/gfx/ok.png"/></c:if>&nbsp;
+						       		</td>
+						       		<td>
+						       			&nbsp;<c:if test="${fn:contains(limitUrl.metadatas,'www')}"><img src="${theme}/gfx/ok.png"/></c:if>&nbsp;
+						       		</td>
+						       		<td>
+						       			<c:forEach items="${limitUrl.metadatas}" var="meta"><c:if test="${meta.metadataKey == 'lang'}">${meta.metadataValue}</c:if></c:forEach>&nbsp;
+						       		</td>
+						       		<td>&nbsp;</td>
+					       		</tr>
+					       		</c:forEach>
+					       		<c:forEach var="excludeUrl" items="${url.excludeUrls}">
+					       		<tr>
+					       			<td><font style="color:red">"${excludeUrl.url}</font></td>
+						       		<td><fmt:formatDate value="${excludeUrl.created}" pattern="yyyy-MM-dd"/></td>
+						       		<td><fmt:formatDate value="${excludeUrl.edited}" pattern="yyyy-MM-dd"/></td>
+						       		<td>&nbsp;</td>
+						       		<td>&nbsp;</td>
+						       		<td>&nbsp;</td>
+						       		<td>&nbsp;</td>
+						       		<td>&nbsp;</td>
+					       		</tr>
+					       		</c:forEach>
+					       		<tr>
+					       			<td>&nbsp;</td>
+					       			<td>&nbsp;</td>
+					       			<td>&nbsp;</td>
+					       			<td>&nbsp;</td>
+					       			<td>&nbsp;</td>
+					       			<td>&nbsp;</td>
+					       			<td>&nbsp;</td>
+					       			<td>&nbsp;</td>
+					       		</tr>	
+					       		</c:forEach>
+					       	</tbody>
+					       </table>
+					   </div>
+						
+					    <div id="paging">
+					   		<c:set var="hitsPerPage" value="2"/>
+					   		<table border="0" cellpadding="1" cellspacing="2" align="center">
+						        <tr>
+						        <c:forEach items="${paging.pages}" var="page" >
+						        <c:choose>
+									<c:when test="${page.currentPage}">
+										<td class="activePageTd">
+										<a href="?page=${page.page}&hitsPerPage=${hitsPerPage}" class="activePage">&nbsp;${page.label}&nbsp;</a>
+										</td>
+									</c:when>
+									<c:otherwise>
+											<td class="inactivePageTd">
+											<a href="?page=${page.page}&hitsPerPage=${hitsPerPage}" class="inactivePage">&nbsp;${page.label}&nbsp;</a>
+											</td>
+										</c:otherwise>
+								</c:choose>
+						 		</c:forEach>	
+						 		<td class="text" style="white-space:nowrap">&nbsp; <fmt:formatNumber value="${paging.totalHits}" pattern="#,###"/> Start URLs</td>
+						 		</tr>
+					  		</table>
+					   </div>    
+						
+				       <script type="text/javascript">
+						var myDataSource = new YAHOO.util.DataSource(YAHOO.util.Dom.get("myTable"));
+						myDataSource.responseType = YAHOO.util.DataSource.TYPE_HTMLTABLE;
+						myDataSource.responseSchema = {
+								fields: [
 				                    {key:"url"},
 				                    {key:"created"},
 				                    {key:"edited"},
@@ -132,48 +215,27 @@
 				                    {key:"isWWW"},
 				                    {key:"lang"},
 				                    {key:"action"}
-				                ],
-				                metaFields: {
-				                    totalRecords: "totalRecords" // Access to value in the server response
-				                }
-				            	
-				            };
-				           
-	
-
-				            
-				            // DataTable configuration
-				            
-				            var myConfigs = {
-				                initialRequest: "&startIndex=0", // Initial request for first page of data
-				                dynamicData: true, // Enables dynamic server-driven data
-				                sortedBy : {key:"created", dir:YAHOO.widget.DataTable.CLASS_ASC}, // Sets UI initial sort arrow
-				                paginator: new YAHOO.widget.Paginator({ 
-					                rowsPerPage:10,
-					                containers : [ "paging" ], 
-					                firstPageLinkLabel : "&lt;&lt; Anfang",
-					                lastPageLinkLabel : "Ende &gt;&gt;",
-					                nextPageLinkLabel : "Nächste &gt;",
-					                previousPageLinkLabel : "&lt; Vorherige"}) // Enables pagination 
-				            };
-				            
-				            // DataTable instance
-				            
-				            var myDataTable = new YAHOO.widget.DataTable("dynamicdata", myColumnDefs, myDataSource, myConfigs);
-				            // Update totalRecords on the fly with value from server
-				            myDataTable.handleDataReturnPayload = function(oRequest, oResponse, oPayload) {
-				                oPayload.totalRecords = oResponse.meta.totalRecords;
-				                return oPayload;
-				            }
-				            
-				            return {
-				                ds: myDataSource,
-				                dt: myDataTable
-				            };
-				                
-				        }();						        
+				                ]
+						};
+						
+						var myColumnDefs = [
+							{key:"url", label:"Url", sortable:true},
+							{key:"created", label:"Erstellt", sortable:true},
+							{key:"edited", label:"Geändert", sortable:true},
+							{key:"isLaw", label:"RV"},
+							{key:"isResearch", label:"FS"},
+							{key:"isWWW", label:"UT"},
+							{key:"lang", label:"Sprache"},
+							{key:"action", label:"Aktion"},
+						];
+						var myConfig = {
+								sortedBy : {key:"created", dir:YAHOO.widget.DataTable.CLASS_ASC}
+								}
+						var myDataTable = new YAHOO.widget.DataTable("dynamicdata", myColumnDefs, myDataSource, myConfig);
 						</script>
 					</div>
+					
+					
 				</div>						
 			</div>
 		</div>

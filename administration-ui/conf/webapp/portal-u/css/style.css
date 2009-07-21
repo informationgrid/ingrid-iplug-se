@@ -100,3 +100,10 @@ form input[type='submit']:hover, form input[type='button']:hover, button:hover {
 
 .tumblerOn {width:50px; height:30px; background-image:url('../gfx/tumbler_on.jpg'); background-repeat:no-repeat;cursor:pointer; color:#FFF; padding:7px 0 0 33px; font-weight:bold}
 .tumblerOff {width:50px; height:30px; background-image:url('../gfx/tumbler_off.jpg'); background-repeat:no-repeat;cursor:pointer; color:#999; padding:7px 0 0 9px; font-weight:bold}
+
+/* Paging */
+.activePageTd {background:#FF9600; border: 1px solid #FF9600}
+.inactivePageTd {border:1px solid #FFFFFF} 
+.activePage {color:#FFFFFF; text-decoration:none}
+.inactivePage {color:#FFFFFF;text-decoration:none}
+.activePage:hover {color:#000000}
