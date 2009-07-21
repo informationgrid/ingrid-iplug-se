@@ -75,16 +75,10 @@ public class IPlugSeOperatorFinder implements IPlugOperatorFinder {
 		}
 
 		public Set<String> getValues() {
-			System.out
-					.println("IPlugSeOperatorFinder.FinderRunnable.getValues() "
-							+ _cache);
 			Set<String> set = new HashSet<String>();
 			synchronized (_mutex) {
 				set.addAll(_cache);
 			}
-			System.out
-					.println("IPlugSeOperatorFinder.FinderRunnable.getValues() "
-							+ set);
 			return set;
 		}
 
