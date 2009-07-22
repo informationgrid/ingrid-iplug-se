@@ -78,8 +78,15 @@
 						<div class="row">	
 							<label>Filter:</label>
 							<c:set var="selectedFilter" value=""/>
-							<c:forEach var="dt" items="${datatypes }"><c:set var="selectedFilter" value="${selectedFilter} datatype:${dt}"/> </c:forEach>
-							<c:forEach var="l" items="${langs}"><c:set var="selectedFilter" value="${selectedFilter} lang:${l}"/> </c:forEach>
+							<c:set var="paramString" value=""/>
+							<c:forEach var="dt" items="${datatypes }">
+								<c:set var="selectedFilter" value="${selectedFilter} datatype:${dt}"/>
+								<c:set var="paramString" value="${paramString}&datatype=${dt}"/> 
+							</c:forEach>
+							<c:forEach var="l" items="${langs}">
+								<c:set var="selectedFilter" value="${selectedFilter} lang:${l}"/>
+								<c:set var="paramString" value="${paramString}&lang=${l}"/> 
+							</c:forEach>
 							
 							<form method="get" action="" id="filter">
 								<c:forEach items="${metadatas}" var="metadata">
@@ -185,6 +192,7 @@
 					   </div>
 						
 					   <c:set var="label" value="URLs" scope="request"/>
+					   <c:set var="paramString" value="${paramString}" scope="request"/>
 					   <%@ include file="/WEB-INF/jsp/includes/paging.jsp" %>     
 						
 				       <script type="text/javascript">
