@@ -65,7 +65,6 @@
 			<div id="yui-main">
 				<div class="yui-b">
 					<h3>Katalog URLs</h3>
-					
 					<div class="yui-navset">
 					    <ul class="yui-nav">
 					        <li class="selected"><a href="listTopicUrls.html"><em>Katalog Url's</em></a></li>
@@ -79,7 +78,7 @@
 							<li<c:if test="${type == 'measure'}"> class="selected"</c:if>><a href="listMeasureUrls.html">Messwerte</a></li>
 						</ul>
 					</div>
-					
+					Type: ${type}-- // Marko, dass muss topics | service | measure sein
 					<fieldset>
 						<legend>Überprüfen und Speichern</legend>
 						<div id="markup">
@@ -87,11 +86,44 @@
 						        <thead>
 						            <tr>
 						                <th>Url</th>
+						                <th>Thema</th>
+						                <th>Funkt. Kategorie</th>
+						                <th>Rubrik</th>
 						            </tr>
 						        </thead>
 						        <tbody>
 						            <tr>
 						                <td>${catalogUrlCommand.url}</td>
+						                <td>
+						                	<c:set var="i" value="-1"/>
+						                	<c:forEach items="${catalogUrlCommand.metadatas}" var="md">
+												<c:if test="${md.metadataKey == 'topics'}">
+													<c:set var="i" value="${i+1}" />
+													<c:if test="${i > 0}">, </c:if>
+													${md.metadataValue}
+												</c:if>
+											</c:forEach>&nbsp;
+						                </td>
+						                <td>
+						                	<c:set var="i" value="-1"/>
+						                	<c:forEach items="${catalogUrlCommand.metadatas}" var="md">
+												<c:if test="${md.metadataKey == 'funct_category'}">
+													<c:set var="i" value="${i+1}" />
+													<c:if test="${i > 0}">, </c:if>
+													${md.metadataValue}
+												</c:if>
+											</c:forEach>&nbsp;
+						                </td>
+						                <td>
+						                	<c:set var="i" value="-1"/>
+						                	<c:forEach items="${catalogUrlCommand.metadatas}" var="md">
+												<c:if test="${md.metadataKey == 'service' || md.metadataKey == 'measure'}">
+													<c:set var="i" value="${i+1}" />
+													<c:if test="${i > 0}">, </c:if>
+													${md.metadataValue}
+												</c:if>
+											</c:forEach>&nbsp;
+						                </td>
 						            </tr>
 						        </tbody>
 						    </table>
@@ -108,12 +140,21 @@
 					    YAHOO.example.EnhanceFromMarkup = function() {
 					        var myColumnDefs = [
 					            {key:"url",label:"URL"},
+					            {key:"topic",label:"Thema"},
+					            {key:"functCat",label:"Funkt. Kategorie"},
+					            {key:"rubric",label:"Rubrik"},
 					        ];
 					
 					        var myDataSource = new YAHOO.util.DataSource(YAHOO.util.Dom.get("urls"));
 					        myDataSource.responseType = YAHOO.util.DataSource.TYPE_HTMLTABLE;
 					        myDataSource.responseSchema = {
-					            fields: [{key:"url"}]
+					            fields: [
+									{key:"url"}, 
+									{key:"topic"}, 
+									{key:"functCat"}, 
+									{key:"rubric"}
+								]
+					            
 					        };
 					
 					        var myDataTable = new YAHOO.widget.DataTable("markup", myColumnDefs, myDataSource);

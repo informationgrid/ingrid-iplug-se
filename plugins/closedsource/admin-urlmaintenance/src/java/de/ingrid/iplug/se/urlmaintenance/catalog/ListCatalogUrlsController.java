@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import de.ingrid.iplug.se.urlmaintenance.Paging;
 import de.ingrid.iplug.se.urlmaintenance.PartnerProviderCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.CatalogUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ICatalogUrlDao;
@@ -51,85 +52,133 @@ public class ListCatalogUrlsController {
   }
 
   @RequestMapping(value = "/listTopicUrls.html", method = RequestMethod.GET)
-  public String listTopicUrls() {
-    return "catalog/listTopicUrls";
+  public String listTopicUrls(@ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand,
+      @RequestParam(value = "page", required = false) Integer page,
+      @RequestParam(value = "hitsPerPage", required = false) Integer hitsPerPage,
+      @RequestParam(value = "sort", required = false) String sort,
+      @RequestParam(value = "dir", required = false) String dir, Model model,
+      HttpServletRequest request) {
+      page = page == null ? 1 : page;
+      hitsPerPage = hitsPerPage == null ? 10 : hitsPerPage;
+  
+      Metadata topics = _metadataDao.getByKeyAndValue("datatype", "topics");
+      ArrayList<Metadata> metadatas = new ArrayList<Metadata>();
+      metadatas.add(topics);
+      String providerString = partnerProviderCommand.getProvider();
+      Provider byName = _providerDao.getByName(providerString);
+      
+      int start = Paging.getStart(page, hitsPerPage);
+      pushUrls(start, hitsPerPage, sort, dir, model, metadatas, byName, hitsPerPage, page);
+      System.out.println("ListCatalogUrlsController.listTopicUrls() topics called");
+      return "catalog/listTopicUrls";
   }
   
   @RequestMapping(value = "/listServiceUrls.html", method = RequestMethod.GET)
-  public String listServiceUrls() {
-    return "catalog/listServiceUrls";
-  }
-  
-  @RequestMapping(value = "/listMeasureUrls.html", method = RequestMethod.GET)
-  public String listMeasureUrls() {
-    return "catalog/listMeasureUrls";
-  }
-
-  @RequestMapping(value = "/topicsUrlSubset.html", method = RequestMethod.GET)
-  public String topicsUrlSubset(
-      @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand,
-      @RequestParam(value = "startIndex", required = false) Integer start,
-      @RequestParam(value = "pageSize", required = false) Integer length,
+  public String listServiceUrls(@ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand,
+      @RequestParam(value = "page", required = false) Integer page,
+      @RequestParam(value = "hitsPerPage", required = false) Integer hitsPerPage,
       @RequestParam(value = "sort", required = false) String sort,
       @RequestParam(value = "dir", required = false) String dir, Model model,
       HttpServletRequest request) {
-    start = start == null ? 0 : start;
-    length = length == null ? 10 : length;
-
-    Metadata topics = _metadataDao.getByKeyAndValue("datatype", "topics");
-    ArrayList<Metadata> metadatas = new ArrayList<Metadata>();
-    metadatas.add(topics);
-    String providerString = partnerProviderCommand.getProvider();
-    Provider byName = _providerDao.getByName(providerString);
-
-    pushUrls(start, length, sort, dir, model, metadatas, byName);
-    return "catalog/topicsUrlSubset";
-  }
-
-  @RequestMapping(value = "/serviceUrlSubset.html", method = RequestMethod.GET)
-  public String serviceUrlSubset(
-      @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand,
-      @RequestParam(value = "startIndex", required = false) Integer start,
-      @RequestParam(value = "pageSize", required = false) Integer length,
-      @RequestParam(value = "sort", required = false) String sort,
-      @RequestParam(value = "dir", required = false) String dir, Model model,
-      HttpServletRequest request) {
-    start = start == null ? 0 : start;
-    length = length == null ? 10 : length;
+    
 
     Metadata topics = _metadataDao.getByKeyAndValue("datatype", "service");
     ArrayList<Metadata> metadatas = new ArrayList<Metadata>();
     metadatas.add(topics);
     String providerString = partnerProviderCommand.getProvider();
     Provider byName = _providerDao.getByName(providerString);
-
-    pushUrls(start, length, sort, dir, model, metadatas, byName);
-    return "catalog/serviceUrlSubset";
+    
+    int start = Paging.getStart(page, hitsPerPage);
+    pushUrls(start, hitsPerPage, sort, dir, model, metadatas, byName, hitsPerPage, page);
+    
+    return "catalog/listServiceUrls";
   }
-
-  @RequestMapping(value = "/measureUrlSubset.html", method = RequestMethod.GET)
-  public String measureUrlSubset(
-      @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand,
-      @RequestParam(value = "startIndex", required = false) Integer start,
-      @RequestParam(value = "pageSize", required = false) Integer length,
+  
+  @RequestMapping(value = "/listMeasureUrls.html", method = RequestMethod.GET)
+  public String listMeasureUrls(@ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand,
+      @RequestParam(value = "page", required = false) Integer page,
+      @RequestParam(value = "hitsPerPage", required = false) Integer hitsPerPage,
       @RequestParam(value = "sort", required = false) String sort,
       @RequestParam(value = "dir", required = false) String dir, Model model,
       HttpServletRequest request) {
-    start = start == null ? 0 : start;
-    length = length == null ? 10 : length;
-
+    
     Metadata topics = _metadataDao.getByKeyAndValue("datatype", "measure");
     ArrayList<Metadata> metadatas = new ArrayList<Metadata>();
     metadatas.add(topics);
     String providerString = partnerProviderCommand.getProvider();
     Provider byName = _providerDao.getByName(providerString);
 
-    pushUrls(start, length, sort, dir, model, metadatas, byName);
-    return "catalog/measureUrlSubset";
+    int start = Paging.getStart(page, hitsPerPage);
+    pushUrls(start, hitsPerPage, sort, dir, model, metadatas, byName, hitsPerPage, page);
+    
+    return "catalog/listMeasureUrls";
   }
 
+//  @RequestMapping(value = "/topicsUrlSubset.html", method = RequestMethod.GET)
+//  public String topicsUrlSubset(
+//      @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand,
+//      @RequestParam(value = "startIndex", required = false) Integer start,
+//      @RequestParam(value = "pageSize", required = false) Integer length,
+//      @RequestParam(value = "sort", required = false) String sort,
+//      @RequestParam(value = "dir", required = false) String dir, Model model,
+//      HttpServletRequest request) {
+//    start = start == null ? 0 : start;
+//    length = length == null ? 10 : length;
+//
+//    Metadata topics = _metadataDao.getByKeyAndValue("datatype", "topics");
+//    ArrayList<Metadata> metadatas = new ArrayList<Metadata>();
+//    metadatas.add(topics);
+//    String providerString = partnerProviderCommand.getProvider();
+//    Provider byName = _providerDao.getByName(providerString);
+//
+//    pushUrls(start, length, sort, dir, model, metadatas, byName);
+//    return "catalog/topicsUrlSubset";
+//  }
+
+//  @RequestMapping(value = "/serviceUrlSubset.html", method = RequestMethod.GET)
+//  public String serviceUrlSubset(
+//      @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand,
+//      @RequestParam(value = "startIndex", required = false) Integer start,
+//      @RequestParam(value = "pageSize", required = false) Integer length,
+//      @RequestParam(value = "sort", required = false) String sort,
+//      @RequestParam(value = "dir", required = false) String dir, Model model,
+//      HttpServletRequest request) {
+//    start = start == null ? 0 : start;
+//    length = length == null ? 10 : length;
+//
+//    Metadata topics = _metadataDao.getByKeyAndValue("datatype", "service");
+//    ArrayList<Metadata> metadatas = new ArrayList<Metadata>();
+//    metadatas.add(topics);
+//    String providerString = partnerProviderCommand.getProvider();
+//    Provider byName = _providerDao.getByName(providerString);
+//
+//    pushUrls(start, length, sort, dir, model, metadatas, byName);
+//    return "catalog/serviceUrlSubset";
+//  }
+
+//  @RequestMapping(value = "/measureUrlSubset.html", method = RequestMethod.GET)
+//  public String measureUrlSubset(
+//      @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand,
+//      @RequestParam(value = "startIndex", required = false) Integer start,
+//      @RequestParam(value = "pageSize", required = false) Integer length,
+//      @RequestParam(value = "sort", required = false) String sort,
+//      @RequestParam(value = "dir", required = false) String dir, Model model,
+//      HttpServletRequest request) {
+//    start = start == null ? 0 : start;
+//    length = length == null ? 10 : length;
+//
+//    Metadata topics = _metadataDao.getByKeyAndValue("datatype", "measure");
+//    ArrayList<Metadata> metadatas = new ArrayList<Metadata>();
+//    metadatas.add(topics);
+//    String providerString = partnerProviderCommand.getProvider();
+//    Provider byName = _providerDao.getByName(providerString);
+//
+//    pushUrls(start, length, sort, dir, model, metadatas, byName);
+//    return "catalog/measureUrlSubset";
+//  }
+
   private void pushUrls(Integer start, Integer length, String sort, String dir,
-      Model model, ArrayList<Metadata> metadatas, Provider byName) {
+      Model model, ArrayList<Metadata> metadatas, Provider byName, Integer hitsPerPage, Integer page) {
     OrderBy orderBy = "url".equals(sort) ? ("asc".equals(dir) ? OrderBy.URL_ASC
         : OrderBy.URL_DESC) : ("asc".equals(dir) ? OrderBy.CREATED_ASC
         : OrderBy.CREATED_DESC);
@@ -139,9 +188,14 @@ public class ListCatalogUrlsController {
       count = _catalogUrlDao.countByProviderAndMetadatas(byName, metadatas);
       catalogUrls = _catalogUrlDao.getByProviderAndMetadatas(byName, metadatas,
           start, length, orderBy);
+      System.out.println("ListCatalogUrlsController.pushUrls() count:" +count);
+      System.out.println("ListCatalogUrlsController.pushUrls() catalogUrls:" +catalogUrls.size());
     }
     model.addAttribute("urls", catalogUrls);
     model.addAttribute("count", count);
+    
+    Paging paging = new Paging(10, hitsPerPage, count.intValue(), page);
+    model.addAttribute("paging", paging);
   }
 
 }

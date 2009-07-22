@@ -79,14 +79,39 @@
 							<li><a href="listMeasureUrls.html">Messwerte</a></li>
 						</ul>
 					</div>
+					
+					<div style="margin-top:25px"></div>
+					<div style="float:right">
+						<img src="${theme}/gfx/add.png" align="absmiddle"/> <b><a href="createCatalogUrl.html?type=topics">Neue Themen Seite</a></b>
+					</div>
+					<h3>Themen Seiten</h3>
+					
+					<table>
+						<thead>
+							<tr>
+								<th>URL</th>
+								<th>Erstellt</th>
+								<th>Geändert</th>
+								<th>Thema</th>
+								<th>Funkt. Kategorie</th>
+							</tr>
+						</thead>
+						<tbody>
+						<c:forEach var="url" items="${urls}">
+							<tr>
+								<td>${url.url}</td>
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+							</tr>	
+						</c:forEach>
+						</tbody>
+					</table>
 					   
 				    <div>
 				        <!-- Themenseite -->
-						<div style="margin-top:25px"></div>
-						<div style="float:right">
-							<img src="${theme}/gfx/add.png" align="absmiddle"/> <b><a href="createCatalogUrl.html?type=topics">Neue Themen Seite</a></b>
-						</div>
-						<h3>Themen Seiten</h3>
+						
 						<div id="topicUrls"></div>
 						<div id="topicPagination"></div>
 				        
