@@ -77,9 +77,14 @@
 						
 						<div class="row">	
 							<label>Filter:</label>
+							<c:set var="selectedFilter" value=""/>
+							<c:forEach var="dt" items="${datatypes }"><c:set var="selectedFilter" value="${selectedFilter} datatype:${dt}"/> </c:forEach>
+							<c:forEach var="l" items="${langs}"><c:set var="selectedFilter" value="${selectedFilter} lang:${l}"/> </c:forEach>
+							
 							<form method="get" action="" id="filter">
 								<c:forEach items="${metadatas}" var="metadata">
-									<input type="checkbox" id="${metadata.metadataKey}_${metadata.metadataValue}" name="${metadata.metadataKey}" value="${metadata.metadataValue}"> ${metadata.metadataKey}:${metadata.metadataValue}&nbsp;&nbsp;
+									<input type="checkbox" id="${metadata.metadataKey}_${metadata.metadataValue}" name="${metadata.metadataKey}" value="${metadata.metadataValue}"
+									<c:if test="${fn:contains(selectedFilter, metadata.metadataValue)}"> checked="checked"</c:if>> ${metadata.metadataKey}:${metadata.metadataValue}&nbsp;&nbsp;
 									<script>
 										function fnCallback(e) { document.getElementById('filter').submit() }
 										YAHOO.util.Event.addListener("${metadata.metadataKey}_${metadata.metadataValue}", "click", fnCallback);

@@ -83,6 +83,8 @@ public class ListWebUrlsController {
       }
 
     }
+    model.addAttribute("datatypes", datatypes);
+    model.addAttribute("langs", langs);
     LOG.debug("filtered metadatas: " + metadatas);
 
     int start = Paging.getStart(page, hitsPerPage);
