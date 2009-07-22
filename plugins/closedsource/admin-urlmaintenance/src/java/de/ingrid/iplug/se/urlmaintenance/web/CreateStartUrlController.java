@@ -45,9 +45,9 @@ public class CreateStartUrlController {
   public String postCreateStartUrl(
       @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand) {
 
-    if (startUrlCommand.getLimitUrls().isEmpty()) {
+    // if (startUrlCommand.getLimitUrls().isEmpty()) {
       startUrlCommand.addLimitUrl(new LimitUrl());
-    }
+    // }
     if (startUrlCommand.getExcludeUrls().isEmpty()) {
       startUrlCommand.getExcludeUrls().add(new ExcludeUrl());
     }

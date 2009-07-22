@@ -80,7 +80,7 @@ public class ListWebUrlsController {
       Metadata metadata = _metadataDao.getByKeyAndValue("datatype", datatype);
       metadatas.add(metadata);
     }
-    metadatas = metadatas.isEmpty() ? injectMetadatas() : metadatas;
+    // metadatas = metadatas.isEmpty() ? injectMetadatas() : metadatas;
 
     int start = Paging.getStart(page, hitsPerPage);
     OrderBy orderBy = "url".equals(sort) ? orderByUrl(dir) : ("created"

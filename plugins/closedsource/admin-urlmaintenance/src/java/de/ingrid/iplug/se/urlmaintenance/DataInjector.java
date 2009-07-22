@@ -1,5 +1,6 @@
 package de.ingrid.iplug.se.urlmaintenance;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,12 +85,19 @@ public class DataInjector {
           OrderBy.URL_ASC);
 
       for (int i = 0; urls.isEmpty() && i < 23; i++) {
-        Metadata metadata = _metadataDao.getByKeyAndValue("datatype", "www");
-        if (i % 5 == 0) {
-          metadata = _metadataDao.getByKeyAndValue("datatype", "research");
+        List<Metadata> metadatas = new ArrayList<Metadata>();
+        metadatas.add(_metadataDao.getByKeyAndValue("datatype", "www"));
+        if (i % 3 == 0) {
+          metadatas.add(_metadataDao.getByKeyAndValue("lang", "en"));
+          metadatas.add(_metadataDao.getByKeyAndValue("lang", "de"));
+        } else if (i % 5 == 0) {
+          metadatas.add(_metadataDao.getByKeyAndValue("datatype", "research"));
+          metadatas.add(_metadataDao.getByKeyAndValue("lang", "en"));
         } else if (i % 7 == 0) {
-          metadata = _metadataDao.getByKeyAndValue("datatype", "law");
+          metadatas.add(_metadataDao.getByKeyAndValue("datatype", "law"));
+          metadatas.add(_metadataDao.getByKeyAndValue("lang", "de"));
         }
+
         StartUrl startUrl = new StartUrl();
         startUrl.setProvider(provider);
         startUrl.setUrl("http://www." + i + ".com/index.html");
@@ -97,7 +105,7 @@ public class DataInjector {
         LimitUrl limitUrl = new LimitUrl();
         limitUrl.setProvider(provider);
         limitUrl.setUrl("http://www." + i + ".com/limit");
-        limitUrl.addMetadata(metadata);
+        limitUrl.setMetadatas(metadatas);
 
         ExcludeUrl excludeUrl = new ExcludeUrl();
         excludeUrl.setProvider(provider);

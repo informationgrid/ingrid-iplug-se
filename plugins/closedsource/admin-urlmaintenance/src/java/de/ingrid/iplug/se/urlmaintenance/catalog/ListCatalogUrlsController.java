@@ -58,6 +58,7 @@ public class ListCatalogUrlsController {
       @RequestParam(value = "sort", required = false) String sort,
       @RequestParam(value = "dir", required = false) String dir, Model model,
       HttpServletRequest request) {
+    System.out.println("ListCatalogUrlsController.listTopicUrls()");
       page = page == null ? 1 : page;
       hitsPerPage = hitsPerPage == null ? 10 : hitsPerPage;
   

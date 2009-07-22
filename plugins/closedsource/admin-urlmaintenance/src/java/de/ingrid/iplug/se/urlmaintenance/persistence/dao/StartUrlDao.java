@@ -87,14 +87,30 @@ public class StartUrlDao extends Dao<StartUrl> implements IStartUrlDao {
       break;
     }
 
-    Collection<Long> idList = new ArrayList<Long>();
+    // init query
+    String q = "SELECT DISTINCT su FROM StartUrl su JOIN su._limitUrls lu ";
+
+    // join metadatas in separately variables
     for (Metadata metadata : metadatas) {
-      idList.add(metadata.getId());
+      q += " JOIN lu._metadatas md" + metadata.getId();
     }
 
-    Query query = _transactionService
-        .createQuery("SELECT DISTINCT su FROM StartUrl su JOIN su._limitUrls lu JOIN lu._metadatas md WHERE su._provider._id = :providerId AND md._id in ("
-            + idList + ") " + orderQuery);
+    // set parameter to every variable
+    q += " WHERE ";
+    for (Metadata metadata : metadatas) {
+      q += " md" + metadata.getId() + "._id = :md" + metadata.getId() + " AND ";
+    }
+
+    // end query with provider
+    q += " su._provider._id = :providerId  " + orderQuery;
+
+    Query query = _transactionService.createQuery(q);
+
+    // fill query with metadata id's
+    for (Metadata metadata : metadatas) {
+      query.setParameter("md" + metadata.getId(), metadata.getId());
+    }
+
     query.setParameter("providerId", provider.getId());
     query.setFirstResult(start);
     query.setMaxResults(length);
@@ -116,9 +132,30 @@ public class StartUrlDao extends Dao<StartUrl> implements IStartUrlDao {
       idList.add(metadata.getId());
     }
 
-    Query query = _transactionService
-        .createQuery("SELECT count(DISTINCT su) FROM StartUrl su JOIN su._limitUrls lu JOIN lu._metadatas md WHERE su._provider._id = :providerId AND md._id in ("
-            + idList + ")");
+    // init query
+    String q = "SELECT COUNT(DISTINCT su) FROM StartUrl su JOIN su._limitUrls lu ";
+
+    // join metadatas in separately variables
+    for (Metadata metadata : metadatas) {
+      q += " JOIN lu._metadatas md" + metadata.getId();
+    }
+
+    // set parameter to every variable
+    q += " WHERE ";
+    for (Metadata metadata : metadatas) {
+      q += " md" + metadata.getId() + "._id = :md" + metadata.getId() + " AND ";
+    }
+
+    // end query with provider
+    q += " su._provider._id = :providerId";
+
+    Query query = _transactionService.createQuery(q);
+
+    // fill query with metadata id's
+    for (Metadata metadata : metadatas) {
+      query.setParameter("md" + metadata.getId(), metadata.getId());
+    }
+
     query.setParameter("providerId", provider.getId());
     return (Long) query.getSingleResult();
   }

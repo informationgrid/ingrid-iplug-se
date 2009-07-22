@@ -9,7 +9,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Url;
 import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
 
-public class DaoTest extends TestCase {
+public abstract class DaoTest extends TestCase {
 
   @Override
   protected void setUp() throws Exception {

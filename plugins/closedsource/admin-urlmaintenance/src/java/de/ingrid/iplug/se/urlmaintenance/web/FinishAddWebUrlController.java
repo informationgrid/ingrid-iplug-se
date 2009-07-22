@@ -19,11 +19,13 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IExcludeUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ILimitUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IProviderDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.StartUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.ExcludeUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.LimitUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Url;
+import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
 
 @Controller
 @SessionAttributes(value = { "partnerProviderCommand", "startUrlCommand" })
@@ -93,6 +95,7 @@ public class FinishAddWebUrlController {
           // reload limit url
           LOG.info("reload limiturl with id: " + limitUrlFromDb.getId());
           LimitUrl refreshedUrl = _limitUrlDao.getById(limitUrlFromDb.getId());
+          LOG.info("update limit url: " + refreshedUrl.getId());
           refreshedUrl.setUrl(newLimitUrl.getUrl());
           refreshedUrl.setMetadatas(newLimitUrl.getMetadatas());
           refreshedUrl.setUpdated(new Date());
@@ -118,6 +121,7 @@ public class FinishAddWebUrlController {
         LimitUrl limitUrlFromDb = (LimitUrl) iterator.next();
         // reload url
         LimitUrl refreshedUrl = _limitUrlDao.getById(limitUrlFromDb.getId());
+        LOG.info("delete limit url: " + refreshedUrl.getId());
         _limitUrlDao.makeTransient(refreshedUrl);
       }
     }
@@ -137,5 +141,14 @@ public class FinishAddWebUrlController {
         iterator.remove();
       }
     }
+  }
+
+  public static void main(String[] args) {
+    TransactionService transactionService = new TransactionService();
+    StartUrlDao startUrlDao = new StartUrlDao(transactionService);
+    StartUrl byId = startUrlDao.getById(70L);
+    System.out.println(byId.getId());
+    System.out.println(byId.getUrl());
+    System.out.println(byId.getLimitUrls());
   }
 }
