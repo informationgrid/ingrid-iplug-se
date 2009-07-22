@@ -66,16 +66,16 @@
 				<div class="yui-b">
 					<h3>Web URLs</h3>
 					
-					<div id="demo" class="yui-navset">
+					<div class="yui-navset">
 					    <ul class="yui-nav">
-					        <li><a href="listCatalogUrls.html"><em>Katalog Url's</em></a></li>
+					        <li><a href="listTopicUrls.html"><em>Katalog Url's</em></a></li>
 					        <li class="selected"><a href="listWebUrls.html"><em>Web Url's</em></a></li>
 					    </ul>            
 					</div>
 					
 					<div>
 						
-						<div>	
+						<div class="row">	
 							<label>Filter:</label>
 							<form method="get" action="" id="filter">
 								<c:forEach items="${metadatas}" var="metadata">
@@ -88,7 +88,7 @@
 							</form>
 						</div>
 					        
-					    <div style="margin-top:25px"></div>
+					    <div style="margin-top:20px"></div>
 					    
 					    <div style="float:right">
 							<img src="${theme}/gfx/add.png" align="absmiddle"/> <b><a href="createStartUrl.html">Neue Webseite</a></b>

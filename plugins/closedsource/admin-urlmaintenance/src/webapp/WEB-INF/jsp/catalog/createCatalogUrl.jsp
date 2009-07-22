@@ -56,6 +56,21 @@
 			<div id="yui-main">
 					<div class="yui-b">
 						<h3>Katalog URLs</h3>
+						
+						<div class="yui-navset">
+						    <ul class="yui-nav">
+						        <li class="selected"><a href="listTopicUrls.html"><em>Katalog Url's</em></a></li>
+						        <li><a href="listWebUrls.html"><em>Web Url's</em></a></li>
+						    </ul>            
+						</div>
+						<div id="subnav">
+							<ul>
+								<li<c:if test="${type == 'topics'}"> class="selected"</c:if>><a href="listTopicUrls.html">Themen</a></li>
+								<li<c:if test="${type == 'service'}"> class="selected"</c:if>><a href="listServiceUrls.html">Service</a></li>
+								<li<c:if test="${type == 'measure'}"> class="selected"</c:if>><a href="listMeasureUrls.html">Messwerte</a></li>
+							</ul>
+						</div>
+						
 						<form:form action="createCatalogUrl.html" method="post" modelAttribute="catalogUrlCommand">
 							<input type="hidden" name="type" value="${type}">
 							<fieldset>
@@ -101,6 +116,22 @@
 							        		<c:if test="${metadata.key == 'funct_category'}">
 							        			<c:forEach var="topic" items="${metadata.value}">
 							        				<input type="checkbox" name="metadatas" value="${topic.id}" /> ${topic.metadataValue} <br/>
+							        			</c:forEach>
+							        		</c:if>
+							        	</c:forEach>
+							        </field>
+							        <desc></desc>
+								</row>
+								</c:if>
+								
+								<c:if test="${!empty metadatas['rubric']}">
+								<row>
+							        <label>Rubrik:</label>
+							        <field>
+							        	<c:forEach items="${metadatas}" var="metadata">
+							        		<c:if test="${metadata.key == 'rubric'}">
+							        			<c:forEach var="rubric" items="${metadata.value}">
+							        				<input type="checkbox" name="metadatas" value="${rubric.id}" /> ${rubric.metadataValue} <br/>
 							        			</c:forEach>
 							        		</c:if>
 							        	</c:forEach>

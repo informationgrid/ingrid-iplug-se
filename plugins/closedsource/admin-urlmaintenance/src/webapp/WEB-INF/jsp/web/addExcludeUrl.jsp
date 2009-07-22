@@ -56,13 +56,21 @@
 			<div id="yui-main">
 				<div class="yui-b">
 					<h3>Web URLs</h3>
+					
+					<div class="yui-navset">
+					    <ul class="yui-nav">
+					        <li><a href="listTopicUrls.html"><em>Katalog Url's</em></a></li>
+					        <li class="selected"><a href="listWebUrls.html"><em>Web Url's</em></a></li>
+					    </ul>            
+					</div>
+					
 					<c:set var="maxExcludeUrls" value="${fn:length(startUrlCommand.excludeUrlCommands)}"/>
 					<c:set var="excludeUrlCounter" value="-1"/>
 					<c:forEach items="${startUrlCommand.excludeUrlCommands}" var="excludeUrl">
 						<c:set var="excludeUrlCounter" value="${excludeUrlCounter+1}"/>
 						<c:choose>
 							<c:when test="${excludeUrlCounter < maxExcludeUrls-1}">
-								<div style="border-bottom:1px dotted #CCCCCC; padding:10px 0 10px 0">
+								<div class="row">
 								<form:form action="removeExcludeUrl.html" method="post" modelAttribute="startUrlCommand">
 									${startUrlCommand.excludeUrlCommands[excludeUrlCounter].url}
 									<input type="hidden" name="index" value="${excludeUrlCounter}" />

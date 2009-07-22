@@ -46,7 +46,7 @@ public class SaveCatalogUrlController {
     catalogUrl.setUrl(catalogUrlCommand.getUrl());
     catalogUrl.setEdited(new Date());
     catalogUrl.setMetadatas(catalogUrlCommand.getMetadatas());
-
+    
     return "redirect:/listCatalogUrls.html";
   }
 }

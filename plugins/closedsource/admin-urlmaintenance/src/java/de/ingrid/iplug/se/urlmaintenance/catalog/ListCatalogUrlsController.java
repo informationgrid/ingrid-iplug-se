@@ -50,9 +50,19 @@ public class ListCatalogUrlsController {
     return command;
   }
 
-  @RequestMapping(value = "/listCatalogUrls.html", method = RequestMethod.GET)
-  public String listCatalogUrls() {
-    return "catalog/listCatalogUrls";
+  @RequestMapping(value = "/listTopicUrls.html", method = RequestMethod.GET)
+  public String listTopicUrls() {
+    return "catalog/listTopicUrls";
+  }
+  
+  @RequestMapping(value = "/listServiceUrls.html", method = RequestMethod.GET)
+  public String listServiceUrls() {
+    return "catalog/listServiceUrls";
+  }
+  
+  @RequestMapping(value = "/listMeasureUrls.html", method = RequestMethod.GET)
+  public String listMeasureUrls() {
+    return "catalog/listMeasureUrls";
   }
 
   @RequestMapping(value = "/topicsUrlSubset.html", method = RequestMethod.GET)

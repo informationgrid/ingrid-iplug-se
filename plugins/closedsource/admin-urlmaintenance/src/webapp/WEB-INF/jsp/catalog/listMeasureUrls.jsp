@@ -66,12 +66,20 @@
 				<div class="yui-b">
 					<h3>Katalog URLs</h3>
 					
-					<div id="demo" class="yui-navset">
+					<div class="yui-navset">
 					    <ul class="yui-nav">
-					        <li class="selected"><a href="listCatalogUrls.html"><em>Katalog Url's</em></a></li>
+					        <li class="selected"><a href="listTopicUrls.html"><em>Katalog Url's</em></a></li>
 					        <li><a href="listWebUrls.html"><em>Web Url's</em></a></li>
 					    </ul>            
-					</div>   
+					</div>
+					<div id="subnav">
+						<ul>
+							<li><a href="listTopicUrls.html">Themen</a></li>
+							<li><a href="listServiceUrls.html">Service</a></li>
+							<li class="selected"><a href="listMeasureUrls.html">Messwerte</a></li>
+						</ul>
+					</div>
+					   
 				    <div>
 				        <!-- Themenseite -->
 						<div style="margin-top:25px"></div>

@@ -57,7 +57,7 @@
 					
 					<div id="demo" class="yui-navset">
 					    <ul class="yui-nav">
-					        <li><a href="listCatalogUrls.html"><em>Katalog Url's</em></a></li>
+					        <li><a href="listTopicUrls.html"><em>Katalog Url's</em></a></li>
 					        <li><a href="listWebUrls.html"><em>Web Url's</em></a></li>
 					    </ul>            
 					</div>						

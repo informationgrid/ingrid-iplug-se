@@ -56,13 +56,21 @@
 			<div id="yui-main">
 				<div class="yui-b">
 					<h3>Web URLs</h3>
+					
+					<div class="yui-navset">
+					    <ul class="yui-nav">
+					        <li><a href="listTopicUrls.html"><em>Katalog Url's</em></a></li>
+					        <li class="selected"><a href="listWebUrls.html"><em>Web Url's</em></a></li>
+					    </ul>            
+					</div>
+					
 					<c:set var="maxLimitUrls" value="${fn:length(startUrlCommand.limitUrlCommands)}"/>
 					<c:set var="limitUrlCounter" value="-1"/>
 					<c:forEach items="${startUrlCommand.limitUrlCommands}" var="limitUrl">
 						<c:set var="limitUrlCounter" value="${limitUrlCounter+1}"/>
 						<c:choose>
 							<c:when test="${limitUrlCounter < maxLimitUrls-1}">
-								<div style="border-bottom:1px dotted #CCCCCC; padding:10px 0 10px 0">
+								<div class="row">
 								<form:form action="removeLimitUrl.html" method="post" modelAttribute="startUrlCommand">
 									${startUrlCommand.limitUrlCommands[limitUrlCounter].url}
 									(<c:forEach var="metadata" items="${startUrlCommand.limitUrlCommands[limitUrlCounter].metadatas}">

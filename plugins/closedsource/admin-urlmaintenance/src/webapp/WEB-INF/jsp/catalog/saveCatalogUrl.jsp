@@ -66,6 +66,20 @@
 				<div class="yui-b">
 					<h3>Katalog URLs</h3>
 					
+					<div class="yui-navset">
+					    <ul class="yui-nav">
+					        <li class="selected"><a href="listTopicUrls.html"><em>Katalog Url's</em></a></li>
+					        <li><a href="listWebUrls.html"><em>Web Url's</em></a></li>
+					    </ul>            
+					</div>
+					<div id="subnav">
+						<ul>
+							<li<c:if test="${type == 'topics'}"> class="selected"</c:if>><a href="listTopicUrls.html">Themen</a></li>
+							<li<c:if test="${type == 'service'}"> class="selected"</c:if>><a href="listServiceUrls.html">Service</a></li>
+							<li<c:if test="${type == 'measure'}"> class="selected"</c:if>><a href="listMeasureUrls.html">Messwerte</a></li>
+						</ul>
+					</div>
+					
 					<fieldset>
 						<legend>Überprüfen und Speichern</legend>
 						<div id="markup">

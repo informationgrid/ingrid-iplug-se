@@ -57,6 +57,14 @@
 			<div id="yui-main">
 				<div class="yui-b">
 					<h3>Web URLs</h3>
+					
+					<div class="yui-navset">
+					    <ul class="yui-nav">
+					        <li><a href="listTopicUrls.html"><em>Katalog Url's</em></a></li>
+					        <li class="selected"><a href="listWebUrls.html"><em>Web Url's</em></a></li>
+					    </ul>            
+					</div>
+					
 					<form:form action="createStartUrl.html" method="post" modelAttribute="startUrlCommand">
 						<fieldset>
 							<legend>Web URL anlegen</legend>

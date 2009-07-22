@@ -61,6 +61,14 @@
 			<div id="yui-main">
 				<div class="yui-b">
 					<h3>Web URLs</h3>
+					
+					<div class="yui-navset">
+					    <ul class="yui-nav">
+					        <li><a href="listTopicUrls.html"><em>Katalog Url's</em></a></li>
+					        <li class="selected"><a href="listWebUrls.html"><em>Web Url's</em></a></li>
+					    </ul>            
+					</div>
+					
 					<fieldset>
 					<legend>Überprüfen und Speichern</legend>
 					<div id="markup">

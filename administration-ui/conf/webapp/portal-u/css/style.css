@@ -98,6 +98,8 @@ form input[type='text'], form input[type='password'], form select {border:1px so
 form input[type='submit'], form input[type='button'], button {background:#68A5D2; color:#FFFFFF; font-weight:bold; border: 0px; padding:2px 10px 2px 10px; cursor:pointer}
 form input[type='submit']:hover, form input[type='button']:hover, button:hover {background:#1B78B1;}
 
+.row {border-bottom:1px dotted #CCCCCC; padding:10px 0 10px 0}
+
 .tumblerOn {width:50px; height:30px; background-image:url('../gfx/tumbler_on.jpg'); background-repeat:no-repeat;cursor:pointer; color:#FFF; padding:7px 0 0 33px; font-weight:bold}
 .tumblerOff {width:50px; height:30px; background-image:url('../gfx/tumbler_off.jpg'); background-repeat:no-repeat;cursor:pointer; color:#999; padding:7px 0 0 9px; font-weight:bold}
 
