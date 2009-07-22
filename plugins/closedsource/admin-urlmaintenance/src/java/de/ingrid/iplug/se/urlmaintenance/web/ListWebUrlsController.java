@@ -1,10 +1,13 @@
 package de.ingrid.iplug.se.urlmaintenance.web;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,7 +35,7 @@ public class ListWebUrlsController {
   private final IStartUrlDao _startUrlDao;
   private final IProviderDao _providerDao;
   private final IMetadataDao _metadataDao;
-  private int _hitsPerPage = 10;
+  private static final Log LOG = LogFactory.getLog(ListWebUrlsController.class);
 
   @Autowired
   public ListWebUrlsController(IProviderDao providerDao,
@@ -59,34 +62,76 @@ public class ListWebUrlsController {
       @RequestParam(value = "page", required = false) Integer page,
       @RequestParam(value = "hitsPerPage", required = false) Integer hitsPerPage,
       @RequestParam(value = "sort", required = false) String sort,
-      @RequestParam(value = "dir", required = false) String dir, Model model,
-      HttpServletRequest request) {
+      @RequestParam(value = "dir", required = false) String dir,
+      @RequestParam(value = "datatype", required = false) String[] datatypes,
+      @RequestParam(value = "lang", required = false) String[] langs,
+      Model model, HttpServletRequest request) {
     page = page == null ? 1 : page;
     hitsPerPage = hitsPerPage == null ? 10 : hitsPerPage;
+    langs = langs != null ? langs : new String[] {};
+    datatypes = datatypes != null ? datatypes : new String[] {};
+    List<Metadata> metadatas = injectMetadatas();
+    Iterator<Metadata> iterator = metadatas.iterator();
+    while (iterator.hasNext()) {
+      Metadata metadata = (Metadata) iterator.next();
+      boolean filter = filter("lang", langs, metadata);
+      if (!filter) {
+        filter = filter("datatype", datatypes, metadata);
+      }
+      if (filter) {
+        iterator.remove();
+      }
 
-    // paging
+    }
+    LOG.debug("filtered metadatas: " + metadatas);
+
     int start = Paging.getStart(page, hitsPerPage);
-
-    OrderBy orderBy = "url".equals(sort) ? ("asc".equals(dir) ? OrderBy.URL_ASC
-        : OrderBy.URL_DESC) : ("asc".equals(dir) ? OrderBy.TIMESTAMP_ASC
-        : OrderBy.TIMESTAMP_DESC);
+    OrderBy orderBy = "url".equals(sort) ? orderByUrl(dir) : ("created"
+        .equals(sort) ? orderByCreated(dir) : orderByUpdated(dir));
     String providerString = partnerProviderCommand.getProvider();
     Provider byName = _providerDao.getByName(providerString);
     Long count = 0L;
     if (byName != null) {
-      count = _startUrlDao.countByProvider(byName);
-      List<StartUrl> startUrls = _startUrlDao.getByProvider(byName, start,
-          hitsPerPage, orderBy);
+      count = _startUrlDao.countByProviderAndMetadatas(byName, metadatas);
+      List<StartUrl> startUrls = _startUrlDao.getByProviderAndMetadatas(byName,
+          metadatas, start, hitsPerPage, orderBy);
       model.addAttribute("urls", startUrls);
     }
     Paging paging = new Paging(10, hitsPerPage, count.intValue(), page);
     model.addAttribute("paging", paging);
+    model.addAttribute("hitsPerPage", hitsPerPage);
+
     return "web/listWebUrls";
   }
 
   @ModelAttribute("startUrlCommand")
   public StartUrlCommand injectStartUrlCommand() {
     return new StartUrlCommand();
+  }
+
+  private boolean filter(String filterKey, String[] filterValues,
+      Metadata metadata) {
+    boolean filter = false;
+    for (String filterValue : filterValues) {
+      if (metadata.getMetadataKey().equals(filterKey)
+          && metadata.getMetadataValue().equals(filterValue)) {
+        filter = true;
+        break;
+      }
+    }
+    return filter;
+  }
+
+  private OrderBy orderByUpdated(String dir) {
+    return "asc".equals(dir) ? OrderBy.UPDATED_ASC : OrderBy.UPDATED_DESC;
+  }
+
+  private OrderBy orderByCreated(String dir) {
+    return "asc".equals(dir) ? OrderBy.CREATED_ASC : OrderBy.CREATED_DESC;
+  }
+
+  private OrderBy orderByUrl(String dir) {
+    return "asc".equals(dir) ? OrderBy.URL_ASC : OrderBy.URL_DESC;
   }
 
   // @RequestMapping(value = "/startUrlSubset.html", method = RequestMethod.GET)

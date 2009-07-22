@@ -121,13 +121,13 @@
 					       		<tr>
 					       			<td><a href="${url.url}" target="_blank" style="color:black">${url.url}</a></td>
 						       		<td><fmt:formatDate value="${url.created}" pattern="yyyy-MM-dd"/></td>
-						       		<td><fmt:formatDate value="${url.edited}" pattern="yyyy-MM-dd"/></td>
+						       		<td><fmt:formatDate value="${url.updated}" pattern="yyyy-MM-dd"/></td>
 						       		<td>&nbsp;</td>
 						       		<td>&nbsp;</td>
 						       		<td>&nbsp;</td>
 						       		<td>&nbsp;</td>
 						       		<td>
-						       			<a href="edit.html?id=${url.id}">EDIT</a>
+						       			<a href="editStartUrl.html?id=${url.id}">EDIT</a>
 						       			<a href="delete.html?id=${url.id}">DEL</a>
 						       			<a href="test.html?id=${url.id}">TEST</a>
 						       		</td>
@@ -136,7 +136,7 @@
 					       		<tr>
 					       			<td><a href="${limitUrl.url}" target="_blank" style="color:green; font-size:11px; margin-left:10px; text-decoration:none">${limitUrl.url}</a></td>
 						       		<td><fmt:formatDate value="${limitUrl.created}" pattern="yyyy-MM-dd"/></td>
-						       		<td><fmt:formatDate value="${limitUrl.edited}" pattern="yyyy-MM-dd"/></td>
+						       		<td><fmt:formatDate value="${limitUrl.updated}" pattern="yyyy-MM-dd"/></td>
 						       		<td>
 						       			&nbsp;<c:if test="${fn:contains(limitUrl.metadatas,'law')}"><img src="${theme}/gfx/ok.png"/></c:if>&nbsp;
 						       		</td>
@@ -156,7 +156,7 @@
 					       		<tr>
 					       			<td><a href="${excludeUrl.url}" target="_blank" style="color:red; font-size:11px; margin-left:10px; text-decoration:none">${excludeUrl.url}</a></td>
 						       		<td><fmt:formatDate value="${excludeUrl.created}" pattern="yyyy-MM-dd"/></td>
-						       		<td><fmt:formatDate value="${excludeUrl.edited}" pattern="yyyy-MM-dd"/></td>
+						       		<td><fmt:formatDate value="${excludeUrl.updated}" pattern="yyyy-MM-dd"/></td>
 						       		<td>&nbsp;</td>
 						       		<td>&nbsp;</td>
 						       		<td>&nbsp;</td>

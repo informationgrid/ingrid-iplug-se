@@ -1,9 +1,11 @@
 package de.ingrid.iplug.se.urlmaintenance.web;
 
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -12,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import de.ingrid.iplug.se.urlmaintenance.PartnerProviderCommand;
-import de.ingrid.iplug.se.urlmaintenance.commandObjects.ExcludeUrlCommand;
-import de.ingrid.iplug.se.urlmaintenance.commandObjects.LimitUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.StartUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IExcludeUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ILimitUrlDao;
@@ -29,6 +29,8 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.Url;
 @SessionAttributes(value = { "partnerProviderCommand", "startUrlCommand" })
 public class FinishAddWebUrlController {
 
+  private static final Log LOG = LogFactory
+      .getLog(FinishAddWebUrlController.class);
   private final IStartUrlDao _startUrlDao;
   private final ILimitUrlDao _limitUrlDao;
   private final IExcludeUrlDao _excludeUrlDao;
@@ -36,7 +38,8 @@ public class FinishAddWebUrlController {
 
   @Autowired
   public FinishAddWebUrlController(IStartUrlDao startUrlDao,
-      ILimitUrlDao limitUrlDao, IExcludeUrlDao excludeDao, IProviderDao providerDao) {
+      ILimitUrlDao limitUrlDao, IExcludeUrlDao excludeDao,
+      IProviderDao providerDao) {
     _startUrlDao = startUrlDao;
     _limitUrlDao = limitUrlDao;
     _excludeUrlDao = excludeDao;
@@ -46,12 +49,10 @@ public class FinishAddWebUrlController {
   @RequestMapping(value = "/finishWebUrl.html", method = RequestMethod.GET)
   public String finish(
       @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand) {
-    List<LimitUrlCommand> limitUrlCommands = startUrlCommand
-        .getLimitUrlCommands();
-    List<ExcludeUrlCommand> excludeUrlCommands = startUrlCommand
-        .getExcludeUrlCommands();
-    cleanupEmptyUrls(limitUrlCommands);
-    cleanupEmptyUrls(excludeUrlCommands);
+    List<LimitUrl> limitUrls = startUrlCommand.getLimitUrls();
+    List<ExcludeUrl> excludeUrls = startUrlCommand.getExcludeUrls();
+    cleanupEmptyUrls(limitUrls);
+    cleanupEmptyUrls(excludeUrls);
     return "web/finishWebUrl";
   }
 
@@ -59,38 +60,71 @@ public class FinishAddWebUrlController {
   public String postFinish(
       @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand,
       @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand) {
-    List<LimitUrlCommand> limitUrlCommands = startUrlCommand
-        .getLimitUrlCommands();
-    List<ExcludeUrlCommand> excludeUrlCommands = startUrlCommand
-        .getExcludeUrlCommands();
 
     Provider provider = _providerDao.getByName(partnerProviderCommand
         .getProvider());
 
-    List<ExcludeUrl> excludeUrls = new ArrayList<ExcludeUrl>();
-    for (ExcludeUrlCommand excludeUrlCommand : excludeUrlCommands) {
-      ExcludeUrl excludeUrl = new ExcludeUrl();
-      excludeUrl.setUrl(excludeUrlCommand.getUrl());
-      excludeUrl.setProvider(provider);
-      excludeUrls.add(excludeUrl);
-      _excludeUrlDao.makePersistent(excludeUrl);
-    }
-    List<LimitUrl> limitUrls = new ArrayList<LimitUrl>();
-    for (LimitUrlCommand limitUrlCommand : limitUrlCommands) {
-      LimitUrl limitUrl = new LimitUrl();
-      limitUrl.setUrl(limitUrlCommand.getUrl());
-      limitUrl.setProvider(provider);
-      limitUrl.setMetadatas(limitUrlCommand.getMetadatas());
-      limitUrls.add(limitUrl);
-      _limitUrlDao.makePersistent(limitUrl);
-    }
-    
+    // load start url from db if id exists
     StartUrl startUrl = new StartUrl();
-    startUrl.setUrl(startUrlCommand.getUrl());
-    startUrl.setProvider(provider);
-    startUrl.setLimitUrls(limitUrls);
-    startUrl.setExcludeUrls(excludeUrls);
-    _startUrlDao.makePersistent(startUrl);
+    if (startUrlCommand.getId() != null) {
+      LOG.info("load startUrl with id: " + startUrlCommand.getId());
+      startUrl = _startUrlDao.getById(startUrlCommand.getId());
+      startUrl.setUpdated(new Date());
+      startUrl.setUrl(startUrlCommand.getUrl());
+    } else {
+      LOG.info("create new start url: " + startUrlCommand.getUrl());
+      startUrl.setUrl(startUrlCommand.getUrl());
+      startUrl.setProvider(provider);
+      startUrl.setCreated(new Date());
+      startUrl.setUpdated(new Date());
+    }
+
+    // delete/update/add previous limit urls
+    List<LimitUrl> newLimitUrls = startUrlCommand.getLimitUrls();
+    for (LimitUrl newLimitUrl : newLimitUrls) {
+      List<LimitUrl> limitUrlsFromDb = startUrl.getLimitUrls();
+
+      // update
+      boolean update = false;
+      Iterator<LimitUrl> iterator = limitUrlsFromDb.iterator();
+      while (iterator.hasNext()) {
+        LimitUrl limitUrlFromDb = (LimitUrl) iterator.next();
+        if (limitUrlFromDb.equals(newLimitUrl)) {
+          // reload limit url
+          LOG.info("reload limiturl with id: " + limitUrlFromDb.getId());
+          LimitUrl refreshedUrl = _limitUrlDao.getById(limitUrlFromDb.getId());
+          refreshedUrl.setUrl(newLimitUrl.getUrl());
+          refreshedUrl.setMetadatas(newLimitUrl.getMetadatas());
+          refreshedUrl.setUpdated(new Date());
+          iterator.remove();
+          update = true;
+          break;
+        }
+      }
+
+      // create
+      if (!update) {
+        newLimitUrl.setProvider(provider);
+        newLimitUrl.setCreated(new Date());
+        newLimitUrl.setUpdated(new Date());
+        newLimitUrl.setStartUrl(startUrl);
+        // startUrl.addLimitUrl(newLimitUrl);
+        _limitUrlDao.makePersistent(newLimitUrl);
+      }
+
+      // delete
+      iterator = limitUrlsFromDb.iterator();
+      while (iterator.hasNext()) {
+        LimitUrl limitUrlFromDb = (LimitUrl) iterator.next();
+        // reload url
+        LimitUrl refreshedUrl = _limitUrlDao.getById(limitUrlFromDb.getId());
+        _limitUrlDao.makeTransient(refreshedUrl);
+      }
+    }
+
+    if (startUrl.getId() == null) {
+      _startUrlDao.makePersistent(startUrl);
+    }
     return "redirect:listWebUrls.html";
   }
 

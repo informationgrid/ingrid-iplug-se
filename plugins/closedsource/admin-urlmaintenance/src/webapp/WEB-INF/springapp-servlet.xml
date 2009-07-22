@@ -20,6 +20,16 @@
 				<value>messages</value> 
 			</list> 
 		</property> 
-	</bean> 
+	</bean>
+
+	<bean
+		class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="exceptionMappings">
+			<map>
+				<entry key="java.lang.Throwable" value="data-error" />
+			</map>
+		</property>
+		<property name="defaultErrorView" value="/error.html" />
+	</bean>
     
 </beans>

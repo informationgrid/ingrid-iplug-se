@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -13,14 +14,16 @@ import javax.persistence.OneToMany;
 @Entity
 @DiscriminatorValue("START")
 @NamedQueries(value = {
-    @NamedQuery(name = "getAllUrlsByProviderOrderByTimeStampAsc", query = "select u from StartUrl as u where u._provider._id = :id order by u._created asc"),
-    @NamedQuery(name = "getAllUrlsByProviderOrderByTimeStampDesc", query = "select u from StartUrl as u where u._provider._id = :id order by u._created desc"),
+    @NamedQuery(name = "getAllUrlsByProviderOrderByCreatedAsc", query = "select u from StartUrl as u where u._provider._id = :id order by u._created asc"),
+    @NamedQuery(name = "getAllUrlsByProviderOrderByCreatedDesc", query = "select u from StartUrl as u where u._provider._id = :id order by u._created desc"),
+    @NamedQuery(name = "getAllUrlsByProviderOrderByUpdatedAsc", query = "select u from StartUrl as u where u._provider._id = :id order by u._updated asc"),
+    @NamedQuery(name = "getAllUrlsByProviderOrderByUpdatedDesc", query = "select u from StartUrl as u where u._provider._id = :id order by u._updated desc"),
     @NamedQuery(name = "getAllUrlsByProviderOrderByUrlAsc", query = "select u from StartUrl as u where u._provider._id = :id order by u._url asc"),
     @NamedQuery(name = "getAllUrlsByProviderOrderByUrlDesc", query = "select u from StartUrl as u where u._provider._id = :id order by u._url desc"),
     @NamedQuery(name = "countByProvider", query = "select count(u) from StartUrl as u where u._provider._id = :id") })
 public class StartUrl extends WebUrl {
 
-  @OneToMany
+  @OneToMany(fetch = FetchType.EAGER)
   @JoinColumn(name = "startUrl_fk")
   private List<LimitUrl> _limitUrls = new ArrayList<LimitUrl>();
 

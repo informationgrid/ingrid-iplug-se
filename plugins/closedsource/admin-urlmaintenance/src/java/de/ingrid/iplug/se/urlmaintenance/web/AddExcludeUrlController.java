@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import de.ingrid.iplug.se.urlmaintenance.commandObjects.ExcludeUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.StartUrlCommand;
+import de.ingrid.iplug.se.urlmaintenance.persistence.model.ExcludeUrl;
 
 @Controller
 @SessionAttributes(value = { "partnerProviderCommand", "startUrlCommand" })
@@ -26,7 +26,7 @@ public class AddExcludeUrlController {
   public String postAddExcludeUrl(
       @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand) {
     // add new command to fill out
-    startUrlCommand.addExcludeUrlCommand(new ExcludeUrlCommand());
+    startUrlCommand.addExcludeUrl(new ExcludeUrl());
     return "redirect:addExcludeUrl.html";
   }
 
@@ -34,9 +34,8 @@ public class AddExcludeUrlController {
   public String removeExcludeUrl(
       @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand,
       @RequestParam("index") Integer index) {
-    List<ExcludeUrlCommand> excludeUrlCommands = startUrlCommand
-        .getExcludeUrlCommands();
-    excludeUrlCommands.remove(index.intValue());
+    List<ExcludeUrl> excludeUrls = startUrlCommand.getExcludeUrls();
+    excludeUrls.remove(index.intValue());
     return "redirect:addExcludeUrl.html";
   }
 

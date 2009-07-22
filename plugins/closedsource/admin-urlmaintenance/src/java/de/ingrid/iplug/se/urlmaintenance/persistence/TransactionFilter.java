@@ -25,6 +25,8 @@ public class TransactionFilter implements Filter {
       chain.doFilter(request, response);
       transactionService.commitTransaction();
     } catch (Throwable t) {
+      System.out.println("TransactionFilter.doFilter() ");
+      t.printStackTrace();
       transactionService.rollbackTransaction();
     } finally {
       transactionService.close();

@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import de.ingrid.iplug.se.urlmaintenance.EntityEditor;
-import de.ingrid.iplug.se.urlmaintenance.commandObjects.LimitUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.StartUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IMetadataDao;
+import de.ingrid.iplug.se.urlmaintenance.persistence.model.LimitUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
 
 @Controller
@@ -28,7 +28,7 @@ public class AddLimitUrlController {
   public AddLimitUrlController(IMetadataDao metadataDao) {
     _metadataDao = metadataDao;
   }
-  
+
   @InitBinder
   public void initBinder(WebDataBinder binder) {
     binder.registerCustomEditor(Metadata.class, new EntityEditor(_metadataDao));
@@ -54,7 +54,7 @@ public class AddLimitUrlController {
   public String postAddLimitUrl(
       @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand) {
     // add new command to fill out
-    startUrlCommand.addLimitUrlCommand(new LimitUrlCommand());
+    startUrlCommand.addLimitUrl(new LimitUrl());
     return "redirect:addLimitUrl.html";
   }
 
@@ -62,9 +62,8 @@ public class AddLimitUrlController {
   public String removeLimitUrl(
       @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand,
       @RequestParam("index") Integer index) {
-    List<LimitUrlCommand> limitUrlCommands = startUrlCommand
-        .getLimitUrlCommands();
-    limitUrlCommands.remove(index.intValue());
+    List<LimitUrl> limitUrls = startUrlCommand.getLimitUrls();
+    limitUrls.remove(index.intValue());
     return "redirect:addLimitUrl.html";
   }
 }

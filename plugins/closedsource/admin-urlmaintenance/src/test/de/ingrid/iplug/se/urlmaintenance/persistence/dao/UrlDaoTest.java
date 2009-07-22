@@ -148,7 +148,7 @@ public class UrlDaoTest extends DaoTest {
     List<Metadata> metadataList = new ArrayList<Metadata>();
     metadataList.add(metadata1);
     List<StartUrl> startUrls = startUrlDao.getByProviderAndMetadatas(byName,
-        metadataList, 0, 10, OrderBy.TIMESTAMP_ASC);
+        metadataList, 0, 10, OrderBy.CREATED_ASC);
     assertEquals(2, startUrls.size());
     assertTrue(startUrls.contains(foo));
     assertTrue(startUrls.contains(foobar));
@@ -159,7 +159,7 @@ public class UrlDaoTest extends DaoTest {
     metadataList.clear();
     metadataList.add(metadata2);
     startUrls = startUrlDao.getByProviderAndMetadatas(byName, metadataList, 0,
-        10, OrderBy.TIMESTAMP_ASC);
+        10, OrderBy.CREATED_ASC);
     assertEquals(2, startUrls.size());
     assertTrue(startUrls.contains(bar));
     assertTrue(startUrls.contains(foobar));
@@ -170,7 +170,7 @@ public class UrlDaoTest extends DaoTest {
     metadataList.clear();
     metadataList.add(metadata3);
     startUrls = startUrlDao.getByProviderAndMetadatas(byName, metadataList, 0,
-        10, OrderBy.TIMESTAMP_ASC);
+        10, OrderBy.CREATED_ASC);
     assertEquals(1, startUrls.size());
     assertTrue(startUrls.contains(foobar));
     count = startUrlDao.countByProviderAndMetadatas(byName, metadataList);

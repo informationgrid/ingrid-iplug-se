@@ -5,12 +5,19 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IExcludeUrlDao;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ILimitUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IMetadataDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IPartnerDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IProviderDao;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao.OrderBy;
+import de.ingrid.iplug.se.urlmaintenance.persistence.model.ExcludeUrl;
+import de.ingrid.iplug.se.urlmaintenance.persistence.model.LimitUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Partner;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
+import de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
 import de.ingrid.iplug.se.urlmaintenance.service.MetadataService;
 
@@ -22,15 +29,23 @@ public class DataInjector {
   private final IPartnerDao _partnerDao;
   private final IProviderDao _providerDao;
   private final TransactionService _transactionService;
+  private final IStartUrlDao _startUrlDao;
+  private final ILimitUrlDao _limitUrlDao;
+  private final IExcludeUrlDao _excludeUrlDao;
 
   @Autowired
   public DataInjector(MetadataService metadataService,
       IMetadataDao metadataDao, IPartnerDao partnerDao,
-      IProviderDao providerDao, TransactionService transactionService) {
+      IProviderDao providerDao, IStartUrlDao startUrlDao,
+      ILimitUrlDao limitUrlDao, IExcludeUrlDao excludeUrlDao,
+      TransactionService transactionService) throws InterruptedException {
     _metadataService = metadataService;
     _metadataDao = metadataDao;
     _partnerDao = partnerDao;
     _providerDao = providerDao;
+    _startUrlDao = startUrlDao;
+    _limitUrlDao = limitUrlDao;
+    _excludeUrlDao = excludeUrlDao;
     _transactionService = transactionService;
 
     createTestData();
@@ -57,6 +72,51 @@ public class DataInjector {
     // topics
     List<Metadata> topics = _metadataService.getTopics();
     createMetadatasIfNotExists(topics);
+
+    createUrls();
+  }
+
+  private void createUrls() throws InterruptedException {
+    if ("dev".equals(System.getProperty("deployMode"))) {
+      _transactionService.beginTransaction();
+      Provider provider = _providerDao.getByName("devProvider");
+      List<StartUrl> urls = _startUrlDao.getByProvider(provider, 0, 23,
+          OrderBy.URL_ASC);
+
+      for (int i = 0; urls.isEmpty() && i < 23; i++) {
+        Metadata metadata = _metadataDao.getByKeyAndValue("datatype", "www");
+        if (i % 5 == 0) {
+          metadata = _metadataDao.getByKeyAndValue("datatype", "research");
+        } else if (i % 7 == 0) {
+          metadata = _metadataDao.getByKeyAndValue("datatype", "law");
+        }
+        StartUrl startUrl = new StartUrl();
+        startUrl.setProvider(provider);
+        startUrl.setUrl("http://www." + i + ".com/index.html");
+
+        LimitUrl limitUrl = new LimitUrl();
+        limitUrl.setProvider(provider);
+        limitUrl.setUrl("http://www." + i + ".com/limit");
+        limitUrl.addMetadata(metadata);
+
+        ExcludeUrl excludeUrl = new ExcludeUrl();
+        excludeUrl.setProvider(provider);
+        excludeUrl.setUrl("http://www." + i + ".com/exclude");
+
+        startUrl.addLimitUrl(limitUrl);
+        startUrl.addExcludeUrl(excludeUrl);
+
+        _limitUrlDao.makePersistent(limitUrl);
+        _excludeUrlDao.makePersistent(excludeUrl);
+        _startUrlDao.makePersistent(startUrl);
+        Thread.sleep(500);
+
+      }
+      _transactionService.commitTransaction();
+      _transactionService.close();
+
+    }
+
   }
 
   private void createTestData() {

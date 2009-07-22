@@ -1,9 +1,11 @@
 package de.ingrid.iplug.se.urlmaintenance.catalog;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -13,6 +15,7 @@ import de.ingrid.iplug.se.urlmaintenance.PartnerProviderCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.CatalogUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ICatalogUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.CatalogUrl;
+import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
 
 @Controller
 @SessionAttributes(value = { "partnerProviderCommand", "catalogUrlCommand" })
@@ -27,7 +30,19 @@ public class SaveCatalogUrlController {
 
   @RequestMapping(value = "/saveCatalogUrl.html", method = RequestMethod.GET)
   public String saveCatalogUrl(
-      @ModelAttribute("catalogUrlCommand") CatalogUrlCommand catalogUrlCommand) {
+      @ModelAttribute("catalogUrlCommand") CatalogUrlCommand catalogUrlCommand,
+      Model model) {
+    List<Metadata> metadatas = catalogUrlCommand.getMetadatas();
+    String type = "topics";
+    for (Metadata metadata : metadatas) {
+      String metadataKey = metadata.getMetadataKey();
+      String metadataValue = metadata.getMetadataValue();
+      if (metadataKey.equals("datatype")) {
+        type = metadataValue;
+        break;
+      }
+    }
+    model.addAttribute("type", type);
     return "catalog/saveCatalogUrl";
   }
 
@@ -44,9 +59,22 @@ public class SaveCatalogUrlController {
       _catalogUrlDao.makePersistent(catalogUrl);
     }
     catalogUrl.setUrl(catalogUrlCommand.getUrl());
-    catalogUrl.setEdited(new Date());
+    catalogUrl.setUpdated(new Date());
     catalogUrl.setMetadatas(catalogUrlCommand.getMetadatas());
-    
-    return "redirect:/listCatalogUrls.html";
+
+    String redirectUrl = "redirect:/listTopicUrls.html";
+    List<Metadata> metadatas = catalogUrlCommand.getMetadatas();
+    for (Metadata metadata : metadatas) {
+      String metadataKey = metadata.getMetadataKey();
+      String metadataValue = metadata.getMetadataValue();
+      if (metadataKey.equals("datatype") && metadataValue.equals("service")) {
+        redirectUrl = "redirect:/listServiceUrls.html";
+        break;
+      } else if (metadataKey.equals("datatype")
+          && metadataValue.equals("measure")) {
+        redirectUrl = "redirect:/listMeasureUrls.html";
+      }
+    }
+    return redirectUrl;
   }
 }

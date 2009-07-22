@@ -131,8 +131,8 @@ public class ListCatalogUrlsController {
   private void pushUrls(Integer start, Integer length, String sort, String dir,
       Model model, ArrayList<Metadata> metadatas, Provider byName) {
     OrderBy orderBy = "url".equals(sort) ? ("asc".equals(dir) ? OrderBy.URL_ASC
-        : OrderBy.URL_DESC) : ("asc".equals(dir) ? OrderBy.TIMESTAMP_ASC
-        : OrderBy.TIMESTAMP_DESC);
+        : OrderBy.URL_DESC) : ("asc".equals(dir) ? OrderBy.CREATED_ASC
+        : OrderBy.CREATED_DESC);
     Long count = 0L;
     List<CatalogUrl> catalogUrls = new ArrayList<CatalogUrl>();
     if (byName != null) {

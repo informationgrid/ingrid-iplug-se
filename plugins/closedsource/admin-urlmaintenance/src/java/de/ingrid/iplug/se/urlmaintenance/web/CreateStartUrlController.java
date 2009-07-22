@@ -8,10 +8,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import de.ingrid.iplug.se.urlmaintenance.commandObjects.ExcludeUrlCommand;
-import de.ingrid.iplug.se.urlmaintenance.commandObjects.LimitUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.StartUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao;
+import de.ingrid.iplug.se.urlmaintenance.persistence.model.ExcludeUrl;
+import de.ingrid.iplug.se.urlmaintenance.persistence.model.LimitUrl;
+import de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl;
 
 @Controller
 @SessionAttributes(value = { "partnerProviderCommand", "startUrlCommand" })
@@ -24,12 +25,18 @@ public class CreateStartUrlController {
     _startUrlDao = startUrlDao;
   }
 
-  @RequestMapping(value = "/createStartUrl.html", method = RequestMethod.GET)
+  @RequestMapping(value = { "/createStartUrl.html", "/editStartUrl.html" }, method = RequestMethod.GET)
   public String createStartUrl(
       @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand,
       @RequestParam(value = "id", required = false) Long id) {
     if (id != null) {
-      // TODO set url etc.
+      StartUrl byId = _startUrlDao.getById(id);
+      startUrlCommand.setId(byId.getId());
+      startUrlCommand.setCreated(byId.getCreated());
+      startUrlCommand.setProvider(byId.getProvider());
+      startUrlCommand.setUrl(byId.getUrl());
+      startUrlCommand.setLimitUrls(byId.getLimitUrls());
+      startUrlCommand.setExcludeUrls(byId.getExcludeUrls());
     }
     return "web/createStartUrl";
   }
@@ -38,11 +45,11 @@ public class CreateStartUrlController {
   public String postCreateStartUrl(
       @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand) {
 
-    if (startUrlCommand.getLimitUrlCommands().isEmpty()) {
-      startUrlCommand.addLimitUrlCommand(new LimitUrlCommand());
+    if (startUrlCommand.getLimitUrls().isEmpty()) {
+      startUrlCommand.addLimitUrl(new LimitUrl());
     }
-    if (startUrlCommand.getExcludeUrlCommands().isEmpty()) {
-      startUrlCommand.getExcludeUrlCommands().add(new ExcludeUrlCommand());
+    if (startUrlCommand.getExcludeUrls().isEmpty()) {
+      startUrlCommand.getExcludeUrls().add(new ExcludeUrl());
     }
     return "redirect:addLimitUrl.html";
   }

@@ -43,7 +43,7 @@ public class StartUrlDaoTest extends DaoTest {
         OrderBy.URL_ASC);
     assertEquals(11, startUrls.size());
     startUrls = startUrlDao.getByProvider(byName, 11, 100,
-        OrderBy.TIMESTAMP_ASC);
+        OrderBy.CREATED_ASC);
     assertEquals(12, startUrls.size());
 
     Long count = startUrlDao.countByProvider(byName);

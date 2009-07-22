@@ -62,7 +62,7 @@ public class CatalogUrlDaoTest extends DaoTest {
     List<Metadata> metadataList = new ArrayList<Metadata>();
     metadataList.add(metadata1);
     List<CatalogUrl> catalogUrls = catalogUrlDao.getByProviderAndMetadatas(
-        byName, metadataList, 0, 10, OrderBy.TIMESTAMP_ASC);
+        byName, metadataList, 0, 10, OrderBy.CREATED_ASC);
     assertEquals(2, catalogUrls.size());
     assertTrue(catalogUrls.contains(foo));
     assertTrue(catalogUrls.contains(anotherFoo));
@@ -74,7 +74,7 @@ public class CatalogUrlDaoTest extends DaoTest {
     metadataList.clear();
     metadataList.add(metadata2);
     catalogUrls = catalogUrlDao.getByProviderAndMetadatas(byName, metadataList,
-        0, 10, OrderBy.TIMESTAMP_ASC);
+        0, 10, OrderBy.CREATED_ASC);
     assertEquals(1, catalogUrls.size());
     assertTrue(catalogUrls.contains(bar));
     count = catalogUrlDao.countByProviderAndMetadatas(byName, metadataList);
@@ -84,7 +84,7 @@ public class CatalogUrlDaoTest extends DaoTest {
     metadataList.clear();
     metadataList.add(metadata3);
     catalogUrls = catalogUrlDao.getByProviderAndMetadatas(byName, metadataList,
-        0, 10, OrderBy.TIMESTAMP_ASC);
+        0, 10, OrderBy.CREATED_ASC);
     assertEquals(1, catalogUrls.size());
     assertTrue(catalogUrls.contains(foobar));
     count = catalogUrlDao.countByProviderAndMetadatas(byName, metadataList);
