@@ -1,7 +1,6 @@
 package de.ingrid.iplug.se.urlmaintenance.web;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -70,22 +69,18 @@ public class ListWebUrlsController {
     hitsPerPage = hitsPerPage == null ? 10 : hitsPerPage;
     langs = langs != null ? langs : new String[] {};
     datatypes = datatypes != null ? datatypes : new String[] {};
-    List<Metadata> metadatas = injectMetadatas();
-    Iterator<Metadata> iterator = metadatas.iterator();
-    while (iterator.hasNext()) {
-      Metadata metadata = (Metadata) iterator.next();
-      boolean filter = filter("lang", langs, metadata);
-      if (!filter) {
-        filter = filter("datatype", datatypes, metadata);
-      }
-      if (filter) {
-        iterator.remove();
-      }
 
+    // filter by metadata
+    List<Metadata> metadatas = new ArrayList<Metadata>();
+    for (String lang : langs) {
+      Metadata metadata = _metadataDao.getByKeyAndValue("lang", lang);
+      metadatas.add(metadata);
     }
-    model.addAttribute("datatypes", datatypes);
-    model.addAttribute("langs", langs);
-    LOG.debug("filtered metadatas: " + metadatas);
+    for (String datatype : datatypes) {
+      Metadata metadata = _metadataDao.getByKeyAndValue("datatype", datatype);
+      metadatas.add(metadata);
+    }
+    metadatas = metadatas.isEmpty() ? injectMetadatas() : metadatas;
 
     int start = Paging.getStart(page, hitsPerPage);
     OrderBy orderBy = "url".equals(sort) ? orderByUrl(dir) : ("created"
@@ -95,6 +90,9 @@ public class ListWebUrlsController {
     Long count = 0L;
     if (byName != null) {
       count = _startUrlDao.countByProviderAndMetadatas(byName, metadatas);
+      LOG.debug("load start by provider [" + byName.getId()
+          + "] with metadatas [" + metadatas + "] start: [" + start
+          + "] hitsPerPage: [" + hitsPerPage + "] orderBy: [" + orderBy + "]");
       List<StartUrl> startUrls = _startUrlDao.getByProviderAndMetadatas(byName,
           metadatas, start, hitsPerPage, orderBy);
       model.addAttribute("urls", startUrls);
@@ -102,6 +100,8 @@ public class ListWebUrlsController {
     Paging paging = new Paging(10, hitsPerPage, count.intValue(), page);
     model.addAttribute("paging", paging);
     model.addAttribute("hitsPerPage", hitsPerPage);
+    model.addAttribute("datatypes", datatypes);
+    model.addAttribute("langs", langs);
 
     return "web/listWebUrls";
   }
