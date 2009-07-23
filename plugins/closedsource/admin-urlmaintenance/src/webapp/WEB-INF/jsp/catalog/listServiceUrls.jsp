@@ -103,7 +103,7 @@
 								<tbody>
 								<c:forEach var="url" items="${urls}">
 									<tr>
-										<td>${url.url}</td>
+										<td><a href="${url.url}" target="_blank" style="color:black">${url.url}</a></td>
 										<td><fmt:formatDate value="${url.created}" pattern="yyyy-MM-dd"/></td>
 										<td><fmt:formatDate value="${url.updated}" pattern="yyyy-MM-dd"/></td>
 										<td>&nbsp;</td>
@@ -118,7 +118,7 @@
 											</c:forEach>
 										</td>
 										<td>
-											<a href="editStartUrl.html?id=${url.id}">EDIT</a>
+											<a href="editCatalogUrl.html?id=${url.id}&type=service">EDIT</a>
 							       			<a href="delete.html?id=${url.id}">DEL</a>
 							       			<a href="test.html?id=${url.id}">TEST</a>
 										</td>

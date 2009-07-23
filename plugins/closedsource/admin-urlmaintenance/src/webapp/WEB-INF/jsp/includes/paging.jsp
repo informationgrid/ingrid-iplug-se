@@ -1,5 +1,5 @@
 <div id="paging" style="margin-top:10px">
-   <c:set var="hitsPerPage" value="1"/>
+   <c:set var="hitsPerPage" value="10"/>
    <c:forEach items="${paging.pages}" var="page" >
      	<c:choose>
 			<c:when test="${page.currentPage}">

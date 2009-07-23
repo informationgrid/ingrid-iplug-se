@@ -78,7 +78,7 @@
 							<li<c:if test="${type == 'measure'}"> class="selected"</c:if>><a href="listMeasureUrls.html">Messwerte</a></li>
 						</ul>
 					</div>
-					Type: ${type}-- // Marko, dass muss topics | service | measure sein
+					
 					<fieldset>
 						<legend>Überprüfen und Speichern</legend>
 						<div id="markup">
@@ -132,6 +132,16 @@
 						<div style="margin-top:25px"></div>
 						
 						<form action="saveCatalogUrl.html" method="post">
+							<c:set var="cancelUrl" value="listTopicUrls.html"/>
+				            <c:choose>
+				            	<c:when test="${type == 'service'}">
+				            		<c:set var="cancelUrl" value="listServiceUrls.html"/>
+				            	</c:when>
+				            	<c:when test="${type == 'measure'}">
+				            		<c:set var="cancelUrl" value="listMeasureUrls.html"/>
+				            	</c:when>
+				            </c:choose>
+				            <input type="button" value="Abbrechen" onclick="window.location.href = '${cancelUrl}'"/>
 							<input type="submit" value="Speichern">
 						</form>	
 					</fieldset>

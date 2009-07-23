@@ -74,7 +74,14 @@
 						<form:form action="createCatalogUrl.html" method="post" modelAttribute="catalogUrlCommand">
 							<input type="hidden" name="type" value="${type}">
 							<fieldset>
-								<legend>Katalog URL anlegen</legend>
+								<c:choose>
+									<c:when test="${catalogUrlCommand.id > -1}">
+										<legend>Katalog URL bearbeiten</legend>
+									</c:when>
+									<c:otherwise>
+										<legend>Katalog URL anlegen</legend>										
+									</c:otherwise>
+								</c:choose>
 								<row>
 							        <label>Typ:</label>
 							        <field>
@@ -99,7 +106,7 @@
 							        	<c:forEach items="${metadatas}" var="metadata">
 							        		<c:if test="${metadata.key == 'topics'}">
 							        			<c:forEach var="topic" items="${metadata.value}">
-							        				<input type="checkbox" name="metadatas" value="${topic.id}" /> ${topic.metadataValue} <br/>
+							        				<input type="checkbox" name="metadatas" value="${topic.id}" <c:if test="${fn:contains(catalogUrlCommand.metadatas , topic.metadataValue)}">checked="ckecked"</c:if>/> ${topic.metadataValue} <br/>
 							        			</c:forEach>
 							        		</c:if>
 							        	</c:forEach>
@@ -114,8 +121,8 @@
 							        <field>
 							        	<c:forEach items="${metadatas}" var="metadata">
 							        		<c:if test="${metadata.key == 'funct_category'}">
-							        			<c:forEach var="topic" items="${metadata.value}">
-							        				<input type="checkbox" name="metadatas" value="${topic.id}" /> ${topic.metadataValue} <br/>
+							        			<c:forEach var="functCat" items="${metadata.value}">
+							        				<input type="checkbox" name="metadatas" value="${functCat.id}" <c:if test="${fn:contains(catalogUrlCommand.metadatas , functCat.metadataValue)}">checked="ckecked"</c:if>/> ${functCat.metadataValue} <br/>
 							        			</c:forEach>
 							        		</c:if>
 							        	</c:forEach>
@@ -131,7 +138,7 @@
 							        	<c:forEach items="${metadatas}" var="metadata">
 							        		<c:if test="${metadata.key == 'rubric'}">
 							        			<c:forEach var="rubric" items="${metadata.value}">
-							        				<input type="checkbox" name="metadatas" value="${rubric.id}" /> ${rubric.metadataValue} <br/>
+							        				<input type="checkbox" name="metadatas" value="${rubric.id}" <c:if test="${fn:contains(catalogUrlCommand.metadatas , rubric.metadataValue)}">checked="ckecked"</c:if>/> ${rubric.metadataValue} <br/>
 							        			</c:forEach>
 							        		</c:if>
 							        	</c:forEach>
@@ -143,6 +150,16 @@
 								<row>
 							        <label>&nbsp;</label>
 							        <field>
+							            <c:set var="cancelUrl" value="listTopicUrls.html"/>
+							            <c:choose>
+							            	<c:when test="${type == 'service'}">
+							            		<c:set var="cancelUrl" value="listServiceUrls.html"/>
+							            	</c:when>
+							            	<c:when test="${type == 'measure'}">
+							            		<c:set var="cancelUrl" value="listMeasureUrls.html"/>
+							            	</c:when>
+							            </c:choose>
+							            <input type="button" value="Abbrechen" onclick="window.location.href = '${cancelUrl}'"/>
 							            <input type="submit" value="Weiter"/>
 							        </field>
 							    </row>	

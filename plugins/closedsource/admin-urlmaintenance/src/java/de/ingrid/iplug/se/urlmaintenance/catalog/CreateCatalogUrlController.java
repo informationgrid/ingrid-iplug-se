@@ -60,7 +60,7 @@ public class CreateCatalogUrlController {
     return metadatas;
   }
 
-  @RequestMapping(value = "/createCatalogUrl.html", method = RequestMethod.GET)
+  @RequestMapping(value = {"/createCatalogUrl.html", "/editCatalogUrl.html"}, method = RequestMethod.GET)
   public String editCatalogUrl(Model model,
       @ModelAttribute("catalogUrlCommand") CatalogUrlCommand catalogUrlCommand,
       @RequestParam(value = "id", required = false) Long id,
@@ -74,6 +74,7 @@ public class CreateCatalogUrlController {
       catalogUrlCommand.setMetadatas(byId.getMetadatas());
       catalogUrlCommand.setProvider(byId.getProvider());
       catalogUrlCommand.setCreated(byId.getCreated());
+      catalogUrlCommand.setUpdated(byId.getUpdated());
     }
     model.addAttribute("type", type);
     return "catalog/createCatalogUrl";
