@@ -19,13 +19,11 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IExcludeUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ILimitUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IProviderDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao;
-import de.ingrid.iplug.se.urlmaintenance.persistence.dao.StartUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.ExcludeUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.LimitUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Url;
-import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
 
 @Controller
 @SessionAttributes(value = { "partnerProviderCommand", "startUrlCommand" })
@@ -143,12 +141,4 @@ public class FinishAddWebUrlController {
     }
   }
 
-  public static void main(String[] args) {
-    TransactionService transactionService = new TransactionService();
-    StartUrlDao startUrlDao = new StartUrlDao(transactionService);
-    StartUrl byId = startUrlDao.getById(70L);
-    System.out.println(byId.getId());
-    System.out.println(byId.getUrl());
-    System.out.println(byId.getLimitUrls());
-  }
 }
