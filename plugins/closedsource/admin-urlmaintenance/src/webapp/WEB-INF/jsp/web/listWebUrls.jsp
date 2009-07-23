@@ -75,30 +75,45 @@
 					
 					<div>
 						
+						<c:set var="selectedFilter" value=""/>
+						<c:set var="paramString" value=""/>
+						<form method="get" action="" id="filter">
 						<div class="row">	
-							<label>Filter:</label>
-							<c:set var="selectedFilter" value=""/>
-							<c:set var="paramString" value=""/>
+							<label>Filter Datatype:</label>
 							<c:forEach var="dt" items="${datatypes }">
 								<c:set var="selectedFilter" value="${selectedFilter} datatype:${dt}"/>
-								<c:set var="paramString" value="${paramString}&datatype=${dt}"/> 
+								<c:set var="paramString" value="${paramString}&datatype=${dt}"/>
 							</c:forEach>
+							<c:forEach items="${metadatas}" var="metadata">
+								<c:if test="${metadata.metadataKey == 'datatype'}">
+								<input type="checkbox" id="${metadata.metadataKey}_${metadata.metadataValue}" name="${metadata.metadataKey}" value="${metadata.metadataValue}"
+								<c:if test="${fn:contains(selectedFilter, metadata.metadataValue)}"> checked="checked"</c:if>> ${metadata.metadataValue}&nbsp;&nbsp;
+								<script>
+									function fnCallback(e) { document.getElementById('filter').submit() }
+									YAHOO.util.Event.addListener("${metadata.metadataKey}_${metadata.metadataValue}", "click", fnCallback);
+								</script>
+								</c:if>
+							</c:forEach>
+						</div>
+						<div class="row">	
+							<label>Filter Sprache:</label>
 							<c:forEach var="l" items="${langs}">
 								<c:set var="selectedFilter" value="${selectedFilter} lang:${l}"/>
 								<c:set var="paramString" value="${paramString}&lang=${l}"/> 
 							</c:forEach>
-							
-							<form method="get" action="" id="filter">
-								<c:forEach items="${metadatas}" var="metadata">
-									<input type="checkbox" id="${metadata.metadataKey}_${metadata.metadataValue}" name="${metadata.metadataKey}" value="${metadata.metadataValue}"
-									<c:if test="${fn:contains(selectedFilter, metadata.metadataValue)}"> checked="checked"</c:if>> ${metadata.metadataKey}:${metadata.metadataValue}&nbsp;&nbsp;
-									<script>
-										function fnCallback(e) { document.getElementById('filter').submit() }
-										YAHOO.util.Event.addListener("${metadata.metadataKey}_${metadata.metadataValue}", "click", fnCallback);
-									</script>
-								</c:forEach>
-							</form>
+							<c:forEach items="${metadatas}" var="metadata">
+								<c:if test="${metadata.metadataKey == 'lang'}">
+								<input type="checkbox" id="${metadata.metadataKey}_${metadata.metadataValue}" name="${metadata.metadataKey}" value="${metadata.metadataValue}"
+								<c:if test="${fn:contains(selectedFilter, metadata.metadataValue)}"> checked="checked"</c:if>> ${metadata.metadataValue}&nbsp;&nbsp;
+								<script>
+									function fnCallback(e) { document.getElementById('filter').submit() }
+									YAHOO.util.Event.addListener("${metadata.metadataKey}_${metadata.metadataValue}", "click", fnCallback);
+								</script>
+								</c:if>
+							</c:forEach>
+						</div>	
 						</div>
+						</form>
 					        
 					    <div style="margin-top:20px"></div>
 					    
@@ -211,6 +226,14 @@
 				                ]
 						};
 						
+						var mySortFunction = function(desc) {
+							var dir = 'desc';
+							if(desc){
+								dir = 'asc';
+							}
+							window.location.href = "listWebUrls.html?sort=" +"url" +"&dir=" +dir +"${paramString}";
+							}
+
 						var myColumnDefs = [
 							{key:"url", label:"Url", sortable:true},
 							{key:"created", label:"Erstellt", sortable:true},
@@ -219,10 +242,16 @@
 							{key:"isResearch", label:"FS"},
 							{key:"isWWW", label:"UT"},
 							{key:"lang", label:"Sprache"},
-							{key:"action", label:"Aktion"},
+							{key:"action", label:"Aktion", width:100},
+							
 						];
+						var sortBy = '${sort}';
+						var sortDir = YAHOO.widget.DataTable.CLASS_ASC;
+						if('${dir}' == 'desc'){
+							 sortDir = YAHOO.widget.DataTable.CLASS_DESC;
+							}
 						var myConfig = {
-							sortedBy : {key:"created", dir:YAHOO.widget.DataTable.CLASS_ASC}
+							sortedBy : {key:sortBy, dir:sortDir},
 						}
 						var myDataTable = new YAHOO.widget.DataTable("dynamicdata", myColumnDefs, myDataSource, myConfig);
 						</script>

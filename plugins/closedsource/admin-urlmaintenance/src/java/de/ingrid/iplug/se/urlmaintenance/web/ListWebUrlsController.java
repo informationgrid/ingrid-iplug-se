@@ -69,7 +69,9 @@ public class ListWebUrlsController {
     hitsPerPage = hitsPerPage == null ? 10 : hitsPerPage;
     langs = langs != null ? langs : new String[] {};
     datatypes = datatypes != null ? datatypes : new String[] {};
-
+    sort = sort != null ? sort : "created";
+    dir = dir != null ? dir : "desc";
+    
     // filter by metadata
     List<Metadata> metadatas = new ArrayList<Metadata>();
     for (String lang : langs) {
@@ -83,8 +85,8 @@ public class ListWebUrlsController {
     // metadatas = metadatas.isEmpty() ? injectMetadatas() : metadatas;
 
     int start = Paging.getStart(page, hitsPerPage);
-    OrderBy orderBy = "url".equals(sort) ? orderByUrl(dir) : ("created"
-        .equals(sort) ? orderByCreated(dir) : orderByUpdated(dir));
+    OrderBy orderBy = "url".equals(sort) ? orderByUrl(dir) : ("edited"
+        .equals(sort) ? orderByUpdated(dir) : orderByCreated(dir));
     String providerString = partnerProviderCommand.getProvider();
     Provider byName = _providerDao.getByName(providerString);
     Long count = 0L;
@@ -102,7 +104,9 @@ public class ListWebUrlsController {
     model.addAttribute("hitsPerPage", hitsPerPage);
     model.addAttribute("datatypes", datatypes);
     model.addAttribute("langs", langs);
-
+    model.addAttribute("sort", sort);
+    model.addAttribute("dir", dir);
+System.out.println("ListWebUrlsController.listWebUrls() sort: " +sort +" dir: " +dir);
     return "web/listWebUrls";
   }
 
