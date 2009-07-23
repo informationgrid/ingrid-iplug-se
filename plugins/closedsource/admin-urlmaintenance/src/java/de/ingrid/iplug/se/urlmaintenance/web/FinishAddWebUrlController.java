@@ -63,27 +63,41 @@ public class FinishAddWebUrlController {
 
     Provider provider = _providerDao.getByName(partnerProviderCommand
         .getProvider());
+    StartUrl startUrl = loadOrCreateStartUrl(startUrlCommand, provider);
+    updateLimitUrlsFromDb(startUrlCommand, startUrl);
+    deleteLimitUrlsFromDb(startUrl);
+    createNewLimitUrls(startUrlCommand, provider, startUrl);
+    return "redirect:listWebUrls.html";
+  }
 
-    // load or create start url
-    StartUrl startUrl = null;
-    if (startUrlCommand.getId() != null) {
-      LOG.info("load startUrl with id: " + startUrlCommand.getId());
-      startUrl = _startUrlDao.getById(startUrlCommand.getId());
-      startUrl.setUpdated(new Date());
-      startUrl.setUrl(startUrlCommand.getUrl());
-    } else {
-      LOG.info("create new start url: " + startUrlCommand.getUrl());
-      startUrl = new StartUrl();
-      startUrl.setUrl(startUrlCommand.getUrl());
-      startUrl.setProvider(provider);
-      startUrl.setCreated(new Date());
-      startUrl.setUpdated(new Date());
-      _startUrlDao.makePersistent(startUrl);
+  private void createNewLimitUrls(StartUrlCommand startUrlCommand,
+      Provider provider, StartUrl startUrl) {
+    Iterator<LimitUrl> newLimitUrlIterator = startUrlCommand.getLimitUrls()
+        .iterator();
+    while (newLimitUrlIterator.hasNext()) {
+      LimitUrl newLimitUrl = (LimitUrl) newLimitUrlIterator.next();
+      newLimitUrl.setProvider(provider);
+      newLimitUrl.setCreated(new Date());
+      newLimitUrl.setUpdated(new Date());
+      newLimitUrl.setStartUrl(startUrl);
+      startUrl.addLimitUrl(newLimitUrl);
+      LOG.info("create new limit url: " + newLimitUrl.getUrl());
+      _limitUrlDao.makePersistent(newLimitUrl);
     }
+  }
 
-    // delete/update/add previous limit urls
+  private void deleteLimitUrlsFromDb(StartUrl startUrl) {
+    Iterator<LimitUrl> limitUrlFromDbIterator = startUrl.getLimitUrls()
+        .iterator();
+    while (limitUrlFromDbIterator.hasNext()) {
+      LimitUrl limitUrlFromDb = (LimitUrl) limitUrlFromDbIterator.next();
+      LOG.info("delete limit url: " + limitUrlFromDb.getId());
+      _limitUrlDao.makeTransient(limitUrlFromDb);
+    }
+  }
 
-    // update
+  private void updateLimitUrlsFromDb(StartUrlCommand startUrlCommand,
+      StartUrl startUrl) {
     Iterator<LimitUrl> newLimitUrlIterator = startUrlCommand.getLimitUrls()
         .iterator();
     while (newLimitUrlIterator.hasNext()) {
@@ -105,30 +119,26 @@ public class FinishAddWebUrlController {
         }
       }
     }
+  }
 
-    // delete limit urls
-    Iterator<LimitUrl> limitUrlFromDbIterator = startUrl.getLimitUrls()
-        .iterator();
-    while (limitUrlFromDbIterator.hasNext()) {
-      LimitUrl limitUrlFromDb = (LimitUrl) limitUrlFromDbIterator.next();
-      LOG.info("delete limit url: " + limitUrlFromDb.getId());
-      _limitUrlDao.makeTransient(limitUrlFromDb);
+  private StartUrl loadOrCreateStartUrl(StartUrlCommand startUrlCommand,
+      Provider provider) {
+    StartUrl startUrl = null;
+    if (startUrlCommand.getId() != null) {
+      LOG.info("load startUrl with id: " + startUrlCommand.getId());
+      startUrl = _startUrlDao.getById(startUrlCommand.getId());
+      startUrl.setUpdated(new Date());
+      startUrl.setUrl(startUrlCommand.getUrl());
+    } else {
+      LOG.info("create new start url: " + startUrlCommand.getUrl());
+      startUrl = new StartUrl();
+      startUrl.setUrl(startUrlCommand.getUrl());
+      startUrl.setProvider(provider);
+      startUrl.setCreated(new Date());
+      startUrl.setUpdated(new Date());
+      _startUrlDao.makePersistent(startUrl);
     }
-
-    // create new limit urls
-    newLimitUrlIterator = startUrlCommand.getLimitUrls().iterator();
-    while (newLimitUrlIterator.hasNext()) {
-      LimitUrl newLimitUrl = (LimitUrl) newLimitUrlIterator.next();
-      newLimitUrl.setProvider(provider);
-      newLimitUrl.setCreated(new Date());
-      newLimitUrl.setUpdated(new Date());
-      newLimitUrl.setStartUrl(startUrl);
-      startUrl.addLimitUrl(newLimitUrl);
-      LOG.info("create new limit url: " + newLimitUrl.getUrl());
-      _limitUrlDao.makePersistent(newLimitUrl);
-    }
-
-    return "redirect:listWebUrls.html";
+    return startUrl;
   }
 
   @SuppressWarnings("unchecked")
