@@ -1,7 +1,5 @@
 package de.ingrid.iplug.se.urlmaintenance.persistence.dao;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.Query;
@@ -127,10 +125,6 @@ public class StartUrlDao extends Dao<StartUrl> implements IStartUrlDao {
   @Override
   public Long countByProviderAndMetadatas(Provider provider,
       List<Metadata> metadatas) {
-    Collection<Long> idList = new ArrayList<Long>();
-    for (Metadata metadata : metadatas) {
-      idList.add(metadata.getId());
-    }
 
     // init query
     String q = "SELECT COUNT(DISTINCT su) FROM StartUrl su JOIN su._limitUrls lu ";

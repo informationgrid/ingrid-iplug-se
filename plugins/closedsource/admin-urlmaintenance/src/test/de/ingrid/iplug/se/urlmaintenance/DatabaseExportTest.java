@@ -5,6 +5,7 @@ import java.io.File;
 import junit.framework.TestCase;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.nutch.util.NutchConfiguration;
 
@@ -20,7 +21,7 @@ public class DatabaseExportTest extends TestCase {
 
   @Override
   protected void tearDown() throws Exception {
-    // assertTrue(FileUtil.fullyDelete(_tmpFolder));
+    assertTrue(FileUtil.fullyDelete(_tmpFolder));
   }
 
   public void testExport() throws Exception {
@@ -29,7 +30,6 @@ public class DatabaseExportTest extends TestCase {
     create.set("url.type", "catalog");
     databaseExport.setConf(create);
     databaseExport.preCrawl(new Path(_tmpFolder.getAbsolutePath()));
-    
-    
+
   }
 }

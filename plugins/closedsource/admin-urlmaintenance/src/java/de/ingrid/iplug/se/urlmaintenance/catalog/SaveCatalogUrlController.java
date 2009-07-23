@@ -1,7 +1,10 @@
 package de.ingrid.iplug.se.urlmaintenance.catalog;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,6 +26,9 @@ public class SaveCatalogUrlController {
 
   private final ICatalogUrlDao _catalogUrlDao;
 
+  private static final Set<String> _supportedTypes = new HashSet<String>(Arrays
+      .asList(new String[] { "topics", "service", "measure" }));
+
   @Autowired
   public SaveCatalogUrlController(ICatalogUrlDao catalogUrlDao) {
     _catalogUrlDao = catalogUrlDao;
@@ -37,7 +43,8 @@ public class SaveCatalogUrlController {
     for (Metadata metadata : metadatas) {
       String metadataKey = metadata.getMetadataKey();
       String metadataValue = metadata.getMetadataValue();
-      if (metadataKey.equals("datatype")) {
+      if ("datatype".equals(metadataKey)
+          && _supportedTypes.contains(metadataValue)) {
         type = metadataValue;
         break;
       }

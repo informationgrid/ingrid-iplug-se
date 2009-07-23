@@ -1,7 +1,5 @@
 package de.ingrid.iplug.se.urlmaintenance.persistence.dao;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.Query;
@@ -26,14 +24,31 @@ public class CatalogUrlDao extends Dao<CatalogUrl> implements ICatalogUrlDao {
   @Override
   public Long countByProviderAndMetadatas(Provider provider,
       List<Metadata> metadatas) {
-    Collection<Long> idList = new ArrayList<Long>();
+
+    // init query
+    String q = "SELECT count(cu) FROM CatalogUrl cu ";
+
+    // join metadatas in separately variables
     for (Metadata metadata : metadatas) {
-      idList.add(metadata.getId());
+      q += " JOIN cu._metadatas md" + metadata.getId();
     }
 
-    Query query = _transactionService
-        .createQuery("SELECT count(cu) FROM CatalogUrl cu JOIN cu._metadatas md WHERE cu._provider._id = :providerId AND md._id in ("
-            + idList + ")");
+    // set parameter to every variable
+    q += " WHERE ";
+    for (Metadata metadata : metadatas) {
+      q += " md" + metadata.getId() + "._id = :md" + metadata.getId() + " AND ";
+    }
+
+    // end query with provider
+    q += " cu._provider._id = :providerId";
+
+    Query query = _transactionService.createQuery(q);
+
+    // fill query with metadata id's
+    for (Metadata metadata : metadatas) {
+      query.setParameter("md" + metadata.getId(), metadata.getId());
+    }
+
     query.setParameter("providerId", provider.getId());
     return (Long) query.getSingleResult();
   }
@@ -52,6 +67,12 @@ public class CatalogUrlDao extends Dao<CatalogUrl> implements ICatalogUrlDao {
     case CREATED_DESC:
       orderQuery = "ORDER BY cu._created desc";
       break;
+    case UPDATED_ASC:
+      orderQuery = "ORDER BY cu._updated asc";
+      break;
+    case UPDATED_DESC:
+      orderQuery = "ORDER BY cu._updated desc";
+      break;
     case URL_ASC:
       orderQuery = "ORDER BY cu._url asc";
       break;
@@ -62,15 +83,31 @@ public class CatalogUrlDao extends Dao<CatalogUrl> implements ICatalogUrlDao {
       break;
     }
 
-    Collection<Long> idList = new ArrayList<Long>();
+    // init query
+    String q = "SELECT cu FROM CatalogUrl cu ";
+
+    // join metadatas in separately variables
     for (Metadata metadata : metadatas) {
-      idList.add(metadata.getId());
+      q += " JOIN cu._metadatas md" + metadata.getId();
     }
 
-    Query query = _transactionService
-        .createQuery("SELECT cu FROM CatalogUrl cu JOIN cu._metadatas md WHERE cu._provider._id = :providerId AND md._id in ("
-            + idList + ") " + orderQuery);
+    // set parameter to every variable
+    q += " WHERE ";
+    for (Metadata metadata : metadatas) {
+      q += " md" + metadata.getId() + "._id = :md" + metadata.getId() + " AND ";
+    }
+
+    // end query with provider
+    q += " cu._provider._id = :providerId  " + orderQuery;
+
+    Query query = _transactionService.createQuery(q);
+
+    // fill query with metadata id's
+    for (Metadata metadata : metadatas) {
+      query.setParameter("md" + metadata.getId(), metadata.getId());
+    }
     query.setParameter("providerId", provider.getId());
+
     query.setFirstResult(firstResult);
     query.setMaxResults(maxResult);
     return query.getResultList();
