@@ -78,6 +78,8 @@
 						<c:set var="selectedFilter" value=""/>
 						<c:set var="paramString" value=""/>
 						<form method="get" action="" id="filter">
+						<input type="hidden" name="sort" value="${sort}"/>
+						<input type="hidden" name="dir" value="${dir}"/>
 						<div class="row">	
 							<label>Filter Datatype:</label>
 							<c:forEach var="dt" items="${datatypes }">
@@ -226,18 +228,14 @@
 				                ]
 						};
 						
-						var mySortFunction = function(desc) {
-							var dir = 'desc';
-							if(desc){
-								dir = 'asc';
-							}
-							window.location.href = "listWebUrls.html?sort=" +"url" +"&dir=" +dir +"${paramString}";
+						var mySortFunction = function(a,b,desc) {
+							// do nothing
 							}
 
 						var myColumnDefs = [
-							{key:"url", label:"Url", sortable:true},
-							{key:"created", label:"Erstellt", sortable:true},
-							{key:"edited", label:"Geändert", sortable:true},
+							{key:"url", label:"Url", sortable:true, sortOptions:{sortFunction:mySortFunction}},
+							{key:"created", label:"Erstellt", sortable:true, sortOptions:{sortFunction:mySortFunction}},
+							{key:"edited", label:"Geändert", sortable:true, sortOptions:{sortFunction:mySortFunction}},
 							{key:"isLaw", label:"RV"},
 							{key:"isResearch", label:"FS"},
 							{key:"isWWW", label:"UT"},
@@ -254,6 +252,25 @@
 							sortedBy : {key:sortBy, dir:sortDir},
 						}
 						var myDataTable = new YAHOO.widget.DataTable("dynamicdata", myColumnDefs, myDataSource, myConfig);
+						</script>
+						
+						<script>
+							function sort(e, data) { 
+								var fieldToSort = data[0];
+								var currentSort = data[1];
+								var currentDir = data[2];
+
+								dir = 'desc';
+								if(fieldToSort == currentSort){
+									if(currentDir == 'desc'){
+										dir = 'asc';
+									}
+								}
+								window.location.href = "listWebUrls.html?sort=" +fieldToSort +"&dir=" +dir +"${paramString}";
+							}
+							YAHOO.util.Event.addListener("yui-dt0-th-url-liner", "click", sort, ['url', '${sort}', '${dir}']);
+							YAHOO.util.Event.addListener("yui-dt0-th-created-liner", "click", sort, ['created', '${sort}', '${dir}']);
+							YAHOO.util.Event.addListener("yui-dt0-th-edited-liner", "click", sort, ['edited', '${sort}', '${dir}']);
 						</script>
 					</div>
 					

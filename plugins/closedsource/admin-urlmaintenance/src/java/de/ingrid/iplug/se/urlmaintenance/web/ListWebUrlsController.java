@@ -106,7 +106,6 @@ public class ListWebUrlsController {
     model.addAttribute("langs", langs);
     model.addAttribute("sort", sort);
     model.addAttribute("dir", dir);
-System.out.println("ListWebUrlsController.listWebUrls() sort: " +sort +" dir: " +dir);
     return "web/listWebUrls";
   }
 
@@ -115,18 +114,6 @@ System.out.println("ListWebUrlsController.listWebUrls() sort: " +sort +" dir: " 
     return new StartUrlCommand();
   }
 
-  private boolean filter(String filterKey, String[] filterValues,
-      Metadata metadata) {
-    boolean filter = false;
-    for (String filterValue : filterValues) {
-      if (metadata.getMetadataKey().equals(filterKey)
-          && metadata.getMetadataValue().equals(filterValue)) {
-        filter = true;
-        break;
-      }
-    }
-    return filter;
-  }
 
   private OrderBy orderByUpdated(String dir) {
     return "asc".equals(dir) ? OrderBy.UPDATED_ASC : OrderBy.UPDATED_DESC;
@@ -140,34 +127,5 @@ System.out.println("ListWebUrlsController.listWebUrls() sort: " +sort +" dir: " 
     return "asc".equals(dir) ? OrderBy.URL_ASC : OrderBy.URL_DESC;
   }
 
-  // @RequestMapping(value = "/startUrlSubset.html", method = RequestMethod.GET)
-  // public String startUrlSubset(
-  // @ModelAttribute("partnerProviderCommand") PartnerProviderCommand
-  // partnerProviderCommand,
-  // @RequestParam(value = "startIndex", required = false) Integer start,
-  // @RequestParam(value = "pageSize", required = false) Integer length,
-  // @RequestParam(value = "sort", required = false) String sort,
-  // @RequestParam(value = "dir", required = false) String dir, Model model,
-  // HttpServletRequest request) {
-  // System.out.println(request.getParameterMap());
-  // start = start == null ? 0 : start;
-  // length = length == null ? 10 : length;
-  //
-  // OrderBy orderBy = "url".equals(sort) ? ("asc".equals(dir) ? OrderBy.URL_ASC
-  // : OrderBy.URL_DESC) : ("asc".equals(dir) ? OrderBy.TIMESTAMP_ASC
-  // : OrderBy.TIMESTAMP_DESC);
-  // String providerString = partnerProviderCommand.getProvider();
-  // Provider byName = _providerDao.getByName(providerString);
-  // Long count = 0L;
-  // if (byName != null) {
-  // count = _startUrlDao.countByProvider(byName);
-  // List<StartUrl> startUrls = _startUrlDao.getByProvider(byName, start,
-  // length, orderBy);
-  // model.addAttribute("urls", startUrls);
-  // }
-  //
-  // model.addAttribute("count", count);
-  //
-  // return "web/startUrlSubset";
-  // }
+
 }

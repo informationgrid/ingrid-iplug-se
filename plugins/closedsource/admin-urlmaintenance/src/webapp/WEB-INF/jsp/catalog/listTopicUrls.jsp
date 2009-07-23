@@ -154,11 +154,15 @@
 				                    {key:"action"}
 				                ]
 						};
+
+						var mySortFunction = function(a,b,desc) {
+							// do nothing
+							}
 						
-							var myColumnDefs = [
-							{key:"url", label:"Url", sortable:true},
-							{key:"created", label:"Erstellt", sortable:true},
-							{key:"edited", label:"Geändert", sortable:true},
+						var myColumnDefs = [
+							{key:"url", label:"Url", sortable:true, sortOptions:{sortFunction:mySortFunction}},
+							{key:"created", label:"Erstellt", sortable:true, sortOptions:{sortFunction:mySortFunction}},
+							{key:"edited", label:"Geändert", sortable:true, sortOptions:{sortFunction:mySortFunction}},
 							{key:"altTitle", label:"Alt. Titel"},
 							{key:"topic", label:"Thema"},
 							{key:"functCategory", label:"Funkt. Kategorie"},
@@ -166,10 +170,34 @@
 							
 						];
 						
+						var sortBy = '${sort}';
+						var sortDir = YAHOO.widget.DataTable.CLASS_ASC;
+						if('${dir}' == 'desc'){
+							 sortDir = YAHOO.widget.DataTable.CLASS_DESC;
+							}
 						var myConfig = {
-							sortedBy : {key:"created", dir:YAHOO.widget.DataTable.CLASS_DESC},
+							sortedBy : {key:sortBy, dir:sortDir},
 						}
 						var myDataTable = new YAHOO.widget.DataTable("dynamicdata", myColumnDefs, myDataSource, myConfig);
+						</script>
+						
+						<script>
+							function sort(e, data) { 
+								var fieldToSort = data[0];
+								var currentSort = data[1];
+								var currentDir = data[2];
+
+								dir = 'desc';
+								if(fieldToSort == currentSort){
+									if(currentDir == 'desc'){
+										dir = 'asc';
+									}
+								}
+								window.location.href = "listTopicUrls.html?sort=" +fieldToSort +"&dir=" +dir;
+							}
+							YAHOO.util.Event.addListener("yui-dt0-th-url-liner", "click", sort, ['url', '${sort}', '${dir}']);
+							YAHOO.util.Event.addListener("yui-dt0-th-created-liner", "click", sort, ['created', '${sort}', '${dir}']);
+							YAHOO.util.Event.addListener("yui-dt0-th-edited-liner", "click", sort, ['edited', '${sort}', '${dir}']);
 						</script>
 				</div>
 			</div>

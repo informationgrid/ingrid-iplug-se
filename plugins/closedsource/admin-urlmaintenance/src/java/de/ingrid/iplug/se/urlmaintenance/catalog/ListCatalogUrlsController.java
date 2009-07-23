@@ -119,9 +119,12 @@ public class ListCatalogUrlsController {
 
   private void pushUrls(Integer start, Integer length, String sort, String dir,
       Model model, ArrayList<Metadata> metadatas, Provider byName, Integer hitsPerPage, Integer page) {
-    OrderBy orderBy = "url".equals(sort) ? ("asc".equals(dir) ? OrderBy.URL_ASC
-        : OrderBy.URL_DESC) : ("asc".equals(dir) ? OrderBy.CREATED_ASC
-        : OrderBy.CREATED_DESC);
+    
+    sort = sort != null ? sort : "created";
+    dir = dir != null ? dir : "desc";
+    
+    OrderBy orderBy = "url".equals(sort) ? orderByUrl(dir) : ("edited"
+        .equals(sort) ? orderByUpdated(dir) : orderByCreated(dir));
     Long count = 0L;
     List<CatalogUrl> catalogUrls = new ArrayList<CatalogUrl>();
     if (byName != null) {
@@ -131,9 +134,23 @@ public class ListCatalogUrlsController {
     }
     model.addAttribute("urls", catalogUrls);
     model.addAttribute("count", count);
+    model.addAttribute("sort", sort);
+    model.addAttribute("dir", dir);
     
     Paging paging = new Paging(10, hitsPerPage, count.intValue(), page);
     model.addAttribute("paging", paging);
+  }
+  
+  private OrderBy orderByUpdated(String dir) {
+    return "asc".equals(dir) ? OrderBy.UPDATED_ASC : OrderBy.UPDATED_DESC;
+  }
+
+  private OrderBy orderByCreated(String dir) {
+    return "asc".equals(dir) ? OrderBy.CREATED_ASC : OrderBy.CREATED_DESC;
+  }
+
+  private OrderBy orderByUrl(String dir) {
+    return "asc".equals(dir) ? OrderBy.URL_ASC : OrderBy.URL_DESC;
   }
 
 }
