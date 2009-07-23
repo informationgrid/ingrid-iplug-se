@@ -5,6 +5,7 @@
 	<title>Admin URL Pflege - Katalog URLs</title>
 	<link rel="stylesheet" type="text/css" href="${theme}/css/reset-fonts-grids.css" />
 	<link rel="stylesheet" type="text/css" href="${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css">
+	<link rel="stylesheet" type="text/css" href="${theme}/js/yui/build/container/assets/skins/sam/container.css" />
 	<script type="text/javascript" src="${theme}/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
 	<script type="text/javascript" src="${theme}/js/yui/build/element/element-min.js"></script>
 	<script type="text/javascript" src="${theme}/js/yui/build/connection/connection-min.js"></script>
@@ -20,6 +21,9 @@
 	<script type="text/javascript" src="${theme}/js/yui/build/yahoo/yahoo-min.js" ></script>
 	<script type="text/javascript" src="${theme}/js/yui/build/event/event-min.js" ></script>
 	<link rel="stylesheet" type="text/css" href="${theme}/css/style.css" />
+	<link rel="stylesheet" type="text/css" href="${theme}/js/yui/build/button/assets/skins/sam/button.css" />
+	<script type="text/javascript" src="${theme}/js/yui/build/button/button-min.js"></script>
+	<script type="text/javascript" src="${theme}/js/yui/build/container/container-min.js"></script>
 </head>
 <body class="yui-skin-sam">
 	<div id="doc2">
@@ -100,7 +104,7 @@
 								</tr>
 							</thead>
 							<tbody>
-							<c:forEach var="url" items="${urls}">
+							<c:forEach var="url" items="${urls}" varStatus="index">
 								<tr>
 									<td><a href="${url.url}" target="_blank" style="color:black">${url.url}</a></td>
 									<td><fmt:formatDate value="${url.created}" pattern="yyyy-MM-dd"/></td>
@@ -128,7 +132,8 @@
 									</td>
 									<td>
 										<a href="editCatalogUrl.html?id=${url.id}&type=topics">EDIT</a>
-						       			<a href="delete.html?id=${url.id}">DEL</a>
+						       			<a href="#" id="deleteCatalogUrl_${index.index}" 
+						       				onclick="document.getElementById('urlToDelete').innerHTML='${url.url}';document.getElementById('idToDelete').value='${url.id }'">DEL</a>
 						       			<a href="test.html?id=${url.id}">TEST</a>
 									</td>
 								</tr>	
@@ -198,6 +203,46 @@
 							YAHOO.util.Event.addListener("yui-dt0-th-url-liner", "click", sort, ['url', '${sort}', '${dir}']);
 							YAHOO.util.Event.addListener("yui-dt0-th-created-liner", "click", sort, ['created', '${sort}', '${dir}']);
 							YAHOO.util.Event.addListener("yui-dt0-th-edited-liner", "click", sort, ['edited', '${sort}', '${dir}']);
+						</script>
+						
+						<div id="deleteCatalogUrlForm">
+							<div class="hd">Löschen</div>
+							<div class="bd">
+								<form method="post" action="deleteCatalogUrl.html">
+									<font color="red">Möchten Sie wirklich löschen?</font>
+									<br/>
+									<input type="hidden" name="id" id="idToDelete" value=""/>
+									<input type="hidden" name="type" value="topics" />
+									<span id="urlToDelete"></span>
+								</form>
+							</div>
+						</div>
+						
+						<script>
+						YAHOO.namespace("example.container");
+						var handleYes = function() {
+						    this.form.submit();
+						};
+						
+						var handleNo = function() {
+						    this.hide();
+						};
+
+						YAHOO.example.container.deleteCatalogUrl = 
+						    new YAHOO.widget.Dialog("deleteCatalogUrlForm", 
+						             { width: "300px",
+						               fixedcenter: true,
+						               visible: false,
+						               draggable: false,
+						               close: true,
+						               constraintoviewport: true,
+						               buttons: [ { text:"Löschen", handler:handleYes, isDefault:true },
+						                          { text:"Abbrechen",  handler:handleNo } ]
+						             } );
+						YAHOO.example.container.deleteCatalogUrl.render();
+						<c:forEach items="${urls}" var="url" varStatus="index">
+						YAHOO.util.Event.addListener("deleteCatalogUrl_${index.index}", "click", YAHOO.example.container.deleteCatalogUrl.show, YAHOO.example.container.deleteCatalogUrl, true);
+						</c:forEach>
 						</script>
 				</div>
 			</div>
