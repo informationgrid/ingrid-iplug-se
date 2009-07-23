@@ -11,32 +11,33 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.CatalogUrl;
 
 @Controller
 public class DeleteCatalogUrlController {
-  
+
   private ICatalogUrlDao _catalogUrlDao;
 
   @Autowired
-  public DeleteCatalogUrlController(ICatalogUrlDao catalogUrlDao){
+  public DeleteCatalogUrlController(ICatalogUrlDao catalogUrlDao) {
     _catalogUrlDao = catalogUrlDao;
-    
+
   }
-  
-  @RequestMapping(method = RequestMethod.POST, value = "deleteCatalogUrl.html")
-  public String deleteCatalogUrl(@RequestParam(value = "id", required = true) final Long id, 
-      @RequestParam(value = "type", required = false) final String type){
-    
+
+  @RequestMapping(method = RequestMethod.POST, value = "/deleteCatalogUrl.html")
+  public String deleteCatalogUrl(
+      @RequestParam(value = "id", required = true) final Long id,
+      @RequestParam(value = "type", required = false) final String type) {
+
     CatalogUrl url = _catalogUrlDao.getById(id);
-    if(url != null){
-      //TODO: check security user is allowed
+    if (url != null) {
+      // TODO: check security user is allowed
       _catalogUrlDao.makeTransient(url);
     }
-    
-    String view = "/listTopicUrls.html";
-    if(type != null && "service".equals(type)){
-      view = "/listServiceUrls.html";
-    }else if(type != null && "measure".equals(type)){
-      view = "/listMeasureUrls.html";
+
+    String view = "redirect:/listTopicUrls.html";
+    if ("service".equals(type)) {
+      view = "redirect:/listServiceUrls.html";
+    } else if ("measure".equals(type)) {
+      view = "redirect:/listMeasureUrls.html";
     }
-    return "redirect:"+view ;
+    return view;
   }
 
 }
