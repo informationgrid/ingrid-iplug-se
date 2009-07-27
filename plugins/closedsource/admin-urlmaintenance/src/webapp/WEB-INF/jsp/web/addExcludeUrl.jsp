@@ -81,7 +81,14 @@
 							<c:otherwise>
 								<form:form action="addExcludeUrl.html" method="post" modelAttribute="startUrlCommand">
 									<fieldset>
-										<legend>Web URL anlegen</legend>
+										<c:choose>
+											<c:when test="${startUrlCommand.id > -1}">
+												<legend>Web Url bearbeiten - Exclude Url</legend>
+											</c:when>
+											<c:otherwise>
+												<legend>Web Url anlegen - Exclude Url</legend>										
+											</c:otherwise>
+										</c:choose>
 										<row>
 									        <label>Exclude URL:</label>
 									        <field>

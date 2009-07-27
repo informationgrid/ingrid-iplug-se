@@ -84,7 +84,14 @@
 							<c:otherwise>
 								<form:form action="addLimitUrl.html" method="post" modelAttribute="startUrlCommand">
 									<fieldset>
-										<legend>Web URL anlegen</legend>
+										<c:choose>
+											<c:when test="${startUrlCommand.id > -1}">
+												<legend>Web Url bearbeiten - Limit Url</legend>
+											</c:when>
+											<c:otherwise>
+												<legend>Web Url anlegen - Limit Url</legend>										
+											</c:otherwise>
+										</c:choose>
 										<row>
 									        <label>Limit URL:</label>
 									        <field>
@@ -111,7 +118,7 @@
 									        <label>Typ:</label>
 									        <field>
 									            <c:forEach var="type" items="${datatypes}">
-									            	<input type="checkbox" name="limitUrls[${limitUrlCounter}].metadatas" value="${type.id}"/> ${type.metadataValue }<br/>
+									            	<input type="checkbox" name="limitUrls[${limitUrlCounter}].metadatas" value="${type.id}" /> ${type.metadataValue }<br/>
 									            </c:forEach>
 									            
 									            <div class="error"><form:errors path="limitUrls[${limitUrlCounter}].metadatas" /></div>

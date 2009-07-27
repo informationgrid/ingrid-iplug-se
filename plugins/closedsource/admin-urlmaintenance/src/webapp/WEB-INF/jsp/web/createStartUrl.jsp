@@ -67,7 +67,14 @@
 					
 					<form:form action="createStartUrl.html" method="post" modelAttribute="startUrlCommand">
 						<fieldset>
-							<legend>Web URL anlegen</legend>
+							<c:choose>
+								<c:when test="${startUrlCommand.id > -1}">
+									<legend>Web Url bearbeiten - Start Url</legend>
+								</c:when>
+								<c:otherwise>
+									<legend>Web Url anlegen - Start Url</legend>										
+								</c:otherwise>
+							</c:choose>
 							<row>
 						        <label>Start URL:</label>
 						        <field>

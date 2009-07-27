@@ -70,7 +70,14 @@
 					</div>
 					
 					<fieldset>
-					<legend>Überprüfen und Speichern</legend>
+					<c:choose>
+						<c:when test="${startUrlCommand.id > -1}">
+							<legend>Web Url bearbeiten - Überprüfen und Speichern</legend>
+						</c:when>
+						<c:otherwise>
+							<legend>Web Url anlegen - Überprüfen und Speichern</legend>										
+						</c:otherwise>
+					</c:choose>
 					<div id="markup">
 					    <table id="urls">
 					        <thead>
