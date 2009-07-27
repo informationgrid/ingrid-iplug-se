@@ -17,13 +17,13 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
 public class UrlDaoTest extends DaoTest {
 
   public void testCreate() throws Exception {
-    createProvider();
+    createProvider("partner", "provider");
 
     TransactionService transactionService = new TransactionService();
     transactionService.beginTransaction();
 
     ProviderDao providerDao = new ProviderDao(transactionService);
-    Provider byName = providerDao.getByName("foo");
+    Provider byName = providerDao.getByName("provider");
 
     IStartUrlDao startUrlDao = new StartUrlDao(transactionService);
     ILimitUrlDao limitUrlDao = new LimitUrlDao(transactionService);
@@ -82,7 +82,7 @@ public class UrlDaoTest extends DaoTest {
   }
 
   public void testLimitUrl() throws Exception {
-    createProvider();
+    createProvider("partner", "provider");
     createMetadata("foo", "bar");
     createMetadata("bar", "foo");
     createMetadata("foobar", "foobar");
@@ -91,7 +91,7 @@ public class UrlDaoTest extends DaoTest {
     transactionService.beginTransaction();
 
     ProviderDao providerDao = new ProviderDao(transactionService);
-    Provider byName = providerDao.getByName("foo");
+    Provider byName = providerDao.getByName("provider");
 
     MetadataDao metadataDao = new MetadataDao(transactionService);
     Metadata metadata1 = metadataDao.getByKeyAndValue("foo", "bar");

@@ -13,20 +13,29 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import de.ingrid.iplug.se.urlmaintenance.EntityEditor;
+import de.ingrid.iplug.se.urlmaintenance.PartnerProviderCommand;
+import de.ingrid.iplug.se.urlmaintenance.commandObjects.LimitUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.StartUrlCommand;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ILimitUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IMetadataDao;
-import de.ingrid.iplug.se.urlmaintenance.persistence.model.LimitUrl;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IProviderDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
+import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 
 @Controller
 @SessionAttributes(value = { "partnerProviderCommand", "startUrlCommand" })
 public class AddLimitUrlController {
 
   private final IMetadataDao _metadataDao;
+  private final ILimitUrlDao _limitUrlDao;
+  private final IProviderDao _providerDao;
 
   @Autowired
-  public AddLimitUrlController(IMetadataDao metadataDao) {
+  public AddLimitUrlController(IMetadataDao metadataDao,
+      ILimitUrlDao limitUrlDao, IProviderDao providerDao) {
     _metadataDao = metadataDao;
+    _limitUrlDao = limitUrlDao;
+    _providerDao = providerDao;
   }
 
   @InitBinder
@@ -52,9 +61,15 @@ public class AddLimitUrlController {
 
   @RequestMapping(value = "/addLimitUrl.html", method = RequestMethod.POST)
   public String postAddLimitUrl(
-      @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand) {
+      @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand,
+      @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand) {
     // add new command to fill out
-    startUrlCommand.addLimitUrl(new LimitUrl());
+    String provider = partnerProviderCommand.getProvider();
+    Provider byName = _providerDao.getByName(provider);
+    LimitUrlCommand limitUrlCommand = new LimitUrlCommand(_limitUrlDao);
+    limitUrlCommand.setProvider(byName);
+    startUrlCommand.addLimitUrlCommand(limitUrlCommand);
+
     return "redirect:addLimitUrl.html";
   }
 
@@ -62,7 +77,7 @@ public class AddLimitUrlController {
   public String removeLimitUrl(
       @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand,
       @RequestParam("index") Integer index) {
-    List<LimitUrl> limitUrls = startUrlCommand.getLimitUrls();
+    List<LimitUrlCommand> limitUrls = startUrlCommand.getLimitUrlCommands();
     limitUrls.remove(index.intValue());
     return "redirect:addLimitUrl.html";
   }

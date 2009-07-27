@@ -44,8 +44,9 @@ public abstract class DaoTest extends TestCase {
     transactionService.close();
   }
 
-  protected Provider createProvider() throws Exception {
-    Partner partner = createPartner();
+  protected Provider createProvider(String partnerName, String providerName)
+      throws Exception {
+    Partner partner = createPartner(partnerName);
 
     TransactionService transactionService = new TransactionService();
     transactionService.beginTransaction();
@@ -53,7 +54,7 @@ public abstract class DaoTest extends TestCase {
     Partner byName = partnerDao.getByName(partner.getName());
 
     Provider provider = new Provider();
-    provider.setName("foo");
+    provider.setName(providerName);
     provider.setPartner(byName);
     IProviderDao dao = new ProviderDao(transactionService);
     dao.makePersistent(provider);
@@ -63,12 +64,12 @@ public abstract class DaoTest extends TestCase {
     return provider;
   }
 
-  protected Partner createPartner() throws Exception {
+  protected Partner createPartner(String name) throws Exception {
     TransactionService transactionService = new TransactionService();
     transactionService.beginTransaction();
 
     Partner partner = new Partner();
-    partner.setName("partner");
+    partner.setName(name);
     IPartnerDao dao = new PartnerDao(transactionService);
     dao.makePersistent(partner);
     transactionService.commitTransaction();
@@ -92,4 +93,5 @@ public abstract class DaoTest extends TestCase {
 
     return metadata;
   }
+
 }

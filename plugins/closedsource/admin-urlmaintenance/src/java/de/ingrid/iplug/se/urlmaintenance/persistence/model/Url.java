@@ -35,7 +35,7 @@ public class Url extends IdBase {
   @JoinColumn(nullable = false, name = "provider_fk")
   private Provider _provider;
 
-  @ManyToMany(fetch=FetchType.EAGER)
+  @ManyToMany(fetch = FetchType.EAGER)
   protected List<Metadata> _metadatas = new ArrayList<Metadata>();
 
   public String getUrl() {
@@ -70,4 +70,9 @@ public class Url extends IdBase {
     _updated = edited;
   }
 
+  @Override
+  public String toString() {
+    String s = super.toString();
+    return s += (" url:" + _url);
+  }
 }

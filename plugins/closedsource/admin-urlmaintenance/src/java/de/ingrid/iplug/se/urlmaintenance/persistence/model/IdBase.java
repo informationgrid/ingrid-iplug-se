@@ -41,4 +41,9 @@ public class IdBase {
     return true;
   }
 
+  @Override
+  public String toString() {
+    return "id: " + _id;
+  }
+
 }

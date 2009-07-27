@@ -9,7 +9,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
 public class ProviderDaoTest extends DaoTest {
 
   public void testCreateProvider() throws Exception {
-    Partner partner = createPartner();
+    Partner partner = createPartner("partner");
 
     TransactionService transactionService = new TransactionService();
     transactionService.beginTransaction();
@@ -32,7 +32,7 @@ public class ProviderDaoTest extends DaoTest {
   }
 
   public void testDeleteProvider() throws Exception {
-    Partner partner = createPartner();
+    Partner partner = createPartner("partner");
 
     TransactionService transactionService = new TransactionService();
     transactionService.beginTransaction();
@@ -60,7 +60,7 @@ public class ProviderDaoTest extends DaoTest {
   }
 
   public void testGetByName() throws Exception {
-    Partner partner = createPartner();
+    Partner partner = createPartner("partner");
 
     TransactionService transactionService = new TransactionService();
     transactionService.beginTransaction();

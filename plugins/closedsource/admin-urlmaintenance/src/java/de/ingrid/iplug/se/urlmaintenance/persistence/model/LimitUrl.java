@@ -15,7 +15,6 @@ public class LimitUrl extends WebUrl {
   @JoinColumn(name = "startUrl_fk")
   private StartUrl _startUrl;
 
-
   public StartUrl getStartUrl() {
     return _startUrl;
   }

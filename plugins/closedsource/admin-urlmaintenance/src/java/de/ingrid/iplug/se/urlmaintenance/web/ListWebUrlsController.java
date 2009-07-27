@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import de.ingrid.iplug.se.urlmaintenance.Paging;
 import de.ingrid.iplug.se.urlmaintenance.PartnerProviderCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.StartUrlCommand;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ILimitUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IMetadataDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IProviderDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao;
@@ -35,12 +36,15 @@ public class ListWebUrlsController {
   private final IProviderDao _providerDao;
   private final IMetadataDao _metadataDao;
   private static final Log LOG = LogFactory.getLog(ListWebUrlsController.class);
+  private final ILimitUrlDao _limitUrlDao;
 
   @Autowired
   public ListWebUrlsController(IProviderDao providerDao,
-      IStartUrlDao startUrlDao, IMetadataDao metadataDao) {
+      IStartUrlDao startUrlDao, ILimitUrlDao limitUrlDao,
+      IMetadataDao metadataDao) {
     _providerDao = providerDao;
     _startUrlDao = startUrlDao;
+    _limitUrlDao = limitUrlDao;
     _metadataDao = metadataDao;
   }
 
@@ -71,7 +75,7 @@ public class ListWebUrlsController {
     datatypes = datatypes != null ? datatypes : new String[] {};
     sort = sort != null ? sort : "created";
     dir = dir != null ? dir : "desc";
-    
+
     // filter by metadata
     List<Metadata> metadatas = new ArrayList<Metadata>();
     for (String lang : langs) {
@@ -82,7 +86,6 @@ public class ListWebUrlsController {
       Metadata metadata = _metadataDao.getByKeyAndValue("datatype", datatype);
       metadatas.add(metadata);
     }
-    // metadatas = metadatas.isEmpty() ? injectMetadatas() : metadatas;
 
     int start = Paging.getStart(page, hitsPerPage);
     OrderBy orderBy = "url".equals(sort) ? orderByUrl(dir) : ("edited"
@@ -110,10 +113,15 @@ public class ListWebUrlsController {
   }
 
   @ModelAttribute("startUrlCommand")
-  public StartUrlCommand injectStartUrlCommand() {
-    return new StartUrlCommand();
+  public StartUrlCommand injectStartUrlCommand(
+      @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand) {
+    String provider = partnerProviderCommand.getProvider();
+    Provider byName = _providerDao.getByName(provider);
+    StartUrlCommand startUrlCommand = new StartUrlCommand(_startUrlDao,
+        _limitUrlDao);
+    startUrlCommand.setProvider(byName);
+    return startUrlCommand;
   }
-
 
   private OrderBy orderByUpdated(String dir) {
     return "asc".equals(dir) ? OrderBy.UPDATED_ASC : OrderBy.UPDATED_DESC;
@@ -126,6 +134,5 @@ public class ListWebUrlsController {
   private OrderBy orderByUrl(String dir) {
     return "asc".equals(dir) ? OrderBy.URL_ASC : OrderBy.URL_DESC;
   }
-
 
 }

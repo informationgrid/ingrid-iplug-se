@@ -64,16 +64,16 @@
 					    </ul>            
 					</div>
 					
-					<c:set var="maxLimitUrls" value="${fn:length(startUrlCommand.limitUrls)}"/>
+					<c:set var="maxLimitUrls" value="${fn:length(startUrlCommand.limitUrlCommands)}"/>
 					<c:set var="limitUrlCounter" value="-1"/>
-					<c:forEach items="${startUrlCommand.limitUrls}" var="limitUrl">
+					<c:forEach items="${startUrlCommand.limitUrlCommands}" var="limitUrl">
 						<c:set var="limitUrlCounter" value="${limitUrlCounter+1}"/>
 						<c:choose>
 							<c:when test="${limitUrlCounter < maxLimitUrls-1}">
 								<div class="row">
 								<form:form action="removeLimitUrl.html" method="post" modelAttribute="startUrlCommand">
-									${startUrlCommand.limitUrls[limitUrlCounter].url}
-									(<c:forEach var="metadata" items="${startUrlCommand.limitUrls[limitUrlCounter].metadatas}">
+									${startUrlCommand.limitUrlCommands[limitUrlCounter].url}
+									(<c:forEach var="metadata" items="${startUrlCommand.limitUrlCommands[limitUrlCounter].metadatas}">
 										${metadata.metadataKey}:${metadata.metadataValue }
 									</c:forEach>)
 									<input type="hidden" name="index" value="${limitUrlCounter}" />
@@ -95,8 +95,8 @@
 										<row>
 									        <label>Limit URL:</label>
 									        <field>
-									           <form:input path="limitUrls[${limitUrlCounter}].url"/>
-									            <div class="error"><form:errors path="limitUrls[${limitUrlCounter}].url" /></div>
+									           <form:input path="limitUrlCommands[${limitUrlCounter}].url"/>
+									            <div class="error"><form:errors path="limitUrlCommands[${limitUrlCounter}].url" /></div>
 									        </field>
 									        <desc></desc>
 									    </row>
@@ -104,12 +104,12 @@
 									    <row>
 									        <label>Sprache:</label>
 									        <field>
-									           <select name="limitUrls[${limitUrlCounter}].metadatas" >
+									           <select name="limitUrlCommands[${limitUrlCounter}].metadatas" >
 													<c:forEach var="lang" items="${langs}">
 														<option value="${lang.id}">${lang.metadataValue }</option>
 													</c:forEach>
 												</select>
-									            <div class="error"><form:errors path="limitUrls[${limitUrlCounter}].metadatas" /></div>
+									            <div class="error"><form:errors path="limitUrlCommands[${limitUrlCounter}].metadatas" /></div>
 									        </field>
 									        <desc></desc>
 									    </row>
@@ -118,10 +118,10 @@
 									        <label>Typ:</label>
 									        <field>
 									            <c:forEach var="type" items="${datatypes}">
-									            	<input type="checkbox" name="limitUrls[${limitUrlCounter}].metadatas" value="${type.id}" /> ${type.metadataValue }<br/>
+									            	<input type="checkbox" name="limitUrlCommands[${limitUrlCounter}].metadatas" value="${type.id}" /> ${type.metadataValue }<br/>
 									            </c:forEach>
 									            
-									            <div class="error"><form:errors path="limitUrls[${limitUrlCounter}].metadatas" /></div>
+									            <div class="error"><form:errors path="limitUrlCommands[${limitUrlCounter}].metadatas" /></div>
 									        </field>
 									        <desc></desc>
 									    </row>

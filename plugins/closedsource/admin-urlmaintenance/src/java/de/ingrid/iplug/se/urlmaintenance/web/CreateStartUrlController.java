@@ -8,10 +8,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import de.ingrid.iplug.se.urlmaintenance.PartnerProviderCommand;
+import de.ingrid.iplug.se.urlmaintenance.commandObjects.LimitUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.StartUrlCommand;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ILimitUrlDao;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IProviderDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.ExcludeUrl;
-import de.ingrid.iplug.se.urlmaintenance.persistence.model.LimitUrl;
+import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl;
 
 @Controller
@@ -19,10 +23,17 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl;
 public class CreateStartUrlController {
 
   private final IStartUrlDao _startUrlDao;
+  private final ILimitUrlDao _limitUrlDao;
+  private final IProviderDao _providerDao;
 
   @Autowired
-  public CreateStartUrlController(IStartUrlDao startUrlDao) {
+  public CreateStartUrlController(
+      IStartUrlDao startUrlDao,
+      ILimitUrlDao limitUrlDao,
+ IProviderDao providerDao) {
     _startUrlDao = startUrlDao;
+    _limitUrlDao = limitUrlDao;
+    _providerDao = providerDao;
   }
 
   @RequestMapping(value = { "/createStartUrl.html", "/editStartUrl.html" }, method = RequestMethod.GET)
@@ -31,26 +42,23 @@ public class CreateStartUrlController {
       @RequestParam(value = "id", required = false) Long id) {
     if (id != null) {
       StartUrl byId = _startUrlDao.getById(id);
-      startUrlCommand.setId(byId.getId());
-      startUrlCommand.setCreated(byId.getCreated());
-      startUrlCommand.setProvider(byId.getProvider());
-      startUrlCommand.setUrl(byId.getUrl());
-      startUrlCommand.setLimitUrls(byId.getLimitUrls());
-      startUrlCommand.setExcludeUrls(byId.getExcludeUrls());
+      startUrlCommand.read(byId);
     }
     return "web/createStartUrl";
   }
 
   @RequestMapping(value = "/createStartUrl.html", method = RequestMethod.POST)
   public String postCreateStartUrl(
-      @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand) {
+      @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand,
+      @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand) {
 
-    // if (startUrlCommand.getLimitUrls().isEmpty()) {
-      startUrlCommand.addLimitUrl(new LimitUrl());
-    // }
-    if (startUrlCommand.getExcludeUrls().isEmpty()) {
-      startUrlCommand.getExcludeUrls().add(new ExcludeUrl());
-    }
+    String provider = partnerProviderCommand.getProvider();
+    Provider byName = _providerDao.getByName(provider);
+
+    LimitUrlCommand limitUrlCommand = new LimitUrlCommand(_limitUrlDao);
+    limitUrlCommand.setProvider(byName);
+    startUrlCommand.addLimitUrlCommand(limitUrlCommand);
+    startUrlCommand.addExcludeUrl(new ExcludeUrl());
     return "redirect:addLimitUrl.html";
   }
 }
