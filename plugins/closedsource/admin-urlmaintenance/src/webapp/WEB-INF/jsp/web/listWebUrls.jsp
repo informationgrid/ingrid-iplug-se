@@ -20,6 +20,10 @@
 	<script type="text/javascript" src="${theme}/js/yui/build/yahoo/yahoo-min.js" ></script>
 	<script type="text/javascript" src="${theme}/js/yui/build/event/event-min.js" ></script>
 	<link rel="stylesheet" type="text/css" href="${theme}/css/style.css" />
+	<link rel="stylesheet" type="text/css" href="${theme}/js/yui/build/button/assets/skins/sam/button.css" />
+	<script type="text/javascript" src="${theme}/js/yui/build/button/button-min.js"></script>
+	<script type="text/javascript" src="${theme}/js/yui/build/container/container-min.js"></script>
+	<link rel="stylesheet" type="text/css" href="${theme}/js/yui/build/container/assets/skins/sam/container.css" />
 </head>
 <body class="yui-skin-sam">
 	<div id="doc2">
@@ -146,7 +150,7 @@
 					       		</tr>
 					       	</thead>
 					       	<tbody>
-					       		<c:forEach var="url" items="${urls}">
+					       		<c:forEach var="url" items="${urls}" varStatus="index">
 					       		<tr>
 					       			<td><a href="${url.url}" target="_blank" style="color:black">${url.url}</a></td>
 						       		<td><fmt:formatDate value="${url.created}" pattern="yyyy-MM-dd"/></td>
@@ -157,7 +161,8 @@
 						       		<td>&nbsp;</td>
 						       		<td>
 						       			<a href="editStartUrl.html?id=${url.id}">EDIT</a>
-						       			<a href="delete.html?id=${url.id}">DEL</a>
+						       			<a href="#" id="deleteWebUrl_${index.index}" 
+						       					onclick="document.getElementById('urlToDelete').innerHTML='${url.url}';document.getElementById('idToDelete').value='${url.id }'">DEL</a>
 						       			<a href="test.html?id=${url.id}">TEST</a>
 						       		</td>
 					       		</tr>
@@ -271,6 +276,45 @@
 							YAHOO.util.Event.addListener("yui-dt0-th-url-liner", "click", sort, ['url', '${sort}', '${dir}']);
 							YAHOO.util.Event.addListener("yui-dt0-th-created-liner", "click", sort, ['created', '${sort}', '${dir}']);
 							YAHOO.util.Event.addListener("yui-dt0-th-edited-liner", "click", sort, ['edited', '${sort}', '${dir}']);
+						</script>
+						
+						<div id="deleteWebUrlForm">
+							<div class="hd">Löschen</div>
+							<div class="bd">
+								<form method="post" action="deleteWebUrl.html">
+									<font color="red">Möchten Sie wirklich löschen?</font>
+									<br/>
+									<input type="hidden" name="id" id="idToDelete" value=""/>
+									<span id="urlToDelete"></span>
+								</form>
+							</div>
+						</div>
+						
+						<script>
+						YAHOO.namespace("example.container");
+						var handleYes = function() {
+						    this.form.submit();
+						};
+						
+						var handleNo = function() {
+						    this.hide();
+						};
+
+						YAHOO.example.container.deleteWebUrl = 
+						    new YAHOO.widget.Dialog("deleteWebUrlForm", 
+						             { width: "300px",
+						               fixedcenter: true,
+						               visible: false,
+						               draggable: false,
+						               close: true,
+						               constraintoviewport: true,
+						               buttons: [ { text:"Löschen", handler:handleYes, isDefault:true },
+						                          { text:"Abbrechen",  handler:handleNo } ]
+						             } );
+						YAHOO.example.container.deleteWebUrl.render();
+						<c:forEach items="${urls}" var="url" varStatus="index">
+						YAHOO.util.Event.addListener("deleteWebUrl_${index.index}", "click", YAHOO.example.container.deleteWebUrl.show, YAHOO.example.container.deleteWebUrl, true);
+						</c:forEach>
 						</script>
 					</div>
 					
