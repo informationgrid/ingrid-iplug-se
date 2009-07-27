@@ -7,8 +7,10 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IExcludeUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ILimitUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao;
+import de.ingrid.iplug.se.urlmaintenance.persistence.model.ExcludeUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.LimitUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl;
 
@@ -27,9 +29,13 @@ public class StartUrlCommand extends StartUrl implements
 
   private static final Log LOG = LogFactory.getLog(StartUrlCommand.class);
 
-  public StartUrlCommand(IStartUrlDao startUrlDao, ILimitUrlDao limitUrlDao) {
+  private final IExcludeUrlDao _excludeUrlDao;
+
+  public StartUrlCommand(IStartUrlDao startUrlDao, ILimitUrlDao limitUrlDao,
+      IExcludeUrlDao excludeUrlDao) {
     _startUrlDao = startUrlDao;
     _limitUrlDao = limitUrlDao;
+    _excludeUrlDao = excludeUrlDao;
   }
 
   public Long getId() {
@@ -77,6 +83,13 @@ public class StartUrlCommand extends StartUrl implements
       limitUrlCommand.read(limitUrl);
       addLimitUrlCommand(limitUrlCommand);
     }
+    List<ExcludeUrl> excludeUrls = in.getExcludeUrls();
+    for (ExcludeUrl excludeUrl : excludeUrls) {
+      ExcludeUrlCommand excludeUrlCommand = new ExcludeUrlCommand(
+          _excludeUrlDao);
+      excludeUrlCommand.read(excludeUrl);
+      addExcludeUrlCommand(excludeUrlCommand);
+    }
   }
 
   @Override
@@ -91,6 +104,18 @@ public class StartUrlCommand extends StartUrl implements
     out.setCreated(getCreated());
     out.setUpdated(getUpdated());
 
+    handleLimitUrls(out);
+    handleExcludeUrls(out);
+
+    if (out.getId() == null) {
+      LOG.info("save new start url: " + out);
+      _startUrlDao.makePersistent(out);
+    }
+    return out;
+
+  }
+
+  private void handleLimitUrls(StartUrl out) {
     Iterator<LimitUrl> iterator = out.getLimitUrls().iterator();
     while (iterator.hasNext()) {
       LimitUrl limitUrlFromDb = (LimitUrl) iterator.next();
@@ -115,13 +140,33 @@ public class StartUrlCommand extends StartUrl implements
         out.addLimitUrl(limitUrl);
       }
     }
+  }
 
-    if (out.getId() == null) {
-      LOG.info("save new start url: " + out);
-      _startUrlDao.makePersistent(out);
+  private void handleExcludeUrls(StartUrl out) {
+    Iterator<ExcludeUrl> iterator = out.getExcludeUrls().iterator();
+    while (iterator.hasNext()) {
+      ExcludeUrl excludeUrlFromDb = (ExcludeUrl) iterator.next();
+      boolean delete = true;
+      for (ExcludeUrlCommand excludeUrlCommand : getExcludeUrlCommands()) {
+        if (excludeUrlFromDb.getId().equals(excludeUrlCommand.getId())) {
+          delete = false;
+          break;
+        }
+      }
+      if (delete) {
+        iterator.remove();
+        LOG.info("delete exclude url with id: " + excludeUrlFromDb.getId());
+        _excludeUrlDao.makeTransient(excludeUrlFromDb);
+      }
     }
-    return out;
 
+    for (ExcludeUrlCommand excludeUrlCommand : getExcludeUrlCommands()) {
+      ExcludeUrl excludeUrl = excludeUrlCommand.write();
+      if (excludeUrl.getId() == null) {
+        LOG.info("add new exclude url: " + excludeUrl);
+        out.addExcludeUrl(excludeUrl);
+      }
+    }
   }
 
 }

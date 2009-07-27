@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import de.ingrid.iplug.se.urlmaintenance.PartnerProviderCommand;
+import de.ingrid.iplug.se.urlmaintenance.commandObjects.ExcludeUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.LimitUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.StartUrlCommand;
-import de.ingrid.iplug.se.urlmaintenance.persistence.model.ExcludeUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Url;
 
 @Controller
@@ -23,7 +23,8 @@ public class FinishAddWebUrlController {
   public String finish(
       @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand) {
     List<LimitUrlCommand> limitUrls = startUrlCommand.getLimitUrlCommands();
-    List<ExcludeUrl> excludeUrls = startUrlCommand.getExcludeUrls();
+    List<ExcludeUrlCommand> excludeUrls = startUrlCommand
+        .getExcludeUrlCommands();
     cleanupEmptyUrls(limitUrls);
     cleanupEmptyUrls(excludeUrls);
     return "web/finishWebUrl";

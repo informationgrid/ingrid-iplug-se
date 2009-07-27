@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import de.ingrid.iplug.se.urlmaintenance.Paging;
 import de.ingrid.iplug.se.urlmaintenance.PartnerProviderCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.StartUrlCommand;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IExcludeUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ILimitUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IMetadataDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IProviderDao;
@@ -37,14 +38,17 @@ public class ListWebUrlsController {
   private final IMetadataDao _metadataDao;
   private static final Log LOG = LogFactory.getLog(ListWebUrlsController.class);
   private final ILimitUrlDao _limitUrlDao;
+  private final IExcludeUrlDao _excludeUrlDao;
 
   @Autowired
   public ListWebUrlsController(IProviderDao providerDao,
       IStartUrlDao startUrlDao, ILimitUrlDao limitUrlDao,
+      IExcludeUrlDao excludeUrlDao,
       IMetadataDao metadataDao) {
     _providerDao = providerDao;
     _startUrlDao = startUrlDao;
     _limitUrlDao = limitUrlDao;
+    _excludeUrlDao = excludeUrlDao;
     _metadataDao = metadataDao;
   }
 
@@ -118,7 +122,7 @@ public class ListWebUrlsController {
     String provider = partnerProviderCommand.getProvider();
     Provider byName = _providerDao.getByName(provider);
     StartUrlCommand startUrlCommand = new StartUrlCommand(_startUrlDao,
-        _limitUrlDao);
+        _limitUrlDao, _excludeUrlDao);
     startUrlCommand.setProvider(byName);
     return startUrlCommand;
   }

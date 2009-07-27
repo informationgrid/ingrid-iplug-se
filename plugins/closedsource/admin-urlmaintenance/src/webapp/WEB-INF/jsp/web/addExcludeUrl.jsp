@@ -64,15 +64,15 @@
 					    </ul>            
 					</div>
 					
-					<c:set var="maxExcludeUrls" value="${fn:length(startUrlCommand.excludeUrls)}"/>
+					<c:set var="maxExcludeUrls" value="${fn:length(startUrlCommand.excludeUrlCommands)}"/>
 					<c:set var="excludeUrlCounter" value="-1"/>
-					<c:forEach items="${startUrlCommand.excludeUrls}" var="excludeUrl">
+					<c:forEach items="${startUrlCommand.excludeUrlCommands}" var="excludeUrl">
 						<c:set var="excludeUrlCounter" value="${excludeUrlCounter+1}"/>
 						<c:choose>
 							<c:when test="${excludeUrlCounter < maxExcludeUrls-1}">
 								<div class="row">
 								<form:form action="removeExcludeUrl.html" method="post" modelAttribute="startUrlCommand">
-									${startUrlCommand.excludeUrls[excludeUrlCounter].url}
+									${startUrlCommand.excludeUrlCommands[excludeUrlCounter].url}
 									<input type="hidden" name="index" value="${excludeUrlCounter}" />
 									<input type="image" src="${theme}/gfx/delete.png" align="absmiddle" title="Löschen"/>
 								</form:form>
@@ -92,8 +92,8 @@
 										<row>
 									        <label>Exclude URL:</label>
 									        <field>
-									          <form:input path="excludeUrls[${excludeUrlCounter}].url"/>
-									            <div class="error"><form:errors path="excludeUrls[${excludeUrlCounter}].url" /></div>
+									          <form:input path="excludeUrlCommands[${excludeUrlCounter}].url"/>
+									            <div class="error"><form:errors path="excludeUrlCommands[${excludeUrlCounter}].url" /></div>
 									        </field>
 									        <desc></desc>
 									    </row>

@@ -4,9 +4,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import de.ingrid.iplug.se.urlmaintenance.commandObjects.LimitUrlCommand;
-import de.ingrid.iplug.se.urlmaintenance.commandObjects.StartUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.DaoTest;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IExcludeUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ILimitUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.LimitUrl;
@@ -22,6 +21,9 @@ public class StartUrlWrapperTest extends DaoTest {
   @Mock
   private ILimitUrlDao _limitUrlDao;
 
+  @Mock
+  private IExcludeUrlDao _excludeUrlDao;
+
   @Override
   protected void setUp() throws Exception {
     super.setUp();
@@ -30,7 +32,7 @@ public class StartUrlWrapperTest extends DaoTest {
 
   public void testRead() throws Exception {
     StartUrlCommand startUrlCommand = new StartUrlCommand(_startUrlDao,
-        _limitUrlDao);
+        _limitUrlDao, _excludeUrlDao);
 
     Provider provider = createProvider("partner", "provider");
     StartUrl model = new StartUrl();
@@ -50,7 +52,6 @@ public class StartUrlWrapperTest extends DaoTest {
     Metadata lang = createMetadata("lang", "de");
     Provider provider = createProvider("partner", "provider");
 
-
     // limit url command
     LimitUrlCommand command = new LimitUrlCommand(_limitUrlDao);
     command.setUrl("http://www.101tec.com");
@@ -59,7 +60,7 @@ public class StartUrlWrapperTest extends DaoTest {
     command.addMetadata(lang);
 
     StartUrlCommand startUrlCommand = new StartUrlCommand(_startUrlDao,
-        _limitUrlDao);
+        _limitUrlDao, _excludeUrlDao);
     startUrlCommand.setUrl("http://www.101tec.com/index");
     startUrlCommand.setId(23L);
     startUrlCommand.addLimitUrlCommand(command);

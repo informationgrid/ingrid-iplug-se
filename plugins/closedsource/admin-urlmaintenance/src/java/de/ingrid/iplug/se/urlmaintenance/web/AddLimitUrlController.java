@@ -18,9 +18,7 @@ import de.ingrid.iplug.se.urlmaintenance.commandObjects.LimitUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.StartUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ILimitUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IMetadataDao;
-import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IProviderDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
-import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 
 @Controller
 @SessionAttributes(value = { "partnerProviderCommand", "startUrlCommand" })
@@ -28,14 +26,12 @@ public class AddLimitUrlController {
 
   private final IMetadataDao _metadataDao;
   private final ILimitUrlDao _limitUrlDao;
-  private final IProviderDao _providerDao;
 
   @Autowired
   public AddLimitUrlController(IMetadataDao metadataDao,
-      ILimitUrlDao limitUrlDao, IProviderDao providerDao) {
+      ILimitUrlDao limitUrlDao) {
     _metadataDao = metadataDao;
     _limitUrlDao = limitUrlDao;
-    _providerDao = providerDao;
   }
 
   @InitBinder
@@ -64,10 +60,8 @@ public class AddLimitUrlController {
       @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand,
       @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand) {
     // add new command to fill out
-    String provider = partnerProviderCommand.getProvider();
-    Provider byName = _providerDao.getByName(provider);
     LimitUrlCommand limitUrlCommand = new LimitUrlCommand(_limitUrlDao);
-    limitUrlCommand.setProvider(byName);
+    limitUrlCommand.setProvider(startUrlCommand.getProvider());
     startUrlCommand.addLimitUrlCommand(limitUrlCommand);
 
     return "redirect:addLimitUrl.html";

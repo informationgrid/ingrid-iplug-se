@@ -9,13 +9,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import de.ingrid.iplug.se.urlmaintenance.PartnerProviderCommand;
+import de.ingrid.iplug.se.urlmaintenance.commandObjects.ExcludeUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.LimitUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.StartUrlCommand;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IExcludeUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ILimitUrlDao;
-import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IProviderDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao;
-import de.ingrid.iplug.se.urlmaintenance.persistence.model.ExcludeUrl;
-import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl;
 
 @Controller
@@ -24,16 +23,14 @@ public class CreateStartUrlController {
 
   private final IStartUrlDao _startUrlDao;
   private final ILimitUrlDao _limitUrlDao;
-  private final IProviderDao _providerDao;
+  private final IExcludeUrlDao _excludeUrlDao;
 
   @Autowired
-  public CreateStartUrlController(
-      IStartUrlDao startUrlDao,
-      ILimitUrlDao limitUrlDao,
- IProviderDao providerDao) {
+  public CreateStartUrlController(IStartUrlDao startUrlDao,
+      ILimitUrlDao limitUrlDao, IExcludeUrlDao excludeUrlDao) {
     _startUrlDao = startUrlDao;
     _limitUrlDao = limitUrlDao;
-    _providerDao = providerDao;
+    _excludeUrlDao = excludeUrlDao;
   }
 
   @RequestMapping(value = { "/createStartUrl.html", "/editStartUrl.html" }, method = RequestMethod.GET)
@@ -52,13 +49,13 @@ public class CreateStartUrlController {
       @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand,
       @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand) {
 
-    String provider = partnerProviderCommand.getProvider();
-    Provider byName = _providerDao.getByName(provider);
-
     LimitUrlCommand limitUrlCommand = new LimitUrlCommand(_limitUrlDao);
-    limitUrlCommand.setProvider(byName);
+    limitUrlCommand.setProvider(startUrlCommand.getProvider());
     startUrlCommand.addLimitUrlCommand(limitUrlCommand);
-    startUrlCommand.addExcludeUrl(new ExcludeUrl());
+
+    ExcludeUrlCommand excludeUrlCommand = new ExcludeUrlCommand(_excludeUrlDao);
+    excludeUrlCommand.setProvider(startUrlCommand.getProvider());
+    startUrlCommand.addExcludeUrlCommand(excludeUrlCommand);
     return "redirect:addLimitUrl.html";
   }
 }
