@@ -20,7 +20,7 @@
 	</script>
 </head>
 
-<body class="yui-skin-sam" onLoad="getLog(1000);">
+<body class="yui-skin-sam" onload="getLog(lineCount)">
 <div id="doc2" class="yui-t4">					
 	<div id="hd">
 		<%@ include file="/WEB-INF/jsp/includes/header.jsp" %>
@@ -73,12 +73,33 @@
 				</div>	
 				
 				<div style="margin-top:25px"></div>
+				<input type="hidden" id="mode" value="start"/>
 				<h3>Log Datei</h3>
 				<img src="${theme}/gfx/console.png" align="absmiddle"/> Zeige <input type="text" id="lineCount" value="" size="5"/> letzte Zeilen <input type="button" value="Setzen" onClick="lineCount = document.getElementById('lineCount').value; getLog(lineCount); "/>
+				<img src="${theme}/gfx/play_inactive.png" align="absmiddle" id="start" onclick="handleStartStop('start')" style="cursor:pointer">
+				<img src="${theme}/gfx/pause.png" align="absmiddle" id="stop" onclick="handleStartStop('stop')"  style="cursor:pointer">
+				<script>
+					function handleStartStop(action){
+						var startImage = document.getElementById('start');
+						var stopImage = document.getElementById('stop');
+						if(action == 'start'){
+							startImage.src = '${theme}/gfx/play_inactive.png';
+							stopImage.src = '${theme}/gfx/pause.png';
+							if(document.getElementById('mode').value != 'start'){
+								document.getElementById('mode').value = 'start';
+								getLog(lineCount);
+							}
+						}else if(action == 'stop'){
+							startImage.src = '${theme}/gfx/play.png';
+							stopImage.src = '${theme}/gfx/pause_inactive.png';
+							document.getElementById('mode').value = 'stop';
+						}
+					}
+				</script>
 				<script>
 					document.getElementById('lineCount').value = lineCount;
 				</script>
-				<div id="logFileContainer" style="height:400px; overflow:auto; background:#F4F4F4; border:1px solid #CCCCCC; font-size:11px"></div>
+				<div id="logFileContainer" style="height:400px; overflow:auto; background:#F4F4F4; border:1px solid #CCCCCC; font-size:11px" onmousedown="document.getElementById('mode').value = 'stop'" onmouseup="document.getElementById('mode').value = 'start'; getLog(lineCount)"></div>
 				
 			</div> 
 		</div> 
