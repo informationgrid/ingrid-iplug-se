@@ -77,10 +77,10 @@
 					            </tr>
 					        </thead>
 					        <tbody>
-								<c:forEach items="${crawlPaths}" var="crawlPath">
+								<c:forEach items="${segments}" var="segment">
 						            <tr>
-						            	<td>${crawlPath.path.name}</td>
-						                <td>${crawlPath.size}</td>
+						            	<td>${segment.path.name}</td>
+						                <td>${segment.size}</td>
 						            </tr>
 								</c:forEach>
 					        </tbody>
@@ -111,38 +111,53 @@
 					    }();
 					});
 					</script>						
+
+					<div>&nbsp;</div>
+					<h3>Datenbänke</h3>
+					<div id="markupDbs">
+					    <table id="dbs">
+					        <thead>
+					            <tr>
+					            	<th>Datenbank</th>
+					                <th>Größe in MB</th>
+					            </tr>
+					        </thead>
+					        <tbody>
+								<c:forEach items="${dbs}" var="db">
+						            <tr>
+						            	<td>${db.path.name}</td>
+						                <td>${db.size}</td>
+						            </tr>
+								</c:forEach>
+					        </tbody>
+					    </table>
+					</div>
+					<script type="text/javascript">
+					YAHOO.util.Event.addListener(window, "load", function() {
+					    YAHOO.example.EnhanceFromMarkup = function() {
+					        var myColumnDefs = [
+								{key:"path",label:"Datenbank", sortable:true},
+					            {key:"size",label:"Größe in MB", sortable:true},
+					        ];
+					
+					        var myDataSource = new YAHOO.util.DataSource(YAHOO.util.Dom.get("dbs"));
+					        myDataSource.responseType = YAHOO.util.DataSource.TYPE_HTMLTABLE;
+					        myDataSource.responseSchema = {
+					            fields: [{key:"path"},
+								        {key:"size", parser:"number"}
+					            ]
+					        };
+					
+					        var myDataTable = new YAHOO.widget.DataTable("markupDbs", myColumnDefs, myDataSource, {sortedBy:{key:"path",dir:"desc"}});
+					        
+					        return {
+					            oDS: myDataSource,
+					            oDT: myDataTable
+					        };
+					    }();
+					});
+					</script>						
 				
-					<form:form action="startCrawl.html" method="post" modelAttribute="crawlCommand">
-						<input type="hidden" name="crawlFolder" value="${crawlFolder}"/>
-						<fieldset>
-							<legend>Neuen Crawl starten</legend>
-							
-							<row>
-						        <label>Crawl Tiefe:</label>
-						        <field>
-						           <form:select path="depth" items="${depths}"/>
-						            <div class="error"><form:errors path="depth" /></div>
-						        </field>
-						        <desc></desc>
-						    </row>
-						    
-						    <row>
-						        <label>Anz. Seiten pro Segment:</label>
-						        <field>
-						         <form:input path="topn"/>
-						            <div class="error"><form:errors path="topn" /></div>
-						        </field>
-						        <desc></desc>
-						    </row>
-						    
-							<row>
-						        <label>&nbsp;</label>
-						        <field>
-						            <input type="submit" value="Starten"/>
-						        </field>
-						    </row>
-						</fieldset>
-					</form:form>
 				</div>
 			</div>
 		</div>

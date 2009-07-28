@@ -53,16 +53,24 @@ public class CrawlController extends NavigationSelector {
     int counter = 0;
     for (FileStatus fileStatus : fileStatusArray) {
       Path fileStatusPath = fileStatus.getPath();
-      ContentSummary contentSummary = fileSystem
-          .getContentSummary(fileStatusPath);
-      long len = contentSummary.getLength();
-      len = (len / 1024) / 1024;
-      crawlPathArray[counter] = new CrawlPath();
-      crawlPathArray[counter].setPath(fileStatusPath);
-      crawlPathArray[counter].setSize(len);
+      crawlPathArray[counter] = createCrawlPath(fileStatusPath, fileSystem);
       counter++;
     }
     return crawlPathArray;
+  }
+
+  private CrawlPath createCrawlPath(Path path, FileSystem fileSystem)
+      throws IOException {
+    long len = 0;
+    if (fileSystem.exists(path)) {
+      ContentSummary contentSummary = fileSystem.getContentSummary(path);
+      len = contentSummary.getLength();
+      len = (len / 1024) / 1024;
+    }
+    CrawlPath crawlPath = new CrawlPath();
+    crawlPath.setPath(path);
+    crawlPath.setSize(len);
+    return crawlPath;
   }
 
   @ModelAttribute("depths")
@@ -119,8 +127,21 @@ public class CrawlController extends NavigationSelector {
     Configuration configuration = nutchInstance.getConfiguration();
     FileSystem fileSystem = FileSystem.get(configuration);
     CrawlPath[] listPaths = listPaths(segmentsPath, fileSystem);
-    model.addAttribute("crawlPaths", listPaths);
+    model.addAttribute("segments", listPaths);
     model.addAttribute("crawlFolder", crawlFolder);
+
+    // db's
+    CrawlPath[] dbPaths = new CrawlPath[4];
+    dbPaths[0] = createCrawlPath(new Path(crawlsPath, new Path(crawlFolder,
+        "crawldb")), fileSystem);
+    dbPaths[1] = createCrawlPath(new Path(crawlsPath, new Path(crawlFolder,
+        "bwdb")), fileSystem);
+    dbPaths[2] = createCrawlPath(new Path(crawlsPath, new Path(crawlFolder,
+        "metadatadb")), fileSystem);
+    dbPaths[3] = createCrawlPath(new Path(crawlsPath, new Path(crawlFolder,
+        "linkdb")), fileSystem);
+    model.addAttribute("dbs", dbPaths);
+
     return "startCrawl";
   }
 
