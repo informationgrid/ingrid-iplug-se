@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="nutch-1.0/src/java"/>
+	<classpathentry kind="src" path="plugins/opensource/index-metadata/src/java"/>
 	<classpathentry kind="src" path="nutch-1.0/src/plugin/index-more/src/java"/>
 	<classpathentry kind="src" path="nutch-1.0/src/plugin/index-more/src/test"/>
 	<classpathentry kind="src" path="nutch-1.0/src/plugin/index-basic/src/java"/>
@@ -14,8 +15,6 @@
 	<classpathentry kind="src" path="nutch-1.0/src/plugin/parse-js/src/java"/>
 	<classpathentry kind="src" path="nutch-1.0/src/plugin/lib-http/src/java"/>
 	<classpathentry kind="src" path="nutch-1.0/src/plugin/lib-http/src/test"/>
-	<classpathentry kind="src" path="plugins/opensource/crawl-prepare-bwdb/src/java"/>
-	<classpathentry kind="src" path="plugins/opensource/crawl-prepare-crawldb/src/java"/>
 	<classpathentry kind="src" path="nutch-1.0/src/plugin/scoring-opic/src/java"/>
 	<classpathentry kind="src" path="nutch-1.0/src/plugin/lib-regex-filter/src/java"/>
 	<classpathentry kind="src" path="nutch-1.0/src/plugin/lib-regex-filter/src/test"/>
