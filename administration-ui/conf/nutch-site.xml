@@ -15,7 +15,7 @@
 
 <property>
   <name>plugin.includes</name>
-  <value>admin-.*|protocol-http|urlfilter-regex|parse-(text|html|js)|index-(basic|anchor)|query-(basic|site|url)|response-(json|xml)|summary-basic|scoring-opic|urlnormalizer-(pass|regex|basic)|crawl-prepare-(dbexport|crawldb|bwdb)</value>
+  <value>admin-.*|protocol-http|urlfilter-regex|parse-(text|html|js)|index-(basic|anchor)|query-(basic|site|url)|response-(json|xml)|summary-basic|scoring-opic|urlnormalizer-(pass|regex|basic)|crawl-prepare-(dbexport)</value>
   <description>Regular expression naming plugin directory names to
   include.  Any plugin not matching this expression is excluded.
   In any case you need at least include the nutch-extensionpoints plugin. By
@@ -27,8 +27,20 @@
 </property>
 
 <property>
+  <name>admin.plugins.order</name>
+  <value>admin-welcome admin-general admin-crawl</value>
+  <description>space delimited list of admin plugins to show the webui tabs in this order.</description>
+</property>
+
+<property>
+  <name>admin.instance.order</name>
+  <value>welcome general crawl</value>
+  <description>space delimited list of nutch instances to show the webui tabs in this order.</description>
+</property>
+
+<property>
   <name>crawl-prepare.order</name>
-  <value>de.ingrid.iplug.se.urlmaintenance.DatabaseExport org.apache.nutch.crawl.prepare.CrawldbPrepare org.apache.nutch.crawl.prepare.BwdbPrepare</value>
+  <value>de.ingrid.iplug.se.urlmaintenance.DatabaseExport</value>
   <description>space delimited list of IPreCrawl Implementations to execute these classes in order</description>
 </property>
 
