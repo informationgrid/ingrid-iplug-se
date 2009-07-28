@@ -197,16 +197,31 @@
 				<div id="startCrawl">
 					<div class="hd"></div>
 					<div class="bd">
-					<form:form method="post" action="">
+					<form:form method="post" action="startCrawl.html" modelAttribute="crawlCommand">
 						
 						<fieldset>
 							<legend>Crawl Starten</legend>
-							
 							<row>
-								<label>Crawl</label>
+								<label>Crawl Name</label>
 								<field><input type="text" name="crawlFolder" id="crawlFolder" value="" readonly="readonly"/></field>
+								<desc></desc>
 							</row>
-							
+							<row>
+								<label>Crawl Tiefe</label>
+								<field>
+						           <form:select path="depth" items="${depths}"/>
+						            <div class="error"><form:errors path="depth" /></div>
+						        </field>
+						        <desc></desc>
+					        </row>
+						    <row>
+						        <label>Anz. Seiten pro Segment:</label>
+						        <field>
+						         <form:input path="topn"/>
+						            <div class="error"><form:errors path="topn" /></div>
+						        </field>
+						        <desc></desc>
+						    </row>
 						</fieldset>
 					</form:form>
 					</div>

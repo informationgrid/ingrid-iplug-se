@@ -7,6 +7,7 @@ import java.net.URL;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
@@ -99,6 +100,10 @@ public class ParseDataWrapper extends Configured {
 
   }
 
+  public ParseDataWrapper(Configuration conf) {
+    super(conf);
+  }
+
   public void wrap(Path segment, Path out) throws IOException {
 
     JobConf job = new NutchJob(getConf());
@@ -118,8 +123,8 @@ public class ParseDataWrapper extends Configured {
   }
 
   public static void main(String[] args) throws IOException {
-    ParseDataWrapper wrapper = new ParseDataWrapper();
-    wrapper.setConf(NutchConfiguration.create());
+    Configuration configuration = NutchConfiguration.create();
+    ParseDataWrapper wrapper = new ParseDataWrapper(configuration);
     wrapper.wrap(new Path(args[0]), new Path(args[1]));
   }
 }

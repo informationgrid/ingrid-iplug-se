@@ -4,10 +4,10 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,7 +42,7 @@ public class MetadataInjector extends Configured {
 
   public static class MetadataContainer implements Writable {
 
-    private List<Metadata> _metadatas = new ArrayList<Metadata>();
+    private Set<Metadata> _metadatas = new HashSet<Metadata>();
 
     public MetadataContainer() {
     }
@@ -57,19 +57,19 @@ public class MetadataInjector extends Configured {
       _metadatas.add(metadata);
     }
 
-    public List<Metadata> getMetadatas() {
+    public Set<Metadata> getMetadatas() {
       return _metadatas;
     }
 
     @Override
     public void readFields(DataInput in) throws IOException {
+      _metadatas.clear();
       int size = in.readInt();
       for (int i = 0; i < size; i++) {
         Metadata metadata = new Metadata();
         metadata.readFields(in);
         _metadatas.add(metadata);
       }
-
     }
 
     @Override
@@ -78,6 +78,27 @@ public class MetadataInjector extends Configured {
       for (Metadata metadata : _metadatas) {
         metadata.write(out);
       }
+    }
+
+    @Override
+    public String toString() {
+      String s = "";
+      for (Metadata metadata : _metadatas) {
+        s += "\r\n";
+        s += metadata;
+      }
+      return s;
+    }
+
+    @Override
+    public int hashCode() {
+      return _metadatas.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      MetadataContainer container = (MetadataContainer) obj;
+      return _metadatas.equals(container._metadatas);
     }
 
   }
@@ -150,7 +171,7 @@ public class MetadataInjector extends Configured {
   }
 
   /**
-   * Reduces {@link HostTypeKey} - {@link BWPatterns} tuples
+   * Reduces {@link HostType} - {@link MetadataContainer} tuples
    */
   public static class MetadataInjectReducer implements
       Reducer<HostType, MetadataContainer, HostType, MetadataContainer> {
@@ -167,7 +188,7 @@ public class MetadataInjector extends Configured {
       MetadataContainer metadataContainer = new MetadataContainer();
       while (values.hasNext()) {
         MetadataContainer next = values.next();
-        List<Metadata> nextMetadatas = next.getMetadatas();
+        Set<Metadata> nextMetadatas = next.getMetadatas();
         for (Metadata nextMetadata : nextMetadatas) {
           metadataContainer.addMetadata(nextMetadata);
         }

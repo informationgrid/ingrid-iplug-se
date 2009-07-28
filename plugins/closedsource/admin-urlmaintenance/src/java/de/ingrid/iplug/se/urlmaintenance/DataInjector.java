@@ -84,7 +84,7 @@ public class DataInjector {
       List<StartUrl> urls = _startUrlDao.getByProvider(provider, 0, 23,
           OrderBy.URL_ASC);
 
-      for (int i = 0; urls.isEmpty() && i < 23; i++) {
+      for (int i = 0; urls.isEmpty() && i < 0; i++) {
         List<Metadata> metadatas = new ArrayList<Metadata>();
         metadatas.add(_metadataDao.getByKeyAndValue("datatype", "www"));
         if (i % 3 == 0) {

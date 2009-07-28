@@ -9,7 +9,10 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.nutch.crawl.bw.BWInjector;
 import org.apache.nutch.crawl.bw.BWUpdateDb;
+import org.apache.nutch.crawl.metadata.MetadataInjector;
+import org.apache.nutch.crawl.metadata.ParseDataUpdater;
 import org.apache.nutch.fetcher.Fetcher;
 import org.apache.nutch.indexer.DeleteDuplicates;
 import org.apache.nutch.indexer.IndexMerger;
@@ -46,22 +49,53 @@ public class CrawlTool {
     LOG.info("depth = " + depth);
     LOG.info("topN = " + topn);
 
+    // url dir's
+    Path urlDir = new Path(_crawlDir, "urls/start");
+    Path limitDir = new Path(_crawlDir, "urls/limit");
+    Path excludeDir = new Path(_crawlDir, "urls/exclude");
+    Path metadataDir = new Path(_crawlDir, "urls/metadata");
+
+    // input path's
     Path crawlDb = new Path(_crawlDir, "crawldb");
     Path bwDb = new Path(_crawlDir, "bwdb");
+    Path metadataDb = new Path(_crawlDir, "metadatadb");
     Path linkDb = new Path(_crawlDir, "linkdb");
     Path segments = new Path(_crawlDir, "segments");
     Path indexes = new Path(_crawlDir, "indexes");
     Path index = new Path(_crawlDir, "index");
 
+    // injectors
+    Injector injector = new Injector(_configuration);
+    BWInjector bwInjector = new BWInjector(_configuration);
+    MetadataInjector metadataInjector = new MetadataInjector(_configuration);
+
+    // other jobs
     Generator generator = new Generator(_configuration);
     Fetcher fetcher = new Fetcher(_configuration);
     ParseSegment parseSegment = new ParseSegment(_configuration);
     BWUpdateDb bwUpdateDb = new BWUpdateDb(_configuration);
+    ParseDataUpdater parseDataUpdater = new ParseDataUpdater(_configuration);
     LinkDb linkDbTool = new LinkDb(_configuration);
     Indexer indexer = new Indexer(_configuration);
     DeleteDuplicates dedup = new DeleteDuplicates(_configuration);
     IndexMerger merger = new IndexMerger(_configuration);
 
+    injector.inject(crawlDb, urlDir);
+    // BwInjector deoesnt support update
+    if (_fileSystem.exists(bwDb)) {
+      LOG.info("bwdb exists, delete it: " + bwDb);
+      _fileSystem.delete(bwDb, true);
+    }
+    bwInjector.inject(bwDb, limitDir, false);
+    bwInjector.inject(bwDb, excludeDir, true);
+
+    // MetadataInjector deoesnt support update
+    if (_fileSystem.exists(metadataDb)) {
+      LOG.info("metadatadb exists, delete it: " + metadataDb);
+      _fileSystem.delete(metadataDb, true);
+    }
+    metadataInjector.inject(metadataDb, metadataDir);
+    
     int i;
     for (i = 0; i < depth; i++) { // generate new segment
       Path segment = generator.generate(crawlDb, segments, -1, topn, System
@@ -75,8 +109,9 @@ public class CrawlTool {
       if (!Fetcher.isParsing(_configuration)) {
         parseSegment.parse(segment); // parse it, if needed
       }
-      bwUpdateDb.update(crawlDb, bwDb, new Path[] { segment }, true, true); // update
-      // crawldb
+      bwUpdateDb.update(crawlDb, bwDb, new Path[] { segment }, true, true); // update crawldb
+      parseDataUpdater.update(metadataDb, segment);
+      
     }
     if (i > 0) {
       linkDbTool.invert(linkDb, segments, true, true, false); // invert links

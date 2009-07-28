@@ -154,6 +154,7 @@ public class BWUpdateDb extends Configured {
         OutputCollector<HostTypeKey, ObjectWritable> out, Reporter report)
         throws IOException {
 
+      System.out.println("KEY: " + key);
       while (values.hasNext()) {
         ObjectWritable obj = (ObjectWritable) values.next();
         Object value = obj.get(); // unwrap
@@ -163,12 +164,14 @@ public class BWUpdateDb extends Configured {
           return;
         }
 
+
         if (_patterns == null) {
           return;
         }
 
         boolean negativeMatch = false;
         Text url = ((Entry) value)._url;
+        System.out.println(url);
         int count = _patterns._negative.length;
         for (int i = 0; i < count; i++) {
           if (url.toString().toLowerCase().startsWith(
@@ -270,8 +273,8 @@ public class BWUpdateDb extends Configured {
     FileInputFormat.addInputPath(filterJob, wrappedSegOutput);
     FileInputFormat.addInputPath(filterJob, new Path(bwdb, "current"));
     FileOutputFormat.setOutputPath(filterJob, tmpMergedDb);
-    filterJob.setReducerClass(BwReducer.class);
     filterJob.setMapperClass(ObjectWritableMapper.class);
+    filterJob.setReducerClass(BwReducer.class);
     filterJob.setOutputFormat(MapFileOutputFormat.class);
     filterJob.setOutputKeyClass(HostTypeKey.class);
     filterJob.setOutputValueClass(ObjectWritable.class);

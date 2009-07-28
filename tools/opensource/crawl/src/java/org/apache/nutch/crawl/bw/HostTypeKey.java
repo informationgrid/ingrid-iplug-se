@@ -78,6 +78,6 @@ public class HostTypeKey implements WritableComparable<HostTypeKey> {
   }
 
   public String toString() {
-    return _host.toString() + " : " + _type.toString();
+    return _host.toString() + " (" + _type.toString() + ")";
   }
 }

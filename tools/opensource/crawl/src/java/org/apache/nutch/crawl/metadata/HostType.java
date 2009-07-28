@@ -10,20 +10,20 @@ import org.apache.hadoop.io.WritableComparable;
 
 public class HostType implements WritableComparable<HostType> {
 
-  public static final IntWritable METADATA_CONTAINER = new IntWritable(0);
+  public static final int METADATA_CONTAINER = 1;
 
-  public static final IntWritable URL_PARSEDATA_CONTAINER = new IntWritable(1);
+  public static final int URL_PARSEDATA_CONTAINER = 2;
 
   private Text _host = new Text();
 
-  private IntWritable _type = METADATA_CONTAINER;
+  private IntWritable _type = new IntWritable();
 
   public HostType() {
   }
 
-  public HostType(Text host, IntWritable type) {
-    _host = host;
-    _type = type;
+  public HostType(Text host, int type) {
+    _host.set(host);
+    _type.set(type);
   }
 
   @Override
@@ -53,6 +53,22 @@ public class HostType implements WritableComparable<HostType> {
 
   public Text getHost() {
     return _host;
+  }
+
+  @Override
+  public int hashCode() {
+    return _host.hashCode() + _type.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    HostType other = (HostType) obj;
+    return _host.equals(other._host) && _type.equals(other._type);
+  }
+
+  @Override
+  public String toString() {
+    return _host.toString() + " (" + _type + ")";
   }
 
 }
