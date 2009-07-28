@@ -29,8 +29,6 @@ import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
-import org.apache.nutch.crawl.bw.BWPatterns;
-import org.apache.nutch.crawl.bw.HostTypeKey;
 import org.apache.nutch.metadata.Metadata;
 import org.apache.nutch.net.URLNormalizers;
 import org.apache.nutch.util.NutchConfiguration;
@@ -108,7 +106,7 @@ public class MetadataInjector extends Configured {
   }
 
   /**
-   * Creates {@link HostTypeKey} - {@link BWPatterns} tuples from each text
+   * Creates {@link HostType} - {@link MetadataContainer} tuples from each text
    * line.
    */
   public static class MetadataInjectMapper implements
@@ -158,9 +156,6 @@ public class MetadataInjector extends Configured {
           return;
         }
 
-        System.out.println(host);
-        System.out.println(metadata);
-        System.out.println("++++");
         HostType hostType = new HostType(new Text(host),
             HostType.METADATA_CONTAINER);
         MetadataContainer metadataContainer = new MetadataContainer(metadata);
@@ -219,7 +214,6 @@ public class MetadataInjector extends Configured {
     sortJob.setOutputValueClass(MetadataContainer.class);
     JobClient.runJob(sortJob);
 
-    // merge with existing bw db
     LOG.info("MetadataInjector: Merging injected urls into metadataDb.");
     String newDbName = Integer
         .toString(new Random().nextInt(Integer.MAX_VALUE));
