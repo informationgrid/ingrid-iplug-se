@@ -25,6 +25,7 @@
 
 	<script type="text/javascript" src="${theme}/js/yui/build/button/button-min.js"></script>
 	<script type="text/javascript" src="${theme}/js/yui/build/container/container-min.js"></script>
+	<script type="text/javascript" src="${theme}/js/yui/build/animation/animation-min.js"></script>
 	<link rel="stylesheet" type="text/css" href="${theme}/css/style.css" />
 </head>
 <body class="yui-skin-sam">
@@ -89,13 +90,49 @@
 								<c:forEach items="${crawlPaths}" var="crawlPath" varStatus="i">
 						            <tr>
 						            	<td>
-						            		<div class="tumblerOff" onclick="document.getElementById('addToSearch').submit()">N</div>
-						            		<div class="tumblerOn" onclick="document.getElementById('removeFromSearch').submit()">J</div>
+						            		<!-- Marko: if searchable set class = switchOff -->
+						            		<div class="switchOn" id="switch_${i.index}">
+						            			<img src="${theme}/gfx/switch_button.png" id="button_${i.index}"/>
+						            		</div>
 						            		
-						            		<form id="addToSearch" action="" method="post">
+						            		<script>
+											 var myAnimOn_${i.index} = new YAHOO.util.Motion('button_${i.index}', {points: { by: [29, 0] } }, 0.5, YAHOO.util.Easing.easeOut);
+											 var myAnimOff_${i.index} = new YAHOO.util.Motion('button_${i.index}', {points: { by: [-29, 0] } }, 0.5, YAHOO.util.Easing.easeOut);
+
+											 var switchOn_${i.index} = function(){
+												 var myAnimOn_${i.index} = new YAHOO.util.Motion('button_${i.index}', {points: { by: [29, 0] } }, 0.5, YAHOO.util.Easing.easeOut);
+												 YAHOO.util.Event.removeListener("switch_${i.index}", "click");	
+												 YAHOO.util.Event.addListener("switch_${i.index}", "click", function(){ 
+													 myAnimOn_${i.index}.onComplete.subscribe(switchOff_${i.index}); 				
+													 myAnimOn_${i.index}.animate();
+												 });
+												 alert('submit remove from search with: ${crawlPath.path.name}');
+												 // document.getElementById('addToSearch_${i.index}${i.index}').submit();
+												 }		
+											 var switchOff_${i.index} = function(){
+												 var myAnimOff_${i.index} = new YAHOO.util.Motion('button_${i.index}', {points: { by: [-29, 0] } }, 0.5, YAHOO.util.Easing.easeOut);
+												 YAHOO.util.Event.removeListener("switch_${i.index}", "click");	
+												 YAHOO.util.Event.addListener("switch_${i.index}", "click", function(){ 
+													 myAnimOff_${i.index}.onComplete.subscribe(switchOn_${i.index}); 
+													 myAnimOff_${i.index}.animate();
+												 });
+												 alert('submit add to search with: ${crawlPath.path.name}');
+												 // document.getElementById('removeFromSearch_${i.index}${i.index}').submit();
+												 }	
+
+											 YAHOO.util.Event.addListener("switch_${i.index}", "click", function(){ 
+												 // Marko: if searchable, rename myAnimOn to myAnimOff and subscribe switchOn_${i.index} below
+												 myAnimOn_${i.index}.onComplete.subscribe(switchOff_${i.index}); 
+												 myAnimOn_${i.index}.animate();
+												 }
+											 );
+											</script>
+						            		
+						            		
+						            		<form id="addToSearch_${i.index}" action="" method="post">
 						            			<input type="hidden" name="crawlFolder" value="${crawlPath.path.name}"/>
 						            		</form>
-						            		<form id="removeFromSearch" action="" method="post">
+						            		<form id="removeFromSearch_${i.index}" action="" method="post">
 						            			<input type="hidden" name="crawlFolder" value="${crawlPath.path.name}"/>
 						            		</form>
 						            	</td>

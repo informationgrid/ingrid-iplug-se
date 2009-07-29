@@ -100,8 +100,9 @@ form input[type='submit']:hover, form input[type='button']:hover, button:hover {
 
 .row {border-bottom:1px dotted #CCCCCC; padding:10px 0 10px 0}
 
-.tumblerOn {width:50px; height:30px; background-image:url('../gfx/tumbler_on.jpg'); background-repeat:no-repeat;cursor:pointer; color:#FFF; padding:7px 0 0 33px; font-weight:bold}
-.tumblerOff {width:50px; height:30px; background-image:url('../gfx/tumbler_off.jpg'); background-repeat:no-repeat;cursor:pointer; color:#999; padding:7px 0 0 9px; font-weight:bold}
+.switchOn, .switchOff {width:60px ; height:26px ; background-image:url('../gfx/switch_bg.png'); background-repeat: no-repeat;}
+.switchOn {padding-left:1px; padding-top:1px}
+.switchOff {padding-left:30px; padding-top:1px}
 
 /* Paging */
 #paging .activePage {background:#1B78B1; float:left; ; margin-left:1px}
