@@ -46,33 +46,6 @@ public class CrawlController extends NavigationSelector {
     return crawlPathArray;
   }
 
-  private CrawlPath[] listPaths(Path path, FileSystem fileSystem)
-      throws IOException {
-    FileStatus[] fileStatusArray = fileSystem.listStatus(path);
-    CrawlPath[] crawlPathArray = new CrawlPath[fileStatusArray.length];
-    int counter = 0;
-    for (FileStatus fileStatus : fileStatusArray) {
-      Path fileStatusPath = fileStatus.getPath();
-      crawlPathArray[counter] = createCrawlPath(fileStatusPath, fileSystem);
-      counter++;
-    }
-    return crawlPathArray;
-  }
-
-  private CrawlPath createCrawlPath(Path path, FileSystem fileSystem)
-      throws IOException {
-    long len = 0;
-    if (fileSystem.exists(path)) {
-      ContentSummary contentSummary = fileSystem.getContentSummary(path);
-      len = contentSummary.getLength();
-      len = (len / 1024) / 1024;
-    }
-    CrawlPath crawlPath = new CrawlPath();
-    crawlPath.setPath(path);
-    crawlPath.setSize(len);
-    return crawlPath;
-  }
-
   @ModelAttribute("depths")
   public Integer[] referenceDataDepths() {
     return new Integer[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
@@ -152,7 +125,7 @@ public class CrawlController extends NavigationSelector {
     ServletContext servletContext = session.getServletContext();
     NutchInstance nutchInstance = (NutchInstance) servletContext
         .getAttribute("nutchInstance");
-
+  
     // local folder for configuration files
     File instanceFolder = nutchInstance.getInstanceFolder();
     // look in the same path in hdfs
@@ -160,7 +133,7 @@ public class CrawlController extends NavigationSelector {
     Configuration configuration = nutchInstance.getConfiguration();
     Path crawlDir = new Path(path, crawlCommand.getCrawlFolder());
     CrawlTool crawlTool = new CrawlTool(configuration, crawlDir);
-
+  
     Integer topn = crawlCommand.getTopn();
     Integer depth = crawlCommand.getDepth();
     Runnable runnable = new StartCrawlRunnable(crawlTool, topn, depth);
@@ -168,5 +141,32 @@ public class CrawlController extends NavigationSelector {
     thread.setDaemon(true);
     thread.start();
     return "redirect:/index.html";
+  }
+
+  private CrawlPath[] listPaths(Path path, FileSystem fileSystem)
+      throws IOException {
+    FileStatus[] fileStatusArray = fileSystem.listStatus(path);
+    CrawlPath[] crawlPathArray = new CrawlPath[fileStatusArray.length];
+    int counter = 0;
+    for (FileStatus fileStatus : fileStatusArray) {
+      Path fileStatusPath = fileStatus.getPath();
+      crawlPathArray[counter] = createCrawlPath(fileStatusPath, fileSystem);
+      counter++;
+    }
+    return crawlPathArray;
+  }
+
+  private CrawlPath createCrawlPath(Path path, FileSystem fileSystem)
+      throws IOException {
+    long len = 0;
+    if (fileSystem.exists(path)) {
+      ContentSummary contentSummary = fileSystem.getContentSummary(path);
+      len = contentSummary.getLength();
+      len = (len / 1024) / 1024;
+    }
+    CrawlPath crawlPath = new CrawlPath();
+    crawlPath.setPath(path);
+    crawlPath.setSize(len);
+    return crawlPath;
   }
 }

@@ -18,6 +18,7 @@ import org.apache.nutch.indexer.DeleteDuplicates;
 import org.apache.nutch.indexer.IndexMerger;
 import org.apache.nutch.indexer.Indexer;
 import org.apache.nutch.parse.ParseSegment;
+import org.apache.nutch.tools.HostStatistic;
 import org.apache.nutch.util.HadoopFSUtil;
 
 public class CrawlTool {
@@ -80,6 +81,9 @@ public class CrawlTool {
     DeleteDuplicates dedup = new DeleteDuplicates(_configuration);
     IndexMerger merger = new IndexMerger(_configuration);
 
+    // statistics
+    HostStatistic hostStatistic = new HostStatistic(_configuration);
+
     injector.inject(crawlDb, urlDir);
     // BwInjector deoesnt support update
     if (_fileSystem.exists(bwDb)) {
@@ -109,9 +113,9 @@ public class CrawlTool {
       if (!Fetcher.isParsing(_configuration)) {
         parseSegment.parse(segment); // parse it, if needed
       }
+      hostStatistic.statistic(crawlDb, segment);
       bwUpdateDb.update(crawlDb, bwDb, new Path[] { segment }, true, true); // update crawldb
       parseDataUpdater.update(metadataDb, segment);
-      
     }
     if (i > 0) {
       linkDbTool.invert(linkDb, segments, true, true, false); // invert links
