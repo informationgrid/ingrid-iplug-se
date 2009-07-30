@@ -1,0 +1,106 @@
+a {color:#DC8600}
+a:hover {color:#FF9B00}
+
+#hd{
+	background:#FF9B00;
+}
+
+#ft{
+	background:#F4F4F4;
+	font-size:77%;
+	text-align:center;
+	color:#666;
+	padding:2px;
+}
+
+.nav {
+	background:#DC8600;
+	clear:both;
+	height:30px;
+	padding:5px 0 0 0px;
+}
+
+#subnav {
+	background:#FFCE00;
+	clear:both;
+	height:20px;
+	padding-left:10px;
+}
+
+#subnav li {padding:0; margin:0 15px 0 0; float:left}
+#subnav li a {text-decoration:none; color:#000; font-size:93%}
+#subnav li a:hover {text-decoration:underline;}
+#subnav li.selected a {font-weight:bold}
+
+#bd {padding: 20px 10px 10px 10px}
+
+/* Fonts */
+.yui-b h3 {font-size:123.1%; color:#FF9B00}
+
+/* Forms */
+fieldset {
+    border: 1px solid #FFCE00;
+    margin:8px 0px 30px 0px;
+    padding: 16px 45px;
+    position:relative;
+}
+
+fieldset.undecorated {
+    border: none;
+    margin-top:-20px;
+}
+
+fieldset legend {
+    color:#DC8600;
+    font-size:93%;
+    font-weight:bold;
+    margin:0 0 0 -10px;
+    padding:0 10px;
+}
+
+label {
+    width:130px;
+    float:left;
+    color:#666666;
+    font-size:93%;
+}
+
+field {
+    float:left;
+    width:250px;
+}
+
+desc {
+    margin-left:20px;
+    color:#959595;
+    font-size:12px;
+    font-style:italic;
+    clear:both;
+}
+
+row {
+    float:left;
+    clear: left;
+    min-height:30px;
+    margin-bottom:15px;
+    width:100%;
+}
+
+div.error {color:#ED171F}
+
+form input[type='text'], form input[type='password'], form select {border:1px solid #FF9B00; width:100%;}
+form input[type='submit'], form input[type='button'], button {background:#FF9B00; color:#FFFFFF; font-weight:bold; border: 0px; padding:2px 10px 2px 10px; cursor:pointer}
+form input[type='submit']:hover, form input[type='button']:hover, button:hover {background:#DC8600;}
+
+.row {border-bottom:1px dotted #FFCE00; padding:10px 0 10px 0; clear:both}
+
+.switchOn, .switchOff {width:60px ; height:26px ; background-image:url('../gfx/switch_bg.png'); background-repeat: no-repeat;}
+.switchOn {padding-left:1px; padding-top:1px}
+.switchOff {padding-left:30px; padding-top:1px}
+
+/* Paging */
+#paging .activePage {background:#DC8600; float:left; ; margin-left:1px}
+#paging .inactivePage {background:#FFCE00; float:left;margin-left:1px}
+#paging .activePage a , #paging .inactivePage a {color:#FFFFFF; text-decoration:none; padding:2px}
+#paging .activePage:hover, #paging .inactivePage:hover {background:#FF9B00}
+#paging .meta {padding:2px; color:#AAAAAA} 
