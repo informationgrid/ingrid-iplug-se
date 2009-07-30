@@ -14,6 +14,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.SequenceFile.Reader;
+import org.apache.nutch.admin.NavigationSelector;
 import org.apache.nutch.admin.NutchInstance;
 import org.apache.nutch.tools.HostStatistic.StatisticWritable;
 import org.apache.nutch.tools.HostStatistic.StatisticWritableContainer;
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-public class StatisticController {
+public class StatisticController extends NavigationSelector {
 
   @RequestMapping(value = "/statistic.html")
   public String statistic(
@@ -31,7 +32,6 @@ public class StatisticController {
       @RequestParam(value = "segment", required = true) String segment,
       @RequestParam(value = "maxCount", required = true) Integer maxCount,
       HttpSession session, Model model) throws IOException {
-    // TODO read statistic from segment
     ServletContext servletContext = session.getServletContext();
     NutchInstance nutchInstance = (NutchInstance) servletContext
         .getAttribute("nutchInstance");

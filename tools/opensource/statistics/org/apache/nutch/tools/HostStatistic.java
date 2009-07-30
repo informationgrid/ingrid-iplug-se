@@ -182,8 +182,6 @@ public class HostStatistic extends Configured {
       }
       _sum._value = counter;
       _sum._type = set.iterator().next();
-      System.out.println("HostStatistic.StatisticWritableCounter.reduce():  "
-          + key + " -> " + _sum._value);
       collector.collect(key, _sum);
     }
 
@@ -266,9 +264,6 @@ public class HostStatistic extends Configured {
       default:
         throw new IOException("unknown type: " + type);
       }
-      System.out
-          .println("HostStatistic.StatisticWritableContainerMerger.map(): "
-              + key + " -> " + container);
       collector.collect(key, container);
     }
 
@@ -278,11 +273,9 @@ public class HostStatistic extends Configured {
         Reporter reporter) throws IOException {
 
       StatisticWritableContainer container = new StatisticWritableContainer();
-      System.out.println(key);
       while (values.hasNext()) {
         StatisticWritableContainer value = (StatisticWritableContainer) values
             .next();
-        System.out.println("\t" + value);
         long longValue = value._crawldbStatistic._value;
         if (longValue != -1L) {
           container._crawldbStatistic._value = longValue;
@@ -292,9 +285,6 @@ public class HostStatistic extends Configured {
           container._fetchStatistic._value = longValue;
         }
       }
-      System.out
-          .println("HostStatistic.StatisticWritableContainerMerger.reduce(): "
-              + key + "_>" + container);
       collector.collect(key, container);
     }
 
@@ -309,22 +299,6 @@ public class HostStatistic extends Configured {
     }
 
   }
-
-  // public static class StatisticWritableContainerComparator extends
-  // WritableComparator {
-  //
-  // public StatisticWritableContainerComparator() {
-  // super(StatisticWritableContainer.class, true);
-  // }
-  //
-  // @Override
-  // public int compare(WritableComparable a, WritableComparable b) {
-  // StatisticWritableContainer c1 = (StatisticWritableContainer) a;
-  // StatisticWritableContainer c2 = (StatisticWritableContainer) b;
-  // return a.compareTo(b);
-  // }
-  //
-  // }
 
   public HostStatistic(Configuration configuration) {
     super(configuration);
@@ -436,8 +410,6 @@ public class HostStatistic extends Configured {
     sortJob.setOutputFormat(SequenceFileOutputFormat.class);
     sortJob.setOutputKeyClass(StatisticWritableContainer.class);
     sortJob.setOutputValueClass(Text.class);
-    // sortJob
-    // .setOutputKeyComparatorClass(StatisticWritableContainerComparator.class);
     return sortJob;
   }
 

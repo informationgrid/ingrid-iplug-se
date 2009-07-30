@@ -74,6 +74,7 @@
 					            <tr>
 					            	<th>Segmente</th>
 					                <th>Größe in MB</th>
+					                <th>Host Statistik</th>
 					            </tr>
 					        </thead>
 					        <tbody>
@@ -81,6 +82,7 @@
 						            <tr>
 						            	<td>${segment.path.name}</td>
 						                <td>${segment.size}</td>
+						                <td><a href="statistic.html?crawlFolder=${crawlFolder}&segment=${segment.path.name}&maxCount=10">Host Statistik</a></td>
 						            </tr>
 								</c:forEach>
 					        </tbody>
@@ -92,13 +94,15 @@
 					        var myColumnDefs = [
 								{key:"path",label:"Segmente", sortable:true},
 					            {key:"size",label:"Größe in MB", sortable:true},
+					            {key:"hostStatistic",label:"Host Statistik", sortable:false}
 					        ];
 					
 					        var myDataSource = new YAHOO.util.DataSource(YAHOO.util.Dom.get("crawls"));
 					        myDataSource.responseType = YAHOO.util.DataSource.TYPE_HTMLTABLE;
 					        myDataSource.responseSchema = {
 					            fields: [{key:"path"},
-								        {key:"size", parser:"number"}
+								        {key:"size", parser:"number"},
+								        {key:"hostStatistic"}
 					            ]
 					        };
 					
@@ -113,7 +117,7 @@
 					</script>						
 
 					<div>&nbsp;</div>
-					<h3>Datenbänke</h3>
+					<h3>Datenbanken</h3>
 					<div id="markupDbs">
 					    <table id="dbs">
 					        <thead>

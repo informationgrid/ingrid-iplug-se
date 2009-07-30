@@ -119,9 +119,9 @@
 					</script>
 					
 					<div style="margin-top:25px"></div>
-					<h3>Top HasteNichtGesehen</h3>
+					<h3>Top ${fn:length(statistics) -1}</h3>
 					
-					<div id="chart2" style="height:1000px">Unable to load Flash content.</div>
+					<div id="chart2" style="height:${(fn:length(statistics) -1) * 100}px ">Unable to load Flash content.</div>
 
 					<script type="text/javascript">
 					

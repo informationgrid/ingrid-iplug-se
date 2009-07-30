@@ -90,16 +90,22 @@ public class CrawlTool {
       LOG.info("bwdb exists, delete it: " + bwDb);
       _fileSystem.delete(bwDb, true);
     }
-    bwInjector.inject(bwDb, limitDir, false);
-    bwInjector.inject(bwDb, excludeDir, true);
+    if (_fileSystem.exists(limitDir)) {
+      bwInjector.inject(bwDb, limitDir, false);
+    }
+    if (_fileSystem.exists(excludeDir)) {
+      bwInjector.inject(bwDb, excludeDir, true);
+    }
 
     // MetadataInjector deoesnt support update
     if (_fileSystem.exists(metadataDb)) {
       LOG.info("metadatadb exists, delete it: " + metadataDb);
       _fileSystem.delete(metadataDb, true);
     }
-    metadataInjector.inject(metadataDb, metadataDir);
-    
+    if (_fileSystem.exists(metadataDir)) {
+      metadataInjector.inject(metadataDb, metadataDir);
+    }
+
     int i;
     for (i = 0; i < depth; i++) { // generate new segment
       Path segment = generator.generate(crawlDb, segments, -1, topn, System
@@ -114,7 +120,8 @@ public class CrawlTool {
         parseSegment.parse(segment); // parse it, if needed
       }
       hostStatistic.statistic(crawlDb, segment);
-      bwUpdateDb.update(crawlDb, bwDb, new Path[] { segment }, true, true); // update crawldb
+      bwUpdateDb.update(crawlDb, bwDb, new Path[] { segment }, true, true); // update
+      // crawldb
       parseDataUpdater.update(metadataDb, segment);
     }
     if (i > 0) {
