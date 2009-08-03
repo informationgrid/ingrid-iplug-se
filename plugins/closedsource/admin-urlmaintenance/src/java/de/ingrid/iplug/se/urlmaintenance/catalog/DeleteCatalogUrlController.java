@@ -1,5 +1,6 @@
 package de.ingrid.iplug.se.urlmaintenance.catalog;
 
+import org.apache.nutch.admin.NavigationSelector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,7 +11,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ICatalogUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.CatalogUrl;
 
 @Controller
-public class DeleteCatalogUrlController {
+public class DeleteCatalogUrlController extends NavigationSelector {
 
   private ICatalogUrlDao _catalogUrlDao;
 

@@ -2,6 +2,7 @@ package de.ingrid.iplug.se.urlmaintenance.web;
 
 import java.util.List;
 
+import org.apache.nutch.admin.NavigationSelector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -16,7 +17,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IExcludeUrlDao;
 
 @Controller
 @SessionAttributes(value = { "partnerProviderCommand", "startUrlCommand" })
-public class AddExcludeUrlController {
+public class AddExcludeUrlController extends NavigationSelector {
 
   private final IExcludeUrlDao _excludeUrlDao;
 

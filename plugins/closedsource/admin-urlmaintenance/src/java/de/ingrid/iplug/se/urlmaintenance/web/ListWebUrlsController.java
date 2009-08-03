@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.nutch.admin.NavigationSelector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,7 +32,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl;
 
 @Controller
 @SessionAttributes(value = { "partnerProviderCommand", "startUrlCommand" })
-public class ListWebUrlsController {
+public class ListWebUrlsController extends NavigationSelector {
 
   private final IStartUrlDao _startUrlDao;
   private final IProviderDao _providerDao;
@@ -43,8 +44,7 @@ public class ListWebUrlsController {
   @Autowired
   public ListWebUrlsController(IProviderDao providerDao,
       IStartUrlDao startUrlDao, ILimitUrlDao limitUrlDao,
-      IExcludeUrlDao excludeUrlDao,
-      IMetadataDao metadataDao) {
+      IExcludeUrlDao excludeUrlDao, IMetadataDao metadataDao) {
     _providerDao = providerDao;
     _startUrlDao = startUrlDao;
     _limitUrlDao = limitUrlDao;

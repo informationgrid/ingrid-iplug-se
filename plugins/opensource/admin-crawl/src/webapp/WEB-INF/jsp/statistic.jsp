@@ -79,7 +79,7 @@
 							YAHOO.example.stats =
 							[
 							<c:forEach items="${crawldbStatistic}" var="statistic" begin="0">
-								{ host: '${statistic.host}', crawlDbCount: ${statistic.crawldbCount}, segmentCount: ${statistic.segmentCount} },
+								{ host: '${statistic.host}', crawlDbCount: ${statistic.overallCount}, segmentCount: ${statistic.fetchSuccessCount} },
 							</c:forEach>	
 							];
 					
@@ -142,7 +142,7 @@
 							YAHOO.example.stats2 =
 							[
 							<c:forEach items="${shardStatistic}" var="statistic" begin="0">
-								{ host: '${statistic.host}', crawlDbCount: ${statistic.crawldbCount}, segmentCount: ${statistic.segmentCount} },
+								{ host: '${statistic.host}', crawlDbCount: ${statistic.overallCount}, segmentCount: ${statistic.fetchSuccessCount} },
 								
 							</c:forEach>	
 							];

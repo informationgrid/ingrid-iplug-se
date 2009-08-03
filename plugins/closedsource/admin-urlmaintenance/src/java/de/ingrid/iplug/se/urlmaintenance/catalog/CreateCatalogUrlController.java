@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.nutch.admin.NavigationSelector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,7 +25,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
 
 @Controller
 @SessionAttributes(value = { "partnerProviderCommand", "catalogUrlCommand" })
-public class CreateCatalogUrlController {
+public class CreateCatalogUrlController extends NavigationSelector {
 
   private final ICatalogUrlDao _catalogUrlDao;
   private final IMetadataDao _metadataDao;
@@ -60,7 +61,7 @@ public class CreateCatalogUrlController {
     return metadatas;
   }
 
-  @RequestMapping(value = {"/createCatalogUrl.html", "/editCatalogUrl.html"}, method = RequestMethod.GET)
+  @RequestMapping(value = { "/createCatalogUrl.html", "/editCatalogUrl.html" }, method = RequestMethod.GET)
   public String editCatalogUrl(Model model,
       @ModelAttribute("catalogUrlCommand") CatalogUrlCommand catalogUrlCommand,
       @RequestParam(value = "id", required = false) Long id,

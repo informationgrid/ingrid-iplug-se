@@ -53,6 +53,16 @@ public class StatisticController extends NavigationSelector {
         fileSystem, new Path(segmentPath, "statistic/host/shard"));
     model.addAttribute("shardStatistic", shardStatistics);
 
+    for (Statistic crawldbStatistic : crawldbStatistics) {
+      for (Statistic shardStatistic : shardStatistics) {
+        if (crawldbStatistic.getHost().equals(shardStatistic.getHost())) {
+          Long count1 = crawldbStatistic.getFetchSuccessCount();
+          Long count2 = shardStatistic.getFetchSuccessCount();
+          crawldbStatistic.setFetchSuccessCount(count1 + count2);
+        }
+      }
+    }
+
     return "statistic";
   }
 

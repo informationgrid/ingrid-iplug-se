@@ -3,6 +3,7 @@ package de.ingrid.iplug.se.urlmaintenance.web;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.nutch.admin.NavigationSelector;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +18,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.Url;
 
 @Controller
 @SessionAttributes(value = { "partnerProviderCommand", "startUrlCommand" })
-public class FinishAddWebUrlController {
+public class FinishAddWebUrlController extends NavigationSelector {
 
   @RequestMapping(value = "/finishWebUrl.html", method = RequestMethod.GET)
   public String finish(

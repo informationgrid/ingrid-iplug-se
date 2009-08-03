@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.nutch.admin.NavigationSelector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,7 +23,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
 
 @Controller
 @SessionAttributes(value = { "partnerProviderCommand", "catalogUrlCommand" })
-public class SaveCatalogUrlController {
+public class SaveCatalogUrlController extends NavigationSelector {
 
   private final ICatalogUrlDao _catalogUrlDao;
 

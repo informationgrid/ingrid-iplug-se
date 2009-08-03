@@ -3,13 +3,13 @@ package org.apache.nutch.admin.crawl.statistic;
 public class Statistic {
 
   private String _host;
-  private Long _crawldbCount;
-  private Long _segmentCount;
+  private Long _overallCount;
+  private Long _fetchSuccessCount;
 
-  public Statistic(String host, Long crawldbCount, Long segmentCount) {
+  public Statistic(String host, Long overallCount, Long fetchSuccessCount) {
     _host = host;
-    _crawldbCount = crawldbCount;
-    _segmentCount = segmentCount;
+    _overallCount = overallCount;
+    _fetchSuccessCount = fetchSuccessCount;
   }
 
   public String getHost() {
@@ -20,20 +20,20 @@ public class Statistic {
     _host = host;
   }
 
-  public Long getCrawldbCount() {
-    return _crawldbCount;
+  public Long getOverallCount() {
+    return _overallCount;
   }
 
-  public void setCrawldbCount(Long crawldbCount) {
-    _crawldbCount = crawldbCount;
+  public void setOverallCount(Long crawldbCount) {
+    _overallCount = crawldbCount;
   }
 
-  public Long getSegmentCount() {
-    return _segmentCount;
+  public Long getFetchSuccessCount() {
+    return _fetchSuccessCount;
   }
 
-  public void setSegmentCount(Long segmentCount) {
-    _segmentCount = segmentCount;
+  public void setFetchSuccessCount(Long segmentCount) {
+    _fetchSuccessCount = segmentCount;
   }
 
 }

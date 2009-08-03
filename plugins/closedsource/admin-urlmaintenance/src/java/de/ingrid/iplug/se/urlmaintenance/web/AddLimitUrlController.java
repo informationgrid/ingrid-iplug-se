@@ -2,6 +2,7 @@ package de.ingrid.iplug.se.urlmaintenance.web;
 
 import java.util.List;
 
+import org.apache.nutch.admin.NavigationSelector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
@@ -22,7 +23,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
 
 @Controller
 @SessionAttributes(value = { "partnerProviderCommand", "startUrlCommand" })
-public class AddLimitUrlController {
+public class AddLimitUrlController extends NavigationSelector {
 
   private final IMetadataDao _metadataDao;
   private final ILimitUrlDao _limitUrlDao;
