@@ -121,7 +121,6 @@ public class CrawlTool {
       }
       hostStatistic.statistic(crawlDb, segment);
       bwUpdateDb.update(crawlDb, bwDb, new Path[] { segment }, true, true); // update
-      // crawldb
       parseDataUpdater.update(metadataDb, segment);
     }
     if (i > 0) {

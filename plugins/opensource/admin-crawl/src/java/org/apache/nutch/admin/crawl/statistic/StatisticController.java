@@ -17,7 +17,6 @@ import org.apache.hadoop.io.SequenceFile.Reader;
 import org.apache.nutch.admin.NavigationSelector;
 import org.apache.nutch.admin.NutchInstance;
 import org.apache.nutch.tools.HostStatistic.StatisticWritable;
-import org.apache.nutch.tools.HostStatistic.StatisticWritableContainer;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,23 +42,35 @@ public class StatisticController extends NavigationSelector {
     Path segmentPath = new Path(segmentsPath, segment);
     Configuration configuration = nutchInstance.getConfiguration();
     FileSystem fileSystem = FileSystem.get(configuration);
-    Path hostStatistic = new Path(segmentPath, "statistic/host");
-    Reader reader = new SequenceFile.Reader(fileSystem, hostStatistic,
-        configuration);
-    StatisticWritableContainer key = new StatisticWritableContainer();
+
+    // crawldb
+    List<Statistic> crawldbStatistics = satistic(maxCount, configuration,
+        fileSystem, new Path(segmentPath, "statistic/host/crawldb"));
+    model.addAttribute("crawldbStatistic", crawldbStatistics);
+
+    // shard
+    List<Statistic> shardStatistics = satistic(maxCount, configuration,
+        fileSystem, new Path(segmentPath, "statistic/host/shard"));
+    model.addAttribute("shardStatistic", shardStatistics);
+
+    return "statistic";
+  }
+
+  private List<Statistic> satistic(Integer maxCount,
+      Configuration configuration, FileSystem fileSystem, Path in)
+      throws IOException {
+    Reader reader = new SequenceFile.Reader(fileSystem, in, configuration);
+    StatisticWritable key = new StatisticWritable();
     Text value = new Text();
     int tmpCount = 0;
     List<Statistic> statistics = new ArrayList<Statistic>();
     while (tmpCount < maxCount && reader.next(key, value)) {
       tmpCount++;
-      StatisticWritable crawldbStatistic = key.getCrawldbStatistic();
-      StatisticWritable fetchStatistic = key.getFetchStatistic();
-      Statistic statistic = new Statistic(value.toString(), crawldbStatistic
-          .getValue(), fetchStatistic.getValue());
+      Statistic statistic = new Statistic(value.toString(), key
+          .getOverallCount(), key.getFetchSuccessCount());
       statistics.add(statistic);
     }
     reader.close();
-    model.addAttribute("statistics", statistics);
-    return "statistic";
+    return statistics;
   }
 }

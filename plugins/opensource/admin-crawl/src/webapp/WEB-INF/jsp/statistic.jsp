@@ -57,8 +57,8 @@
 		<div id="bd">
 			<div id="yui-main">
 				<div class="yui-b">
-					<h3>URL Statistik Gesamt</h3>
-					<div id="chart" style="height:150px">Unable to load Flash content.</div>
+					<h3>Crawldb Statistik Gesamt</h3>
+					<div id="chart" style="height:${(fn:length(crawldbStatistic)) * 100}px">Unable to load Flash content.</div>
 
 					<script type="text/javascript">
 					
@@ -78,7 +78,7 @@
 					
 							YAHOO.example.stats =
 							[
-							<c:forEach items="${statistics}" var="statistic" begin="0" end="0">
+							<c:forEach items="${crawldbStatistic}" var="statistic" begin="0">
 								{ host: '${statistic.host}', crawlDbCount: ${statistic.crawldbCount}, segmentCount: ${statistic.segmentCount} },
 							</c:forEach>	
 							];
@@ -119,9 +119,9 @@
 					</script>
 					
 					<div style="margin-top:25px"></div>
-					<h3>Top ${fn:length(statistics) -1}</h3>
+					<h3>Segment Statistik</h3>
 					
-					<div id="chart2" style="height:${(fn:length(statistics) -1) * 100}px ">Unable to load Flash content.</div>
+					<div id="chart2" style="height:${(fn:length(shardStatistic)) * 100}px">Unable to load Flash content.</div>
 
 					<script type="text/javascript">
 					
@@ -141,7 +141,7 @@
 					
 							YAHOO.example.stats2 =
 							[
-							<c:forEach items="${statistics}" var="statistic" begin="1">
+							<c:forEach items="${shardStatistic}" var="statistic" begin="0">
 								{ host: '${statistic.host}', crawlDbCount: ${statistic.crawldbCount}, segmentCount: ${statistic.segmentCount} },
 								
 							</c:forEach>	
