@@ -30,7 +30,6 @@
 	<classpathentry kind="src" path="101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/src/plugin/admin-system/src/java"/>
 	<classpathentry kind="src" path="101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/src/plugin/admin-scheduling/src/java"/>
 	<classpathentry kind="src" path="101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/src/java"/>
-	<classpathentry kind="src" path="administration-ui/conf"/>
 	<classpathentry kind="src" path="portalu-nutch-gui/conf"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
