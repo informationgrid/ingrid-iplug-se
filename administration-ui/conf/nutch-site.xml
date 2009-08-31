@@ -7,7 +7,7 @@
 
 <property>
   <name>plugin.folders</name>
-  <value>nutch-1.0/src/plugin,plugins/opensource,plugins/closedsource</value>
+  <value>101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/src/plugin,plugins/closedsource</value>
   <description>Directories where nutch plugins are located.  Each
   element may be a relative or absolute path.  If absolute, it is used
   as is.  If relative, it is searched for on the classpath.</description>
@@ -27,15 +27,10 @@
 </property>
 
 <property>
-  <name>admin.plugins.order</name>
-  <value>admin-welcome admin-general admin-crawl</value>
-  <description>space delimited list of admin plugins to show the webui tabs in this order.</description>
-</property>
-
-<property>
-  <name>admin.instance.order</name>
-  <value>welcome general crawl</value>
-  <description>space delimited list of nutch instances to show the webui tabs in this order.</description>
+  <name>plugin.excludes</name>
+  <value>admin-(search|url-upload)</value>
+  <description>Regular expression naming plugin directory names to exclude.  
+  </description>
 </property>
 
 <property>

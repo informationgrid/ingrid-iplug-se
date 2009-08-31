@@ -15,4 +15,6 @@ public interface IDao<T> {
 
   List<T> getAll(int start, int length);
 
+  void flush();
+
 }

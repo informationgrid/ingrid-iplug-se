@@ -97,6 +97,11 @@ public class TransactionService {
     return entityManager.createNamedQuery(name);
   }
 
+  public void flush() {
+    EntityManager entityManager = getEntityManager();
+    entityManager.flush();
+  }
+
   public static TransactionService getInstance() {
     return INSTANCE;
   }

@@ -53,4 +53,9 @@ public abstract class Dao<T extends IdBase> implements IDao<T> {
     _transactionService.remove(t);
   }
 
+  @Override
+  public void flush() {
+    _transactionService.flush();
+  }
+
 }

@@ -110,6 +110,7 @@ public class StartUrlCommand extends StartUrl implements
     if (out.getId() == null) {
       LOG.info("save new start url: " + out);
       _startUrlDao.makePersistent(out);
+      _startUrlDao.flush();
     }
     return out;
 
