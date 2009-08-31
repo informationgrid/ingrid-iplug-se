@@ -52,5 +52,9 @@
 <wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/index-basic/src/java"/>
 <wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/index-anchor/src/java"/>
 <wb-resource deploy-path="/" source-path="/nutch-1.0/src/plugin/field-basic/src/java"/>
+<wb-resource deploy-path="/" source-path="/portalu-nutch-gui/conf"/>
+<wb-resource deploy-path="/" source-path="/portalu-nutch-gui/src/plugin/admin-urlmaintenance/src/java"/>
+<wb-resource deploy-path="/" source-path="/portalu-nutch-gui/src/plugin/admin-urlmaintenance/src/test"/>
+<wb-resource deploy-path="/" source-path="/portalu-nutch-gui/src/plugin/admin-urlmaintenance/conf"/>
 </wb-module>
 </project-modules>
