@@ -1,1 +1,0 @@
-Portal-U &copy 2009
