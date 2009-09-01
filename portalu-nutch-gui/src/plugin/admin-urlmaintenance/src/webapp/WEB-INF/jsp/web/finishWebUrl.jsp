@@ -46,10 +46,10 @@
 				<c:forEach items="${componentNavigation}" var="navigation">
 					<c:choose>
 						<c:when test="${navigation.name == selectedComponent}">
-							<li class="selected"><a href="${navigation.link}"><em>${navigation.name}</em></a></li>
+							<li class="selected"><a href="${navigation.link}"><em><fmt:message key="plugin.${navigation.name}" bundle="${globalBundle}"/></em></a></li>
 						</c:when>
 						<c:otherwise>
-							<li><a href="${navigation.link}"><em>${navigation.name}</em></a></li>
+							<li><a href="${navigation.link}"><em><fmt:message key="plugin.${navigation.name}" bundle="${globalBundle}"/></em></a></li>
 						</c:otherwise>
 					</c:choose>
 				</c:forEach>
