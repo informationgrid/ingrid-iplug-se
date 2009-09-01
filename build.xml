@@ -1,6 +1,6 @@
 <project>
 
-	<property name="nutch-version" value="nutch-1.0" />
+	<property name="nutch-version" value="101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225" />
 	
 	<target name="init">
 		<mkdir dir="build" />
@@ -15,56 +15,30 @@
 		<unzip src="contrib/${nutch-version}.zip" dest="build" />
 	</target>
 
-
 	<target name="patch-nutch">
-		<patch patchfile="patches/opensource/build.xml.patch" dir="build/${nutch-version}" strip="0" />
-		<patch patchfile="patches/opensource/build-plugins.xml.patch" dir="build/${nutch-version}" strip="0" />
-		<patch patchfile="patches/opensource/build-plugin.xml.patch" dir="build/${nutch-version}" strip="0" />
-		<patch patchfile="patches/opensource/nutch-extensionpoint-plugin.xml.patch" dir="build/${nutch-version}" strip="0" />
-		<patch patchfile="patches/opensource/nutch-default.xml.patch" dir="build/${nutch-version}" strip="0" />
-		<patch patchfile="patches/opensource/nutch.patch" dir="build/${nutch-version}" strip="0" />
+		<patch patchfile="patches/build.xml.patch" dir="build/${nutch-version}" strip="1" />
+		<patch patchfile="patches/Query.patch" dir="build/${nutch-version}" strip="1" />
 	</target>
 
-	<target name="copy-administration-ui">
-		<antcall target="copy-administration-ui-sources" />
-		<antcall target="copy-administration-ui-libraries" />
-	</target>
-	
-	<target name="copy-administration-ui-sources">
-		<copy todir="build/${nutch-version}/src/java">
-			<fileset dir="administration-ui/src/java" />
-		</copy>
-	</target>
 
-	<target name="copy-administration-ui-libraries">
-		<copy todir="build/${nutch-version}/lib/admin-ui-ext">
-			<fileset dir="administration-ui/lib" />
-		</copy>
-	</target>
-	
 	<target name="copy-administration-plugins">
-		<antcall target="copy-admin-instance" />
-		<antcall target="copy-admin-welcome" />
-		<antcall target="copy-admin-scheduling" />
+		<antcall target="copy-admin-url-maintenance" />
 	</target>
 
-	<target name="copy-admin-instance">
-		<copy todir="build/${nutch-version}/src/plugin/admin-instance">
-			<fileset dir="administration-ui/src/plugin/admin-instance" />
-		</copy>
-	</target>
-	<target name="copy-admin-welcome">
-		<copy todir="build/${nutch-version}/src/plugin/admin-welcome">
-			<fileset dir="administration-ui/src/plugin/admin-welcome" />
-		</copy>
-	</target>
-	<target name="copy-admin-scheduling">
-		<copy todir="build/${nutch-version}/src/plugin/admin-scheduling">
-			<fileset dir="administration-ui/src/plugin/admin-scheduling" />
+	<target name="copy-admin-url-maintenance">
+		<copy todir="build/${nutch-version}/src/plugin/admin-urlmaintenance">
+			<fileset dir="portalu-nutch-gui/src/plugin/admin-urlmaintenance" />
 		</copy>
 	</target>
 
-	<target name="dist" depends="unzip-nutch, patch-nutch, copy-administration-ui, copy-administration-plugins">
+	<target name="copy-css">
+		<copy todir="build/${nutch-version}/conf/webapp/portal-u">
+			<fileset dir="portalu-nutch-gui/conf/webapp/portal-u" />
+		</copy>
+	</target>
+
+
+	<target name="dist" depends="unzip-nutch, patch-nutch, copy-administration-plugins, copy-css">
 		<!--<ant antfile="build/${nutch-version}/build.xml" target="tar" />-->
 	</target>
 	

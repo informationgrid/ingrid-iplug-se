@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/src/plugin/parse-js/src/java"/>
+	<classpathentry kind="src" path="101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/src/plugin/query-url/src/java"/>
+	<classpathentry kind="src" path="101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/src/plugin/query-site/src/java"/>
+	<classpathentry kind="src" path="101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/src/plugin/query-basic/src/java"/>
+	<classpathentry kind="src" path="portalu-search/src/test/java"/>
+	<classpathentry kind="src" path="portalu-search/src/main/java"/>
 	<classpathentry kind="src" path="portalu-nutch-gui/src/plugin/admin-urlmaintenance/src/java"/>
 	<classpathentry kind="src" path="portalu-nutch-gui/src/plugin/admin-urlmaintenance/src/test"/>
 	<classpathentry kind="src" path="portalu-nutch-gui/src/plugin/admin-urlmaintenance/conf"/>
@@ -31,6 +36,7 @@
 	<classpathentry kind="src" path="101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/src/plugin/admin-scheduling/src/java"/>
 	<classpathentry kind="src" path="101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/src/java"/>
 	<classpathentry kind="src" path="portalu-nutch-gui/conf"/>
+	<classpathentry kind="src" path="portalu-search/src/test/resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="lib" path="101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/lib/apache-solr-common-1.3.0.jar"/>
@@ -77,5 +83,6 @@
 	<classpathentry kind="lib" path="portalu-nutch-gui/src/plugin/admin-urlmaintenance/lib/javax.persistence_1.0.0.jar"/>
 	<classpathentry kind="lib" path="portalu-nutch-gui/src/plugin/admin-urlmaintenance/lib/mockito-all-1.7.jar"/>
 	<classpathentry kind="lib" path="portalu-nutch-gui/src/plugin/admin-urlmaintenance/lib/mysql-connector-java-5.1.7-bin.jar"/>
+	<classpathentry kind="lib" path="portalu-search/lib/ingrid-ext/ingrid-utils-1.2.2.jar"/>
 	<classpathentry kind="output" path="eclipse-classes"/>
 </classpath>

@@ -11,6 +11,22 @@
      <library name="admin-urlmaintenance.jar">
         <export name="*"/>
      </library>
+     <library name="eclipselink.jar">
+        <export name="*"/>
+     </library>
+     <library name="hsqldb.jar">
+        <export name="*"/>
+     </library>
+     <library name="javax.persistence_1.0.0.jar">
+        <export name="*"/>
+     </library>
+     <library name="mysql-connector-java-5.1.7-bin.jar">
+        <export name="*"/>
+     </library>
+     <library name="mockito-all-1.7..jar">
+        <export name="*"/>
+     </library>
+
      <library name="conf">
         <export name="*"/>
      </library>

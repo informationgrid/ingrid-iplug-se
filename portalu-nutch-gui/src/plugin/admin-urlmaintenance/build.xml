@@ -7,6 +7,9 @@
 		<copy todir="${deploy.dir}/src/webapp">
 			<fileset dir="${basedir}/src/webapp" />
 		</copy>
+		<copy todir="${deploy.dir}/conf">
+			<fileset dir="${basedir}/conf" />
+		</copy>
 	</target>
 
 </project>
