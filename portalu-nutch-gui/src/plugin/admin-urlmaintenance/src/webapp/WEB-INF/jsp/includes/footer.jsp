@@ -1,1 +1,1 @@
-Portal-U &copy 2009
+<fmt:message key="footer" bundle="${globalBundle}"/>
