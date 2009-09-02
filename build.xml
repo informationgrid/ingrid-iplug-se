@@ -1,7 +1,7 @@
 <project>
 
 	<property name="nutch-version" value="101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225" />
-	
+
 	<target name="init">
 		<mkdir dir="build" />
 	</target>
@@ -18,6 +18,8 @@
 	<target name="patch-nutch">
 		<patch patchfile="patches/build.xml.patch" dir="build/${nutch-version}" strip="1" />
 		<patch patchfile="patches/Query.patch" dir="build/${nutch-version}" strip="1" />
+		<patch patchfile="patches/core-build.xml.patch" dir="build/${nutch-version}" strip="1" />
+		<patch patchfile="patches/nutch.patch" dir="build/${nutch-version}" strip="1" />
 	</target>
 
 
@@ -37,9 +39,41 @@
 		</copy>
 	</target>
 
+	<target name="copy-portalu-search">
+		<copy todir="build/${nutch-version}/src/java/de">
+			<fileset dir="portalu-search/src/main/java/de" />
+		</copy>
+		<antcall target="copy-portalu-search-libs" />
+	</target>
 
-	<target name="dist" depends="unzip-nutch, patch-nutch, copy-administration-plugins, copy-css">
+	<target name="copy-portalu-search-libs">
+		<exec dir="portalu-search" executable="mvn">
+			<arg line="dependency:copy-dependencies -DoutputDirectory=${basedir}/build/${nutch-version}/lib/ingrid-ext"/>
+		</exec>
+
+	</target>
+
+	<target name="copy-start-scripts">
+		<copy todir="build/${nutch-version}">
+			<fileset dir="portalu-search/src/main/scripts" />
+		</copy>
+	</target>
+
+	<target name="conf.check">
+		<condition property="conf.exists">
+			<available file="portalu-search/conf/${deploy.mode}" />
+		</condition>
+	</target>
+
+	<target name="copy-configs" depends="conf.check" if="conf.exists">
+		<copy todir="build/${nutch-version}/conf">
+			<fileset dir="portalu-search/conf/${deploy.mode}/" />
+		</copy>
+	</target>
+
+
+	<target name="dist" depends="unzip-nutch, patch-nutch, copy-administration-plugins, copy-css, copy-portalu-search, copy-start-scripts, copy-configs">
 		<!--<ant antfile="build/${nutch-version}/build.xml" target="tar" />-->
 	</target>
-	
+
 </project>
