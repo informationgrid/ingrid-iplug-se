@@ -39,6 +39,45 @@
 		</copy>
 	</target>
 
+	<target name="copy-i18n">
+		<!-- configuration -->
+		<copy todir="build/${nutch-version}/src/plugin/admin-configuration/src/conf/portal-u/i18n">
+			<fileset dir="portalu-nutch-gui/conf/portal-u/i18n" >
+				<include name="configuration*"/>
+			</fileset>
+		</copy>
+		<!-- crawl -->
+		<copy todir="build/${nutch-version}/src/plugin/admin-crawl/src/conf/portal-u/i18n">
+			<fileset dir="portalu-nutch-gui/conf/portal-u/i18n" >
+				<include name="crawl*"/>
+			</fileset>
+		</copy>
+		<!-- instance -->
+		<copy todir="build/${nutch-version}/src/plugin/admin-instance/src/conf/portal-u/i18n">
+			<fileset dir="portalu-nutch-gui/conf/portal-u/i18n" >
+				<include name="instance*"/>
+			</fileset>
+		</copy>
+		<!-- scheduling -->
+		<copy todir="build/${nutch-version}/src/plugin/admin-scheduling/src/conf/portal-u/i18n">
+			<fileset dir="portalu-nutch-gui/conf/portal-u/i18n" >
+				<include name="scheduling*"/>
+			</fileset>
+		</copy>
+		<!-- system -->
+		<copy todir="build/${nutch-version}/src/plugin/admin-system/src/conf/portal-u/i18n">
+			<fileset dir="portalu-nutch-gui/conf/portal-u/i18n" >
+				<include name="system*"/>
+			</fileset>
+		</copy>
+		<!-- welcome -->
+		<copy todir="build/${nutch-version}/src/plugin/admin-welcome/src/conf/portal-u/i18n">
+			<fileset dir="portalu-nutch-gui/conf/portal-u/i18n" >
+				<include name="welcome*"/>
+			</fileset>
+		</copy>
+	</target>
+
 	<target name="copy-portalu-search">
 		<copy todir="build/${nutch-version}/src/java/de">
 			<fileset dir="portalu-search/src/main/java/de" />
@@ -72,7 +111,7 @@
 	</target>
 
 
-	<target name="dist" depends="unzip-nutch, patch-nutch, copy-administration-plugins, copy-css, copy-portalu-search, copy-start-scripts, copy-configs">
+	<target name="dist" depends="unzip-nutch, patch-nutch, copy-administration-plugins, copy-css, copy-i18n, copy-portalu-search, copy-start-scripts, copy-configs">
 		<!--<ant antfile="build/${nutch-version}/build.xml" target="tar" />-->
 	</target>
 
