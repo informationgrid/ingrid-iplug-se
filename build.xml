@@ -19,6 +19,7 @@
 		<patch patchfile="patches/build.xml.patch" dir="build/${nutch-version}" strip="1" />
 		<patch patchfile="patches/Query.patch" dir="build/${nutch-version}" strip="1" />
 		<patch patchfile="patches/core-build.xml.patch" dir="build/${nutch-version}" strip="1" />
+		<patch patchfile="patches/build-plugin.xml.patch" dir="build/${nutch-version}" strip="1" />
 		<patch patchfile="patches/nutch.patch" dir="build/${nutch-version}" strip="1" />
 	</target>
 
@@ -104,15 +105,25 @@
 		</condition>
 	</target>
 
-	<target name="copy-configs" depends="conf.check" if="conf.exists">
+	<target name="copy-search-configs" depends="conf.check" if="conf.exists">
 		<copy todir="build/${nutch-version}/conf">
 			<fileset dir="portalu-search/conf/${deploy.mode}/" />
 		</copy>
 	</target>
 
-
-	<target name="dist" depends="unzip-nutch, patch-nutch, copy-administration-plugins, copy-css, copy-i18n, copy-portalu-search, copy-start-scripts, copy-configs">
-		<!--<ant antfile="build/${nutch-version}/build.xml" target="tar" />-->
+	<target name="copy-gui-configs">
+		<copy todir="build/${nutch-version}/conf/" file="portalu-nutch-gui/conf/nutch-site.xml" />
 	</target>
 
+	<target name="dist" depends="unzip-nutch, patch-nutch, copy-administration-plugins, copy-css, copy-i18n, copy-portalu-search, copy-start-scripts, copy-search-configs, copy-gui-configs">
+		<ant dir="build/${nutch-version}" target="package" />
+	</target>
+	
+	<target name="deploy" depends="dist">
+		<exec command="rsync">
+			<arg line=" -c -a -r --progress -e ssh --delete build/${nutch-version}/build/nutch-gui-0.1 213.144.28.245:/opt/ingrid/ingrid-iplug-se-dev"/>
+		</exec>
+	</target>
+
+		
 </project>
