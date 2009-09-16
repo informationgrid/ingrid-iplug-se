@@ -101,7 +101,7 @@
 
 <property>
   <name>db.fetch.schedule.class</name>
-  <value>org.apache.nutch.crawl.AbstractFetchSchedule</value>
+  <value>org.apache.nutch.crawl.AdaptiveFetchSchedule</value>
   <description>The implementation of fetch schedule. DefaultFetchSchedule simply
   adds the original fetchInterval to the last fetch time, regardless of
   page changes.</description>
