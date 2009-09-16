@@ -2,14 +2,23 @@ Index: 101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/bin/nutch
 ===================================================================
 --- 101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/bin/nutch	(revision 13654)
 +++ 101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/bin/nutch	(working copy)
-@@ -148,6 +148,11 @@
+@@ -11,6 +11,9 @@
+ #
+ #   NUTCH_OPTS      Extra Java runtime options.
+ #
++
++NUTCH_OPTS="-Dnutch.gui.theme=portal-u -DdeployMode=dev"
++
+ cygwin=false
+ case "`uname`" in
+ CYGWIN*) cygwin=true;;
+@@ -148,6 +151,10 @@
    CLASSPATH=${CLASSPATH}:$f;
  done
  
 +for f in $NUTCH_HOME/lib/ingrid-ext/*.jar; do
 +  CLASSPATH=${CLASSPATH}:$f;
 +done
-+
 +
  # cygwin path translation
  if $cygwin; then
