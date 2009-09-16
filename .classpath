@@ -78,11 +78,11 @@
 	<classpathentry kind="lib" path="101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/src/plugin/admin-scheduling/lib/cron4j-1.1.6.jar"/>
 	<classpathentry kind="lib" path="101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/src/plugin/lib-nekohtml/lib/nekohtml-0.9.4.jar"/>
 	<classpathentry kind="lib" path="101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/src/plugin/parse-html/lib/tagsoup-1.2.jar"/>
+	<classpathentry kind="lib" path="portalu-search/lib/ingrid-ext/ingrid-utils-1.2.2.jar"/>
 	<classpathentry kind="lib" path="portalu-nutch-gui/src/plugin/admin-urlmaintenance/lib/eclipselink.jar"/>
 	<classpathentry kind="lib" path="portalu-nutch-gui/src/plugin/admin-urlmaintenance/lib/hsqldb.jar"/>
-	<classpathentry kind="lib" path="portalu-nutch-gui/src/plugin/admin-urlmaintenance/lib/javax.persistence_1.0.0.jar"/>
+	<classpathentry kind="lib" path="portalu-nutch-gui/src/plugin/admin-urlmaintenance/lib/javax.persistence_1.0.0.v200905011740.jar"/>
 	<classpathentry kind="lib" path="portalu-nutch-gui/src/plugin/admin-urlmaintenance/lib/mockito-all-1.7.jar"/>
 	<classpathentry kind="lib" path="portalu-nutch-gui/src/plugin/admin-urlmaintenance/lib/mysql-connector-java-5.1.7-bin.jar"/>
-	<classpathentry kind="lib" path="portalu-search/lib/ingrid-ext/ingrid-utils-1.2.2.jar"/>
 	<classpathentry kind="output" path="eclipse-classes"/>
 </classpath>
