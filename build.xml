@@ -99,27 +99,19 @@
 		</copy>
 	</target>
 
-	<target name="conf.check">
-		<condition property="conf.exists">
-			<available file="portalu-search/conf/${deploy.mode}" />
-		</condition>
-	</target>
-
-	<target name="copy-search-configs" depends="conf.check" if="conf.exists">
-		<copy todir="build/${nutch-version}/conf">
-			<fileset dir="portalu-search/conf/${deploy.mode}/" />
-		</copy>
-	</target>
-
 	<target name="copy-gui-configs">
 		<copy todir="build/${nutch-version}/conf/" file="portalu-nutch-gui/conf/nutch-site.xml" />
 	</target>
 
-	<target name="dist" depends="unzip-nutch, patch-nutch, copy-administration-plugins, copy-css, copy-i18n, copy-portalu-search, copy-start-scripts, copy-search-configs, copy-gui-configs">
+	<target name="mylesDistribution" depends="unzip-nutch, patch-nutch, copy-administration-plugins, copy-css, copy-i18n, copy-portalu-search, copy-start-scripts, copy-gui-configs">
+		<copy todir="build/${nutch-version}/conf">
+			<fileset dir="deploy/ingrid-search/myles/" />
+		</copy>
+		<copy todir="build/${nutch-version}/src/plugin/admin-urlmaintenance/conf/META-INF/" file="deploy/nutch-gui/myles/persistence.xml" overwrite="true"/>
 		<ant dir="build/${nutch-version}" target="package" />
 	</target>
-	
-	<target name="deploy" depends="dist">
+
+	<target name="deployMyles" depends="mylesDistribution">
 		<exec command="rsync">
 			<arg line=" -c -a -r --progress -e ssh --delete build/${nutch-version}/build/nutch-gui-0.1 213.144.28.245:/opt/ingrid/ingrid-iplug-se-dev"/>
 		</exec>
