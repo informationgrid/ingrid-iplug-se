@@ -5,6 +5,7 @@
 
 <configuration>
 
+<!-- 
 <property>
   <name>plugin.folders</name>
   <value>101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/src/plugin,portalu-nutch-gui/src/plugin</value>
@@ -12,7 +13,7 @@
   element may be a relative or absolute path.  If absolute, it is used
   as is.  If relative, it is searched for on the classpath.</description>
 </property>
-
+ -->
 <property>
   <name>plugin.includes</name>
   <value>admin-.*|protocol-http|urlfilter-regex|parse-(text|html|js)|index-(basic|anchor|metadata)|query-(basic|site|url)|response-(json|xml)|summary-basic|scoring-opic|urlnormalizer-(pass|regex|basic)|crawl-prepare-(dbexport)</value>
@@ -97,5 +98,14 @@
   <description>A version string to advertise in the User-Agent 
    header.</description>
 </property>
+
+<property>
+  <name>db.fetch.schedule.class</name>
+  <value>org.apache.nutch.crawl.AbstractFetchSchedule</value>
+  <description>The implementation of fetch schedule. DefaultFetchSchedule simply
+  adds the original fetchInterval to the last fetch time, regardless of
+  page changes.</description>
+</property>
+
 
 </configuration>
