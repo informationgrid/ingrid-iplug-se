@@ -47,6 +47,6 @@
 			<property name="eclipselink.ddl-generation" value="create-tables"/>
 		</properties>
 	</persistence-unit>
-	
+
 
 </persistence> 
