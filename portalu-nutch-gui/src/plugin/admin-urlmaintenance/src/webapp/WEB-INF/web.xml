@@ -39,7 +39,7 @@ http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 	<servlet-mapping>
 		<servlet-name>resourceLoader</servlet-name>
 		<url-pattern>*.gif</url-pattern>
-	</servlet-mapping>	
+	</servlet-mapping>
 	
 	<error-page>
         <error-code>500</error-code>

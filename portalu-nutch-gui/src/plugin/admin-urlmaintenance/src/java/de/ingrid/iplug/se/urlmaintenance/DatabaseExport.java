@@ -12,58 +12,53 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.apache.nutch.crawl.IPreCrawl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import de.ingrid.iplug.se.urlmaintenance.persistence.dao.CatalogUrlDao;
-import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ExcludeUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ICatalogUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IExcludeUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ILimitUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao;
-import de.ingrid.iplug.se.urlmaintenance.persistence.dao.LimitUrlDao;
-import de.ingrid.iplug.se.urlmaintenance.persistence.dao.StartUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.CatalogUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.LimitUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Partner;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Url;
-import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
 
-public class DatabaseExport implements IPreCrawl {
+@Service
+public class DatabaseExport {
 
-  private Configuration _conf;
-  private ICatalogUrlDao _catalogUrlDao;
-  private IStartUrlDao _startUrlDao;
-  private ILimitUrlDao _limitUrlDao;
-  private IExcludeUrlDao _excludeUrlDao;
+  protected ICatalogUrlDao _catalogUrlDao;
+  protected IStartUrlDao _startUrlDao;
+  protected ILimitUrlDao _limitUrlDao;
+  protected IExcludeUrlDao _excludeUrlDao;
   private static final Log LOG = LogFactory.getLog(DatabaseExport.class);
 
-  @Override
-  public void preCrawl(Path crawlDir) throws IOException {
+  @Autowired
+  public DatabaseExport(IStartUrlDao startUrlDao, ICatalogUrlDao catalogUrlDao,
+      ILimitUrlDao limitUrlDao, IExcludeUrlDao excludeUrlDao) {
+    _startUrlDao = startUrlDao;
+    _catalogUrlDao = catalogUrlDao;
+    _limitUrlDao = limitUrlDao;
+    _excludeUrlDao = excludeUrlDao;
+  }
 
-    LOG.info("prepare crawl folder: " + crawlDir);
+  public void export(String urlType, File exportDir) throws IOException {
 
-    FileSystem fileSystem = FileSystem.get(_conf);
+    exportDir = new File(exportDir, urlType);
+    LOG.info("export urls into folder: " + exportDir);
 
-    // write urls in local tmp folder
-    String tmp = System.getProperty("java.io.tmpdir");
-    File tmpFolder = new File(tmp, DatabaseExport.class.getName() + "-"
-        + System.currentTimeMillis());
-    File start = new File(tmpFolder, "urls/start");
+    File start = new File(exportDir, "urls/start");
     start.mkdirs();
-    File limit = new File(tmpFolder, "urls/limit");
+    File limit = new File(exportDir, "urls/limit");
     limit.mkdirs();
-    File exclude = new File(tmpFolder, "urls/exclude");
+    File exclude = new File(exportDir, "urls/exclude");
     exclude.mkdirs();
-    File metadata = new File(tmpFolder, "urls/metadata");
+    File metadata = new File(exportDir, "urls/metadata");
     metadata.mkdirs();
 
-    String urlType = _conf.get("url.type");
     // write urls
     if ("web".equalsIgnoreCase(urlType)) {
       // export web urls
@@ -87,40 +82,6 @@ public class DatabaseExport implements IPreCrawl {
       LOG
           .warn("configuration invalid. please configure 'url.type' to [web|catalog]");
     }
-
-    // upload urls
-    upload(fileSystem, start, crawlDir);
-    upload(fileSystem, limit, crawlDir);
-    upload(fileSystem, exclude, crawlDir);
-    upload(fileSystem, metadata, crawlDir);
-  }
-
-  private void upload(FileSystem fileSystem, File urlFolder, Path crawlDir)
-      throws IOException {
-    if (!new File(urlFolder.getAbsolutePath(), "urls.txt").exists()) {
-      return;
-    }
-    Path urlFile = new Path(urlFolder.getAbsolutePath(), "urls.txt");
-    Path uploadPath = new Path(crawlDir, "urls/" + urlFolder.getName()
-        + "/urls.txt");
-    LOG.info("upload url file [" + urlFile + "] to hdfs [" + uploadPath + "]");
-    fileSystem.copyFromLocalFile(true, true, urlFile, uploadPath);
-  }
-
-  @Override
-  public Configuration getConf() {
-    return _conf;
-  }
-
-  @Override
-  public void setConf(Configuration conf) {
-    _conf = conf;
-    // instantiate UrlDao's without spring :(
-    TransactionService transactionService = new TransactionService();
-    _catalogUrlDao = new CatalogUrlDao(transactionService);
-    _startUrlDao = new StartUrlDao(transactionService);
-    _limitUrlDao = new LimitUrlDao(transactionService);
-    _excludeUrlDao = new ExcludeUrlDao(transactionService);
   }
 
   private void printMetadatas(File file, IDao<? extends Url> urlDao)
