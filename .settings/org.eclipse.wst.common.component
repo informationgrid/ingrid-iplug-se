@@ -56,5 +56,11 @@
 <wb-resource deploy-path="/" source-path="/portalu-nutch-gui/src/plugin/admin-urlmaintenance/src/java"/>
 <wb-resource deploy-path="/" source-path="/portalu-nutch-gui/src/plugin/admin-urlmaintenance/src/test"/>
 <wb-resource deploy-path="/" source-path="/portalu-nutch-gui/src/plugin/admin-urlmaintenance/conf"/>
+<wb-resource deploy-path="/" source-path="/portalu-search/src/main/java"/>
+<wb-resource deploy-path="/" source-path="/portalu-search/src/test/java"/>
+<wb-resource deploy-path="/" source-path="/portalu-search/src/test/resources"/>
+<wb-resource deploy-path="/" source-path="/101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/src/plugin/query-url/src/java"/>
+<wb-resource deploy-path="/" source-path="/101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/src/plugin/query-site/src/java"/>
+<wb-resource deploy-path="/" source-path="/101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/src/plugin/query-basic/src/java"/>
 </wb-module>
 </project-modules>

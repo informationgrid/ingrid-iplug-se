@@ -35,7 +35,7 @@
 
 <property>
   <name>crawl-prepare.order</name>
-  <value>de.ingrid.iplug.se.urlmaintenance.DatabaseExport</value>
+  <value>de.ingrid.iplug.se.urlmaintenance.UrlmaintenancePreCrawl</value>
   <description>space delimited list of IPreCrawl Implementations to execute these classes in order</description>
 </property>
 
