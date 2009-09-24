@@ -80,7 +80,7 @@ public class NutchSearcher implements IPlug {
   public NutchSearcher(File indexFolder, String plugId, Configuration conf)
       throws IOException {
     SearcherFactory factory = SearcherFactory.getInstance(conf);
-    _searcher = factory.get(false);
+    _searcher = factory.get();
     this.fPlugId = plugId;
     _configuration = conf;
   }
@@ -94,7 +94,7 @@ public class NutchSearcher implements IPlug {
     _configuration.set("nutch.instance.folder", workinDirectory
         .getAbsolutePath());
     SearcherFactory factory = SearcherFactory.getInstance(_configuration);
-    _searcher = factory.get(false);
+    _searcher = factory.get();
     ProcessorPipeFactory processorPipeFactory = new ProcessorPipeFactory(
         plugDescription);
     _processorPipe = processorPipeFactory.getProcessorPipe();
