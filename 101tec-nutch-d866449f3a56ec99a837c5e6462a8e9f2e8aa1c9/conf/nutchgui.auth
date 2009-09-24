@@ -1,0 +1,4 @@
+PropertyFileLogin {
+   org.apache.nutch.admin.security.PropertyFileLoginModule required
+   file="nutchguiUsers.properties";
+};
