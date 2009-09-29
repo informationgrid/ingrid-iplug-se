@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="101tec-nutch-d866449f3a56ec99a837c5e6462a8e9f2e8aa1c9/src/plugin/parse-js/src/java"/>
+	<classpathentry kind="src" path="portalu-nutch-gui/src/java"/>
 	<classpathentry kind="src" path="101tec-nutch-d866449f3a56ec99a837c5e6462a8e9f2e8aa1c9/src/plugin/query-url/src/java"/>
 	<classpathentry kind="src" path="101tec-nutch-d866449f3a56ec99a837c5e6462a8e9f2e8aa1c9/src/plugin/query-site/src/java"/>
 	<classpathentry kind="src" path="101tec-nutch-d866449f3a56ec99a837c5e6462a8e9f2e8aa1c9/src/plugin/query-basic/src/java"/>
@@ -78,11 +79,42 @@
 	<classpathentry kind="lib" path="101tec-nutch-d866449f3a56ec99a837c5e6462a8e9f2e8aa1c9/src/plugin/admin-scheduling/lib/cron4j-1.1.6.jar"/>
 	<classpathentry kind="lib" path="101tec-nutch-d866449f3a56ec99a837c5e6462a8e9f2e8aa1c9/src/plugin/lib-nekohtml/lib/nekohtml-0.9.4.jar"/>
 	<classpathentry kind="lib" path="101tec-nutch-d866449f3a56ec99a837c5e6462a8e9f2e8aa1c9/src/plugin/parse-html/lib/tagsoup-1.2.jar"/>
-	<classpathentry kind="lib" path="portalu-search/lib/ingrid-ext/ingrid-utils-1.2.2.jar"/>
 	<classpathentry kind="lib" path="portalu-nutch-gui/src/plugin/admin-urlmaintenance/lib/eclipselink.jar"/>
 	<classpathentry kind="lib" path="portalu-nutch-gui/src/plugin/admin-urlmaintenance/lib/hsqldb.jar"/>
 	<classpathentry kind="lib" path="portalu-nutch-gui/src/plugin/admin-urlmaintenance/lib/javax.persistence_1.0.0.v200905011740.jar"/>
 	<classpathentry kind="lib" path="portalu-nutch-gui/src/plugin/admin-urlmaintenance/lib/mockito-all-1.7.jar"/>
 	<classpathentry kind="lib" path="portalu-nutch-gui/src/plugin/admin-urlmaintenance/lib/mysql-connector-java-5.1.7-bin.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/ant-1.6.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/backport-util-concurrent-3.1.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/commons-beanutils-1.7.0.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/commons-beanutils-core-1.7.0.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/commons-betwixt-0.7.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/commons-codec-1.3.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/commons-collections-3.1.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/commons-digester-1.6.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/commons-el-1.0.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/commons-logging-1.0.4.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/ehcache-1.4.1.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/ingrid-communication-1.2.1.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/ingrid-communication-authentication-1.2.1.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/ingrid-ibus-1.2.1.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/ingrid-ibus-client-1.2.2.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/ingrid-iplug-1.2.2-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/ingrid-utils-1.2.3-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/jasper-compiler-5.5.9.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/jasper-runtime-5.5.9.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/jsr107cache-1.0.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/junit-3.8.1.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/log4j-1.2.9.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/mockito-all-1.8.0.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/org.mortbay.jetty-5.1.8.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/quartz-1.5.0.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/servlet-api-2.5-6.0.0beta6.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/spring-beans-2.5.6.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/spring-core-2.5.6.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/xercesImpl-2.4.0.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/xml-apis-1.3.03.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/xpp3_min-1.1.3.4.O.jar"/>
+	<classpathentry kind="lib" path="portalu-common/eclipse-libs/xstream-1.2.1.jar"/>
 	<classpathentry kind="output" path="eclipse-classes"/>
 </classpath>
