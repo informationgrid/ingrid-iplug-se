@@ -52,9 +52,17 @@ public class PortaluLoginModule extends AbstractLoginModule {
           60000);
     }
 
-    public static IndexIPlug getInstance() throws IOException {
+    public static IndexIPlug getInstance() throws Exception {
       if (INSTANCE == null) {
         INSTANCE = new IndexIPlug();
+        URL resource = PortaluLoginModule.class
+            .getResource("/plugdescription-index.xml");
+        File pd = new File(resource.getFile());
+        PlugDescription plugDescription = new PlugdescriptionSerializer()
+            .deSerialize(pd);
+        plugDescription.setRecordLoader(true);
+        INSTANCE.configure(plugDescription);
+        INSTANCE.startHeartBeats();
       }
       return INSTANCE;
     }
@@ -90,17 +98,7 @@ public class PortaluLoginModule extends AbstractLoginModule {
   }
 
   public PortaluLoginModule() throws Exception {
-    System.out.println("PortaluLoginModule.PortaluLoginModule()");
     IndexIPlug plug = IndexIPlug.getInstance();
-    URL resource = PortaluLoginModule.class
-        .getResource("/plugdescription-index.xml");
-    File pd = new File(resource.getFile());
-    PlugDescription plugDescription = new PlugdescriptionSerializer()
-        .deSerialize(pd);
-    plugDescription.setRecordLoader(true);
-    plug.configure(plugDescription);
-    plug.startHeartBeats();
-
   }
 
   @Override
@@ -116,7 +114,7 @@ public class PortaluLoginModule extends AbstractLoginModule {
         principal = createFromHits(userName, password, hits,
             allPartnerWithProvider);
       }
-    } catch (IOException e) {
+    } catch (Exception e) {
       LOG.error("error while authenticate against management iplug", e);
     }
     return principal;
