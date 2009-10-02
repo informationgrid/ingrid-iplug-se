@@ -1,0 +1,65 @@
+Index: 101tec-nutch-d866449f3a56ec99a837c5e6462a8e9f2e8aa1c9/src/plugin/admin-configuration/src/webapp/WEB-INF/web.xml
+===================================================================
+--- 101tec-nutch-d866449f3a56ec99a837c5e6462a8e9f2e8aa1c9/src/plugin/admin-configuration/src/webapp/WEB-INF/web.xml	(revision 13745)
++++ 101tec-nutch-d866449f3a56ec99a837c5e6462a8e9f2e8aa1c9/src/plugin/admin-configuration/src/webapp/WEB-INF/web.xml	(working copy)
+@@ -55,7 +55,7 @@
+             <url-pattern>*.html</url-pattern>
+         </web-resource-collection>
+         <auth-constraint>
+-            <role-name>admin</role-name>
++            <role-name>admin.portal</role-name>
+         </auth-constraint>
+     </security-constraint>
+  
+Index: 101tec-nutch-d866449f3a56ec99a837c5e6462a8e9f2e8aa1c9/src/plugin/admin-system/src/webapp/WEB-INF/web.xml
+===================================================================
+--- 101tec-nutch-d866449f3a56ec99a837c5e6462a8e9f2e8aa1c9/src/plugin/admin-system/src/webapp/WEB-INF/web.xml	(revision 13745)
++++ 101tec-nutch-d866449f3a56ec99a837c5e6462a8e9f2e8aa1c9/src/plugin/admin-system/src/webapp/WEB-INF/web.xml	(working copy)
+@@ -60,7 +60,7 @@
+             <url-pattern>*.html</url-pattern>
+         </web-resource-collection>
+         <auth-constraint>
+-            <role-name>admin</role-name>
++            <role-name>admin.portal</role-name>
+         </auth-constraint>
+     </security-constraint>
+     
+Index: 101tec-nutch-d866449f3a56ec99a837c5e6462a8e9f2e8aa1c9/src/plugin/admin-instance/src/webapp/WEB-INF/web.xml
+===================================================================
+--- 101tec-nutch-d866449f3a56ec99a837c5e6462a8e9f2e8aa1c9/src/plugin/admin-instance/src/webapp/WEB-INF/web.xml	(revision 13745)
++++ 101tec-nutch-d866449f3a56ec99a837c5e6462a8e9f2e8aa1c9/src/plugin/admin-instance/src/webapp/WEB-INF/web.xml	(working copy)
+@@ -60,7 +60,7 @@
+             <url-pattern>*.html</url-pattern>
+         </web-resource-collection>
+         <auth-constraint>
+-            <role-name>admin</role-name>
++            <role-name>admin.portal</role-name>
+         </auth-constraint>
+     </security-constraint>
+  
+Index: 101tec-nutch-d866449f3a56ec99a837c5e6462a8e9f2e8aa1c9/src/plugin/admin-crawl/src/webapp/WEB-INF/web.xml
+===================================================================
+--- 101tec-nutch-d866449f3a56ec99a837c5e6462a8e9f2e8aa1c9/src/plugin/admin-crawl/src/webapp/WEB-INF/web.xml	(revision 13745)
++++ 101tec-nutch-d866449f3a56ec99a837c5e6462a8e9f2e8aa1c9/src/plugin/admin-crawl/src/webapp/WEB-INF/web.xml	(working copy)
+@@ -63,7 +63,7 @@
+             <url-pattern>*.html</url-pattern>
+         </web-resource-collection>
+         <auth-constraint>
+-            <role-name>admin</role-name>
++            <role-name>admin.portal</role-name>
+         </auth-constraint>
+     </security-constraint>
+  
+Index: 101tec-nutch-d866449f3a56ec99a837c5e6462a8e9f2e8aa1c9/src/plugin/admin-scheduling/src/webapp/WEB-INF/web.xml
+===================================================================
+--- 101tec-nutch-d866449f3a56ec99a837c5e6462a8e9f2e8aa1c9/src/plugin/admin-scheduling/src/webapp/WEB-INF/web.xml	(revision 13745)
++++ 101tec-nutch-d866449f3a56ec99a837c5e6462a8e9f2e8aa1c9/src/plugin/admin-scheduling/src/webapp/WEB-INF/web.xml	(working copy)
+@@ -61,7 +61,7 @@
+             <url-pattern>*.html</url-pattern>
+         </web-resource-collection>
+         <auth-constraint>
+-            <role-name>admin</role-name>
++            <role-name>admin.portal</role-name>
+         </auth-constraint>
+     </security-constraint>
+  
