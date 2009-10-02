@@ -3,27 +3,27 @@
 <html>
 <head>
 	<title>Admin URL Pflege - Web URLs</title>
-	<link rel="stylesheet" type="text/css" href="${theme}/css/reset-fonts-grids.css" />
-	<link rel="stylesheet" type="text/css" href="${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css">
-	<script type="text/javascript" src="${theme}/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
-	<script type="text/javascript" src="${theme}/js/yui/build/element/element-min.js"></script>
-	<script type="text/javascript" src="${theme}/js/yui/build/connection/connection-min.js"></script>
-	<script type="text/javascript" src="${theme}/js/yui/build/tabview/tabview-min.js"></script>
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/css/reset-fonts-grids.css" />
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css">
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/element/element-min.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/connection/connection-min.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/tabview/tabview-min.js"></script>
 	
-	<link rel="stylesheet" type="text/css" href="${theme}/js/yui/build/paginator/assets/skins/sam/paginator.css" />
-	<link rel="stylesheet" type="text/css" href="${theme}/js/yui/build/datatable/assets/skins/sam/datatable.css" />
-	<script type="text/javascript" src="${theme}/js/yui/build/json/json-min.js"></script>
-	<script type="text/javascript" src="${theme}/js/yui/build/paginator/paginator-min.js"></script>
-	<script type="text/javascript" src="${theme}/js/yui/build/datasource/datasource-min.js"></script>
-	<script type="text/javascript" src="${theme}/js/yui/build/datatable/datatable-min.js"></script>
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/paginator/assets/skins/sam/paginator.css" />
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/datatable/assets/skins/sam/datatable.css" />
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/json/json-min.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/paginator/paginator-min.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/datasource/datasource-min.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/datatable/datatable-min.js"></script>
 	
-	<script type="text/javascript" src="${theme}/js/yui/build/yahoo/yahoo-min.js" ></script>
-	<script type="text/javascript" src="${theme}/js/yui/build/event/event-min.js" ></script>
-	<link rel="stylesheet" type="text/css" href="${theme}/css/style.css" />
-	<link rel="stylesheet" type="text/css" href="${theme}/js/yui/build/button/assets/skins/sam/button.css" />
-	<script type="text/javascript" src="${theme}/js/yui/build/button/button-min.js"></script>
-	<script type="text/javascript" src="${theme}/js/yui/build/container/container-min.js"></script>
-	<link rel="stylesheet" type="text/css" href="${theme}/js/yui/build/container/assets/skins/sam/container.css" />
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/yahoo/yahoo-min.js" ></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/event/event-min.js" ></script>
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/css/style.css" />
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/button/assets/skins/sam/button.css" />
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/button/button-min.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/container/container-min.js"></script>
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/container/assets/skins/sam/container.css" />
 </head>
 <body class="yui-skin-sam">
 	<div id="doc2">
@@ -72,8 +72,8 @@
 					
 					<div class="yui-navset">
 					    <ul class="yui-nav">
-					        <li><a href="listTopicUrls.html"><em>Katalog Url's</em></a></li>
-					        <li class="selected"><a href="listWebUrls.html"><em>Web Url's</em></a></li>
+					        <li><a href="<%=request.getContextPath()%>/catalog/listTopicUrls.html"><em>Katalog Url's</em></a></li>
+					        <li class="selected"><a href="<%=request.getContextPath()%>/web/listWebUrls.html"><em>Web Url's</em></a></li>
 					    </ul>            
 					</div>
 					
@@ -124,7 +124,7 @@
 					    <div style="margin-top:20px"></div>
 					    
 					    <div style="float:right">
-							<img src="${theme}/gfx/add.png" align="absmiddle"/> <b><a href="createStartUrl.html">Neue Webseite</a></b>
+							<img src="<%=request.getContextPath()%>/theme/${theme}/gfx/add.png" align="absmiddle"/> <b><a href="createStartUrl.html">Neue Webseite</a></b>
 						</div>
 					    <h3>Web Seiten</h3>
 				        <ul>
@@ -172,13 +172,13 @@
 						       		<td><fmt:formatDate value="${limitUrl.created}" pattern="yyyy-MM-dd"/></td>
 						       		<td><fmt:formatDate value="${limitUrl.updated}" pattern="yyyy-MM-dd"/></td>
 						       		<td>
-						       			&nbsp;<c:if test="${fn:contains(limitUrl.metadatas,'law')}"><img src="${theme}/gfx/ok.png"/></c:if>&nbsp;
+						       			&nbsp;<c:if test="${fn:contains(limitUrl.metadatas,'law')}"><img src="<%=request.getContextPath()%>/theme/${theme}/gfx/ok.png"/></c:if>&nbsp;
 						       		</td>
 						       		<td>
-						       			&nbsp;<c:if test="${fn:contains(limitUrl.metadatas,'research')}"><img src="${theme}/gfx/ok.png"/></c:if>&nbsp;
+						       			&nbsp;<c:if test="${fn:contains(limitUrl.metadatas,'research')}"><img src="<%=request.getContextPath()%>/theme/${theme}/gfx/ok.png"/></c:if>&nbsp;
 						       		</td>
 						       		<td>
-						       			&nbsp;<c:if test="${fn:contains(limitUrl.metadatas,'www')}"><img src="${theme}/gfx/ok.png"/></c:if>&nbsp;
+						       			&nbsp;<c:if test="${fn:contains(limitUrl.metadatas,'www')}"><img src="<%=request.getContextPath()%>/theme/${theme}/gfx/ok.png"/></c:if>&nbsp;
 						       		</td>
 						       		<td>
 						       			<c:forEach items="${limitUrl.metadatas}" var="meta"><c:if test="${meta.metadataKey == 'lang'}">${meta.metadataValue}</c:if></c:forEach>&nbsp;

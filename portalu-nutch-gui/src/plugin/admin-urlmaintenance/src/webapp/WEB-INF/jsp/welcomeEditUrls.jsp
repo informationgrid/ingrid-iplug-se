@@ -3,12 +3,12 @@
 <html>
 <head>
 <title>Admin URL Pflege - Welcome</title>
-	<link rel="stylesheet" type="text/css" href="${theme}/css/reset-fonts-grids.css" />
-	<link rel="stylesheet" type="text/css" href="${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css" />
-	<script type="text/javascript" src="${theme}/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
-	<script type="text/javascript" src="${theme}/js/yui/build/element/element-min.js"></script>
-	<script type="text/javascript" src="${theme}/js/yui/build/tabview/tabview-min.js"></script>
-	<link rel="stylesheet" type="text/css" href="${theme}/css/style.css" />
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/css/reset-fonts-grids.css" />
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css" />
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/element/element-min.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/tabview/tabview-min.js"></script>
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/css/style.css" />
 </head>
 <body class="yui-skin-sam">
 	<div id="doc2">					
@@ -57,8 +57,8 @@
 					
 					<div id="demo" class="yui-navset">
 					    <ul class="yui-nav">
-					        <li><a href="listTopicUrls.html"><em>Katalog Url's</em></a></li>
-					        <li><a href="listWebUrls.html"><em>Web Url's</em></a></li>
+					        <li><a href="catalog/listTopicUrls.html"><em>Katalog Url's</em></a></li>
+					        <li><a href="web/listWebUrls.html"><em>Web Url's</em></a></li>
 					    </ul>            
 					</div>						
 

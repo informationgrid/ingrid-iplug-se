@@ -63,7 +63,7 @@ public class ListWebUrlsController extends NavigationSelector {
     return arrayList;
   }
 
-  @RequestMapping(value = "/listWebUrls.html", method = RequestMethod.GET)
+  @RequestMapping(value = "/web/listWebUrls.html", method = RequestMethod.GET)
   public String listWebUrls(
       @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand,
       @RequestParam(value = "page", required = false) Integer page,

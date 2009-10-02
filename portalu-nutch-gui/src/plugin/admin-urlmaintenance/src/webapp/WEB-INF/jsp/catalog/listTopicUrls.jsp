@@ -3,27 +3,27 @@
 <html>
 <head>
 	<title>Admin URL Pflege - Katalog URLs</title>
-	<link rel="stylesheet" type="text/css" href="${theme}/css/reset-fonts-grids.css" />
-	<link rel="stylesheet" type="text/css" href="${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css">
-	<link rel="stylesheet" type="text/css" href="${theme}/js/yui/build/container/assets/skins/sam/container.css" />
-	<script type="text/javascript" src="${theme}/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
-	<script type="text/javascript" src="${theme}/js/yui/build/element/element-min.js"></script>
-	<script type="text/javascript" src="${theme}/js/yui/build/connection/connection-min.js"></script>
-	<script type="text/javascript" src="${theme}/js/yui/build/tabview/tabview-min.js"></script>
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/css/reset-fonts-grids.css" />
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css">
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/container/assets/skins/sam/container.css" />
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/element/element-min.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/connection/connection-min.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/tabview/tabview-min.js"></script>
 	
-	<link rel="stylesheet" type="text/css" href="${theme}/js/yui/build/paginator/assets/skins/sam/paginator.css" />
-	<link rel="stylesheet" type="text/css" href="${theme}/js/yui/build/datatable/assets/skins/sam/datatable.css" />
-	<script type="text/javascript" src="${theme}/js/yui/build/json/json-min.js"></script>
-	<script type="text/javascript" src="${theme}/js/yui/build/paginator/paginator-min.js"></script>
-	<script type="text/javascript" src="${theme}/js/yui/build/datasource/datasource-min.js"></script>
-	<script type="text/javascript" src="${theme}/js/yui/build/datatable/datatable-min.js"></script>
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/paginator/assets/skins/sam/paginator.css" />
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/datatable/assets/skins/sam/datatable.css" />
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/json/json-min.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/paginator/paginator-min.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/datasource/datasource-min.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/datatable/datatable-min.js"></script>
 	
-	<script type="text/javascript" src="${theme}/js/yui/build/yahoo/yahoo-min.js" ></script>
-	<script type="text/javascript" src="${theme}/js/yui/build/event/event-min.js" ></script>
-	<link rel="stylesheet" type="text/css" href="${theme}/css/style.css" />
-	<link rel="stylesheet" type="text/css" href="${theme}/js/yui/build/button/assets/skins/sam/button.css" />
-	<script type="text/javascript" src="${theme}/js/yui/build/button/button-min.js"></script>
-	<script type="text/javascript" src="${theme}/js/yui/build/container/container-min.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/yahoo/yahoo-min.js" ></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/event/event-min.js" ></script>
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/css/style.css" />
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/button/assets/skins/sam/button.css" />
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/button/button-min.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/container/container-min.js"></script>
 </head>
 <body class="yui-skin-sam">
 	<div id="doc2">
@@ -72,13 +72,13 @@
 					
 					<div id="demo" class="yui-navset">
 					    <ul class="yui-nav">
-					        <li class="selected"><a href="listTopicUrls.html"><em>Katalog Url's</em></a></li>
-					        <li><a href="listWebUrls.html"><em>Web Url's</em></a></li>
+					        <li class="selected"><a href="<%=request.getContextPath()%>/catalog/listTopicUrls.html"><em>Katalog Url's</em></a></li>
+					        <li><a href="<%=request.getContextPath()%>/web/listWebUrls.html"><em>Web Url's</em></a></li>
 					    </ul>            
 					</div>
 					<div id="subnav">
 						<ul>
-							<li class="selected"><a href="listTopicUrls.html">Themen</a></li>
+							<li class="selected"><a href="<%=request.getContextPath()%>/catalog/listTopicUrls.html">Themen</a></li>
 							<li><a href="listServiceUrls.html">Service</a></li>
 							<li><a href="listMeasureUrls.html">Messwerte</a></li>
 						</ul>
@@ -86,7 +86,7 @@
 					
 					<div style="margin-top:25px"></div>
 					<div style="float:right">
-						<img src="${theme}/gfx/add.png" align="absmiddle"/> <b><a href="createCatalogUrl.html?type=topics">Neue Themen Seite</a></b>
+						<img src="<%=request.getContextPath()%>/theme/${theme}/gfx/add.png" align="absmiddle"/> <b><a href="<%=request.getContextPath()%>/catalog/createCatalogUrl.html?type=topics">Neue Themen Seite</a></b>
 					</div>
 					<h3>Themen Seiten</h3>
 					
@@ -131,7 +131,7 @@
 										</c:forEach>
 									</td>
 									<td>
-										<a href="editCatalogUrl.html?id=${url.id}&type=topics">EDIT</a>
+										<a href="<%=request.getContextPath()%>/catalog/editCatalogUrl.html?id=${url.id}&type=topics">EDIT</a>
 						       			<a href="#" id="deleteCatalogUrl_${index.index}" 
 						       				onclick="document.getElementById('urlToDelete').innerHTML='${url.url}';document.getElementById('idToDelete').value='${url.id }'">DEL</a>
 						       			<a href="test.html?id=${url.id}">TEST</a>
@@ -198,7 +198,7 @@
 										dir = 'asc';
 									}
 								}
-								window.location.href = "listTopicUrls.html?sort=" +fieldToSort +"&dir=" +dir;
+								window.location.href = "<%=request.getContextPath()%>/catalog/listTopicUrls.html?sort=" +fieldToSort +"&dir=" +dir;
 							}
 							YAHOO.util.Event.addListener("yui-dt0-th-url-liner", "click", sort, ['url', '${sort}', '${dir}']);
 							YAHOO.util.Event.addListener("yui-dt0-th-created-liner", "click", sort, ['created', '${sort}', '${dir}']);
@@ -208,7 +208,7 @@
 						<div id="deleteCatalogUrlForm">
 							<div class="hd">Löschen</div>
 							<div class="bd">
-								<form method="post" action="deleteCatalogUrl.html">
+								<form method="post" action="<%=request.getContextPath()%>/catalog/deleteCatalogUrl.html">
 									<font color="red">Möchten Sie wirklich löschen?</font>
 									<br/>
 									<input type="hidden" name="id" id="idToDelete" value=""/>

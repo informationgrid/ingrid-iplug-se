@@ -61,7 +61,8 @@ public class CreateCatalogUrlController extends NavigationSelector {
     return metadatas;
   }
 
-  @RequestMapping(value = { "/createCatalogUrl.html", "/editCatalogUrl.html" }, method = RequestMethod.GET)
+  @RequestMapping(value = { "/catalog/createCatalogUrl.html",
+      "/catalog/editCatalogUrl.html" }, method = RequestMethod.GET)
   public String editCatalogUrl(Model model,
       @ModelAttribute("catalogUrlCommand") CatalogUrlCommand catalogUrlCommand,
       @RequestParam(value = "id", required = false) Long id,
@@ -81,7 +82,7 @@ public class CreateCatalogUrlController extends NavigationSelector {
     return "catalog/createCatalogUrl";
   }
 
-  @RequestMapping(value = "/createCatalogUrl.html", method = RequestMethod.POST)
+  @RequestMapping(value = "/catalog/createCatalogUrl.html", method = RequestMethod.POST)
   public String anotherPostEditCatalogUrl(
       @ModelAttribute("catalogUrlCommand") CatalogUrlCommand catalogUrlCommand,
       @RequestParam(value = "type", required = true) String type) {
@@ -98,6 +99,6 @@ public class CreateCatalogUrlController extends NavigationSelector {
       datatypeMetadata = _metadataDao.getByKeyAndValue("datatype", "measure");
     }
     catalogUrlCommand.addMetadata(datatypeMetadata);
-    return "redirect:/saveCatalogUrl.html";
+    return "redirect:/catalog/saveCatalogUrl.html";
   }
 }

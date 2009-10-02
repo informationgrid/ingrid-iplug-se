@@ -3,14 +3,14 @@
 <html>
 <head>
 	<title>Admin URL Pflege - Exclude URL</title>
-	<link rel="stylesheet" type="text/css" href="${theme}/css/reset-fonts-grids.css" />
-	<link rel="stylesheet" type="text/css" href="${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css">
-	<script type="text/javascript" src="${theme}/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
-	<script type="text/javascript" src="${theme}/js/yui/build/element/element-min.js"></script>
-	<script type="text/javascript" src="${theme}/js/yui/build/connection/connection-min.js"></script>
-	<script type="text/javascript" src="${theme}/js/yui/build/tabview/tabview-min.js"></script>
-	<link rel="stylesheet" type="text/css" href="${theme}/css/fonts.css" />
-	<link rel="stylesheet" type="text/css" href="${theme}/css/style.css" />
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/css/reset-fonts-grids.css" />
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css">
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/element/element-min.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/connection/connection-min.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/tabview/tabview-min.js"></script>
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/css/fonts.css" />
+	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/css/style.css" />
 </head>
 <body class="yui-skin-sam">
 	<div id="doc2" class="yui-t4">
@@ -74,7 +74,7 @@
 								<form:form action="removeExcludeUrl.html" method="post" modelAttribute="startUrlCommand">
 									${startUrlCommand.excludeUrlCommands[excludeUrlCounter].url}
 									<input type="hidden" name="index" value="${excludeUrlCounter}" />
-									<input type="image" src="${theme}/gfx/delete.png" align="absmiddle" title="Löschen"/>
+									<input type="image" src="<%=request.getContextPath()%>/theme/${theme}/gfx/delete.png" align="absmiddle" title="Löschen"/>
 								</form:form>
 								</div>
 							</c:when>

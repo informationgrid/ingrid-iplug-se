@@ -50,13 +50,13 @@ public class AddLimitUrlController extends NavigationSelector {
     return _metadataDao.getByKey("datatype");
   }
 
-  @RequestMapping(value = "/addLimitUrl.html", method = RequestMethod.GET)
+  @RequestMapping(value = "/web/addLimitUrl.html", method = RequestMethod.GET)
   public String addLimitUrl(
       @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand) {
     return "web/addLimitUrl";
   }
 
-  @RequestMapping(value = "/addLimitUrl.html", method = RequestMethod.POST)
+  @RequestMapping(value = "/web/addLimitUrl.html", method = RequestMethod.POST)
   public String postAddLimitUrl(
       @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand,
       @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand) {
@@ -65,15 +65,15 @@ public class AddLimitUrlController extends NavigationSelector {
     limitUrlCommand.setProvider(startUrlCommand.getProvider());
     startUrlCommand.addLimitUrlCommand(limitUrlCommand);
 
-    return "redirect:addLimitUrl.html";
+    return "redirect:/web/addLimitUrl.html";
   }
 
-  @RequestMapping(value = "/removeLimitUrl.html", method = RequestMethod.POST)
+  @RequestMapping(value = "/web/removeLimitUrl.html", method = RequestMethod.POST)
   public String removeLimitUrl(
       @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand,
       @RequestParam("index") Integer index) {
     List<LimitUrlCommand> limitUrls = startUrlCommand.getLimitUrlCommands();
     limitUrls.remove(index.intValue());
-    return "redirect:addLimitUrl.html";
+    return "redirect:/web/addLimitUrl.html";
   }
 }

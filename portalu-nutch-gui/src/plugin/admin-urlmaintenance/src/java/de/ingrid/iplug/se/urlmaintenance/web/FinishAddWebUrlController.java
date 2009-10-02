@@ -20,7 +20,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.Url;
 @SessionAttributes(value = { "partnerProviderCommand", "startUrlCommand" })
 public class FinishAddWebUrlController extends NavigationSelector {
 
-  @RequestMapping(value = "/finishWebUrl.html", method = RequestMethod.GET)
+  @RequestMapping(value = "/web/finishWebUrl.html", method = RequestMethod.GET)
   public String finish(
       @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand) {
     List<LimitUrlCommand> limitUrls = startUrlCommand.getLimitUrlCommands();
@@ -31,12 +31,12 @@ public class FinishAddWebUrlController extends NavigationSelector {
     return "web/finishWebUrl";
   }
 
-  @RequestMapping(value = "/finishWebUrl.html", method = RequestMethod.POST)
+  @RequestMapping(value = "/web/finishWebUrl.html", method = RequestMethod.POST)
   public String postFinish(
       @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand,
       @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand) {
     startUrlCommand.write();
-    return "redirect:listWebUrls.html";
+    return "redirect:/web/listWebUrls.html";
   }
 
   @SuppressWarnings("unchecked")

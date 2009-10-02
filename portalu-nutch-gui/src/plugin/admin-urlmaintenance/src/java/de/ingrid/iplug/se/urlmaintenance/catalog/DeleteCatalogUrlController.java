@@ -21,7 +21,7 @@ public class DeleteCatalogUrlController extends NavigationSelector {
 
   }
 
-  @RequestMapping(method = RequestMethod.POST, value = "/deleteCatalogUrl.html")
+  @RequestMapping(method = RequestMethod.POST, value = "/catalog/deleteCatalogUrl.html")
   public String deleteCatalogUrl(
       @RequestParam(value = "id", required = true) final Long id,
       @RequestParam(value = "type", required = false) final String type) {
@@ -32,11 +32,11 @@ public class DeleteCatalogUrlController extends NavigationSelector {
       _catalogUrlDao.makeTransient(url);
     }
 
-    String view = "redirect:/listTopicUrls.html";
+    String view = "redirect:/catalog/listTopicUrls.html";
     if ("service".equals(type)) {
-      view = "redirect:/listServiceUrls.html";
+      view = "redirect:/catalog/listServiceUrls.html";
     } else if ("measure".equals(type)) {
-      view = "redirect:/listMeasureUrls.html";
+      view = "redirect:/catalog/listMeasureUrls.html";
     }
     return view;
   }

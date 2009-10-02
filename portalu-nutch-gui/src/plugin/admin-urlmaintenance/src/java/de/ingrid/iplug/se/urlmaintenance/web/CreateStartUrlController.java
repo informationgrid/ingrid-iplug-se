@@ -34,7 +34,8 @@ public class CreateStartUrlController extends NavigationSelector {
     _excludeUrlDao = excludeUrlDao;
   }
 
-  @RequestMapping(value = { "/createStartUrl.html", "/editStartUrl.html" }, method = RequestMethod.GET)
+  @RequestMapping(value = { "/web/createStartUrl.html",
+      "/web/editStartUrl.html" }, method = RequestMethod.GET)
   public String createStartUrl(
       @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand,
       @RequestParam(value = "id", required = false) Long id) {
@@ -45,7 +46,7 @@ public class CreateStartUrlController extends NavigationSelector {
     return "web/createStartUrl";
   }
 
-  @RequestMapping(value = "/createStartUrl.html", method = RequestMethod.POST)
+  @RequestMapping(value = "/web/createStartUrl.html", method = RequestMethod.POST)
   public String postCreateStartUrl(
       @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand,
       @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand) {
@@ -57,6 +58,6 @@ public class CreateStartUrlController extends NavigationSelector {
     ExcludeUrlCommand excludeUrlCommand = new ExcludeUrlCommand(_excludeUrlDao);
     excludeUrlCommand.setProvider(startUrlCommand.getProvider());
     startUrlCommand.addExcludeUrlCommand(excludeUrlCommand);
-    return "redirect:addLimitUrl.html";
+    return "redirect:/web/addLimitUrl.html";
   }
 }

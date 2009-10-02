@@ -1,8 +1,24 @@
+<%--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+--%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <%@ include file="/WEB-INF/jsp/includes/include.jsp" %>
 <html>
 <head>
-<title>Admin URL Pflege - Welcome</title>
+	<title><fmt:message key="login.title" bundle="${globalBundle}"/></title>
 	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/css/reset-fonts-grids.css" />
 	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css" />
 	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
@@ -11,11 +27,12 @@
 	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/css/style.css" />
 </head>
 <body class="yui-skin-sam">
-	<div id="doc2" class="yui-t4">
+	<div id="doc2">					
 		<div id="hd">
 			<%@ include file="/WEB-INF/jsp/includes/header.jsp" %>
 		</div>
 		
+		<c:if test="${!empty instanceNavigation}">
 		<div class="yui-navset nav">
 		    <ul class="yui-nav">
 				<c:forEach items="${instanceNavigation}" var="navigation">
@@ -30,7 +47,9 @@
 				</c:forEach>
 		    </ul>
 		</div>
+		</c:if>
 		
+		<c:if test="${!empty componentNavigation}">
 		<div id="subnav">
 		    <ul>
 				<c:forEach items="${componentNavigation}" var="navigation">
@@ -45,49 +64,48 @@
 				</c:forEach>
 		    </ul>
 		</div>
+		</c:if>
 		
 		<div id="bd">
 			<div id="yui-main">
 				<div class="yui-b">
-					<h3>URL Pflege</h3>
-					<form:form action="index.html" commandName="partnerProviderCommand" method="post">
-						<fieldset>
-						    <legend>Partner und Provider auswählen</legend>
-						    
-						    <row>
-						        <label><form:label path="partner" >Partner: </form:label></label>
-						        <field>
-						           <form:select path="partner" items="${partners}" itemLabel="name" itemValue="name"/>
-						        </field>
-						        <desc></desc>
-						    </row>
-						    
-						    <row>
-						        <label><form:label path="provider" >Provider: </form:label></label>
-						        <field>
-						           <form:select path="provider" items="${providers}" itemLabel="name" itemValue="name"/>
-						        </field>
-						        <desc></desc>
-						    </row>
-						    
-						     <row>
-						        <label>&nbsp;</label>
-						        <field>
-						            <input type="submit" value="Weiter"/>
-						        </field>
-						    </row>
-						    
-						</fieldset>
-					</form:form>
+					<h3><fmt:message key="login.headline" bundle="${globalBundle}"/></h3>
+					<div>
+				        <div>
+				        	<p>&nbsp;</p>
+				            <form method="post" action="j_security_check" id="login">
+				                <fieldset>
+				                  <legend><fmt:message key="login.legend" bundle="${globalBundle}"/></legend>
+				                  	<row>
+					                    <label><fmt:message key="login.username" bundle="${globalBundle}"/></label>
+					                    <field>
+						                    <input type="text" name="j_username"/>
+					                    </field>
+				                    </row>
+				                    <row>
+				                    	<label><fmt:message key="login.password" bundle="${globalBundle}"/></label>
+				                    	<field>
+				                    		<input type="password" name="j_password" />
+				                    	</field>
+				                    </row>
+				                </fieldset>
+				                  <input type="submit" value="Login"/>
+				            </form>
+				        	<c:if test="${!securityEnabled}">
+					        	<script>
+					        		document.getElementById('login').submit();
+					        	</script>
+				        	</c:if>
+				        </div>
+				    </div>
 				</div>
 			</div>
-			<div class="yui-b">
-				
-			</div>
-		</div>
+		</div>		
 		<div id="ft">
 			<%@ include file="/WEB-INF/jsp/includes/footer.jsp" %>
 		</div>
 	</div>
+</div>
 </body>
 </html>
+

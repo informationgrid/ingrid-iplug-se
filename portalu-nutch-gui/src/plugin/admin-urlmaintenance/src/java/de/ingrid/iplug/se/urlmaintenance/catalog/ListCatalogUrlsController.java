@@ -52,7 +52,7 @@ public class ListCatalogUrlsController extends NavigationSelector {
     return command;
   }
 
-  @RequestMapping(value = "/listTopicUrls.html", method = RequestMethod.GET)
+  @RequestMapping(value = "/catalog/listTopicUrls.html", method = RequestMethod.GET)
   public String listTopicUrls(
       @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand,
       @RequestParam(value = "page", required = false) Integer page,
@@ -75,7 +75,7 @@ public class ListCatalogUrlsController extends NavigationSelector {
     return "catalog/listTopicUrls";
   }
 
-  @RequestMapping(value = "/listServiceUrls.html", method = RequestMethod.GET)
+  @RequestMapping(value = "/catalog/listServiceUrls.html", method = RequestMethod.GET)
   public String listServiceUrls(
       @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand,
       @RequestParam(value = "page", required = false) Integer page,
@@ -99,7 +99,7 @@ public class ListCatalogUrlsController extends NavigationSelector {
     return "catalog/listServiceUrls";
   }
 
-  @RequestMapping(value = "/listMeasureUrls.html", method = RequestMethod.GET)
+  @RequestMapping(value = "/catalog/listMeasureUrls.html", method = RequestMethod.GET)
   public String listMeasureUrls(
       @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand,
       @RequestParam(value = "page", required = false) Integer page,

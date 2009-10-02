@@ -26,30 +26,30 @@ public class AddExcludeUrlController extends NavigationSelector {
     _excludeUrlDao = excludeUrlDao;
   }
 
-  @RequestMapping(value = "/addExcludeUrl.html", method = RequestMethod.GET)
+  @RequestMapping(value = "/web/addExcludeUrl.html", method = RequestMethod.GET)
   public String addExcludeUrl(
       @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand) {
     return "web/addExcludeUrl";
   }
 
-  @RequestMapping(value = "/addExcludeUrl.html", method = RequestMethod.POST)
+  @RequestMapping(value = "/web/addExcludeUrl.html", method = RequestMethod.POST)
   public String postAddExcludeUrl(
       @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand) {
     // add new command to fill out
     ExcludeUrlCommand excludeUrlCommand = new ExcludeUrlCommand(_excludeUrlDao);
     excludeUrlCommand.setProvider(startUrlCommand.getProvider());
     startUrlCommand.addExcludeUrlCommand(excludeUrlCommand);
-    return "redirect:addExcludeUrl.html";
+    return "redirect:/web/addExcludeUrl.html";
   }
 
-  @RequestMapping(value = "/removeExcludeUrl.html", method = RequestMethod.POST)
+  @RequestMapping(value = "/web/removeExcludeUrl.html", method = RequestMethod.POST)
   public String removeExcludeUrl(
       @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand,
       @RequestParam("index") Integer index) {
     List<ExcludeUrlCommand> excludeUrls = startUrlCommand
         .getExcludeUrlCommands();
     excludeUrls.remove(index.intValue());
-    return "redirect:addExcludeUrl.html";
+    return "redirect:/web/addExcludeUrl.html";
   }
 
 }

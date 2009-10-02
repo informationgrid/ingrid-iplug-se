@@ -29,7 +29,7 @@
 				<entry key="java.lang.Throwable" value="data-error" />
 			</map>
 		</property>
-		<property name="defaultErrorView" value="/error.html" />
+		<property name="defaultErrorView" value="/common/error.html" />
 	</bean>
     
 </beans>

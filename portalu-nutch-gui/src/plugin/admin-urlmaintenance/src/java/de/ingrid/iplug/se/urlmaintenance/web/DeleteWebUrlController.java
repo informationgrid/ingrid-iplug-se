@@ -35,7 +35,7 @@ public class DeleteWebUrlController extends NavigationSelector {
     _excludeUrlDao = excludeUrlDao;
   }
 
-  @RequestMapping(method = RequestMethod.POST, value = "/deleteWebUrl.html")
+  @RequestMapping(method = RequestMethod.POST, value = "/web/deleteWebUrl.html")
   public String deleteWebUrl(
       @RequestParam(value = "id", required = true) final Long id) {
 
@@ -57,7 +57,7 @@ public class DeleteWebUrlController extends NavigationSelector {
       _startUrlDao.makeTransient(startUrl);
     }
 
-    String view = "redirect:/listWebUrls.html";
+    String view = "redirect:/web/listWebUrls.html";
     return view;
   }
 }

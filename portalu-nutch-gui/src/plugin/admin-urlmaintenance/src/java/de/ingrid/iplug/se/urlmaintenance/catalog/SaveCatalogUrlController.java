@@ -35,7 +35,7 @@ public class SaveCatalogUrlController extends NavigationSelector {
     _catalogUrlDao = catalogUrlDao;
   }
 
-  @RequestMapping(value = "/saveCatalogUrl.html", method = RequestMethod.GET)
+  @RequestMapping(value = "/catalog/saveCatalogUrl.html", method = RequestMethod.GET)
   public String saveCatalogUrl(
       @ModelAttribute("catalogUrlCommand") CatalogUrlCommand catalogUrlCommand,
       Model model) {
@@ -54,7 +54,7 @@ public class SaveCatalogUrlController extends NavigationSelector {
     return "catalog/saveCatalogUrl";
   }
 
-  @RequestMapping(value = "/saveCatalogUrl.html", method = RequestMethod.POST)
+  @RequestMapping(value = "/catalog/saveCatalogUrl.html", method = RequestMethod.POST)
   public String postSaveCatalogUrl(
       @ModelAttribute("catalogUrlCommand") CatalogUrlCommand catalogUrlCommand,
       @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand) {
@@ -70,17 +70,17 @@ public class SaveCatalogUrlController extends NavigationSelector {
     catalogUrl.setUpdated(new Date());
     catalogUrl.setMetadatas(catalogUrlCommand.getMetadatas());
 
-    String redirectUrl = "redirect:/listTopicUrls.html";
+    String redirectUrl = "redirect:/catalog/listTopicUrls.html";
     List<Metadata> metadatas = catalogUrlCommand.getMetadatas();
     for (Metadata metadata : metadatas) {
       String metadataKey = metadata.getMetadataKey();
       String metadataValue = metadata.getMetadataValue();
       if (metadataKey.equals("datatype") && metadataValue.equals("service")) {
-        redirectUrl = "redirect:/listServiceUrls.html";
+        redirectUrl = "redirect:/catalog/listServiceUrls.html";
         break;
       } else if (metadataKey.equals("datatype")
           && metadataValue.equals("measure")) {
-        redirectUrl = "redirect:/listMeasureUrls.html";
+        redirectUrl = "redirect:/catalog/listMeasureUrls.html";
       }
     }
     return redirectUrl;
