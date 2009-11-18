@@ -63,5 +63,35 @@
 <wb-resource deploy-path="/" source-path="/101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/src/plugin/query-site/src/java"/>
 <wb-resource deploy-path="/" source-path="/101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/src/plugin/query-basic/src/java"/>
 <wb-resource deploy-path="/" source-path="/portalu-nutch-gui/src/java"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/parse-js/src/java"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/query-url/src/java"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/query-site/src/java"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/query-basic/src/java"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/urlfilter-regex/src/java"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/admin-crawl/src/conf"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/admin-system/src/conf"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/admin-configuration/src/conf"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/admin-scheduling/src/conf"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/admin-instance/src/conf"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/admin-welcome/src/conf"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/conf"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/scoring-opic/src/java"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/parse-html/src/java"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/protocol-http/src/java"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/lib-regex-filter/src/java"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/lib-http/src/java"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/urlnormalizer-pass/src/java"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/urlnormalizer-basic/src/java"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/urlnormalizer-regex/src/java"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/admin-configuration/src/java"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/admin-crawl/src/java"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/index-basic/src/java"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/index-anchor/src/java"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/index-metadata/src/java"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/admin-instance/src/java"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/admin-welcome/src/java"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/admin-system/src/java"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/admin-scheduling/src/java"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/java"/>
 </wb-module>
 </project-modules>
