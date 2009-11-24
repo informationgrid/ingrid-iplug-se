@@ -130,7 +130,9 @@
 									        <label>&nbsp;</label>
 									        <field>
 									            <input type="submit" value="Hinzufügen"/>
-									            <input type="button" value="Weiter" onclick="window.location.href='addExcludeUrl.html'" />
+									            <c:if test="${maxLimitUrls > 1}">
+										            <input type="button" value="Weiter" onclick="window.location.href='addExcludeUrl.html'" />
+										        </c:if>
 									        </field>
 									    </row>
 									    

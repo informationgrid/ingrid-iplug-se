@@ -64,7 +64,7 @@ public class AddLimitUrlController extends NavigationSelector {
     LimitUrlCommand limitUrlCommand = new LimitUrlCommand(_limitUrlDao);
     limitUrlCommand.setProvider(startUrlCommand.getProvider());
     startUrlCommand.addLimitUrlCommand(limitUrlCommand);
-
+// TODO rwe: Verify, that the limit url is valid!
     return "redirect:/web/addLimitUrl.html";
   }
 

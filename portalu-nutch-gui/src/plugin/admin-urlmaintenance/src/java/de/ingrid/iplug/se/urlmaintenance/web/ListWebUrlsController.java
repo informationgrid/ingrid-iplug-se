@@ -23,7 +23,6 @@ import de.ingrid.iplug.se.urlmaintenance.commandObjects.StartUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IExcludeUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ILimitUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IMetadataDao;
-import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IProviderDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao.OrderBy;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
@@ -35,17 +34,14 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl;
 public class ListWebUrlsController extends NavigationSelector {
 
   private final IStartUrlDao _startUrlDao;
-  private final IProviderDao _providerDao;
   private final IMetadataDao _metadataDao;
   private static final Log LOG = LogFactory.getLog(ListWebUrlsController.class);
   private final ILimitUrlDao _limitUrlDao;
   private final IExcludeUrlDao _excludeUrlDao;
 
   @Autowired
-  public ListWebUrlsController(IProviderDao providerDao,
-      IStartUrlDao startUrlDao, ILimitUrlDao limitUrlDao,
-      IExcludeUrlDao excludeUrlDao, IMetadataDao metadataDao) {
-    _providerDao = providerDao;
+  public ListWebUrlsController(IStartUrlDao startUrlDao, ILimitUrlDao limitUrlDao, IExcludeUrlDao excludeUrlDao,
+      IMetadataDao metadataDao) {
     _startUrlDao = startUrlDao;
     _limitUrlDao = limitUrlDao;
     _excludeUrlDao = excludeUrlDao;
@@ -64,15 +60,13 @@ public class ListWebUrlsController extends NavigationSelector {
   }
 
   @RequestMapping(value = "/web/listWebUrls.html", method = RequestMethod.GET)
-  public String listWebUrls(
-      @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand,
+  public String listWebUrls(@ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand,
       @RequestParam(value = "page", required = false) Integer page,
       @RequestParam(value = "hitsPerPage", required = false) Integer hitsPerPage,
       @RequestParam(value = "sort", required = false) String sort,
       @RequestParam(value = "dir", required = false) String dir,
       @RequestParam(value = "datatype", required = false) String[] datatypes,
-      @RequestParam(value = "lang", required = false) String[] langs,
-      Model model, HttpServletRequest request) {
+      @RequestParam(value = "lang", required = false) String[] langs, Model model, HttpServletRequest request) {
     page = page == null ? 1 : page;
     hitsPerPage = hitsPerPage == null ? 10 : hitsPerPage;
     langs = langs != null ? langs : new String[] {};
@@ -92,18 +86,16 @@ public class ListWebUrlsController extends NavigationSelector {
     }
 
     int start = Paging.getStart(page, hitsPerPage);
-    OrderBy orderBy = "url".equals(sort) ? orderByUrl(dir) : ("edited"
-        .equals(sort) ? orderByUpdated(dir) : orderByCreated(dir));
-    String providerString = partnerProviderCommand.getProvider();
-    Provider byName = _providerDao.getByName(providerString);
+    OrderBy orderBy = "url".equals(sort) ? orderByUrl(dir) : ("edited".equals(sort) ? orderByUpdated(dir)
+        : orderByCreated(dir));
+    Provider provider = partnerProviderCommand.getProvider();
     Long count = 0L;
-    if (byName != null) {
-      count = _startUrlDao.countByProviderAndMetadatas(byName, metadatas);
-      LOG.debug("load start by provider [" + byName.getId()
-          + "] with metadatas [" + metadatas + "] start: [" + start
+    if (provider != null) {
+      count = _startUrlDao.countByProviderAndMetadatas(provider, metadatas);
+      LOG.debug("load start by provider [" + provider.getId() + "] with metadatas [" + metadatas + "] start: [" + start
           + "] hitsPerPage: [" + hitsPerPage + "] orderBy: [" + orderBy + "]");
-      List<StartUrl> startUrls = _startUrlDao.getByProviderAndMetadatas(byName,
-          metadatas, start, hitsPerPage, orderBy);
+      List<StartUrl> startUrls = _startUrlDao.getByProviderAndMetadatas(provider, metadatas, start, hitsPerPage,
+          orderBy);
       model.addAttribute("urls", startUrls);
     }
     Paging paging = new Paging(10, hitsPerPage, count.intValue(), page);
@@ -119,11 +111,8 @@ public class ListWebUrlsController extends NavigationSelector {
   @ModelAttribute("startUrlCommand")
   public StartUrlCommand injectStartUrlCommand(
       @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand) {
-    String provider = partnerProviderCommand.getProvider();
-    Provider byName = _providerDao.getByName(provider);
-    StartUrlCommand startUrlCommand = new StartUrlCommand(_startUrlDao,
-        _limitUrlDao, _excludeUrlDao);
-    startUrlCommand.setProvider(byName);
+    StartUrlCommand startUrlCommand = new StartUrlCommand(_startUrlDao, _limitUrlDao, _excludeUrlDao);
+    startUrlCommand.setProvider(partnerProviderCommand.getProvider());
     return startUrlCommand;
   }
 

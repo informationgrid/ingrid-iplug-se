@@ -131,7 +131,7 @@ public class PartnerAndProviderDbSyncService {
 
       partnerInDb = partnersInDb.poll();
     }
-    _partnerDao.flipTransaction();
+
     // add addional partner and its provides to db
     for (InternalPartner partnerWitProvider : partnersAndProviders) {
       createPartnerAndProviders(partnerWitProvider);
@@ -156,7 +156,6 @@ public class PartnerAndProviderDbSyncService {
     Provider newProvider = new Provider();
     newProvider.setName(provider.getName());
 
-    // TODO rwe: set url
     return newProvider;
   }
 
@@ -182,9 +181,9 @@ public class PartnerAndProviderDbSyncService {
       LOG.info("Remove provider '" + provider.getName() + "' from partner '" + partnerInDb.getName() + "'.");
       _partnerDao.removeProvider(partnerInDb, provider);
     }
-    if (providersToRemove.size() > 0) {
-      _partnerDao.flipTransaction();
-    }
+//    if (providersToRemove.size() > 0) {
+//      _partnerDao.flipTransaction();
+//    }
 
     // add provider for partner?
     for (String providerName : providersToAdd) {
@@ -194,9 +193,8 @@ public class PartnerAndProviderDbSyncService {
     }
     if (providersToAdd.size() > 0) {
       _partnerDao.makePersistent(partnerInDb);
-      _partnerDao.flipTransaction();
+//      _partnerDao.flipTransaction();
     }
-
   }
 
   private InternalProvider findInternalProviderByName(Set<InternalProvider> providers, String providerName) {

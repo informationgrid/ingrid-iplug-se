@@ -94,25 +94,25 @@ public class StartUrlCommand extends StartUrl implements
 
   @Override
   public StartUrl write() {
-    StartUrl out = new StartUrl();
-    out.setProvider(getProvider());
+    StartUrl startUrl = new StartUrl();
+    startUrl.setProvider(getProvider());
     if (getId() != null) {
       LOG.info("load start url with id: " + getId());
-      out = _startUrlDao.getById(getId());
+      startUrl = _startUrlDao.getById(getId());
     }
-    out.setUrl(getUrl());
-    out.setCreated(getCreated());
-    out.setUpdated(getUpdated());
+    startUrl.setUrl(getUrl());
+    startUrl.setCreated(getCreated());
+    startUrl.setUpdated(getUpdated());
 
-    handleLimitUrls(out);
-    handleExcludeUrls(out);
+    handleLimitUrls(startUrl);
+    handleExcludeUrls(startUrl);
 
-    if (out.getId() == null) {
-      LOG.info("save new start url: " + out);
-      _startUrlDao.makePersistent(out);
+    if (startUrl.getId() == null) {
+      LOG.info("save new start url: " + startUrl);
+      _startUrlDao.makePersistent(startUrl);
       _startUrlDao.flush();
     }
-    return out;
+    return startUrl;
 
   }
 
@@ -136,10 +136,10 @@ public class StartUrlCommand extends StartUrl implements
 
     for (LimitUrlCommand limitUrlCommand : getLimitUrlCommands()) {
       LimitUrl limitUrl = limitUrlCommand.write();
-      if (limitUrl.getId() == null) {
+//      if (limitUrl.getId() == null) {
         LOG.info("add new limit url: " + limitUrl);
         out.addLimitUrl(limitUrl);
-      }
+//      }
     }
   }
 
@@ -163,10 +163,10 @@ public class StartUrlCommand extends StartUrl implements
 
     for (ExcludeUrlCommand excludeUrlCommand : getExcludeUrlCommands()) {
       ExcludeUrl excludeUrl = excludeUrlCommand.write();
-      if (excludeUrl.getId() == null) {
+//      if (excludeUrl.getId() == null) {
         LOG.info("add new exclude url: " + excludeUrl);
         out.addExcludeUrl(excludeUrl);
-      }
+//      }
     }
   }
 

@@ -26,9 +26,9 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import de.ingrid.iplug.se.security.PortaluPrincipal;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IPartnerDao;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IProviderDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Partner;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
-import de.ingrid.iplug.se.urlmaintenance.propertyEditorSupport.PartnerPropertyEditorSupport;
 import de.ingrid.iplug.se.urlmaintenance.service.PartnerAndProviderDbSyncService;
 import edu.emory.mathcs.backport.java.util.Collections;
 
@@ -40,23 +40,15 @@ public class UrlMaintenanceController extends NavigationSelector {
   // private final Log LOG = LogFactory.getLog(UrlMaintenanceController.class);
 
   private final IPartnerDao _partnerDao;
+  private final IProviderDao _providerDao;
   private final PartnerAndProviderDbSyncService _syncService;
 
   @Autowired
-  public UrlMaintenanceController(IPartnerDao partnerDao, PartnerAndProviderDbSyncService syncService) {
+  public UrlMaintenanceController(IPartnerDao partnerDao, IProviderDao providerDao, PartnerAndProviderDbSyncService syncService) {
     _partnerDao = partnerDao;
+    _providerDao = providerDao;
     _syncService = syncService;
   }
-
-//  @ModelAttribute("partners")
-//  public List<Partner> referenceDataPartners() {
-//    return _partnerDao.getAll();
-//  }
-//
-//  @ModelAttribute("providers")
-//  public List<Provider> referenceDataProviders() {
-//    return _providerDao.getAll();
-//  }
 
   @RequestMapping(method = RequestMethod.GET)
   public String urlMaintenance(HttpServletRequest httpRequest, Model model) {
@@ -70,7 +62,7 @@ public class UrlMaintenanceController extends NavigationSelector {
     model.addAttribute("partnerProviderCommand", new PartnerProviderCommand());
     List<Partner> partners = _partnerDao.getAll();
     model.addAttribute("partners", partners);
-    
+
     model.addAttribute("jsonMap", createPartnerAndProviderJsonMap());
     return "urlmaintenance";
   }
@@ -78,29 +70,30 @@ public class UrlMaintenanceController extends NavigationSelector {
   private String createPartnerAndProviderJsonMap() {
     StringWriter stringWriter = new StringWriter();
     try {
-        JsonGenerator jsonGenerator = new ObjectMapper().getJsonFactory().createJsonGenerator(stringWriter);
-        jsonGenerator.writeStartObject();
-        for(Partner partner : _partnerDao.getAll()){
-          jsonGenerator.writeArrayFieldStart(String.valueOf(partner.getId()));
-          List<Provider> providers = new ArrayList<Provider>(partner.getProviders());
-          Collections.sort(providers, new Comparator<Provider>(){
+      JsonGenerator jsonGenerator = new ObjectMapper().getJsonFactory().createJsonGenerator(stringWriter);
+      jsonGenerator.writeStartObject();
+      for (Partner partner : _partnerDao.getAll()) {
+        jsonGenerator.writeArrayFieldStart(String.valueOf(partner.getId()));
+        List<Provider> providers = new ArrayList<Provider>(partner.getProviders());
+        Collections.sort(providers, new Comparator<Provider>() {
 
-            @Override
-            public int compare(Provider o1, Provider o2) {
-              return o1.getName().compareToIgnoreCase(o2.getName());
-            }});
-          for(Provider provider : providers){
-            jsonGenerator.writeStartObject();
-            jsonGenerator.writeNumberField("id", provider.getId());
-            jsonGenerator.writeStringField("name", StringEscapeUtils.escapeHtml(provider.getName()));
-            jsonGenerator.writeEndObject();
+          @Override
+          public int compare(Provider o1, Provider o2) {
+            return o1.getName().compareToIgnoreCase(o2.getName());
           }
-          jsonGenerator.writeEndArray();
+        });
+        for (Provider provider : providers) {
+          jsonGenerator.writeStartObject();
+          jsonGenerator.writeNumberField("id", provider.getId());
+          jsonGenerator.writeStringField("name", StringEscapeUtils.escapeHtml(provider.getName()));
+          jsonGenerator.writeEndObject();
         }
-        jsonGenerator.writeEndObject();
-        jsonGenerator.flush();
+        jsonGenerator.writeEndArray();
+      }
+      jsonGenerator.writeEndObject();
+      jsonGenerator.flush();
     } catch (Exception e) {
-        throw new RuntimeException(e);
+      throw new RuntimeException(e);
     }
     return stringWriter.toString();
   }
@@ -112,6 +105,7 @@ public class UrlMaintenanceController extends NavigationSelector {
 
   @InitBinder
   public void initBinder(ServletRequestDataBinder binder) {
-      binder.registerCustomEditor(Partner.class, new PartnerPropertyEditorSupport(_partnerDao));
+    binder.registerCustomEditor(Partner.class, new EntityEditor(_partnerDao));
+    binder.registerCustomEditor(Provider.class, new EntityEditor(_providerDao));
   }
 }

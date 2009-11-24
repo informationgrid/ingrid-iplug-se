@@ -53,7 +53,7 @@
 		<div id="bd">
 			<div id="yui-main">
 				<div class="yui-b">
-					<h3>Willkommen ${partnerProviderCommand.provider}</h3>
+					<h3>Willkommen ${partnerProviderCommand.provider.name}</h3>
 					
 					<div id="demo" class="yui-navset">
 					    <ul class="yui-nav">

@@ -76,7 +76,7 @@
 						    <row>
 						        <label><form:label path="partner" >Partner: </form:label></label>
 						        <field>
-						           	<form:select path="partner" items="${partners}" itemLabel="name" itemValue="id"/>
+						           	<form:select path="partner" items="${partners}" itemLabel="name"/>
 						        </field>
 						        <desc></desc>
 						    </row>
@@ -84,7 +84,7 @@
 						    <row>
 						        <label><form:label path="provider" >Provider: </form:label></label>
 						        <field>
-						           <form:select path="provider" items="${providers}" itemLabel="name" itemValue="name"/>
+						           <form:select path="provider" items="${providers}" itemLabel="name"/>
 						        </field>
 						        <desc></desc>
 						    </row>

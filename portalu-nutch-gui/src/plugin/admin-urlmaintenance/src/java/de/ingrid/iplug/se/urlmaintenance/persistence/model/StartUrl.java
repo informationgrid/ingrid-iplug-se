@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -23,7 +22,7 @@ import javax.persistence.OneToMany;
     @NamedQuery(name = "countByProvider", query = "select count(u) from StartUrl as u where u._provider._id = :id") })
 public class StartUrl extends WebUrl {
 
-  @OneToMany(fetch = FetchType.EAGER)
+  @OneToMany//(fetch = FetchType.EAGER) // TODO rwe: Do we really need an eager fetch?
   @JoinColumn(name = "startUrl_fk")
   private List<LimitUrl> _limitUrls = new ArrayList<LimitUrl>();
 

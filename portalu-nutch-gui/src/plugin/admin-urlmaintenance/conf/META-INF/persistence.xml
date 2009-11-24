@@ -4,7 +4,6 @@
 	version="1.0">
 
 	<persistence-unit name="hsql-mem" transaction-type="RESOURCE_LOCAL">
-        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
 		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.Url</class>
 		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.CatalogUrl</class>
 		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl</class>
@@ -76,5 +75,8 @@
 		</properties>
 	</persistence-unit>
 
+	<!--  Just created persistence-unit to satisfy the jboss hibernate tools -->
+    <persistence-unit name="HibernateToolsPersistency">  
+    </persistence-unit>  
 
 </persistence> 

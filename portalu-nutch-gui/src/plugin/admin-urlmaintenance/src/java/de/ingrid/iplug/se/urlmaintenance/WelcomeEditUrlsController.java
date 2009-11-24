@@ -13,8 +13,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 public class WelcomeEditUrlsController extends NavigationSelector {
 
   @RequestMapping(method = RequestMethod.GET)
-  public String index(
-      @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand) {
+  public String index(@ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand) {
     return "welcomeEditUrls";
   }
 }
