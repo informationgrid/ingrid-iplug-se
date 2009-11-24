@@ -17,23 +17,27 @@
 
 package org.apache.nutch.indexer;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.apache.hadoop.fs.*;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.FileAlreadyExistsException;
-import org.apache.hadoop.util.*;
-import org.apache.hadoop.conf.*;
-
+import org.apache.hadoop.util.StringUtils;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.store.Directory;
 import org.apache.nutch.util.HadoopFSUtil;
 import org.apache.nutch.util.LogUtil;
 import org.apache.nutch.util.NutchConfiguration;
-
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.index.IndexWriter;
 
 /*************************************************************************
  * IndexMerger creates an index for the output corresponding to a 

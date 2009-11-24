@@ -20,17 +20,18 @@ package org.apache.nutch.indexer;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-// Commons Logging imports
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.apache.nutch.plugin.*;
-import org.apache.nutch.parse.Parse;
-import org.apache.nutch.util.ObjectCache;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.io.Text;
 import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.crawl.Inlinks;
-import org.apache.hadoop.io.Text;
+import org.apache.nutch.parse.Parse;
+import org.apache.nutch.plugin.Extension;
+import org.apache.nutch.plugin.ExtensionPoint;
+import org.apache.nutch.plugin.PluginRepository;
+import org.apache.nutch.plugin.PluginRuntimeException;
+import org.apache.nutch.util.ObjectCache;
 
 /** Creates and caches {@link IndexingFilter} implementing plugins.*/
 public class IndexingFilters {

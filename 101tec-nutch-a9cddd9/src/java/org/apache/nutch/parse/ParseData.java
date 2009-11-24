@@ -17,13 +17,18 @@
 
 package org.apache.nutch.parse;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.util.Arrays;
 
-import org.apache.hadoop.io.*;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.*;
-
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.ArrayFile;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.VersionMismatchException;
+import org.apache.hadoop.io.VersionedWritable;
 import org.apache.nutch.metadata.Metadata;
 import org.apache.nutch.util.NutchConfiguration;
 

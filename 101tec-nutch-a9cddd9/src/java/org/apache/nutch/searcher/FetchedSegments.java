@@ -18,7 +18,6 @@
 package org.apache.nutch.searcher;
 
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -31,15 +30,21 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.io.*;
-import org.apache.hadoop.fs.*;
-import org.apache.nutch.protocol.*;
-import org.apache.nutch.parse.*;
-import org.apache.nutch.util.HadoopFSUtil;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.mapred.*;
-import org.apache.hadoop.mapred.lib.*;
-import org.apache.nutch.crawl.*;
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.MapFile;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.Writable;
+import org.apache.hadoop.mapred.MapFileOutputFormat;
+import org.apache.hadoop.mapred.Partitioner;
+import org.apache.hadoop.mapred.lib.HashPartitioner;
+import org.apache.nutch.crawl.CrawlDatum;
+import org.apache.nutch.parse.ParseData;
+import org.apache.nutch.parse.ParseText;
+import org.apache.nutch.protocol.Content;
+import org.apache.nutch.util.HadoopFSUtil;
 
 /** Implements {@link HitSummarizer} and {@link HitContent} for a set of
  * fetched segments. */

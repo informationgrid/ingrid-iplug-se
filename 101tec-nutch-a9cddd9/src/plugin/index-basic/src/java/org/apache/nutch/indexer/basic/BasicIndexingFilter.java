@@ -17,26 +17,22 @@
 
 package org.apache.nutch.indexer.basic;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.apache.lucene.document.DateTools;
-
-import org.apache.nutch.metadata.Nutch;
-import org.apache.nutch.parse.Parse;
-
-import org.apache.nutch.indexer.IndexingFilter;
-import org.apache.nutch.indexer.IndexingException;
-import org.apache.nutch.indexer.NutchDocument;
-import org.apache.nutch.indexer.lucene.LuceneWriter;
-import org.apache.hadoop.io.Text;
-
-import org.apache.nutch.crawl.CrawlDatum;
-import org.apache.nutch.crawl.Inlinks;
-
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.io.Text;
+import org.apache.lucene.document.DateTools;
+import org.apache.nutch.crawl.CrawlDatum;
+import org.apache.nutch.crawl.Inlinks;
+import org.apache.nutch.indexer.IndexingException;
+import org.apache.nutch.indexer.IndexingFilter;
+import org.apache.nutch.indexer.NutchDocument;
+import org.apache.nutch.indexer.lucene.LuceneWriter;
+import org.apache.nutch.metadata.Nutch;
+import org.apache.nutch.parse.Parse;
 
 /** Adds basic searchable fields to a document. */
 public class BasicIndexingFilter implements IndexingFilter {

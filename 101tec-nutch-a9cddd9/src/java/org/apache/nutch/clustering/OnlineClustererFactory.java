@@ -20,9 +20,11 @@ package org.apache.nutch.clustering;
 // Commons Logging imports
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.apache.nutch.plugin.*;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.nutch.plugin.Extension;
+import org.apache.nutch.plugin.ExtensionPoint;
+import org.apache.nutch.plugin.PluginRepository;
+import org.apache.nutch.plugin.PluginRuntimeException;
 
 /**
  * A factory for retrieving {@link OnlineClusterer} extensions.

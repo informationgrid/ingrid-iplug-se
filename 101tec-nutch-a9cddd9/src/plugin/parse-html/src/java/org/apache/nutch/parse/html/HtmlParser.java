@@ -17,29 +17,44 @@
 
 package org.apache.nutch.parse.html;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Map;
-import java.net.URL;
-import java.net.MalformedURLException;
-import java.nio.charset.Charset;
-import java.io.*;
-import java.util.regex.*;
-
-import org.cyberneko.html.parsers.*;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.w3c.dom.*;
-import org.apache.html.dom.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.hadoop.conf.Configuration;
+import org.apache.html.dom.HTMLDocumentImpl;
 import org.apache.nutch.metadata.Metadata;
 import org.apache.nutch.metadata.Nutch;
+import org.apache.nutch.parse.HTMLMetaTags;
+import org.apache.nutch.parse.HtmlParseFilters;
+import org.apache.nutch.parse.Outlink;
+import org.apache.nutch.parse.Parse;
+import org.apache.nutch.parse.ParseData;
+import org.apache.nutch.parse.ParseImpl;
+import org.apache.nutch.parse.ParseResult;
+import org.apache.nutch.parse.ParseStatus;
+import org.apache.nutch.parse.Parser;
 import org.apache.nutch.protocol.Content;
-import org.apache.hadoop.conf.*;
-import org.apache.nutch.parse.*;
-import org.apache.nutch.util.*;
+import org.apache.nutch.util.EncodingDetector;
+import org.apache.nutch.util.LogUtil;
+import org.apache.nutch.util.NutchConfiguration;
+import org.cyberneko.html.parsers.DOMFragmentParser;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.DocumentFragment;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 public class HtmlParser implements Parser {
   public static final Log LOG = LogFactory.getLog("org.apache.nutch.parse.html");

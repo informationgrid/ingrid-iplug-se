@@ -21,11 +21,9 @@ package org.apache.nutch.indexer;
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
-
-// Nutch imports
-import org.apache.nutch.parse.Parse;
 import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.crawl.Inlinks;
+import org.apache.nutch.parse.Parse;
 import org.apache.nutch.plugin.Pluggable;
 
 

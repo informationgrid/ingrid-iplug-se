@@ -9,40 +9,42 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
 public class ProviderDaoTest extends DaoTest {
 
   public void testCreateProvider() throws Exception {
-    Partner partner = createPartner("partner");
 
     TransactionService transactionService = new TransactionService();
     transactionService.beginTransaction();
-    PartnerDao partnerDao = new PartnerDao(transactionService);
+    IProviderDao providerDao = new ProviderDao(transactionService);
+    PartnerDao partnerDao = new PartnerDao(transactionService, providerDao);
+    Partner partner = createPartner("partner");
+    partnerDao.makePersistent(partner);
     Partner byName = partnerDao.getByName(partner.getName());
 
     Provider provider = new Provider();
     provider.setName("foo");
     provider.setPartner(byName);
-    IProviderDao dao = new ProviderDao(transactionService);
-    dao.makePersistent(provider);
+    providerDao.makePersistent(provider);
     transactionService.commitTransaction();
     transactionService.close();
 
     transactionService.beginTransaction();
-    List<Provider> all = dao.getAll();
+    List<Provider> all = providerDao.getAll();
     assertEquals(1, all.size());
     Provider Provider2 = all.get(0);
     assertEquals(provider.getName(), Provider2.getName());
   }
 
   public void testDeleteProvider() throws Exception {
-    Partner partner = createPartner("partner");
 
     TransactionService transactionService = new TransactionService();
     transactionService.beginTransaction();
-    PartnerDao partnerDao = new PartnerDao(transactionService);
+    IProviderDao dao = new ProviderDao(transactionService);
+    PartnerDao partnerDao = new PartnerDao(transactionService, dao);
+    Partner partner = createPartner("partner");
+    partnerDao.makePersistent(partner);
     Partner byName = partnerDao.getByName(partner.getName());
 
     Provider provider = new Provider();
     provider.setName("foo");
     provider.setPartner(byName);
-    IProviderDao dao = new ProviderDao(transactionService);
     dao.makePersistent(provider);
     transactionService.commitTransaction();
     transactionService.close();
@@ -60,18 +62,19 @@ public class ProviderDaoTest extends DaoTest {
   }
 
   public void testGetByName() throws Exception {
-    Partner partner = createPartner("partner");
 
     TransactionService transactionService = new TransactionService();
     transactionService.beginTransaction();
 
-    PartnerDao partnerDao = new PartnerDao(transactionService);
+    IProviderDao dao = new ProviderDao(transactionService);
+    PartnerDao partnerDao = new PartnerDao(transactionService,dao);
+    Partner partner = createPartner("partner");
+    partnerDao.makePersistent(partner);
     Partner byName = partnerDao.getByName(partner.getName());
 
     Provider provider = new Provider();
     provider.setName("foo");
     provider.setPartner(byName);
-    IProviderDao dao = new ProviderDao(transactionService);
     dao.makePersistent(provider);
     transactionService.commitTransaction();
     transactionService.close();
@@ -80,5 +83,5 @@ public class ProviderDaoTest extends DaoTest {
     Provider provider2 = dao.getByName("foo");
     assertEquals(provider.getId(), provider2.getId());
   }
-
+  
 }

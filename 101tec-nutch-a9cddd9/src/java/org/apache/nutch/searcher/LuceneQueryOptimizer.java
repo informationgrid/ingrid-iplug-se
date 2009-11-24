@@ -17,18 +17,26 @@
 
 package org.apache.nutch.searcher;
 
-import org.apache.lucene.search.Searcher;
-import org.apache.lucene.search.*;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.misc.ChainedFilter;
-
-import org.apache.hadoop.conf.Configuration;
-
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.ArrayList;
 
-import java.io.IOException;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.misc.ChainedFilter;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.CachingWrapperFilter;
+import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.QueryWrapperFilter;
+import org.apache.lucene.search.RangeFilter;
+import org.apache.lucene.search.RangeQuery;
+import org.apache.lucene.search.Searcher;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TopDocCollector;
+import org.apache.lucene.search.TopDocs;
 
 /** Utility which converts certain query clauses into {@link QueryFilter}s and
  * caches these.  Only required clauses whose boost is zero are converted to

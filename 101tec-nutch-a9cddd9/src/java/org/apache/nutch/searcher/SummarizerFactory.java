@@ -19,11 +19,7 @@ package org.apache.nutch.searcher;
 // Commons Logging imports
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-// Hadoop imports
 import org.apache.hadoop.conf.Configuration;
-
-// Nutch imports
 import org.apache.nutch.plugin.Extension;
 import org.apache.nutch.plugin.PluginRepository;
 

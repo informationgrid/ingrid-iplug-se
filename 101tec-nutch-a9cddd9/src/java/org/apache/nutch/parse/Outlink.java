@@ -17,10 +17,13 @@
 
 package org.apache.nutch.parse;
 
-import java.io.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.net.MalformedURLException;
 
-import org.apache.hadoop.io.*;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.Writable;
 
 /* An outgoing link from a page. */
 public class Outlink implements Writable {

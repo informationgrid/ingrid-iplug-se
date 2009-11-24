@@ -21,10 +21,8 @@ package org.apache.nutch.util;
 import java.io.File;
 import java.util.logging.Logger;
 
-// Hadoop imports
 import org.apache.hadoop.conf.Configuration;
-
-// Tika imports
+import org.apache.nutch.protocol.ProtocolOutput;
 import org.apache.tika.mime.MimeType;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;

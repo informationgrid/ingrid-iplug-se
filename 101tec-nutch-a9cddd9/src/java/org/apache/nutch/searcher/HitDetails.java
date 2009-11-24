@@ -22,7 +22,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.apache.hadoop.io.*;
+import org.apache.hadoop.io.Writable;
 import org.apache.nutch.html.Entities;
 
 /** Data stored in the index for a hit.

@@ -17,21 +17,32 @@
 
 package org.apache.nutch.searcher;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
 
-import javax.servlet.*;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.apache.hadoop.fs.*;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.conf.*;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.util.StringUtils;
-import org.apache.nutch.parse.*;
 import org.apache.nutch.crawl.Inlinks;
+import org.apache.nutch.parse.ParseData;
+import org.apache.nutch.parse.ParseText;
 import org.apache.nutch.util.NutchConfiguration;
 
 /**

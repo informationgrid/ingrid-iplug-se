@@ -22,11 +22,8 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
 
-// Hadoop imports
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
-
-// Nutch imports
 import org.apache.nutch.html.Entities;
 
 

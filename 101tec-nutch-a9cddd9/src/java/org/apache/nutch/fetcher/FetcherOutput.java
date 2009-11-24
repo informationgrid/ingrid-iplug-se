@@ -17,12 +17,14 @@
 
 package org.apache.nutch.fetcher;
 
-import java.io.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
-import org.apache.hadoop.io.*;
+import org.apache.hadoop.io.Writable;
 import org.apache.nutch.crawl.CrawlDatum;
+import org.apache.nutch.parse.ParseImpl;
 import org.apache.nutch.protocol.Content;
-import org.apache.nutch.parse.*;
 
 /* An entry in the fetcher's output. */
 public final class FetcherOutput implements Writable {

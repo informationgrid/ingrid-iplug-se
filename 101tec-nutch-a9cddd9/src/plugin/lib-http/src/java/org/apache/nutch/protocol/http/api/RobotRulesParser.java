@@ -19,8 +19,8 @@ package org.apache.nutch.protocol.http.api;
 // JDK imports
 import java.io.FileInputStream;
 import java.io.FileReader;
-import java.io.LineNumberReader;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -28,12 +28,10 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
 
-// Commons Logging imports
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-// Nutch imports
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configurable;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.net.protocols.Response;

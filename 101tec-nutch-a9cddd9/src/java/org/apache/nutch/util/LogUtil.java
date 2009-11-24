@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
 
-// Commons Logging imports
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

@@ -23,7 +23,6 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.CatalogUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.LimitUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
-import de.ingrid.iplug.se.urlmaintenance.persistence.model.Partner;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Url;
 
@@ -96,8 +95,7 @@ public class DatabaseExport {
         metadatas = ((CatalogUrl) url).getMetadatas();
       }
       Provider provider = url.getProvider();
-      Partner partner = provider.getPartner();
-      metadatas.add(new Metadata("partner", partner.getName()));
+      metadatas.add(new Metadata("partner", provider.getPartner().getName()));
       metadatas.add(new Metadata("provider", provider.getName()));
 
       String urlString = url.getUrl();

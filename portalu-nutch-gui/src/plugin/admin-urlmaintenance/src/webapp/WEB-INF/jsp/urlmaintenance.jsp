@@ -9,6 +9,25 @@
 	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/element/element-min.js"></script>
 	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/tabview/tabview-min.js"></script>
 	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/css/style.css" />
+	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/jquery-1.3.2.min.js"></script>
+	<script type="text/javascript">
+		var map = ${jsonMap};
+	
+	    $(document).ready(function() {
+	        $("#partner").change(function() {
+	        	var select = $("#provider");
+	        	select.find("option[value]").remove();
+	            var partner = $(this).val();
+	            // at first call it's normally empty / not selected
+	            if (map[partner]) {
+	                for(var i = 0; i < map[partner].length; i++) {
+	                    select.append("<option value='" + map[partner][i].id + "'>" + map[partner][i].name + "</option>");
+	                }
+	            }
+	        }).trigger('change');
+	        <%/*$("#provider").val("${plugDescription.organisationAbbr}");*/%>
+	    });
+	</script> 
 </head>
 <body class="yui-skin-sam">
 	<div id="doc2" class="yui-t4">
@@ -57,7 +76,7 @@
 						    <row>
 						        <label><form:label path="partner" >Partner: </form:label></label>
 						        <field>
-						           <form:select path="partner" items="${partners}" itemLabel="name" itemValue="name"/>
+						           	<form:select path="partner" items="${partners}" itemLabel="name" itemValue="id"/>
 						        </field>
 						        <desc></desc>
 						    </row>

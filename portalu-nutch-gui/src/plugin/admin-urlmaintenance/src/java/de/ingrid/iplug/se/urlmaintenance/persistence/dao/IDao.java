@@ -17,4 +17,6 @@ public interface IDao<T> {
 
   void flush();
 
+  void flipTransaction();
+
 }

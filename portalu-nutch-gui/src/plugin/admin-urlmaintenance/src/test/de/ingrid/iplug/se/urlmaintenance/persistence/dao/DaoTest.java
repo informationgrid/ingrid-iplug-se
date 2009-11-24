@@ -13,6 +13,8 @@ public abstract class DaoTest extends TestCase {
 
   @Override
   protected void setUp() throws Exception {
+    System.setProperty("db.mode", "hsql-mem");
+
     TransactionService transactionService = new TransactionService();
     transactionService.beginTransaction();
 
@@ -34,7 +36,7 @@ public abstract class DaoTest extends TestCase {
       providerDao.makeTransient(provider);
     }
 
-    IPartnerDao partnerDao = new PartnerDao(transactionService);
+    IPartnerDao partnerDao = new PartnerDao(transactionService, providerDao);
     List<Partner> allPartners = partnerDao.getAll();
     for (Partner partner : allPartners) {
       partnerDao.makeTransient(partner);
@@ -44,20 +46,29 @@ public abstract class DaoTest extends TestCase {
     transactionService.close();
   }
 
-  protected Provider createProvider(String partnerName, String providerName)
-      throws Exception {
-    Partner partner = createPartner(partnerName);
+  protected Provider createProviderForExistingPartner(Partner existingPartner, String providerName) {
+    Provider provider = new Provider();
+    provider.setName(providerName);
+    provider.setPartner(existingPartner);
+    existingPartner.addProvider(provider);
+
+    return provider;
+  }
+
+  protected Provider createProviderInSeparateTransaction(String partnerName, String providerName) throws Exception {
 
     TransactionService transactionService = new TransactionService();
     transactionService.beginTransaction();
-    PartnerDao partnerDao = new PartnerDao(transactionService);
+    IProviderDao providerDao = new ProviderDao(transactionService);
+    PartnerDao partnerDao = new PartnerDao(transactionService, providerDao);
+    Partner partner = createPartner(partnerName);
+    partnerDao.makePersistent(partner);
     Partner byName = partnerDao.getByName(partner.getName());
 
     Provider provider = new Provider();
     provider.setName(providerName);
     provider.setPartner(byName);
-    IProviderDao dao = new ProviderDao(transactionService);
-    dao.makePersistent(provider);
+    providerDao.makePersistent(provider);
     transactionService.commitTransaction();
     transactionService.close();
 
@@ -65,15 +76,8 @@ public abstract class DaoTest extends TestCase {
   }
 
   protected Partner createPartner(String name) throws Exception {
-    TransactionService transactionService = new TransactionService();
-    transactionService.beginTransaction();
-
     Partner partner = new Partner();
     partner.setName(name);
-    IPartnerDao dao = new PartnerDao(transactionService);
-    dao.makePersistent(partner);
-    transactionService.commitTransaction();
-    transactionService.close();
 
     return partner;
   }

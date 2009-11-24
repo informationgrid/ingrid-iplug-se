@@ -32,8 +32,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.nutch.metadata.Metadata;
 import org.apache.nutch.net.protocols.Response;
 import org.apache.nutch.protocol.Content;
-import org.apache.nutch.util.LogUtil;
-import org.apache.nutch.util.NutchConfiguration;
 
 import com.ibm.icu.text.CharsetDetector;
 import com.ibm.icu.text.CharsetMatch;

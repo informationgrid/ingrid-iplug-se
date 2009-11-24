@@ -30,7 +30,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.logging.Log;
-
 import org.apache.hadoop.conf.Configuration;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

@@ -19,14 +19,12 @@ package org.apache.nutch.analysis;
 // Commons Logging imports
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-// Nutch imports
+import org.apache.hadoop.conf.Configuration;
 import org.apache.nutch.plugin.Extension;
 import org.apache.nutch.plugin.ExtensionPoint;
-import org.apache.nutch.plugin.PluginRuntimeException;
 import org.apache.nutch.plugin.PluginRepository;
+import org.apache.nutch.plugin.PluginRuntimeException;
 import org.apache.nutch.util.ObjectCache;
-import org.apache.hadoop.conf.Configuration;
 
 
 /**

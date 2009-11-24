@@ -22,7 +22,7 @@ public abstract class Dao<T extends IdBase> implements IDao<T> {
   @Override
   public List<T> getAll() {
     Query query = _transactionService.createQuery("select t from "
-        + _clazz.getSimpleName() + " as t");
+        + _clazz.getSimpleName() + " as t order by t._id asc");
     return query.getResultList();
   }
 
@@ -56,6 +56,11 @@ public abstract class Dao<T extends IdBase> implements IDao<T> {
   @Override
   public void flush() {
     _transactionService.flush();
+  }
+
+  @Override
+  public void flipTransaction() {
+    _transactionService.flipTransaction();
   }
 
 }

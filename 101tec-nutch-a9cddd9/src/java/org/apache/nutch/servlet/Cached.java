@@ -17,21 +17,20 @@
 
 package org.apache.nutch.servlet;
 
-import org.apache.nutch.metadata.Metadata;
-import org.apache.nutch.net.protocols.Response;
-import org.apache.nutch.searcher.NutchBean;
-import org.apache.nutch.searcher.Hit;
-import org.apache.nutch.searcher.HitDetails;
-import org.apache.nutch.util.NutchConfiguration;
-
-import org.apache.hadoop.conf.Configuration;
+import java.io.IOException;
+import java.io.OutputStream;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.io.OutputStream;
-import java.io.IOException;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.nutch.metadata.Metadata;
+import org.apache.nutch.net.protocols.Response;
+import org.apache.nutch.searcher.Hit;
+import org.apache.nutch.searcher.HitDetails;
+import org.apache.nutch.searcher.NutchBean;
+import org.apache.nutch.util.NutchConfiguration;
 
 /**
  * A servlet that serves raw Content of any mime type.

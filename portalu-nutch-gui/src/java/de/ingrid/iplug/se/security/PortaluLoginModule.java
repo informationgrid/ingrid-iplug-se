@@ -98,6 +98,7 @@ public class PortaluLoginModule extends AbstractLoginModule {
   }
 
   public PortaluLoginModule() throws Exception {
+    LOG.info("PortaluLoginModule loaded.");
     IndexIPlug plug = IndexIPlug.getInstance();
   }
 
@@ -218,7 +219,7 @@ public class PortaluLoginModule extends AbstractLoginModule {
 
   @SuppressWarnings("unchecked")
   private List<Map<String, Serializable>> getAllPartnerWithProvider(IBus bus) {
-
+  
     List<Map<String, Serializable>> list = new ArrayList<Map<String, Serializable>>();
     try {
       String query = "datatype:management management_request_type:1";

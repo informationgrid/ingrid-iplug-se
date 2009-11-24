@@ -17,17 +17,20 @@
 
 package org.apache.nutch.searcher;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.apache.nutch.plugin.*;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.nutch.plugin.Extension;
+import org.apache.nutch.plugin.ExtensionPoint;
+import org.apache.nutch.plugin.PluginRepository;
+import org.apache.nutch.plugin.PluginRuntimeException;
 import org.apache.nutch.searcher.Query.Clause;
 import org.apache.nutch.util.ObjectCache;
-import org.apache.hadoop.conf.Configuration;
-
-import java.util.*;
-
-import org.apache.lucene.search.BooleanQuery;
 
 /** Creates and caches {@link QueryFilter} implementing plugins.  QueryFilter
  * implementations should define either the "fields" or "raw-fields" attributes

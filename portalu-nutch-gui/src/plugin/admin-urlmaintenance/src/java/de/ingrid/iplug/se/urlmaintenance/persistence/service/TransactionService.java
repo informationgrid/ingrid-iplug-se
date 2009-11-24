@@ -25,8 +25,8 @@ public class TransactionService {
   private static TransactionService INSTANCE;
 
   public TransactionService() {
-    String dbMode = System.getProperty("db.mode", "mysql");
-    _entityManagerFactory = Persistence.createEntityManagerFactory(dbMode);
+    String persistenceUnitName = System.getProperty("db.mode", "mysql");
+    _entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnitName);
     INSTANCE = this;
   }
 
@@ -52,6 +52,15 @@ public class TransactionService {
     EntityTransaction transaction = entityManager.getTransaction();
     if (transaction.isActive()) {
       transaction.commit();
+    }
+  }
+
+  public void flipTransaction() {
+    EntityManager entityManager = getEntityManager();
+    EntityTransaction transaction = entityManager.getTransaction();
+    if (transaction.isActive()) {
+      transaction.commit();
+      transaction.begin();
     }
   }
 

@@ -1,6 +1,6 @@
 <project>
 
-	<property name="nutch-version" value="101tec-nutch-d866449f3a56ec99a837c5e6462a8e9f2e8aa1c9" />
+	<property name="nutch-version" value="101tec-nutch-a9cddd9" />
 
 	<target name="init">
 		<mkdir dir="build" />

@@ -17,18 +17,18 @@
 
 package org.apache.nutch.parse.html;
 
-import java.net.URL;
 import java.net.MalformedURLException;
-import java.util.Collection;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.Stack;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.nutch.parse.Outlink;
 import org.apache.nutch.util.NodeWalker;
-import org.apache.hadoop.conf.Configuration;
-
-import org.w3c.dom.*;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * A collection of methods for extracting content from DOM trees.

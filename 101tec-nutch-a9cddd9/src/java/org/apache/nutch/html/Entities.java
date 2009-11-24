@@ -17,7 +17,7 @@
 
 package org.apache.nutch.html;
 
-import java.util.*;
+import java.util.Hashtable;
 
 public class Entities {
   static final Hashtable<String, String> decoder =

@@ -19,11 +19,13 @@ package org.apache.nutch.parse;
 
 import java.util.HashMap;
 
-import org.apache.nutch.protocol.Content;
-import org.apache.nutch.plugin.*;
-import org.apache.nutch.util.ObjectCache;
 import org.apache.hadoop.conf.Configuration;
-
+import org.apache.nutch.plugin.Extension;
+import org.apache.nutch.plugin.ExtensionPoint;
+import org.apache.nutch.plugin.PluginRepository;
+import org.apache.nutch.plugin.PluginRuntimeException;
+import org.apache.nutch.protocol.Content;
+import org.apache.nutch.util.ObjectCache;
 import org.w3c.dom.DocumentFragment;
 
 /** Creates and caches {@link HtmlParseFilter} implementing plugins.*/

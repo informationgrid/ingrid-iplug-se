@@ -22,7 +22,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.io.Text;
-import org.apache.nutch.crawl.CrawlDatum;
 
 /**
  * This class provides common methods for implementations of

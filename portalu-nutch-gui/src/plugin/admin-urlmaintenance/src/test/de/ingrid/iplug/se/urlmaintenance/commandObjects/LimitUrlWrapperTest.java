@@ -4,7 +4,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import de.ingrid.iplug.se.urlmaintenance.commandObjects.LimitUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.DaoTest;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ILimitUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.LimitUrl;
@@ -25,7 +24,7 @@ public class LimitUrlWrapperTest extends DaoTest {
   public void testRead() throws Exception {
 
     LimitUrlCommand limitUrlCommand = new LimitUrlCommand(_limitUrlDao);
-    Provider provider = createProvider("partner", "provider");
+    Provider provider = createProviderInSeparateTransaction("partner", "provider");
     Metadata lang = createMetadata("lang", "de");
     LimitUrl model = new LimitUrl();
     model.setUrl("http://www.101tec.com");
@@ -39,7 +38,7 @@ public class LimitUrlWrapperTest extends DaoTest {
 
   public void testWrite() throws Exception {
     Metadata lang = createMetadata("lang", "de");
-    Provider provider = createProvider("partner", "provider");
+    Provider provider = createProviderInSeparateTransaction("partner", "provider");
 
     LimitUrlCommand command = new LimitUrlCommand(_limitUrlDao);
     command.setUrl("http://www.101tec.com");

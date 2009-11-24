@@ -17,11 +17,10 @@
 
 package org.apache.nutch.searcher;
 
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.index.Term;
-
 import org.apache.nutch.searcher.Query.Clause;
 
 /** Translate raw query fields to search the same-named field, as indexed by an

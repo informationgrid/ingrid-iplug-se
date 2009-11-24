@@ -17,21 +17,26 @@
 
 package org.apache.nutch.analysis;
 
-import org.apache.lucene.analysis.TokenFilter;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Token;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.ListIterator;
 
-import java.io.*;
-import java.util.*;
-
-// Commons Logging imports
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.apache.hadoop.conf.*;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.lucene.analysis.Token;
+import org.apache.lucene.analysis.TokenFilter;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.nutch.searcher.Query.Phrase;
+import org.apache.nutch.searcher.Query.Term;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.ObjectCache;
-import org.apache.nutch.searcher.Query.*;
 
 /** Construct n-grams for frequently occuring terms and phrases while indexing.
  * Optimize phrase queries to use the n-grams. Single terms are still indexed

@@ -37,13 +37,9 @@ import java.util.BitSet;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-// Commons Logging imports
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.hadoop.conf.Configuration;
-import org.apache.nutch.util.NutchConfiguration;
-
 import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
@@ -54,6 +50,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.nutch.util.NutchConfiguration;
 
 /**
  * This tool prunes existing Nutch indexes of unwanted content. The main method

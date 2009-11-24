@@ -1,6 +1,7 @@
 package de.ingrid.iplug.se.urlmaintenance.persistence.dao;
 
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Partner;
+import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 
 public interface IPartnerDao extends IDao<Partner> {
 
@@ -8,4 +9,5 @@ public interface IPartnerDao extends IDao<Partner> {
 
   boolean exists(String name);
 
+  void removeProvider(Partner partner, Provider provider);
 }

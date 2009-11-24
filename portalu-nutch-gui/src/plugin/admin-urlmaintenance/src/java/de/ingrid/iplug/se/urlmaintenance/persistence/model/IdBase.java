@@ -9,7 +9,8 @@ import javax.persistence.MappedSuperclass;
 public class IdBase {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+//  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private Long _id;
 
   public Long getId() {

@@ -91,7 +91,7 @@ public class NutchGuiRealm implements UserRealm, SSORealm {
           LOG.info("principal has logged in: " + principal);
         }
       } catch (LoginException e) {
-        LOG.error("login error for user: " + userName);
+        LOG.error("login error for user: " + userName, e);
       }
     }
     if (principal == null) {

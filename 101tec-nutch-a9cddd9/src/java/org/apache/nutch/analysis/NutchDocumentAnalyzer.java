@@ -17,15 +17,14 @@
 package org.apache.nutch.analysis;
 
 // JDK imports
-import java.io.Reader;
 import java.io.IOException;
+import java.io.Reader;
 
-// Lucene imports
+import org.apache.hadoop.conf.Configuration;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Token;
-import org.apache.hadoop.conf.Configuration;
 
 /**
  * The analyzer used for Nutch documents. Uses the JavaCC-defined lexical

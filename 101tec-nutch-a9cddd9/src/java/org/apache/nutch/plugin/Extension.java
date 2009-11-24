@@ -18,8 +18,8 @@ package org.apache.nutch.plugin;
 
 import java.util.HashMap;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configurable;
+import org.apache.hadoop.conf.Configuration;
 
 /**
  * An <code>Extension</code> is a kind of listener descriptor that will be

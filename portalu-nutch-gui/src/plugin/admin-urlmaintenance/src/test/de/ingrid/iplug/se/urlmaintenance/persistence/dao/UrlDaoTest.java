@@ -17,7 +17,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
 public class UrlDaoTest extends DaoTest {
 
   public void testCreate() throws Exception {
-    createProvider("partner", "provider");
+    createProviderInSeparateTransaction("partner", "provider");
 
     TransactionService transactionService = new TransactionService();
     transactionService.beginTransaction();
@@ -82,7 +82,7 @@ public class UrlDaoTest extends DaoTest {
   }
 
   public void testLimitUrl() throws Exception {
-    createProvider("partner", "provider");
+    createProviderInSeparateTransaction("partner", "provider");
     createMetadata("foo", "bar");
     createMetadata("bar", "foo");
     createMetadata("foobar", "foobar");

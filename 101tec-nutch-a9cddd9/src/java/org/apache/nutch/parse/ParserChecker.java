@@ -19,18 +19,13 @@ package org.apache.nutch.parse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.hadoop.conf.Configuration;
-
-import org.apache.nutch.util.NutchConfiguration;
-
-import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.hadoop.io.Text;
-import org.apache.nutch.parse.ParseUtil;
-
-import org.apache.nutch.protocol.ProtocolFactory;
-import org.apache.nutch.protocol.Protocol;
+import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.protocol.Content;
+import org.apache.nutch.protocol.Protocol;
+import org.apache.nutch.protocol.ProtocolFactory;
+import org.apache.nutch.util.NutchConfiguration;
 
 /**
  * Parser checker, useful for testing parser.

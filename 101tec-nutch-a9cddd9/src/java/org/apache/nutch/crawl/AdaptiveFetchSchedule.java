@@ -19,7 +19,6 @@ package org.apache.nutch.crawl;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
-import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.util.NutchConfiguration;
 
 /**
