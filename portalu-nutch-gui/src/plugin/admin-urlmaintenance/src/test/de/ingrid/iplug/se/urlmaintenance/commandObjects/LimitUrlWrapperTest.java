@@ -42,7 +42,7 @@ public class LimitUrlWrapperTest extends DaoTest {
 
     LimitUrlCommand command = new LimitUrlCommand(_limitUrlDao);
     command.setUrl("http://www.101tec.com");
-    command.setId(23L);
+//    command.setId(23L);
     command.setProvider(provider);
     command.addMetadata(lang);
 

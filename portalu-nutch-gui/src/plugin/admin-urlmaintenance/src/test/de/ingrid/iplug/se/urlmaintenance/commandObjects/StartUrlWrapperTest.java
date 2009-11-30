@@ -1,36 +1,40 @@
 package de.ingrid.iplug.se.urlmaintenance.commandObjects;
 
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.DaoTest;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ExcludeUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IExcludeUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ILimitUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.LimitUrlDao;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.StartUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.LimitUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl;
+import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
 
 public class StartUrlWrapperTest extends DaoTest {
 
-  @Mock
+  private TransactionService _transactionService;
+
   private IStartUrlDao _startUrlDao;
-
-  @Mock
   private ILimitUrlDao _limitUrlDao;
-
-  @Mock
   private IExcludeUrlDao _excludeUrlDao;
 
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    MockitoAnnotations.initMocks(this);
+
+    _transactionService = new TransactionService();
+    _transactionService.beginTransaction();
+
+    _startUrlDao = new StartUrlDao(_transactionService);
+    _limitUrlDao = new LimitUrlDao(_transactionService);
+    _excludeUrlDao = new ExcludeUrlDao(_transactionService);
   }
 
   public void testRead() throws Exception {
+    _transactionService.close();
     StartUrlCommand startUrlCommand = new StartUrlCommand(_startUrlDao,
         _limitUrlDao, _excludeUrlDao);
 
@@ -43,34 +47,105 @@ public class StartUrlWrapperTest extends DaoTest {
     limitUrl.setUrl("http://www.101tec.com/limit");
     limitUrl.setProvider(provider);
     model.addLimitUrl(limitUrl);
+    _startUrlDao.makePersistent(model);
+    _startUrlDao.flipTransaction();
 
     startUrlCommand.read(model);
     assertEquals(model.getUrl(), startUrlCommand.getUrl());
+    assertEquals(1, startUrlCommand.getLimitUrlCommands().size());
+    _startUrlDao.flipTransaction();
+    
+    // re-read the startUrlCommand and verify the limit url
+    StartUrl startUrlFromDb = _startUrlDao.getById(model.getId());
+    startUrlCommand.read(startUrlFromDb);
+    assertEquals(1, startUrlCommand.getLimitUrlCommands().size());
+
+    _transactionService.commitTransaction();
+    _transactionService.close();
   }
 
-  public void testWrite() throws Exception {
+  public void testWrite_OverwriteExistingStartAndLimitUrls() throws Exception {
+    _transactionService.close();
     Metadata lang = createMetadata("lang", "de");
     Provider provider = createProviderInSeparateTransaction("partner", "provider");
 
-    // limit url command
-    LimitUrlCommand command = new LimitUrlCommand(_limitUrlDao);
-    command.setUrl("http://www.101tec.com");
-    command.setId(23L);
-    command.setProvider(provider);
-    command.addMetadata(lang);
+    _transactionService.beginTransaction();
+    StartUrl startUrl = new StartUrl();
+    startUrl.setUrl("http://www.101tec.com/old");
+    startUrl.setProvider(provider);
+    _startUrlDao.makePersistent(startUrl);
+    LimitUrl limitUrl = new LimitUrl();
+    limitUrl.setUrl("http://www.101tec.com/blah");
+    limitUrl.setProvider(provider);
+    limitUrl.addMetadata(lang);
+    _limitUrlDao.makePersistent(limitUrl);
+    _limitUrlDao.flipTransaction();
 
+    // limit url command
+    LimitUrlCommand limitUrlCommand = new LimitUrlCommand(_limitUrlDao);
+    limitUrlCommand.setUrl("http://www.101tec.com");
+//    limitUrlCommand.setCommandId(limitUrl.getId());
+    limitUrlCommand.setProvider(provider);
+    limitUrlCommand.addMetadata(lang);
+    
     StartUrlCommand startUrlCommand = new StartUrlCommand(_startUrlDao,
         _limitUrlDao, _excludeUrlDao);
     startUrlCommand.setUrl("http://www.101tec.com/index");
-    startUrlCommand.setId(23L);
-    startUrlCommand.addLimitUrlCommand(command);
+    startUrlCommand.setId(startUrl.getId());
+    startUrlCommand.addLimitUrlCommand(limitUrlCommand);
 
-    Mockito.when(_startUrlDao.getById(23L)).thenReturn(new StartUrl());
-    Mockito.when(_limitUrlDao.getById(23L)).thenReturn(new LimitUrl());
+    StartUrl startUrlWritten = startUrlCommand.write();
+    assertEquals(startUrlCommand.getUrl(), startUrlWritten.getUrl());
+    assertEquals(1, startUrlWritten.getLimitUrls().size());
+    assertEquals(limitUrlCommand.getUrl(), startUrlWritten.getLimitUrls().get(0).getUrl());
+    
+    _transactionService.commitTransaction();
+    _transactionService.close();
+  }
+  
+  public void testWrite_StartAndLinitUrlsAlreadyExists() throws Exception{
+    _transactionService.close();
+    Metadata lang = createMetadata("lang", "de");
+    Provider provider = createProviderInSeparateTransaction("partner", "provider");
 
-    StartUrl startUrl = startUrlCommand.write();
-    assertEquals(startUrlCommand.getUrl(), startUrl.getUrl());
-    assertTrue(startUrl.getLimitUrls().size() == 1);
+    _transactionService.beginTransaction();
+    LimitUrl limitUrl = new LimitUrl();
+    limitUrl.setUrl("http://www.101tec.com");
+    limitUrl.setProvider(provider);
+    limitUrl.addMetadata(lang);
+    _limitUrlDao.makePersistent(limitUrl);
+    StartUrl startUrl = new StartUrl();
+    startUrl.setUrl("http://www.101tec.com/index");
+    startUrl.addLimitUrl(limitUrl);
+    startUrl.setProvider(provider);
+    _startUrlDao.makePersistent(startUrl);
+    _limitUrlDao.flipTransaction();
+    
+    // limit url and start url commands
+    LimitUrlCommand limitUrlCommand = new LimitUrlCommand(_limitUrlDao);
+    limitUrlCommand.setUrl(limitUrl.getUrl());
+//    limitUrlCommand.setCommandId(limitUrl.getId());
+    limitUrlCommand.setProvider(provider);
+    limitUrlCommand.addMetadata(lang);
+    StartUrlCommand startUrlCommand = new StartUrlCommand(_startUrlDao, _limitUrlDao, _excludeUrlDao);
+    startUrlCommand.setUrl(startUrl.getUrl());
+    startUrlCommand.setId(startUrl.getId());
+    startUrlCommand.addLimitUrlCommand(limitUrlCommand);
 
+    _transactionService.beginTransaction();
+    assertEquals(1, _limitUrlDao.getAll().size());
+    _limitUrlDao.flipTransaction();
+    
+    StartUrl startUrlWritten = startUrlCommand.write();
+
+//    _transactionService.beginTransaction();
+    assertEquals(1, _limitUrlDao.getAll().size());
+//    _limitUrlDao.flipTransaction();
+
+    assertEquals(startUrlCommand.getUrl(), startUrlWritten.getUrl());
+    assertEquals(1, startUrlWritten.getLimitUrls().size());
+
+    _transactionService.commitTransaction();
+    _transactionService.close();
   }
 }

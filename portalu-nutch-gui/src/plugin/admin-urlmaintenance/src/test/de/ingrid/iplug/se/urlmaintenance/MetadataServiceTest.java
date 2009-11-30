@@ -17,6 +17,6 @@ public class MetadataServiceTest extends TestCase {
   public void testGetDatatypes() throws Exception {
     MetadataService metadataService = new MetadataService();
     List<Metadata> datatypes = metadataService.getDatatypes();
-    assertEquals(7, datatypes.size());
+    assertEquals(4, datatypes.size());
   }
 }
