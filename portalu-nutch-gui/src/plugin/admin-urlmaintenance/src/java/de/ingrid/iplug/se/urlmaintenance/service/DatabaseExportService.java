@@ -5,10 +5,10 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.conf.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,9 +23,8 @@ public class DatabaseExportService {
 
     private final File _folder;
 
-    public ExportRunnable(File folder, Configuration conf) {
+    public ExportRunnable(File folder) {
       _folder = folder;
-      _conf = conf;
     }
 
     @Override
@@ -41,11 +40,10 @@ public class DatabaseExportService {
 
   }
 
-  private static final long HOUR = 1000 * 60 * 60;
+  private static final long INTERVAL = TimeUnit.MINUTES.toMillis(1L);// 1000 *
+                                                                     // 60 * 60;
 
   private final DatabaseExport _databaseExport;
-
-  private Configuration _conf;
 
   @Autowired
   public DatabaseExportService(DatabaseExport databaseExport) {
@@ -57,7 +55,7 @@ public class DatabaseExportService {
     String tmp = System.getProperty("java.io.tmpdir");
     File tmpFolder = new File(tmp, "portal-u-" + DatabaseExport.class.getName());
     Timer timer = new Timer("exportTimer", true);
-    timer.schedule(new ExportRunnable(tmpFolder, _conf), new Date(), HOUR);
+    timer.schedule(new ExportRunnable(tmpFolder), new Date(), INTERVAL);
   }
 
 }

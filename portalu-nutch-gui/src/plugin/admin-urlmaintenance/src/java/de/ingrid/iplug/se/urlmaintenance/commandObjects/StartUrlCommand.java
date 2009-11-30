@@ -11,11 +11,11 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IExcludeUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ILimitUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.ExcludeUrl;
+import de.ingrid.iplug.se.urlmaintenance.persistence.model.IdBase;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.LimitUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl;
 
-public class StartUrlCommand extends StartUrl implements
-    ICommandSerializer<StartUrl> {
+public class StartUrlCommand extends StartUrl implements ICommandSerializer<StartUrl> {
 
   private Long _id;
 
@@ -31,8 +31,7 @@ public class StartUrlCommand extends StartUrl implements
 
   private final IExcludeUrlDao _excludeUrlDao;
 
-  public StartUrlCommand(IStartUrlDao startUrlDao, ILimitUrlDao limitUrlDao,
-      IExcludeUrlDao excludeUrlDao) {
+  public StartUrlCommand(IStartUrlDao startUrlDao, ILimitUrlDao limitUrlDao, IExcludeUrlDao excludeUrlDao) {
     _startUrlDao = startUrlDao;
     _limitUrlDao = limitUrlDao;
     _excludeUrlDao = excludeUrlDao;
@@ -71,22 +70,22 @@ public class StartUrlCommand extends StartUrl implements
   }
 
   @Override
-  public void read(StartUrl in) {
-    setId(in.getId());
-    setProvider(in.getProvider());
-    setUrl(in.getUrl());
-    setCreated(in.getCreated());
-    setUpdated(in.getUpdated());
-    List<LimitUrl> limitUrls = in.getLimitUrls();
+  public void read(StartUrl startUrl) {
+    setId(startUrl.getId());
+    setProvider(startUrl.getProvider());
+    setUrl(startUrl.getUrl());
+    setCreated(startUrl.getCreated());
+    setUpdated(startUrl.getUpdated());
+    List<LimitUrl> limitUrls = startUrl.getLimitUrls();
+    _limitUrlCommands.clear();
     for (LimitUrl limitUrl : limitUrls) {
       LimitUrlCommand limitUrlCommand = new LimitUrlCommand(_limitUrlDao);
       limitUrlCommand.read(limitUrl);
       addLimitUrlCommand(limitUrlCommand);
     }
-    List<ExcludeUrl> excludeUrls = in.getExcludeUrls();
+    List<ExcludeUrl> excludeUrls = startUrl.getExcludeUrls();
     for (ExcludeUrl excludeUrl : excludeUrls) {
-      ExcludeUrlCommand excludeUrlCommand = new ExcludeUrlCommand(
-          _excludeUrlDao);
+      ExcludeUrlCommand excludeUrlCommand = new ExcludeUrlCommand(_excludeUrlDao);
       excludeUrlCommand.read(excludeUrl);
       addExcludeUrlCommand(excludeUrlCommand);
     }
@@ -136,11 +135,20 @@ public class StartUrlCommand extends StartUrl implements
 
     for (LimitUrlCommand limitUrlCommand : getLimitUrlCommands()) {
       LimitUrl limitUrl = limitUrlCommand.write();
-//      if (limitUrl.getId() == null) {
+      if (limitUrl.getId() == null || !containsEntity(out.getLimitUrls(), limitUrl.getId())) {
         LOG.info("add new limit url: " + limitUrl);
         out.addLimitUrl(limitUrl);
-//      }
+      }
     }
+  }
+
+  private boolean containsEntity(List<? extends IdBase> entityCommands, Long idToTest) {
+    for (IdBase idBase : entityCommands) {
+      if (idToTest.equals(idBase.getId())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private void handleExcludeUrls(StartUrl out) {
@@ -163,10 +171,10 @@ public class StartUrlCommand extends StartUrl implements
 
     for (ExcludeUrlCommand excludeUrlCommand : getExcludeUrlCommands()) {
       ExcludeUrl excludeUrl = excludeUrlCommand.write();
-//      if (excludeUrl.getId() == null) {
+      if (excludeUrl.getId() == null || !containsEntity(_excludeUrlCommands, excludeUrl.getId())) {
         LOG.info("add new exclude url: " + excludeUrl);
         out.addExcludeUrl(excludeUrl);
-//      }
+      }
     }
   }
 

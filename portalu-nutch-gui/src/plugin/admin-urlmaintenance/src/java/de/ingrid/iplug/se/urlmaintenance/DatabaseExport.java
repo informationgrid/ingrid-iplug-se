@@ -43,7 +43,7 @@ public class DatabaseExport {
     _limitUrlDao = limitUrlDao;
     _excludeUrlDao = excludeUrlDao;
   }
-
+  @Deprecated
   public void export(String urlType, File exportDir) throws IOException {
 
     exportDir = new File(exportDir, urlType);

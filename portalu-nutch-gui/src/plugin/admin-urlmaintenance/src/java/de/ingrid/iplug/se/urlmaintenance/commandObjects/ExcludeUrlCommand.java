@@ -9,8 +9,6 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.ExcludeUrl;
 public class ExcludeUrlCommand extends ExcludeUrl implements
     ICommandSerializer<ExcludeUrl> {
 
-  private Long _id;
-
   private final IExcludeUrlDao _excludeUrlDao;
 
   private static final Log LOG = LogFactory.getLog(ExcludeUrlCommand.class);
@@ -19,17 +17,8 @@ public class ExcludeUrlCommand extends ExcludeUrl implements
     _excludeUrlDao = excludeUrlDao;
   }
 
-  public Long getId() {
-    return _id;
-  }
-
-  public void setId(Long id) {
-    _id = id;
-  }
-
   @Override
   public void read(ExcludeUrl in) {
-    setId(in.getId());
     setProvider(in.getProvider());
     setUrl(in.getUrl());
     setCreated(in.getCreated());
@@ -48,10 +37,10 @@ public class ExcludeUrlCommand extends ExcludeUrl implements
     out.setCreated(getCreated());
     out.setUpdated(getUpdated());
 
-    if (out.getId() == null) {
+//    if (out.getId() == null) {
       LOG.info("save new exclude url: " + out);
       _excludeUrlDao.makePersistent(out);
-    }
+//    }
 
     return out;
   }

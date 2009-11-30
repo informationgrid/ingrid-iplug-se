@@ -53,7 +53,7 @@ public class UrlMaintenanceController extends NavigationSelector {
   @RequestMapping(method = RequestMethod.GET)
   public String urlMaintenance(HttpServletRequest httpRequest, Model model) {
     Principal userPrincipal = httpRequest.getUserPrincipal();
-    if (userPrincipal != null) {
+    if (userPrincipal != null && userPrincipal instanceof PortaluPrincipal) {
       List<Map<String, Serializable>> allPartnerWithProvider = ((PortaluPrincipal) userPrincipal).getAllPartnerWithProvider();
       if (allPartnerWithProvider != null && allPartnerWithProvider.size() > 0) {
         _syncService.syncDb(allPartnerWithProvider);

@@ -40,8 +40,8 @@ public class CreateStartUrlController extends NavigationSelector {
       @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand,
       @RequestParam(value = "id", required = false) Long id) {
     if (id != null) {
-      StartUrl byId = _startUrlDao.getById(id);
-      startUrlCommand.read(byId);
+      StartUrl startUrl = _startUrlDao.getById(id);
+      startUrlCommand.read(startUrl);
     }
     return "web/createStartUrl";
   }

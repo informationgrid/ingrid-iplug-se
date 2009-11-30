@@ -9,8 +9,6 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.LimitUrl;
 public class LimitUrlCommand extends LimitUrl implements
     ICommandSerializer<LimitUrl> {
 
-  private Long _id;
-
   private final ILimitUrlDao _limitUrlDao;
 
   private static final Log LOG = LogFactory.getLog(LimitUrlCommand.class);
@@ -19,17 +17,8 @@ public class LimitUrlCommand extends LimitUrl implements
     _limitUrlDao = limitUrlDao;
   }
 
-  public Long getId() {
-    return _id;
-  }
-
-  public void setId(Long id) {
-    _id = id;
-  }
-
   @Override
   public void read(LimitUrl in) {
-    setId(in.getId());
     setProvider(in.getProvider());
     setUrl(in.getUrl());
     setCreated(in.getCreated());
@@ -50,10 +39,10 @@ public class LimitUrlCommand extends LimitUrl implements
     out.setUpdated(getUpdated());
     out.setMetadatas(getMetadatas());
 
-    if (out.getId() == null) {
+//    if (out.getId() == null) {
       LOG.info("save new limit url: " + out);
       _limitUrlDao.makePersistent(out);
-    }
+//    }
 
     return out;
   }
