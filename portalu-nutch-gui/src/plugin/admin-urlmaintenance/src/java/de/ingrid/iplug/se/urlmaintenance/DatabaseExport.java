@@ -5,7 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,7 +27,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.LimitUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Url;
-
+// TODO rwe: clean up code!
 @Service
 public class DatabaseExport {
 
@@ -34,7 +36,8 @@ public class DatabaseExport {
   protected ILimitUrlDao _limitUrlDao;
   protected IExcludeUrlDao _excludeUrlDao;
   private static final Log LOG = LogFactory.getLog(DatabaseExport.class);
-
+  private static DatabaseExport _instance = null;
+  
   @Autowired
   public DatabaseExport(IStartUrlDao startUrlDao, ICatalogUrlDao catalogUrlDao,
       ILimitUrlDao limitUrlDao, IExcludeUrlDao excludeUrlDao) {
@@ -42,7 +45,13 @@ public class DatabaseExport {
     _catalogUrlDao = catalogUrlDao;
     _limitUrlDao = limitUrlDao;
     _excludeUrlDao = excludeUrlDao;
+    _instance = this;
   }
+  
+  public static DatabaseExport getInstance() {
+    return _instance;
+  }
+  
   @Deprecated
   public void export(String urlType, File exportDir) throws IOException {
 
@@ -83,6 +92,7 @@ public class DatabaseExport {
     }
   }
 
+  @Deprecated
   private void printMetadatas(File file, IDao<? extends Url> urlDao)
       throws FileNotFoundException {
     List<? extends Url> all = urlDao.getAll();
@@ -125,6 +135,7 @@ public class DatabaseExport {
 
   }
 
+  @Deprecated
   private void printUrls(File file, IDao<? extends Url> urlDao)
       throws FileNotFoundException {
     List<? extends Url> all = urlDao.getAll();
@@ -134,6 +145,71 @@ public class DatabaseExport {
       printWriter.println(urlString);
     }
     printWriter.close();
+  }
+
+  private Iterator<String> metadata2Iterator(IDao<? extends Url> urlDao) {
+    List<? extends Url> all = urlDao.getAll();
+    Collection<String> ret = new ArrayList<String>();
+    
+    for (Url url : all) {
+      List<Metadata> metadatas = null;
+      if (url instanceof LimitUrl) {
+        metadatas = ((LimitUrl) url).getMetadatas();
+      } else if (url instanceof CatalogUrl) {
+        metadatas = ((CatalogUrl) url).getMetadatas();
+      }
+      Provider provider = url.getProvider();
+      metadatas.add(new Metadata("partner", provider.getPartner().getName()));
+      metadatas.add(new Metadata("provider", provider.getName()));
+
+      String urlString = url.getUrl();
+      StringBuilder builder = new StringBuilder();
+      builder.append(urlString + "\t");
+      Map<String, List<String>> map = new HashMap<String, List<String>>();
+      for (Metadata metadata : metadatas) {
+        String metadataKey = metadata.getMetadataKey();
+        String metadataValue = metadata.getMetadataValue();
+        if (!map.containsKey(metadataKey)) {
+          map.put(metadataKey, new ArrayList<String>());
+        }
+//        List<String> list = map.get(metadataKey);       // TODO rwe: remove these two lines...
+//        list.add(metadataValue);
+      }
+      Set<String> keySet = map.keySet();
+      for (String key : keySet) {
+        builder.append(key + ":\t");
+        List<String> list = map.get(key);
+        for (String value : list) {
+          builder.append(value + "\t");
+        }
+      }
+      ret.add(builder.toString());
+    }
+    return ret.iterator();
+  }
+
+  public IDao<? extends Url> getStartUrlDao() {
+    return _startUrlDao;
+  }
+
+  public IDao<? extends Url> getLimitUrlDao() {
+    return _limitUrlDao;
+  }
+
+  public IDao<? extends Url> getExcludeUrlDao() {
+    return _excludeUrlDao;
+  }
+
+  public IDao<? extends Url> getCatalogUrlDao() {
+    return _catalogUrlDao;
+  }
+
+  public Iterator<String> getWebMetadataIterator() {
+    return metadata2Iterator(_limitUrlDao);
+  }
+
+  public Iterator<String> getCatalogMetadataIterator() {
+    return metadata2Iterator(_catalogUrlDao);
   }
 
 }

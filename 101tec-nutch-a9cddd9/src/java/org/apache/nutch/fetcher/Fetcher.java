@@ -797,7 +797,7 @@ public class Fetcher extends Configured implements
          * original URL. */ 
         if (parsing && status == CrawlDatum.STATUS_FETCH_SUCCESS) {
           try {
-            parseResult = this.parseUtil.parse(content);
+            parseResult = this.parseUtil.parse(content);// TODO rwe: append a ParseResultHandler behind the successive parsing.
           } catch (Exception e) {
             LOG.warn("Error parsing: " + key + ": " + StringUtils.stringifyException(e));
           }

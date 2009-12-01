@@ -22,7 +22,7 @@ import javax.persistence.OneToMany;
     @NamedQuery(name = "countByProvider", query = "select count(u) from StartUrl as u where u._provider._id = :id") })
 public class StartUrl extends WebUrl {
 
-  @OneToMany//(fetch = FetchType.EAGER) // TODO rwe: Do we really need an eager fetch?
+  @OneToMany
   @JoinColumn(name = "startUrl_fk")
   private List<LimitUrl> _limitUrls = new ArrayList<LimitUrl>();
 

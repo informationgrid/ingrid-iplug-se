@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.ingrid.iplug.se.urlmaintenance.DatabaseExport;
-
+// TODO rwe: remove this class
 @Service
 public class DatabaseExportService {
 
@@ -40,8 +40,7 @@ public class DatabaseExportService {
 
   }
 
-  private static final long INTERVAL = TimeUnit.MINUTES.toMillis(1L);// 1000 *
-                                                                     // 60 * 60;
+  private static final long INTERVAL = TimeUnit.HOURS.toMillis(1L);
 
   private final DatabaseExport _databaseExport;
 
