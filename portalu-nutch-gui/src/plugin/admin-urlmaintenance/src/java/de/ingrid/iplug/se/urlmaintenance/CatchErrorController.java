@@ -14,16 +14,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class CatchErrorController {
 
   @RequestMapping(value = "/error.html", method = RequestMethod.GET)
-  public String catchError(HttpServletRequest request, Model model) {
+  public String catchError(final HttpServletRequest request, final Model model) {
     System.out.println("CatchErrorController.catchError()");
-    Throwable ex = (Throwable) request
+    final Throwable ex = (Throwable) request
         .getAttribute("javax.servlet.error.exception");
     if (ex != null) {
-      ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-      PrintStream printStream = new PrintStream(outputStream);
+      final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+      final PrintStream printStream = new PrintStream(outputStream);
       ex.printStackTrace(printStream);
       printStream.flush();
-      byte[] byteArray = outputStream.toByteArray();
+      final byte[] byteArray = outputStream.toByteArray();
       model.addAttribute("message", new String(byteArray));
       printStream.close();
     }

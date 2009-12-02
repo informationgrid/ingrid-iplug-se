@@ -73,7 +73,7 @@
 					<div class="yui-navset">
 					    <ul class="yui-nav">
 					        <li class="selected"><a href="<%=request.getContextPath()%>/catalog/listTopicUrls.html"><em>Katalog Url's</em></a></li>
-					        <li><a href="listWebUrls.html"><em>Web Url's</em></a></li>
+					        <li><a href="<%=request.getContextPath()%>/web/listWebUrls.html"><em>Web Url's</em></a></li>
 					    </ul>            
 					</div>
 					<div id="subnav">
@@ -124,7 +124,7 @@
 											<a href="editCatalogUrl.html?id=${url.id}&type=measure">EDIT</a>
 							       			<a href="#" id="deleteCatalogUrl_${index.index}" 
 						       					onclick="document.getElementById('urlToDelete').innerHTML='${url.url}';document.getElementById('idToDelete').value='${url.id }'">DEL</a>
-							       			<a href="test.html?id=${url.id}">TEST</a>
+							       			<a href="<%=request.getContextPath()%>/test.html?id=${url.id}">TEST</a>
 										</td>
 									</tr>	
 								</c:forEach>

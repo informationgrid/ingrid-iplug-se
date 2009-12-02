@@ -79,8 +79,8 @@
 					<div id="subnav">
 						<ul>
 							<li class="selected"><a href="<%=request.getContextPath()%>/catalog/listTopicUrls.html">Themen</a></li>
-							<li><a href="listServiceUrls.html">Service</a></li>
-							<li><a href="listMeasureUrls.html">Messwerte</a></li>
+							<li><a href="<%=request.getContextPath()%>/catalog/listServiceUrls.html">Service</a></li>
+							<li><a href="<%=request.getContextPath()%>/catalog/listMeasureUrls.html">Messwerte</a></li>
 						</ul>
 					</div>
 					
@@ -134,7 +134,7 @@
 										<a href="<%=request.getContextPath()%>/catalog/editCatalogUrl.html?id=${url.id}&type=topics">EDIT</a>
 						       			<a href="#" id="deleteCatalogUrl_${index.index}" 
 						       				onclick="document.getElementById('urlToDelete').innerHTML='${url.url}';document.getElementById('idToDelete').value='${url.id }'">DEL</a>
-						       			<a href="test.html?id=${url.id}">TEST</a>
+						       			<a href="<%=request.getContextPath()%>/test.html?id=${url.id}">TEST</a>
 									</td>
 								</tr>	
 							</c:forEach>

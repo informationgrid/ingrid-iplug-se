@@ -163,7 +163,7 @@
 						       			<a href="editStartUrl.html?id=${url.id}">EDIT</a>
 						       			<a href="#" id="deleteWebUrl_${index.index}" 
 						       					onclick="document.getElementById('urlToDelete').innerHTML='${url.url}';document.getElementById('idToDelete').value='${url.id }'">DEL</a>
-						       			<a href="test.html?id=${url.id}">TEST</a>
+						       			<a href="<%=request.getContextPath()%>/test.html?id=${url.id}">TEST</a>
 						       		</td>
 					       		</tr>
 					       		<c:forEach var="limitUrl" items="${url.limitUrls}">
