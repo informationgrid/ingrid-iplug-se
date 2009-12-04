@@ -48,12 +48,10 @@ public class MetadataMerger extends Configured {
 
   public static final Log LOG = LogFactory.getLog(MetadataMerger.class);
 
-  public static class ObjectWritableMapper implements
-      Mapper<HostType, Writable, HostType, ObjectWritable> {
+  public static class ObjectWritableMapper implements Mapper<HostType, Writable, HostType, ObjectWritable> {
 
     @Override
-    public void map(HostType key, Writable value,
-        OutputCollector<HostType, ObjectWritable> collector, Reporter reporter)
+    public void map(HostType key, Writable value, OutputCollector<HostType, ObjectWritable> collector, Reporter reporter)
         throws IOException {
       ObjectWritable objectWritable = new ObjectWritable(value);
       collector.collect(key, objectWritable);
@@ -69,44 +67,47 @@ public class MetadataMerger extends Configured {
 
   }
 
-  public static class MetadataReducer implements
-      Reducer<HostType, ObjectWritable, HostType, ObjectWritable> {
+  public static class MetadataReducer implements Reducer<HostType, ObjectWritable, HostType, ObjectWritable> {
 
     private MetadataContainer _metadataContainer;
 
-    public void reduce(HostType key, Iterator<ObjectWritable> values,
-        OutputCollector<HostType, ObjectWritable> out, Reporter report)
-        throws IOException {
+    public void reduce(HostType key, Iterator<ObjectWritable> values, OutputCollector<HostType, ObjectWritable> out,
+        Reporter report) throws IOException {
 
       while (values.hasNext()) {
         ObjectWritable obj = (ObjectWritable) values.next();
         Object value = obj.get(); // unwrap
+
         if (value instanceof MetadataContainer) {
           _metadataContainer = (MetadataContainer) value;
           return;
         }
 
-        UrlParseDataContainer urlParseDataContainer = (UrlParseDataContainer) value;
-        Text url = urlParseDataContainer.getUrl();
-        ParseData parseData = urlParseDataContainer.getParseData();
-        Metadata metadataFromSegment = parseData.getParseMeta();
-        //
+        if (_metadataContainer != null) {
+          // for this HostType a MetadataContainer exists
+          UrlParseDataContainer urlParseDataContainer = (UrlParseDataContainer) value;
+          Text url = urlParseDataContainer.getUrl();
+          ParseData parseData = urlParseDataContainer.getParseData();
+          Metadata metadataFromSegment = parseData.getParseMeta();
 
-        for (Metadata metadata : _metadataContainer.getMetadatas()) {
-          String pattern = metadata.get("pattern");
-          if (url.toString().startsWith(pattern)) {
-            String[] names = metadata.names();
-            for (String name : names) {
-              String[] metadataValues = metadata.getValues(name);
-              for (String metadataValue : metadataValues) {
-                metadataFromSegment.add(name, metadataValue);
+          for (Metadata metadata : _metadataContainer.getMetadatas()) {
+            String pattern = metadata.get("pattern");
+            if (url.toString().startsWith(pattern)) {
+              String[] names = metadata.names();
+              for (String name : names) {
+                String[] metadataValues = metadata.getValues(name);
+                for (String metadataValue : metadataValues) {
+                  metadataFromSegment.add(name, metadataValue);
+                }
               }
             }
           }
+        } else {
+          // for this HostType no MetadataContainer exist
+          LOG.warn("No MetadataContainer found for: " + ((UrlParseDataContainer) value).getUrl());
         }
 
         out.collect(key, obj);
-
       }
     }
 
@@ -122,15 +123,17 @@ public class MetadataMerger extends Configured {
     super(conf);
   }
 
-  public void merge(Path metadataDb, Path wrappedParseData, Path out)
-      throws IOException {
+  public void merge(Path metadataDb, Path wrappedParseData, Path out) throws IOException {
     LOG.info("metadata update: merge started.");
     JobConf mergeJob = new NutchJob(getConf());
     mergeJob.setJobName("merging: " + metadataDb + " and " + wrappedParseData);
     mergeJob.setInputFormat(SequenceFileInputFormat.class);
 
+    Path metadataDbPath = new Path(metadataDb, "current");
+    // LOG.info("Merge job uses input pathes: '" + wrappedParseData + "' and '"
+    // + metadataDbPath + "'.");
     FileInputFormat.addInputPath(mergeJob, wrappedParseData);
-    FileInputFormat.addInputPath(mergeJob, new Path(metadataDb, "current"));
+    FileInputFormat.addInputPath(mergeJob, metadataDbPath);
     FileOutputFormat.setOutputPath(mergeJob, out);
     mergeJob.setMapperClass(ObjectWritableMapper.class);
     mergeJob.setReducerClass(MetadataReducer.class);
