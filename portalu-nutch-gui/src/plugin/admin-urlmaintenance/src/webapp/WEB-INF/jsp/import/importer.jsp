@@ -2,7 +2,7 @@
 <%@ include file="/WEB-INF/jsp/includes/include.jsp" %>
 <html>
 <head>
-    <title>Admin URL Pflege - URL Test</title>
+    <title>Admin URL Pflege - Importer</title>
     <link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/css/reset-fonts-grids.css" />
     <link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css">
     <script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
@@ -68,48 +68,57 @@
         <div id="bd">
             <div id="yui-main">
                 <div class="yui-b">
-                    <h3>URL Test</h3>    
+                    <h3>Importer</h3>
                     
                     <div class="yui-navset">
                         <ul class="yui-nav">
                             <li><a href="<%=request.getContextPath()%>/catalog/listTopicUrls.html"><em>Katalog Url's</em></a></li>
                             <li><a href="<%=request.getContextPath()%>/web/listWebUrls.html"><em>Web Url's</em></a></li>
-                            <li><a href="<%=request.getContextPath()%>/import/importer.html"><em>Importer</em></a></li>
+                            <li class="selected"><a href="<%=request.getContextPath()%>/import/importer.html"><em>Importer</em></a></li>
                         </ul>            
                     </div>
                     
-                    <br />
-
-                    <p>Testergebnisse der URL <b>${url}</b></p>
+                    <c:choose>
+                        <c:when test="${state == 'failed'}"><br /><div class="error"><b>Der Import ist fehlgeschlagen.</b></div></c:when>
+                        <c:when test="${state == 'succeed'}"><br /><div class="success"><b>Der Import ist gelungen.</b></div></c:when>
+                    </c:choose>
                     
-                    <fieldset>
-                        <legend>Ergebnisse</legend>
-                        <label>Status:</label>
-                        <b>${status}</b><br />
-                        <c:if test="${!empty error}">
-                            <label>Fehler:</label>
-                            <b>${error}</b><br />
-                        </c:if>
-                        <br />
-                        <c:if test="${!empty outlinks}">
-                            <label>Outlinks:</label>
-                            <ul style="display: inline-block">
-	                            <c:forEach items="${outlinks}" var="link">
-	                               <li>${link.toUrl}</li>
-	                            </c:forEach>
-	                        </ul><br />
-                        </c:if>
-                    </fieldset>
-                    
-                    <button onclick="history.back()">Zur&uuml;ck</button>
-
+                    <form:form action="importer.html" method="post" enctype="multipart/form-data" modelAttribute="uploadCommand">
+                        <fieldset>
+                            <legend>Import</legend>
+                            <row>
+	                            <label>Datei:</label>
+	                            <field>
+		                            <input name="file" type="file" value="" /><br />
+				                    <c:if test="${!empty errors}">
+				                        <div class="error">
+				                            <c:if test="${!empty errors['suffix.invalid']}">Die Datei muss entweder auf .csv oder .xml enden.<br /></c:if>
+				                            <c:if test="${!empty errors['contentType.invalid']}">Die Datei hat ungültigen Inhalt.<br /></c:if>
+				                            <c:if test="${!empty errors['size.invalid']}">Die Datei ist zu groß. (max. 3 MB)<br /></c:if>
+				                        </div>
+				                    </c:if>
+	                            </field>
+                            </row>
+                            <row>
+	                            <label>Typ</label>
+	                            <field>
+                                    <form:radiobutton path="type" value="CATALOG"/> Katalog URLs<br />
+                                    <form:radiobutton path="type" value="WEB"/> Web URLs
+                                    <c:if test="${!empty errors['type.empty']}">
+                                        <div class="error">Bitte wählen sie einen URL-Typ aus.</div>
+                                    </c:if>
+	                            </field>
+                            </row>
+                            <row>
+                                <label>&nbsp;</label>
+                                <field>
+                                    <input type="submit" value="Weiter"/>
+                                </field>
+                            </row>
+                        </fieldset>
+                    </form:form>
                 </div>
             </div>
         </div>
-        
-        <div id="ft">
-            <%@ include file="/WEB-INF/jsp/includes/footer.jsp" %>
-        </div>
     </div>
-</body>
-</html>
+</body></html>

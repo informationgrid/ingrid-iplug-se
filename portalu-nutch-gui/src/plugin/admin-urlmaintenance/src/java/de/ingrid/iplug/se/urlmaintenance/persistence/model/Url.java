@@ -38,11 +38,19 @@ public class Url extends IdBase {
   @ManyToMany(fetch = FetchType.EAGER)
   protected List<Metadata> _metadatas = new ArrayList<Metadata>();
 
+  public Url() {
+
+  }
+
+  public Url(final String url) {
+    _url = url;
+  }
+
   public String getUrl() {
     return _url;
   }
 
-  public void setUrl(String url) {
+  public void setUrl(final String url) {
     _url = url;
   }
 
@@ -50,7 +58,7 @@ public class Url extends IdBase {
     return _provider;
   }
 
-  public void setProvider(Provider provider) {
+  public void setProvider(final Provider provider) {
     _provider = provider;
   }
 
@@ -58,7 +66,7 @@ public class Url extends IdBase {
     return _created;
   }
 
-  public void setCreated(Date timeStamp) {
+  public void setCreated(final Date timeStamp) {
     _created = timeStamp;
   }
 
@@ -66,7 +74,7 @@ public class Url extends IdBase {
     return _updated;
   }
 
-  public void setUpdated(Date edited) {
+  public void setUpdated(final Date edited) {
     _updated = edited;
   }
 

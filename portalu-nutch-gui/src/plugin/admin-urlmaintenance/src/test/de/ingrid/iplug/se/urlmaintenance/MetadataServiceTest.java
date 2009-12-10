@@ -9,14 +9,14 @@ import de.ingrid.iplug.se.urlmaintenance.service.MetadataService;
 public class MetadataServiceTest extends TestCase {
 
   public void testGetLang() throws Exception {
-    MetadataService metadataService = new MetadataService();
-    List<Metadata> langs = metadataService.getLang();
+    final MetadataService metadataService = new MetadataService();
+    final List<Metadata> langs = metadataService.getLang();
     assertEquals(2, langs.size());
   }
-  
+
   public void testGetDatatypes() throws Exception {
-    MetadataService metadataService = new MetadataService();
-    List<Metadata> datatypes = metadataService.getDatatypes();
-    assertEquals(4, datatypes.size());
+    final MetadataService metadataService = new MetadataService();
+    final List<Metadata> datatypes = metadataService.getDatatypes();
+    assertEquals(5, datatypes.size());
   }
 }

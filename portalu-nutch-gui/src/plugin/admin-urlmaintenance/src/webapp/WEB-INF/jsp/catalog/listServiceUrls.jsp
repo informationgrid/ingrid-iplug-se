@@ -74,6 +74,7 @@
 					    <ul class="yui-nav">
 					        <li class="selected"><a href="<%=request.getContextPath()%>/catalog/listTopicUrls.html"><em>Katalog Url's</em></a></li>
 					        <li><a href="<%=request.getContextPath()%>/web/listWebUrls.html"><em>Web Url's</em></a></li>
+					        <li><a href="<%=request.getContextPath()%>/import/importer.html"><em>Importer</em></a></li>
 					    </ul>            
 					</div>
 					<div id="subnav">

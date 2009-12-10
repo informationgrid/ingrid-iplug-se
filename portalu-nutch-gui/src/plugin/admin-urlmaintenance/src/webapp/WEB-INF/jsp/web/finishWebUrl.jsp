@@ -64,8 +64,9 @@
 					
 					<div class="yui-navset">
 					    <ul class="yui-nav">
-					        <li><a href="listTopicUrls.html"><em>Katalog Url's</em></a></li>
-					        <li class="selected"><a href="listWebUrls.html"><em>Web Url's</em></a></li>
+					        <li><a href="<%=request.getContextPath()%>/catalog/listTopicUrls.html"><em>Katalog Url's</em></a></li>
+					        <li class="selected"><a href="<%=request.getContextPath()%>/web/listWebUrls.html"><em>Web Url's</em></a></li>
+					        <li><a href="<%=request.getContextPath()%>/import/importer.html"><em>Importer</em></a></li>
 					    </ul>            
 					</div>
 					
