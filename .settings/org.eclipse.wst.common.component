@@ -93,5 +93,10 @@
         <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/admin-system/src/java"/>
         <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/admin-scheduling/src/java"/>
         <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/java"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/test"/>
+        <wb-resource deploy-path="/" source-path="/portalu-nutch-gui/src/plugin/index-sns/src/java"/>
+        <wb-resource deploy-path="/" source-path="/portalu-nutch-gui/src/plugin/index-sns/src/test"/>
+        <wb-resource deploy-path="/" source-path="/portalu-nutch-gui/src/test"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/summary-basic/src/java"/>
 </wb-module>
 </project-modules>
