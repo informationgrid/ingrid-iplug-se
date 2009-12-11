@@ -104,7 +104,7 @@ public class MetadataMerger extends Configured {
           }
         } else {
           // for this HostType no MetadataContainer exist
-          LOG.warn("No MetadataContainer found for: " + ((UrlParseDataContainer) value).getUrl());
+          LOG.info("No MetadataContainer found for: " + ((UrlParseDataContainer) value).getUrl());
         }
 
         out.collect(key, obj);

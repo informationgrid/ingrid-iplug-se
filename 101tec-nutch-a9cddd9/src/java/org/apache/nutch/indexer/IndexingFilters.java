@@ -69,7 +69,7 @@ public class IndexingFilters {
           Extension extension = extensions[i];
           IndexingFilter filter = (IndexingFilter) extension
               .getExtensionInstance();
-          LOG.info("Adding " + filter.getClass().getName());
+          LOG.debug("Adding " + filter.getClass().getName());
           if (!filterMap.containsKey(filter.getClass().getName())) {
             filter.addIndexBackendOptions(conf);
             filterMap.put(filter.getClass().getName(), filter);
