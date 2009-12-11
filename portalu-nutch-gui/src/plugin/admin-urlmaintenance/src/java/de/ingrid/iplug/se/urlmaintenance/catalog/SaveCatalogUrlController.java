@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import de.ingrid.iplug.se.urlmaintenance.DatabaseExport;
 import de.ingrid.iplug.se.urlmaintenance.PartnerProviderCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.CatalogUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ICatalogUrlDao;
@@ -26,13 +27,15 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
 public class SaveCatalogUrlController extends NavigationSelector {
 
   private final ICatalogUrlDao _catalogUrlDao;
+  private final DatabaseExport _databaseExport;
 
   private static final Set<String> _supportedTypes = new HashSet<String>(Arrays
       .asList(new String[] { "topics", "service", "measure" }));
 
   @Autowired
-  public SaveCatalogUrlController(ICatalogUrlDao catalogUrlDao) {
+  public SaveCatalogUrlController(ICatalogUrlDao catalogUrlDao, DatabaseExport databaseExport) {
     _catalogUrlDao = catalogUrlDao;
+    _databaseExport = databaseExport;
   }
 
   @RequestMapping(value = "/catalog/saveCatalogUrl.html", method = RequestMethod.GET)
@@ -83,6 +86,9 @@ public class SaveCatalogUrlController extends NavigationSelector {
         redirectUrl = "redirect:/catalog/listMeasureUrls.html";
       }
     }
+    
+    _databaseExport.exportCatalogUrls();
+    
     return redirectUrl;
   }
 }

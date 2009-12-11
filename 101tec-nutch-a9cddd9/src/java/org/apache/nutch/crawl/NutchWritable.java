@@ -19,6 +19,8 @@ package org.apache.nutch.crawl;
 import org.apache.hadoop.io.Writable;
 import org.apache.nutch.util.GenericWritableConfigurable;
 
+import de.ingrid.iplug.se.crawl.sns.CompressedSnsData;
+
 public class NutchWritable extends GenericWritableConfigurable {
   
   private static Class<? extends Writable>[] CLASSES = null;
@@ -47,7 +49,10 @@ public class NutchWritable extends GenericWritableConfigurable {
       org.apache.nutch.protocol.ProtocolStatus.class,
       org.apache.nutch.searcher.Hit.class,
       org.apache.nutch.searcher.HitDetails.class,
-      org.apache.nutch.searcher.Hits.class
+      org.apache.nutch.searcher.Hits.class,
+      /// TODO rwe: none nutch specific code start:
+      CompressedSnsData.class
+      /// none nutch specific code end. 
     };
   }
 

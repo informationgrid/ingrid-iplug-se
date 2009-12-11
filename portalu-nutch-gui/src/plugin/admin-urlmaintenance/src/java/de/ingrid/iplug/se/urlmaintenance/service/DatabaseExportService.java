@@ -9,12 +9,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import de.ingrid.iplug.se.urlmaintenance.DatabaseExport;
 // TODO rwe: remove this class
-@Service
+//@Service
 public class DatabaseExportService {
 
   class ExportRunnable extends TimerTask {
@@ -44,7 +42,7 @@ public class DatabaseExportService {
 
   private final DatabaseExport _databaseExport;
 
-  @Autowired
+//  @Autowired
   public DatabaseExportService(DatabaseExport databaseExport) {
     _databaseExport = databaseExport;
     start();

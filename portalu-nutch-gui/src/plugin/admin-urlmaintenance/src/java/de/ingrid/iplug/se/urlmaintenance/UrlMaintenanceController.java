@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.io.StringWriter;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,6 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IProviderDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Partner;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 import de.ingrid.iplug.se.urlmaintenance.service.PartnerAndProviderDbSyncService;
-import edu.emory.mathcs.backport.java.util.Collections;
 
 @Controller
 @SessionAttributes("partnerProviderCommand")

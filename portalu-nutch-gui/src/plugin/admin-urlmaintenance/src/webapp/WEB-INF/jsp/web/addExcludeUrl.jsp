@@ -94,7 +94,7 @@
 									        <label>Exclude URL:</label>
 									        <field>
 									          <form:input path="excludeUrlCommands[${excludeUrlCounter}].url"/>
-									            <div class="error"><form:errors path="excludeUrlCommands[${excludeUrlCounter}].url" /></div>
+									            <form:errors path="excludeUrlCommands[${excludeUrlCounter}].url" cssClass="error" element="div"/>
 									        </field>
 									        <desc></desc>
 									    </row>

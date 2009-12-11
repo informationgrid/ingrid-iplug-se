@@ -1,0 +1,5042 @@
+Only in ./: .classpath
+Only in ./: .gitignore
+Only in ./: .project
+Only in ./: .settings
+diff -crBE ./bin/nutch ../local/bin/nutch
+*** ./bin/nutch	Wed Nov 18 07:56:50 2009
+--- ../local/bin/nutch	Fri Dec 11 22:31:05 2009
+***************
+*** 11,16 ****
+--- 11,19 ----
+  #
+  #   NUTCH_OPTS      Extra Java runtime options.
+  #
++ 
++ NUTCH_OPTS="-Dnutch.gui.theme=portal-u -DdeployMode=dev"
++ 
+  cygwin=false
+  case "`uname`" in
+  CYGWIN*) cygwin=true;;
+***************
+*** 148,153 ****
+--- 151,160 ----
+    CLASSPATH=${CLASSPATH}:$f;
+  done
+  
++ for f in $NUTCH_HOME/lib/ingrid-ext/*.jar; do
++   CLASSPATH=${CLASSPATH}:$f;
++ done
++ 
+  # cygwin path translation
+  if $cygwin; then
+    CLASSPATH=`cygpath -p -w "$CLASSPATH"`
+***************
+*** 255,259 ****
+  fi
+  
+  # run it
+! exec "$JAVA" $JAVA_HEAP_MAX $NUTCH_OPTS -classpath "$CLASSPATH" $CLASS "$@"
+  
+--- 262,268 ----
+  fi
+  
+  # run it
+! #exec "$JAVA" $JAVA_HEAP_MAX $NUTCH_OPTS -classpath "$CLASSPATH" $CLASS "$@"
+! # run it in debugging mode
+! exec "$JAVA" $JAVA_HEAP_MAX $NUTCH_OPTS -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=5000,server=y,suspend=n -classpath "$CLASSPATH" $CLASS "$@"
+  
+diff -crBE ./build.xml ../local/build.xml
+*** ./build.xml	Wed Nov 18 07:56:50 2009
+--- ../local/build.xml	Fri Dec 11 22:31:05 2009
+***************
+*** 33,38 ****
+--- 33,41 ----
+    	<fileset dir="${lib.dir}/admin-ui-ext">
+    		<include name="*.jar" />
+    	</fileset>  	
++   	<fileset dir="${lib.dir}/ingrid-ext">
++   		<include name="*.jar" />
++   	</fileset>  	
+    </path>
+  
+    <!-- the unit test classpath -->
+***************
+*** 101,107 ****
+      <javac 
+       encoding="${build.encoding}" 
+       srcdir="${src.dir}"
+!      includes="org/apache/nutch/**/*.java"
+       destdir="${build.classes}"
+       debug="${javac.debug}"
+       optimize="${javac.optimize}"
+--- 104,110 ----
+      <javac 
+       encoding="${build.encoding}" 
+       srcdir="${src.dir}"
+!      includes="**/*.java"
+       destdir="${build.classes}"
+       debug="${javac.debug}"
+       optimize="${javac.optimize}"
+***************
+*** 531,542 ****
+    <!-- ================================================================== -->
+    <!--                                                                    -->
+    <!-- ================================================================== -->
+!   <target name="package" depends="jar, job, war, javadoc">
+      <mkdir dir="${dist.dir}"/>
+      <mkdir dir="${dist.dir}/lib"/>
+      <mkdir dir="${dist.dir}/bin"/>
+-     <mkdir dir="${dist.dir}/docs"/>
+-     <mkdir dir="${dist.dir}/docs/api"/>
+      <mkdir dir="${dist.dir}/plugins"/>
+  
+      <copy todir="${dist.dir}/lib" includeEmptyDirs="false">
+--- 534,543 ----
+    <!-- ================================================================== -->
+    <!--                                                                    -->
+    <!-- ================================================================== -->
+!   <target name="package" depends="jar, job">
+      <mkdir dir="${dist.dir}"/>
+      <mkdir dir="${dist.dir}/lib"/>
+      <mkdir dir="${dist.dir}/bin"/>
+      <mkdir dir="${dist.dir}/plugins"/>
+  
+      <copy todir="${dist.dir}/lib" includeEmptyDirs="false">
+***************
+*** 553,559 ****
+  
+      <copy file="${build.dir}/${final.name}.jar" todir="${dist.dir}"/>
+      <copy file="${build.dir}/${final.name}.job" todir="${dist.dir}"/>
+-     <copy file="${build.dir}/${final.name}.war" todir="${dist.dir}"/>
+  
+      <copy todir="${dist.dir}/bin">
+        <fileset dir="bin"/>
+--- 554,559 ----
+***************
+*** 567,580 ****
+          <fileset dir="${dist.dir}/bin"/>
+      </chmod>
+  
+-     <copy todir="${dist.dir}/docs">
+-       <fileset dir="${docs.dir}"/>
+-     </copy>
+- 
+-     <copy todir="${dist.dir}/docs/api">
+-       <fileset dir="${build.javadoc}"/>
+-     </copy>
+- 
+      <copy todir="${dist.dir}">
+        <fileset dir=".">
+          <include name="*.txt" />
+--- 567,572 ----
+***************
+*** 582,593 ****
+        </fileset>
+      </copy>
+  
+-     <copy todir="${dist.dir}/src" includeEmptyDirs="true">
+-       <fileset dir="src"/>
+-     </copy>
+- 
+      <copy todir="${dist.dir}/" file="build.xml"/>
+      <copy todir="${dist.dir}/" file="default.properties"/>
+  
+    </target>
+  
+--- 574,583 ----
+        </fileset>
+      </copy>
+  
+      <copy todir="${dist.dir}/" file="build.xml"/>
+      <copy todir="${dist.dir}/" file="default.properties"/>
++   	<copy todir="${dist.dir}/" file="start-search.sh"/>
++   	<copy todir="${dist.dir}/" file="start-index.sh"/>
+  
+    </target>
+  
+diff -crBE ./conf/log4j.properties ../local/conf/log4j.properties
+*** ./conf/log4j.properties	Wed Nov 18 07:56:50 2009
+--- ../local/conf/log4j.properties	Fri Dec 11 22:31:04 2009
+***************
+*** 3,33 ****
+  hadoop.log.file=hadoop.log
+  
+  # RootLogger - DailyRollingFileAppender
+! log4j.rootLogger=INFO,DRFA
+  
+  # Logging Threshold
+  log4j.threshhold=ALL
+  
+  #special logging requirements for some commandline tools
+! log4j.logger.org.apache.nutch.crawl.Crawl=INFO,cmdstdout
+! log4j.logger.org.apache.nutch.crawl.Injector=INFO,cmdstdout
+! log4j.logger.org.apache.nutch.crawl.Generator=INFO,cmdstdout
+! log4j.logger.org.apache.nutch.fetcher.Fetcher=INFO,cmdstdout
+! log4j.logger.org.apache.nutch.parse.ParseSegment=INFO,cmdstdout
+! log4j.logger.org.apache.nutch.crawl.CrawlDbReader=INFO,cmdstdout
+! log4j.logger.org.apache.nutch.crawl.CrawlDbMerger=INFO,cmdstdout
+! log4j.logger.org.apache.nutch.crawl.LinkDbReader=INFO,cmdstdout
+! log4j.logger.org.apache.nutch.segment.SegmentReader=INFO,cmdstdout
+! log4j.logger.org.apache.nutch.segment.SegmentMerger=INFO,cmdstdout
+! log4j.logger.org.apache.nutch.crawl.CrawlDb=INFO,cmdstdout
+! log4j.logger.org.apache.nutch.crawl.LinkDb=INFO,cmdstdout
+! log4j.logger.org.apache.nutch.crawl.LinkDbMerger=INFO,cmdstdout
+! log4j.logger.org.apache.nutch.indexer.Indexer=INFO,cmdstdout
+! log4j.logger.org.apache.nutch.indexer.DeleteDuplicates=INFO,cmdstdout
+! log4j.logger.org.apache.nutch.indexer.IndexMerger=INFO,cmdstdout
+  
+! log4j.logger.org.apache.nutch=INFO
+  log4j.logger.org.apache.hadoop=WARN
+  
+  #
+  # Daily Rolling File Appender
+--- 3,35 ----
+  hadoop.log.file=hadoop.log
+  
+  # RootLogger - DailyRollingFileAppender
+! log4j.rootLogger=INFO,DRFA,stdout
+  
+  # Logging Threshold
+  log4j.threshhold=ALL
+  
+  #special logging requirements for some commandline tools
+! #log4j.logger.org.apache.nutch.crawl.Crawl=INFO,cmdstdout
+! #log4j.logger.org.apache.nutch.crawl.Injector=INFO,cmdstdout
+! #log4j.logger.org.apache.nutch.crawl.Generator=INFO,cmdstdout
+! #log4j.logger.org.apache.nutch.fetcher.Fetcher=INFO,cmdstdout
+! #log4j.logger.org.apache.nutch.parse.ParseSegment=INFO,cmdstdout
+! #log4j.logger.org.apache.nutch.crawl.CrawlDbReader=INFO,cmdstdout
+! #log4j.logger.org.apache.nutch.crawl.CrawlDbMerger=INFO,cmdstdout
+! #log4j.logger.org.apache.nutch.crawl.LinkDbReader=INFO,cmdstdout
+! #log4j.logger.org.apache.nutch.segment.SegmentReader=INFO,cmdstdout
+! #log4j.logger.org.apache.nutch.segment.SegmentMerger=INFO,cmdstdout
+! #log4j.logger.org.apache.nutch.crawl.CrawlDb=INFO,cmdstdout
+! #log4j.logger.org.apache.nutch.crawl.LinkDb=INFO,cmdstdout
+! #log4j.logger.org.apache.nutch.crawl.LinkDbMerger=INFO,cmdstdout
+! #log4j.logger.org.apache.nutch.indexer.Indexer=INFO,cmdstdout
+! #log4j.logger.org.apache.nutch.indexer.DeleteDuplicates=INFO,cmdstdout
+! #log4j.logger.org.apache.nutch.indexer.IndexMerger=INFO,cmdstdout
+  
+! #log4j.logger.org.apache.nutch=INFO
+! log4j.logger.org.apache.nutch.plugin=WARN
+  log4j.logger.org.apache.hadoop=WARN
++ log4j.logger.de.ingrid=INFO
+  
+  #
+  # Daily Rolling File Appender
+***************
+*** 56,62 ****
+  
+  log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+  log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+! log4j.appender.stdout.layout.ConversionPattern=%d{ISO8601} %-5p %c{2} (%F:%M(%L)) - %m%n
+  
+  #
+  # plain layout used for commandline tools to output to console
+--- 58,64 ----
+  
+  log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+  log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+! log4j.appender.stdout.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %5p [%t] (%F:%L) - %m%n
+  
+  #
+  # plain layout used for commandline tools to output to console
+diff -crBE ./conf/nutch-default.xml ../local/conf/nutch-default.xml
+*** ./conf/nutch-default.xml	Wed Nov 18 07:56:50 2009
+--- ../local/conf/nutch-default.xml	Fri Dec 11 22:31:04 2009
+***************
+*** 681,686 ****
+--- 681,693 ----
+    </description>
+  </property>
+  
++ <property>
++   <name>index.sns</name>
++   <value>true</value>
++   <description>If true, then the Index-Sns Plugin are index with sns dates. Otherwise, without sns dates.
++   </description>
++ </property>
++ 
+  <!-- indexingfilter plugin properties -->
+  
+  <property>
+Only in ../local/conf: regex-normalize.xml
+Only in ../local/conf: regex-urlfilter.txt
+diff -crBE ./default.properties ../local/default.properties
+*** ./default.properties	Wed Nov 18 07:56:50 2009
+--- ../local/default.properties	Fri Dec 11 22:31:05 2009
+***************
+*** 19,25 ****
+  build.plugins = ${build.dir}/plugins
+  build.docs = ${build.dir}/docs
+  build.javadoc = ${build.docs}/api
+! build.encoding = UTF-8
+  
+  test.src.dir = ./src/test
+  test.build.dir = ${build.dir}/test
+--- 19,26 ----
+  build.plugins = ${build.dir}/plugins
+  build.docs = ${build.dir}/docs
+  build.javadoc = ${build.docs}/api
+! #build.encoding = UTF-8
+! build.encoding = MacRoman
+  
+  test.src.dir = ./src/test
+  test.build.dir = ${build.dir}/test
+diff -crBE ./src/java/org/apache/nutch/admin/security/NutchGuiRealm.java ../local/src/java/org/apache/nutch/admin/security/NutchGuiRealm.java
+*** ./src/java/org/apache/nutch/admin/security/NutchGuiRealm.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/admin/security/NutchGuiRealm.java	Fri Dec 11 22:31:05 2009
+***************
+*** 91,97 ****
+            LOG.info("principal has logged in: " + principal);
+          }
+        } catch (LoginException e) {
+!         LOG.error("login error for user: " + userName);
+        }
+      }
+      if (principal == null) {
+--- 91,97 ----
+            LOG.info("principal has logged in: " + principal);
+          }
+        } catch (LoginException e) {
+!         LOG.error("login error for user: " + userName, e);
+        }
+      }
+      if (principal == null) {
+diff -crBE ./src/java/org/apache/nutch/analysis/AnalyzerFactory.java ../local/src/java/org/apache/nutch/analysis/AnalyzerFactory.java
+*** ./src/java/org/apache/nutch/analysis/AnalyzerFactory.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/analysis/AnalyzerFactory.java	Fri Dec 11 22:31:04 2009
+***************
+*** 19,32 ****
+  // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! 
+! // Nutch imports
+  import org.apache.nutch.plugin.Extension;
+  import org.apache.nutch.plugin.ExtensionPoint;
+- import org.apache.nutch.plugin.PluginRuntimeException;
+  import org.apache.nutch.plugin.PluginRepository;
+  import org.apache.nutch.util.ObjectCache;
+- import org.apache.hadoop.conf.Configuration;
+  
+  
+  /**
+--- 19,30 ----
+  // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! import org.apache.hadoop.conf.Configuration;
+  import org.apache.nutch.plugin.Extension;
+  import org.apache.nutch.plugin.ExtensionPoint;
+  import org.apache.nutch.plugin.PluginRepository;
++ import org.apache.nutch.plugin.PluginRuntimeException;
+  import org.apache.nutch.util.ObjectCache;
+  
+  
+  /**
+diff -crBE ./src/java/org/apache/nutch/analysis/CommonGrams.java ../local/src/java/org/apache/nutch/analysis/CommonGrams.java
+*** ./src/java/org/apache/nutch/analysis/CommonGrams.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/analysis/CommonGrams.java	Fri Dec 11 22:31:04 2009
+***************
+*** 17,37 ****
+  
+  package org.apache.nutch.analysis;
+  
+! import org.apache.lucene.analysis.TokenFilter;
+! import org.apache.lucene.analysis.TokenStream;
+! import org.apache.lucene.analysis.Token;
+! 
+! import java.io.*;
+! import java.util.*;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! 
+! import org.apache.hadoop.conf.*;
+  import org.apache.nutch.util.NutchConfiguration;
+  import org.apache.nutch.util.ObjectCache;
+- import org.apache.nutch.searcher.Query.*;
+  
+  /** Construct n-grams for frequently occuring terms and phrases while indexing.
+   * Optimize phrase queries to use the n-grams. Single terms are still indexed
+--- 17,42 ----
+  
+  package org.apache.nutch.analysis;
+  
+! import java.io.BufferedReader;
+! import java.io.IOException;
+! import java.io.Reader;
+! import java.io.StringReader;
+! import java.util.ArrayList;
+! import java.util.HashMap;
+! import java.util.HashSet;
+! import java.util.LinkedList;
+! import java.util.ListIterator;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! import org.apache.hadoop.conf.Configuration;
+! import org.apache.lucene.analysis.Token;
+! import org.apache.lucene.analysis.TokenFilter;
+! import org.apache.lucene.analysis.TokenStream;
+! import org.apache.nutch.searcher.Query.Phrase;
+! import org.apache.nutch.searcher.Query.Term;
+  import org.apache.nutch.util.NutchConfiguration;
+  import org.apache.nutch.util.ObjectCache;
+  
+  /** Construct n-grams for frequently occuring terms and phrases while indexing.
+   * Optimize phrase queries to use the n-grams. Single terms are still indexed
+diff -crBE ./src/java/org/apache/nutch/analysis/FastCharStream.java ../local/src/java/org/apache/nutch/analysis/FastCharStream.java
+*** ./src/java/org/apache/nutch/analysis/FastCharStream.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/analysis/FastCharStream.java	Fri Dec 11 22:31:04 2009
+***************
+*** 17,23 ****
+  
+  package org.apache.nutch.analysis;
+  
+! import java.io.*;
+  
+  /** An efficient implementation of JavaCC's CharStream interface.  <p>Note that
+   * this does not do line-number counting, but instead keeps track of the
+--- 17,24 ----
+  
+  package org.apache.nutch.analysis;
+  
+! import java.io.IOException;
+! import java.io.Reader;
+  
+  /** An efficient implementation of JavaCC's CharStream interface.  <p>Note that
+   * this does not do line-number counting, but instead keeps track of the
+diff -crBE ./src/java/org/apache/nutch/analysis/NutchAnalysis.java ../local/src/java/org/apache/nutch/analysis/NutchAnalysis.java
+*** ./src/java/org/apache/nutch/analysis/NutchAnalysis.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/analysis/NutchAnalysis.java	Fri Dec 11 22:31:04 2009
+***************
+*** 1,18 ****
+  /* Generated By:JavaCC: Do not edit this line. NutchAnalysis.java */
+  package org.apache.nutch.analysis;
+  
+  import java.io.StringReader;
+  import org.apache.hadoop.conf.Configuration;
+  import org.apache.nutch.searcher.Query;
+  import org.apache.nutch.searcher.QueryFilters;
+  import org.apache.nutch.searcher.Query.Clause;
+  import org.apache.nutch.util.NutchConfiguration;
+- import org.apache.lucene.analysis.Analyzer;
+- import org.apache.lucene.analysis.StopFilter;
+- import org.apache.lucene.analysis.TokenStream;
+- 
+- import java.io.*;
+- import java.util.*;
+  
+  /** The JavaCC-generated Nutch lexical analyzer and query parser. */
+  public class NutchAnalysis implements NutchAnalysisConstants {
+--- 1,21 ----
+  /* Generated By:JavaCC: Do not edit this line. NutchAnalysis.java */
+  package org.apache.nutch.analysis;
+  
++ import java.io.BufferedReader;
++ import java.io.IOException;
++ import java.io.InputStreamReader;
+  import java.io.StringReader;
++ import java.util.ArrayList;
++ import java.util.Set;
++ 
+  import org.apache.hadoop.conf.Configuration;
++ import org.apache.lucene.analysis.Analyzer;
++ import org.apache.lucene.analysis.StopFilter;
++ import org.apache.lucene.analysis.TokenStream;
+  import org.apache.nutch.searcher.Query;
+  import org.apache.nutch.searcher.QueryFilters;
+  import org.apache.nutch.searcher.Query.Clause;
+  import org.apache.nutch.util.NutchConfiguration;
+  
+  /** The JavaCC-generated Nutch lexical analyzer and query parser. */
+  public class NutchAnalysis implements NutchAnalysisConstants {
+diff -crBE ./src/java/org/apache/nutch/analysis/NutchAnalysisTokenManager.java ../local/src/java/org/apache/nutch/analysis/NutchAnalysisTokenManager.java
+*** ./src/java/org/apache/nutch/analysis/NutchAnalysisTokenManager.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/analysis/NutchAnalysisTokenManager.java	Fri Dec 11 22:31:04 2009
+***************
+*** 1,7 ****
+  /* Generated By:JavaCC: Do not edit this line. NutchAnalysisTokenManager.java */
+  package org.apache.nutch.analysis;
+  
+! import java.io.*;
+  
+  public class NutchAnalysisTokenManager implements NutchAnalysisConstants
+  {
+--- 1,7 ----
+  /* Generated By:JavaCC: Do not edit this line. NutchAnalysisTokenManager.java */
+  package org.apache.nutch.analysis;
+  
+! import java.io.Reader;
+  
+  public class NutchAnalysisTokenManager implements NutchAnalysisConstants
+  {
+diff -crBE ./src/java/org/apache/nutch/analysis/NutchAnalyzer.java ../local/src/java/org/apache/nutch/analysis/NutchAnalyzer.java
+*** ./src/java/org/apache/nutch/analysis/NutchAnalyzer.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/analysis/NutchAnalyzer.java	Fri Dec 11 22:31:04 2009
+***************
+*** 19,33 ****
+  // JDK imports
+  import java.io.Reader;
+  
+- // Lucene imports
+- import org.apache.lucene.analysis.Analyzer;
+- import org.apache.lucene.analysis.TokenStream;
+- 
+- // Hadoop imports
+  import org.apache.hadoop.conf.Configurable;
+  import org.apache.hadoop.conf.Configuration;
+! 
+! // Nutch imports
+  import org.apache.nutch.plugin.Pluggable;
+  
+  
+--- 19,28 ----
+  // JDK imports
+  import java.io.Reader;
+  
+  import org.apache.hadoop.conf.Configurable;
+  import org.apache.hadoop.conf.Configuration;
+! import org.apache.lucene.analysis.Analyzer;
+! import org.apache.lucene.analysis.TokenStream;
+  import org.apache.nutch.plugin.Pluggable;
+  
+  
+diff -crBE ./src/java/org/apache/nutch/analysis/NutchDocumentAnalyzer.java ../local/src/java/org/apache/nutch/analysis/NutchDocumentAnalyzer.java
+*** ./src/java/org/apache/nutch/analysis/NutchDocumentAnalyzer.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/analysis/NutchDocumentAnalyzer.java	Fri Dec 11 22:31:05 2009
+***************
+*** 17,31 ****
+  package org.apache.nutch.analysis;
+  
+  // JDK imports
+- import java.io.Reader;
+  import java.io.IOException;
+  
+! // Lucene imports
+  import org.apache.lucene.analysis.Analyzer;
+  import org.apache.lucene.analysis.TokenFilter;
+  import org.apache.lucene.analysis.TokenStream;
+- import org.apache.lucene.analysis.Token;
+- import org.apache.hadoop.conf.Configuration;
+  
+  /**
+   * The analyzer used for Nutch documents. Uses the JavaCC-defined lexical
+--- 17,30 ----
+  package org.apache.nutch.analysis;
+  
+  // JDK imports
+  import java.io.IOException;
++ import java.io.Reader;
+  
+! import org.apache.hadoop.conf.Configuration;
+  import org.apache.lucene.analysis.Analyzer;
++ import org.apache.lucene.analysis.Token;
+  import org.apache.lucene.analysis.TokenFilter;
+  import org.apache.lucene.analysis.TokenStream;
+  
+  /**
+   * The analyzer used for Nutch documents. Uses the JavaCC-defined lexical
+diff -crBE ./src/java/org/apache/nutch/analysis/NutchDocumentTokenizer.java ../local/src/java/org/apache/nutch/analysis/NutchDocumentTokenizer.java
+*** ./src/java/org/apache/nutch/analysis/NutchDocumentTokenizer.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/analysis/NutchDocumentTokenizer.java	Fri Dec 11 22:31:04 2009
+***************
+*** 17,26 ****
+  
+  package org.apache.nutch.analysis;
+  
+! import java.io.*;
+  
+- import org.apache.lucene.analysis.Tokenizer;
+  import org.apache.lucene.analysis.Token;
+  
+  /** The tokenizer used for Nutch document text.  Implemented in terms of our
+   * JavaCC-generated lexical analyzer, {@link NutchAnalysisTokenManager}, shared
+--- 17,30 ----
+  
+  package org.apache.nutch.analysis;
+  
+! import java.io.BufferedReader;
+! import java.io.IOException;
+! import java.io.InputStreamReader;
+! import java.io.Reader;
+! import java.io.StringReader;
+  
+  import org.apache.lucene.analysis.Token;
++ import org.apache.lucene.analysis.Tokenizer;
+  
+  /** The tokenizer used for Nutch document text.  Implemented in terms of our
+   * JavaCC-generated lexical analyzer, {@link NutchAnalysisTokenManager}, shared
+diff -crBE ./src/java/org/apache/nutch/clustering/OnlineClustererFactory.java ../local/src/java/org/apache/nutch/clustering/OnlineClustererFactory.java
+*** ./src/java/org/apache/nutch/clustering/OnlineClustererFactory.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/clustering/OnlineClustererFactory.java	Fri Dec 11 22:31:05 2009
+***************
+*** 20,28 ****
+  // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+- 
+- import org.apache.nutch.plugin.*;
+  import org.apache.hadoop.conf.Configuration;
+  
+  /**
+   * A factory for retrieving {@link OnlineClusterer} extensions.
+--- 20,30 ----
+  // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.hadoop.conf.Configuration;
++ import org.apache.nutch.plugin.Extension;
++ import org.apache.nutch.plugin.ExtensionPoint;
++ import org.apache.nutch.plugin.PluginRepository;
++ import org.apache.nutch.plugin.PluginRuntimeException;
+  
+  /**
+   * A factory for retrieving {@link OnlineClusterer} extensions.
+diff -crBE ./src/java/org/apache/nutch/crawl/AbstractFetchSchedule.java ../local/src/java/org/apache/nutch/crawl/AbstractFetchSchedule.java
+*** ./src/java/org/apache/nutch/crawl/AbstractFetchSchedule.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/crawl/AbstractFetchSchedule.java	Fri Dec 11 22:31:05 2009
+***************
+*** 22,28 ****
+  import org.apache.hadoop.conf.Configuration;
+  import org.apache.hadoop.conf.Configured;
+  import org.apache.hadoop.io.Text;
+- import org.apache.nutch.crawl.CrawlDatum;
+  
+  /**
+   * This class provides common methods for implementations of
+--- 22,27 ----
+diff -crBE ./src/java/org/apache/nutch/crawl/AdaptiveFetchSchedule.java ../local/src/java/org/apache/nutch/crawl/AdaptiveFetchSchedule.java
+*** ./src/java/org/apache/nutch/crawl/AdaptiveFetchSchedule.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/crawl/AdaptiveFetchSchedule.java	Fri Dec 11 22:31:05 2009
+***************
+*** 19,25 ****
+  
+  import org.apache.hadoop.conf.Configuration;
+  import org.apache.hadoop.io.Text;
+- import org.apache.nutch.crawl.CrawlDatum;
+  import org.apache.nutch.util.NutchConfiguration;
+  
+  /**
+--- 19,24 ----
+diff -crBE ./src/java/org/apache/nutch/crawl/Crawl.java ../local/src/java/org/apache/nutch/crawl/Crawl.java
+*** ./src/java/org/apache/nutch/crawl/Crawl.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/crawl/Crawl.java	Fri Dec 11 22:31:04 2009
+***************
+*** 17,42 ****
+  
+  package org.apache.nutch.crawl;
+  
+! import java.util.*;
+! import java.text.*;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! 
+! import org.apache.hadoop.fs.*;
+! import org.apache.hadoop.conf.*;
+! import org.apache.hadoop.mapred.*;
+! import org.apache.nutch.parse.ParseSegment;
+  import org.apache.nutch.indexer.DeleteDuplicates;
+  import org.apache.nutch.indexer.IndexMerger;
+  import org.apache.nutch.indexer.Indexer;
+  import org.apache.nutch.util.HadoopFSUtil;
+  import org.apache.nutch.util.NutchConfiguration;
+  import org.apache.nutch.util.NutchJob;
+  
+- import org.apache.nutch.fetcher.Fetcher;
+- 
+  public class Crawl {
+    public static final Log LOG = LogFactory.getLog(Crawl.class);
+  
+--- 17,42 ----
+  
+  package org.apache.nutch.crawl;
+  
+! import java.text.SimpleDateFormat;
+! import java.util.Arrays;
+! import java.util.Date;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! import org.apache.hadoop.conf.Configuration;
+! import org.apache.hadoop.fs.FileStatus;
+! import org.apache.hadoop.fs.FileSystem;
+! import org.apache.hadoop.fs.Path;
+! import org.apache.hadoop.mapred.JobConf;
+! import org.apache.nutch.fetcher.Fetcher;
+  import org.apache.nutch.indexer.DeleteDuplicates;
+  import org.apache.nutch.indexer.IndexMerger;
+  import org.apache.nutch.indexer.Indexer;
++ import org.apache.nutch.parse.ParseSegment;
+  import org.apache.nutch.util.HadoopFSUtil;
+  import org.apache.nutch.util.NutchConfiguration;
+  import org.apache.nutch.util.NutchJob;
+  
+  public class Crawl {
+    public static final Log LOG = LogFactory.getLog(Crawl.class);
+  
+diff -crBE ./src/java/org/apache/nutch/crawl/CrawlDatum.java ../local/src/java/org/apache/nutch/crawl/CrawlDatum.java
+*** ./src/java/org/apache/nutch/crawl/CrawlDatum.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/crawl/CrawlDatum.java	Fri Dec 11 22:31:04 2009
+***************
+*** 17,28 ****
+  
+  package org.apache.nutch.crawl;
+  
+! import java.io.*;
+! import java.util.*;
+  import java.util.Map.Entry;
+  
+! import org.apache.hadoop.io.*;
+! import org.apache.nutch.util.*;
+  
+  /* The crawl state of a url. */
+  public class CrawlDatum implements WritableComparable<CrawlDatum>, Cloneable {
+--- 17,35 ----
+  
+  package org.apache.nutch.crawl;
+  
+! import java.io.DataInput;
+! import java.io.DataOutput;
+! import java.io.IOException;
+! import java.util.Date;
+! import java.util.HashMap;
+! import java.util.HashSet;
+  import java.util.Map.Entry;
+  
+! import org.apache.hadoop.io.VersionMismatchException;
+! import org.apache.hadoop.io.Writable;
+! import org.apache.hadoop.io.WritableComparable;
+! import org.apache.hadoop.io.WritableComparator;
+! import org.apache.nutch.util.StringUtil;
+  
+  /* The crawl state of a url. */
+  public class CrawlDatum implements WritableComparable<CrawlDatum>, Cloneable {
+diff -crBE ./src/java/org/apache/nutch/crawl/CrawlDb.java ../local/src/java/org/apache/nutch/crawl/CrawlDb.java
+*** ./src/java/org/apache/nutch/crawl/CrawlDb.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/crawl/CrawlDb.java	Fri Dec 11 22:31:04 2009
+***************
+*** 17,35 ****
+  
+  package org.apache.nutch.crawl;
+  
+! import java.io.*;
+! import java.util.*;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! 
+! import org.apache.hadoop.io.*;
+! import org.apache.hadoop.fs.*;
+! import org.apache.hadoop.conf.*;
+! import org.apache.hadoop.mapred.*;
+! import org.apache.hadoop.util.*;
+! 
+  import org.apache.nutch.util.HadoopFSUtil;
+  import org.apache.nutch.util.LockUtil;
+  import org.apache.nutch.util.NutchConfiguration;
+--- 17,44 ----
+  
+  package org.apache.nutch.crawl;
+  
+! import java.io.IOException;
+! import java.util.Arrays;
+! import java.util.HashSet;
+! import java.util.Random;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! import org.apache.hadoop.conf.Configuration;
+! import org.apache.hadoop.conf.Configured;
+! import org.apache.hadoop.fs.FileStatus;
+! import org.apache.hadoop.fs.FileSystem;
+! import org.apache.hadoop.fs.Path;
+! import org.apache.hadoop.io.Text;
+! import org.apache.hadoop.mapred.FileInputFormat;
+! import org.apache.hadoop.mapred.FileOutputFormat;
+! import org.apache.hadoop.mapred.JobClient;
+! import org.apache.hadoop.mapred.JobConf;
+! import org.apache.hadoop.mapred.MapFileOutputFormat;
+! import org.apache.hadoop.mapred.SequenceFileInputFormat;
+! import org.apache.hadoop.util.StringUtils;
+! import org.apache.hadoop.util.Tool;
+! import org.apache.hadoop.util.ToolRunner;
+  import org.apache.nutch.util.HadoopFSUtil;
+  import org.apache.nutch.util.LockUtil;
+  import org.apache.nutch.util.NutchConfiguration;
+diff -crBE ./src/java/org/apache/nutch/crawl/CrawlDbMerger.java ../local/src/java/org/apache/nutch/crawl/CrawlDbMerger.java
+*** ./src/java/org/apache/nutch/crawl/CrawlDbMerger.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/crawl/CrawlDbMerger.java	Fri Dec 11 22:31:06 2009
+***************
+*** 18,38 ****
+  package org.apache.nutch.crawl;
+  
+  import java.io.IOException;
+! import java.util.*;
+  import java.util.Map.Entry;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+- 
+  import org.apache.hadoop.conf.Configuration;
+  import org.apache.hadoop.fs.FileSystem;
+  import org.apache.hadoop.fs.Path;
+  import org.apache.hadoop.io.Text;
+  import org.apache.hadoop.io.Writable;
+! import org.apache.hadoop.mapred.*;
+! import org.apache.hadoop.util.*;
+! import org.apache.hadoop.conf.*;
+  import org.apache.nutch.util.NutchConfiguration;
+  import org.apache.nutch.util.NutchJob;
+  
+--- 18,49 ----
+  package org.apache.nutch.crawl;
+  
+  import java.io.IOException;
+! import java.util.ArrayList;
+! import java.util.Iterator;
+! import java.util.Random;
+  import java.util.Map.Entry;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.hadoop.conf.Configuration;
++ import org.apache.hadoop.conf.Configured;
+  import org.apache.hadoop.fs.FileSystem;
+  import org.apache.hadoop.fs.Path;
+  import org.apache.hadoop.io.Text;
+  import org.apache.hadoop.io.Writable;
+! import org.apache.hadoop.mapred.FileInputFormat;
+! import org.apache.hadoop.mapred.FileOutputFormat;
+! import org.apache.hadoop.mapred.JobClient;
+! import org.apache.hadoop.mapred.JobConf;
+! import org.apache.hadoop.mapred.MapFileOutputFormat;
+! import org.apache.hadoop.mapred.MapReduceBase;
+! import org.apache.hadoop.mapred.OutputCollector;
+! import org.apache.hadoop.mapred.Reducer;
+! import org.apache.hadoop.mapred.Reporter;
+! import org.apache.hadoop.mapred.SequenceFileInputFormat;
+! import org.apache.hadoop.util.StringUtils;
+! import org.apache.hadoop.util.Tool;
+! import org.apache.hadoop.util.ToolRunner;
+  import org.apache.nutch.util.NutchConfiguration;
+  import org.apache.nutch.util.NutchJob;
+  
+diff -crBE ./src/java/org/apache/nutch/crawl/CrawlDbReader.java ../local/src/java/org/apache/nutch/crawl/CrawlDbReader.java
+*** ./src/java/org/apache/nutch/crawl/CrawlDbReader.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/crawl/CrawlDbReader.java	Fri Dec 11 22:31:04 2009
+***************
+*** 26,35 ****
+  import java.util.Random;
+  import java.util.TreeMap;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+- 
+  import org.apache.hadoop.conf.Configuration;
+  import org.apache.hadoop.fs.FileSystem;
+  import org.apache.hadoop.fs.Path;
+--- 26,33 ----
+diff -crBE ./src/java/org/apache/nutch/crawl/CrawlDbReducer.java ../local/src/java/org/apache/nutch/crawl/CrawlDbReducer.java
+*** ./src/java/org/apache/nutch/crawl/CrawlDbReducer.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/crawl/CrawlDbReducer.java	Fri Dec 11 22:31:05 2009
+***************
+*** 17,32 ****
+  
+  package org.apache.nutch.crawl;
+  
+  import java.util.ArrayList;
+  import java.util.Iterator;
+- import java.io.IOException;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! 
+! import org.apache.hadoop.io.*;
+! import org.apache.hadoop.mapred.*;
+  import org.apache.nutch.metadata.Nutch;
+  import org.apache.nutch.scoring.ScoringFilterException;
+  import org.apache.nutch.scoring.ScoringFilters;
+--- 17,33 ----
+  
+  package org.apache.nutch.crawl;
+  
++ import java.io.IOException;
+  import java.util.ArrayList;
+  import java.util.Iterator;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! import org.apache.hadoop.io.Text;
+! import org.apache.hadoop.mapred.JobConf;
+! import org.apache.hadoop.mapred.OutputCollector;
+! import org.apache.hadoop.mapred.Reducer;
+! import org.apache.hadoop.mapred.Reporter;
+  import org.apache.nutch.metadata.Nutch;
+  import org.apache.nutch.scoring.ScoringFilterException;
+  import org.apache.nutch.scoring.ScoringFilters;
+diff -crBE ./src/java/org/apache/nutch/crawl/Generator.java ../local/src/java/org/apache/nutch/crawl/Generator.java
+*** ./src/java/org/apache/nutch/crawl/Generator.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/crawl/Generator.java	Fri Dec 11 22:31:04 2009
+***************
+*** 17,38 ****
+  
+  package org.apache.nutch.crawl;
+  
+! import java.io.*;
+! import java.net.*;
+! import java.util.*;
+! import java.text.*;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! 
+! import org.apache.hadoop.io.*;
+! import org.apache.hadoop.conf.*;
+! import org.apache.hadoop.mapred.*;
+! import org.apache.hadoop.util.*;
+  import org.apache.hadoop.fs.FileSystem;
+  import org.apache.hadoop.fs.Path;
+! 
+  import org.apache.nutch.metadata.Nutch;
+  import org.apache.nutch.net.URLFilterException;
+  import org.apache.nutch.net.URLFilters;
+--- 17,66 ----
+  
+  package org.apache.nutch.crawl;
+  
+! import java.io.DataInput;
+! import java.io.DataOutput;
+! import java.io.IOException;
+! import java.net.InetAddress;
+! import java.net.MalformedURLException;
+! import java.net.URL;
+! import java.net.UnknownHostException;
+! import java.text.SimpleDateFormat;
+! import java.util.Date;
+! import java.util.HashMap;
+! import java.util.HashSet;
+! import java.util.Iterator;
+! import java.util.Random;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! import org.apache.hadoop.conf.Configuration;
+! import org.apache.hadoop.conf.Configured;
+  import org.apache.hadoop.fs.FileSystem;
+  import org.apache.hadoop.fs.Path;
+! import org.apache.hadoop.io.FloatWritable;
+! import org.apache.hadoop.io.IntWritable;
+! import org.apache.hadoop.io.LongWritable;
+! import org.apache.hadoop.io.SequenceFile;
+! import org.apache.hadoop.io.Text;
+! import org.apache.hadoop.io.Writable;
+! import org.apache.hadoop.io.WritableComparable;
+! import org.apache.hadoop.io.WritableComparator;
+! import org.apache.hadoop.mapred.FileInputFormat;
+! import org.apache.hadoop.mapred.FileOutputFormat;
+! import org.apache.hadoop.mapred.JobClient;
+! import org.apache.hadoop.mapred.JobConf;
+! import org.apache.hadoop.mapred.MapFileOutputFormat;
+! import org.apache.hadoop.mapred.MapReduceBase;
+! import org.apache.hadoop.mapred.Mapper;
+! import org.apache.hadoop.mapred.OutputCollector;
+! import org.apache.hadoop.mapred.Partitioner;
+! import org.apache.hadoop.mapred.Reducer;
+! import org.apache.hadoop.mapred.Reporter;
+! import org.apache.hadoop.mapred.SequenceFileInputFormat;
+! import org.apache.hadoop.mapred.SequenceFileOutputFormat;
+! import org.apache.hadoop.util.StringUtils;
+! import org.apache.hadoop.util.Tool;
+! import org.apache.hadoop.util.ToolRunner;
+  import org.apache.nutch.metadata.Nutch;
+  import org.apache.nutch.net.URLFilterException;
+  import org.apache.nutch.net.URLFilters;
+diff -crBE ./src/java/org/apache/nutch/crawl/Injector.java ../local/src/java/org/apache/nutch/crawl/Injector.java
+*** ./src/java/org/apache/nutch/crawl/Injector.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/crawl/Injector.java	Fri Dec 11 22:31:04 2009
+***************
+*** 17,36 ****
+  
+  package org.apache.nutch.crawl;
+  
+! import java.io.*;
+! import java.util.*;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! 
+! import org.apache.hadoop.io.*;
+! import org.apache.hadoop.fs.*;
+! import org.apache.hadoop.conf.*;
+! import org.apache.hadoop.mapred.*;
+! import org.apache.hadoop.util.*;
+! 
+! import org.apache.nutch.net.*;
+  import org.apache.nutch.scoring.ScoringFilterException;
+  import org.apache.nutch.scoring.ScoringFilters;
+  import org.apache.nutch.util.NutchConfiguration;
+--- 17,48 ----
+  
+  package org.apache.nutch.crawl;
+  
+! import java.io.IOException;
+! import java.util.Iterator;
+! import java.util.Random;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! import org.apache.hadoop.conf.Configuration;
+! import org.apache.hadoop.conf.Configured;
+! import org.apache.hadoop.fs.FileSystem;
+! import org.apache.hadoop.fs.Path;
+! import org.apache.hadoop.io.Text;
+! import org.apache.hadoop.io.WritableComparable;
+! import org.apache.hadoop.mapred.FileInputFormat;
+! import org.apache.hadoop.mapred.FileOutputFormat;
+! import org.apache.hadoop.mapred.JobClient;
+! import org.apache.hadoop.mapred.JobConf;
+! import org.apache.hadoop.mapred.Mapper;
+! import org.apache.hadoop.mapred.OutputCollector;
+! import org.apache.hadoop.mapred.Reducer;
+! import org.apache.hadoop.mapred.Reporter;
+! import org.apache.hadoop.mapred.SequenceFileOutputFormat;
+! import org.apache.hadoop.util.StringUtils;
+! import org.apache.hadoop.util.Tool;
+! import org.apache.hadoop.util.ToolRunner;
+! import org.apache.nutch.net.URLFilters;
+! import org.apache.nutch.net.URLNormalizers;
+  import org.apache.nutch.scoring.ScoringFilterException;
+  import org.apache.nutch.scoring.ScoringFilters;
+  import org.apache.nutch.util.NutchConfiguration;
+diff -crBE ./src/java/org/apache/nutch/crawl/Inlink.java ../local/src/java/org/apache/nutch/crawl/Inlink.java
+*** ./src/java/org/apache/nutch/crawl/Inlink.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/crawl/Inlink.java	Fri Dec 11 22:31:05 2009
+***************
+*** 17,24 ****
+  
+  package org.apache.nutch.crawl;
+  
+! import java.io.*;
+! import org.apache.hadoop.io.*;
+  
+  /* An incoming link to a page. */
+  public class Inlink implements Writable {
+--- 17,28 ----
+  
+  package org.apache.nutch.crawl;
+  
+! import java.io.DataInput;
+! import java.io.DataOutput;
+! import java.io.IOException;
+! 
+! import org.apache.hadoop.io.Text;
+! import org.apache.hadoop.io.Writable;
+  
+  /* An incoming link to a page. */
+  public class Inlink implements Writable {
+diff -crBE ./src/java/org/apache/nutch/crawl/Inlinks.java ../local/src/java/org/apache/nutch/crawl/Inlinks.java
+*** ./src/java/org/apache/nutch/crawl/Inlinks.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/crawl/Inlinks.java	Fri Dec 11 22:31:04 2009
+***************
+*** 17,27 ****
+  
+  package org.apache.nutch.crawl;
+  
+! import java.io.*;
+! import java.net.*;
+! import java.util.*;
+  
+! import org.apache.hadoop.io.*;
+  
+  /** A list of {@link Inlink}s. */
+  public class Inlinks implements Writable {
+--- 17,34 ----
+  
+  package org.apache.nutch.crawl;
+  
+! import java.io.DataInput;
+! import java.io.DataOutput;
+! import java.io.IOException;
+! import java.net.MalformedURLException;
+! import java.net.URL;
+! import java.util.ArrayList;
+! import java.util.HashMap;
+! import java.util.HashSet;
+! import java.util.Iterator;
+! import java.util.Set;
+  
+! import org.apache.hadoop.io.Writable;
+  
+  /** A list of {@link Inlink}s. */
+  public class Inlinks implements Writable {
+diff -crBE ./src/java/org/apache/nutch/crawl/LinkDb.java ../local/src/java/org/apache/nutch/crawl/LinkDb.java
+*** ./src/java/org/apache/nutch/crawl/LinkDb.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/crawl/LinkDb.java	Fri Dec 11 22:31:05 2009
+***************
+*** 17,40 ****
+  
+  package org.apache.nutch.crawl;
+  
+! import java.io.*;
+! import java.util.*;
+! import java.net.*;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! 
+! import org.apache.hadoop.io.*;
+! import org.apache.hadoop.fs.*;
+  import org.apache.hadoop.fs.FileSystem;
+! import org.apache.hadoop.conf.*;
+! import org.apache.hadoop.mapred.*;
+! import org.apache.hadoop.util.*;
+! 
+  import org.apache.nutch.net.URLFilters;
+  import org.apache.nutch.net.URLNormalizers;
+! import org.apache.nutch.parse.*;
+  import org.apache.nutch.util.HadoopFSUtil;
+  import org.apache.nutch.util.LockUtil;
+  import org.apache.nutch.util.NutchConfiguration;
+--- 17,53 ----
+  
+  package org.apache.nutch.crawl;
+  
+! import java.io.IOException;
+! import java.net.MalformedURLException;
+! import java.net.URL;
+! import java.util.ArrayList;
+! import java.util.Arrays;
+! import java.util.Random;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! import org.apache.hadoop.conf.Configuration;
+! import org.apache.hadoop.conf.Configured;
+! import org.apache.hadoop.fs.FileStatus;
+  import org.apache.hadoop.fs.FileSystem;
+! import org.apache.hadoop.fs.Path;
+! import org.apache.hadoop.io.Text;
+! import org.apache.hadoop.mapred.FileInputFormat;
+! import org.apache.hadoop.mapred.FileOutputFormat;
+! import org.apache.hadoop.mapred.JobClient;
+! import org.apache.hadoop.mapred.JobConf;
+! import org.apache.hadoop.mapred.MapFileOutputFormat;
+! import org.apache.hadoop.mapred.Mapper;
+! import org.apache.hadoop.mapred.OutputCollector;
+! import org.apache.hadoop.mapred.Reporter;
+! import org.apache.hadoop.mapred.SequenceFileInputFormat;
+! import org.apache.hadoop.util.StringUtils;
+! import org.apache.hadoop.util.Tool;
+! import org.apache.hadoop.util.ToolRunner;
+  import org.apache.nutch.net.URLFilters;
+  import org.apache.nutch.net.URLNormalizers;
+! import org.apache.nutch.parse.Outlink;
+! import org.apache.nutch.parse.ParseData;
+  import org.apache.nutch.util.HadoopFSUtil;
+  import org.apache.nutch.util.LockUtil;
+  import org.apache.nutch.util.NutchConfiguration;
+diff -crBE ./src/java/org/apache/nutch/crawl/LinkDbReader.java ../local/src/java/org/apache/nutch/crawl/LinkDbReader.java
+*** ./src/java/org/apache/nutch/crawl/LinkDbReader.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/crawl/LinkDbReader.java	Fri Dec 11 22:31:05 2009
+***************
+*** 18,41 ****
+  package org.apache.nutch.crawl;
+  
+  import java.io.IOException;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! 
+  import org.apache.hadoop.conf.Configured;
+! import org.apache.hadoop.io.*;
+! import org.apache.hadoop.fs.*;
+! import org.apache.hadoop.mapred.*;
+  import org.apache.hadoop.mapred.lib.HashPartitioner;
+! import org.apache.hadoop.util.*;
+! import org.apache.hadoop.conf.Configuration;
+! 
+  import org.apache.nutch.util.NutchConfiguration;
+  import org.apache.nutch.util.NutchJob;
+  
+- import java.util.Iterator;
+- 
+  /** . */
+  public class LinkDbReader extends Configured implements Tool, Closeable {
+    public static final Log LOG = LogFactory.getLog(LinkDbReader.class);
+--- 18,51 ----
+  package org.apache.nutch.crawl;
+  
+  import java.io.IOException;
++ import java.util.Iterator;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! import org.apache.hadoop.conf.Configuration;
+  import org.apache.hadoop.conf.Configured;
+! import org.apache.hadoop.fs.FileSystem;
+! import org.apache.hadoop.fs.Path;
+! import org.apache.hadoop.io.Closeable;
+! import org.apache.hadoop.io.MapFile;
+! import org.apache.hadoop.io.Text;
+! import org.apache.hadoop.io.Writable;
+! import org.apache.hadoop.io.WritableComparable;
+! import org.apache.hadoop.mapred.FileInputFormat;
+! import org.apache.hadoop.mapred.FileOutputFormat;
+! import org.apache.hadoop.mapred.JobClient;
+! import org.apache.hadoop.mapred.JobConf;
+! import org.apache.hadoop.mapred.MapFileOutputFormat;
+! import org.apache.hadoop.mapred.Partitioner;
+! import org.apache.hadoop.mapred.SequenceFileInputFormat;
+! import org.apache.hadoop.mapred.TextOutputFormat;
+  import org.apache.hadoop.mapred.lib.HashPartitioner;
+! import org.apache.hadoop.util.StringUtils;
+! import org.apache.hadoop.util.Tool;
+! import org.apache.hadoop.util.ToolRunner;
+  import org.apache.nutch.util.NutchConfiguration;
+  import org.apache.nutch.util.NutchJob;
+  
+  /** . */
+  public class LinkDbReader extends Configured implements Tool, Closeable {
+    public static final Log LOG = LogFactory.getLog(LinkDbReader.class);
+diff -crBE ./src/java/org/apache/nutch/crawl/MapWritable.java ../local/src/java/org/apache/nutch/crawl/MapWritable.java
+*** ./src/java/org/apache/nutch/crawl/MapWritable.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/crawl/MapWritable.java	Fri Dec 11 22:31:04 2009
+***************
+*** 28,37 ****
+  import java.util.Map;
+  import java.util.Set;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+- 
+  import org.apache.hadoop.io.BytesWritable;
+  import org.apache.hadoop.io.DataInputBuffer;
+  import org.apache.hadoop.io.DataOutputBuffer;
+--- 28,35 ----
+diff -crBE ./src/java/org/apache/nutch/crawl/NutchWritable.java ../local/src/java/org/apache/nutch/crawl/NutchWritable.java
+*** ./src/java/org/apache/nutch/crawl/NutchWritable.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/crawl/NutchWritable.java	Fri Dec 11 22:31:05 2009
+***************
+*** 19,24 ****
+--- 19,26 ----
+  import org.apache.hadoop.io.Writable;
+  import org.apache.nutch.util.GenericWritableConfigurable;
+  
++ import de.ingrid.iplug.se.crawl.sns.CompressedSnsData;
++ 
+  public class NutchWritable extends GenericWritableConfigurable {
+    
+    private static Class<? extends Writable>[] CLASSES = null;
+***************
+*** 47,53 ****
+        org.apache.nutch.protocol.ProtocolStatus.class,
+        org.apache.nutch.searcher.Hit.class,
+        org.apache.nutch.searcher.HitDetails.class,
+!       org.apache.nutch.searcher.Hits.class
+      };
+    }
+  
+--- 49,58 ----
+        org.apache.nutch.protocol.ProtocolStatus.class,
+        org.apache.nutch.searcher.Hit.class,
+        org.apache.nutch.searcher.HitDetails.class,
+!       org.apache.nutch.searcher.Hits.class,
+!       /// TODO rwe: none nutch specific code start:
+!       CompressedSnsData.class
+!       /// none nutch specific code end. 
+      };
+    }
+  
+diff -crBE ./src/java/org/apache/nutch/crawl/PartitionUrlByHost.java ../local/src/java/org/apache/nutch/crawl/PartitionUrlByHost.java
+*** ./src/java/org/apache/nutch/crawl/PartitionUrlByHost.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/crawl/PartitionUrlByHost.java	Fri Dec 11 22:31:05 2009
+***************
+*** 17,29 ****
+  
+  package org.apache.nutch.crawl;
+  
+- import java.net.URL;
+  import java.net.MalformedURLException;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! import org.apache.hadoop.io.*;
+! import org.apache.hadoop.mapred.*;
+  import org.apache.nutch.net.URLNormalizers;
+  
+  /** Partition urls by hostname. */
+--- 17,31 ----
+  
+  package org.apache.nutch.crawl;
+  
+  import java.net.MalformedURLException;
++ import java.net.URL;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! import org.apache.hadoop.io.Text;
+! import org.apache.hadoop.io.Writable;
+! import org.apache.hadoop.mapred.JobConf;
+! import org.apache.hadoop.mapred.Partitioner;
+  import org.apache.nutch.net.URLNormalizers;
+  
+  /** Partition urls by hostname. */
+diff -crBE ./src/java/org/apache/nutch/crawl/Signature.java ../local/src/java/org/apache/nutch/crawl/Signature.java
+*** ./src/java/org/apache/nutch/crawl/Signature.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/crawl/Signature.java	Fri Dec 11 22:31:04 2009
+***************
+*** 17,26 ****
+  
+  package org.apache.nutch.crawl;
+  
+  import org.apache.nutch.parse.Parse;
+  import org.apache.nutch.protocol.Content;
+- import org.apache.hadoop.conf.Configuration;
+- import org.apache.hadoop.conf.Configurable;
+  
+  public abstract class Signature implements Configurable {
+    protected Configuration conf;
+--- 17,26 ----
+  
+  package org.apache.nutch.crawl;
+  
++ import org.apache.hadoop.conf.Configurable;
++ import org.apache.hadoop.conf.Configuration;
+  import org.apache.nutch.parse.Parse;
+  import org.apache.nutch.protocol.Content;
+  
+  public abstract class Signature implements Configurable {
+    protected Configuration conf;
+diff -crBE ./src/java/org/apache/nutch/crawl/SignatureFactory.java ../local/src/java/org/apache/nutch/crawl/SignatureFactory.java
+*** ./src/java/org/apache/nutch/crawl/SignatureFactory.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/crawl/SignatureFactory.java	Fri Dec 11 22:31:06 2009
+***************
+*** 20,27 ****
+  // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+- 
+- // Hadoop imports
+  import org.apache.hadoop.conf.Configuration;
+  import org.apache.nutch.util.ObjectCache;
+  
+--- 20,25 ----
+diff -crBE ./src/java/org/apache/nutch/crawl/TextProfileSignature.java ../local/src/java/org/apache/nutch/crawl/TextProfileSignature.java
+*** ./src/java/org/apache/nutch/crawl/TextProfileSignature.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/crawl/TextProfileSignature.java	Fri Dec 11 22:31:04 2009
+***************
+*** 31,38 ****
+  import org.apache.nutch.parse.Parse;
+  import org.apache.nutch.parse.ParseImpl;
+  import org.apache.nutch.protocol.Content;
+- import org.apache.nutch.util.StringUtil;
+  import org.apache.nutch.util.NutchConfiguration;
+  
+  /**
+   * <p>An implementation of a page signature. It calculates an MD5 hash
+--- 31,38 ----
+  import org.apache.nutch.parse.Parse;
+  import org.apache.nutch.parse.ParseImpl;
+  import org.apache.nutch.protocol.Content;
+  import org.apache.nutch.util.NutchConfiguration;
++ import org.apache.nutch.util.StringUtil;
+  
+  /**
+   * <p>An implementation of a page signature. It calculates an MD5 hash
+diff -crBE ./src/java/org/apache/nutch/crawl/metadata/MetadataMerger.java ../local/src/java/org/apache/nutch/crawl/metadata/MetadataMerger.java
+*** ./src/java/org/apache/nutch/crawl/metadata/MetadataMerger.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/crawl/metadata/MetadataMerger.java	Fri Dec 11 22:31:05 2009
+***************
+*** 48,59 ****
+  
+    public static final Log LOG = LogFactory.getLog(MetadataMerger.class);
+  
+!   public static class ObjectWritableMapper implements
+!       Mapper<HostType, Writable, HostType, ObjectWritable> {
+  
+      @Override
+!     public void map(HostType key, Writable value,
+!         OutputCollector<HostType, ObjectWritable> collector, Reporter reporter)
+          throws IOException {
+        ObjectWritable objectWritable = new ObjectWritable(value);
+        collector.collect(key, objectWritable);
+--- 48,57 ----
+  
+    public static final Log LOG = LogFactory.getLog(MetadataMerger.class);
+  
+!   public static class ObjectWritableMapper implements Mapper<HostType, Writable, HostType, ObjectWritable> {
+  
+      @Override
+!     public void map(HostType key, Writable value, OutputCollector<HostType, ObjectWritable> collector, Reporter reporter)
+          throws IOException {
+        ObjectWritable objectWritable = new ObjectWritable(value);
+        collector.collect(key, objectWritable);
+***************
+*** 69,82 ****
+  
+    }
+  
+!   public static class MetadataReducer implements
+!       Reducer<HostType, ObjectWritable, HostType, ObjectWritable> {
+  
+      private MetadataContainer _metadataContainer;
+  
+!     public void reduce(HostType key, Iterator<ObjectWritable> values,
+!         OutputCollector<HostType, ObjectWritable> out, Reporter report)
+!         throws IOException {
+  
+        while (values.hasNext()) {
+          ObjectWritable obj = (ObjectWritable) values.next();
+--- 67,78 ----
+  
+    }
+  
+!   public static class MetadataReducer implements Reducer<HostType, ObjectWritable, HostType, ObjectWritable> {
+  
+      private MetadataContainer _metadataContainer;
+  
+!     public void reduce(HostType key, Iterator<ObjectWritable> values, OutputCollector<HostType, ObjectWritable> out,
+!         Reporter report) throws IOException {
+  
+        while (values.hasNext()) {
+          ObjectWritable obj = (ObjectWritable) values.next();
+***************
+*** 86,108 ****
+            return;
+          }
+  
+!         UrlParseDataContainer urlParseDataContainer = (UrlParseDataContainer) value;
+!         Text url = urlParseDataContainer.getUrl();
+!         ParseData parseData = urlParseDataContainer.getParseData();
+!         Metadata metadataFromSegment = parseData.getParseMeta();
+!         //
+! 
+!         for (Metadata metadata : _metadataContainer.getMetadatas()) {
+!           String pattern = metadata.get("pattern");
+!           if (url.toString().startsWith(pattern)) {
+!             String[] names = metadata.names();
+!             for (String name : names) {
+!               String[] metadataValues = metadata.getValues(name);
+!               for (String metadataValue : metadataValues) {
+!                 metadataFromSegment.add(name, metadataValue);
+                }
+              }
+            }
+          }
+  
+          out.collect(key, obj);
+--- 83,110 ----
+            return;
+          }
+  
+!         if (_metadataContainer != null) {
+!           // for this HostType a MetadataContainer exists
+!           UrlParseDataContainer urlParseDataContainer = (UrlParseDataContainer) value;
+!           Text url = urlParseDataContainer.getUrl();
+!           ParseData parseData = urlParseDataContainer.getParseData();
+!           Metadata metadataFromSegment = parseData.getParseMeta();
+! 
+!           for (Metadata metadata : _metadataContainer.getMetadatas()) {
+!             String pattern = metadata.get("pattern");
+!             if (url.toString().startsWith(pattern)) {
+!               String[] names = metadata.names();
+!               for (String name : names) {
+!                 String[] metadataValues = metadata.getValues(name);
+!                 for (String metadataValue : metadataValues) {
+!                   metadataFromSegment.add(name, metadataValue);
+!                 }
+                }
+              }
+            }
++         } else {
++           // for this HostType no MetadataContainer exist
++           LOG.info("No MetadataContainer found for: " + ((UrlParseDataContainer) value).getUrl());
+          }
+  
+          out.collect(key, obj);
+***************
+*** 122,136 ****
+      super(conf);
+    }
+  
+!   public void merge(Path metadataDb, Path wrappedParseData, Path out)
+!       throws IOException {
+      LOG.info("metadata update: merge started.");
+      JobConf mergeJob = new NutchJob(getConf());
+      mergeJob.setJobName("merging: " + metadataDb + " and " + wrappedParseData);
+      mergeJob.setInputFormat(SequenceFileInputFormat.class);
+  
+      FileInputFormat.addInputPath(mergeJob, wrappedParseData);
+!     FileInputFormat.addInputPath(mergeJob, new Path(metadataDb, "current"));
+      FileOutputFormat.setOutputPath(mergeJob, out);
+      mergeJob.setMapperClass(ObjectWritableMapper.class);
+      mergeJob.setReducerClass(MetadataReducer.class);
+--- 123,139 ----
+      super(conf);
+    }
+  
+!   public void merge(Path metadataDb, Path wrappedParseData, Path out) throws IOException {
+      LOG.info("metadata update: merge started.");
+      JobConf mergeJob = new NutchJob(getConf());
+      mergeJob.setJobName("merging: " + metadataDb + " and " + wrappedParseData);
+      mergeJob.setInputFormat(SequenceFileInputFormat.class);
+  
++     Path metadataDbPath = new Path(metadataDb, "current");
++     // LOG.info("Merge job uses input pathes: '" + wrappedParseData + "' and '"
++     // + metadataDbPath + "'.");
+      FileInputFormat.addInputPath(mergeJob, wrappedParseData);
+!     FileInputFormat.addInputPath(mergeJob, metadataDbPath);
+      FileOutputFormat.setOutputPath(mergeJob, out);
+      mergeJob.setMapperClass(ObjectWritableMapper.class);
+      mergeJob.setReducerClass(MetadataReducer.class);
+diff -crBE ./src/java/org/apache/nutch/fetcher/Fetcher.java ../local/src/java/org/apache/nutch/fetcher/Fetcher.java
+*** ./src/java/org/apache/nutch/fetcher/Fetcher.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/fetcher/Fetcher.java	Fri Dec 11 22:31:04 2009
+***************
+*** 21,41 ****
+  import java.net.MalformedURLException;
+  import java.net.URL;
+  import java.net.UnknownHostException;
+! import java.util.*;
+  import java.util.Map.Entry;
+  import java.util.concurrent.atomic.AtomicInteger;
+  import java.util.concurrent.atomic.AtomicLong;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! 
+! import org.apache.hadoop.io.*;
+! import org.apache.hadoop.fs.*;
+! import org.apache.hadoop.conf.*;
+! import org.apache.hadoop.mapred.*;
+  import org.apache.hadoop.util.StringUtils;
+- 
+  import org.apache.nutch.crawl.CrawlDatum;
+  import org.apache.nutch.crawl.NutchWritable;
+  import org.apache.nutch.crawl.SignatureFactory;
+--- 21,59 ----
+  import java.net.MalformedURLException;
+  import java.net.URL;
+  import java.net.UnknownHostException;
+! import java.util.ArrayList;
+! import java.util.Collections;
+! import java.util.HashMap;
+! import java.util.HashSet;
+! import java.util.Iterator;
+! import java.util.LinkedList;
+! import java.util.List;
+! import java.util.Map;
+! import java.util.Set;
+! import java.util.StringTokenizer;
+  import java.util.Map.Entry;
+  import java.util.concurrent.atomic.AtomicInteger;
+  import java.util.concurrent.atomic.AtomicLong;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! import org.apache.hadoop.conf.Configuration;
+! import org.apache.hadoop.conf.Configured;
+! import org.apache.hadoop.fs.FileStatus;
+! import org.apache.hadoop.fs.Path;
+! import org.apache.hadoop.io.Text;
+! import org.apache.hadoop.mapred.FileInputFormat;
+! import org.apache.hadoop.mapred.FileOutputFormat;
+! import org.apache.hadoop.mapred.FileSplit;
+! import org.apache.hadoop.mapred.InputSplit;
+! import org.apache.hadoop.mapred.JobClient;
+! import org.apache.hadoop.mapred.JobConf;
+! import org.apache.hadoop.mapred.MapRunnable;
+! import org.apache.hadoop.mapred.OutputCollector;
+! import org.apache.hadoop.mapred.RecordReader;
+! import org.apache.hadoop.mapred.Reporter;
+! import org.apache.hadoop.mapred.SequenceFileInputFormat;
+  import org.apache.hadoop.util.StringUtils;
+  import org.apache.nutch.crawl.CrawlDatum;
+  import org.apache.nutch.crawl.NutchWritable;
+  import org.apache.nutch.crawl.SignatureFactory;
+***************
+*** 41,51 ****
+  import org.apache.nutch.crawl.SignatureFactory;
+  import org.apache.nutch.metadata.Metadata;
+  import org.apache.nutch.metadata.Nutch;
+! import org.apache.nutch.net.*;
+! import org.apache.nutch.protocol.*;
+! import org.apache.nutch.parse.*;
+  import org.apache.nutch.scoring.ScoringFilters;
+! import org.apache.nutch.util.*;
+  
+  
+  /** 
+--- 59,86 ----
+  import org.apache.nutch.crawl.SignatureFactory;
+  import org.apache.nutch.metadata.Metadata;
+  import org.apache.nutch.metadata.Nutch;
+! import org.apache.nutch.net.URLFilterException;
+! import org.apache.nutch.net.URLFilters;
+! import org.apache.nutch.net.URLNormalizers;
+! import org.apache.nutch.parse.Parse;
+! import org.apache.nutch.parse.ParseImpl;
+! import org.apache.nutch.parse.ParseResult;
+! import org.apache.nutch.parse.ParseStatus;
+! import org.apache.nutch.parse.ParseText;
+! import org.apache.nutch.parse.ParseUtil;
+! import org.apache.nutch.parse.resulthandler.SnsParseResultHandler;
+! import org.apache.nutch.protocol.Content;
+! import org.apache.nutch.protocol.Protocol;
+! import org.apache.nutch.protocol.ProtocolFactory;
+! import org.apache.nutch.protocol.ProtocolOutput;
+! import org.apache.nutch.protocol.ProtocolStatus;
+! import org.apache.nutch.protocol.RobotRules;
+  import org.apache.nutch.scoring.ScoringFilters;
+! import org.apache.nutch.util.LogUtil;
+! import org.apache.nutch.util.NutchConfiguration;
+! import org.apache.nutch.util.NutchJob;
+! import org.apache.nutch.util.StringUtil;
+! import org.apache.nutch.util.URLUtil;
+  
+  
+  /** 
+***************
+*** 92,98 ****
+  
+    public static final String PROTOCOL_REDIR = "protocol";
+  
+!   public static final Log LOG = LogFactory.getLog(Fetcher.class);
+    
+    public static class InputFormat extends SequenceFileInputFormat<Text, CrawlDatum> {
+      /** Don't split inputs, to keep things polite. */
+--- 127,133 ----
+  
+    public static final String PROTOCOL_REDIR = "protocol";
+  
+!   private static final Log LOG = LogFactory.getLog(Fetcher.class);
+    
+    public static class InputFormat extends SequenceFileInputFormat<Text, CrawlDatum> {
+      /** Don't split inputs, to keep things polite. */
+***************
+*** 109,114 ****
+--- 144,151 ----
+      }
+    }
+  
++   private SnsParseResultHandler _snsParseResultHandler;
++   
+    private OutputCollector<Text, NutchWritable> output;
+    private Reporter reporter;
+    
+***************
+*** 769,778 ****
+            }
+  
+            if (parseResult == null) {
+!             byte[] signature = 
+!               SignatureFactory.getSignature(getConf()).calculate(content, 
+!                   new ParseStatus().getEmptyParse(conf));
+              datum.setSignature(signature);
+            }
+          }
+          
+--- 806,816 ----
+            }
+  
+            if (parseResult == null) {
+!             byte[] signature = SignatureFactory.getSignature(getConf()).calculate(content,
+!                 new ParseStatus().getEmptyParse(conf));
+              datum.setSignature(signature);
++           } else {
++             _snsParseResultHandler.process(content, parseResult);
+            }
+          }
+          
+***************
+*** 885,939 ****
+      return conf.getBoolean("fetcher.store.content", true);
+    }
+  
+!   public void run(RecordReader<Text, CrawlDatum> input,
+!       OutputCollector<Text, NutchWritable> output,
+!                   Reporter reporter) throws IOException {
+  
+      this.output = output;
+      this.reporter = reporter;
+      this.fetchQueues = new FetchItemQueues(getConf());
+  
+      int threadCount = getConf().getInt("fetcher.threads.fetch", 10);
+!     if (LOG.isInfoEnabled()) { LOG.info("Fetcher: threads: " + threadCount); }
+  
+      feeder = new QueueFeeder(input, fetchQueues, threadCount * 50);
+!     //feeder.setPriority((Thread.MAX_PRIORITY + Thread.NORM_PRIORITY) / 2);
+      feeder.start();
+  
+      // set non-blocking & no-robots mode for HTTP protocol plugins.
+      getConf().setBoolean(Protocol.CHECK_BLOCKING, false);
+      getConf().setBoolean(Protocol.CHECK_ROBOTS, false);
+      
+!     for (int i = 0; i < threadCount; i++) {       // spawn threads
+        new FetcherThread(getConf()).start();
+      }
+  
+      // select a timeout that avoids a task timeout
+!     long timeout = getConf().getInt("mapred.task.timeout", 10*60*1000)/2;
+  
+!     do {                                          // wait for threads to exit
+!       try {
+!         Thread.sleep(1000);
+!       } catch (InterruptedException e) {}
+  
+!       reportStatus();
+!       LOG.info("-activeThreads=" + activeThreads + ", spinWaiting=" + spinWaiting.get()
+!           + ", fetchQueues.totalSize=" + fetchQueues.getTotalSize());
+  
+!       if (!feeder.isAlive() && fetchQueues.getTotalSize() < 5) {
+!         fetchQueues.dump();
+!       }
+!       // some requests seem to hang, despite all intentions
+!       if ((System.currentTimeMillis() - lastRequestStart.get()) > timeout) {
+!         if (LOG.isWarnEnabled()) {
+!           LOG.warn("Aborting with "+activeThreads+" hung threads.");
+          }
+-         return;
+-       }
+  
+!     } while (activeThreads.get() > 0);
+!     LOG.info("-activeThreads=" + activeThreads);
+!     
+    }
+  
+    public void fetch(Path segment, int threads, boolean parsing)
+--- 923,990 ----
+      return conf.getBoolean("fetcher.store.content", true);
+    }
+  
+!   public void run(RecordReader<Text, CrawlDatum> input, OutputCollector<Text, NutchWritable> output, Reporter reporter)
+!       throws IOException {
+  
+      this.output = output;
+      this.reporter = reporter;
+      this.fetchQueues = new FetchItemQueues(getConf());
+  
+      int threadCount = getConf().getInt("fetcher.threads.fetch", 10);
+!     if (LOG.isInfoEnabled()) {
+!       LOG.info("Fetcher: threads: " + threadCount);
+!     }
+  
+      feeder = new QueueFeeder(input, fetchQueues, threadCount * 50);
+!     // feeder.setPriority((Thread.MAX_PRIORITY + Thread.NORM_PRIORITY) / 2);
+      feeder.start();
+  
+      // set non-blocking & no-robots mode for HTTP protocol plugins.
+      getConf().setBoolean(Protocol.CHECK_BLOCKING, false);
+      getConf().setBoolean(Protocol.CHECK_ROBOTS, false);
++ 
++     if (_snsParseResultHandler == null) {
++       _snsParseResultHandler = new SnsParseResultHandler();
++     }
+      
+!     // start the sns analyzing
+!     _snsParseResultHandler.beginParsing(getConf().get(Nutch.SEGMENT_NAME_KEY), (JobConf) getConf());
+! 
+!     for (int i = 0; i < threadCount; i++) { // spawn threads
+        new FetcherThread(getConf()).start();
+      }
+  
+      // select a timeout that avoids a task timeout
+!     long timeout = getConf().getInt("mapred.task.timeout", 10 * 60 * 1000) / 2;
+  
+!     try {
+!       do { // wait for threads to exit
+!         try {
+!           Thread.sleep(1000);
+!         } catch (InterruptedException e) {
+!         }
+  
+!         reportStatus();
+!         LOG.info("-activeThreads=" + activeThreads + ", spinWaiting=" + spinWaiting.get() + ", fetchQueues.totalSize="
+!             + fetchQueues.getTotalSize());
+  
+!         if (!feeder.isAlive() && fetchQueues.getTotalSize() < 5) {
+!           fetchQueues.dump();
+!         }
+!         // some requests seem to hang, despite all intentions
+!         if ((System.currentTimeMillis() - lastRequestStart.get()) > timeout) {
+!           if (LOG.isWarnEnabled()) {
+!             LOG.warn("Aborting with " + activeThreads + " hung threads.");
+!           }
+!           return;
+          }
+  
+!       } while (activeThreads.get() > 0);
+!       LOG.info("-activeThreads=" + activeThreads);
+!     } finally {
+!       // stop the sns analyzing
+!       _snsParseResultHandler.stopParsing(getConf().get(Nutch.SEGMENT_NAME_KEY));
+!     }
+    }
+  
+    public void fetch(Path segment, int threads, boolean parsing)
+diff -crBE ./src/java/org/apache/nutch/fetcher/FetcherOutput.java ../local/src/java/org/apache/nutch/fetcher/FetcherOutput.java
+*** ./src/java/org/apache/nutch/fetcher/FetcherOutput.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/fetcher/FetcherOutput.java	Fri Dec 11 22:31:05 2009
+***************
+*** 17,28 ****
+  
+  package org.apache.nutch.fetcher;
+  
+! import java.io.*;
+  
+! import org.apache.hadoop.io.*;
+  import org.apache.nutch.crawl.CrawlDatum;
+  import org.apache.nutch.protocol.Content;
+- import org.apache.nutch.parse.*;
+  
+  /* An entry in the fetcher's output. */
+  public final class FetcherOutput implements Writable {
+--- 17,30 ----
+  
+  package org.apache.nutch.fetcher;
+  
+! import java.io.DataInput;
+! import java.io.DataOutput;
+! import java.io.IOException;
+  
+! import org.apache.hadoop.io.Writable;
+  import org.apache.nutch.crawl.CrawlDatum;
++ import org.apache.nutch.parse.ParseImpl;
+  import org.apache.nutch.protocol.Content;
+  
+  /* An entry in the fetcher's output. */
+  public final class FetcherOutput implements Writable {
+diff -crBE ./src/java/org/apache/nutch/fetcher/FetcherOutputFormat.java ../local/src/java/org/apache/nutch/fetcher/FetcherOutputFormat.java
+*** ./src/java/org/apache/nutch/fetcher/FetcherOutputFormat.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/fetcher/FetcherOutputFormat.java	Fri Dec 11 22:31:05 2009
+***************
+*** 19,42 ****
+  
+  import java.io.IOException;
+  
+- import org.apache.nutch.crawl.CrawlDatum;
+- import org.apache.nutch.crawl.NutchWritable;
+  import org.apache.hadoop.fs.FileSystem;
+  import org.apache.hadoop.fs.Path;
+- 
+  import org.apache.hadoop.io.MapFile;
+- import org.apache.hadoop.io.Writable;
+  import org.apache.hadoop.io.Text;
+  import org.apache.hadoop.io.SequenceFile.CompressionType;
+- 
+  import org.apache.hadoop.mapred.FileOutputFormat;
+  import org.apache.hadoop.mapred.OutputFormat;
+  import org.apache.hadoop.mapred.RecordWriter;
+- import org.apache.hadoop.mapred.JobConf;
+  import org.apache.hadoop.mapred.Reporter;
+  import org.apache.hadoop.mapred.SequenceFileOutputFormat;
+  import org.apache.hadoop.util.Progressable;
+! 
+  import org.apache.nutch.parse.Parse;
+  import org.apache.nutch.parse.ParseOutputFormat;
+  import org.apache.nutch.protocol.Content;
+--- 19,39 ----
+  
+  import java.io.IOException;
+  
+  import org.apache.hadoop.fs.FileSystem;
+  import org.apache.hadoop.fs.Path;
+  import org.apache.hadoop.io.MapFile;
+  import org.apache.hadoop.io.Text;
++ import org.apache.hadoop.io.Writable;
+  import org.apache.hadoop.io.SequenceFile.CompressionType;
+  import org.apache.hadoop.mapred.FileOutputFormat;
++ import org.apache.hadoop.mapred.JobConf;
+  import org.apache.hadoop.mapred.OutputFormat;
+  import org.apache.hadoop.mapred.RecordWriter;
+  import org.apache.hadoop.mapred.Reporter;
+  import org.apache.hadoop.mapred.SequenceFileOutputFormat;
+  import org.apache.hadoop.util.Progressable;
+! import org.apache.nutch.crawl.CrawlDatum;
+! import org.apache.nutch.crawl.NutchWritable;
+  import org.apache.nutch.parse.Parse;
+  import org.apache.nutch.parse.ParseOutputFormat;
+  import org.apache.nutch.protocol.Content;
+diff -crBE ./src/java/org/apache/nutch/html/Entities.java ../local/src/java/org/apache/nutch/html/Entities.java
+*** ./src/java/org/apache/nutch/html/Entities.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/html/Entities.java	Fri Dec 11 22:31:05 2009
+***************
+*** 17,23 ****
+  
+  package org.apache.nutch.html;
+  
+! import java.util.*;
+  
+  public class Entities {
+    static final Hashtable<String, String> decoder =
+--- 17,23 ----
+  
+  package org.apache.nutch.html;
+  
+! import java.util.Hashtable;
+  
+  public class Entities {
+    static final Hashtable<String, String> decoder =
+diff -crBE ./src/java/org/apache/nutch/indexer/DeleteDuplicates.java ../local/src/java/org/apache/nutch/indexer/DeleteDuplicates.java
+*** ./src/java/org/apache/nutch/indexer/DeleteDuplicates.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/indexer/DeleteDuplicates.java	Fri Dec 11 22:31:04 2009
+***************
+*** 17,41 ****
+  
+  package org.apache.nutch.indexer;
+  
+! import java.io.*;
+  import java.text.SimpleDateFormat;
+! import java.util.*;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! 
+! import org.apache.hadoop.io.*;
+! import org.apache.hadoop.fs.*;
+! import org.apache.hadoop.conf.*;
+! import org.apache.hadoop.mapred.*;
+! import org.apache.hadoop.util.*;
+! 
+! import org.apache.nutch.util.NutchConfiguration;
+! import org.apache.nutch.util.NutchJob;
+! 
+! import org.apache.lucene.index.IndexReader;
+  import org.apache.lucene.document.DateTools;
+  import org.apache.lucene.document.Document;
+  
+  /**
+   * Delete duplicate documents in a set of Lucene indexes.
+--- 17,67 ----
+  
+  package org.apache.nutch.indexer;
+  
+! import java.io.DataInput;
+! import java.io.DataOutput;
+! import java.io.IOException;
+  import java.text.SimpleDateFormat;
+! import java.util.Iterator;
+! import java.util.Random;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! import org.apache.hadoop.conf.Configuration;
+! import org.apache.hadoop.conf.Configured;
+! import org.apache.hadoop.fs.FileStatus;
+! import org.apache.hadoop.fs.FileSystem;
+! import org.apache.hadoop.fs.Path;
+! import org.apache.hadoop.io.IntWritable;
+! import org.apache.hadoop.io.MD5Hash;
+! import org.apache.hadoop.io.Text;
+! import org.apache.hadoop.io.Writable;
+! import org.apache.hadoop.io.WritableComparable;
+! import org.apache.hadoop.io.WritableUtils;
+! import org.apache.hadoop.mapred.FileInputFormat;
+! import org.apache.hadoop.mapred.FileOutputFormat;
+! import org.apache.hadoop.mapred.FileSplit;
+! import org.apache.hadoop.mapred.InputSplit;
+! import org.apache.hadoop.mapred.JobClient;
+! import org.apache.hadoop.mapred.JobConf;
+! import org.apache.hadoop.mapred.Mapper;
+! import org.apache.hadoop.mapred.OutputCollector;
+! import org.apache.hadoop.mapred.OutputFormat;
+! import org.apache.hadoop.mapred.Partitioner;
+! import org.apache.hadoop.mapred.RecordReader;
+! import org.apache.hadoop.mapred.RecordWriter;
+! import org.apache.hadoop.mapred.Reducer;
+! import org.apache.hadoop.mapred.Reporter;
+! import org.apache.hadoop.mapred.SequenceFileInputFormat;
+! import org.apache.hadoop.mapred.SequenceFileOutputFormat;
+! import org.apache.hadoop.util.Progressable;
+! import org.apache.hadoop.util.StringUtils;
+! import org.apache.hadoop.util.Tool;
+! import org.apache.hadoop.util.ToolRunner;
+  import org.apache.lucene.document.DateTools;
+  import org.apache.lucene.document.Document;
++ import org.apache.lucene.index.IndexReader;
++ import org.apache.nutch.util.NutchConfiguration;
++ import org.apache.nutch.util.NutchJob;
+  
+  /**
+   * Delete duplicate documents in a set of Lucene indexes.
+diff -crBE ./src/java/org/apache/nutch/indexer/FsDirectory.java ../local/src/java/org/apache/nutch/indexer/FsDirectory.java
+*** ./src/java/org/apache/nutch/indexer/FsDirectory.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/indexer/FsDirectory.java	Fri Dec 11 22:31:05 2009
+***************
+*** 17,29 ****
+  
+  package org.apache.nutch.indexer;
+  
+! import java.io.*;
+  import java.util.Random;
+  
+- import org.apache.lucene.store.*;
+- import org.apache.nutch.util.HadoopFSUtil;
+- import org.apache.hadoop.fs.*;
+  import org.apache.hadoop.conf.Configuration;
+  
+  /** Reads a Lucene index stored in DFS. */
+  public class FsDirectory extends Directory {
+--- 17,40 ----
+  
+  package org.apache.nutch.indexer;
+  
+! import java.io.File;
+! import java.io.IOException;
+! import java.io.RandomAccessFile;
+  import java.util.Random;
+  
+  import org.apache.hadoop.conf.Configuration;
++ import org.apache.hadoop.fs.FSDataInputStream;
++ import org.apache.hadoop.fs.FSDataOutputStream;
++ import org.apache.hadoop.fs.FileStatus;
++ import org.apache.hadoop.fs.FileSystem;
++ import org.apache.hadoop.fs.Path;
++ import org.apache.lucene.store.BufferedIndexInput;
++ import org.apache.lucene.store.BufferedIndexOutput;
++ import org.apache.lucene.store.Directory;
++ import org.apache.lucene.store.IndexInput;
++ import org.apache.lucene.store.IndexOutput;
++ import org.apache.lucene.store.Lock;
++ import org.apache.nutch.util.HadoopFSUtil;
+  
+  /** Reads a Lucene index stored in DFS. */
+  public class FsDirectory extends Directory {
+diff -crBE ./src/java/org/apache/nutch/indexer/HighFreqTerms.java ../local/src/java/org/apache/nutch/indexer/HighFreqTerms.java
+*** ./src/java/org/apache/nutch/indexer/HighFreqTerms.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/indexer/HighFreqTerms.java	Fri Dec 11 22:31:05 2009
+***************
+*** 17,28 ****
+  
+  package org.apache.nutch.indexer;
+  
+! import org.apache.lucene.util.PriorityQueue;
+  import org.apache.lucene.index.IndexReader;
+  import org.apache.lucene.index.Term;
+  import org.apache.lucene.index.TermEnum;
+! 
+! import java.io.OutputStreamWriter;
+  
+  /** Lists the most frequent terms in an index. */
+  public class HighFreqTerms {
+--- 17,28 ----
+  
+  package org.apache.nutch.indexer;
+  
+! import java.io.OutputStreamWriter;
+! 
+  import org.apache.lucene.index.IndexReader;
+  import org.apache.lucene.index.Term;
+  import org.apache.lucene.index.TermEnum;
+! import org.apache.lucene.util.PriorityQueue;
+  
+  /** Lists the most frequent terms in an index. */
+  public class HighFreqTerms {
+diff -crBE ./src/java/org/apache/nutch/indexer/IndexMerger.java ../local/src/java/org/apache/nutch/indexer/IndexMerger.java
+*** ./src/java/org/apache/nutch/indexer/IndexMerger.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/indexer/IndexMerger.java	Fri Dec 11 22:31:04 2009
+***************
+*** 17,40 ****
+  
+  package org.apache.nutch.indexer;
+  
+! import java.io.*;
+! import java.util.*;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! 
+! import org.apache.hadoop.fs.*;
+  import org.apache.hadoop.mapred.FileAlreadyExistsException;
+! import org.apache.hadoop.util.*;
+! import org.apache.hadoop.conf.*;
+! 
+  import org.apache.nutch.util.HadoopFSUtil;
+  import org.apache.nutch.util.LogUtil;
+  import org.apache.nutch.util.NutchConfiguration;
+  
+- import org.apache.lucene.store.Directory;
+- import org.apache.lucene.index.IndexWriter;
+- 
+  /*************************************************************************
+   * IndexMerger creates an index for the output corresponding to a 
+   * single fetcher run.
+--- 17,44 ----
+  
+  package org.apache.nutch.indexer;
+  
+! import java.io.IOException;
+! import java.util.ArrayList;
+! import java.util.Arrays;
+! import java.util.List;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! import org.apache.hadoop.conf.Configuration;
+! import org.apache.hadoop.conf.Configured;
+! import org.apache.hadoop.fs.FileStatus;
+! import org.apache.hadoop.fs.FileSystem;
+! import org.apache.hadoop.fs.Path;
+  import org.apache.hadoop.mapred.FileAlreadyExistsException;
+! import org.apache.hadoop.util.StringUtils;
+! import org.apache.hadoop.util.Tool;
+! import org.apache.hadoop.util.ToolRunner;
+! import org.apache.lucene.index.IndexWriter;
+! import org.apache.lucene.store.Directory;
+  import org.apache.nutch.util.HadoopFSUtil;
+  import org.apache.nutch.util.LogUtil;
+  import org.apache.nutch.util.NutchConfiguration;
+  
+  /*************************************************************************
+   * IndexMerger creates an index for the output corresponding to a 
+   * single fetcher run.
+diff -crBE ./src/java/org/apache/nutch/indexer/IndexSorter.java ../local/src/java/org/apache/nutch/indexer/IndexSorter.java
+*** ./src/java/org/apache/nutch/indexer/IndexSorter.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/indexer/IndexSorter.java	Fri Dec 11 22:31:04 2009
+***************
+*** 19,39 ****
+  
+  import java.io.File;
+  import java.io.IOException;
+- import java.util.Date;
+  import java.util.Arrays;
+! 
+! import org.apache.lucene.index.*;
+! import org.apache.lucene.document.*;
+! import org.apache.lucene.store.*;
+! import org.apache.lucene.search.*;
+! 
+! import org.apache.nutch.util.NutchConfiguration;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.hadoop.conf.Configuration;
+  import org.apache.hadoop.conf.Configured;
+! import org.apache.hadoop.util.*;
+  
+  /** Sort a Nutch index by page score.  Higher scoring documents are assigned
+   * smaller document numbers. */
+--- 19,49 ----
+  
+  import java.io.File;
+  import java.io.IOException;
+  import java.util.Arrays;
+! import java.util.Date;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.hadoop.conf.Configuration;
+  import org.apache.hadoop.conf.Configured;
+! import org.apache.hadoop.util.StringUtils;
+! import org.apache.hadoop.util.Tool;
+! import org.apache.hadoop.util.ToolRunner;
+! import org.apache.lucene.document.Document;
+! import org.apache.lucene.document.FieldSelector;
+! import org.apache.lucene.index.CorruptIndexException;
+! import org.apache.lucene.index.FilterIndexReader;
+! import org.apache.lucene.index.IndexReader;
+! import org.apache.lucene.index.IndexWriter;
+! import org.apache.lucene.index.Term;
+! import org.apache.lucene.index.TermDocs;
+! import org.apache.lucene.index.TermEnum;
+! import org.apache.lucene.index.TermPositions;
+! import org.apache.lucene.search.Similarity;
+! import org.apache.lucene.store.IndexInput;
+! import org.apache.lucene.store.RAMDirectory;
+! import org.apache.lucene.store.RAMOutputStream;
+! import org.apache.nutch.util.NutchConfiguration;
+  
+  /** Sort a Nutch index by page score.  Higher scoring documents are assigned
+   * smaller document numbers. */
+diff -crBE ./src/java/org/apache/nutch/indexer/IndexerMapReduce.java ../local/src/java/org/apache/nutch/indexer/IndexerMapReduce.java
+*** ./src/java/org/apache/nutch/indexer/IndexerMapReduce.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/indexer/IndexerMapReduce.java	Fri Dec 11 22:31:04 2009
+***************
+*** 47,52 ****
+--- 47,55 ----
+  import org.apache.nutch.scoring.ScoringFilterException;
+  import org.apache.nutch.scoring.ScoringFilters;
+  
++ import de.ingrid.iplug.se.crawl.sns.CompressedSnsData;
++ import de.ingrid.iplug.se.crawl.sns.SnsParseImpl;
++ 
+  public class IndexerMapReduce extends Configured
+  implements Mapper<Text, Writable, Text, NutchWritable>,
+            Reducer<Text, NutchWritable, Text, NutchDocument> {
+***************
+*** 75,80 ****
+--- 78,86 ----
+      CrawlDatum fetchDatum = null;
+      ParseData parseData = null;
+      ParseText parseText = null;
++     /// TODO rwe: none nutch specific code start:
++     CompressedSnsData snsData = null;
++     /// none nutch specific code end. 
+      while (values.hasNext()) {
+        final Writable value = values.next().get(); // unwrap
+        if (value instanceof Inlinks) {
+***************
+*** 97,102 ****
+--- 103,110 ----
+          parseData = (ParseData)value;
+        } else if (value instanceof ParseText) {
+          parseText = (ParseText)value;
++       } else if (value instanceof CompressedSnsData) {
++         snsData = (CompressedSnsData)value;
+        } else if (LOG.isWarnEnabled()) {
+          LOG.warn("Unrecognized type: "+value.getClass());
+        }
+***************
+*** 121,127 ****
+      // add digest, used by dedup
+      doc.add("digest", metadata.get(Nutch.SIGNATURE_KEY));
+  
+!     final Parse parse = new ParseImpl(parseText, parseData);
+      try {
+        // extract information from dbDatum and pass it to
+        // fetchDatum so that indexing filters can use it
+--- 129,138 ----
+      // add digest, used by dedup
+      doc.add("digest", metadata.get(Nutch.SIGNATURE_KEY));
+  
+! //    final Parse parse = new ParseImpl(parseText, parseData);
+!     /// TODO rwe: none nutch specific code start:
+!     final Parse parse = ((snsData != null)? new SnsParseImpl(parseText, parseData, snsData) : new ParseImpl(parseText, parseData));
+!     /// none nutch specific code end. 
+      try {
+        // extract information from dbDatum and pass it to
+        // fetchDatum so that indexing filters can use it
+***************
+*** 173,178 ****
+--- 184,192 ----
+        FileInputFormat.addInputPath(job, new Path(segment, CrawlDatum.PARSE_DIR_NAME));
+        FileInputFormat.addInputPath(job, new Path(segment, ParseData.DIR_NAME));
+        FileInputFormat.addInputPath(job, new Path(segment, ParseText.DIR_NAME));
++       /// TODO rwe: none nutch specific code start: 
++       FileInputFormat.addInputPath(job, new Path(segment, CompressedSnsData.DIR_NAME));
++       /// none nutch specific code end. 
+      }
+  
+      FileInputFormat.addInputPath(job, new Path(crawlDb, CrawlDb.CURRENT_NAME));
+diff -crBE ./src/java/org/apache/nutch/indexer/IndexingFilter.java ../local/src/java/org/apache/nutch/indexer/IndexingFilter.java
+*** ./src/java/org/apache/nutch/indexer/IndexingFilter.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/indexer/IndexingFilter.java	Fri Dec 11 22:31:04 2009
+***************
+*** 21,31 ****
+  import org.apache.hadoop.conf.Configurable;
+  import org.apache.hadoop.conf.Configuration;
+  import org.apache.hadoop.io.Text;
+- 
+- // Nutch imports
+- import org.apache.nutch.parse.Parse;
+  import org.apache.nutch.crawl.CrawlDatum;
+  import org.apache.nutch.crawl.Inlinks;
+  import org.apache.nutch.plugin.Pluggable;
+  
+  
+--- 21,29 ----
+  import org.apache.hadoop.conf.Configurable;
+  import org.apache.hadoop.conf.Configuration;
+  import org.apache.hadoop.io.Text;
+  import org.apache.nutch.crawl.CrawlDatum;
+  import org.apache.nutch.crawl.Inlinks;
++ import org.apache.nutch.parse.Parse;
+  import org.apache.nutch.plugin.Pluggable;
+  
+  
+diff -crBE ./src/java/org/apache/nutch/indexer/IndexingFilters.java ../local/src/java/org/apache/nutch/indexer/IndexingFilters.java
+*** ./src/java/org/apache/nutch/indexer/IndexingFilters.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/indexer/IndexingFilters.java	Fri Dec 11 22:31:05 2009
+***************
+*** 20,36 ****
+  import java.util.ArrayList;
+  import java.util.HashMap;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+- 
+- import org.apache.nutch.plugin.*;
+- import org.apache.nutch.parse.Parse;
+- import org.apache.nutch.util.ObjectCache;
+  import org.apache.hadoop.conf.Configuration;
+  import org.apache.nutch.crawl.CrawlDatum;
+  import org.apache.nutch.crawl.Inlinks;
+! import org.apache.hadoop.io.Text;
+  
+  /** Creates and caches {@link IndexingFilter} implementing plugins.*/
+  public class IndexingFilters {
+--- 20,37 ----
+  import java.util.ArrayList;
+  import java.util.HashMap;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.hadoop.conf.Configuration;
++ import org.apache.hadoop.io.Text;
+  import org.apache.nutch.crawl.CrawlDatum;
+  import org.apache.nutch.crawl.Inlinks;
+! import org.apache.nutch.parse.Parse;
+! import org.apache.nutch.plugin.Extension;
+! import org.apache.nutch.plugin.ExtensionPoint;
+! import org.apache.nutch.plugin.PluginRepository;
+! import org.apache.nutch.plugin.PluginRuntimeException;
+! import org.apache.nutch.util.ObjectCache;
+  
+  /** Creates and caches {@link IndexingFilter} implementing plugins.*/
+  public class IndexingFilters {
+***************
+*** 68,74 ****
+            Extension extension = extensions[i];
+            IndexingFilter filter = (IndexingFilter) extension
+                .getExtensionInstance();
+!           LOG.info("Adding " + filter.getClass().getName());
+            if (!filterMap.containsKey(filter.getClass().getName())) {
+              filter.addIndexBackendOptions(conf);
+              filterMap.put(filter.getClass().getName(), filter);
+--- 69,75 ----
+            Extension extension = extensions[i];
+            IndexingFilter filter = (IndexingFilter) extension
+                .getExtensionInstance();
+!           LOG.debug("Adding " + filter.getClass().getName());
+            if (!filterMap.containsKey(filter.getClass().getName())) {
+              filter.addIndexBackendOptions(conf);
+              filterMap.put(filter.getClass().getName(), filter);
+diff -crBE ./src/java/org/apache/nutch/net/URLFilter.java ../local/src/java/org/apache/nutch/net/URLFilter.java
+*** ./src/java/org/apache/nutch/net/URLFilter.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/net/URLFilter.java	Fri Dec 11 22:31:04 2009
+***************
+*** 19,26 ****
+  
+  // Hadoop imports
+  import org.apache.hadoop.conf.Configurable;
+- 
+- // Nutch imports
+  import org.apache.nutch.plugin.Pluggable;
+  
+  
+--- 19,24 ----
+diff -crBE ./src/java/org/apache/nutch/net/URLFilterChecker.java ../local/src/java/org/apache/nutch/net/URLFilterChecker.java
+*** ./src/java/org/apache/nutch/net/URLFilterChecker.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/net/URLFilterChecker.java	Fri Dec 11 22:31:04 2009
+***************
+*** 17,33 ****
+  
+  package org.apache.nutch.net;
+  
+  import org.apache.nutch.plugin.Extension;
+  import org.apache.nutch.plugin.ExtensionPoint;
+  import org.apache.nutch.plugin.PluginRepository;
+- 
+- import org.apache.hadoop.conf.Configuration;
+- 
+  import org.apache.nutch.util.NutchConfiguration;
+  
+- import java.io.BufferedReader;
+- import java.io.InputStreamReader;
+- 
+  /**
+   * Checks one given filter or all filters.
+   * 
+--- 17,31 ----
+  
+  package org.apache.nutch.net;
+  
++ import java.io.BufferedReader;
++ import java.io.InputStreamReader;
++ 
++ import org.apache.hadoop.conf.Configuration;
+  import org.apache.nutch.plugin.Extension;
+  import org.apache.nutch.plugin.ExtensionPoint;
+  import org.apache.nutch.plugin.PluginRepository;
+  import org.apache.nutch.util.NutchConfiguration;
+  
+  /**
+   * Checks one given filter or all filters.
+   * 
+diff -crBE ./src/java/org/apache/nutch/net/URLFilters.java ../local/src/java/org/apache/nutch/net/URLFilters.java
+*** ./src/java/org/apache/nutch/net/URLFilters.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/net/URLFilters.java	Fri Dec 11 22:31:04 2009
+***************
+*** 21,33 ****
+  import java.util.HashMap;
+  import java.util.Map;
+  
+  import org.apache.nutch.plugin.Extension;
+  import org.apache.nutch.plugin.ExtensionPoint;
+- import org.apache.nutch.plugin.PluginRuntimeException;
+  import org.apache.nutch.plugin.PluginRepository;
+  import org.apache.nutch.util.ObjectCache;
+- 
+- import org.apache.hadoop.conf.Configuration;
+  /** Creates and caches {@link URLFilter} implementing plugins.*/
+  public class URLFilters {
+  
+--- 21,32 ----
+  import java.util.HashMap;
+  import java.util.Map;
+  
++ import org.apache.hadoop.conf.Configuration;
+  import org.apache.nutch.plugin.Extension;
+  import org.apache.nutch.plugin.ExtensionPoint;
+  import org.apache.nutch.plugin.PluginRepository;
++ import org.apache.nutch.plugin.PluginRuntimeException;
+  import org.apache.nutch.util.ObjectCache;
+  /** Creates and caches {@link URLFilter} implementing plugins.*/
+  public class URLFilters {
+  
+diff -crBE ./src/java/org/apache/nutch/net/URLNormalizerChecker.java ../local/src/java/org/apache/nutch/net/URLNormalizerChecker.java
+*** ./src/java/org/apache/nutch/net/URLNormalizerChecker.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/net/URLNormalizerChecker.java	Fri Dec 11 22:31:04 2009
+***************
+*** 17,33 ****
+  
+  package org.apache.nutch.net;
+  
+  import org.apache.nutch.plugin.Extension;
+  import org.apache.nutch.plugin.ExtensionPoint;
+  import org.apache.nutch.plugin.PluginRepository;
+- 
+- import org.apache.hadoop.conf.Configuration;
+- 
+  import org.apache.nutch.util.NutchConfiguration;
+  
+- import java.io.BufferedReader;
+- import java.io.InputStreamReader;
+- 
+  /**
+   * Checks one given normalizer or all normalizers.
+   */
+--- 17,31 ----
+  
+  package org.apache.nutch.net;
+  
++ import java.io.BufferedReader;
++ import java.io.InputStreamReader;
++ 
++ import org.apache.hadoop.conf.Configuration;
+  import org.apache.nutch.plugin.Extension;
+  import org.apache.nutch.plugin.ExtensionPoint;
+  import org.apache.nutch.plugin.PluginRepository;
+  import org.apache.nutch.util.NutchConfiguration;
+  
+  /**
+   * Checks one given normalizer or all normalizers.
+   */
+diff -crBE ./src/java/org/apache/nutch/net/protocols/HttpDateFormat.java ../local/src/java/org/apache/nutch/net/protocols/HttpDateFormat.java
+*** ./src/java/org/apache/nutch/net/protocols/HttpDateFormat.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/net/protocols/HttpDateFormat.java	Fri Dec 11 22:31:04 2009
+***************
+*** 17,28 ****
+  
+  package org.apache.nutch.net.protocols;
+  
+  import java.util.Calendar;
+  import java.util.Date;
+  import java.util.Locale;
+  import java.util.TimeZone;
+- import java.text.SimpleDateFormat;
+- import java.text.ParseException;
+  
+  /**
+   * class to handle HTTP dates.
+--- 17,28 ----
+  
+  package org.apache.nutch.net.protocols;
+  
++ import java.text.ParseException;
++ import java.text.SimpleDateFormat;
+  import java.util.Calendar;
+  import java.util.Date;
+  import java.util.Locale;
+  import java.util.TimeZone;
+  
+  /**
+   * class to handle HTTP dates.
+diff -crBE ./src/java/org/apache/nutch/net/protocols/Response.java ../local/src/java/org/apache/nutch/net/protocols/Response.java
+*** ./src/java/org/apache/nutch/net/protocols/Response.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/net/protocols/Response.java	Fri Dec 11 22:31:05 2009
+***************
+*** 19,25 ****
+  // JDK imports
+  import java.net.URL;
+  
+- // Nutch imports
+  import org.apache.nutch.metadata.HttpHeaders;
+  import org.apache.nutch.metadata.Metadata;
+  
+--- 19,24 ----
+diff -crBE ./src/java/org/apache/nutch/ontology/Ontology.java ../local/src/java/org/apache/nutch/ontology/Ontology.java
+*** ./src/java/org/apache/nutch/ontology/Ontology.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/ontology/Ontology.java	Fri Dec 11 22:31:05 2009
+***************
+*** 20,26 ****
+  // JDK imports
+  import java.util.Iterator;
+  
+- // Nutch imports
+  import org.apache.nutch.plugin.Pluggable;
+  
+  
+--- 20,25 ----
+diff -crBE ./src/java/org/apache/nutch/ontology/OntologyFactory.java ../local/src/java/org/apache/nutch/ontology/OntologyFactory.java
+*** ./src/java/org/apache/nutch/ontology/OntologyFactory.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/ontology/OntologyFactory.java	Fri Dec 11 22:31:05 2009
+***************
+*** 20,28 ****
+  // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+- 
+- import org.apache.nutch.plugin.*;
+  import org.apache.hadoop.conf.Configuration;
+  
+  /**
+   * A factory for retrieving {@link Ontology} extensions.
+--- 20,30 ----
+  // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.hadoop.conf.Configuration;
++ import org.apache.nutch.plugin.Extension;
++ import org.apache.nutch.plugin.ExtensionPoint;
++ import org.apache.nutch.plugin.PluginRepository;
++ import org.apache.nutch.plugin.PluginRuntimeException;
+  
+  /**
+   * A factory for retrieving {@link Ontology} extensions.
+diff -crBE ./src/java/org/apache/nutch/parse/HtmlParseFilter.java ../local/src/java/org/apache/nutch/parse/HtmlParseFilter.java
+*** ./src/java/org/apache/nutch/parse/HtmlParseFilter.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/parse/HtmlParseFilter.java	Fri Dec 11 22:31:05 2009
+***************
+*** 18,31 ****
+  package org.apache.nutch.parse;
+  
+  // JDK imports
+- import org.w3c.dom.DocumentFragment;
+- 
+- // Hadoop imports
+  import org.apache.hadoop.conf.Configurable;
+- 
+- // Nutch imports
+  import org.apache.nutch.plugin.Pluggable;
+  import org.apache.nutch.protocol.Content;
+  
+  
+  /** Extension point for DOM-based HTML parsers.  Permits one to add additional
+--- 18,27 ----
+  package org.apache.nutch.parse;
+  
+  // JDK imports
+  import org.apache.hadoop.conf.Configurable;
+  import org.apache.nutch.plugin.Pluggable;
+  import org.apache.nutch.protocol.Content;
++ import org.w3c.dom.DocumentFragment;
+  
+  
+  /** Extension point for DOM-based HTML parsers.  Permits one to add additional
+diff -crBE ./src/java/org/apache/nutch/parse/HtmlParseFilters.java ../local/src/java/org/apache/nutch/parse/HtmlParseFilters.java
+*** ./src/java/org/apache/nutch/parse/HtmlParseFilters.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/parse/HtmlParseFilters.java	Fri Dec 11 22:31:05 2009
+***************
+*** 19,29 ****
+  
+  import java.util.HashMap;
+  
+  import org.apache.nutch.protocol.Content;
+- import org.apache.nutch.plugin.*;
+  import org.apache.nutch.util.ObjectCache;
+- import org.apache.hadoop.conf.Configuration;
+- 
+  import org.w3c.dom.DocumentFragment;
+  
+  /** Creates and caches {@link HtmlParseFilter} implementing plugins.*/
+--- 19,31 ----
+  
+  import java.util.HashMap;
+  
++ import org.apache.hadoop.conf.Configuration;
++ import org.apache.nutch.plugin.Extension;
++ import org.apache.nutch.plugin.ExtensionPoint;
++ import org.apache.nutch.plugin.PluginRepository;
++ import org.apache.nutch.plugin.PluginRuntimeException;
+  import org.apache.nutch.protocol.Content;
+  import org.apache.nutch.util.ObjectCache;
+  import org.w3c.dom.DocumentFragment;
+  
+  /** Creates and caches {@link HtmlParseFilter} implementing plugins.*/
+diff -crBE ./src/java/org/apache/nutch/parse/Outlink.java ../local/src/java/org/apache/nutch/parse/Outlink.java
+*** ./src/java/org/apache/nutch/parse/Outlink.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/parse/Outlink.java	Fri Dec 11 22:31:05 2009
+***************
+*** 17,26 ****
+  
+  package org.apache.nutch.parse;
+  
+! import java.io.*;
+  import java.net.MalformedURLException;
+  
+! import org.apache.hadoop.io.*;
+  
+  /* An outgoing link from a page. */
+  public class Outlink implements Writable {
+--- 17,29 ----
+  
+  package org.apache.nutch.parse;
+  
+! import java.io.DataInput;
+! import java.io.DataOutput;
+! import java.io.IOException;
+  import java.net.MalformedURLException;
+  
+! import org.apache.hadoop.io.Text;
+! import org.apache.hadoop.io.Writable;
+  
+  /* An outgoing link from a page. */
+  public class Outlink implements Writable {
+diff -crBE ./src/java/org/apache/nutch/parse/ParseData.java ../local/src/java/org/apache/nutch/parse/ParseData.java
+*** ./src/java/org/apache/nutch/parse/ParseData.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/parse/ParseData.java	Fri Dec 11 22:31:04 2009
+***************
+*** 17,29 ****
+  
+  package org.apache.nutch.parse;
+  
+! import java.io.*;
+! import java.util.*;
+  
+- import org.apache.hadoop.io.*;
+  import org.apache.hadoop.conf.Configuration;
+! import org.apache.hadoop.fs.*;
+! 
+  import org.apache.nutch.metadata.Metadata;
+  import org.apache.nutch.util.NutchConfiguration;
+  
+--- 17,34 ----
+  
+  package org.apache.nutch.parse;
+  
+! import java.io.DataInput;
+! import java.io.DataOutput;
+! import java.io.IOException;
+! import java.util.Arrays;
+  
+  import org.apache.hadoop.conf.Configuration;
+! import org.apache.hadoop.fs.FileSystem;
+! import org.apache.hadoop.fs.Path;
+! import org.apache.hadoop.io.ArrayFile;
+! import org.apache.hadoop.io.Text;
+! import org.apache.hadoop.io.VersionMismatchException;
+! import org.apache.hadoop.io.VersionedWritable;
+  import org.apache.nutch.metadata.Metadata;
+  import org.apache.nutch.util.NutchConfiguration;
+  
+diff -crBE ./src/java/org/apache/nutch/parse/ParseImpl.java ../local/src/java/org/apache/nutch/parse/ParseImpl.java
+*** ./src/java/org/apache/nutch/parse/ParseImpl.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/parse/ParseImpl.java	Fri Dec 11 22:31:05 2009
+***************
+*** 17,24 ****
+  
+  package org.apache.nutch.parse;
+  
+! import java.io.*;
+! import org.apache.hadoop.io.*;
+  
+  
+  /** The result of parsing a page's raw content.
+--- 17,27 ----
+  
+  package org.apache.nutch.parse;
+  
+! import java.io.DataInput;
+! import java.io.DataOutput;
+! import java.io.IOException;
+! 
+! import org.apache.hadoop.io.Writable;
+  
+  
+  /** The result of parsing a page's raw content.
+diff -crBE ./src/java/org/apache/nutch/parse/ParseOutputFormat.java ../local/src/java/org/apache/nutch/parse/ParseOutputFormat.java
+*** ./src/java/org/apache/nutch/parse/ParseOutputFormat.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/parse/ParseOutputFormat.java	Fri Dec 11 22:31:04 2009
+***************
+*** 18,47 ****
+  package org.apache.nutch.parse;
+  
+  // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! 
+! import org.apache.hadoop.io.*;
+  import org.apache.hadoop.io.SequenceFile.CompressionType;
+  import org.apache.nutch.crawl.CrawlDatum;
+  import org.apache.nutch.fetcher.Fetcher;
+! import org.apache.hadoop.fs.*;
+! import org.apache.hadoop.mapred.*;
+  import org.apache.nutch.scoring.ScoringFilterException;
+  import org.apache.nutch.scoring.ScoringFilters;
+  import org.apache.nutch.util.StringUtil;
+  import org.apache.nutch.util.URLUtil;
+- import org.apache.nutch.metadata.Nutch;
+- import org.apache.nutch.net.*;
+- 
+- import java.io.*;
+- import java.net.MalformedURLException;
+- import java.net.URL;
+- import java.util.ArrayList;
+- import java.util.List;
+- import java.util.Map.Entry;
+- 
+- import org.apache.hadoop.util.Progressable;
+  
+  /* Parse content in a segment. */
+  public class ParseOutputFormat implements OutputFormat<Text, Parse> {
+--- 18,55 ----
+  package org.apache.nutch.parse;
+  
+  // Commons Logging imports
++ import java.io.IOException;
++ import java.net.MalformedURLException;
++ import java.net.URL;
++ import java.util.ArrayList;
++ import java.util.List;
++ import java.util.Map.Entry;
++ 
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! import org.apache.hadoop.fs.FileSystem;
+! import org.apache.hadoop.fs.Path;
+! import org.apache.hadoop.io.MapFile;
+! import org.apache.hadoop.io.SequenceFile;
+! import org.apache.hadoop.io.Text;
+  import org.apache.hadoop.io.SequenceFile.CompressionType;
++ import org.apache.hadoop.mapred.FileOutputFormat;
++ import org.apache.hadoop.mapred.JobConf;
++ import org.apache.hadoop.mapred.OutputFormat;
++ import org.apache.hadoop.mapred.RecordWriter;
++ import org.apache.hadoop.mapred.Reporter;
++ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
++ import org.apache.hadoop.util.Progressable;
+  import org.apache.nutch.crawl.CrawlDatum;
+  import org.apache.nutch.fetcher.Fetcher;
+! import org.apache.nutch.metadata.Nutch;
+! import org.apache.nutch.net.URLFilterException;
+! import org.apache.nutch.net.URLFilters;
+! import org.apache.nutch.net.URLNormalizers;
+  import org.apache.nutch.scoring.ScoringFilterException;
+  import org.apache.nutch.scoring.ScoringFilters;
+  import org.apache.nutch.util.StringUtil;
+  import org.apache.nutch.util.URLUtil;
+  
+  /* Parse content in a segment. */
+  public class ParseOutputFormat implements OutputFormat<Text, Parse> {
+diff -crBE ./src/java/org/apache/nutch/parse/ParsePluginsReader.java ../local/src/java/org/apache/nutch/parse/ParsePluginsReader.java
+*** ./src/java/org/apache/nutch/parse/ParsePluginsReader.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/parse/ParsePluginsReader.java	Fri Dec 11 22:31:04 2009
+***************
+*** 27,46 ****
+  import javax.xml.parsers.DocumentBuilder;
+  import javax.xml.parsers.DocumentBuilderFactory;
+  
+- import org.w3c.dom.Document;
+- import org.w3c.dom.Element;
+- import org.w3c.dom.NodeList;
+- import org.xml.sax.InputSource;
+- 
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+- 
+- // Hadoop imports
+  import org.apache.hadoop.conf.Configuration;
+- 
+- // Nutch imports
+  import org.apache.nutch.util.NutchConfiguration;
+  
+  
+  /**
+--- 27,40 ----
+  import javax.xml.parsers.DocumentBuilder;
+  import javax.xml.parsers.DocumentBuilderFactory;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.hadoop.conf.Configuration;
+  import org.apache.nutch.util.NutchConfiguration;
++ import org.w3c.dom.Document;
++ import org.w3c.dom.Element;
++ import org.w3c.dom.NodeList;
++ import org.xml.sax.InputSource;
+  
+  
+  /**
+diff -crBE ./src/java/org/apache/nutch/parse/ParseSegment.java ../local/src/java/org/apache/nutch/parse/ParseSegment.java
+*** ./src/java/org/apache/nutch/parse/ParseSegment.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/parse/ParseSegment.java	Fri Dec 11 22:31:05 2009
+***************
+*** 17,41 ****
+  
+  package org.apache.nutch.parse;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! 
+  import org.apache.nutch.crawl.CrawlDatum;
+  import org.apache.nutch.crawl.SignatureFactory;
+- import org.apache.hadoop.io.*;
+- import org.apache.hadoop.mapred.*;
+- import org.apache.hadoop.util.*;
+- import org.apache.hadoop.conf.*;
+  import org.apache.nutch.metadata.Nutch;
+! import org.apache.nutch.protocol.*;
+  import org.apache.nutch.scoring.ScoringFilterException;
+  import org.apache.nutch.scoring.ScoringFilters;
+! import org.apache.nutch.util.*;
+! import org.apache.hadoop.fs.Path;
+! 
+! import java.io.*;
+! import java.util.*;
+! import java.util.Map.Entry;
+  
+  /* Parse content in a segment. */
+  public class ParseSegment extends Configured implements Tool,
+--- 17,57 ----
+  
+  package org.apache.nutch.parse;
+  
++ import java.io.IOException;
++ import java.util.Iterator;
++ import java.util.Map.Entry;
++ 
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! import org.apache.hadoop.conf.Configuration;
+! import org.apache.hadoop.conf.Configured;
+! import org.apache.hadoop.fs.Path;
+! import org.apache.hadoop.io.Text;
+! import org.apache.hadoop.io.UTF8;
+! import org.apache.hadoop.io.Writable;
+! import org.apache.hadoop.io.WritableComparable;
+! import org.apache.hadoop.mapred.FileInputFormat;
+! import org.apache.hadoop.mapred.FileOutputFormat;
+! import org.apache.hadoop.mapred.JobClient;
+! import org.apache.hadoop.mapred.JobConf;
+! import org.apache.hadoop.mapred.Mapper;
+! import org.apache.hadoop.mapred.OutputCollector;
+! import org.apache.hadoop.mapred.Reducer;
+! import org.apache.hadoop.mapred.Reporter;
+! import org.apache.hadoop.mapred.SequenceFileInputFormat;
+! import org.apache.hadoop.util.StringUtils;
+! import org.apache.hadoop.util.Tool;
+! import org.apache.hadoop.util.ToolRunner;
+  import org.apache.nutch.crawl.CrawlDatum;
+  import org.apache.nutch.crawl.SignatureFactory;
+  import org.apache.nutch.metadata.Nutch;
+! import org.apache.nutch.protocol.Content;
+  import org.apache.nutch.scoring.ScoringFilterException;
+  import org.apache.nutch.scoring.ScoringFilters;
+! import org.apache.nutch.util.LogUtil;
+! import org.apache.nutch.util.NutchConfiguration;
+! import org.apache.nutch.util.NutchJob;
+! import org.apache.nutch.util.StringUtil;
+  
+  /* Parse content in a segment. */
+  public class ParseSegment extends Configured implements Tool,
+diff -crBE ./src/java/org/apache/nutch/parse/ParseStatus.java ../local/src/java/org/apache/nutch/parse/ParseStatus.java
+*** ./src/java/org/apache/nutch/parse/ParseStatus.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/parse/ParseStatus.java	Fri Dec 11 22:31:04 2009
+***************
+*** 25,35 ****
+  import java.io.DataOutput;
+  import java.io.IOException;
+  
+  import org.apache.hadoop.io.VersionMismatchException;
+  import org.apache.hadoop.io.Writable;
+  import org.apache.hadoop.io.WritableUtils;
+- import org.apache.hadoop.conf.Configuration;
+- 
+  import org.apache.nutch.metadata.Metadata;
+  
+  
+--- 25,34 ----
+  import java.io.DataOutput;
+  import java.io.IOException;
+  
++ import org.apache.hadoop.conf.Configuration;
+  import org.apache.hadoop.io.VersionMismatchException;
+  import org.apache.hadoop.io.Writable;
+  import org.apache.hadoop.io.WritableUtils;
+  import org.apache.nutch.metadata.Metadata;
+  
+  
+diff -crBE ./src/java/org/apache/nutch/parse/ParseText.java ../local/src/java/org/apache/nutch/parse/ParseText.java
+*** ./src/java/org/apache/nutch/parse/ParseText.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/parse/ParseText.java	Fri Dec 11 22:31:04 2009
+***************
+*** 17,26 ****
+  
+  package org.apache.nutch.parse;
+  
+! import java.io.*;
+! import org.apache.hadoop.io.*;
+! import org.apache.hadoop.fs.*;
+! import org.apache.hadoop.conf.*;
+  import org.apache.nutch.util.NutchConfiguration;
+  
+  /* The text conversion of page's content, stored using gzip compression.
+--- 17,34 ----
+  
+  package org.apache.nutch.parse;
+  
+! import java.io.DataInput;
+! import java.io.DataOutput;
+! import java.io.IOException;
+! 
+! import org.apache.hadoop.conf.Configuration;
+! import org.apache.hadoop.fs.FileSystem;
+! import org.apache.hadoop.fs.Path;
+! import org.apache.hadoop.io.ArrayFile;
+! import org.apache.hadoop.io.Text;
+! import org.apache.hadoop.io.VersionMismatchException;
+! import org.apache.hadoop.io.Writable;
+! import org.apache.hadoop.io.WritableUtils;
+  import org.apache.nutch.util.NutchConfiguration;
+  
+  /* The text conversion of page's content, stored using gzip compression.
+diff -crBE ./src/java/org/apache/nutch/parse/ParseUtil.java ../local/src/java/org/apache/nutch/parse/ParseUtil.java
+*** ./src/java/org/apache/nutch/parse/ParseUtil.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/parse/ParseUtil.java	Fri Dec 11 22:31:04 2009
+***************
+*** 19,30 ****
+  // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+- 
+- // Nutch Imports
+- import org.apache.nutch.protocol.Content;
+- 
+- // Hadoop imports
+  import org.apache.hadoop.conf.Configuration;
+  
+  
+  /**
+--- 19,26 ----
+  // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.hadoop.conf.Configuration;
++ import org.apache.nutch.protocol.Content;
+  
+  
+  /**
+diff -crBE ./src/java/org/apache/nutch/parse/Parser.java ../local/src/java/org/apache/nutch/parse/Parser.java
+*** ./src/java/org/apache/nutch/parse/Parser.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/parse/Parser.java	Fri Dec 11 22:31:05 2009
+***************
+*** 19,26 ****
+  
+  // Hadoop imports
+  import org.apache.hadoop.conf.Configurable;
+- 
+- // Nutch imports
+  import org.apache.nutch.plugin.Pluggable;
+  import org.apache.nutch.protocol.Content;
+  
+--- 19,24 ----
+diff -crBE ./src/java/org/apache/nutch/parse/ParserChecker.java ../local/src/java/org/apache/nutch/parse/ParserChecker.java
+*** ./src/java/org/apache/nutch/parse/ParserChecker.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/parse/ParserChecker.java	Fri Dec 11 22:31:05 2009
+***************
+*** 19,36 ****
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+- 
+  import org.apache.hadoop.conf.Configuration;
+- 
+- import org.apache.nutch.util.NutchConfiguration;
+- 
+- import org.apache.nutch.crawl.CrawlDatum;
+  import org.apache.hadoop.io.Text;
+! import org.apache.nutch.parse.ParseUtil;
+! 
+! import org.apache.nutch.protocol.ProtocolFactory;
+! import org.apache.nutch.protocol.Protocol;
+  import org.apache.nutch.protocol.Content;
+  
+  /**
+   * Parser checker, useful for testing parser.
+--- 19,31 ----
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.hadoop.conf.Configuration;
+  import org.apache.hadoop.io.Text;
+! import org.apache.nutch.crawl.CrawlDatum;
+  import org.apache.nutch.protocol.Content;
++ import org.apache.nutch.protocol.Protocol;
++ import org.apache.nutch.protocol.ProtocolFactory;
++ import org.apache.nutch.util.NutchConfiguration;
+  
+  /**
+   * Parser checker, useful for testing parser.
+diff -crBE ./src/java/org/apache/nutch/parse/ParserFactory.java ../local/src/java/org/apache/nutch/parse/ParserFactory.java
+*** ./src/java/org/apache/nutch/parse/ParserFactory.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/parse/ParserFactory.java	Fri Dec 11 22:31:04 2009
+***************
+*** 23,40 ****
+  import java.util.List;
+  import java.util.Vector;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+- 
+- // Hadoop imports
+  import org.apache.hadoop.conf.Configuration;
+- 
+- // Nutch imports
+  import org.apache.nutch.plugin.Extension;
+  import org.apache.nutch.plugin.ExtensionPoint;
+- import org.apache.nutch.plugin.PluginRuntimeException;
+  import org.apache.nutch.plugin.PluginRepository;
+  import org.apache.nutch.util.LogUtil;
+  import org.apache.nutch.util.MimeUtil;
+  import org.apache.nutch.util.ObjectCache;
+--- 23,35 ----
+  import java.util.List;
+  import java.util.Vector;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.hadoop.conf.Configuration;
+  import org.apache.nutch.plugin.Extension;
+  import org.apache.nutch.plugin.ExtensionPoint;
+  import org.apache.nutch.plugin.PluginRepository;
++ import org.apache.nutch.plugin.PluginRuntimeException;
+  import org.apache.nutch.util.LogUtil;
+  import org.apache.nutch.util.MimeUtil;
+  import org.apache.nutch.util.ObjectCache;
+Only in ../local/src/java/org/apache/nutch/parse: resulthandler
+diff -crBE ./src/java/org/apache/nutch/plugin/Extension.java ../local/src/java/org/apache/nutch/plugin/Extension.java
+*** ./src/java/org/apache/nutch/plugin/Extension.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/plugin/Extension.java	Fri Dec 11 22:31:04 2009
+***************
+*** 18,25 ****
+  
+  import java.util.HashMap;
+  
+- import org.apache.hadoop.conf.Configuration;
+  import org.apache.hadoop.conf.Configurable;
+  
+  /**
+   * An <code>Extension</code> is a kind of listener descriptor that will be
+--- 18,25 ----
+  
+  import java.util.HashMap;
+  
+  import org.apache.hadoop.conf.Configurable;
++ import org.apache.hadoop.conf.Configuration;
+  
+  /**
+   * An <code>Extension</code> is a kind of listener descriptor that will be
+diff -crBE ./src/java/org/apache/nutch/plugin/PluginManifestParser.java ../local/src/java/org/apache/nutch/plugin/PluginManifestParser.java
+*** ./src/java/org/apache/nutch/plugin/PluginManifestParser.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/plugin/PluginManifestParser.java	Fri Dec 11 22:31:04 2009
+***************
+*** 85,91 ****
+        }
+        LOG.info("Plugins: looking in: " + directory.getAbsolutePath());
+        for (File oneSubFolder : directory.listFiles()) {
+!         if (oneSubFolder.isDirectory()) {
+            String manifestPath = oneSubFolder.getAbsolutePath() + File.separator
+                + "plugin.xml";
+            try {
+--- 84,90 ----
+        }
+        LOG.info("Plugins: looking in: " + directory.getAbsolutePath());
+        for (File oneSubFolder : directory.listFiles()) {
+!         if (oneSubFolder.isDirectory() && !oneSubFolder.getPath().endsWith(".svn")) {
+            String manifestPath = oneSubFolder.getAbsolutePath() + File.separator
+                + "plugin.xml";
+            try {
+diff -crBE ./src/java/org/apache/nutch/plugin/PluginRepository.java ../local/src/java/org/apache/nutch/plugin/PluginRepository.java
+*** ./src/java/org/apache/nutch/plugin/PluginRepository.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/plugin/PluginRepository.java	Fri Dec 11 22:31:04 2009
+***************
+*** 21,30 ****
+  import java.lang.reflect.Method;
+  import java.util.ArrayList;
+  import java.util.HashMap;
+- import java.util.WeakHashMap;
+  import java.util.List;
+  import java.util.Map;
+  import java.util.regex.Pattern;
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.hadoop.conf.Configuration;
+--- 21,31 ----
+  import java.lang.reflect.Method;
+  import java.util.ArrayList;
+  import java.util.HashMap;
+  import java.util.List;
+  import java.util.Map;
++ import java.util.WeakHashMap;
+  import java.util.regex.Pattern;
++ 
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.hadoop.conf.Configuration;
+diff -crBE ./src/java/org/apache/nutch/protocol/Content.java ../local/src/java/org/apache/nutch/protocol/Content.java
+*** ./src/java/org/apache/nutch/protocol/Content.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/protocol/Content.java	Fri Dec 11 22:31:05 2009
+***************
+*** 26,32 ****
+  import java.util.Arrays;
+  import java.util.zip.InflaterInputStream;
+  
+- //Hadoop imports
+  import org.apache.hadoop.conf.Configuration;
+  import org.apache.hadoop.fs.FileSystem;
+  import org.apache.hadoop.fs.Path;
+--- 26,31 ----
+***************
+*** 35,42 ****
+  import org.apache.hadoop.io.UTF8;
+  import org.apache.hadoop.io.VersionMismatchException;
+  import org.apache.hadoop.io.Writable;
+- 
+- //Nutch imports
+  import org.apache.nutch.metadata.Metadata;
+  import org.apache.nutch.util.MimeUtil;
+  import org.apache.nutch.util.NutchConfiguration;
+--- 34,39 ----
+diff -crBE ./src/java/org/apache/nutch/protocol/Protocol.java ../local/src/java/org/apache/nutch/protocol/Protocol.java
+*** ./src/java/org/apache/nutch/protocol/Protocol.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/protocol/Protocol.java	Fri Dec 11 22:31:05 2009
+***************
+*** 20,27 ****
+  // Hadoop imports
+  import org.apache.hadoop.conf.Configurable;
+  import org.apache.hadoop.io.Text;
+- 
+- // Nutch imports
+  import org.apache.nutch.crawl.CrawlDatum;
+  import org.apache.nutch.plugin.Pluggable;
+  
+--- 20,25 ----
+diff -crBE ./src/java/org/apache/nutch/protocol/ProtocolFactory.java ../local/src/java/org/apache/nutch/protocol/ProtocolFactory.java
+*** ./src/java/org/apache/nutch/protocol/ProtocolFactory.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/protocol/ProtocolFactory.java	Fri Dec 11 22:31:05 2009
+***************
+*** 17,33 ****
+  
+  package org.apache.nutch.protocol;
+  
+- import java.net.URL;
+  import java.net.MalformedURLException;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+- 
+- import org.apache.nutch.plugin.*;
+- import org.apache.nutch.util.ObjectCache;
+- 
+  import org.apache.hadoop.conf.Configuration;
+  
+  /**
+   * Creates and caches {@link Protocol} plugins. Protocol plugins should define
+--- 17,33 ----
+  
+  package org.apache.nutch.protocol;
+  
+  import java.net.MalformedURLException;
++ import java.net.URL;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.hadoop.conf.Configuration;
++ import org.apache.nutch.plugin.Extension;
++ import org.apache.nutch.plugin.ExtensionPoint;
++ import org.apache.nutch.plugin.PluginRepository;
++ import org.apache.nutch.plugin.PluginRuntimeException;
++ import org.apache.nutch.util.ObjectCache;
+  
+  /**
+   * Creates and caches {@link Protocol} plugins. Protocol plugins should define
+diff -crBE ./src/java/org/apache/nutch/scoring/ScoringFilters.java ../local/src/java/org/apache/nutch/scoring/ScoringFilters.java
+*** ./src/java/org/apache/nutch/scoring/ScoringFilters.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/scoring/ScoringFilters.java	Fri Dec 11 22:31:04 2009
+***************
+*** 22,27 ****
+--- 22,30 ----
+  import java.util.List;
+  import java.util.Map.Entry;
+  
++ import org.apache.hadoop.conf.Configuration;
++ import org.apache.hadoop.conf.Configured;
++ import org.apache.hadoop.io.Text;
+  import org.apache.nutch.crawl.CrawlDatum;
+  import org.apache.nutch.crawl.Inlinks;
+  import org.apache.nutch.indexer.NutchDocument;
+***************
+*** 29,43 ****
+  import org.apache.nutch.parse.ParseData;
+  import org.apache.nutch.plugin.Extension;
+  import org.apache.nutch.plugin.ExtensionPoint;
+- import org.apache.nutch.plugin.PluginRuntimeException;
+  import org.apache.nutch.plugin.PluginRepository;
+  import org.apache.nutch.protocol.Content;
+  import org.apache.nutch.util.ObjectCache;
+  
+- import org.apache.hadoop.conf.Configuration;
+- import org.apache.hadoop.conf.Configured;
+- import org.apache.hadoop.io.Text;
+- 
+  /**
+   * Creates and caches {@link ScoringFilter} implementing plugins.
+   * 
+--- 32,42 ----
+  import org.apache.nutch.parse.ParseData;
+  import org.apache.nutch.plugin.Extension;
+  import org.apache.nutch.plugin.ExtensionPoint;
+  import org.apache.nutch.plugin.PluginRepository;
++ import org.apache.nutch.plugin.PluginRuntimeException;
+  import org.apache.nutch.protocol.Content;
+  import org.apache.nutch.util.ObjectCache;
+  
+  /**
+   * Creates and caches {@link ScoringFilter} implementing plugins.
+   * 
+diff -crBE ./src/java/org/apache/nutch/searcher/FetchedSegments.java ../local/src/java/org/apache/nutch/searcher/FetchedSegments.java
+*** ./src/java/org/apache/nutch/searcher/FetchedSegments.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/searcher/FetchedSegments.java	Fri Dec 11 22:31:04 2009
+***************
+*** 31,45 ****
+  import java.util.concurrent.Future;
+  
+  import org.apache.commons.lang.StringUtils;
+- import org.apache.hadoop.io.*;
+- import org.apache.hadoop.fs.*;
+- import org.apache.nutch.protocol.*;
+- import org.apache.nutch.parse.*;
+- import org.apache.nutch.util.HadoopFSUtil;
+  import org.apache.hadoop.conf.Configuration;
+! import org.apache.hadoop.mapred.*;
+! import org.apache.hadoop.mapred.lib.*;
+! import org.apache.nutch.crawl.*;
+  
+  /** Implements {@link HitSummarizer} and {@link HitContent} for a set of
+   * fetched segments. */
+--- 30,50 ----
+  import java.util.concurrent.Future;
+  
+  import org.apache.commons.lang.StringUtils;
+  import org.apache.hadoop.conf.Configuration;
+! import org.apache.hadoop.fs.FileStatus;
+! import org.apache.hadoop.fs.FileSystem;
+! import org.apache.hadoop.fs.Path;
+! import org.apache.hadoop.io.MapFile;
+! import org.apache.hadoop.io.Text;
+! import org.apache.hadoop.io.Writable;
+! import org.apache.hadoop.mapred.MapFileOutputFormat;
+! import org.apache.hadoop.mapred.Partitioner;
+! import org.apache.hadoop.mapred.lib.HashPartitioner;
+! import org.apache.nutch.crawl.CrawlDatum;
+! import org.apache.nutch.parse.ParseData;
+! import org.apache.nutch.parse.ParseText;
+! import org.apache.nutch.protocol.Content;
+! import org.apache.nutch.util.HadoopFSUtil;
+  
+  /** Implements {@link HitSummarizer} and {@link HitContent} for a set of
+   * fetched segments. */
+diff -crBE ./src/java/org/apache/nutch/searcher/FieldQueryFilter.java ../local/src/java/org/apache/nutch/searcher/FieldQueryFilter.java
+*** ./src/java/org/apache/nutch/searcher/FieldQueryFilter.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/searcher/FieldQueryFilter.java	Fri Dec 11 22:31:05 2009
+***************
+*** 17,33 ****
+  
+  package org.apache.nutch.searcher;
+  
+  import org.apache.lucene.search.BooleanClause;
+  import org.apache.lucene.search.BooleanQuery;
+  import org.apache.lucene.search.PhraseQuery;
+  import org.apache.lucene.search.TermQuery;
+- import org.apache.lucene.index.Term;
+- 
+  import org.apache.nutch.analysis.CommonGrams;
+- 
+  import org.apache.nutch.searcher.Query.Clause;
+  import org.apache.nutch.searcher.Query.Phrase;
+- import org.apache.hadoop.conf.Configuration;
+  
+  /** Translate query fields to search the same-named field, as indexed by an
+   * IndexingFilter.  Best for tokenized fields. */
+--- 17,31 ----
+  
+  package org.apache.nutch.searcher;
+  
++ import org.apache.hadoop.conf.Configuration;
++ import org.apache.lucene.index.Term;
+  import org.apache.lucene.search.BooleanClause;
+  import org.apache.lucene.search.BooleanQuery;
+  import org.apache.lucene.search.PhraseQuery;
+  import org.apache.lucene.search.TermQuery;
+  import org.apache.nutch.analysis.CommonGrams;
+  import org.apache.nutch.searcher.Query.Clause;
+  import org.apache.nutch.searcher.Query.Phrase;
+  
+  /** Translate query fields to search the same-named field, as indexed by an
+   * IndexingFilter.  Best for tokenized fields. */
+diff -crBE ./src/java/org/apache/nutch/searcher/HitDetails.java ../local/src/java/org/apache/nutch/searcher/HitDetails.java
+*** ./src/java/org/apache/nutch/searcher/HitDetails.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/searcher/HitDetails.java	Fri Dec 11 22:31:06 2009
+***************
+*** 22,28 ****
+  import java.io.IOException;
+  import java.util.ArrayList;
+  
+! import org.apache.hadoop.io.*;
+  import org.apache.nutch.html.Entities;
+  
+  /** Data stored in the index for a hit.
+--- 22,28 ----
+  import java.io.IOException;
+  import java.util.ArrayList;
+  
+! import org.apache.hadoop.io.Writable;
+  import org.apache.nutch.html.Entities;
+  
+  /** Data stored in the index for a hit.
+diff -crBE ./src/java/org/apache/nutch/searcher/Hits.java ../local/src/java/org/apache/nutch/searcher/Hits.java
+*** ./src/java/org/apache/nutch/searcher/Hits.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/searcher/Hits.java	Fri Dec 11 22:31:04 2009
+***************
+*** 21,29 ****
+  import java.io.DataOutput;
+  import java.io.IOException;
+  
+  import org.apache.hadoop.io.Writable;
+  import org.apache.hadoop.io.WritableComparable;
+- import org.apache.hadoop.io.Text;
+  
+  /** A set of hits matching a query. */
+  public final class Hits implements Writable {
+--- 21,29 ----
+  import java.io.DataOutput;
+  import java.io.IOException;
+  
++ import org.apache.hadoop.io.Text;
+  import org.apache.hadoop.io.Writable;
+  import org.apache.hadoop.io.WritableComparable;
+  
+  /** A set of hits matching a query. */
+  public final class Hits implements Writable {
+diff -crBE ./src/java/org/apache/nutch/searcher/LinkDbInlinks.java ../local/src/java/org/apache/nutch/searcher/LinkDbInlinks.java
+*** ./src/java/org/apache/nutch/searcher/LinkDbInlinks.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/searcher/LinkDbInlinks.java	Fri Dec 11 22:31:05 2009
+***************
+*** 23,36 ****
+  
+  import java.io.IOException;
+  
+- import org.apache.nutch.crawl.Inlinks;
+- import org.apache.nutch.crawl.LinkDbReader;
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+- import org.apache.hadoop.fs.FileSystem;
+- import org.apache.hadoop.io.Text;
+  import org.apache.hadoop.conf.Configuration;
+  import org.apache.hadoop.fs.Path;
+  
+  public class LinkDbInlinks implements HitInlinks {
+    private static final Log LOG = LogFactory.getLog(LinkDbInlinks.class);
+--- 23,36 ----
+  
+  import java.io.IOException;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.hadoop.conf.Configuration;
++ import org.apache.hadoop.fs.FileSystem;
+  import org.apache.hadoop.fs.Path;
++ import org.apache.hadoop.io.Text;
++ import org.apache.nutch.crawl.Inlinks;
++ import org.apache.nutch.crawl.LinkDbReader;
+  
+  public class LinkDbInlinks implements HitInlinks {
+    private static final Log LOG = LogFactory.getLog(LinkDbInlinks.class);
+diff -crBE ./src/java/org/apache/nutch/searcher/LuceneQueryOptimizer.java ../local/src/java/org/apache/nutch/searcher/LuceneQueryOptimizer.java
+*** ./src/java/org/apache/nutch/searcher/LuceneQueryOptimizer.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/searcher/LuceneQueryOptimizer.java	Fri Dec 11 22:31:05 2009
+***************
+*** 17,34 ****
+  
+  package org.apache.nutch.searcher;
+  
+! import org.apache.lucene.search.Searcher;
+! import org.apache.lucene.search.*;
+! import org.apache.lucene.index.Term;
+! import org.apache.lucene.misc.ChainedFilter;
+! 
+! import org.apache.hadoop.conf.Configuration;
+! 
+  import java.util.LinkedHashMap;
+  import java.util.Map;
+- import java.util.ArrayList;
+  
+! import java.io.IOException;
+  
+  /** Utility which converts certain query clauses into {@link QueryFilter}s and
+   * caches these.  Only required clauses whose boost is zero are converted to
+--- 17,42 ----
+  
+  package org.apache.nutch.searcher;
+  
+! import java.io.IOException;
+! import java.util.ArrayList;
+  import java.util.LinkedHashMap;
+  import java.util.Map;
+  
+! import org.apache.hadoop.conf.Configuration;
+! import org.apache.lucene.index.Term;
+! import org.apache.lucene.misc.ChainedFilter;
+! import org.apache.lucene.search.BooleanClause;
+! import org.apache.lucene.search.BooleanQuery;
+! import org.apache.lucene.search.CachingWrapperFilter;
+! import org.apache.lucene.search.Filter;
+! import org.apache.lucene.search.QueryWrapperFilter;
+! import org.apache.lucene.search.RangeFilter;
+! import org.apache.lucene.search.RangeQuery;
+! import org.apache.lucene.search.Searcher;
+! import org.apache.lucene.search.Sort;
+! import org.apache.lucene.search.TermQuery;
+! import org.apache.lucene.search.TopDocCollector;
+! import org.apache.lucene.search.TopDocs;
+  
+  /** Utility which converts certain query clauses into {@link QueryFilter}s and
+   * caches these.  Only required clauses whose boost is zero are converted to
+diff -crBE ./src/java/org/apache/nutch/searcher/NutchBean.java ../local/src/java/org/apache/nutch/searcher/NutchBean.java
+*** ./src/java/org/apache/nutch/searcher/NutchBean.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/searcher/NutchBean.java	Fri Dec 11 22:31:05 2009
+***************
+*** 17,37 ****
+  
+  package org.apache.nutch.searcher;
+  
+! import java.io.*;
+  import java.net.InetSocketAddress;
+! import java.util.*;
+! 
+! import javax.servlet.*;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! 
+! import org.apache.hadoop.fs.*;
+  import org.apache.hadoop.fs.FileSystem;
+! import org.apache.hadoop.conf.*;
+  import org.apache.hadoop.util.StringUtils;
+- import org.apache.nutch.parse.*;
+  import org.apache.nutch.crawl.Inlinks;
+  import org.apache.nutch.util.NutchConfiguration;
+  
+  /**
+--- 17,48 ----
+  
+  package org.apache.nutch.searcher;
+  
+! import java.io.BufferedReader;
+! import java.io.Closeable;
+! import java.io.IOException;
+! import java.io.InputStreamReader;
+  import java.net.InetSocketAddress;
+! import java.util.ArrayList;
+! import java.util.HashMap;
+! import java.util.HashSet;
+! import java.util.List;
+! import java.util.Map;
+! import java.util.Set;
+! import java.util.StringTokenizer;
+! 
+! import javax.servlet.ServletContext;
+! import javax.servlet.ServletContextEvent;
+! import javax.servlet.ServletContextListener;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! import org.apache.hadoop.conf.Configuration;
+  import org.apache.hadoop.fs.FileSystem;
+! import org.apache.hadoop.fs.Path;
+  import org.apache.hadoop.util.StringUtils;
+  import org.apache.nutch.crawl.Inlinks;
++ import org.apache.nutch.parse.ParseData;
++ import org.apache.nutch.parse.ParseText;
+  import org.apache.nutch.util.NutchConfiguration;
+  
+  /**
+diff -crBE ./src/java/org/apache/nutch/searcher/OpenSearchServlet.java ../local/src/java/org/apache/nutch/searcher/OpenSearchServlet.java
+*** ./src/java/org/apache/nutch/searcher/OpenSearchServlet.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/searcher/OpenSearchServlet.java	Fri Dec 11 22:31:04 2009
+***************
+*** 19,45 ****
+  
+  import java.io.IOException;
+  import java.net.URLEncoder;
+- import java.util.Map;
+  import java.util.HashMap;
+- import java.util.Set;
+  import java.util.HashSet;
+  
+- import javax.servlet.ServletException;
+  import javax.servlet.ServletConfig;
+  import javax.servlet.http.HttpServlet;
+  import javax.servlet.http.HttpServletRequest;
+  import javax.servlet.http.HttpServletResponse;
+! 
+! import javax.xml.parsers.*;
+! 
+! import org.apache.hadoop.conf.Configuration;
+! import org.apache.nutch.util.NutchConfiguration;
+! import org.w3c.dom.*;
+! import javax.xml.transform.TransformerFactory;
+  import javax.xml.transform.Transformer;
+  import javax.xml.transform.dom.DOMSource;
+  import javax.xml.transform.stream.StreamResult;
+  
+  
+  /** Present search results using A9's OpenSearch extensions to RSS, plus a few
+   * Nutch-specific extensions. */   
+--- 19,47 ----
+  
+  import java.io.IOException;
+  import java.net.URLEncoder;
+  import java.util.HashMap;
+  import java.util.HashSet;
++ import java.util.Map;
++ import java.util.Set;
+  
+  import javax.servlet.ServletConfig;
++ import javax.servlet.ServletException;
+  import javax.servlet.http.HttpServlet;
+  import javax.servlet.http.HttpServletRequest;
+  import javax.servlet.http.HttpServletResponse;
+! import javax.xml.parsers.DocumentBuilderFactory;
+  import javax.xml.transform.Transformer;
++ import javax.xml.transform.TransformerFactory;
+  import javax.xml.transform.dom.DOMSource;
+  import javax.xml.transform.stream.StreamResult;
+  
++ import org.apache.hadoop.conf.Configuration;
++ import org.apache.nutch.util.NutchConfiguration;
++ import org.w3c.dom.Attr;
++ import org.w3c.dom.Document;
++ import org.w3c.dom.Element;
++ import org.w3c.dom.Node;
++ 
+  
+  /** Present search results using A9's OpenSearch extensions to RSS, plus a few
+   * Nutch-specific extensions. */   
+diff -crBE ./src/java/org/apache/nutch/searcher/Query.java ../local/src/java/org/apache/nutch/searcher/Query.java
+*** ./src/java/org/apache/nutch/searcher/Query.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/searcher/Query.java	Fri Dec 11 22:31:05 2009
+***************
+*** 17,34 ****
+  
+  package org.apache.nutch.searcher;
+  
+  import java.io.DataInput;
+  import java.io.DataOutput;
+  import java.io.IOException;
+- import java.io.BufferedReader;
+  import java.io.InputStreamReader;
+- import java.util.Arrays;
+  import java.util.ArrayList;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+- 
+  import org.apache.hadoop.conf.Configurable;
+  import org.apache.hadoop.conf.Configuration;
+  import org.apache.hadoop.io.Writable;
+--- 17,34 ----
+  
+  package org.apache.nutch.searcher;
+  
++ import java.io.BufferedReader;
+  import java.io.DataInput;
+  import java.io.DataOutput;
+  import java.io.IOException;
+  import java.io.InputStreamReader;
+  import java.util.ArrayList;
++ import java.util.Arrays;
++ import java.util.LinkedList;
++ import java.util.List;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.hadoop.conf.Configurable;
+  import org.apache.hadoop.conf.Configuration;
+  import org.apache.hadoop.io.Writable;
+***************
+*** 33,40 ****
+  import org.apache.hadoop.conf.Configuration;
+  import org.apache.hadoop.io.Writable;
+  import org.apache.nutch.analysis.AnalyzerFactory;
+- 
+  import org.apache.nutch.analysis.NutchAnalysis;
+  import org.apache.nutch.util.NutchConfiguration;
+  
+  /** A Nutch query. */
+--- 33,40 ----
+  import org.apache.hadoop.conf.Configuration;
+  import org.apache.hadoop.io.Writable;
+  import org.apache.nutch.analysis.AnalyzerFactory;
+  import org.apache.nutch.analysis.NutchAnalysis;
++ import org.apache.nutch.searcher.Query.Clause.NutchClause;
+  import org.apache.nutch.util.NutchConfiguration;
+  
+  /** A Nutch query. */
+***************
+*** 57,62 ****
+--- 57,101 ----
+  
+      private Configuration conf; 
+  
++     public static class NutchClause {
++       private boolean _required;
++       private boolean _prohibited;
++       private List<Clause> _clauses;
++       private List<NutchClause> _nutchClauses;
++ 
++       public NutchClause(boolean required, boolean prohibited) {
++         _required = required;
++         _prohibited = prohibited;
++         _clauses = new LinkedList<Clause>();
++         _nutchClauses = new LinkedList<NutchClause>();
++       }
++ 
++       public void addClause(Clause clause) {
++         _clauses.add(clause);
++       }
++ 
++       public Clause[] getClauses() {
++         return (Clause[]) _clauses.toArray(new Clause[_clauses.size()]);
++       }
++ 
++       public void addNutchClause(NutchClause clause) {
++         _nutchClauses.add(clause);
++       }
++ 
++       public NutchClause[] getNutchClauses() {
++         return (NutchClause[]) _nutchClauses
++             .toArray(new NutchClause[_nutchClauses.size()]);
++       }
++ 
++       public boolean isRequired() {
++         return _required;
++       }
++ 
++       public boolean isProhibited() {
++         return _prohibited;
++       }
++     }
++ 
+      public Clause(Term term, String field,
+                    boolean isRequired, boolean isProhibited, Configuration conf) {
+        this(term, isRequired, isProhibited, conf);
+***************
+*** 284,289 ****
+--- 323,330 ----
+  
+    private ArrayList<Clause> clauses = new ArrayList<Clause>();
+  
++   private ArrayList<NutchClause> _nutchClauses = new ArrayList<NutchClause>();
++ 
+    private Configuration conf;
+  
+    private static final Clause[] CLAUSES_PROTO = new Clause[0];
+***************
+*** 318,323 ****
+--- 359,374 ----
+      clauses.add(new Clause(new Term(term), field, true, false, this.conf));
+    }
+  
++   /** Add a non required term in the default field. */
++   public void addNonRequiredTerm(String term) {
++     addNonRequiredTerm(term, Clause.DEFAULT_FIELD);
++   }
++ 
++   /** Add a non required term in a specified field. */
++   public void addNonRequiredTerm(String term, String field) {
++     clauses.add(new Clause(new Term(term), field, false, false, this.conf));
++   }
++ 
+    /** Add a prohibited term in the default field. */
+    public void addProhibitedTerm(String term) {
+      addProhibitedTerm(term, Clause.DEFAULT_FIELD);
+***************
+*** 343,348 ****
+--- 394,415 ----
+      }
+    }
+  
++   /** Add a non required phrase in the default field. */
++   public void addNonRequiredPhrase(String[] terms) {
++     addNonRequiredPhrase(terms, Clause.DEFAULT_FIELD);
++   }
++ 
++   /** Add a non required phrase in the specified field. */
++   public void addNonRequiredPhrase(String[] terms, String field) {
++     if (terms.length == 0) { // ignore empty phrase
++     } else if (terms.length == 1) {
++       addNonRequiredTerm(terms[0], field); // optimize to term query
++     } else {
++       clauses
++           .add(new Clause(new Phrase(terms), field, false, false, this.conf));
++     }
++   }
++ 
+    /** Add a prohibited phrase in the default field. */
+    public void addProhibitedPhrase(String[] terms) {
+      addProhibitedPhrase(terms, Clause.DEFAULT_FIELD);
+***************
+*** 358,363 ****
+--- 425,439 ----
+      }
+    }
+  
++   public void addNutchClause(NutchClause clause) {
++     _nutchClauses.add(clause);
++   }
++ 
++   public NutchClause[] getNutchClauses() {
++     return (NutchClause[]) _nutchClauses.toArray(new NutchClause[_nutchClauses
++         .size()]);
++   }
++ 
+    public void write(DataOutput out) throws IOException {
+      out.writeByte(clauses.size());
+      for (int i = 0; i < clauses.size(); i++)
+diff -crBE ./src/java/org/apache/nutch/searcher/QueryFilter.java ../local/src/java/org/apache/nutch/searcher/QueryFilter.java
+*** ./src/java/org/apache/nutch/searcher/QueryFilter.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/searcher/QueryFilter.java	Fri Dec 11 22:31:05 2009
+***************
+*** 18,29 ****
+  package org.apache.nutch.searcher;
+  
+  // Lucene imports
+- import org.apache.lucene.search.BooleanQuery;
+- 
+- // Hadoop imports
+  import org.apache.hadoop.conf.Configurable;
+! 
+! // Nutch imports
+  import org.apache.nutch.plugin.Pluggable;
+  
+  
+--- 18,25 ----
+  package org.apache.nutch.searcher;
+  
+  // Lucene imports
+  import org.apache.hadoop.conf.Configurable;
+! import org.apache.lucene.search.BooleanQuery;
+  import org.apache.nutch.plugin.Pluggable;
+  
+  
+diff -crBE ./src/java/org/apache/nutch/searcher/QueryFilters.java ../local/src/java/org/apache/nutch/searcher/QueryFilters.java
+*** ./src/java/org/apache/nutch/searcher/QueryFilters.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/searcher/QueryFilters.java	Fri Dec 11 22:31:06 2009
+***************
+*** 17,33 ****
+  
+  package org.apache.nutch.searcher;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+- 
+- import org.apache.nutch.plugin.*;
+- import org.apache.nutch.searcher.Query.Clause;
+- import org.apache.nutch.util.ObjectCache;
+  import org.apache.hadoop.conf.Configuration;
+- 
+- import java.util.*;
+- 
+  import org.apache.lucene.search.BooleanQuery;
+  
+  /** Creates and caches {@link QueryFilter} implementing plugins.  QueryFilter
+   * implementations should define either the "fields" or "raw-fields" attributes
+--- 17,36 ----
+  
+  package org.apache.nutch.searcher;
+  
++ import java.util.Arrays;
++ import java.util.HashSet;
++ import java.util.List;
++ 
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.hadoop.conf.Configuration;
+  import org.apache.lucene.search.BooleanQuery;
++ import org.apache.nutch.plugin.Extension;
++ import org.apache.nutch.plugin.ExtensionPoint;
++ import org.apache.nutch.plugin.PluginRepository;
++ import org.apache.nutch.plugin.PluginRuntimeException;
++ import org.apache.nutch.searcher.Query.Clause;
++ import org.apache.nutch.util.ObjectCache;
+  
+  /** Creates and caches {@link QueryFilter} implementing plugins.  QueryFilter
+   * implementations should define either the "fields" or "raw-fields" attributes
+diff -crBE ./src/java/org/apache/nutch/searcher/RawFieldQueryFilter.java ../local/src/java/org/apache/nutch/searcher/RawFieldQueryFilter.java
+*** ./src/java/org/apache/nutch/searcher/RawFieldQueryFilter.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/searcher/RawFieldQueryFilter.java	Fri Dec 11 22:31:04 2009
+***************
+*** 17,27 ****
+  
+  package org.apache.nutch.searcher;
+  
+  import org.apache.lucene.search.BooleanClause;
+  import org.apache.lucene.search.BooleanQuery;
+  import org.apache.lucene.search.TermQuery;
+- import org.apache.lucene.index.Term;
+- 
+  import org.apache.nutch.searcher.Query.Clause;
+  
+  /** Translate raw query fields to search the same-named field, as indexed by an
+--- 17,26 ----
+  
+  package org.apache.nutch.searcher;
+  
++ import org.apache.lucene.index.Term;
+  import org.apache.lucene.search.BooleanClause;
+  import org.apache.lucene.search.BooleanQuery;
+  import org.apache.lucene.search.TermQuery;
+  import org.apache.nutch.searcher.Query.Clause;
+  
+  /** Translate raw query fields to search the same-named field, as indexed by an
+diff -crBE ./src/java/org/apache/nutch/searcher/Summarizer.java ../local/src/java/org/apache/nutch/searcher/Summarizer.java
+*** ./src/java/org/apache/nutch/searcher/Summarizer.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/searcher/Summarizer.java	Fri Dec 11 22:31:04 2009
+***************
+*** 18,25 ****
+  
+  // Hadoop imports
+  import org.apache.hadoop.conf.Configurable;
+- 
+- // Nutch imports
+  import org.apache.nutch.plugin.Pluggable;
+  
+  
+--- 18,23 ----
+diff -crBE ./src/java/org/apache/nutch/searcher/SummarizerFactory.java ../local/src/java/org/apache/nutch/searcher/SummarizerFactory.java
+*** ./src/java/org/apache/nutch/searcher/SummarizerFactory.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/searcher/SummarizerFactory.java	Fri Dec 11 22:31:04 2009
+***************
+*** 19,29 ****
+  // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+- 
+- // Hadoop imports
+  import org.apache.hadoop.conf.Configuration;
+- 
+- // Nutch imports
+  import org.apache.nutch.plugin.Extension;
+  import org.apache.nutch.plugin.PluginRepository;
+  
+--- 19,25 ----
+diff -crBE ./src/java/org/apache/nutch/searcher/Summary.java ../local/src/java/org/apache/nutch/searcher/Summary.java
+*** ./src/java/org/apache/nutch/searcher/Summary.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/searcher/Summary.java	Fri Dec 11 22:31:05 2009
+***************
+*** 22,32 ****
+  import java.io.IOException;
+  import java.util.ArrayList;
+  
+- // Hadoop imports
+  import org.apache.hadoop.io.Text;
+  import org.apache.hadoop.io.Writable;
+- 
+- // Nutch imports
+  import org.apache.nutch.html.Entities;
+  
+  
+--- 22,29 ----
+diff -crBE ./src/java/org/apache/nutch/servlet/Cached.java ../local/src/java/org/apache/nutch/servlet/Cached.java
+*** ./src/java/org/apache/nutch/servlet/Cached.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/servlet/Cached.java	Fri Dec 11 22:31:04 2009
+***************
+*** 17,37 ****
+  
+  package org.apache.nutch.servlet;
+  
+! import org.apache.nutch.metadata.Metadata;
+! import org.apache.nutch.net.protocols.Response;
+! import org.apache.nutch.searcher.NutchBean;
+! import org.apache.nutch.searcher.Hit;
+! import org.apache.nutch.searcher.HitDetails;
+! import org.apache.nutch.util.NutchConfiguration;
+! 
+! import org.apache.hadoop.conf.Configuration;
+  
+  import javax.servlet.http.HttpServlet;
+  import javax.servlet.http.HttpServletRequest;
+  import javax.servlet.http.HttpServletResponse;
+  
+! import java.io.OutputStream;
+! import java.io.IOException;
+  
+  /**
+   * A servlet that serves raw Content of any mime type.
+--- 17,36 ----
+  
+  package org.apache.nutch.servlet;
+  
+! import java.io.IOException;
+! import java.io.OutputStream;
+  
+  import javax.servlet.http.HttpServlet;
+  import javax.servlet.http.HttpServletRequest;
+  import javax.servlet.http.HttpServletResponse;
+  
+! import org.apache.hadoop.conf.Configuration;
+! import org.apache.nutch.metadata.Metadata;
+! import org.apache.nutch.net.protocols.Response;
+! import org.apache.nutch.searcher.Hit;
+! import org.apache.nutch.searcher.HitDetails;
+! import org.apache.nutch.searcher.NutchBean;
+! import org.apache.nutch.util.NutchConfiguration;
+  
+  /**
+   * A servlet that serves raw Content of any mime type.
+diff -crBE ./src/java/org/apache/nutch/tools/DmozParser.java ../local/src/java/org/apache/nutch/tools/DmozParser.java
+*** ./src/java/org/apache/nutch/tools/DmozParser.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/tools/DmozParser.java	Fri Dec 11 22:31:05 2009
+***************
+*** 17,40 ****
+  
+  package org.apache.nutch.tools;
+  
+! import java.io.*;
+! import java.util.*;
+! import java.util.regex.*;
+! 
+! import javax.xml.parsers.*;
+! import org.xml.sax.*;
+! import org.xml.sax.helpers.*;
+! import org.apache.xerces.util.XMLChar;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+- 
+- import org.apache.hadoop.io.*;
+- import org.apache.hadoop.fs.*;
+  import org.apache.hadoop.conf.Configuration;
+  import org.apache.nutch.util.LogUtil;
+  import org.apache.nutch.util.NutchConfiguration;
+  
+  
+  /** Utility that converts DMOZ RDF into a flat file of URLs to be injected. */
+--- 17,53 ----
+  
+  package org.apache.nutch.tools;
+  
+! import java.io.BufferedInputStream;
+! import java.io.BufferedReader;
+! import java.io.File;
+! import java.io.FileInputStream;
+! import java.io.FilterReader;
+! import java.io.IOException;
+! import java.io.InputStreamReader;
+! import java.io.Reader;
+! import java.util.Random;
+! import java.util.Vector;
+! import java.util.regex.Pattern;
+! 
+! import javax.xml.parsers.ParserConfigurationException;
+! import javax.xml.parsers.SAXParser;
+! import javax.xml.parsers.SAXParserFactory;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.hadoop.conf.Configuration;
++ import org.apache.hadoop.fs.FileSystem;
++ import org.apache.hadoop.io.MD5Hash;
+  import org.apache.nutch.util.LogUtil;
+  import org.apache.nutch.util.NutchConfiguration;
++ import org.apache.xerces.util.XMLChar;
++ import org.xml.sax.Attributes;
++ import org.xml.sax.InputSource;
++ import org.xml.sax.Locator;
++ import org.xml.sax.SAXException;
++ import org.xml.sax.SAXParseException;
++ import org.xml.sax.XMLReader;
++ import org.xml.sax.helpers.DefaultHandler;
+  
+  
+  /** Utility that converts DMOZ RDF into a flat file of URLs to be injected. */
+diff -crBE ./src/java/org/apache/nutch/tools/FreeGenerator.java ../local/src/java/org/apache/nutch/tools/FreeGenerator.java
+*** ./src/java/org/apache/nutch/tools/FreeGenerator.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/tools/FreeGenerator.java	Fri Dec 11 22:31:04 2009
+***************
+*** 24,31 ****
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+- import org.apache.hadoop.fs.Path;
+  import org.apache.hadoop.conf.Configured;
+  import org.apache.hadoop.io.Text;
+  import org.apache.hadoop.io.WritableComparable;
+  import org.apache.hadoop.mapred.FileInputFormat;
+--- 24,31 ----
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.hadoop.conf.Configured;
++ import org.apache.hadoop.fs.Path;
+  import org.apache.hadoop.io.Text;
+  import org.apache.hadoop.io.WritableComparable;
+  import org.apache.hadoop.mapred.FileInputFormat;
+diff -crBE ./src/java/org/apache/nutch/tools/PruneIndexTool.java ../local/src/java/org/apache/nutch/tools/PruneIndexTool.java
+*** ./src/java/org/apache/nutch/tools/PruneIndexTool.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/tools/PruneIndexTool.java	Fri Dec 11 22:31:05 2009
+***************
+*** 37,49 ****
+  import java.util.StringTokenizer;
+  import java.util.Vector;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+- 
+  import org.apache.hadoop.conf.Configuration;
+- import org.apache.nutch.util.NutchConfiguration;
+- 
+  import org.apache.lucene.analysis.WhitespaceAnalyzer;
+  import org.apache.lucene.document.Document;
+  import org.apache.lucene.index.IndexReader;
+--- 37,45 ----
+***************
+*** 54,59 ****
+--- 50,56 ----
+  import org.apache.lucene.search.Query;
+  import org.apache.lucene.store.Directory;
+  import org.apache.lucene.store.FSDirectory;
++ import org.apache.nutch.util.NutchConfiguration;
+  
+  /**
+   * This tool prunes existing Nutch indexes of unwanted content. The main method
+diff -crBE ./src/java/org/apache/nutch/util/CommandRunner.java ../local/src/java/org/apache/nutch/util/CommandRunner.java
+*** ./src/java/org/apache/nutch/util/CommandRunner.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/util/CommandRunner.java	Fri Dec 11 22:31:05 2009
+***************
+*** 32,39 ****
+  
+  import java.io.IOException;
+  import java.io.InputStream;
+- import java.io.OutputStream;
+  import java.io.InterruptedIOException;
+  import java.util.concurrent.BrokenBarrierException;
+  import java.util.concurrent.CyclicBarrier;
+  import java.util.concurrent.TimeUnit;
+--- 32,39 ----
+  
+  import java.io.IOException;
+  import java.io.InputStream;
+  import java.io.InterruptedIOException;
++ import java.io.OutputStream;
+  import java.util.concurrent.BrokenBarrierException;
+  import java.util.concurrent.CyclicBarrier;
+  import java.util.concurrent.TimeUnit;
+diff -crBE ./src/java/org/apache/nutch/util/DeflateUtils.java ../local/src/java/org/apache/nutch/util/DeflateUtils.java
+*** ./src/java/org/apache/nutch/util/DeflateUtils.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/util/DeflateUtils.java	Fri Dec 11 22:31:04 2009
+***************
+*** 16,29 ****
+  
+  package org.apache.nutch.util;
+  
+- import java.io.ByteArrayOutputStream;
+  import java.io.ByteArrayInputStream;
+  import java.io.IOException;
+  import java.util.zip.Inflater;
+  import java.util.zip.InflaterInputStream;
+- import java.util.zip.DeflaterOutputStream;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  
+--- 16,28 ----
+  
+  package org.apache.nutch.util;
+  
+  import java.io.ByteArrayInputStream;
++ import java.io.ByteArrayOutputStream;
+  import java.io.IOException;
++ import java.util.zip.DeflaterOutputStream;
+  import java.util.zip.Inflater;
+  import java.util.zip.InflaterInputStream;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  
+diff -crBE ./src/java/org/apache/nutch/util/DomUtil.java ../local/src/java/org/apache/nutch/util/DomUtil.java
+*** ./src/java/org/apache/nutch/util/DomUtil.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/util/DomUtil.java	Fri Dec 11 22:31:05 2009
+***************
+*** 29,43 ****
+  import javax.xml.transform.dom.DOMSource;
+  import javax.xml.transform.stream.StreamResult;
+  
+  import org.apache.xerces.parsers.DOMParser;
+  import org.w3c.dom.Element;
+  import org.xml.sax.InputSource;
+  import org.xml.sax.SAXException;
+  
+- // Commons Logging imports
+- import org.apache.commons.logging.Log;
+- import org.apache.commons.logging.LogFactory;
+- 
+  
+  public class DomUtil {
+  
+--- 29,41 ----
+  import javax.xml.transform.dom.DOMSource;
+  import javax.xml.transform.stream.StreamResult;
+  
++ import org.apache.commons.logging.Log;
++ import org.apache.commons.logging.LogFactory;
+  import org.apache.xerces.parsers.DOMParser;
+  import org.w3c.dom.Element;
+  import org.xml.sax.InputSource;
+  import org.xml.sax.SAXException;
+  
+  
+  public class DomUtil {
+  
+diff -crBE ./src/java/org/apache/nutch/util/EncodingDetector.java ../local/src/java/org/apache/nutch/util/EncodingDetector.java
+*** ./src/java/org/apache/nutch/util/EncodingDetector.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/util/EncodingDetector.java	Fri Dec 11 22:31:04 2009
+***************
+*** 32,39 ****
+  import org.apache.nutch.metadata.Metadata;
+  import org.apache.nutch.net.protocols.Response;
+  import org.apache.nutch.protocol.Content;
+- import org.apache.nutch.util.LogUtil;
+- import org.apache.nutch.util.NutchConfiguration;
+  
+  import com.ibm.icu.text.CharsetDetector;
+  import com.ibm.icu.text.CharsetMatch;
+--- 32,37 ----
+diff -crBE ./src/java/org/apache/nutch/util/GZIPUtils.java ../local/src/java/org/apache/nutch/util/GZIPUtils.java
+*** ./src/java/org/apache/nutch/util/GZIPUtils.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/util/GZIPUtils.java	Fri Dec 11 22:31:06 2009
+***************
+*** 17,29 ****
+  
+  package org.apache.nutch.util;
+  
+- import java.io.ByteArrayOutputStream;
+  import java.io.ByteArrayInputStream;
+  import java.io.IOException;
+  import java.util.zip.GZIPInputStream;
+  import java.util.zip.GZIPOutputStream;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  
+--- 17,28 ----
+  
+  package org.apache.nutch.util;
+  
+  import java.io.ByteArrayInputStream;
++ import java.io.ByteArrayOutputStream;
+  import java.io.IOException;
+  import java.util.zip.GZIPInputStream;
+  import java.util.zip.GZIPOutputStream;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  
+diff -crBE ./src/java/org/apache/nutch/util/LogUtil.java ../local/src/java/org/apache/nutch/util/LogUtil.java
+*** ./src/java/org/apache/nutch/util/LogUtil.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/util/LogUtil.java	Fri Dec 11 22:31:04 2009
+***************
+*** 22,28 ****
+  import java.io.PrintStream;
+  import java.lang.reflect.Method;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  
+--- 22,27 ----
+diff -crBE ./src/java/org/apache/nutch/util/MimeUtil.java ../local/src/java/org/apache/nutch/util/MimeUtil.java
+*** ./src/java/org/apache/nutch/util/MimeUtil.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/util/MimeUtil.java	Fri Dec 11 22:31:04 2009
+***************
+*** 21,30 ****
+  import java.io.File;
+  import java.util.logging.Logger;
+  
+- // Hadoop imports
+  import org.apache.hadoop.conf.Configuration;
+! 
+! // Tika imports
+  import org.apache.tika.mime.MimeType;
+  import org.apache.tika.mime.MimeTypeException;
+  import org.apache.tika.mime.MimeTypes;
+--- 21,28 ----
+  import java.io.File;
+  import java.util.logging.Logger;
+  
+  import org.apache.hadoop.conf.Configuration;
+! import org.apache.nutch.protocol.ProtocolOutput;
+  import org.apache.tika.mime.MimeType;
+  import org.apache.tika.mime.MimeTypeException;
+  import org.apache.tika.mime.MimeTypes;
+diff -crBE ./src/java/org/apache/nutch/util/NutchConfiguration.java ../local/src/java/org/apache/nutch/util/NutchConfiguration.java
+*** ./src/java/org/apache/nutch/util/NutchConfiguration.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/java/org/apache/nutch/util/NutchConfiguration.java	Fri Dec 11 22:31:05 2009
+***************
+*** 20,29 ****
+  // JDK imports
+  import java.util.Enumeration;
+  
+- // Servlet imports
+  import javax.servlet.ServletContext;
+  
+- // Hadoop imports
+  import org.apache.hadoop.conf.Configuration;
+  import org.apache.hadoop.io.WritableName;
+  
+--- 20,27 ----
+diff -crBE ./src/plugin/admin-crawl/src/java/org/apache/nutch/admin/crawl/StartCrawlRunnable.java ../local/src/plugin/admin-crawl/src/java/org/apache/nutch/admin/crawl/StartCrawlRunnable.java
+*** ./src/plugin/admin-crawl/src/java/org/apache/nutch/admin/crawl/StartCrawlRunnable.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/plugin/admin-crawl/src/java/org/apache/nutch/admin/crawl/StartCrawlRunnable.java	Fri Dec 11 22:31:05 2009
+***************
+*** 47,59 ****
+        fileSystem.createNewFile(lockPath);
+        _crawlTool.preCrawl();
+        _crawlTool.crawl(_topN, _depth);
+!     } catch (IOException e) {
+        LOG.warn("can not start crawl.", e);
+      } finally {
+        try {
+          fileSystem.delete(lockPath, false);
+        } catch (IOException e) {
+!         LOG.warn("can not delete lock file.", e);
+        }
+      }
+    }
+--- 47,59 ----
+        fileSystem.createNewFile(lockPath);
+        _crawlTool.preCrawl();
+        _crawlTool.crawl(_topN, _depth);
+!     } catch (Throwable e) {
+        LOG.warn("can not start crawl.", e);
+      } finally {
+        try {
+          fileSystem.delete(lockPath, false);
+        } catch (IOException e) {
+!         LOG.warn("Can not delete lock file.", e);
+        }
+      }
+    }
+diff -crBE ./src/plugin/build-plugin.xml ../local/src/plugin/build-plugin.xml
+*** ./src/plugin/build-plugin.xml	Wed Nov 18 07:56:50 2009
+--- ../local/src/plugin/build-plugin.xml	Fri Dec 11 22:31:04 2009
+***************
+*** 57,63 ****
+      </fileset>
+    	<fileset dir="${nutch.root}/lib/admin-ui-ext">
+    		<include name="*.jar" />
+!   	</fileset>  	
+      <path refid="plugin.deps"/>
+    </path>
+  
+--- 57,66 ----
+      </fileset>
+    	<fileset dir="${nutch.root}/lib/admin-ui-ext">
+    		<include name="*.jar" />
+!   	</fileset>
+!   	<fileset dir="${nutch.root}/lib/ingrid-ext">
+!   		<include name="*.jar" />
+!   	</fileset>
+      <path refid="plugin.deps"/>
+    </path>
+  
+diff -crBE ./src/plugin/build.xml ../local/src/plugin/build.xml
+*** ./src/plugin/build.xml	Wed Nov 18 07:56:50 2009
+--- ../local/src/plugin/build.xml	Fri Dec 11 22:31:05 2009
+***************
+*** 94,99 ****
+--- 94,100 ----
+    	 <ant dir="admin-url-upload" target="deploy"/>
+    	 <ant dir="admin-search" target="deploy"/>
+    	 <ant dir="index-metadata" target="deploy"/>
++   	 <ant dir="admin-urlmaintenance" target="deploy"/>
+    </target>
+  
+    <!-- ====================================================== -->
+***************
+*** 207,211 ****
+--- 208,213 ----
+    	<ant dir="admin-url-upload" target="clean"/>
+    	<ant dir="admin-search" target="clean"/>
+    	<ant dir="index-metadata" target="clean"/>
++   	<ant dir="admin-urlmaintenance" target="clean"/>
+    </target>
+  </project>
+diff -crBE ./src/plugin/index-basic/src/java/org/apache/nutch/indexer/basic/BasicIndexingFilter.java ../local/src/plugin/index-basic/src/java/org/apache/nutch/indexer/basic/BasicIndexingFilter.java
+*** ./src/plugin/index-basic/src/java/org/apache/nutch/indexer/basic/BasicIndexingFilter.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/plugin/index-basic/src/java/org/apache/nutch/indexer/basic/BasicIndexingFilter.java	Fri Dec 11 22:31:05 2009
+***************
+*** 17,42 ****
+  
+  package org.apache.nutch.indexer.basic;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! 
+  import org.apache.lucene.document.DateTools;
+! 
+! import org.apache.nutch.metadata.Nutch;
+! import org.apache.nutch.parse.Parse;
+! 
+! import org.apache.nutch.indexer.IndexingFilter;
+  import org.apache.nutch.indexer.IndexingException;
+  import org.apache.nutch.indexer.NutchDocument;
+  import org.apache.nutch.indexer.lucene.LuceneWriter;
+! import org.apache.hadoop.io.Text;
+! 
+! import org.apache.nutch.crawl.CrawlDatum;
+! import org.apache.nutch.crawl.Inlinks;
+! 
+! import java.net.MalformedURLException;
+! import java.net.URL;
+! import org.apache.hadoop.conf.Configuration;
+  
+  /** Adds basic searchable fields to a document. */
+  public class BasicIndexingFilter implements IndexingFilter {
+--- 17,38 ----
+  
+  package org.apache.nutch.indexer.basic;
+  
++ import java.net.MalformedURLException;
++ import java.net.URL;
++ 
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! import org.apache.hadoop.conf.Configuration;
+! import org.apache.hadoop.io.Text;
+  import org.apache.lucene.document.DateTools;
+! import org.apache.nutch.crawl.CrawlDatum;
+! import org.apache.nutch.crawl.Inlinks;
+  import org.apache.nutch.indexer.IndexingException;
++ import org.apache.nutch.indexer.IndexingFilter;
+  import org.apache.nutch.indexer.NutchDocument;
+  import org.apache.nutch.indexer.lucene.LuceneWriter;
+! import org.apache.nutch.metadata.Nutch;
+! import org.apache.nutch.parse.Parse;
+  
+  /** Adds basic searchable fields to a document. */
+  public class BasicIndexingFilter implements IndexingFilter {
+diff -crBE ./src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java ../local/src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java
+*** ./src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java	Fri Dec 11 22:31:04 2009
+***************
+*** 24,34 ****
+  import java.util.HashMap;
+  import java.util.LinkedList;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! 
+! // Nutch imports
+  import org.apache.nutch.crawl.CrawlDatum;
+  import org.apache.nutch.net.protocols.Response;
+  import org.apache.nutch.protocol.Content;
+--- 24,33 ----
+  import java.util.HashMap;
+  import java.util.LinkedList;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! import org.apache.hadoop.conf.Configuration;
+! import org.apache.hadoop.io.Text;
+  import org.apache.nutch.crawl.CrawlDatum;
+  import org.apache.nutch.net.protocols.Response;
+  import org.apache.nutch.protocol.Content;
+***************
+*** 37,50 ****
+  import org.apache.nutch.protocol.ProtocolOutput;
+  import org.apache.nutch.protocol.ProtocolStatus;
+  import org.apache.nutch.protocol.RobotRules;
+- import org.apache.nutch.util.GZIPUtils;
+  import org.apache.nutch.util.DeflateUtils;
+  import org.apache.nutch.util.LogUtil;
+  
+- // Hadoop imports
+- import org.apache.hadoop.conf.Configuration;
+- import org.apache.hadoop.io.Text;
+- 
+  /**
+   * @author J&eacute;r&ocirc;me Charron
+   */
+--- 36,45 ----
+  import org.apache.nutch.protocol.ProtocolOutput;
+  import org.apache.nutch.protocol.ProtocolStatus;
+  import org.apache.nutch.protocol.RobotRules;
+  import org.apache.nutch.util.DeflateUtils;
++ import org.apache.nutch.util.GZIPUtils;
+  import org.apache.nutch.util.LogUtil;
+  
+  /**
+   * @author J&eacute;r&ocirc;me Charron
+   */
+diff -crBE ./src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/RobotRulesParser.java ../local/src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/RobotRulesParser.java
+*** ./src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/RobotRulesParser.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/RobotRulesParser.java	Fri Dec 11 22:31:05 2009
+***************
+*** 19,26 ****
+  // JDK imports
+  import java.io.FileInputStream;
+  import java.io.FileReader;
+- import java.io.LineNumberReader;
+  import java.io.IOException;
+  import java.net.URL;
+  import java.net.URLDecoder;
+  import java.util.ArrayList;
+--- 19,26 ----
+  // JDK imports
+  import java.io.FileInputStream;
+  import java.io.FileReader;
+  import java.io.IOException;
++ import java.io.LineNumberReader;
+  import java.net.URL;
+  import java.net.URLDecoder;
+  import java.util.ArrayList;
+***************
+*** 28,39 ****
+  import java.util.Hashtable;
+  import java.util.StringTokenizer;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+- // Nutch imports
+- import org.apache.hadoop.conf.Configuration;
+  import org.apache.hadoop.conf.Configurable;
+  import org.apache.hadoop.io.Text;
+  import org.apache.nutch.crawl.CrawlDatum;
+  import org.apache.nutch.net.protocols.Response;
+--- 28,37 ----
+  import java.util.Hashtable;
+  import java.util.StringTokenizer;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.hadoop.conf.Configurable;
++ import org.apache.hadoop.conf.Configuration;
+  import org.apache.hadoop.io.Text;
+  import org.apache.nutch.crawl.CrawlDatum;
+  import org.apache.nutch.net.protocols.Response;
+diff -crBE ./src/plugin/lib-regex-filter/src/java/org/apache/nutch/urlfilter/api/RegexRule.java ../local/src/plugin/lib-regex-filter/src/java/org/apache/nutch/urlfilter/api/RegexRule.java
+*** ./src/plugin/lib-regex-filter/src/java/org/apache/nutch/urlfilter/api/RegexRule.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/plugin/lib-regex-filter/src/java/org/apache/nutch/urlfilter/api/RegexRule.java	Fri Dec 11 22:31:04 2009
+***************
+*** 16,22 ****
+   */
+  package org.apache.nutch.urlfilter.api;
+  
+- import org.apache.nutch.net.*;
+  
+  
+  /**
+--- 16,21 ----
+diff -crBE ./src/plugin/lib-regex-filter/src/java/org/apache/nutch/urlfilter/api/RegexURLFilterBase.java ../local/src/plugin/lib-regex-filter/src/java/org/apache/nutch/urlfilter/api/RegexURLFilterBase.java
+*** ./src/plugin/lib-regex-filter/src/java/org/apache/nutch/urlfilter/api/RegexURLFilterBase.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/plugin/lib-regex-filter/src/java/org/apache/nutch/urlfilter/api/RegexURLFilterBase.java	Fri Dec 11 22:31:04 2009
+***************
+*** 17,39 ****
+  package org.apache.nutch.urlfilter.api;
+  
+  // JDK imports
+- import java.io.Reader;
+- import java.io.FileReader;
+  import java.io.BufferedReader;
+! import java.io.InputStreamReader;
+  import java.io.IOException;
+! import java.util.List;
+  import java.util.ArrayList;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+- 
+- // Hadoop imports
+  import org.apache.hadoop.conf.Configuration;
+! 
+! // Nutch imports
+! import org.apache.nutch.net.*;
+  
+  
+  /**
+--- 17,34 ----
+  package org.apache.nutch.urlfilter.api;
+  
+  // JDK imports
+  import java.io.BufferedReader;
+! import java.io.FileReader;
+  import java.io.IOException;
+! import java.io.InputStreamReader;
+! import java.io.Reader;
+  import java.util.ArrayList;
++ import java.util.List;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.hadoop.conf.Configuration;
+! import org.apache.nutch.net.URLFilter;
+  
+  
+  /**
+diff -crBE ./src/plugin/parse-html/src/java/org/apache/nutch/parse/html/DOMBuilder.java ../local/src/plugin/parse-html/src/java/org/apache/nutch/parse/html/DOMBuilder.java
+*** ./src/plugin/parse-html/src/java/org/apache/nutch/parse/html/DOMBuilder.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/plugin/parse-html/src/java/org/apache/nutch/parse/html/DOMBuilder.java	Fri Dec 11 22:31:05 2009
+***************
+*** 27,40 ****
+  
+  import java.util.Stack;
+  
+  import org.w3c.dom.Comment;
+  import org.w3c.dom.Document;
+  import org.w3c.dom.DocumentFragment;
+  import org.w3c.dom.Element;
+  import org.w3c.dom.Node;
+  import org.w3c.dom.Text;
+- import org.w3c.dom.CDATASection;
+- 
+  import org.xml.sax.Attributes;
+  import org.xml.sax.ContentHandler;
+  import org.xml.sax.Locator;
+--- 27,39 ----
+  
+  import java.util.Stack;
+  
++ import org.w3c.dom.CDATASection;
+  import org.w3c.dom.Comment;
+  import org.w3c.dom.Document;
+  import org.w3c.dom.DocumentFragment;
+  import org.w3c.dom.Element;
+  import org.w3c.dom.Node;
+  import org.w3c.dom.Text;
+  import org.xml.sax.Attributes;
+  import org.xml.sax.ContentHandler;
+  import org.xml.sax.Locator;
+diff -crBE ./src/plugin/parse-html/src/java/org/apache/nutch/parse/html/DOMContentUtils.java ../local/src/plugin/parse-html/src/java/org/apache/nutch/parse/html/DOMContentUtils.java
+*** ./src/plugin/parse-html/src/java/org/apache/nutch/parse/html/DOMContentUtils.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/plugin/parse-html/src/java/org/apache/nutch/parse/html/DOMContentUtils.java	Fri Dec 11 22:31:04 2009
+***************
+*** 17,34 ****
+  
+  package org.apache.nutch.parse.html;
+  
+- import java.net.URL;
+  import java.net.MalformedURLException;
+! import java.util.Collection;
+  import java.util.ArrayList;
+  import java.util.HashMap;
+- import java.util.Stack;
+  
+  import org.apache.nutch.parse.Outlink;
+  import org.apache.nutch.util.NodeWalker;
+! import org.apache.hadoop.conf.Configuration;
+! 
+! import org.w3c.dom.*;
+  
+  /**
+   * A collection of methods for extracting content from DOM trees.
+--- 17,34 ----
+  
+  package org.apache.nutch.parse.html;
+  
+  import java.net.MalformedURLException;
+! import java.net.URL;
+  import java.util.ArrayList;
++ import java.util.Collection;
+  import java.util.HashMap;
+  
++ import org.apache.hadoop.conf.Configuration;
+  import org.apache.nutch.parse.Outlink;
+  import org.apache.nutch.util.NodeWalker;
+! import org.w3c.dom.NamedNodeMap;
+! import org.w3c.dom.Node;
+! import org.w3c.dom.NodeList;
+  
+  /**
+   * A collection of methods for extracting content from DOM trees.
+diff -crBE ./src/plugin/parse-html/src/java/org/apache/nutch/parse/html/HTMLMetaProcessor.java ../local/src/plugin/parse-html/src/java/org/apache/nutch/parse/html/HTMLMetaProcessor.java
+*** ./src/plugin/parse-html/src/java/org/apache/nutch/parse/html/HTMLMetaProcessor.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/plugin/parse-html/src/java/org/apache/nutch/parse/html/HTMLMetaProcessor.java	Fri Dec 11 22:31:05 2009
+***************
+*** 20,26 ****
+  import java.net.URL;
+  
+  import org.apache.nutch.parse.HTMLMetaTags;
+! import org.w3c.dom.*;
+  
+  /**
+   * Class for parsing META Directives from DOM trees.  This class
+--- 20,28 ----
+  import java.net.URL;
+  
+  import org.apache.nutch.parse.HTMLMetaTags;
+! import org.w3c.dom.NamedNodeMap;
+! import org.w3c.dom.Node;
+! import org.w3c.dom.NodeList;
+  
+  /**
+   * Class for parsing META Directives from DOM trees.  This class
+diff -crBE ./src/plugin/parse-html/src/java/org/apache/nutch/parse/html/HtmlParser.java ../local/src/plugin/parse-html/src/java/org/apache/nutch/parse/html/HtmlParser.java
+*** ./src/plugin/parse-html/src/java/org/apache/nutch/parse/html/HtmlParser.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/plugin/parse-html/src/java/org/apache/nutch/parse/html/HtmlParser.java	Fri Dec 11 22:31:04 2009
+***************
+*** 17,45 ****
+  
+  package org.apache.nutch.parse.html;
+  
+! import java.util.ArrayList;
+! import java.util.Map;
+! import java.net.URL;
+  import java.net.MalformedURLException;
+  import java.nio.charset.Charset;
+! import java.io.*;
+! import java.util.regex.*;
+! 
+! import org.cyberneko.html.parsers.*;
+! import org.xml.sax.InputSource;
+! import org.xml.sax.SAXException;
+! import org.w3c.dom.*;
+! import org.apache.html.dom.*;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! 
+  import org.apache.nutch.metadata.Metadata;
+  import org.apache.nutch.metadata.Nutch;
+  import org.apache.nutch.protocol.Content;
+! import org.apache.hadoop.conf.*;
+! import org.apache.nutch.parse.*;
+! import org.apache.nutch.util.*;
+  
+  public class HtmlParser implements Parser {
+    public static final Log LOG = LogFactory.getLog("org.apache.nutch.parse.html");
+--- 17,60 ----
+  
+  package org.apache.nutch.parse.html;
+  
+! import java.io.ByteArrayInputStream;
+! import java.io.DataInputStream;
+! import java.io.File;
+! import java.io.FileInputStream;
+! import java.io.IOException;
+! import java.io.UnsupportedEncodingException;
+  import java.net.MalformedURLException;
++ import java.net.URL;
+  import java.nio.charset.Charset;
+! import java.util.ArrayList;
+! import java.util.Map;
+! import java.util.regex.Matcher;
+! import java.util.regex.Pattern;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! import org.apache.hadoop.conf.Configuration;
+! import org.apache.html.dom.HTMLDocumentImpl;
+  import org.apache.nutch.metadata.Metadata;
+  import org.apache.nutch.metadata.Nutch;
++ import org.apache.nutch.parse.HTMLMetaTags;
++ import org.apache.nutch.parse.HtmlParseFilters;
++ import org.apache.nutch.parse.Outlink;
++ import org.apache.nutch.parse.Parse;
++ import org.apache.nutch.parse.ParseData;
++ import org.apache.nutch.parse.ParseImpl;
++ import org.apache.nutch.parse.ParseResult;
++ import org.apache.nutch.parse.ParseStatus;
++ import org.apache.nutch.parse.Parser;
+  import org.apache.nutch.protocol.Content;
+! import org.apache.nutch.util.EncodingDetector;
+! import org.apache.nutch.util.LogUtil;
+! import org.apache.nutch.util.NutchConfiguration;
+! import org.cyberneko.html.parsers.DOMFragmentParser;
+! import org.w3c.dom.DOMException;
+! import org.w3c.dom.DocumentFragment;
+! import org.xml.sax.InputSource;
+! import org.xml.sax.SAXException;
+  
+  public class HtmlParser implements Parser {
+    public static final Log LOG = LogFactory.getLog("org.apache.nutch.parse.html");
+diff -crBE ./src/plugin/parse-js/src/java/org/apache/nutch/parse/js/JSParseFilter.java ../local/src/plugin/parse-js/src/java/org/apache/nutch/parse/js/JSParseFilter.java
+*** ./src/plugin/parse-js/src/java/org/apache/nutch/parse/js/JSParseFilter.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/plugin/parse-js/src/java/org/apache/nutch/parse/js/JSParseFilter.java	Fri Dec 11 22:31:05 2009
+***************
+*** 28,34 ****
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! 
+  import org.apache.nutch.parse.HTMLMetaTags;
+  import org.apache.nutch.parse.HtmlParseFilter;
+  import org.apache.nutch.parse.Outlink;
+--- 28,34 ----
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! import org.apache.hadoop.conf.Configuration;
+  import org.apache.nutch.parse.HTMLMetaTags;
+  import org.apache.nutch.parse.HtmlParseFilter;
+  import org.apache.nutch.parse.Outlink;
+***************
+*** 36,48 ****
+  import org.apache.nutch.parse.ParseData;
+  import org.apache.nutch.parse.ParseImpl;
+  import org.apache.nutch.parse.ParseResult;
+- import org.apache.nutch.parse.ParseText;
+  import org.apache.nutch.parse.ParseStatus;
+  import org.apache.nutch.parse.Parser;
+  import org.apache.nutch.protocol.Content;
+  import org.apache.nutch.util.NutchConfiguration;
+- import org.apache.hadoop.conf.Configuration;
+- import org.apache.hadoop.io.Text;
+  import org.apache.oro.text.regex.MatchResult;
+  import org.apache.oro.text.regex.Pattern;
+  import org.apache.oro.text.regex.PatternCompiler;
+--- 36,46 ----
+  import org.apache.nutch.parse.ParseData;
+  import org.apache.nutch.parse.ParseImpl;
+  import org.apache.nutch.parse.ParseResult;
+  import org.apache.nutch.parse.ParseStatus;
++ import org.apache.nutch.parse.ParseText;
+  import org.apache.nutch.parse.Parser;
+  import org.apache.nutch.protocol.Content;
+  import org.apache.nutch.util.NutchConfiguration;
+  import org.apache.oro.text.regex.MatchResult;
+  import org.apache.oro.text.regex.Pattern;
+  import org.apache.oro.text.regex.PatternCompiler;
+diff -crBE ./src/plugin/protocol-http/src/java/org/apache/nutch/protocol/http/Http.java ../local/src/plugin/protocol-http/src/java/org/apache/nutch/protocol/http/Http.java
+*** ./src/plugin/protocol-http/src/java/org/apache/nutch/protocol/http/Http.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/plugin/protocol-http/src/java/org/apache/nutch/protocol/http/Http.java	Fri Dec 11 22:31:04 2009
+***************
+*** 20,33 ****
+  import java.io.IOException;
+  import java.net.URL;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+- 
+- // Hadoop imports
+  import org.apache.hadoop.conf.Configuration;
+- 
+- // Nutch imports
+  import org.apache.nutch.crawl.CrawlDatum;
+  import org.apache.nutch.net.protocols.Response;
+  import org.apache.nutch.protocol.ProtocolException;
+--- 20,28 ----
+diff -crBE ./src/plugin/protocol-http/src/java/org/apache/nutch/protocol/http/HttpResponse.java ../local/src/plugin/protocol-http/src/java/org/apache/nutch/protocol/http/HttpResponse.java
+*** ./src/plugin/protocol-http/src/java/org/apache/nutch/protocol/http/HttpResponse.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/plugin/protocol-http/src/java/org/apache/nutch/protocol/http/HttpResponse.java	Fri Dec 11 22:31:05 2009
+***************
+*** 28,34 ****
+  import java.net.Socket;
+  import java.net.URL;
+  
+- // Nutch imports
+  import org.apache.nutch.crawl.CrawlDatum;
+  import org.apache.nutch.metadata.Metadata;
+  import org.apache.nutch.metadata.SpellCheckedMetadata;
+--- 28,33 ----
+diff -crBE ./src/plugin/query-basic/src/java/org/apache/nutch/searcher/basic/BasicQueryFilter.java ../local/src/plugin/query-basic/src/java/org/apache/nutch/searcher/basic/BasicQueryFilter.java
+*** ./src/plugin/query-basic/src/java/org/apache/nutch/searcher/basic/BasicQueryFilter.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/plugin/query-basic/src/java/org/apache/nutch/searcher/basic/BasicQueryFilter.java	Fri Dec 11 22:31:05 2009
+***************
+*** 17,27 ****
+  
+  package org.apache.nutch.searcher.basic;
+  
+- import org.apache.lucene.search.BooleanClause;
+- import org.apache.lucene.search.BooleanQuery;
+- import org.apache.lucene.search.PhraseQuery;
+- import org.apache.lucene.search.TermQuery;
+- 
+  import java.util.ArrayList;
+  import java.util.Iterator;
+  import java.util.List;
+--- 17,22 ----
+***************
+*** 29,41 ****
+  import java.util.regex.Matcher;
+  import java.util.regex.Pattern;
+  
+! import org.apache.nutch.analysis.NutchDocumentAnalyzer;
+  import org.apache.nutch.analysis.CommonGrams;
+! 
+! import org.apache.nutch.searcher.QueryFilter;
+  import org.apache.nutch.searcher.Query;
+! import org.apache.nutch.searcher.Query.*;
+! import org.apache.hadoop.conf.Configuration;
+  
+  /** The default query filter.  Query terms in the default query field are
+   * expanded to search the url, anchor and content document fields.
+--- 24,41 ----
+  import java.util.regex.Matcher;
+  import java.util.regex.Pattern;
+  
+! import org.apache.hadoop.conf.Configuration;
+! import org.apache.lucene.search.BooleanClause;
+! import org.apache.lucene.search.BooleanQuery;
+! import org.apache.lucene.search.PhraseQuery;
+! import org.apache.lucene.search.TermQuery;
+  import org.apache.nutch.analysis.CommonGrams;
+! import org.apache.nutch.analysis.NutchDocumentAnalyzer;
+  import org.apache.nutch.searcher.Query;
+! import org.apache.nutch.searcher.QueryFilter;
+! import org.apache.nutch.searcher.Query.Clause;
+! import org.apache.nutch.searcher.Query.Phrase;
+! import org.apache.nutch.searcher.Query.Term;
+  
+  /** The default query filter.  Query terms in the default query field are
+   * expanded to search the url, anchor and content document fields.
+diff -crBE ./src/plugin/query-site/src/java/org/apache/nutch/searcher/site/SiteQueryFilter.java ../local/src/plugin/query-site/src/java/org/apache/nutch/searcher/site/SiteQueryFilter.java
+*** ./src/plugin/query-site/src/java/org/apache/nutch/searcher/site/SiteQueryFilter.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/plugin/query-site/src/java/org/apache/nutch/searcher/site/SiteQueryFilter.java	Fri Dec 11 22:31:05 2009
+***************
+*** 17,24 ****
+  
+  package org.apache.nutch.searcher.site;
+  
+- import org.apache.nutch.searcher.RawFieldQueryFilter;
+  import org.apache.hadoop.conf.Configuration;
+  
+  /** Handles "site:" query clauses, causing them to search the field indexed by
+   * SiteIndexingFilter. */
+--- 17,24 ----
+  
+  package org.apache.nutch.searcher.site;
+  
+  import org.apache.hadoop.conf.Configuration;
++ import org.apache.nutch.searcher.RawFieldQueryFilter;
+  
+  /** Handles "site:" query clauses, causing them to search the field indexed by
+   * SiteIndexingFilter. */
+diff -crBE ./src/plugin/query-url/src/java/org/apache/nutch/searcher/url/URLQueryFilter.java ../local/src/plugin/query-url/src/java/org/apache/nutch/searcher/url/URLQueryFilter.java
+*** ./src/plugin/query-url/src/java/org/apache/nutch/searcher/url/URLQueryFilter.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/plugin/query-url/src/java/org/apache/nutch/searcher/url/URLQueryFilter.java	Fri Dec 11 22:31:04 2009
+***************
+*** 17,24 ****
+  
+  package org.apache.nutch.searcher.url;
+  
+- import org.apache.nutch.searcher.FieldQueryFilter;
+  import org.apache.hadoop.conf.Configuration;
+  
+  /**
+   * Handles "url:" query clauses, causing them to search the field indexed by
+--- 17,24 ----
+  
+  package org.apache.nutch.searcher.url;
+  
+  import org.apache.hadoop.conf.Configuration;
++ import org.apache.nutch.searcher.FieldQueryFilter;
+  
+  /**
+   * Handles "url:" query clauses, causing them to search the field indexed by
+diff -crBE ./src/plugin/scoring-opic/src/java/org/apache/nutch/scoring/opic/OPICScoringFilter.java ../local/src/plugin/scoring-opic/src/java/org/apache/nutch/scoring/opic/OPICScoringFilter.java
+*** ./src/plugin/scoring-opic/src/java/org/apache/nutch/scoring/opic/OPICScoringFilter.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/plugin/scoring-opic/src/java/org/apache/nutch/scoring/opic/OPICScoringFilter.java	Fri Dec 11 22:31:04 2009
+***************
+*** 23,32 ****
+  import java.util.List;
+  import java.util.Map.Entry;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+- 
+  import org.apache.hadoop.conf.Configuration;
+  import org.apache.hadoop.io.Text;
+  import org.apache.nutch.crawl.CrawlDatum;
+--- 23,30 ----
+diff -crBE ./src/plugin/urlfilter-regex/src/java/org/apache/nutch/urlfilter/regex/RegexURLFilter.java ../local/src/plugin/urlfilter-regex/src/java/org/apache/nutch/urlfilter/regex/RegexURLFilter.java
+*** ./src/plugin/urlfilter-regex/src/java/org/apache/nutch/urlfilter/regex/RegexURLFilter.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/plugin/urlfilter-regex/src/java/org/apache/nutch/urlfilter/regex/RegexURLFilter.java	Fri Dec 11 22:31:05 2009
+***************
+*** 17,30 ****
+  package org.apache.nutch.urlfilter.regex;
+  
+  // JDK imports
+- import java.io.Reader;
+  import java.io.IOException;
+  import java.util.regex.Pattern;
+  import java.util.regex.PatternSyntaxException;
+  
+- // Hadoop imports
+  import org.apache.hadoop.conf.Configuration;
+- import org.apache.nutch.net.*;
+  import org.apache.nutch.urlfilter.api.RegexRule;
+  import org.apache.nutch.urlfilter.api.RegexURLFilterBase;
+  import org.apache.nutch.util.NutchConfiguration;
+--- 17,28 ----
+  package org.apache.nutch.urlfilter.regex;
+  
+  // JDK imports
+  import java.io.IOException;
++ import java.io.Reader;
+  import java.util.regex.Pattern;
+  import java.util.regex.PatternSyntaxException;
+  
+  import org.apache.hadoop.conf.Configuration;
+  import org.apache.nutch.urlfilter.api.RegexRule;
+  import org.apache.nutch.urlfilter.api.RegexURLFilterBase;
+  import org.apache.nutch.util.NutchConfiguration;
+diff -crBE ./src/plugin/urlnormalizer-basic/src/java/org/apache/nutch/net/urlnormalizer/basic/BasicURLNormalizer.java ../local/src/plugin/urlnormalizer-basic/src/java/org/apache/nutch/net/urlnormalizer/basic/BasicURLNormalizer.java
+*** ./src/plugin/urlnormalizer-basic/src/java/org/apache/nutch/net/urlnormalizer/basic/BasicURLNormalizer.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/plugin/urlnormalizer-basic/src/java/org/apache/nutch/net/urlnormalizer/basic/BasicURLNormalizer.java	Fri Dec 11 22:31:04 2009
+***************
+*** 17,35 ****
+  
+  package org.apache.nutch.net.urlnormalizer.basic;
+  
+- import java.net.URL;
+  import java.net.MalformedURLException;
+  
+- // Commons Logging imports
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! 
+! // Nutch imports
+  import org.apache.nutch.net.URLNormalizer;
+  import org.apache.nutch.util.LogUtil;
+! 
+! import org.apache.hadoop.conf.Configuration;
+! import org.apache.oro.text.regex.*;
+  
+  /** Converts URLs to a normal form . */
+  public class BasicURLNormalizer implements URLNormalizer {
+--- 17,36 ----
+  
+  package org.apache.nutch.net.urlnormalizer.basic;
+  
+  import java.net.MalformedURLException;
++ import java.net.URL;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+! import org.apache.hadoop.conf.Configuration;
+  import org.apache.nutch.net.URLNormalizer;
+  import org.apache.nutch.util.LogUtil;
+! import org.apache.oro.text.regex.MalformedPatternException;
+! import org.apache.oro.text.regex.Perl5Compiler;
+! import org.apache.oro.text.regex.Perl5Matcher;
+! import org.apache.oro.text.regex.Perl5Pattern;
+! import org.apache.oro.text.regex.Perl5Substitution;
+! import org.apache.oro.text.regex.Util;
+  
+  /** Converts URLs to a normal form . */
+  public class BasicURLNormalizer implements URLNormalizer {
+diff -crBE ./src/plugin/urlnormalizer-regex/src/java/org/apache/nutch/net/urlnormalizer/regex/RegexURLNormalizer.java ../local/src/plugin/urlnormalizer-regex/src/java/org/apache/nutch/net/urlnormalizer/regex/RegexURLNormalizer.java
+*** ./src/plugin/urlnormalizer-regex/src/java/org/apache/nutch/net/urlnormalizer/regex/RegexURLNormalizer.java	Wed Nov 18 07:56:50 2009
+--- ../local/src/plugin/urlnormalizer-regex/src/java/org/apache/nutch/net/urlnormalizer/regex/RegexURLNormalizer.java	Fri Dec 11 22:31:04 2009
+***************
+*** 17,33 ****
+  
+  package org.apache.nutch.net.urlnormalizer.regex;
+  
+- import java.net.URL;
+- import java.net.MalformedURLException;
+  import java.io.FileInputStream;
+  import java.io.IOException;
+  import java.io.InputStream;
+! 
+  import java.util.Collections;
+  import java.util.HashMap;
+- import java.util.List;
+- import java.util.ArrayList;
+  import java.util.Iterator;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+--- 17,34 ----
+  
+  package org.apache.nutch.net.urlnormalizer.regex;
+  
+  import java.io.FileInputStream;
+  import java.io.IOException;
+  import java.io.InputStream;
+! import java.net.MalformedURLException;
+! import java.net.URL;
+! import java.util.ArrayList;
+  import java.util.Collections;
+  import java.util.HashMap;
+  import java.util.Iterator;
++ import java.util.List;
++ 
++ import javax.xml.parsers.DocumentBuilderFactory;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+***************
+*** 37,46 ****
+  import org.apache.nutch.net.URLNormalizer;
+  import org.apache.nutch.net.URLNormalizers;
+  import org.apache.nutch.util.NutchConfiguration;
+! 
+! import javax.xml.parsers.*;
+! import org.w3c.dom.*;
+! import org.apache.oro.text.regex.*;
+  
+  /**
+   * Allows users to do regex substitutions on all/any URLs that are encountered,
+--- 37,54 ----
+  import org.apache.nutch.net.URLNormalizer;
+  import org.apache.nutch.net.URLNormalizers;
+  import org.apache.nutch.util.NutchConfiguration;
+! import org.apache.oro.text.regex.MalformedPatternException;
+! import org.apache.oro.text.regex.PatternMatcher;
+! import org.apache.oro.text.regex.Perl5Compiler;
+! import org.apache.oro.text.regex.Perl5Matcher;
+! import org.apache.oro.text.regex.Perl5Pattern;
+! import org.apache.oro.text.regex.Perl5Substitution;
+! import org.apache.oro.text.regex.Util;
+! import org.w3c.dom.Document;
+! import org.w3c.dom.Element;
+! import org.w3c.dom.Node;
+! import org.w3c.dom.NodeList;
+! import org.w3c.dom.Text;
+  
+  /**
+   * Allows users to do regex substitutions on all/any URLs that are encountered,

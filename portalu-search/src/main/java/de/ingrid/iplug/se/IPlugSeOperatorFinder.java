@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocalFileSystem;
@@ -19,8 +18,8 @@ import de.ingrid.utils.metadata.IPlugOperatorFinder;
 
 public class IPlugSeOperatorFinder implements IPlugOperatorFinder {
 
-  private static final Logger LOG = Logger
-      .getLogger(IPlugSeOperatorFinder.class.getName());
+  // private static final Logger LOG = Logger
+  // .getLogger(IPlugSeOperatorFinder.class.getName());
 
   private FileSystem _fileSystem = null;
 
@@ -50,8 +49,7 @@ public class IPlugSeOperatorFinder implements IPlugOperatorFinder {
         File[] crawls = instance.listFiles(new FileFilter() {
           @Override
           public boolean accept(File pathname) {
-            return pathname.isDirectory()
-                && pathname.getName().startsWith("Crawl")
+            return pathname.isDirectory() && pathname.getName().startsWith("Crawl")
                 && new File(pathname, "search.done").exists();
           }
         });
@@ -80,8 +78,7 @@ public class IPlugSeOperatorFinder implements IPlugOperatorFinder {
     return _fileSystem;
   }
 
-  public Set<String> findIndexValues(File workingFolder, String indexFieldName)
-      throws IOException {
+  public Set<String> findIndexValues(File workingFolder, String indexFieldName) throws IOException {
     List<File> indices = findIndices(workingFolder);
     IndexReader[] readers = new IndexReader[indices.size()];
     for (int i = 0; i < indices.size(); i++) {

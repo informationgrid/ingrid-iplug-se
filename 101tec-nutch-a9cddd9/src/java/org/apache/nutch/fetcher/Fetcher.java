@@ -68,6 +68,7 @@ import org.apache.nutch.parse.ParseResult;
 import org.apache.nutch.parse.ParseStatus;
 import org.apache.nutch.parse.ParseText;
 import org.apache.nutch.parse.ParseUtil;
+import org.apache.nutch.parse.resulthandler.SnsParseResultHandler;
 import org.apache.nutch.protocol.Content;
 import org.apache.nutch.protocol.Protocol;
 import org.apache.nutch.protocol.ProtocolFactory;
@@ -126,7 +127,7 @@ public class Fetcher extends Configured implements
 
   public static final String PROTOCOL_REDIR = "protocol";
 
-  public static final Log LOG = LogFactory.getLog(Fetcher.class);
+  private static final Log LOG = LogFactory.getLog(Fetcher.class);
   
   public static class InputFormat extends SequenceFileInputFormat<Text, CrawlDatum> {
     /** Don't split inputs, to keep things polite. */
@@ -143,6 +144,8 @@ public class Fetcher extends Configured implements
     }
   }
 
+  private SnsParseResultHandler _snsParseResultHandler;
+  
   private OutputCollector<Text, NutchWritable> output;
   private Reporter reporter;
   
@@ -797,16 +800,17 @@ public class Fetcher extends Configured implements
          * original URL. */ 
         if (parsing && status == CrawlDatum.STATUS_FETCH_SUCCESS) {
           try {
-            parseResult = this.parseUtil.parse(content);// TODO rwe: append a ParseResultHandler behind the successive parsing.
+            parseResult = this.parseUtil.parse(content);
           } catch (Exception e) {
             LOG.warn("Error parsing: " + key + ": " + StringUtils.stringifyException(e));
           }
 
           if (parseResult == null) {
-            byte[] signature = 
-              SignatureFactory.getSignature(getConf()).calculate(content, 
-                  new ParseStatus().getEmptyParse(conf));
+            byte[] signature = SignatureFactory.getSignature(getConf()).calculate(content,
+                new ParseStatus().getEmptyParse(conf));
             datum.setSignature(signature);
+          } else {
+            _snsParseResultHandler.process(content, parseResult);
           }
         }
         
@@ -919,55 +923,68 @@ public class Fetcher extends Configured implements
     return conf.getBoolean("fetcher.store.content", true);
   }
 
-  public void run(RecordReader<Text, CrawlDatum> input,
-      OutputCollector<Text, NutchWritable> output,
-                  Reporter reporter) throws IOException {
+  public void run(RecordReader<Text, CrawlDatum> input, OutputCollector<Text, NutchWritable> output, Reporter reporter)
+      throws IOException {
 
     this.output = output;
     this.reporter = reporter;
     this.fetchQueues = new FetchItemQueues(getConf());
 
     int threadCount = getConf().getInt("fetcher.threads.fetch", 10);
-    if (LOG.isInfoEnabled()) { LOG.info("Fetcher: threads: " + threadCount); }
+    if (LOG.isInfoEnabled()) {
+      LOG.info("Fetcher: threads: " + threadCount);
+    }
 
     feeder = new QueueFeeder(input, fetchQueues, threadCount * 50);
-    //feeder.setPriority((Thread.MAX_PRIORITY + Thread.NORM_PRIORITY) / 2);
+    // feeder.setPriority((Thread.MAX_PRIORITY + Thread.NORM_PRIORITY) / 2);
     feeder.start();
 
     // set non-blocking & no-robots mode for HTTP protocol plugins.
     getConf().setBoolean(Protocol.CHECK_BLOCKING, false);
     getConf().setBoolean(Protocol.CHECK_ROBOTS, false);
+
+    if (_snsParseResultHandler == null) {
+      _snsParseResultHandler = new SnsParseResultHandler();
+    }
     
-    for (int i = 0; i < threadCount; i++) {       // spawn threads
+    // start the sns analyzing
+    _snsParseResultHandler.beginParsing(getConf().get(Nutch.SEGMENT_NAME_KEY), (JobConf) getConf());
+
+    for (int i = 0; i < threadCount; i++) { // spawn threads
       new FetcherThread(getConf()).start();
     }
 
     // select a timeout that avoids a task timeout
-    long timeout = getConf().getInt("mapred.task.timeout", 10*60*1000)/2;
+    long timeout = getConf().getInt("mapred.task.timeout", 10 * 60 * 1000) / 2;
 
-    do {                                          // wait for threads to exit
-      try {
-        Thread.sleep(1000);
-      } catch (InterruptedException e) {}
-
-      reportStatus();
-      LOG.info("-activeThreads=" + activeThreads + ", spinWaiting=" + spinWaiting.get()
-          + ", fetchQueues.totalSize=" + fetchQueues.getTotalSize());
-
-      if (!feeder.isAlive() && fetchQueues.getTotalSize() < 5) {
-        fetchQueues.dump();
-      }
-      // some requests seem to hang, despite all intentions
-      if ((System.currentTimeMillis() - lastRequestStart.get()) > timeout) {
-        if (LOG.isWarnEnabled()) {
-          LOG.warn("Aborting with "+activeThreads+" hung threads.");
+    try {
+      do { // wait for threads to exit
+        try {
+          Thread.sleep(1000);
+        } catch (InterruptedException e) {
         }
-        return;
-      }
 
-    } while (activeThreads.get() > 0);
-    LOG.info("-activeThreads=" + activeThreads);
-    
+        reportStatus();
+        LOG.info("-activeThreads=" + activeThreads + ", spinWaiting=" + spinWaiting.get() + ", fetchQueues.totalSize="
+            + fetchQueues.getTotalSize());
+
+        if (!feeder.isAlive() && fetchQueues.getTotalSize() < 5) {
+          fetchQueues.dump();
+        }
+        // some requests seem to hang, despite all intentions
+        if ((System.currentTimeMillis() - lastRequestStart.get()) > timeout) {
+          if (LOG.isWarnEnabled()) {
+            LOG.warn("Aborting with " + activeThreads + " hung threads.");
+          }
+          return;
+        }
+
+      } while (activeThreads.get() > 0);
+      LOG.info("-activeThreads=" + activeThreads);
+    } finally {
+      // stop the sns analyzing
+      _snsParseResultHandler.stopParsing(getConf().get(Nutch.SEGMENT_NAME_KEY));
+    }
   }
 
   public void fetch(Path segment, int threads, boolean parsing)
@@ -1003,7 +1020,6 @@ public class Fetcher extends Configured implements
     JobClient.runJob(job);
     if (LOG.isInfoEnabled()) { LOG.info("Fetcher: done"); }
   }
-
 
   /** Run the fetcher. */
   public static void main(String[] args) throws Exception {

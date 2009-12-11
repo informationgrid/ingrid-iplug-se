@@ -97,7 +97,7 @@
 									        <label>Limit URL:</label>
 									        <field>
 									           <form:input path="limitUrlCommands[${limitUrlCounter}].url"/>
-									            <div class="error"><form:errors path="limitUrlCommands[${limitUrlCounter}].url" /></div>
+									            <form:errors path="limitUrlCommands[${limitUrlCounter}].url" cssClass="error" element="div"/>
 									        </field>
 									        <desc></desc>
 									    </row>

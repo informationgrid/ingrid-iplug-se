@@ -1,7 +1,9 @@
 <project>
 
 	<property name="nutch-version" value="101tec-nutch-a9cddd9" />
-
+	<property name="dir.nutch.patches.build" value="build_patches"/>
+	<property name="dir.nutch.patches" value="patches/nutch_all"/>
+	
 	<target name="init">
 		<mkdir dir="build" />
 	</target>
@@ -10,23 +12,27 @@
 		<delete dir="build" />
 	</target>
 
-
 	<target name="unzip-nutch" depends="init">
 		<unzip src="contrib/${nutch-version}.zip" dest="build" />
 	</target>
 
-	<target name="patch-nutch">
+<!--	<target name="patch-nutch">
 		<patch patchfile="patches/build.xml.patch" dir="build/${nutch-version}" strip="1" />
 		<patch patchfile="patches/Query.patch" dir="build/${nutch-version}" strip="1" />
 		<patch patchfile="patches/core-build.xml.patch" dir="build/${nutch-version}" strip="1" />
 		<patch patchfile="patches/build-plugin.xml.patch" dir="build/${nutch-version}" strip="1" />
 		<patch patchfile="patches/nutch.patch" dir="build/${nutch-version}" strip="1" />
+	</target>-->
+
+	<target name="copy-nutch">
+		<copy todir="build/${nutch-version}">
+			<fileset dir="${nutch-version}" >
+				<exclude name=".*/**"/>
+			</fileset>
+		</copy>
 	</target>
 
-
-	<target name="copy-administration-plugins">
-		<antcall target="copy-admin-url-maintenance" />
-	</target>
+	<target name="copy-administration-plugins" depends="copy-admin-url-maintenance"/>
 
 	<target name="copy-admin-url-maintenance">
 		<copy todir="build/${nutch-version}/src/plugin/admin-urlmaintenance">
@@ -35,62 +41,62 @@
 	</target>
 
 	<target name="copy-css">
-		<copy todir="build/${nutch-version}/conf/webapp/portal-u">
-			<fileset dir="portalu-nutch-gui/conf/webapp/portal-u" />
+		<copy todir="build/${nutch-version}/conf/webapp/theme/portal-u" >
+			<fileset dir="portalu-nutch-gui/conf/webapp/theme/portal-u" />
 		</copy>
 	</target>
 
 	<target name="copy-i18n">
 		<!-- configuration -->
-		<copy todir="build/${nutch-version}/src/plugin/admin-configuration/src/conf/portal-u/i18n">
-			<fileset dir="portalu-nutch-gui/conf/portal-u/i18n" >
+		<copy todir="build/${nutch-version}/src/plugin/admin-configuration/src/conf/theme/portal-u/i18n">
+			<fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n" >
 				<include name="configuration*"/>
 			</fileset>
 		</copy>
 		<!-- crawl -->
-		<copy todir="build/${nutch-version}/src/plugin/admin-crawl/src/conf/portal-u/i18n">
-			<fileset dir="portalu-nutch-gui/conf/portal-u/i18n" >
+		<copy todir="build/${nutch-version}/src/plugin/admin-crawl/src/conf/theme/portal-u/i18n">
+			<fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n" >
 				<include name="crawl*"/>
 			</fileset>
 		</copy>
 		<!-- instance -->
-		<copy todir="build/${nutch-version}/src/plugin/admin-instance/src/conf/portal-u/i18n">
-			<fileset dir="portalu-nutch-gui/conf/portal-u/i18n" >
+		<copy todir="build/${nutch-version}/src/plugin/admin-instance/src/conf/theme/portal-u/i18n">
+			<fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n" >
 				<include name="instance*"/>
 			</fileset>
 		</copy>
 		<!-- scheduling -->
-		<copy todir="build/${nutch-version}/src/plugin/admin-scheduling/src/conf/portal-u/i18n">
-			<fileset dir="portalu-nutch-gui/conf/portal-u/i18n" >
+		<copy todir="build/${nutch-version}/src/plugin/admin-scheduling/src/conf/theme/portal-u/i18n">
+			<fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n" >
 				<include name="scheduling*"/>
 			</fileset>
 		</copy>
 		<!-- system -->
-		<copy todir="build/${nutch-version}/src/plugin/admin-system/src/conf/portal-u/i18n">
-			<fileset dir="portalu-nutch-gui/conf/portal-u/i18n" >
+		<copy todir="build/${nutch-version}/src/plugin/admin-system/src/conf/theme/portal-u/i18n">
+			<fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n" >
 				<include name="system*"/>
 			</fileset>
 		</copy>
 		<!-- welcome -->
-		<copy todir="build/${nutch-version}/src/plugin/admin-welcome/src/conf/portal-u/i18n">
-			<fileset dir="portalu-nutch-gui/conf/portal-u/i18n" >
+		<copy todir="build/${nutch-version}/src/plugin/admin-welcome/src/conf/theme/portal-u/i18n">
+			<fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n" >
 				<include name="welcome*"/>
 			</fileset>
 		</copy>
 	</target>
 
-	<target name="copy-portalu-search">
+	<target name="copy-ingrid-se-part">
 		<copy todir="build/${nutch-version}/src/java/de">
+			<fileset dir="portalu-nutch-gui/src/java/de" />
 			<fileset dir="portalu-search/src/main/java/de" />
 		</copy>
-		<antcall target="copy-portalu-libs" />
+<!-- rwe: just to save time		<antcall target="copy-portalu-libs" />-->
 	</target>
-
+	
 	<target name="copy-portalu-libs">
 		<exec dir="portalu-common" executable="mvn">
 			<arg line="dependency:copy-dependencies -DoutputDirectory=${basedir}/build/${nutch-version}/lib/ingrid-ext"/>
 		</exec>
-
 	</target>
 
 	<target name="copy-start-scripts">
@@ -100,18 +106,32 @@
 	</target>
 
 	<target name="copy-gui-configs">
-		<copy todir="build/${nutch-version}/conf/" file="portalu-nutch-gui/conf/nutch-site.xml" />
+		<copy todir="build/${nutch-version}/conf/">
+			<fileset dir="portalu-nutch-gui/conf">
+			    <include name="nutch-site.xml"/>
+			    <include name="sns.properties"/>
+			</fileset>
+		</copy>
 	</target>
 
-	<target name="mylesDistribution" depends="unzip-nutch, patch-nutch, copy-administration-plugins, copy-css, copy-i18n, copy-portalu-search, copy-start-scripts, copy-gui-configs">
+<!--	<target name="mylesDistribution" depends="unzip-nutch, patch-nutch, copy-administration-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts, copy-gui-configs">
 		<copy todir="build/${nutch-version}/conf">
 			<fileset dir="deploy/ingrid-search/myles/" />
 		</copy>
 		<copy todir="build/${nutch-version}/src/plugin/admin-urlmaintenance/conf/META-INF/" file="deploy/nutch-gui/myles/persistence.xml" overwrite="true"/>
 		<ant dir="build/${nutch-version}" target="package" />
+	</target>-->
+
+	<target name="dist" depends="copy-nutch, copy-administration-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts, copy-gui-configs">
+		<copy todir="build/${nutch-version}/conf">
+			<fileset dir="deploy/ingrid-search/myles/" />
+		</copy>
+<!--		<copy todir="build/${nutch-version}/src/plugin/admin-urlmaintenance/conf/META-INF/" file="deploy/nutch-gui/myles/persistence.xml" overwrite="true"/>-->
+		<ant dir="build/${nutch-version}" target="package" />
 	</target>
 
-	<target name="deployMyles" depends="mylesDistribution">
+<!-- (whole element can not be commented, due to the illegal double minus signs in arg)	<target name="deployMyles" depends="mylesDistribution">-->
+		<target name="deployMyles">
 		<exec command="rsync">
 			<arg line=" -c -a -r --progress -e ssh --delete build/${nutch-version}/build/nutch-gui-0.1 213.144.28.245:/opt/ingrid/ingrid-iplug-se-dev"/>
 		</exec>
@@ -123,4 +143,37 @@
 		</exec>
 	</target>
 		
+	<!-- Targets to create patches from local 101tec...-folder and the zip-content (OS nutch-gui Release) in contrib-folder -->
+	<target name="patch_clean">
+		<delete dir="${dir.nutch.patches.build}" />
+		<delete dir="${dir.nutch.patches}"/>
+	</target>
+
+	<target name="patch_init">
+		<mkdir dir="${dir.nutch.patches.build}" />
+		<mkdir dir="${dir.nutch.patches}" />
+	</target>
+
+	<target name="create_full_nutch_patch" depends="patch_unzip-nutch,patch_copy-local-nutch">
+		<antcall target="patch_run_diff"/>
+	</target>
+
+	<target name="patch_unzip-nutch" depends="patch_init">
+		<unzip src="contrib/${nutch-version}.zip" dest="${dir.nutch.patches.build}" />
+	</target>
+
+	<target name="patch_copy-local-nutch" depends="patch_init">
+		<copy todir="${dir.nutch.patches.build}/local">
+			<fileset dir="${nutch-version}" >
+				<exclude name=".*/**"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="patch_run_diff" depends="patch_init">
+		<exec dir="${dir.nutch.patches.build}/${nutch-version}" executable="diff" output="${dir.nutch.patches}/all_changes_against_contrib.patch">
+			<arg line="-crBE ./ ../local/" />
+		</exec>
+	</target>
+
 </project>

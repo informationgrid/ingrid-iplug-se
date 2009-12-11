@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.nutch.admin.security.AbstractLoginModule;
 import org.apache.nutch.admin.security.NutchGuiPrincipal;
 
+import de.ingrid.ibus.client.BusClientFactory;
 import de.ingrid.iplug.HeartBeatPlug;
 import de.ingrid.utils.IBus;
 import de.ingrid.utils.IngridHit;
@@ -47,19 +48,16 @@ public class PortaluLoginModule extends AbstractLoginModule {
 
     private static IndexIPlug INSTANCE;
 
-    private IndexIPlug() throws IOException {
-      super(IndexIPlug.class.getResourceAsStream("/communication-index.xml"),
-          60000);
+    public IndexIPlug() throws IOException {
+      super(60000);
     }
 
     public static IndexIPlug getInstance() throws Exception {
       if (INSTANCE == null) {
         INSTANCE = new IndexIPlug();
-        URL resource = PortaluLoginModule.class
-            .getResource("/plugdescription-index.xml");
+        URL resource = PortaluLoginModule.class.getResource("/plugdescription-index.xml");
         File pd = new File(resource.getFile());
-        PlugDescription plugDescription = new PlugdescriptionSerializer()
-            .deSerialize(pd);
+        PlugDescription plugDescription = new PlugdescriptionSerializer().deSerialize(pd);
         plugDescription.setRecordLoader(true);
         INSTANCE.configure(plugDescription);
         INSTANCE.startHeartBeats();
@@ -68,38 +66,19 @@ public class PortaluLoginModule extends AbstractLoginModule {
     }
 
     @Override
-    public void close() throws Exception {
-      super.close();
-    }
-
-    @Override
-    public void configure(PlugDescription arg0) throws Exception {
-      super.configure(arg0);
-    }
-
-    @Override
-    public IngridHits search(IngridQuery arg0, int arg1, int arg2)
-        throws Exception {
+    public IngridHits search(IngridQuery arg0, int arg1, int arg2) throws Exception {
       return null;
     }
 
     @Override
-    public IngridHitDetail getDetail(IngridHit arg0, IngridQuery arg1,
-        String[] arg2) throws Exception {
+    public IngridHitDetail getDetail(IngridHit arg0, IngridQuery arg1, String[] arg2) throws Exception {
       return null;
     }
 
     @Override
-    public IngridHitDetail[] getDetails(IngridHit[] arg0, IngridQuery arg1,
-        String[] arg2) throws Exception {
+    public IngridHitDetail[] getDetails(IngridHit[] arg0, IngridQuery arg1, String[] arg2) throws Exception {
       return null;
     }
-
-  }
-
-  public PortaluLoginModule() throws Exception {
-    LOG.info("PortaluLoginModule loaded.");
-    IndexIPlug plug = IndexIPlug.getInstance();
   }
 
   @Override
@@ -107,7 +86,9 @@ public class PortaluLoginModule extends AbstractLoginModule {
     PortaluPrincipal principal = null;
     try {
       IndexIPlug plug = IndexIPlug.getInstance();
-      IBus bus = plug.getMotherIBus();
+      URL communicationXml = PortaluLoginModule.class.getResource("/communication-index.xml");
+      File communicationXmlFile = new File(communicationXml.getFile());
+      IBus bus = BusClientFactory.createBusClient(communicationXmlFile, plug).getNonCacheableIBus();
       IngridHits authenticationData = login(bus, userName, password);
       IngridHit[] hits = authenticationData.getHits();
       if (isAuthenticated(hits)) {

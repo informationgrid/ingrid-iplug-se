@@ -1,0 +1,14 @@
+Index: 101tec-nutch-a9cddd9/default.properties
+===================================================================
+--- 101tec-nutch-a9cddd9/default.properties	(revision 14285)
++++ 101tec-nutch-a9cddd9/default.properties	(working copy)
+@@ -19,7 +19,8 @@
+ build.plugins = ${build.dir}/plugins
+ build.docs = ${build.dir}/docs
+ build.javadoc = ${build.docs}/api
+-build.encoding = UTF-8
++#build.encoding = UTF-8
++build.encoding = MacRoman
+ 
+ test.src.dir = ./src/test
+ test.build.dir = ${build.dir}/test

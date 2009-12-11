@@ -681,6 +681,13 @@
   </description>
 </property>
 
+<property>
+  <name>index.sns</name>
+  <value>true</value>
+  <description>If true, then the Index-Sns Plugin are index with sns dates. Otherwise, without sns dates.
+  </description>
+</property>
+
 <!-- indexingfilter plugin properties -->
 
 <property>

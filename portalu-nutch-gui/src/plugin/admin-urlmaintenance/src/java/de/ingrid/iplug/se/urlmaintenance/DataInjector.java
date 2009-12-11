@@ -39,7 +39,7 @@ public class DataInjector {
       IMetadataDao metadataDao, IPartnerDao partnerDao,
       IProviderDao providerDao, IStartUrlDao startUrlDao,
       ILimitUrlDao limitUrlDao, IExcludeUrlDao excludeUrlDao,
-      TransactionService transactionService) throws InterruptedException {
+      TransactionService transactionService, DatabaseExport databaseExport) throws InterruptedException {
     _metadataService = metadataService;
     _metadataDao = metadataDao;
     _partnerDao = partnerDao;
@@ -75,6 +75,9 @@ public class DataInjector {
     createMetadatasIfNotExists(topics);
 
     createUrls();
+    
+    databaseExport.exportWebUrls();
+    databaseExport.exportCatalogUrls();
   }
 
   private void createUrls() throws InterruptedException {

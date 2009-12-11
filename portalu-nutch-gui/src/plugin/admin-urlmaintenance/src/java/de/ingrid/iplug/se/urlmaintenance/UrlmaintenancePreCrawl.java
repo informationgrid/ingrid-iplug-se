@@ -14,6 +14,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.nutch.crawl.IPreCrawl;
 
+import de.ingrid.iplug.se.communication.InterplugInCommunication;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Url;
 // TODO rwe: cleanup code
@@ -25,7 +26,7 @@ public class UrlmaintenancePreCrawl implements IPreCrawl {
 
   private FileSystem _fileSystem;
   private final String _lineSeparator;
-
+  
   public UrlmaintenancePreCrawl() {
     super();
     _lineSeparator = System.getProperty("line.separator");
@@ -33,48 +34,48 @@ public class UrlmaintenancePreCrawl implements IPreCrawl {
 
   @Override
   public void preCrawl(Path crawlDir) throws IOException {
-//    String tmp = System.getProperty("java.io.tmpdir");
-//    File tmpFolder = new File(tmp, "portal-u-" + DatabaseExport.class.getName());
 
     String urlType = _conf.get("url.type");
-//    File inDir = new File(tmpFolder, urlType);
-//    File start = new File(inDir, "urls/start");
-//    File limit = new File(inDir, "urls/limit");
-//    File exclude = new File(inDir, "urls/exclude");
-//    File metadata = new File(inDir, "urls/metadata");
-//
-//    // upload urls
-//    upload(_fileSystem, start, crawlDir);
-//    upload(_fileSystem, limit, crawlDir);
-//    upload(_fileSystem, exclude, crawlDir);
-//    upload(_fileSystem, metadata, crawlDir);
-
-    DatabaseExport databaseExport = DatabaseExport.getInstance();
-
-    if (databaseExport != null) {
-      uploadUrlsFromDatabase(urlType, databaseExport, crawlDir);
-    }
+    uploadUrlsFromCommunicationObject(urlType, crawlDir);
   }
 
-  private void uploadUrlsFromDatabase(String urlType, DatabaseExport databaseExport, Path crawlDir) throws IOException {
-    // TODO Auto-generated method stub
-    LOG.info("Sync urls from database...");
-    if(urlType.equals("web")){
-      upload(databaseExport.getStartUrlDao(), "start", crawlDir);
-      upload(databaseExport.getLimitUrlDao(), "limit", crawlDir);
-      upload(databaseExport.getExcludeUrlDao(), "exclude", crawlDir);
-      upload(databaseExport.getWebMetadataIterator(), "metadata", crawlDir);
+//  @Deprecated
+//  private void uploadUrlsFromDatabase(String urlType, DatabaseExport databaseExport, Path crawlDir) throws IOException {
+//    LOG.info("Sync urls from database...");
+//    if(urlType.equals("web")){
+//      upload(databaseExport.getStartUrlDao(), "start", crawlDir);
+//      upload(databaseExport.getLimitUrlDao(), "limit", crawlDir);
+//      upload(databaseExport.getExcludeUrlDao(), "exclude", crawlDir);
+//      upload(databaseExport.getWebMetadataIterator(), "metadata", crawlDir);
+//    }
+//    else if(urlType.equals("catalog")){
+//      upload(databaseExport.getCatalogUrlDao(), "start", crawlDir);
+//      upload(databaseExport.getCatalogUrlDao(), "limit", crawlDir);
+//      upload(databaseExport.getCatalogMetadataIterator(), "metadata", crawlDir);
+//    }
+//    else{
+//      throw new IllegalArgumentException("Internal error: The given parameter 'urlType'='" +
+//      		urlType+"' is invalid.");
+//    }
+//    LOG.info("Sync urls from database... OK.");
+//  }
+
+  private void uploadUrlsFromCommunicationObject(String urlType, Path crawlDir) throws IOException {
+    LOG.info("Sync urls of type '" + urlType + "' from InterplugInCommunication...");
+    if (urlType.equals("web")) {
+      writeFromCommunicationObjectIntoFile(DatabaseExport.WEB_START_URLS, new Path(crawlDir, "urls/start/urls.txt"));
+      writeFromCommunicationObjectIntoFile(DatabaseExport.WEB_LIMIT_URLS, new Path(crawlDir, "urls/limit/urls.txt"));
+      writeFromCommunicationObjectIntoFile(DatabaseExport.WEB_EXCLUDE_URLS, new Path(crawlDir, "urls/exclude/urls.txt"));
+      writeFromCommunicationObjectIntoFile(DatabaseExport.WEB_METADATA, new Path(crawlDir, "urls/metadata/urls.txt"));
+    } else if (urlType.equals("catalog")) {
+      writeFromCommunicationObjectIntoFile(DatabaseExport.CATALOG_URLS, new Path(crawlDir, "urls/start/urls.txt"));
+      writeFromCommunicationObjectIntoFile(DatabaseExport.CATALOG_URLS, new Path(crawlDir, "urls/limit/urls.txt"));
+      writeFromCommunicationObjectIntoFile(DatabaseExport.CATALOG_METADATA,
+          new Path(crawlDir, "urls/metadata/urls.txt"));
+    } else {
+      throw new IllegalArgumentException("Internal error: The given parameter 'urlType'='" + urlType + "' is invalid.");
     }
-    else if(urlType.equals("catalog")){
-      upload(databaseExport.getCatalogUrlDao(), "start", crawlDir);
-      upload(databaseExport.getCatalogUrlDao(), "limit", crawlDir);
-      upload(databaseExport.getCatalogMetadataIterator(), "metadata", crawlDir);
-    }
-    else{
-      throw new IllegalArgumentException("Internal error: The given parameter 'urlType'='" +
-      		urlType+"' is invalid.");
-    }
-    LOG.info("Sync urls from database... OK.");
+    LOG.info("Sync urls of type '" + urlType + "' from InterplugInCommunication...OK");
   }
 
   @Override
@@ -92,6 +93,7 @@ public class UrlmaintenancePreCrawl implements IPreCrawl {
     }
   }
 
+  @Deprecated
   private void upload(FileSystem fileSystem, File urlFolder, Path crawlDir) throws IOException {
     if (!new File(urlFolder.getAbsolutePath(), "urls.txt").exists()) {
       return;
@@ -102,6 +104,7 @@ public class UrlmaintenancePreCrawl implements IPreCrawl {
     fileSystem.copyFromLocalFile(false, true, urlFile, uploadPath);
   }
 
+  @Deprecated
   private void upload(IDao<? extends Url> urlDao, String folderName, Path crawlDir) throws IOException {
     Path uploadPath = new Path(crawlDir, "urls/" + folderName + "/urls.txt");
     FSDataOutputStream dataOutputStream = _fileSystem.create(uploadPath, true);
@@ -114,6 +117,20 @@ public class UrlmaintenancePreCrawl implements IPreCrawl {
     dataOutputStream.close();
   }
 
+  private void writeFromCommunicationObjectIntoFile(String key, Path uploadPath) throws IOException {
+    InterplugInCommunication<String> instanceForStringLists = InterplugInCommunication.getInstanceForStringLists();
+    List<String> lines = instanceForStringLists.getObjectContent(key);
+    if(lines != null && lines.size() > 0){
+      FSDataOutputStream dataOutputStream = _fileSystem.create(uploadPath, true);
+      for (String line : lines) {
+        dataOutputStream.writeBytes(line);
+        dataOutputStream.writeBytes(_lineSeparator);
+      }
+      dataOutputStream.close();
+    }
+  }
+
+  @Deprecated
   private void upload(Iterator<String> dataIterator, String folderName, Path crawlDir) throws IOException {
     Path uploadPath = new Path(crawlDir, "urls/" + folderName + "/urls.txt");
     FSDataOutputStream dataOutputStream = _fileSystem.create(uploadPath, true);

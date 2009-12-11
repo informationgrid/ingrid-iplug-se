@@ -47,6 +47,9 @@ import org.apache.nutch.parse.ParseText;
 import org.apache.nutch.scoring.ScoringFilterException;
 import org.apache.nutch.scoring.ScoringFilters;
 
+import de.ingrid.iplug.se.crawl.sns.CompressedSnsData;
+import de.ingrid.iplug.se.crawl.sns.SnsParseImpl;
+
 public class IndexerMapReduce extends Configured
 implements Mapper<Text, Writable, Text, NutchWritable>,
           Reducer<Text, NutchWritable, Text, NutchDocument> {
@@ -75,6 +78,9 @@ implements Mapper<Text, Writable, Text, NutchWritable>,
     CrawlDatum fetchDatum = null;
     ParseData parseData = null;
     ParseText parseText = null;
+    /// TODO rwe: none nutch specific code start:
+    CompressedSnsData snsData = null;
+    /// none nutch specific code end. 
     while (values.hasNext()) {
       final Writable value = values.next().get(); // unwrap
       if (value instanceof Inlinks) {
@@ -97,6 +103,8 @@ implements Mapper<Text, Writable, Text, NutchWritable>,
         parseData = (ParseData)value;
       } else if (value instanceof ParseText) {
         parseText = (ParseText)value;
+      } else if (value instanceof CompressedSnsData) {
+        snsData = (CompressedSnsData)value;
       } else if (LOG.isWarnEnabled()) {
         LOG.warn("Unrecognized type: "+value.getClass());
       }
@@ -121,7 +129,10 @@ implements Mapper<Text, Writable, Text, NutchWritable>,
     // add digest, used by dedup
     doc.add("digest", metadata.get(Nutch.SIGNATURE_KEY));
 
-    final Parse parse = new ParseImpl(parseText, parseData);
+//    final Parse parse = new ParseImpl(parseText, parseData);
+    /// TODO rwe: none nutch specific code start:
+    final Parse parse = ((snsData != null)? new SnsParseImpl(parseText, parseData, snsData) : new ParseImpl(parseText, parseData));
+    /// none nutch specific code end. 
     try {
       // extract information from dbDatum and pass it to
       // fetchDatum so that indexing filters can use it
@@ -173,6 +184,9 @@ implements Mapper<Text, Writable, Text, NutchWritable>,
       FileInputFormat.addInputPath(job, new Path(segment, CrawlDatum.PARSE_DIR_NAME));
       FileInputFormat.addInputPath(job, new Path(segment, ParseData.DIR_NAME));
       FileInputFormat.addInputPath(job, new Path(segment, ParseText.DIR_NAME));
+      /// TODO rwe: none nutch specific code start: 
+      FileInputFormat.addInputPath(job, new Path(segment, CompressedSnsData.DIR_NAME));
+      /// none nutch specific code end. 
     }
 
     FileInputFormat.addInputPath(job, new Path(crawlDb, CrawlDb.CURRENT_NAME));
