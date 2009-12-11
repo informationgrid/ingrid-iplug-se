@@ -18,6 +18,7 @@
 		<property name="basenames"> 
 			<list> 
 				<value>messages</value> 
+				<value>portal-u/i18n/urlmaintenance_messages</value>
 			</list> 
 		</property> 
 	</bean>
