@@ -120,5 +120,9 @@
                 </div>
             </div>
         </div>
+        <div id="ft">
+            <%@ include file="/WEB-INF/jsp/includes/footer.jsp" %>
+        </div>
     </div>
-</body></html>
+</body>
+</html>
