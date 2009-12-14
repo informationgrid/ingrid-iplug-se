@@ -13,4 +13,9 @@
 		</copy>
 		<copy file="plugin.properties" todir="${deploy.dir}" preservelastmodified="true" />
 	</target>-->
+	<target name="deploy">
+		<mkdir dir="${deploy.dir}" />
+		<copy file="plugin.properties" todir="${deploy.dir}" preservelastmodified="true" />
+		<ant antfile="../build-plugin.xml" target="deploy"/>
+	</target>
 </project>

@@ -1,4 +1,4 @@
-<project>
+<project default="dist">
 
 	<property name="nutch-version" value="101tec-nutch-a9cddd9" />
 	<property name="dir.nutch.patches.build" value="build_patches"/>
@@ -32,11 +32,16 @@
 		</copy>
 	</target>
 
-	<target name="copy-administration-plugins" depends="copy-admin-url-maintenance"/>
+	<target name="copy-ingrid-se-plugins" depends="copy-admin-url-maintenance,copy-index-sns-filter"/>
 
 	<target name="copy-admin-url-maintenance">
 		<copy todir="build/${nutch-version}/src/plugin/admin-urlmaintenance">
 			<fileset dir="portalu-nutch-gui/src/plugin/admin-urlmaintenance" />
+		</copy>
+	</target>
+	<target name="copy-index-sns-filter">
+		<copy todir="build/${nutch-version}/src/plugin/index-sns">
+			<fileset dir="portalu-nutch-gui/src/plugin/index-sns" />
 		</copy>
 	</target>
 
@@ -90,7 +95,7 @@
 			<fileset dir="portalu-nutch-gui/src/java/de" />
 			<fileset dir="portalu-search/src/main/java/de" />
 		</copy>
-<!-- rwe: just to save time		<antcall target="copy-portalu-libs" />-->
+		<antcall target="copy-portalu-libs" />
 	</target>
 	
 	<target name="copy-portalu-libs">
@@ -114,7 +119,7 @@
 		</copy>
 	</target>
 
-<!--	<target name="mylesDistribution" depends="unzip-nutch, patch-nutch, copy-administration-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts, copy-gui-configs">
+<!--	<target name="mylesDistribution" depends="unzip-nutch, patch-nutch, copy-ingrid-se-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts, copy-gui-configs">
 		<copy todir="build/${nutch-version}/conf">
 			<fileset dir="deploy/ingrid-search/myles/" />
 		</copy>
@@ -122,7 +127,7 @@
 		<ant dir="build/${nutch-version}" target="package" />
 	</target>-->
 
-	<target name="dist" depends="copy-nutch, copy-administration-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts, copy-gui-configs">
+	<target name="dist" depends="copy-nutch, copy-ingrid-se-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts, copy-gui-configs">
 		<copy todir="build/${nutch-version}/conf">
 			<fileset dir="deploy/ingrid-search/myles/" />
 		</copy>

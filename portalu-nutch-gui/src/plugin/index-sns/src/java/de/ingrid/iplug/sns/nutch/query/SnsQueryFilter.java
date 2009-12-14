@@ -104,6 +104,10 @@ public class SnsQueryFilter implements QueryFilter {
 
   private String fY2Max;
 
+  public SnsQueryFilter() {
+    super();
+  }
+
   public BooleanQuery filter(Query input, BooleanQuery output) throws QueryException {
 
     boolean search = false;
@@ -304,7 +308,7 @@ public class SnsQueryFilter implements QueryFilter {
       Term y1TermMin = new Term(this.fY1, this.fY1Min);
       Term y2TermMax = new Term(this.fY2, this.fY2Max);
 
-      // TODO rwe: use ConstantScoreRangeQuery, TermRangeQuery etc., because RangeQuery is not supported in version 3.0.0!
+      // TODO rwe: better use ConstantScoreRangeQuery, TermRangeQuery etc., because RangeQuery is not supported in version 3.0.0!
       RangeQuery xRangeQuery1 = new RangeQuery(x1TermMin, x1Term1, true);
       RangeQuery xRangeQuery2 = new RangeQuery(x2Term1, x2TermMax, true);
       RangeQuery yRangeQuery1 = new RangeQuery(y1TermMin, y1Term1, true);

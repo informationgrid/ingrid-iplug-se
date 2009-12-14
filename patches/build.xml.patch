@@ -7,6 +7,7 @@ Index: 101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/src/plugin/build.xm
    	 <ant dir="admin-search" target="deploy"/>
    	 <ant dir="index-metadata" target="deploy"/>
 +  	 <ant dir="admin-urlmaintenance" target="deploy"/>
++  	 <ant dir="index-sns" target="deploy"/>
    </target>
  
    <!-- ====================================================== -->
@@ -15,5 +16,6 @@ Index: 101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/src/plugin/build.xm
    	<ant dir="admin-search" target="clean"/>
    	<ant dir="index-metadata" target="clean"/>
 +  	<ant dir="admin-urlmaintenance" target="clean"/>
++  	<ant dir="index-sns" target="clean"/>
    </target>
  </project>

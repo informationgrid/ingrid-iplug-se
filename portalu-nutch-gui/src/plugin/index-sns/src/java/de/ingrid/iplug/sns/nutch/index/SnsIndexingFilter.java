@@ -53,6 +53,10 @@ public class SnsIndexingFilter implements IndexingFilter {
 
   private boolean fIndexOn = false;
 
+  public SnsIndexingFilter() {
+    super();
+  }
+
   @Override
   public NutchDocument filter(NutchDocument document, Parse parse, Text url, CrawlDatum datum, Inlinks inlinks)
       throws IndexingException {
@@ -172,7 +176,7 @@ public class SnsIndexingFilter implements IndexingFilter {
     this.fT1 = properties.getProperty(IPlugSNSPlugin.T1);
     this.fT2 = properties.getProperty(IPlugSNSPlugin.T2);
     this.fArea = properties.getProperty(IPlugSNSPlugin.AREA);
-    this.fIndexOn = "true".equals(System.getProperty("index.sns")) ? true : false; // TODO rwe: checkout, why this line is never reached!
+    this.fIndexOn = "true".equals(System.getProperty("index.sns")) ? true : false;
     if (!this.fIndexOn) {
       this.fIndexOn = this.fConfiguration.getBoolean("index.sns", false);
     }
