@@ -147,6 +147,7 @@
 						       		<td>FS</td>
 						       		<td>UT</td>
 						       		<td>Sprache</td>
+						       		<td>Status</td>
 						       		<td>Aktion</td>
 					       		</tr>
 					       	</thead>
@@ -160,6 +161,7 @@
 						       		<td>&nbsp;</td>
 						       		<td>&nbsp;</td>
 						       		<td>&nbsp;</td>
+						       		<td>&nbsp;${url.statusAsText}</td>
 						       		<td>
 						       			<a href="editStartUrl.html?id=${url.id}">EDIT</a>
 						       			<a href="#" id="deleteWebUrl_${index.index}" 
@@ -184,6 +186,7 @@
 						       		<td>
 						       			<c:forEach items="${limitUrl.metadatas}" var="meta"><c:if test="${meta.metadataKey == 'lang'}">${meta.metadataValue}</c:if></c:forEach>&nbsp;
 						       		</td>
+						       		<td>&nbsp;${limitUrl.statusAsText}</td>
 						       		<td>&nbsp;</td>
 					       		</tr>
 					       		</c:forEach>
@@ -197,6 +200,7 @@
 						       		<td>&nbsp;</td>
 						       		<td>&nbsp;</td>
 						       		<td>&nbsp;</td>
+						       		<td>&nbsp;</td>
 					       		</tr>
 					       		</c:forEach>
 					       		<tr>
@@ -208,6 +212,7 @@
 					       			<td>&nbsp;</td>
 					       			<td>&nbsp;</td>
 					       			<td>&nbsp;</td>
+						       		<td>&nbsp;</td>
 					       		</tr>	
 					       		</c:forEach>
 					       	</tbody>
@@ -230,6 +235,7 @@
 				                    {key:"isResearch"},
 				                    {key:"isWWW"},
 				                    {key:"lang"},
+				                    {key:"status"},
 				                    {key:"action"}
 				                ]
 						};
@@ -246,6 +252,7 @@
 							{key:"isResearch", label:"FS"},
 							{key:"isWWW", label:"UT"},
 							{key:"lang", label:"Sprache"},
+							{key:"status", label:"Status"},
 							{key:"action", label:"Aktion", width:100},
 							
 						];

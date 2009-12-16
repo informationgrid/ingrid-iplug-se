@@ -12,9 +12,9 @@
 		<delete dir="build" />
 	</target>
 
-	<target name="unzip-nutch" depends="init">
+<!--	<target name="unzip-nutch" depends="init">
 		<unzip src="contrib/${nutch-version}.zip" dest="build" />
-	</target>
+	</target>-->
 
 <!--	<target name="patch-nutch">
 		<patch patchfile="patches/build.xml.patch" dir="build/${nutch-version}" strip="1" />
@@ -119,24 +119,27 @@
 		</copy>
 	</target>
 
-<!--	<target name="mylesDistribution" depends="unzip-nutch, patch-nutch, copy-ingrid-se-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts, copy-gui-configs">
-		<copy todir="build/${nutch-version}/conf">
-			<fileset dir="deploy/ingrid-search/myles/" />
-		</copy>
-		<copy todir="build/${nutch-version}/src/plugin/admin-urlmaintenance/conf/META-INF/" file="deploy/nutch-gui/myles/persistence.xml" overwrite="true"/>
-		<ant dir="build/${nutch-version}" target="package" />
-	</target>-->
-
-	<target name="dist" depends="copy-nutch, copy-ingrid-se-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts, copy-gui-configs">
-		<copy todir="build/${nutch-version}/conf">
-			<fileset dir="deploy/ingrid-search/myles/" />
-		</copy>
-<!--		<copy todir="build/${nutch-version}/src/plugin/admin-urlmaintenance/conf/META-INF/" file="deploy/nutch-gui/myles/persistence.xml" overwrite="true"/>-->
+	<target name="dist" depends="copy-nutch, copy-ingrid-se-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts, copy-gui-configs,update-special-deploy-files">
 		<ant dir="build/${nutch-version}" target="package" />
 	</target>
 
-<!-- (whole element can not be commented, due to the illegal double minus signs in arg)	<target name="deployMyles" depends="mylesDistribution">-->
-		<target name="deployMyles">
+	<target name="update-special-deploy-files" depends="copy-gui-configs">
+		<copy todir="build/${nutch-version}/conf">
+			<fileset dir="deploy/ingrid-search/myles/" />
+			<fileset file="deploy/nutch-gui/myles/log4j.properties" /><!-- comment this out, if you want logging from os-nutgui configuration -->
+		</copy>
+		<replaceregexp file="build/${nutch-version}/conf/nutch-site.xml"
+		                         match="101tec-nutch-a9cddd9/src/plugin,portalu-nutch-gui/src/plugin"
+		                         replace="./plugins"
+		                         byline="true"/>
+	</target>
+	
+	<target name="mylesDistribution" depends="copy-nutch, copy-ingrid-se-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts, copy-gui-configs,update-special-deploy-files">
+		<copy todir="build/${nutch-version}/src/plugin/admin-urlmaintenance/conf/META-INF/" file="deploy/nutch-gui/myles/persistence.xml" overwrite="true"/>
+		<ant dir="build/${nutch-version}" target="package" />
+	</target>
+	
+	<target name="deployMyles" depends="mylesDistribution">
 		<exec command="rsync">
 			<arg line=" -c -a -r --progress -e ssh --delete build/${nutch-version}/build/nutch-gui-0.1 213.144.28.245:/opt/ingrid/ingrid-iplug-se-dev"/>
 		</exec>

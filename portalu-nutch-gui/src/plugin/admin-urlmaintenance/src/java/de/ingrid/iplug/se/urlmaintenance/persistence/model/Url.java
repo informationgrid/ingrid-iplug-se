@@ -1,5 +1,6 @@
 package de.ingrid.iplug.se.urlmaintenance.persistence.model;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,6 +17,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import org.apache.nutch.protocol.ProtocolStatus;
 
 @Entity
 @Table(name = "URL")
@@ -38,8 +41,19 @@ public class Url extends IdBase {
   @ManyToMany(fetch = FetchType.EAGER)
   protected List<Metadata> _metadatas = new ArrayList<Metadata>();
 
-  public Url() {
+  /**
+   * The status given as defined in {@link ProtocolStatus}. db-update: alter
+   * table url add column _STATUS INTEGER;
+   */
+  protected Integer _status = null;
+  /**
+   * The timestamp, the status was updated by a fetch for this url db-update:
+   * alter table url add column _STATUSUPDATED DATETIME;
+   */
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date _statusUpdated = null;
 
+  public Url() {
   }
 
   public Url(final String url) {
@@ -76,6 +90,40 @@ public class Url extends IdBase {
 
   public void setUpdated(final Date edited) {
     _updated = edited;
+  }
+
+  public Integer getStatus() {
+    return _status;
+  }
+
+  public void setStatus(Integer status) {
+    _status = status;
+  }
+
+  public Date getStatusUpdated() {
+    return _statusUpdated;
+  }
+
+  public void setStatusUpdated(Date statusUpdated) {
+    _statusUpdated = statusUpdated;
+  }
+
+  public String getStatusAsText() {
+    if (_status == null) {
+      return "";
+    }
+    // As the ProtocollStatus does not provide a method to resolve the code to a
+    // human readable message, we have to fix it here.
+    String strOutput = new ProtocolStatus(_status).toString();
+    int pos = strOutput.indexOf('(');
+    String ret = "";
+    if (pos > 0) {
+      ret = strOutput.substring(0, pos);
+      if (_statusUpdated != null) {
+        ret += " (" + new SimpleDateFormat("yyyy-MM-dd").format(_statusUpdated) + ")";
+      }
+    }
+    return ret;
   }
 
   @Override

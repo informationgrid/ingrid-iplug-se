@@ -18,7 +18,7 @@ public abstract class DaoTest extends TestCase {
     TransactionService transactionService = new TransactionService();
     transactionService.beginTransaction();
 
-    IUrlDao urlDao = new UrlDao(transactionService);
+    IUrlDao urlDao = new UrlDao(transactionService, null);
     List<Url> all = urlDao.getAll();
     for (Url url : all) {
       urlDao.makeTransient(url);
@@ -98,4 +98,14 @@ public abstract class DaoTest extends TestCase {
     return metadata;
   }
 
+  protected Metadata createMetadata(TransactionService transactionService, String key, String value) {
+    Metadata metadata = new Metadata();
+    metadata.setMetadataKey(key);
+    metadata.setMetadataValue(value);
+    IMetadataDao metadataDao = new MetadataDao(transactionService);
+    metadataDao.makePersistent(metadata);
+    metadataDao.flipTransaction();
+    
+    return metadata;
+  }
 }

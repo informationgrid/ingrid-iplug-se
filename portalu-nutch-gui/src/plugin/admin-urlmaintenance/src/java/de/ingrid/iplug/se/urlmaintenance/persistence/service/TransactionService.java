@@ -1,6 +1,8 @@
 package de.ingrid.iplug.se.urlmaintenance.persistence.service;
 
 import java.io.Serializable;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -112,5 +114,87 @@ public class TransactionService {
 
   public static TransactionService getInstance() {
     return INSTANCE;
+  }
+
+  /**
+   * Executes a <code>Runnable</code> within a transaction. See
+   * {@linkplain #executeInTransaction(Callable)} for more details.
+   * 
+   * @param runnable
+   *          The <code>Runnable</code> that contains the code.
+   */
+  public void executeInTransaction(Runnable runnable) {
+    executeInTransaction(Executors.callable(runnable));
+  }
+
+  /**
+   * Executes a <code>Callable</code> within a hibernate transaction. If no
+   * transaction is open a new transaction will be openend and committed between
+   * the <code>Callable.call()</code> execution. When a transaction is already
+   * open this transaction will be used an no <code>commit()</code> or
+   * <code>rollback()</code> will be called.
+   * 
+   * @param <K>
+   *          The return type of <code>Callable.call()</code>.
+   * @param callable
+   *          The Callable than contains the hibernate code.
+   * @return An arbitrary result of the {@link Callable#call()} method.
+   */
+  public <K> K executeInTransaction(Callable<K> callable) {
+    EntityManager entityManager = getEntityManager();
+    if (entityManager.getTransaction().isActive()) {
+      try {
+        return callable.call();
+      } catch (Exception e) {
+        throw convertToRuntimeException(e);
+      }
+    }
+
+    entityManager.getTransaction().begin();
+    boolean success = false;
+    try {
+      K result = callable.call();
+      success = true;
+      return result;
+    } catch (Exception e) {
+      throw convertToRuntimeException(e);
+    } finally {
+      if (success) {
+        if (entityManager.getTransaction().isActive()) {
+//          try {
+            entityManager.getTransaction().commit();
+//          } catch (StaleStateException e) {
+//            entityManager.getTransaction().rollback();
+//            throw e;
+//          }
+        }
+      } else {
+        if (entityManager.getTransaction().isActive()) {
+          entityManager.getTransaction().rollback();
+        }
+      }
+    }
+  }
+
+  public static RuntimeException convertToRuntimeException(Throwable t) {
+    if (t instanceof RuntimeException) {
+      return (RuntimeException) t;
+    }
+    retainInterruptFlag(t);
+    return new RuntimeException(t);
+  }
+
+  /**
+   * This sets the interrupt flag if the catched exception was an
+   * {@link InterruptedException}. Catching such an exception always clears the
+   * interrupt flag.
+   * 
+   * @param catchedException
+   *          The catched exception.
+   */
+  public static void retainInterruptFlag(Throwable catchedException) {
+    if (catchedException instanceof InterruptedException) {
+      Thread.currentThread().interrupt();
+    }
   }
 }

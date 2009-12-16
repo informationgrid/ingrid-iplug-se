@@ -14,3 +14,4 @@ b) Connect to ibus and retrieve actual Partners/Providers:
 TODO rwe:
 ---------
 * In der Datei 'nutch' die Anwendnung wirder ohne Debug-Mode starten lassen 
+* SNSQuery Ÿberarbeiten; die JUnit Tests laufen nicht

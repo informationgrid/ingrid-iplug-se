@@ -101,6 +101,7 @@
 									<th>Alt. Titel</th>
 									<th>Thema</th>
 									<th>Funkt. Kategorie</th>
+						       		<td>Status</td>
 									<th>Aktion</th>
 								</tr>
 							</thead>
@@ -131,6 +132,7 @@
 											</c:if>
 										</c:forEach>
 									</td>
+						       		<td>&nbsp;${url.statusAsText}</td>
 									<td>
 										<a href="<%=request.getContextPath()%>/catalog/editCatalogUrl.html?id=${url.id}&type=topics">EDIT</a>
 						       			<a href="#" id="deleteCatalogUrl_${index.index}" 
@@ -157,6 +159,7 @@
 				                    {key:"altTitle"},
 				                    {key:"topic"},
 				                    {key:"functCategory"},
+				                    {key:"status"},
 				                    {key:"action"}
 				                ]
 						};
@@ -172,6 +175,7 @@
 							{key:"altTitle", label:"Alt. Titel"},
 							{key:"topic", label:"Thema"},
 							{key:"functCategory", label:"Funkt. Kategorie"},
+							{key:"status", label:"Status"},
 							{key:"action", label:"Aktion", width:100},
 							
 						];

@@ -53,6 +53,7 @@ public class CatalogUrlDao extends Dao<CatalogUrl> implements ICatalogUrlDao {
     return (Long) query.getSingleResult();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public List<CatalogUrl> getByProviderAndMetadatas(Provider provider,
       List<Metadata> metadatas, int firstResult, int maxResult, OrderBy orderBy) {
@@ -112,5 +113,4 @@ public class CatalogUrlDao extends Dao<CatalogUrl> implements ICatalogUrlDao {
     query.setMaxResults(maxResult);
     return query.getResultList();
   }
-
 }

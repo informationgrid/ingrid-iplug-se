@@ -28,7 +28,7 @@ public class SnsQueryTimeFilterTest extends TestCase {
   protected void setUp() throws Exception {
     this.fConfiguration = NutchConfiguration.create();
     String userDir = System.getProperty("user.dir");
-    String pluginPath = new File(userDir, "src/plugin").getAbsolutePath();
+    String pluginPath = new File(userDir, "portalu-nutch-gui/src/plugin,101tec-nutch-a9cddd9/src/plugin").getAbsolutePath();
     this.fConfiguration.set("plugin.folders", pluginPath);
     this.fConfiguration
         .set(

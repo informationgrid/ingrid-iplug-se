@@ -82,6 +82,9 @@ import org.apache.nutch.util.NutchJob;
 import org.apache.nutch.util.StringUtil;
 import org.apache.nutch.util.URLUtil;
 
+import de.ingrid.iplug.se.communication.InterplugInCommunicationConstants;
+import de.ingrid.iplug.se.communication.InterplugInQueueCommunication;
+
 
 /** 
  * A queue-based fetcher.
@@ -571,6 +574,17 @@ public class Fetcher extends Configured implements
               }
               ProtocolOutput output = protocol.getProtocolOutput(fit.url, fit.datum);
               ProtocolStatus status = output.getStatus();
+              
+              // ------ none nutch-specific code starts here
+              // Add protocoll's status and the url into InterplugInQueueCommunication object. A 
+              // consumer in another thread will update the database with this information.
+              InterplugInQueueCommunication<String> instanceForQueues = InterplugInQueueCommunication
+                  .getInstanceForStringQueues();
+              instanceForQueues
+                  .offer(InterplugInCommunicationConstants.URLSTATUS_KEY, status.getCode() + ":" + fit.url);
+              LOG.debug("Set status code '" + status.toString() + "' for url '" + fit.url + "'.");
+              // ------ none nutch-specific code ends here
+              
               Content content = output.getContent();
               ParseStatus pstatus = null;
               // unblock queue
@@ -878,9 +892,8 @@ public class Fetcher extends Configured implements
       }
       return null;
     }
-    
   }
-
+  
   public Fetcher() { super(null); }
 
   public Fetcher(Configuration conf) { super(conf); }

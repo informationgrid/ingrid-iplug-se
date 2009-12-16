@@ -1,8 +1,14 @@
 package de.ingrid.iplug.se.urlmaintenance.persistence.dao;
 
+import static org.mockito.Mockito.when;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import org.apache.nutch.protocol.ProtocolStatus;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao.OrderBy;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.CatalogUrl;
@@ -13,22 +19,46 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Url;
 import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
+import de.ingrid.iplug.se.urlmaintenance.util.TimeProvider;
 
 public class UrlDaoTest extends DaoTest {
 
-  public void testCreate() throws Exception {
+  private TransactionService _transactionService;
+
+  private IUrlDao _urlDao;
+
+  @Mock
+  private TimeProvider _timeProvider;
+
+  @Override
+  protected void setUp() throws Exception {
+    MockitoAnnotations.initMocks(this);
+    super.setUp();
+
     createProviderInSeparateTransaction("partner", "provider");
 
-    TransactionService transactionService = new TransactionService();
-    transactionService.beginTransaction();
+    _transactionService = new TransactionService();
+    _transactionService.beginTransaction();
+    _urlDao = new UrlDao(_transactionService, _timeProvider);
+  }
 
-    ProviderDao providerDao = new ProviderDao(transactionService);
+  @Override
+  protected void tearDown() throws Exception {
+    _transactionService.commitTransaction();
+    _transactionService.close();
+
+    super.tearDown();
+  }
+
+  public void testCreate() throws Exception {
+
+    ProviderDao providerDao = new ProviderDao(_transactionService);
     Provider byName = providerDao.getByName("provider");
 
-    IStartUrlDao startUrlDao = new StartUrlDao(transactionService);
-    ILimitUrlDao limitUrlDao = new LimitUrlDao(transactionService);
-    IExcludeUrlDao excludeUrlDao = new ExcludeUrlDao(transactionService);
-    ICatalogUrlDao catalogUrlDao = new CatalogUrlDao(transactionService);
+    IStartUrlDao startUrlDao = new StartUrlDao(_transactionService);
+    ILimitUrlDao limitUrlDao = new LimitUrlDao(_transactionService);
+    IExcludeUrlDao excludeUrlDao = new ExcludeUrlDao(_transactionService);
+    ICatalogUrlDao catalogUrlDao = new CatalogUrlDao(_transactionService);
 
     long start = System.currentTimeMillis();
     StartUrl startUrl = new StartUrl();
@@ -59,10 +89,10 @@ public class UrlDaoTest extends DaoTest {
     startUrl.addLimitUrl(limitUrl);
     startUrl.addExcludeUrl(excludeUrl);
 
-    transactionService.commitTransaction();
-    transactionService.close();
+    _transactionService.commitTransaction();
+    _transactionService.close();
 
-    transactionService.beginTransaction();
+    _transactionService.beginTransaction();
 
     List<StartUrl> allStartUrls = startUrlDao.getAll();
     assertEquals(1, allStartUrls.size());
@@ -73,19 +103,15 @@ public class UrlDaoTest extends DaoTest {
     List<CatalogUrl> allCatalogUrls = catalogUrlDao.getAll();
     assertEquals(1, allCatalogUrls.size());
 
-    IUrlDao urlDao = new UrlDao(transactionService);
-    List<Url> all = urlDao.getAll();
+    List<Url> all = _urlDao.getAll();
     assertEquals(4, all.size());
 
-    transactionService.commitTransaction();
-    transactionService.close();
   }
 
   public void testLimitUrl() throws Exception {
-    createProviderInSeparateTransaction("partner", "provider");
-    createMetadata("foo", "bar");
-    createMetadata("bar", "foo");
-    createMetadata("foobar", "foobar");
+    createMetadata(_transactionService, "foo", "bar");
+    createMetadata(_transactionService, "bar", "foo");
+    createMetadata(_transactionService, "foobar", "foobar");
 
     TransactionService transactionService = new TransactionService();
     transactionService.beginTransaction();
@@ -147,8 +173,7 @@ public class UrlDaoTest extends DaoTest {
     // should return foo and foobar
     List<Metadata> metadataList = new ArrayList<Metadata>();
     metadataList.add(metadata1);
-    List<StartUrl> startUrls = startUrlDao.getByProviderAndMetadatas(byName,
-        metadataList, 0, 10, OrderBy.CREATED_ASC);
+    List<StartUrl> startUrls = startUrlDao.getByProviderAndMetadatas(byName, metadataList, 0, 10, OrderBy.CREATED_ASC);
     assertEquals(2, startUrls.size());
     assertTrue(startUrls.contains(foo));
     assertTrue(startUrls.contains(foobar));
@@ -158,8 +183,7 @@ public class UrlDaoTest extends DaoTest {
     // should return bar and foobar
     metadataList.clear();
     metadataList.add(metadata2);
-    startUrls = startUrlDao.getByProviderAndMetadatas(byName, metadataList, 0,
-        10, OrderBy.CREATED_ASC);
+    startUrls = startUrlDao.getByProviderAndMetadatas(byName, metadataList, 0, 10, OrderBy.CREATED_ASC);
     assertEquals(2, startUrls.size());
     assertTrue(startUrls.contains(bar));
     assertTrue(startUrls.contains(foobar));
@@ -169,12 +193,45 @@ public class UrlDaoTest extends DaoTest {
     // should return foobar
     metadataList.clear();
     metadataList.add(metadata3);
-    startUrls = startUrlDao.getByProviderAndMetadatas(byName, metadataList, 0,
-        10, OrderBy.CREATED_ASC);
+    startUrls = startUrlDao.getByProviderAndMetadatas(byName, metadataList, 0, 10, OrderBy.CREATED_ASC);
     assertEquals(1, startUrls.size());
     assertTrue(startUrls.contains(foobar));
     count = startUrlDao.countByProviderAndMetadatas(byName, metadataList);
     assertEquals(new Long(1), count);
+  }
+
+  public void testUpdateStatus() throws Exception {
+    ProviderDao providerDao = new ProviderDao(_transactionService);
+    Provider byName = providerDao.getByName("provider");
+    IStartUrlDao startUrlDao = new StartUrlDao(_transactionService);
+    ICatalogUrlDao catalogUrlDao = new CatalogUrlDao(_transactionService);
+
+    StartUrl startUrl = new StartUrl();
+    startUrl.setUrl("http://www.start.com");
+    startUrl.setProvider(byName);
+    CatalogUrl catalogUrl = new CatalogUrl();
+    catalogUrl.setUrl("http://www.catalog.com");
+    catalogUrl.setProvider(byName);
+    startUrlDao.makePersistent(startUrl);
+    catalogUrlDao.makePersistent(catalogUrl);
+    startUrlDao.flipTransaction();
+
+    // verify 2 urls are stored in db with no status
+    List<Url> all = _urlDao.getAll();
+    assertEquals(2, all.size());
+    for (Url urlFromDb : all) {
+      assertNull(urlFromDb.getStatus());
+    }
+
+    // update status of one url
+    when(_timeProvider.getTime()).thenReturn(12345L);
+    _urlDao.updateStatus("http://www.start.com", ProtocolStatus.GONE);
+    _urlDao.flipTransaction();
+
+    assertEquals(ProtocolStatus.GONE, startUrlDao.getById(startUrl.getId()).getStatus().intValue());
+    assertEquals(new Date(12345L), startUrlDao.getById(startUrl.getId()).getStatusUpdated());
+    assertEquals(null, catalogUrlDao.getById(catalogUrl.getId()).getStatus());
+    assertEquals(null, catalogUrlDao.getById(catalogUrl.getId()).getStatusUpdated());
   }
 
 }
