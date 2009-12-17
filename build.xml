@@ -110,23 +110,20 @@
 		</copy>
 	</target>
 
-	<target name="copy-gui-configs">
-		<copy todir="build/${nutch-version}/conf/">
-			<fileset dir="portalu-nutch-gui/conf">
-			    <include name="nutch-site.xml"/>
-			    <include name="sns.properties"/>
-			</fileset>
+	<target name="copy-indexer-searcher-configs">
+		<copy todir="build/${nutch-version}/conf/" overwrite="true">
+			<fileset dir="portalu-nutch-gui/conf"/>
+			<fileset dir="portalu-search/conf"/>
 		</copy>
 	</target>
 
-	<target name="dist" depends="copy-nutch, copy-ingrid-se-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts, copy-gui-configs,update-special-deploy-files">
+	<target name="dist" depends="copy-nutch, copy-ingrid-se-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts,copy-indexer-searcher-configs,copy-deploy-conf-files">
 		<ant dir="build/${nutch-version}" target="package" />
 	</target>
 
-	<target name="update-special-deploy-files" depends="copy-gui-configs">
-		<copy todir="build/${nutch-version}/conf">
-			<fileset dir="deploy/ingrid-search/myles/" />
-			<fileset file="deploy/nutch-gui/myles/log4j.properties" /><!-- comment this out, if you want logging from os-nutgui configuration -->
+	<target name="copy-deploy-conf-files" depends="copy-indexer-searcher-configs">
+		<copy todir="build/${nutch-version}/conf" overwrite="true">
+			<fileset file="deploy/nutch-gui/log4j.properties" /><!-- comment this out, if you want logging as in os-nutgui configuration -->
 		</copy>
 		<replaceregexp file="build/${nutch-version}/conf/nutch-site.xml"
 		                         match="101tec-nutch-a9cddd9/src/plugin,portalu-nutch-gui/src/plugin"
@@ -134,14 +131,30 @@
 		                         byline="true"/>
 	</target>
 	
-	<target name="mylesDistribution" depends="copy-nutch, copy-ingrid-se-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts, copy-gui-configs,update-special-deploy-files">
-		<copy todir="build/${nutch-version}/src/plugin/admin-urlmaintenance/conf/META-INF/" file="deploy/nutch-gui/myles/persistence.xml" overwrite="true"/>
+	<target name="copy-deploy-myles-conf-files" depends="copy-deploy-conf-files">
+		<copy todir="build/${nutch-version}/conf" overwrite="true">
+			<fileset dir="deploy/ingrid-search/myles/" />
+			<fileset dir="deploy/nutch-gui/myles/" >
+				<exclude name="**/persistence.xml"/>
+			</fileset>
+		</copy>
+		<copy todir="build/${nutch-version}/src/plugin/admin-urlmaintenance/conf/META-INF/" 
+				file="deploy/nutch-gui/myles/persistence.xml" overwrite="true"/>
+	</target>
+	
+	<target name="mylesDistribution" depends="copy-nutch, copy-ingrid-se-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts, copy-indexer-searcher-configs,copy-deploy-myles-conf-files">
 		<ant dir="build/${nutch-version}" target="package" />
 	</target>
 	
-	<target name="deployMyles" depends="mylesDistribution">
-		<exec command="rsync">
-			<arg line=" -c -a -r --progress -e ssh --delete build/${nutch-version}/build/nutch-gui-0.1 213.144.28.245:/opt/ingrid/ingrid-iplug-se-dev"/>
+	<target name="deployMyles" >
+		<property name="nutch.gui.name" value="nutch-gui-0.3"/>
+		<tar destfile="build/${nutch.gui.name}-dev.tar.gz"  basedir="build/${nutch-version}/build/${nutch.gui.name}" compression="gzip" />
+		<echo message="use: rsync -c -a -r --progress -e 'ssh -l tec' --delete build/${nutch-version}/build/${nutch.gui.name} tec@213.144.28.218:/home/tec/temp"/>
+		<echo message="use: scp build/${nutch.gui.name}-dev.tar.gz tec@213.144.28.218:/home/tec/temp"/>
+		<echo message="from staging use: scp -P882 /home/tec/temp/nutch-gui-0.3-dev.tar.gz ingrid@192.168.64.34:/opt/ingrid/ingrid-iplug-se-dev/"/>
+		
+		<exec executable="rsync">
+			<arg line=" -c -a -r --progress -e 'ssh -l tec' --delete build/${nutch-version}/build/${nutch.gui.name} tec@213.144.28.218:/home/tec/temp"/>
 		</exec>
 	</target>
 
