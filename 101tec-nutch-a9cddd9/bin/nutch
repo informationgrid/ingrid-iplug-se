@@ -12,7 +12,8 @@
 #   NUTCH_OPTS      Extra Java runtime options.
 #
 
-NUTCH_OPTS="-Dnutch.gui.theme=portal-u -DdeployMode=dev"
+#NUTCH_OPTS="-Dnutch.gui.theme=portal-u -DdeployMode=dev"
+NUTCH_OPTS="-Dnutch.gui.theme=portal-u -Djava.security.auth.login.config=conf/nutchgui.auth"
 
 cygwin=false
 case "`uname`" in

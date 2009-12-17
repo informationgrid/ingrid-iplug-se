@@ -76,7 +76,8 @@ startIplug()
 	echo 'finished syncronize.'
   fi
   
-  nohup bin/nutch admin /tmp/nutchGui 50060 > logs/console-index.log &
+  #nohup bin/nutch admin /tmp/nutchGui 50060 > logs/console-index.log &
+  nohup bin/nutch admin /tmp/nutchGui 50060 --secure > logs/console-index.log &
   echo "ingrid component ($INGRID_HOME) started."
   echo $! > $PID
 }
