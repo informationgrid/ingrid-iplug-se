@@ -14,7 +14,7 @@ public class GuiComponentExtensionContainerTest extends TestCase {
 
   public void testGeneralGuiComponent() throws Exception {
     Configuration configuration = NutchConfiguration.create();
-    configuration.set("plugin.folders", "src/plugin");
+    configuration.set("plugin.folders", "101tec-nutch-a9cddd9/src/plugin,portalu-nutch-gui/src/plugin");
     GuiComponentExtensionContainer guiComponentContainer = new GuiComponentExtensionContainer(
             configuration);
     List<Extension> list = guiComponentContainer

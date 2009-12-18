@@ -13,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao.OrderBy;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.CatalogUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.ExcludeUrl;
+import de.ingrid.iplug.se.urlmaintenance.persistence.model.IdBase;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.LimitUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
@@ -234,4 +235,29 @@ public class UrlDaoTest extends DaoTest {
     assertEquals(null, catalogUrlDao.getById(catalogUrl.getId()).getStatusUpdated());
   }
 
+  public void testCountByProviders() throws Exception {
+
+    _transactionService.commitTransaction();
+    _transactionService.close();
+    createProviderInSeparateTransaction("2ProviderPartner", "provider-a", "provider-b");
+    _transactionService = new TransactionService();
+    _transactionService.beginTransaction();
+    
+    ProviderDao providerDao = new ProviderDao(_transactionService);
+    List<Provider> providerFromDb = providerDao.getAll();
+    IStartUrlDao startUrlDao = new StartUrlDao(_transactionService);
+
+    StartUrl startUrl = new StartUrl();
+    startUrl.setUrl("http://www.start.com");
+    startUrl.setProvider(providerFromDb.get(1));
+    startUrlDao.makePersistent(startUrl);
+    startUrlDao.flipTransaction();
+
+    // verify 1 url is stored in db with no status
+    List<Url> all = _urlDao.getAll();
+    assertEquals(1, all.size());
+
+    // update status of one url
+    assertEquals(1, _urlDao.countByProvider(IdBase.toIds(providerFromDb)));
+  }
 }

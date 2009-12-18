@@ -1,5 +1,8 @@
 package de.ingrid.iplug.se.urlmaintenance.persistence.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -9,7 +12,7 @@ import javax.persistence.MappedSuperclass;
 public class IdBase {
 
   @Id
-//  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  // @GeneratedValue(strategy = GenerationType.SEQUENCE)
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long _id;
 
@@ -47,4 +50,13 @@ public class IdBase {
     return "id: " + _id;
   }
 
+  public static List<Long> toIds(List<? extends IdBase> objects) {
+    List<Long> ret = new ArrayList<Long>();
+    if (objects != null) {
+      for (IdBase object : objects) {
+        ret.add(object.getId());
+      }
+    }
+    return ret;
+  }
 }

@@ -1,5 +1,6 @@
 package de.ingrid.iplug.se.urlmaintenance.persistence.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -55,7 +56,7 @@ public abstract class DaoTest extends TestCase {
     return provider;
   }
 
-  protected Provider createProviderInSeparateTransaction(String partnerName, String providerName) throws Exception {
+  protected List<Provider> createProviderInSeparateTransaction(String partnerName, String... providerNames) throws Exception {
 
     TransactionService transactionService = new TransactionService();
     transactionService.beginTransaction();
@@ -64,15 +65,19 @@ public abstract class DaoTest extends TestCase {
     Partner partner = createPartner(partnerName);
     partnerDao.makePersistent(partner);
     Partner byName = partnerDao.getByName(partner.getName());
-
-    Provider provider = new Provider();
-    provider.setName(providerName);
-    provider.setPartner(byName);
-    providerDao.makePersistent(provider);
+    List<Provider> ret = new ArrayList<Provider>();
+    
+    for(String providerName : providerNames){
+      Provider provider = new Provider();
+      provider.setName(providerName);
+      provider.setPartner(byName);
+      providerDao.makePersistent(provider);
+      ret.add(provider);
+    }
     transactionService.commitTransaction();
     transactionService.close();
 
-    return provider;
+    return ret;
   }
 
   protected Partner createPartner(String name) throws Exception {

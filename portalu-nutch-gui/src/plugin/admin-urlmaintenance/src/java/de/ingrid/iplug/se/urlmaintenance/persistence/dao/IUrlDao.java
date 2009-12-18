@@ -1,7 +1,10 @@
 package de.ingrid.iplug.se.urlmaintenance.persistence.dao;
 
+import java.util.List;
+
 import org.apache.nutch.protocol.Protocol;
 
+import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Url;
 
 public interface IUrlDao extends IDao<Url> {
@@ -20,4 +23,12 @@ public interface IUrlDao extends IDao<Url> {
    */
   void updateStatus(String url, Integer status);
 
+  /**
+   * Provides the number of urls that refer to one or more providers.
+   * 
+   * @param providersIds
+   *          The ids of providers to test.
+   * @return Number of urls that have a foreign key to given providers.
+   */
+  int countByProvider(List<Long> providersIds);
 }

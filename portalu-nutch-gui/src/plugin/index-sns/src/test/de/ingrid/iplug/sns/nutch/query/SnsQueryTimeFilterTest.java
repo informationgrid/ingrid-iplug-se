@@ -17,7 +17,7 @@ import junit.framework.TestCase;
 
 /**
  * @author mb
- * 
+ * TODO rwe: fix test
  */
 public class SnsQueryTimeFilterTest extends TestCase {
 

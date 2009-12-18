@@ -11,38 +11,44 @@ import java.util.Map;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.DaoTest;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.PartnerDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ProviderDao;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.StartUrlDao;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.UrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Partner;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
+import de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
+import de.ingrid.iplug.se.urlmaintenance.util.TimeProvider;
 
 public class PartnerAndProviderDbSyncServiceTest extends DaoTest {
 
-  private PartnerAndProviderDbSyncService service;
-  private TransactionService transactionService;
-  private PartnerDao partnerDao;
-  private ProviderDao providerDao;
+  private PartnerAndProviderDbSyncService _service;
+  private TransactionService _transactionService;
+  private PartnerDao _partnerDao;
+  private ProviderDao _providerDao;
+  private UrlDao _urlDao;
 
   @Override
   protected void setUp() throws Exception {
     super.setUp();
 
-    transactionService = new TransactionService();
-    transactionService.beginTransaction();
-    providerDao = new ProviderDao(transactionService);
-    partnerDao = new PartnerDao(transactionService, providerDao);
+    _transactionService = new TransactionService();
+    _transactionService.beginTransaction();
+    _providerDao = new ProviderDao(_transactionService);
+    _partnerDao = new PartnerDao(_transactionService, _providerDao);
+    _urlDao = new UrlDao(_transactionService, new TimeProvider());
 
-    service = new PartnerAndProviderDbSyncService(partnerDao, providerDao);
+    _service = new PartnerAndProviderDbSyncService(_partnerDao, _urlDao);
   }
 
   public void testSyncDb() {
     List<Map<String, Serializable>> allPartnerWithProvider = new ArrayList<Map<String, Serializable>>();
     allPartnerWithProvider.add(createPartnerWithProviders("partnerA", "providerA"));
 
-    service.syncDb(allPartnerWithProvider);
+    _service.syncDb(allPartnerWithProvider);
 
     // verify partnerA with providerA are in db
-    List<Partner> partnersFromDb = partnerDao.getAll();
-    List<Provider> providersFromDb = providerDao.getAll();
+    List<Partner> partnersFromDb = _partnerDao.getAll();
+    List<Provider> providersFromDb = _providerDao.getAll();
     assertEquals(1, partnersFromDb.size());
     assertEquals(1, providersFromDb.size());
 
@@ -50,12 +56,12 @@ public class PartnerAndProviderDbSyncServiceTest extends DaoTest {
     allPartnerWithProvider.clear();
     allPartnerWithProvider.add(createPartnerWithProviders("partnerA", "providerA-A"));
     allPartnerWithProvider.add(createPartnerWithProviders("partnerB", "providerA", "providerB"));
-    service.syncDb(allPartnerWithProvider);
-    transactionService.flipTransaction();
+    _service.syncDb(allPartnerWithProvider);
+    _transactionService.flipTransaction();
 
     // verify partnerA with new provider, and partnerB with two providers
-    partnersFromDb = partnerDao.getAll();
-    providersFromDb = providerDao.getAll();
+    partnersFromDb = _partnerDao.getAll();
+    providersFromDb = _providerDao.getAll();
     assertEquals(2, partnersFromDb.size());
     assertEquals(3, providersFromDb.size());
     assertEquals("partnerA", partnersFromDb.get(0).getName());
@@ -77,11 +83,11 @@ public class PartnerAndProviderDbSyncServiceTest extends DaoTest {
     // delete the providerB completely and append new provider to partnerA
     allPartnerWithProvider.clear();
     allPartnerWithProvider.add(createPartnerWithProviders("partnerA", "providerA-A", "providerA-B"));
-    service.syncDb(allPartnerWithProvider);
-    transactionService.flipTransaction();
+    _service.syncDb(allPartnerWithProvider);
+    _transactionService.flipTransaction();
 
-    partnersFromDb = partnerDao.getAll();
-    providersFromDb = providerDao.getAll();
+    partnersFromDb = _partnerDao.getAll();
+    providersFromDb = _providerDao.getAll();
     assertEquals(1, partnersFromDb.size());
     assertEquals(providersFromDb.toString(), 2, providersFromDb.size());
     assertEquals("partnerA", partnersFromDb.get(0).getName());
@@ -89,46 +95,78 @@ public class PartnerAndProviderDbSyncServiceTest extends DaoTest {
     assertEquals("providerA-A", partnersFromDb.get(0).getProviders().get(0).getName());
     assertEquals("providerA-B", partnersFromDb.get(0).getProviders().get(1).getName());
 
-    transactionService.commitTransaction();
-    transactionService.close();
+    _transactionService.commitTransaction();
+    _transactionService.close();
   }
 
   public void testSyncDb_DeleteAllProvidesFromPartner() {
     List<Map<String, Serializable>> allPartnerWithProvider = new ArrayList<Map<String, Serializable>>();
     allPartnerWithProvider.add(createPartnerWithProviders("partnerA", "providerA1", "providerA2"));
 
-    service.syncDb(allPartnerWithProvider);
+    _service.syncDb(allPartnerWithProvider);
 
     // verify partnerA with providerA are in db
-    List<Partner> partnersFromDb = partnerDao.getAll();
-    List<Provider> providersFromDb = providerDao.getAll();
+    List<Partner> partnersFromDb = _partnerDao.getAll();
+    List<Provider> providersFromDb = _providerDao.getAll();
     assertEquals(1, partnersFromDb.size());
     assertEquals(2, providersFromDb.size());
 
     // remove all providers from partnerA
     allPartnerWithProvider.clear();
     allPartnerWithProvider.add(createPartnerWithProviders("partnerA"));
-    service.syncDb(allPartnerWithProvider);
+    _service.syncDb(allPartnerWithProvider);
 
     // verify partnerA with new provider, and partnerB with two providers
-    partnersFromDb = partnerDao.getAll();
-    providersFromDb = providerDao.getAll();
+    partnersFromDb = _partnerDao.getAll();
+    providersFromDb = _providerDao.getAll();
     assertEquals(1, partnersFromDb.size());
     assertEquals(0, providersFromDb.size());
     assertEquals("partnerA", partnersFromDb.get(0).getName());
     assertEquals(0, partnersFromDb.get(0).getProviders().size());
-    
+
     // delete the last partner too
     allPartnerWithProvider.clear();
-    service.syncDb(allPartnerWithProvider);
+    _service.syncDb(allPartnerWithProvider);
 
-    partnersFromDb = partnerDao.getAll();
-    providersFromDb = providerDao.getAll();
+    partnersFromDb = _partnerDao.getAll();
+    providersFromDb = _providerDao.getAll();
     assertEquals(0, partnersFromDb.size());
     assertEquals(0, providersFromDb.size());
 
-    transactionService.commitTransaction();
-    transactionService.close();
+    _transactionService.commitTransaction();
+    _transactionService.close();
+  }
+
+  public void testSyncDb_DontDeleteProvidersThatReferToAnUrl() {
+    // Create a partner with providers
+    List<Map<String, Serializable>> allPartnerWithProvider = new ArrayList<Map<String, Serializable>>();
+    allPartnerWithProvider.add(createPartnerWithProviders("partnerA", "providerA1", "providerA2"));
+
+    _service.syncDb(allPartnerWithProvider);
+
+    // Add a start url to one provider
+    StartUrlDao startUrlDao = new StartUrlDao(_transactionService);
+    StartUrl startUrl = new StartUrl();
+    startUrl.setUrl("http://www.start.com");
+    startUrl.setProvider(_providerDao.getByName("providerA1"));
+    startUrlDao.makePersistent(startUrl);
+    startUrlDao.flipTransaction();
+
+    // verify url with provider exists
+    assertEquals(1, startUrlDao.getAll().size());
+    assertNotNull(startUrlDao.getAll().get(0).getProvider());
+
+    // remove all partner and providers in startUrlDao.getAll()
+    allPartnerWithProvider.clear();
+    _service.syncDb(allPartnerWithProvider);
+
+    // verify, that the partner and provider still exists due to the reference
+    // of the url
+    assertEquals(1, _partnerDao.getAll().size());
+    assertEquals(2, _providerDao.getAll().size());
+
+    _transactionService.commitTransaction();
+    _transactionService.close();
   }
 
   private Map<String, Serializable> createPartnerWithProviders(String partnerName, String... providerNames) {

@@ -12,6 +12,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.nutch.admin.NavigationSelector;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -37,14 +39,15 @@ import de.ingrid.iplug.se.urlmaintenance.service.PartnerAndProviderDbSyncService
 @RequestMapping("/index.html")
 public class UrlMaintenanceController extends NavigationSelector {
 
-  // private final Log LOG = LogFactory.getLog(UrlMaintenanceController.class);
+  private final Log LOG = LogFactory.getLog(UrlMaintenanceController.class);
 
   private final IPartnerDao _partnerDao;
   private final IProviderDao _providerDao;
   private final PartnerAndProviderDbSyncService _syncService;
 
   @Autowired
-  public UrlMaintenanceController(IPartnerDao partnerDao, IProviderDao providerDao, PartnerAndProviderDbSyncService syncService) {
+  public UrlMaintenanceController(IPartnerDao partnerDao, IProviderDao providerDao,
+      PartnerAndProviderDbSyncService syncService) {
     _partnerDao = partnerDao;
     _providerDao = providerDao;
     _syncService = syncService;
@@ -54,9 +57,14 @@ public class UrlMaintenanceController extends NavigationSelector {
   public String urlMaintenance(HttpServletRequest httpRequest, Model model) {
     Principal userPrincipal = httpRequest.getUserPrincipal();
     if (userPrincipal != null && userPrincipal instanceof PortaluPrincipal) {
-      List<Map<String, Serializable>> allPartnerWithProvider = ((PortaluPrincipal) userPrincipal).getAllPartnerWithProvider();
+      List<Map<String, Serializable>> allPartnerWithProvider = ((PortaluPrincipal) userPrincipal)
+          .getAllPartnerWithProvider();
       if (allPartnerWithProvider != null && allPartnerWithProvider.size() > 0) {
-        _syncService.syncDb(allPartnerWithProvider);
+        try {
+          _syncService.syncDb(allPartnerWithProvider);
+        } catch (Throwable ex) {
+          LOG.error("Can not sync DB with partner/provider from ibus.", ex);
+        }
       }
     }
     model.addAttribute("partnerProviderCommand", new PartnerProviderCommand());
@@ -99,7 +107,8 @@ public class UrlMaintenanceController extends NavigationSelector {
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String postUrlMaintenance(@ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand) {
+  public String postUrlMaintenance(
+      @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand) {
     return "redirect:/welcomeEditUrls.html";
   }
 

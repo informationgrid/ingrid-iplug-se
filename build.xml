@@ -99,9 +99,9 @@
 	</target>
 	
 	<target name="copy-portalu-libs">
-		<exec dir="portalu-common" executable="mvn">
+<!--		<exec dir="portalu-common" executable="mvn">
 			<arg line="dependency:copy-dependencies -DoutputDirectory=${basedir}/build/${nutch-version}/lib/ingrid-ext"/>
-		</exec>
+		</exec>-->
 	</target>
 
 	<target name="copy-start-scripts">

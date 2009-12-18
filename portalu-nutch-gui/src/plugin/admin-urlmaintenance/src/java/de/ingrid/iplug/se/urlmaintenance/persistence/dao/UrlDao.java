@@ -43,4 +43,14 @@ public class UrlDao extends Dao<Url> implements IUrlDao {
     }
   }
 
+  @Override
+  public int countByProvider(List<Long> providersIds) {
+    if (providersIds.size() == 0) {
+      return 0;
+    }
+    Query query = _transactionService.createNamedQuery("countUrlsThatUsesSpecialProviders");
+    query.setParameter("providersIds", providersIds);
+    Number count = (Number) query.getSingleResult();
+    return count.intValue();
+  }
 }

@@ -11,12 +11,12 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
 public class StartUrlDaoTest extends DaoTest {
 
   public void testPaging() throws Exception {
-    Provider provider = createProviderInSeparateTransaction("partner", "provider");
+    List<Provider> providers = createProviderInSeparateTransaction("partner", "provider");
     TransactionService transactionService = new TransactionService();
     transactionService.beginTransaction();
 
     ProviderDao providerDao = new ProviderDao(transactionService);
-    Provider providerFromDb = providerDao.getByName(provider.getName());
+    Provider providerFromDb = providerDao.getByName(providers.get(0).getName());
     IStartUrlDao startUrlDao = new StartUrlDao(transactionService);
     ICatalogUrlDao catalogUrlDao = new CatalogUrlDao(transactionService);
 
@@ -37,7 +37,7 @@ public class StartUrlDaoTest extends DaoTest {
     transactionService.close();
     transactionService.beginTransaction();
 
-    providerFromDb = providerDao.getByName(provider.getName());
+    providerFromDb = providerDao.getByName(providers.get(0).getName());
     List<StartUrl> startUrls = startUrlDao.getByProvider(providerFromDb, 0, 11, OrderBy.URL_ASC);
     assertEquals(11, startUrls.size());
     startUrls = startUrlDao.getByProvider(providerFromDb, 11, 100, OrderBy.CREATED_ASC);

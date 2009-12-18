@@ -8,10 +8,14 @@ import java.io.File;
 import junit.framework.TestCase;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.nutch.searcher.Query;
+import org.apache.nutch.searcher.QueryFilters;
 import org.apache.nutch.util.NutchConfiguration;
 
 /**
  * @author mb, Ralf
+ * TODO rwe: fix test
  */
 public class SnsBuzzwordTest extends TestCase {
   private Configuration fConfiguration;
@@ -29,14 +33,14 @@ public class SnsBuzzwordTest extends TestCase {
   protected void tearDown() throws Exception {
   }
 
-//  public void testBuzzword() throws Exception {
-//    Query query = new Query(this.fConfiguration);
-//    query.addRequiredTerm("h2o");
-//    query.addRequiredTerm("www", "datatype");
-//    query.addNonRequiredTerm("on", "incl_meta");
-//    System.out.println("NutchQuery: " + query.toString());
-//    QueryFilters queryFilters = new QueryFilters(this.fConfiguration);
-//    BooleanQuery booleanQuery = queryFilters.filter(query);
-//    System.out.println("LuceneQuery :" + booleanQuery);
-//  }
+  public void testBuzzword() throws Exception {
+    Query query = new Query(this.fConfiguration);
+    query.addRequiredTerm("h2o");
+    query.addRequiredTerm("www", "datatype");
+    query.addNonRequiredTerm("on", "incl_meta");
+    System.out.println("NutchQuery: " + query.toString());
+    QueryFilters queryFilters = new QueryFilters(this.fConfiguration);
+    BooleanQuery booleanQuery = queryFilters.filter(query);
+    System.out.println("LuceneQuery :" + booleanQuery);
+  }
 }

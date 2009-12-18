@@ -1,5 +1,7 @@
 package de.ingrid.iplug.se.urlmaintenance.commandObjects;
 
+import java.util.List;
+
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.DaoTest;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ExcludeUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IExcludeUrlDao;
@@ -38,14 +40,14 @@ public class StartUrlWrapperTest extends DaoTest {
     StartUrlCommand startUrlCommand = new StartUrlCommand(_startUrlDao,
         _limitUrlDao, _excludeUrlDao);
 
-    Provider provider = createProviderInSeparateTransaction("partner", "provider");
+    List<Provider> providers = createProviderInSeparateTransaction("partner", "provider");
     StartUrl model = new StartUrl();
     model.setUrl("http://www.101tec.com");
-    model.setProvider(provider);
+    model.setProvider(providers.get(0));
 
     LimitUrl limitUrl = new LimitUrl();
     limitUrl.setUrl("http://www.101tec.com/limit");
-    limitUrl.setProvider(provider);
+    limitUrl.setProvider(providers.get(0));
     model.addLimitUrl(limitUrl);
     _startUrlDao.makePersistent(model);
     _startUrlDao.flipTransaction();
@@ -67,16 +69,16 @@ public class StartUrlWrapperTest extends DaoTest {
   public void testWrite_OverwriteExistingStartAndLimitUrls() throws Exception {
     _transactionService.close();
     Metadata lang = createMetadata("lang", "de");
-    Provider provider = createProviderInSeparateTransaction("partner", "provider");
+    List<Provider> providers = createProviderInSeparateTransaction("partner", "provider");
 
     _transactionService.beginTransaction();
     StartUrl startUrl = new StartUrl();
     startUrl.setUrl("http://www.101tec.com/old");
-    startUrl.setProvider(provider);
+    startUrl.setProvider(providers.get(0));
     _startUrlDao.makePersistent(startUrl);
     LimitUrl limitUrl = new LimitUrl();
     limitUrl.setUrl("http://www.101tec.com/blah");
-    limitUrl.setProvider(provider);
+    limitUrl.setProvider(providers.get(0));
     limitUrl.addMetadata(lang);
     _limitUrlDao.makePersistent(limitUrl);
     _limitUrlDao.flipTransaction();
@@ -85,7 +87,7 @@ public class StartUrlWrapperTest extends DaoTest {
     LimitUrlCommand limitUrlCommand = new LimitUrlCommand(_limitUrlDao);
     limitUrlCommand.setUrl("http://www.101tec.com");
 //    limitUrlCommand.setCommandId(limitUrl.getId());
-    limitUrlCommand.setProvider(provider);
+    limitUrlCommand.setProvider(providers.get(0));
     limitUrlCommand.addMetadata(lang);
     
     StartUrlCommand startUrlCommand = new StartUrlCommand(_startUrlDao,
@@ -106,18 +108,18 @@ public class StartUrlWrapperTest extends DaoTest {
   public void testWrite_StartAndLinitUrlsAlreadyExists() throws Exception{
     _transactionService.close();
     Metadata lang = createMetadata("lang", "de");
-    Provider provider = createProviderInSeparateTransaction("partner", "provider");
+    List<Provider> providers = createProviderInSeparateTransaction("partner", "provider");
 
     _transactionService.beginTransaction();
     LimitUrl limitUrl = new LimitUrl();
     limitUrl.setUrl("http://www.101tec.com");
-    limitUrl.setProvider(provider);
+    limitUrl.setProvider(providers.get(0));
     limitUrl.addMetadata(lang);
     _limitUrlDao.makePersistent(limitUrl);
     StartUrl startUrl = new StartUrl();
     startUrl.setUrl("http://www.101tec.com/index");
     startUrl.addLimitUrl(limitUrl);
-    startUrl.setProvider(provider);
+    startUrl.setProvider(providers.get(0));
     _startUrlDao.makePersistent(startUrl);
     _limitUrlDao.flipTransaction();
     
@@ -125,7 +127,7 @@ public class StartUrlWrapperTest extends DaoTest {
     LimitUrlCommand limitUrlCommand = new LimitUrlCommand(_limitUrlDao);
     limitUrlCommand.setUrl(limitUrl.getUrl());
 //    limitUrlCommand.setCommandId(limitUrl.getId());
-    limitUrlCommand.setProvider(provider);
+    limitUrlCommand.setProvider(providers.get(0));
     limitUrlCommand.addMetadata(lang);
     StartUrlCommand startUrlCommand = new StartUrlCommand(_startUrlDao, _limitUrlDao, _excludeUrlDao);
     startUrlCommand.setUrl(startUrl.getUrl());

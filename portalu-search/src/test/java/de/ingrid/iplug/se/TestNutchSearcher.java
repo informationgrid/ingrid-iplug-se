@@ -26,6 +26,7 @@ import de.ingrid.utils.queryparser.QueryStringParser;
 
 /**
  * TODO comment for TestNutchSearcher
+ * TODO rwe: fix test
  * 
  * <p/>
  * created on 02.06.2006

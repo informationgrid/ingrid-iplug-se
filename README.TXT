@@ -20,9 +20,9 @@ Deployment:
 -----------
 Alle Zugänge sind unter http://dev.wemove.com/confluence/pages/viewpage.action?pageId=360465 eingetragen.
 * ssh tec@213.144.28.218
-  cd temp
+  
 * ssh -p 882 ingrid@192.168.64.34
-  cd /opt/ingrid/ingrid-iplug-se-dev/
+  cd /opt/ingrid/ingrid-iplug-se-dev/nutch-gui-0.3-dev/
   ...
   
   

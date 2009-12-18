@@ -19,8 +19,6 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
 public class TestStartUrlCommand extends DaoTest {
 
   private TransactionService _transactionService;
-//  private ProviderDao _providerDao;
-//  private IPartnerDao _partnerDao;
   private IStartUrlDao _startUrlDao;
   private ILimitUrlDao _limitUrlDao;
   private IExcludeUrlDao _excludeUrlDao;
@@ -34,8 +32,6 @@ public class TestStartUrlCommand extends DaoTest {
     _transactionService = new TransactionService();
     _transactionService.beginTransaction();
 
-//    _providerDao = new ProviderDao(_transactionService);
-//    _partnerDao = new PartnerDao(_transactionService, _providerDao);
     _startUrlDao = new StartUrlDao(_transactionService);
     _limitUrlDao = new LimitUrlDao(_transactionService);
     _excludeUrlDao = new ExcludeUrlDao(_transactionService);
@@ -45,13 +41,13 @@ public class TestStartUrlCommand extends DaoTest {
   public void testWrite_StartUrlAndLimitUrl() throws Exception{
     _transactionService.close();
     
-    Provider provider = createProviderInSeparateTransaction("partner", "provider");
+    List<Provider> providers = createProviderInSeparateTransaction("partner", "provider");
     
-    _command.setProvider(provider);
+    _command.setProvider(providers.get(0));
     _command.setUrl("www.starturl.de");
     LimitUrlCommand limitUrlCommand = new LimitUrlCommand(_limitUrlDao);
     limitUrlCommand.setUrl("www.limiturl.de");
-    limitUrlCommand.setProvider(provider);
+    limitUrlCommand.setProvider(providers.get(0));
     _command.addLimitUrlCommand(limitUrlCommand);
     
     _transactionService.beginTransaction();

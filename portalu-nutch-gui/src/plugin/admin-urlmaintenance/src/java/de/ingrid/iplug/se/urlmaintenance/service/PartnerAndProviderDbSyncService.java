@@ -18,7 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IPartnerDao;
-import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IProviderDao;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IUrlDao;
+import de.ingrid.iplug.se.urlmaintenance.persistence.model.IdBase;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Partner;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 
@@ -28,7 +29,7 @@ public class PartnerAndProviderDbSyncService {
   private final Log LOG = LogFactory.getLog(PartnerAndProviderDbSyncService.class);
 
   private final IPartnerDao _partnerDao;
-  private final IProviderDao _providerDao;
+  private final IUrlDao _urlDao;
 
   private class InternalPartner {
     private String _id;
@@ -71,6 +72,7 @@ public class PartnerAndProviderDbSyncService {
     private String _name;
     private List<String> _urls = new ArrayList<String>();
 
+    @SuppressWarnings("unused")
     public String getId() {
       return _id;
     }
@@ -87,6 +89,7 @@ public class PartnerAndProviderDbSyncService {
       _name = name;
     }
 
+    @SuppressWarnings("unused")
     public List<String> getUrls() {
       return _urls;
     }
@@ -102,10 +105,10 @@ public class PartnerAndProviderDbSyncService {
   };
 
   @Autowired
-  public PartnerAndProviderDbSyncService(IPartnerDao partnerDao, IProviderDao providerDao) {
+  public PartnerAndProviderDbSyncService(IPartnerDao partnerDao, IUrlDao urlDao) {
     super();
     _partnerDao = partnerDao;
-    _providerDao = providerDao;
+    _urlDao = urlDao;
   }
 
   public void syncDb(List<Map<String, Serializable>> allPartnerWithProvider) {
@@ -116,7 +119,8 @@ public class PartnerAndProviderDbSyncService {
     Queue<Partner> partnersInDb = new LinkedList<Partner>(_partnerDao.getAll());
     Partner partnerInDb = partnersInDb.poll();
     while (partnerInDb != null) {
-      InternalPartner partnerWithProvider = findInternalPartnerByPartnerName(partnersAndProviders, partnerInDb.getName());
+      InternalPartner partnerWithProvider = findInternalPartnerByPartnerName(partnersAndProviders, partnerInDb
+          .getName());
 
       if (partnerWithProvider != null) {
         // there exists the same partner from ibus with partner stored in db
@@ -124,9 +128,16 @@ public class PartnerAndProviderDbSyncService {
         // remove partner from temporary ibus list
         partnersAndProviders.remove(partnerWithProvider);
       } else {
-        // the partner stored in db exists not on ibus results
-        LOG.info("Remove partner with name: '" + partnerInDb.getName() + "'.");
-        _partnerDao.makeTransient(partnerInDb);
+        // The partner stored in db exists not on ibus results.
+        // But before we remove it we have to test if the partner's providers
+        // are not referred by any URL.
+        if (_urlDao.countByProvider(IdBase.toIds(partnerInDb.getProviders())) == 0L) {
+          LOG.info("Remove partner with name: '" + partnerInDb.getName() + "'.");
+          _partnerDao.makeTransient(partnerInDb);
+        } else {
+          LOG.info("Can not remove partner with name: '" + partnerInDb.getName()
+              + "', because it is already used by an URL.");
+        }
       }
 
       partnerInDb = partnersInDb.poll();
@@ -144,7 +155,8 @@ public class PartnerAndProviderDbSyncService {
     newPartner.setName(internalPartner.getName());
     LOG.info("Create new partner with name '" + internalPartner.getName() + "'.");
     for (InternalProvider provider : internalPartner.getProviders()) {
-      LOG.info("Add new provider with name '" + provider.getName() + "' to existing partner '" + internalPartner.getName() + "'.");
+      LOG.info("Add new provider with name '" + provider.getName() + "' to existing partner '"
+          + internalPartner.getName() + "'.");
       Provider newProvider = craeteProvider(provider);
       newPartner.addProvider(newProvider);
     }
@@ -181,9 +193,9 @@ public class PartnerAndProviderDbSyncService {
       LOG.info("Remove provider '" + provider.getName() + "' from partner '" + partnerInDb.getName() + "'.");
       _partnerDao.removeProvider(partnerInDb, provider);
     }
-//    if (providersToRemove.size() > 0) {
-//      _partnerDao.flipTransaction();
-//    }
+    // if (providersToRemove.size() > 0) {
+    // _partnerDao.flipTransaction();
+    // }
 
     // add provider for partner?
     for (String providerName : providersToAdd) {
@@ -193,7 +205,7 @@ public class PartnerAndProviderDbSyncService {
     }
     if (providersToAdd.size() > 0) {
       _partnerDao.makePersistent(partnerInDb);
-//      _partnerDao.flipTransaction();
+      // _partnerDao.flipTransaction();
     }
   }
 
@@ -203,10 +215,12 @@ public class PartnerAndProviderDbSyncService {
         return internalProvider;
       }
     }
-    throw new RuntimeException("Can not fine an Internal Provider form name '" + providerName + "' from list: " + providers);
+    throw new RuntimeException("Can not fine an Internal Provider form name '" + providerName + "' from list: "
+        + providers);
   }
 
-  private static InternalPartner findInternalPartnerByPartnerName(List<InternalPartner> partnersAndProviders, String searchPartnerName) {
+  private static InternalPartner findInternalPartnerByPartnerName(List<InternalPartner> partnersAndProviders,
+      String searchPartnerName) {
     for (InternalPartner partnerWithProvider : partnersAndProviders) {
       if (searchPartnerName.equals(partnerWithProvider.getName())) {
         return partnerWithProvider;

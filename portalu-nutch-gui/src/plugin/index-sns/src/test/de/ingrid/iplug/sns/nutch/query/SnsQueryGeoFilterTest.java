@@ -15,6 +15,7 @@ import org.apache.nutch.util.NutchConfiguration;
 
 /**
  * @author mb
+ * TODO rwe: fix test
  * 
  */
 public class SnsQueryGeoFilterTest extends TestCase {
