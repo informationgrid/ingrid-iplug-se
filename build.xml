@@ -99,9 +99,9 @@
 	</target>
 	
 	<target name="copy-portalu-libs">
-<!--		<exec dir="portalu-common" executable="mvn">
+		<exec dir="portalu-common" executable="mvn">
 			<arg line="dependency:copy-dependencies -DoutputDirectory=${basedir}/build/${nutch-version}/lib/ingrid-ext"/>
-		</exec>-->
+		</exec>
 	</target>
 
 	<target name="copy-start-scripts">
@@ -149,7 +149,6 @@
 	<target name="deployMyles" >
 		<property name="nutch.gui.name" value="nutch-gui-0.3"/>
 		<tar destfile="build/${nutch.gui.name}-dev.tar.gz"  basedir="build/${nutch-version}/build/${nutch.gui.name}" compression="gzip" />
-		<echo message="use: rsync -c -a -r --progress -e 'ssh -l tec' --delete build/${nutch-version}/build/${nutch.gui.name} tec@213.144.28.218:/home/tec/temp"/>
 		<echo message="use: scp build/${nutch.gui.name}-dev.tar.gz tec@213.144.28.218:/home/tec/temp"/>
 		<echo message="from staging use: scp -P882 /home/tec/temp/nutch-gui-0.3-dev.tar.gz ingrid@192.168.64.34:/opt/ingrid/ingrid-iplug-se-dev/"/>
 		

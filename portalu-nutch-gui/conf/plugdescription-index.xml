@@ -5,7 +5,7 @@
   <string>personName</string>
   <string>Fred</string>
   <string>proxyServiceUrl</string>
-  <string>/torwald-group:mbauhardt-iplug-se-index</string>
+  <string>/torwald-group:iplug-se-index</string>
   <string>IPLUG_ADMIN_PASSWORD</string>
   <string></string>
   <string>connection</string>
@@ -17,7 +17,7 @@
   <string>personTitle</string>
   <string>Dr.</string>
   <string>workingDirectory</string>
-  <string>/tmp/iplug-se/</string>
+  <string>/tmp/nutchGui</string>
   <string>personSureName</string>
   <string>Kruse</string>
   <string>dataSourceDescription</string>

@@ -32,7 +32,9 @@ public final class Hits implements Writable {
   private boolean totalIsExact = true;
   private Hit[] top;
 
-  public Hits() {}
+  public Hits() {
+    top = new Hit[0];
+  }
 
   public Hits(long total, Hit[] top) {
     this.total = total;

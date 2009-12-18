@@ -50,7 +50,7 @@ public class NutchSearcher implements IPlug {
 
   public static final String EXPLANATION = "explanation";
 
-  private static final String DATATYPE = "datatype";
+//  private static final String DATATYPE = "datatype";
 
   private Log fLogger = LogFactory.getLog(this.getClass());
 
@@ -137,6 +137,7 @@ public class NutchSearcher implements IPlug {
     return translateHits;
   }
 
+  @SuppressWarnings("unused")
   private void printMemoryStatus() {
     Runtime runtime = Runtime.getRuntime();
     long freeMemory = runtime.freeMemory();
@@ -148,6 +149,7 @@ public class NutchSearcher implements IPlug {
         + (maxMemory / (1024 * 1024)) + " MB total (" + percent + " %)" + "]");
   }
 
+  @SuppressWarnings("unused")
   private void printNumberOfOpenFiles() {
     try {
       String property = System.getProperty("pid");
@@ -192,7 +194,7 @@ public class NutchSearcher implements IPlug {
       final int documentId = Integer.parseInt(hit.getUniqueKey());
       final int datasourceId = hit.getIndexNo();
       IngridHit ingridHit = null;
-      WritableComparable sortValue = hit.getSortValue();
+      WritableComparable<?> sortValue = hit.getSortValue();
       if (sortValue instanceof FloatWritable) {
         final float score = ((FloatWritable) hit.getSortValue()).get();
         ingridHit = new IngridHit(this.fPlugId, documentId, datasourceId, score);
@@ -443,12 +445,13 @@ public class NutchSearcher implements IPlug {
     }
   }
 
+  @SuppressWarnings("unchecked")
   private static FieldQuery[] getFields(IngridQuery ingridQuery, String key) {
-    ArrayList fields = ingridQuery.getArrayList(key);
+    ArrayList<FieldQuery> fields = ingridQuery.getArrayList(key);
     if (fields == null) {
       return new FieldQuery[0];
     }
-    return (FieldQuery[]) fields.toArray(new FieldQuery[fields.size()]);
+    return fields.toArray(new FieldQuery[fields.size()]);
   }
 
   /**
@@ -531,7 +534,7 @@ public class NutchSearcher implements IPlug {
       int length = details.getLength();
 
       for (int j = 0; j < requestedFields.length; j++) {
-        ArrayList arrayList = new ArrayList();
+        ArrayList<String> arrayList = new ArrayList<String>();
         for (int i = 0; i < length; i++) {
           String luceneField = details.getField(i);
           if (luceneField.toLowerCase()

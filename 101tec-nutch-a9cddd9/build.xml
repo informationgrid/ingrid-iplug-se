@@ -579,6 +579,9 @@
   	<copy todir="${dist.dir}/" file="start-search.sh"/>
   	<copy todir="${dist.dir}/" file="start-index.sh"/>
 
+  	<chmod file="${dist.dir}/bin/*" perm="754"/>
+  	<chmod file="${dist.dir}/start-*.sh" perm="754"/>
+
   </target>
 
   <!-- ================================================================== -->

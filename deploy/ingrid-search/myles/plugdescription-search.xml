@@ -15,7 +15,7 @@
     <string>law</string>
   </list>
   <string>proxyServiceUrl</string>
-  <string>/torwald-group:iplug-se-search-myles</string>
+  <string>/torwald-group:iplug-se-search</string>
   <string>IPLUG_ADMIN_PASSWORD</string>
   <string>password</string>
   <string>connection</string>
@@ -27,7 +27,7 @@
   <string>personTitle</string>
   <string>Dr.</string>
   <string>workingDirectory</string>
-  <string>/tmp/iplug-se</string>
+  <string>/tmp/nutchGui</string>
   <string>fields</string>
   <list>
     <string>datatype</string>

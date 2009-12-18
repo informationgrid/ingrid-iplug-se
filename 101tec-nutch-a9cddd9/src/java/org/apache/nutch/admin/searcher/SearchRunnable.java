@@ -66,7 +66,7 @@ public class SearchRunnable implements Runnable {
       SearchBucket bucket = new SearchBucket(_id, hits);
       _queue.put(bucket);
     } catch (Exception e) {
-      LOG.warn("error while searching", e);
+      LOG.warn("error while searching with query '" + _query + "'", e);
       try {
         _queue.put(_empty);
       } catch (InterruptedException e1) {
