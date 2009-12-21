@@ -15,7 +15,7 @@
 
 <property>
   <name>plugin.includes</name>
-  <value>admin-.*|protocol-http|urlfilter-regex|parse-(text|html|js)|index-(basic|anchor|metadata|sns)|query-(basic|site|url)|response-(json|xml)|summary-basic|scoring-opic|urlnormalizer-(pass|regex|basic)|crawl-prepare-(dbexport)</value>
+  <value>admin-.*|protocol-http|urlfilter-regex|parse-(text|html|js)|index-(basic|anchor|metadata|sns|more)|query-(basic|site|url)|response-(json|xml)|summary-basic|scoring-opic|urlnormalizer-(pass|regex|basic)|crawl-prepare-(dbexport)</value>
   <description>Regular expression naming plugin directory names to
   include.  Any plugin not matching this expression is excluded.
   In any case you need at least include the nutch-extensionpoints plugin. By

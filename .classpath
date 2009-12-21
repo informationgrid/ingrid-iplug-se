@@ -40,6 +40,8 @@
 	<classpathentry kind="src" path="101tec-nutch-a9cddd9/src/plugin/index-basic/src/java"/>
 	<classpathentry kind="src" path="101tec-nutch-a9cddd9/src/plugin/index-anchor/src/java"/>
 	<classpathentry kind="src" path="101tec-nutch-a9cddd9/src/plugin/index-metadata/src/java"/>
+	<classpathentry kind="src" path="101tec-nutch-a9cddd9/src/plugin/index-more/src/java"/>
+	<classpathentry kind="src" path="101tec-nutch-a9cddd9/src/plugin/index-more/src/test"/>
 	<classpathentry kind="src" path="101tec-nutch-a9cddd9/src/plugin/summary-basic/src/java"/>
 	<classpathentry kind="src" path="101tec-nutch-a9cddd9/src/java"/>
 	<classpathentry kind="src" path="101tec-nutch-a9cddd9/src/test"/>

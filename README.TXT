@@ -1,16 +1,27 @@
-Run/Debug in Eclipse:
+Run/Debug indexer:
 ---------------------
-a) Run without connection to ibus:
+a) Run without connection to ibus (eclipse):
  Main class: org.apache.nutch.admin.AdministrationApplication
  Params:     /tmp/ingrid-iplug-se/nutchgui 8080
  VM-Params: -Xmx256m -Dnutch.gui.theme=portal-u
  
-b) Connect to ibus and retrieve actual Partners/Providers:
+b) Connect to ibus and retrieve actual Partners/Providers (eclipse):
  Main class: org.apache.nutch.admin.AdministrationApplication
  Params:     /tmp/ingrid-iplug-se/nutchgui 8080 --secure
  VM-Params:  -Xmx256m -Dnutch.gui.theme=portal-u -Djava.security.auth.login.config=portalu-nutch-gui/conf/nutchgui.auth
  (user/passwort: adminportal/adminportal)
  
+c) run ./start-indexer.sh 
+ 
+Run/Debug searcher:
+---------------------
+a) in eclipse:
+ Main class: de.ingrid.iplug.PlugServer
+ Params:     --plugdescription portalu-search/conf/plugdescription-search.xml --descriptor portalu-search/conf/communication-search.xml
+ VM-Params: 
+ 
+b) run ./start-indexer.sh 
+
 TODO rwe:
 ---------
 * In der Datei 'nutch' die Anwendnung wieder ohne Debug-Mode starten lassen 

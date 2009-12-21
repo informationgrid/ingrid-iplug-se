@@ -98,5 +98,7 @@
         <wb-resource deploy-path="/" source-path="/portalu-nutch-gui/src/test"/>
         <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/summary-basic/src/java"/>
         <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/test"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/index-more/src/java"/>
+        <wb-resource deploy-path="/" source-path="/101tec-nutch-a9cddd9/src/plugin/index-more/src/test"/>
 </wb-module>
 </project-modules>
