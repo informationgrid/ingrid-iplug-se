@@ -1,33 +1,45 @@
 <de.ingrid.utils.PlugDescription>
-  <int>22</int>
-  <string>personPhone</string>
-  <string>0511 120 3480</string>
-  <string>personName</string>
-  <string>Fred</string>
-  <string>proxyServiceUrl</string>
-  <string>/torwald-group:iplug-se-index</string>
-  <string>IPLUG_ADMIN_PASSWORD</string>
-  <string></string>
+  <int>23</int>
   <string>connection</string>
   <list>
     <string></string>
   </list>
-  <string>plugId</string>
-  <string>iplug-se-kug-1234</string>
-  <string>personTitle</string>
-  <string>Dr.</string>
-  <string>workingDirectory</string>
-  <string>/tmp/nutchGui</string>
-  <string>personSureName</string>
-  <string>Kruse</string>
-  <string>dataSourceDescription</string>
-  <string>Webseiten vom Bund</string>
-  <string>IPLUG_ADMIN_GUI_URL</string>
-  <string>http://plant.its-technidata.de/iplug-admin-se-index-mbauhardt/</string>
-  <string>dataSourceName</string>
-  <string>PortalU-Internet-Suchmaschine-Indexkomponente-mbauhardt</string>
+  <string>proxyServiceUrl</string>
+  <string>/torwald-group:rwehner-iplug-se-index-admin_me</string>
+  <string>IPLUG_ADMIN_GUI_PORT</string>
+  <int>50060</int>
+  <string>organisation</string>
+  <string></string>
+  <string>busUrls</string>
+  <list>
+    <string>/torwald-group:torwald-ibus</string>
+  </list>
+  <string>isRecordLoader</string>
+  <boolean>false</boolean>
+  <string>provider</string>
+  <list>
+    <string>all</string>
+  </list>
   <string>organisationAbbr</string>
   <string></string>
+  <string>dataSourceName</string>
+  <string>PortalU-Internet-Suchmaschine-Indexkomponente-mbauhardt</string>
+  <string>dataSourceDescription</string>
+  <string>Webseiten vom Bund</string>
+  <string>md5Hash</string>
+  <string>/kug-group:iplug-se-index-bund</string>
+  <string>personName</string>
+  <string>Fred</string>
+  <string>personMail</string>
+  <string>kst@portalu.de</string>
+  <string>personSureName</string>
+  <string>Kruse</string>
+  <string>personPhone</string>
+  <string>0511 120 3480</string>
+  <string>iPlugClass</string>
+  <string>de.ingrid.admin.object.BasePlug</string>
+  <string>personTitle</string>
+  <string>Dr.</string>
   <string>partner</string>
   <list>
     <string>bund</string>
@@ -48,24 +60,8 @@
     <string>st</string>
     <string>th</string>
   </list>
-  <string>IPLUG_ADMIN_GUI_PORT</string>
-  <int>50060</int>
-  <string>busUrls</string>
-  <list>
-    <string>/torwald-group:torwald-ibus</string>
-  </list>
-  <string>md5Hash</string>
-  <string>/kug-group:iplug-se-index-bund</string>
-  <string>iPlugClass</string>
-  <string>de.ingrid.iplug.se.IndexIPlug</string>
-  <string>provider</string>
-  <list>
-    <string>all</string>
-  </list>
-  <string>personMail</string>
-  <string>kst@portalu.de</string>
-  <string>organisation</string>
-  <string></string>
+  <string>plugId</string>
+  <string>iplug-se-kug-1234</string>
   <string>ranking</string>
   <list>
     <string>score</string>
@@ -77,4 +73,10 @@
     <string>score</string>
     <string>date</string>
   </list>
+  <string>IPLUG_ADMIN_PASSWORD</string>
+  <string></string>
+  <string>workingDirectory</string>
+  <string>/tmp/nutchGui</string>
+  <string>IPLUG_ADMIN_GUI_URL</string>
+  <string>http://plant.its-technidata.de/iplug-admin-se-index-mbauhardt/</string>
 </de.ingrid.utils.PlugDescription>
