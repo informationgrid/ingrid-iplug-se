@@ -82,7 +82,7 @@
     <string>th</string>
   </list>
   <string>IPLUG_ADMIN_GUI_PORT</string>
-  <int>50061</int>
+  <int>50059</int>
   <string>busUrls</string>
   <list>
     <string>/torwald-group:torwald-ibus</string>

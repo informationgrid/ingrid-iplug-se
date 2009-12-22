@@ -15,8 +15,8 @@ import org.apache.nutch.util.NutchConfiguration;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import de.ingrid.iplug.se.urlmaintenance.util.TimeProvider;
 import de.ingrid.iplug.se.util.TestUtil;
+import de.ingrid.iplug.util.TimeProvider;
 
 public class DirectoryScanningSearcherFactoryTest extends TestCase {
 

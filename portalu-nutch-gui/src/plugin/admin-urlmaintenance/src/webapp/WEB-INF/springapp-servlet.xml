@@ -13,6 +13,7 @@
     </bean>
 
     <context:component-scan base-package="de.ingrid.iplug.se.urlmaintenance"/>
+    <context:component-scan base-package="de.ingrid.iplug.util"/>
     
     <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource"> 
 		<property name="basenames"> 

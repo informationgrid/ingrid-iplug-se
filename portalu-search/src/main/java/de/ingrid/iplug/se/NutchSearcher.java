@@ -24,7 +24,7 @@ import org.apache.nutch.searcher.Query.Clause.NutchClause;
 import org.apache.nutch.util.NutchConfiguration;
 
 import de.ingrid.iplug.se.searcher.DirectoryScanningSearcherFactory;
-import de.ingrid.iplug.se.urlmaintenance.util.TimeProvider;
+import de.ingrid.iplug.util.TimeProvider;
 import de.ingrid.utils.IPlug;
 import de.ingrid.utils.IngridHit;
 import de.ingrid.utils.IngridHitDetail;

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Url;
 import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
-import de.ingrid.iplug.se.urlmaintenance.util.TimeProvider;
+import de.ingrid.iplug.util.TimeProvider;
 
 @Service
 public class UrlDao extends Dao<Url> implements IUrlDao {

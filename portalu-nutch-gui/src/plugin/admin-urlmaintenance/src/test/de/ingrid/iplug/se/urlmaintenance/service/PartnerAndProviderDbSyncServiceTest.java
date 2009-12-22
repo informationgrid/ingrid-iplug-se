@@ -17,7 +17,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.Partner;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
-import de.ingrid.iplug.se.urlmaintenance.util.TimeProvider;
+import de.ingrid.iplug.util.TimeProvider;
 
 public class PartnerAndProviderDbSyncServiceTest extends DaoTest {
 

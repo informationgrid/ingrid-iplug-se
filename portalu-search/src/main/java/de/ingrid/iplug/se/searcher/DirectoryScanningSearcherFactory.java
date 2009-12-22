@@ -18,10 +18,11 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.nutch.admin.searcher.MultipleSearcher;
+import org.apache.nutch.admin.searcher.SearcherFactory;
 import org.apache.nutch.admin.searcher.ThreadPool;
 import org.apache.nutch.searcher.NutchBean;
 
-import de.ingrid.iplug.se.urlmaintenance.util.TimeProvider;
+import de.ingrid.iplug.util.TimeProvider;
 
 /**
  * Same as {@linkplain SearcherFactory}, but this class provides the additional

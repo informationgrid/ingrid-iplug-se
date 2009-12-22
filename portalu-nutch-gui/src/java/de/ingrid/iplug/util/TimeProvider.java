@@ -1,4 +1,4 @@
-package de.ingrid.iplug.se.urlmaintenance.util;
+package de.ingrid.iplug.util;
 
 import org.springframework.stereotype.Component;
 

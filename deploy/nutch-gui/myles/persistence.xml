@@ -16,10 +16,10 @@
 		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.Crawl</class>
 
 		<properties>
-			<property name="eclipselink.jdbc.driver" value="com.mysql.jdbc.Driver" />
-			<property name="eclipselink.jdbc.user" value="myles" />
-			<property name="eclipselink.jdbc.password" value="eki7y6" />
-			<property name="eclipselink.jdbc.url" value="jdbc:mysql://192.168.64.33/iplugse" />
+			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://192.168.64.33/iplugse" />
+			<property name="javax.persistence.jdbc.user" value="myles" />
+			<property name="javax.persistence.jdbc.password" value="eki7y6" />
 			<property name="eclipselink.ddl-generation" value="create-tables"/>
 		</properties>
 	</persistence-unit>
