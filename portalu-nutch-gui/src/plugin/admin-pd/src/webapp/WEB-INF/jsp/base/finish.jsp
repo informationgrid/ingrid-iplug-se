@@ -36,7 +36,8 @@
 		<div id="content">
 			<h2>Herzlichen Glückwunsch! Ihr IPlug ist jetzt konfiguriert.</h2>
 			<p>
-				Sie können den Browser jetzt schließen.
+				Sie können sich nun authentifizieren, um die weiteren Funktionen zu nutzen.
+				Bitte loggen sie sich hierzu vorher aus.
 			</p>
 		</div>
 	</div>

@@ -37,7 +37,7 @@
 			<br/>
 				        <div>
 				        	<p>&nbsp;</p>
-				            <form method="post" action="j_security_check" id="login">
+				            <form method="post" action="j_security_check" name="login">
 					            <table id="konfigForm">
 									<tr>
 										<td class="leftCol">Name:</td>
@@ -62,7 +62,9 @@
 				        </div>
 						<c:if test="${!securityEnabled}">
 					       	<script>
-					       		document.getElementById('login').submit();
+					            document.login.j_username.value = "configurator";
+					            document.login.j_password.value = "configurator";
+					       		document.login.submit();
 					       	</script>
 				        </c:if>
 			

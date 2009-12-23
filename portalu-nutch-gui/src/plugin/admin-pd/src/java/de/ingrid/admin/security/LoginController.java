@@ -3,6 +3,7 @@ package de.ingrid.admin.security;
 import javax.servlet.http.HttpSession;
 
 import org.apache.nutch.admin.NavigationSelector;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -14,9 +15,16 @@ import de.ingrid.admin.service.PlugDescriptionService;
 @Controller
 public class LoginController extends NavigationSelector {
 
+    private final PlugDescriptionService _plugDescriptionService;
+
+    @Autowired
+    public LoginController(final PlugDescriptionService plugDescriptionService) {
+        _plugDescriptionService = plugDescriptionService;
+    }
+
     @ModelAttribute("securityEnabled")
-    public Boolean injectAuthenticate(final PlugDescriptionService pds) {
-        return pds.existsPlugDescription();
+    public Boolean injectAuthenticate() {
+        return _plugDescriptionService.existsPlugDescription();
     }
 
     @RequestMapping(value = "/base/auth/login.html", method = RequestMethod.GET)

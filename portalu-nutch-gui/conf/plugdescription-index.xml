@@ -1,82 +1,55 @@
 <de.ingrid.utils.PlugDescription>
-  <int>23</int>
-  <string>connection</string>
-  <list>
-    <string></string>
-  </list>
+  <int>16</int>
   <string>proxyServiceUrl</string>
-  <string>/torwald-group:rwehner-iplug-se-index-admin_me</string>
+  <string>/torwald-group:base-webapp_me</string>
   <string>IPLUG_ADMIN_GUI_PORT</string>
-  <int>50060</int>
-  <string>organisation</string>
-  <string></string>
-  <string>busUrls</string>
-  <list>
-    <string>/torwald-group:torwald-ibus</string>
-  </list>
+  <int>8082</int>
   <string>isRecordLoader</string>
   <boolean>false</boolean>
   <string>provider</string>
   <list>
     <string>all</string>
   </list>
-  <string>organisationAbbr</string>
-  <string></string>
   <string>dataSourceName</string>
-  <string>PortalU-Internet-Suchmaschine-Indexkomponente-mbauhardt</string>
+  <string>Overmind</string>
   <string>dataSourceDescription</string>
-  <string>Webseiten vom Bund</string>
-  <string>md5Hash</string>
-  <string>/kug-group:iplug-se-index-bund</string>
+  <string></string>
   <string>personName</string>
-  <string>Fred</string>
+  <string>Super</string>
+  <string>md5Hash</string>
+  <string>/torwald-group:base-webapp_me</string>
   <string>personMail</string>
-  <string>kst@portalu.de</string>
+  <string>super.man@heroes.org</string>
   <string>personSureName</string>
-  <string>Kruse</string>
+  <string>Man</string>
   <string>personPhone</string>
-  <string>0511 120 3480</string>
+  <string>0800 - HEROES</string>
+  <string>personTitle</string>
+  <string>Held</string>
   <string>iPlugClass</string>
   <string>de.ingrid.admin.object.BasePlug</string>
-  <string>personTitle</string>
-  <string>Dr.</string>
   <string>partner</string>
   <list>
     <string>bund</string>
-    <string>be</string>
-    <string>bb</string>
     <string>bw</string>
     <string>by</string>
+    <string>be</string>
+    <string>bb</string>
     <string>hb</string>
-    <string>he</string>
     <string>hh</string>
+    <string>he</string>
     <string>mv</string>
     <string>ni</string>
     <string>nw</string>
     <string>rp</string>
-    <string>sh</string>
     <string>sl</string>
     <string>sn</string>
     <string>st</string>
+    <string>sh</string>
     <string>th</string>
   </list>
-  <string>plugId</string>
-  <string>iplug-se-kug-1234</string>
-  <string>ranking</string>
-  <list>
-    <string>score</string>
-    <string>date</string>
-    <string>score</string>
-    <string>date</string>
-    <string>score</string>
-    <string>date</string>
-    <string>score</string>
-    <string>date</string>
-  </list>
-  <string>IPLUG_ADMIN_PASSWORD</string>
-  <string></string>
-  <string>workingDirectory</string>
-  <string>/tmp/nutchGui</string>
   <string>IPLUG_ADMIN_GUI_URL</string>
-  <string>http://plant.its-technidata.de/iplug-admin-se-index-mbauhardt/</string>
+  <string>http://www.heroes.org</string>
+  <string>workingDirectory</string>
+  <string>/tmp/index</string>
 </de.ingrid.utils.PlugDescription>

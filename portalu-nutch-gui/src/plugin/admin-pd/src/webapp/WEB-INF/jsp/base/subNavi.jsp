@@ -70,17 +70,29 @@
     </div>
     <ul>
 
-        <c:if test="${!empty componentNavigation}">
-	        <c:forEach items="${componentNavigation}" var="navigation">
-		        <c:choose>
-		            <c:when test="${navigation.name == selectedComponent}">
-		                <li class="active"><a href="${navigation.link}"><fmt:message key="plugin.${navigation.name}" bundle="${globalBundle}"/></a></li>
-		            </c:when>
-		            <c:otherwise>
-		                <li><a href="${navigation.link}"><fmt:message key="plugin.${navigation.name}" bundle="${globalBundle}"/></a></li>
-		            </c:otherwise>
-		        </c:choose>
-		    </c:forEach>
+        <c:if test="${!empty instanceNavigation}">
+	        <c:forEach items="${instanceNavigation}" var="navigation">
+	            <c:choose>
+	                <c:when test="${navigation.name == selectedInstance}">
+	                    <li class="active"><a href="${navigation.link}"><em>${navigation.name}</em></a></li>
+	                    <c:if test="${!empty componentNavigation}">
+				            <c:forEach items="${componentNavigation}" var="navigation">
+				                <c:choose>
+				                    <c:when test="${navigation.name == selectedComponent}">
+				                        <li class="active">&nbsp;&nbsp;&nbsp;<a href="${navigation.link}"><fmt:message key="plugin.${navigation.name}" bundle="${globalBundle}"/></a></li>
+				                    </c:when>
+				                    <c:otherwise>
+				                        <li>&nbsp;&nbsp;&nbsp;<a href="${navigation.link}"><fmt:message key="plugin.${navigation.name}" bundle="${globalBundle}"/></a></li>
+				                    </c:otherwise>
+				                </c:choose>
+				            </c:forEach>
+				        </c:if>
+	                </c:when>
+	                <c:otherwise>
+	                    <li><a href="${navigation.link}"><em>${navigation.name}</em></a></li>
+	                </c:otherwise>
+	            </c:choose>
+	        </c:forEach>
         </c:if>
 
     </ul>

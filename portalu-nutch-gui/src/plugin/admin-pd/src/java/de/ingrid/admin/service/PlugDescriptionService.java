@@ -21,8 +21,7 @@ public class PlugDescriptionService {
 
 	private PlugDescription _plugDescription;
 
-
-	public PlugDescriptionService() throws IOException {
+    public PlugDescriptionService() throws IOException {
 		_plugDescriptionFile = new File(System.getProperty(IKeys.PLUG_DESCRIPTION));
 		if (existsPlugDescription()) {
 			_plugDescription = loadPlugDescription();
@@ -47,7 +46,7 @@ public class PlugDescriptionService {
             tmpDesc = new PlugDescription();
             tmpDesc.putAll(plugDescription);
 		}
-		PlugdescriptionSerializer serializer = new PlugdescriptionSerializer();
+		final PlugdescriptionSerializer serializer = new PlugdescriptionSerializer();
 		serializer.serialize(tmpDesc, _plugDescriptionFile);
 		// load again to set the serialized folder
 		_plugDescription = loadPlugDescription();
