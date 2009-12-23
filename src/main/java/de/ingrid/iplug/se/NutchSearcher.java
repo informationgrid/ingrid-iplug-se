@@ -303,7 +303,7 @@ public class NutchSearcher implements IPlug {
             addToClause(providerClause, getFields(clauseQuery, "provider"));
             addToClause(datatypeClause, getFields(clauseQuery, "datatype"));
 
-            addToQuery(out, nutchClause);
+            out.addNutchClause(nutchClause);
         }
 
         // wildcard fields
