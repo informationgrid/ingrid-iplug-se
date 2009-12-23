@@ -303,7 +303,7 @@ public class NutchSearcher implements IPlug {
             addToClause(providerClause, getFields(clauseQuery, "provider"));
             addToClause(datatypeClause, getFields(clauseQuery, "datatype"));
 
-            out.addNutchClause(nutchClause);
+            addToQuery(out, nutchClause);
         }
 
         // wildcard fields
@@ -379,20 +379,18 @@ public class NutchSearcher implements IPlug {
         Clause[] clauses = nutchClause.getClauses();
         if (clauses != null) {
             for (int i = 0; i < clauses.length; i++) {
-                if (clauses[i].isRequired()) {
+                // if there is one, that is not prohibited, add whole clause
+                if (!clauses[i].isProhibited()) {
                     query.addNutchClause(nutchClause);
                     return;
                 }
             }
+            // otherwise add them seperately
             for (int i = 0; i < clauses.length; i++) {
                 final Clause clause = clauses[i];
-                if (clause.isProhibited()) {
-                    query.addProhibitedTerm(clause.getTerm().toString(), clause.getField());
-                } else if (clause.isRequired()) {
-                    query.addRequiredTerm(clause.getTerm().toString(), clause.getField());
-                } else {
-                    query.addNonRequiredTerm(clause.getTerm().toString(), clause.getField());
-                }
+                NutchClause nutch = new NutchClause(clause.isRequired(), clause.isProhibited());
+                nutch.addClause(new Clause(clause.getTerm(), clause.getField(), false, false, this.fNutchConf));
+                query.addNutchClause(nutch);
             }
         }
     }
@@ -408,10 +406,9 @@ public class NutchSearcher implements IPlug {
         for (int i = 0; i < fieldQueries.length; i++) {
             FieldQuery fieldQuery = fieldQueries[i];
             boolean prohibited = fieldQuery.isProhibited();
-            boolean required = fieldQuery.isRequred();
             String fieldName = fieldQuery.getFieldName();
             Term term = new Query.Term(filterTerm(fieldQuery.getFieldValue()));
-            clause.addClause(new Query.Clause(term, fieldName, required, prohibited, this.fNutchConf));
+            clause.addClause(new Query.Clause(term, fieldName, false, prohibited, this.fNutchConf));
         }
     }
 
