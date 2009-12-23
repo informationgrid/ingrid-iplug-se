@@ -19,6 +19,7 @@ import org.apache.nutch.searcher.Hit;
 import org.apache.nutch.searcher.HitDetails;
 import org.apache.nutch.searcher.Hits;
 import org.apache.nutch.searcher.Query;
+import org.apache.nutch.searcher.Query.Clause;
 import org.apache.nutch.searcher.Query.Term;
 import org.apache.nutch.searcher.Query.Clause.NutchClause;
 import org.apache.nutch.util.NutchConfiguration;
@@ -367,11 +368,30 @@ public class NutchSearcher implements IPlug {
     addToClause(partnerClause, getFields(query, "partner"));
     addToClause(providerClause, getFields(query, "provider"));
     addToClause(datatypeClause, getFields(query, "datatype"));
-    out.addNutchClause(partnerClause);
-    out.addNutchClause(providerClause);
-    out.addNutchClause(datatypeClause);
-
-  }
+    addToQuery(out, partnerClause);
+    addToQuery(out, providerClause);
+    addToQuery(out, datatypeClause);
+    }
+    
+    private void addToQuery(final Query query, final NutchClause nutchClause) {
+        Clause[] clauses = nutchClause.getClauses();
+        if (clauses != null) {
+            for (int i = 0; i < clauses.length; i++) {
+                // if there is one, that is not prohibited, add whole clause
+                if (!clauses[i].isProhibited()) {
+                    query.addNutchClause(nutchClause);
+                    return;
+                }
+            }
+            // otherwise add them seperately
+            for (int i = 0; i < clauses.length; i++) {
+                final Clause clause = clauses[i];
+                NutchClause nutch = new NutchClause(clause.isRequired(), clause.isProhibited());
+                nutch.addClause(new Clause(clause.getTerm(), clause.getField(), false, false, _configuration));
+                query.addNutchClause(nutch);
+            }
+        }
+    }
 
   /**
    * @param clause
