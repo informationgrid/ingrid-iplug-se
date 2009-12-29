@@ -95,6 +95,7 @@
   	 <ant dir="admin-search" target="deploy"/>
   	 <ant dir="index-metadata" target="deploy"/>
   	 <ant dir="admin-urlmaintenance" target="deploy"/>
+ 	 <ant dir="admin-pd" target="deploy"/>
  	 <ant dir="index-sns" target="deploy"/>
   </target>
 
@@ -210,6 +211,7 @@
   	<ant dir="admin-search" target="clean"/>
   	<ant dir="index-metadata" target="clean"/>
   	<ant dir="admin-urlmaintenance" target="clean"/>
+  	<ant dir="admin-pd" target="clean"/>
   	<ant dir="index-sns" target="clean"/>
   </target>
 </project>

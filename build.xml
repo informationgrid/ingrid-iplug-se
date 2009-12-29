@@ -34,11 +34,16 @@
 		</copy>
 	</target>
 
-	<target name="copy-ingrid-se-plugins" depends="copy-admin-url-maintenance,copy-index-sns-filter" />
+	<target name="copy-ingrid-se-plugins" depends="copy-admin-url-maintenance,copy-admin-pd,copy-index-sns-filter" />
 
 	<target name="copy-admin-url-maintenance">
 		<copy todir="build/${nutch-version}/src/plugin/admin-urlmaintenance">
 			<fileset dir="portalu-nutch-gui/src/plugin/admin-urlmaintenance" />
+		</copy>
+	</target>
+	<target name="copy-admin-pd">
+		<copy todir="build/${nutch-version}/src/plugin/admin-pd">
+			<fileset dir="portalu-nutch-gui/src/plugin/admin-pd" />
 		</copy>
 	</target>
 	<target name="copy-index-sns-filter">
@@ -110,7 +115,7 @@
 	</target>
 
 	<target name="copy-indexer-searcher-configs">
-		<copy todir="build/${nutch-version}/conf/" overwrite="true">
+		<copy todir="build/${nutch-version}/conf/" >
 			<fileset dir="portalu-nutch-gui/conf" />
 			<fileset dir="portalu-search/conf" />
 		</copy>

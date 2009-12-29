@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project name="admin-urlmaintenance">
 
-  <import file="../build-plugin.xml"/>
+	<import file="../build-plugin.xml" />
 
 	<target name="deps-jar">
 		<copy todir="${deploy.dir}/src/webapp">

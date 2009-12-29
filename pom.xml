@@ -87,9 +87,9 @@
 							<tasks>
 								<echo
 									message="Executing original ant build script '${basedir}/build.xml' target=dist." />
-<!--  rwe:								<ant antfile="${basedir}/build.xml" inheritRefs="true">
+								<ant antfile="${basedir}/build.xml" inheritRefs="true">
 									<target name="dist" />
-								</ant>-->
+								</ant>
 							</tasks>
 						</configuration>
 						<goals>
