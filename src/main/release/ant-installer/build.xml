@@ -1,0 +1,69 @@
+<project name="PortalU Installation">
+	<description>
+        iPlug-DSC Installation Script
+    </description>
+	<!-- set global properties for this build -->
+	<property name="iPlugName" value="${project.artifactId}-${project.version}" />
+	<property name="xml-communication-index" value="${installDir}/conf/communication-index.xml" />
+
+	<target name="install" description="Extract all files to the installation directory.">
+		<unzip src="${antinstaller.jar}" dest="${installDir}">
+			<patternset>
+				<include name="${iPlugName}/**/*" />
+			</patternset>
+		</unzip>
+		<move toDir="${installDir}">
+			<fileset dir="${installDir}/${iPlugName}" />
+		</move>
+		<chmod dir="${installDir}" perm="ugo+rx" includes="*.sh" />
+		<chmod dir="${installDir}/bin" perm="ugo+rx" includes="*.sh,nutch" />
+		<mkdir dir="${installDir}/logs" />
+
+	</target>
+
+	<target name="startIPlug">
+		<exec dir="${installDir}" executable="./start-index.sh" spawn="true">
+			<arg line="start" />
+		</exec>
+		<exec dir="${installDir}" executable="./start-search.sh" spawn="true">
+			<arg line="start" />
+		</exec>
+	</target>
+
+	<target name="showStartHints">
+		<echo>
+=====================================
+Informationen zum Start/Konfiguration
+=====================================
+
+		</echo>
+		<echo>
+Diese Installation liefert zwei iPlugs:
+	* Indexer: Zum Crawlen und Aufbau ein Indexes
+	* Searcher: Zum Durchsuchen des Indexes auf entspr. Anfragen
+			
+Gehen Sie ins Verzeichnis:
+${installDir}
+und rufen sie von der Kommandozeile folgendes auf
+    * "./start-indexer.sh start", um den Indexer zu starten und
+    * "./start-searcher.sh start", um den Searcher zu starten.
+			
+Im Browser können Sie unter 
+"http://localhost:50060" den Indexer konfigurieren.
+Bitte lesen Sie bzgl. der Administration die Kapitel unter
+"http://www.kst.portalu.de/wiki/index.php/Allgemeines_zu_den_iPlugs".
+
+Beendet werden können die beiden iPlugs durch die Aufrufe:
+    * "./start-indexer.sh stop"und
+    * "./start-searcher.sh stop"
+			
+Bevor das iPlug benutzt werden kann, muss es in der iBus-
+Administration (im Portal) eingeschaltet werden.
+
+Weitere Informationen entnehmen Sie bitte dem
+Online-Handbuch unter 
+http://www.kst.portalu.de/wiki/index.php/InGrid_Installation.
+		</echo>
+	</target>
+
+</project>
