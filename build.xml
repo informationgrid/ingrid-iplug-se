@@ -1,9 +1,9 @@
 <project default="dist">
 
 	<property name="nutch-version" value="101tec-nutch-a9cddd9" />
-	<property name="dir.nutch.patches.build" value="build_patches"/>
-	<property name="dir.nutch.patches" value="patches/nutch_all"/>
-	
+	<property name="dir.nutch.patches.build" value="build_patches" />
+	<property name="dir.nutch.patches" value="patches/nutch_all" />
+
 	<target name="init">
 		<mkdir dir="build" />
 	</target>
@@ -12,11 +12,13 @@
 		<delete dir="build" />
 	</target>
 
-<!--	<target name="unzip-nutch" depends="init">
+	<!-- does not work anymore:
+		<target name="unzip-nutch" depends="init">
 		<unzip src="contrib/${nutch-version}.zip" dest="build" />
 	</target>-->
 
-<!--	<target name="patch-nutch">
+	<!-- does not work anymore:
+		<target name="patch-nutch">
 		<patch patchfile="patches/build.xml.patch" dir="build/${nutch-version}" strip="1" />
 		<patch patchfile="patches/Query.patch" dir="build/${nutch-version}" strip="1" />
 		<patch patchfile="patches/core-build.xml.patch" dir="build/${nutch-version}" strip="1" />
@@ -26,13 +28,13 @@
 
 	<target name="copy-nutch">
 		<copy todir="build/${nutch-version}">
-			<fileset dir="${nutch-version}" >
-				<exclude name=".*/**"/>
+			<fileset dir="${nutch-version}">
+				<exclude name=".*/**" />
 			</fileset>
 		</copy>
 	</target>
 
-	<target name="copy-ingrid-se-plugins" depends="copy-admin-url-maintenance,copy-index-sns-filter"/>
+	<target name="copy-ingrid-se-plugins" depends="copy-admin-url-maintenance,copy-index-sns-filter" />
 
 	<target name="copy-admin-url-maintenance">
 		<copy todir="build/${nutch-version}/src/plugin/admin-urlmaintenance">
@@ -46,7 +48,7 @@
 	</target>
 
 	<target name="copy-css">
-		<copy todir="build/${nutch-version}/conf/webapp/theme/portal-u" >
+		<copy todir="build/${nutch-version}/conf/webapp/theme/portal-u">
 			<fileset dir="portalu-nutch-gui/conf/webapp/theme/portal-u" />
 		</copy>
 	</target>
@@ -54,38 +56,38 @@
 	<target name="copy-i18n">
 		<!-- configuration -->
 		<copy todir="build/${nutch-version}/src/plugin/admin-configuration/src/conf/theme/portal-u/i18n">
-			<fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n" >
-				<include name="configuration*"/>
+			<fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n">
+				<include name="configuration*" />
 			</fileset>
 		</copy>
 		<!-- crawl -->
 		<copy todir="build/${nutch-version}/src/plugin/admin-crawl/src/conf/theme/portal-u/i18n">
-			<fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n" >
-				<include name="crawl*"/>
+			<fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n">
+				<include name="crawl*" />
 			</fileset>
 		</copy>
 		<!-- instance -->
 		<copy todir="build/${nutch-version}/src/plugin/admin-instance/src/conf/theme/portal-u/i18n">
-			<fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n" >
-				<include name="instance*"/>
+			<fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n">
+				<include name="instance*" />
 			</fileset>
 		</copy>
 		<!-- scheduling -->
 		<copy todir="build/${nutch-version}/src/plugin/admin-scheduling/src/conf/theme/portal-u/i18n">
-			<fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n" >
-				<include name="scheduling*"/>
+			<fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n">
+				<include name="scheduling*" />
 			</fileset>
 		</copy>
 		<!-- system -->
 		<copy todir="build/${nutch-version}/src/plugin/admin-system/src/conf/theme/portal-u/i18n">
-			<fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n" >
-				<include name="system*"/>
+			<fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n">
+				<include name="system*" />
 			</fileset>
 		</copy>
 		<!-- welcome -->
 		<copy todir="build/${nutch-version}/src/plugin/admin-welcome/src/conf/theme/portal-u/i18n">
-			<fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n" >
-				<include name="welcome*"/>
+			<fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n">
+				<include name="welcome*" />
 			</fileset>
 		</copy>
 	</target>
@@ -95,13 +97,10 @@
 			<fileset dir="portalu-nutch-gui/src/java/de" />
 			<fileset dir="portalu-search/src/main/java/de" />
 		</copy>
-		<antcall target="copy-portalu-libs" />
-	</target>
-	
-	<target name="copy-portalu-libs">
-		<exec dir="portalu-common" executable="mvn">
-			<arg line="dependency:copy-dependencies -DoutputDirectory=${basedir}/build/${nutch-version}/lib/ingrid-ext"/>
-		</exec>
+		<copy todir="${basedir}/build/${nutch-version}/lib/ingrid-ext">
+			<fileset dir="target/ingrid-ext" />
+		</copy>
+
 	</target>
 
 	<target name="copy-start-scripts">
@@ -112,61 +111,81 @@
 
 	<target name="copy-indexer-searcher-configs">
 		<copy todir="build/${nutch-version}/conf/" overwrite="true">
-			<fileset dir="portalu-nutch-gui/conf"/>
-			<fileset dir="portalu-search/conf"/>
+			<fileset dir="portalu-nutch-gui/conf" />
+			<fileset dir="portalu-search/conf" />
 		</copy>
 	</target>
 
+	<!-- Before the first call of this target, we need the ingrid-dependent jars. So call once: 'mvn dependency:copy-dependencies' -->
 	<target name="dist" depends="copy-nutch, copy-ingrid-se-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts,copy-indexer-searcher-configs,copy-deploy-conf-files">
 		<ant dir="build/${nutch-version}" target="package" />
+
+		<property file="${basedir}/${nutch-version}/default.properties" />
+		<property name="dist.final.name" value="build/dist/ingrid-iplug-se" />
+		<copy todir="${dist.final.name}/">
+			<fileset dir="build/${nutch-version}/build/${final.name}">
+				<exclude name="nutch-gui-*.*" />
+				<exclude name="*.xml" />
+				<exclude name="*.txt" />
+				<exclude name="*.properties" />
+				<exclude name="KEYS" />
+			</fileset>
+		</copy>
+		<copy todir="${dist.final.name}/lib">
+			<fileset dir="build/${nutch-version}/build/${final.name}">
+				<include name="nutch-*.jar" />
+			</fileset>
+		</copy>
 	</target>
 
 	<target name="copy-deploy-conf-files" depends="copy-indexer-searcher-configs">
 		<copy todir="build/${nutch-version}/conf" overwrite="true">
-			<fileset file="deploy/nutch-gui/log4j.properties" /><!-- comment this out, if you want logging as in os-nutgui configuration -->
+			<fileset file="deploy/nutch-gui/log4j.properties" />
+			<!-- comment this out, if you want logging as in os-nutgui configuration -->
 		</copy>
-		<replaceregexp file="build/${nutch-version}/conf/nutch-site.xml"
-		                         match="101tec-nutch-a9cddd9/src/plugin,portalu-nutch-gui/src/plugin"
-		                         replace="./plugins"
-		                         byline="true"/>
+		<replaceregexp file="build/${nutch-version}/conf/nutch-site.xml" match="101tec-nutch-a9cddd9/src/plugin,portalu-nutch-gui/src/plugin" replace="./plugins" byline="true" />
 	</target>
-	
+
 	<target name="copy-deploy-myles-conf-files" depends="copy-deploy-conf-files">
 		<copy todir="build/${nutch-version}/conf" overwrite="true">
 			<fileset dir="deploy/ingrid-search/myles/" />
-			<fileset dir="deploy/nutch-gui/myles/" >
-				<exclude name="**/persistence.xml"/>
+			<fileset dir="deploy/nutch-gui/myles/">
+				<exclude name="**/persistence.xml" />
 			</fileset>
 		</copy>
-		<copy todir="build/${nutch-version}/src/plugin/admin-urlmaintenance/conf/META-INF/" 
-				file="deploy/nutch-gui/myles/persistence.xml" overwrite="true"/>
+		<copy todir="build/${nutch-version}/src/plugin/admin-urlmaintenance/conf/META-INF/" file="deploy/nutch-gui/myles/persistence.xml" overwrite="true" />
 	</target>
-	
+
 	<target name="mylesDistribution" depends="copy-nutch, copy-ingrid-se-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts, copy-indexer-searcher-configs,copy-deploy-myles-conf-files">
 		<ant dir="build/${nutch-version}" target="package" />
 	</target>
-	
-	<target name="deployMyles" >
-		<property name="nutch.gui.name" value="nutch-gui-0.3"/>
-		<tar destfile="build/${nutch.gui.name}-dev.tar.gz"  basedir="build/${nutch-version}/build/${nutch.gui.name}" compression="gzip" />
-		<echo message="use: scp build/${nutch.gui.name}-dev.tar.gz tec@213.144.28.218:/home/tec/temp"/>
-		<echo message="from staging use: scp -P882 /home/tec/temp/nutch-gui-0.3-dev.tar.gz ingrid@192.168.64.34:/opt/ingrid/ingrid-iplug-se-dev/"/>
-		
+
+	<target name="deployMyles">
+		<property name="nutch.gui.name" value="nutch-gui-0.3" />
+		<tar destfile="build/${nutch.gui.name}-dev.tar.gz" basedir="build/${nutch-version}/build/${nutch.gui.name}" compression="gzip" />
+		<echo message="use: scp build/${nutch.gui.name}-dev.tar.gz tec@213.144.28.218:/home/tec/temp" />
+		<echo message="from staging use: scp -P882 /home/tec/temp/nutch-gui-0.3-dev.tar.gz ingrid@192.168.64.34:/opt/ingrid/ingrid-iplug-se-dev/" />
+
 		<exec executable="rsync">
-			<arg line=" -c -a -r --progress -e 'ssh -l tec' --delete build/${nutch-version}/build/${nutch.gui.name} tec@213.144.28.218:/home/tec/temp"/>
+			<arg line=" -c -a -r --progress -e 'ssh -l tec' --delete build/${nutch-version}/build/${nutch.gui.name} tec@213.144.28.218:/home/tec/temp" />
 		</exec>
 	</target>
 
 	<target name="download-portalu-libs-for-eclipse">
-		<exec dir="portalu-common" executable="mvn">
-			<arg line="dependency:copy-dependencies -U -DoutputDirectory=${basedir}/portalu-common/eclipse-libs"/>
+		<property name="ingrid.ext.libs" value="${basedir}/portalu-common/eclipse-libs" />
+		<delete>
+			<fileset dir="${ingrid.ext.libs}" includes="**/*" />
+		</delete>
+		<!-- We use the pom.xml in projects base directory for (transitiv) jar dependencies -->
+		<exec executable="mvn">
+			<arg line="dependency:copy-dependencies -U -DoutputDirectory=${ingrid.ext.libs} -DexcludeArtifactIds=ingrid-installer" />
 		</exec>
 	</target>
-		
+
 	<!-- Targets to create patches from local 101tec...-folder and the zip-content (OS nutch-gui Release) in contrib-folder -->
-	<target name="patch_clean">
+	<target name="clean_patch">
 		<delete dir="${dir.nutch.patches.build}" />
-		<delete dir="${dir.nutch.patches}"/>
+		<delete dir="${dir.nutch.patches}" />
 	</target>
 
 	<target name="patch_init">
@@ -175,7 +194,7 @@
 	</target>
 
 	<target name="create_full_nutch_patch" depends="patch_unzip-nutch,patch_copy-local-nutch">
-		<antcall target="patch_run_diff"/>
+		<antcall target="patch_run_diff" />
 	</target>
 
 	<target name="patch_unzip-nutch" depends="patch_init">
@@ -184,8 +203,8 @@
 
 	<target name="patch_copy-local-nutch" depends="patch_init">
 		<copy todir="${dir.nutch.patches.build}/local">
-			<fileset dir="${nutch-version}" >
-				<exclude name=".*/**"/>
+			<fileset dir="${nutch-version}">
+				<exclude name=".*/**" />
 			</fileset>
 		</copy>
 	</target>
