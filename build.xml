@@ -3,6 +3,7 @@
 	<property name="nutch-version" value="101tec-nutch-a9cddd9" />
 	<property name="dir.nutch.patches.build" value="build_patches" />
 	<property name="dir.nutch.patches" value="patches/nutch_all" />
+	<property name="ingrid.ext.libs" value="${basedir}/portalu-common/ingrid-ext" />
 
 	<target name="init">
 		<mkdir dir="build" />
@@ -103,25 +104,24 @@
 			<fileset dir="portalu-search/src/main/java/de" />
 		</copy>
 		<copy todir="${basedir}/build/${nutch-version}/lib/ingrid-ext">
-			<fileset dir="target/ingrid-ext" />
+			<fileset dir="${ingrid.ext.libs}" />
 		</copy>
-
 	</target>
 
 	<target name="copy-start-scripts">
 		<copy todir="build/${nutch-version}">
-			<fileset dir="portalu-search/src/main/scripts" />
+			<fileset dir="src/scripts" />
 		</copy>
 	</target>
 
 	<target name="copy-indexer-searcher-configs">
-		<copy todir="build/${nutch-version}/conf/" >
+		<copy todir="build/${nutch-version}/conf/" overwrite="true">
 			<fileset dir="portalu-nutch-gui/conf" />
 			<fileset dir="portalu-search/conf" />
 		</copy>
 	</target>
 
-	<!-- Before the first call of this target, we need the ingrid-dependent jars. So call once: 'mvn dependency:copy-dependencies' -->
+	<!-- To build the installer, use maven: mvn assembly:assembly -Dmaven.test.skip -->
 	<target name="dist" depends="copy-nutch, copy-ingrid-se-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts,copy-indexer-searcher-configs,copy-deploy-conf-files">
 		<ant dir="build/${nutch-version}" target="package" />
 
@@ -144,9 +144,10 @@
 	</target>
 
 	<target name="copy-deploy-conf-files" depends="copy-indexer-searcher-configs">
-		<copy todir="build/${nutch-version}/conf" overwrite="true">
-			<fileset file="deploy/nutch-gui/log4j.properties" />
-			<!-- comment this out, if you want logging as in os-nutgui configuration -->
+		<copy todir="build/${nutch-version}/conf" overwrite="true" flatten="true">
+			<fileset dir="deploy" casesensitive="yes">
+				<filename name="**/log4j-*.properties"/>
+			</fileset>
 		</copy>
 		<replaceregexp file="build/${nutch-version}/conf/nutch-site.xml" match="101tec-nutch-a9cddd9/src/plugin,portalu-nutch-gui/src/plugin" replace="./plugins" byline="true" />
 	</target>
@@ -177,7 +178,6 @@
 	</target>
 
 	<target name="download-portalu-libs-for-eclipse">
-		<property name="ingrid.ext.libs" value="${basedir}/portalu-common/eclipse-libs" />
 		<delete>
 			<fileset dir="${ingrid.ext.libs}" includes="**/*" />
 		</delete>

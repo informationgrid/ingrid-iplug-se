@@ -6,9 +6,9 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import de.ingrid.admin.IKeys;
 import de.ingrid.ibus.client.BusClient;
 import de.ingrid.ibus.client.BusClientFactory;
+import de.ingrid.iplug.se.IKeys;
 import de.ingrid.utils.IBus;
 import de.ingrid.utils.IPlug;
 

@@ -1,4 +1,4 @@
-package de.ingrid.admin;
+package de.ingrid.iplug.se;
 
 public interface IKeys {
 

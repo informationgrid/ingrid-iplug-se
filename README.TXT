@@ -4,7 +4,11 @@ a) Run without connection to ibus (eclipse):
  Main class: org.apache.nutch.admin.AdministrationApplication
  Params:     /tmp/ingrid-iplug-se/nutchgui 8080
  VM-Params: -Xmx256m -Dnutch.gui.theme=portal-u
- 
+or 
+ Main class: de.ingrid.iplug.se.AdministrationApp
+ Params:     --plugdescription=portalu-nutch-gui/conf/plugdescription-index.xml_blah --descriptor=portalu-nutch-gui/conf/communication-index.xml --workingDirectory=/tmp/nutchGui_eclipse --secure --port=8080
+ VM-Params: -Xmx256m -Dnutch.gui.theme=portal-u
+
 b) Connect to ibus and retrieve actual Partners/Providers (eclipse):
  Main class: org.apache.nutch.admin.AdministrationApplication
  Params:     /tmp/ingrid-iplug-se/nutchgui 8080 --secure

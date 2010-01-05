@@ -1,5 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
 	<parent>
 		<artifactId>ingrid-releases-pom</artifactId>
 		<groupId>de.ingrid</groupId>
@@ -11,6 +12,7 @@
 	<packaging>jar</packaging>
 	<version>2.0.0-SNAPSHOT</version>
 	<name>Ingrid iPlug SE</name>
+
 	<scm>
 		<connection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid-iplug-se/trunk</connection>
 		<developerConnection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid-iplug-se/trunk</developerConnection>
@@ -43,10 +45,11 @@
 			<version>1.4.2-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
+
 	<repositories>
-		<repository>
-			<id>de.ingrid.m2</id>
-			<name>Maven2 Repo InGrid</name>
+ 		<repository>
+			<id>harrison.its-technidata.de-archiva</id>
+			<name>Harrison Archiva Maven2 Repo InGrid</name>
 			<url>http://harrison.its-technidata.de/archiva/repository/ingrid-all</url>
 		</repository>
 		<repository>
@@ -55,6 +58,7 @@
 			<url>http://repo1.maven.org/maven2</url>
 		</repository>
 	</repositories>
+
 	<build>
 		<finalName>${project.artifactId}-${project.version}</finalName>
 		<plugins>
@@ -65,18 +69,19 @@
 				<executions>
 					<execution>
 						<id>copy-dependencies</id>
-						<phase>package</phase>
+						<phase>process-resources</phase>
 						<goals>
 							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${project.build.directory}/ingrid-ext</outputDirectory>
+							<outputDirectory>portalu-common/ingrid-ext</outputDirectory>
 							<excludeTransitive>false</excludeTransitive>
 							<excludeArtifactIds>ingrid-installer</excludeArtifactIds>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
+
 			<!-- Build the plugin via ant build scripts -->
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>

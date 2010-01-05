@@ -4,7 +4,8 @@
     </description>
 	<!-- set global properties for this build -->
 	<property name="iPlugName" value="${project.artifactId}-${project.version}" />
-	<property name="xml-communication-index" value="${installDir}/conf/communication-index.xml" />
+	<property name="index-xml-communication" 	value="${installDir}/conf/communication-index.xml"/>
+	<property name="search-xml-communication" 	value="${installDir}/conf/communication-search.xml"/>
 
 	<target name="install" description="Extract all files to the installation directory.">
 		<unzip src="${antinstaller.jar}" dest="${installDir}">
@@ -15,10 +16,30 @@
 		<move toDir="${installDir}">
 			<fileset dir="${installDir}/${iPlugName}" />
 		</move>
-		<chmod dir="${installDir}" perm="ugo+rx" includes="*.sh" />
-		<chmod dir="${installDir}/bin" perm="ugo+rx" includes="*.sh,nutch" />
-		<mkdir dir="${installDir}/logs" />
 
+		<chmod dir="${installDir}" perm="ugo+rx" includes="*.sh" />
+		<chmod dir="${installDir}/bin" perm="ugo+rx" includes="*.sh,nutch*" />
+		<mkdir dir="${installDir}/logs" />
+	</target>
+
+	<target name="communicationIndex" description="Set configuration correctly for the iBus.">
+		<echo>Schreibe Konfigurations Parameter des Indexer's in die communication-index.xml
+		</echo>
+		<xmlproperty file="${index-xml-communication}" prefix="indexXML"/>
+		<replace file="${index-xml-communication}" token="${indexXML.communication.client(name)}" 								value="${indexClientName}-admin"/>
+		<replace file="${index-xml-communication}" token="${indexXML.communication.client.connections.server(name)}" 			value="${indexServerName}"/>
+		<replace file="${index-xml-communication}" token="${indexXML.communication.client.connections.server.socket(ip)}" 		value="${indexServerIp}"/>
+		<replace file="${index-xml-communication}" token="${indexXML.communication.client.connections.server.socket(port)}" 	value="${indexServerPort}"/>		
+	</target>
+
+	<target name="communicationSearch" description="Set configuration correctly for the iBus.">
+		<echo>Schreibe Konfigurations Parameter des Searchers's in die communication-index.xml
+		</echo>
+		<xmlproperty file="${search-xml-communication}" prefix="searchXML"/>
+		<replace file="${search-xml-communication}" token="${searchXML.communication.client(name)}" 								value="${searchClientName}-admin"/>
+		<replace file="${search-xml-communication}" token="${searchXML.communication.client.connections.server(name)}" 			value="${searchServerName}"/>
+		<replace file="${search-xml-communication}" token="${searchXML.communication.client.connections.server.socket(ip)}" 		value="${searchServerIp}"/>
+		<replace file="${search-xml-communication}" token="${searchXML.communication.client.connections.server.socket(port)}" 	value="${searchServerPort}"/>		
 	</target>
 
 	<target name="startIPlug">
@@ -30,11 +51,11 @@
 		</exec>
 	</target>
 
-	<target name="showStartHints">
+	<target name="showInstallNotes">
 		<echo>
-=====================================
-Informationen zum Start/Konfiguration
-=====================================
+=========================================
+Informationen zur Konfiguration und Start
+=========================================
 
 		</echo>
 		<echo>
@@ -45,11 +66,13 @@ Diese Installation liefert zwei iPlugs:
 Gehen Sie ins Verzeichnis:
 ${installDir}
 und rufen sie von der Kommandozeile folgendes auf
-    * "./start-indexer.sh start", um den Indexer zu starten und
+    * "./start-indexer.sh start", um die Konfiguration des Indexer zu starten und durchzuführen
+	  (http://localhost:50060/general/admin-pd)
+    * "./start-indexer.sh restart", um den Indexer mit der erstellten Konfiguration zu starten
+	  (http://localhost:50060/general)
+    * "./admin-search.sh", um die Konfiguration des Searchers zu starten und durchzuführen
     * "./start-searcher.sh start", um den Searcher zu starten.
 			
-Im Browser können Sie unter 
-"http://localhost:50060" den Indexer konfigurieren.
 Bitte lesen Sie bzgl. der Administration die Kapitel unter
 "http://www.kst.portalu.de/wiki/index.php/Allgemeines_zu_den_iPlugs".
 
@@ -61,8 +84,8 @@ Bevor das iPlug benutzt werden kann, muss es in der iBus-
 Administration (im Portal) eingeschaltet werden.
 
 Weitere Informationen entnehmen Sie bitte dem
-Online-Handbuch unter 
-http://www.kst.portalu.de/wiki/index.php/InGrid_Installation.
+Online-Handbuch unter:
+	http://www.kst.portalu.de/wiki/index.php/IPlug_SE_%28nutch_1.0%29#Installation
 		</echo>
 	</target>
 

@@ -6,8 +6,8 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
-import de.ingrid.admin.IKeys;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
+import de.ingrid.iplug.se.IKeys;
 import de.ingrid.utils.PlugDescription;
 import de.ingrid.utils.xml.PlugdescriptionSerializer;
 

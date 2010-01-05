@@ -578,7 +578,11 @@
     <copy todir="${dist.dir}/" file="default.properties"/>
   	<copy todir="${dist.dir}/" file="start-search.sh"/>
   	<copy todir="${dist.dir}/" file="start-index.sh"/>
-
+  	<copy todir="${dist.dir}/" >
+		<fileset dir=".">
+			<include name="*.sh" />
+		</fileset>
+	</copy>
   	<chmod file="${dist.dir}/bin/*" perm="754"/>
   	<chmod file="${dist.dir}/start-*.sh" perm="754"/>
 

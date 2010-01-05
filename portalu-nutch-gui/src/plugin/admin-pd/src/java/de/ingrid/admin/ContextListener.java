@@ -7,6 +7,8 @@ import javax.servlet.ServletContextListener;
 
 import org.apache.log4j.Logger;
 
+import de.ingrid.iplug.se.IKeys;
+
 public class ContextListener implements ServletContextListener {
 
     private static final Logger LOG = Logger.getLogger(ContextListener.class);

@@ -11,10 +11,6 @@
 #
 #   NUTCH_OPTS      Extra Java runtime options.
 #
-
-#NUTCH_OPTS="-Dnutch.gui.theme=portal-u -DdeployMode=dev"
-NUTCH_OPTS="-Dnutch.gui.theme=portal-u -Djava.security.auth.login.config=conf/nutchgui.auth"
-
 cygwin=false
 case "`uname`" in
 CYGWIN*) cygwin=true;;
@@ -149,10 +145,6 @@ for f in $NUTCH_HOME/lib/jetty-ext/*.jar; do
 done
 
 for f in $NUTCH_HOME/lib/admin-ui-ext/*.jar; do
-  CLASSPATH=${CLASSPATH}:$f;
-done
-
-for f in $NUTCH_HOME/lib/ingrid-ext/*.jar; do
   CLASSPATH=${CLASSPATH}:$f;
 done
 
