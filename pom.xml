@@ -52,6 +52,12 @@
 			<artifactId>ingrid-iplug-sns</artifactId>
 			<version>1.4.2-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+            <groupId>de.ingrid</groupId>
+            <artifactId>ingrid-iplug-admin-step1-se</artifactId>
+            <version>1.2.2-SNAPSHOT</version>
+            <type>war</type>
+        </dependency>
 	</dependencies>
 
 	<repositories>

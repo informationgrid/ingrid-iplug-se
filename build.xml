@@ -103,7 +103,7 @@
 			<fileset dir="portalu-nutch-gui/src/java/de" />
 			<fileset dir="portalu-search/src/main/java/de" />
 		</copy>
-		<copy todir="${basedir}/build/${nutch-version}/lib/ingrid-ext">
+		<copy todir="build/${nutch-version}/lib/ingrid-ext">
 			<fileset dir="${ingrid.ext.libs}" />
 		</copy>
 	</target>
