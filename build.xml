@@ -116,13 +116,17 @@
 
 	<target name="copy-indexer-searcher-configs">
 		<copy todir="build/${nutch-version}/conf/" overwrite="true">
-			<fileset dir="portalu-nutch-gui/conf" />
-			<fileset dir="portalu-search/conf" />
+			<fileset dir="portalu-nutch-gui/conf">
+			    <exclude name="**/*plugdescription*.xml"/>
+			</fileset>
+			<fileset dir="portalu-search/conf">
+			    <exclude name="**/*plugdescription*.xml"/>
+			</fileset>
 		</copy>
 	</target>
 
 	<!-- To build the installer, use maven: mvn assembly:assembly -Dmaven.test.skip -->
-	<target name="dist" depends="copy-nutch, copy-ingrid-se-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts,copy-indexer-searcher-configs,copy-deploy-conf-files">
+	<target name="dist" depends="clean, copy-nutch, copy-ingrid-se-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts,copy-indexer-searcher-configs,copy-deploy-conf-files">
 		<ant dir="build/${nutch-version}" target="package" />
 
 		<property file="${basedir}/${nutch-version}/default.properties" />
