@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.apache.nutch.protocol.Protocol;
 
-import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Url;
 
 public interface IUrlDao extends IDao<Url> {

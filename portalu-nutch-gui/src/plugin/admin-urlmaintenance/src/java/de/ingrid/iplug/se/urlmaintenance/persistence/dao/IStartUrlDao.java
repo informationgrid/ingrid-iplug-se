@@ -1,5 +1,6 @@
 package de.ingrid.iplug.se.urlmaintenance.persistence.dao;
 
+import java.io.Serializable;
 import java.util.List;
 
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
@@ -21,5 +22,7 @@ public interface IStartUrlDao extends IDao<StartUrl> {
 
   List<StartUrl> getByProviderAndMetadatas(Provider provider,
       List<Metadata> metadatas, int start, int length, OrderBy orderBy);
+
+  List<StartUrl> getByUrl(String url, Serializable providerId);
 
 }

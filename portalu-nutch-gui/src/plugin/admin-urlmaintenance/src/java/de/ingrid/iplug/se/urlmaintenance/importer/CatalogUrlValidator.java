@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.ingrid.iplug.se.urlmaintenance.parse.UrlContainer;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ICatalogUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IProviderDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Url;
@@ -16,9 +17,11 @@ public class CatalogUrlValidator implements IUrlValidator {
 
   private final Map<String, Set<String>> _supportedMetadatas = new HashMap<String, Set<String>>();
   private final IProviderDao _providerDao;
+  private final ICatalogUrlDao _urlDao;
 
-  public CatalogUrlValidator(final IProviderDao providerDao) {
+  public CatalogUrlValidator(final IProviderDao providerDao, final ICatalogUrlDao urlDao) {
     _providerDao = providerDao;
+    _urlDao = urlDao;
     _supportedMetadatas.put("datatype", new HashSet<String>());
     _supportedMetadatas.put("lang", new HashSet<String>());
     _supportedMetadatas.put("alt_title", new HashSet<String>());
@@ -33,12 +36,24 @@ public class CatalogUrlValidator implements IUrlValidator {
     final Map<String, Map<String, Set<String>>> metadatas = urlContainer.getMetadatas();
     final Serializable providerId = urlContainer.getProviderId();
     int errorCount = 0;
+    errorCount += validateDuple(whiteUrls, providerId, errorCodes);
     errorCount += validateWhiteUrl(whiteUrls, errorCodes);
     errorCount += validateWhiteUrlWithMetadatas(whiteUrls, metadatas, errorCodes);
     errorCount += validateProvider(providerId, errorCodes);
     final boolean valid = (errorCount == 0);
     urlContainer.setValid(valid);
     return errorCount == 0;
+  }
+  
+  private int validateDuple(final List<Url> whiteUrls, Serializable providerId, final Map<String, String> errorCodes) {
+      if (whiteUrls.size() > 0) {
+        final Url startUrl = whiteUrls.get(0);
+        if (_urlDao.getByUrl(startUrl.getUrl(), providerId).size() > 0) {
+            errorCodes.put("whiteurl.duple", startUrl.getUrl());
+            return 1;
+        }
+      }
+      return 0;
   }
 
   private int validateProvider(final Serializable providerId, final Map<String, String> errorCodes) {

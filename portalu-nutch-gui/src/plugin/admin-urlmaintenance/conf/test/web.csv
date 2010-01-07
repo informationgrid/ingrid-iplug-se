@@ -1,4 +1,4 @@
-Start Url,Limit Url,Exclude Urlâ€™s,Umweltinformationen,Forschung,Rechtsvorschriften,Sprache
+Start Url,Limit Url,Exclude UrlâUmweltinformationen,Forschung,Rechtsvorschriften,Sprache
 http://www.kst.de/index.html,http://www.kst.de/limit1 ,http://www.kst.de/limit1/exclude.html,TRUE,FALSE,FALSE,DE
 ,http://www.kst.de/limit2,http://www.kst.de/limit2/exclude.html,FALSE,TRUE,FALSE,DE
 ,http://www.kst.de/limit3,http://www.kst.de/limit3/exclude.html http://www.kst.de/limit3/private.html,TRUE,TRUE,TRUE,EN

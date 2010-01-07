@@ -1,5 +1,6 @@
 package de.ingrid.iplug.se.urlmaintenance.persistence.dao;
 
+import java.io.Serializable;
 import java.util.List;
 
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao.OrderBy;
@@ -14,4 +15,5 @@ public interface ICatalogUrlDao extends IDao<CatalogUrl> {
 
   Long countByProviderAndMetadatas(Provider provider, List<Metadata> metadatas);
 
+  List<CatalogUrl> getByUrl(String url, Serializable providerId);
 }

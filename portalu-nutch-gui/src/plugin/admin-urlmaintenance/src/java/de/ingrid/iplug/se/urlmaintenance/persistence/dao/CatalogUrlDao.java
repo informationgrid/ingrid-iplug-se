@@ -1,5 +1,6 @@
 package de.ingrid.iplug.se.urlmaintenance.persistence.dao;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.Query;
@@ -111,6 +112,15 @@ public class CatalogUrlDao extends Dao<CatalogUrl> implements ICatalogUrlDao {
 
     query.setFirstResult(firstResult);
     query.setMaxResults(maxResult);
+    return query.getResultList();
+  }
+  
+  @SuppressWarnings("unchecked")
+  public List<CatalogUrl> getByUrl(final String url, final Serializable providerId) {
+    final String q = "SELECT DISTINCT cu FROM CatalogUrl cu WHERE cu._url = :url and cu._provider._id = :providerId";
+    final Query query = _transactionService.createQuery(q);
+    query.setParameter("url", url);
+    query.setParameter("providerId", providerId);
     return query.getResultList();
   }
 }

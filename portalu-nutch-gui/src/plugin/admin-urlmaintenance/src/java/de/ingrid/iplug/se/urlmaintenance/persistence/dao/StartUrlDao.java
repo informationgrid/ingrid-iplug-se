@@ -1,5 +1,6 @@
 package de.ingrid.iplug.se.urlmaintenance.persistence.dao;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.Query;
@@ -16,14 +17,14 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
 public class StartUrlDao extends Dao<StartUrl> implements IStartUrlDao {
 
   @Autowired
-  public StartUrlDao(TransactionService transactionService) {
+  public StartUrlDao(final TransactionService transactionService) {
     super(StartUrl.class, transactionService);
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public List<StartUrl> getByProvider(Provider provider, int start, int length,
-      OrderBy orderBy) {
+  public List<StartUrl> getByProvider(final Provider provider, final int start, final int length,
+      final OrderBy orderBy) {
     String namedQuery = null;
     switch (orderBy) {
     case CREATED_ASC:
@@ -47,7 +48,7 @@ public class StartUrlDao extends Dao<StartUrl> implements IStartUrlDao {
     default:
       break;
     }
-    Query query = _transactionService.createNamedQuery(namedQuery);
+    final Query query = _transactionService.createNamedQuery(namedQuery);
     query.setParameter("id", provider.getId());
     query.setFirstResult(start);
     query.setMaxResults(length);
@@ -56,8 +57,8 @@ public class StartUrlDao extends Dao<StartUrl> implements IStartUrlDao {
 
   @SuppressWarnings("unchecked")
   @Override
-  public List<StartUrl> getByProviderAndMetadatas(Provider provider,
-      List<Metadata> metadatas, int start, int length, OrderBy orderBy) {
+  public List<StartUrl> getByProviderAndMetadatas(final Provider provider,
+      final List<Metadata> metadatas, final int start, final int length, final OrderBy orderBy) {
     // we cant use namedqueries with an 'in expression' because jpa does not
     // support query.setParameterList. so we have to implement the query inside
     // the dao
@@ -89,23 +90,23 @@ public class StartUrlDao extends Dao<StartUrl> implements IStartUrlDao {
     String q = "SELECT DISTINCT su FROM StartUrl su JOIN su._limitUrls lu ";
 
     // join metadatas in separately variables
-    for (Metadata metadata : metadatas) {
+    for (final Metadata metadata : metadatas) {
       q += " JOIN lu._metadatas md" + metadata.getId();
     }
 
     // set parameter to every variable
     q += " WHERE ";
-    for (Metadata metadata : metadatas) {
+    for (final Metadata metadata : metadatas) {
       q += " md" + metadata.getId() + "._id = :md" + metadata.getId() + " AND ";
     }
 
     // end query with provider
     q += " su._provider._id = :providerId  " + orderQuery;
 
-    Query query = _transactionService.createQuery(q);
+    final Query query = _transactionService.createQuery(q);
 
     // fill query with metadata id's
-    for (Metadata metadata : metadatas) {
+    for (final Metadata metadata : metadatas) {
       query.setParameter("md" + metadata.getId(), metadata.getId());
     }
 
@@ -116,37 +117,37 @@ public class StartUrlDao extends Dao<StartUrl> implements IStartUrlDao {
   }
 
   @Override
-  public Long countByProvider(Provider provider) {
-    Query query = _transactionService.createNamedQuery("countByProvider");
+  public Long countByProvider(final Provider provider) {
+    final Query query = _transactionService.createNamedQuery("countByProvider");
     query.setParameter("id", provider.getId());
     return (Long) query.getSingleResult();
   }
 
   @Override
-  public Long countByProviderAndMetadatas(Provider provider,
-      List<Metadata> metadatas) {
+  public Long countByProviderAndMetadatas(final Provider provider,
+      final List<Metadata> metadatas) {
 
     // init query
     String q = "SELECT COUNT(DISTINCT su) FROM StartUrl su JOIN su._limitUrls lu ";
 
     // join metadatas in separately variables
-    for (Metadata metadata : metadatas) {
+    for (final Metadata metadata : metadatas) {
       q += " JOIN lu._metadatas md" + metadata.getId();
     }
 
     // set parameter to every variable
     q += " WHERE ";
-    for (Metadata metadata : metadatas) {
+    for (final Metadata metadata : metadatas) {
       q += " md" + metadata.getId() + "._id = :md" + metadata.getId() + " AND ";
     }
 
     // end query with provider
     q += " su._provider._id = :providerId";
 
-    Query query = _transactionService.createQuery(q);
+    final Query query = _transactionService.createQuery(q);
 
     // fill query with metadata id's
-    for (Metadata metadata : metadatas) {
+    for (final Metadata metadata : metadatas) {
       query.setParameter("md" + metadata.getId(), metadata.getId());
     }
 
@@ -154,4 +155,12 @@ public class StartUrlDao extends Dao<StartUrl> implements IStartUrlDao {
     return (Long) query.getSingleResult();
   }
 
+  @SuppressWarnings("unchecked")
+  public List<StartUrl> getByUrl(final String url, final Serializable providerId) {
+    final String q = "SELECT DISTINCT su FROM StartUrl su WHERE su._url = :url and su._provider._id = :providerId";
+    final Query query = _transactionService.createQuery(q);
+    query.setParameter("url", url);
+    query.setParameter("providerId", providerId);
+    return query.getResultList();
+  }
 }

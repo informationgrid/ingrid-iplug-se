@@ -11,16 +11,23 @@ import de.ingrid.iplug.se.urlmaintenance.parse.CsvParser;
 import de.ingrid.iplug.se.urlmaintenance.parse.GoogleSiteXmlParser;
 import de.ingrid.iplug.se.urlmaintenance.parse.IUrlFileParser;
 import de.ingrid.iplug.se.urlmaintenance.parse.UrlContainer.UrlType;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ICatalogUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IProviderDao;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao;
 
 public class ImportFactory {
 
   private final UploadCommand _uploadCommand;
   private final IProviderDao _providerDao;
 
-  public ImportFactory(final UploadCommand uploadCommand, final IProviderDao providerDao) {
+    private final IStartUrlDao _startUrlDao;
+    private final ICatalogUrlDao _catalogUrlDao;
+
+  public ImportFactory(final UploadCommand uploadCommand, final IProviderDao providerDao, final IStartUrlDao startUrlDao, final ICatalogUrlDao catalogUrlDao) {
     _uploadCommand = uploadCommand;
     _providerDao = providerDao;
+    _catalogUrlDao = catalogUrlDao;
+    _startUrlDao = startUrlDao;
   }
 
   public IUrlFileParser findFileParser() throws Exception {
@@ -36,9 +43,9 @@ public class ImportFactory {
   public IUrlValidator findUrlValidator() {
     final UrlType type = _uploadCommand.getType();
     if (type == UrlType.WEB) {
-      return new WebUrlValidator(_providerDao);
+      return new WebUrlValidator(_providerDao, _startUrlDao);
     } else if (type == UrlType.CATALOG) {
-      return new CatalogUrlValidator(_providerDao);
+      return new CatalogUrlValidator(_providerDao, _catalogUrlDao);
     }
     return null;
   }

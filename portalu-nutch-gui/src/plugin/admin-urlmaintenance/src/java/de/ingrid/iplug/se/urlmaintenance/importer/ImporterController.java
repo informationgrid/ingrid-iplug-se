@@ -19,17 +19,23 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import de.ingrid.iplug.se.urlmaintenance.PartnerProviderCommand;
 import de.ingrid.iplug.se.urlmaintenance.parse.IUrlFileParser;
 import de.ingrid.iplug.se.urlmaintenance.parse.UrlContainer;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ICatalogUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IProviderDao;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao;
 
 @Controller
 @SessionAttributes(value = { "partnerProviderCommand", "containerCommand" })
 public class ImporterController extends NavigationSelector {
 
   private final IProviderDao _providerDao;
+  private final IStartUrlDao _startUrlDao;
+  private final ICatalogUrlDao _catalogUrlDao;
 
   @Autowired
-  public ImporterController(final IProviderDao providerDao) {
+  public ImporterController(final IProviderDao providerDao, final IStartUrlDao urlDao, final ICatalogUrlDao catalogUrlDao) {
     _providerDao = providerDao;
+    _startUrlDao = urlDao;
+    _catalogUrlDao = catalogUrlDao;
   }
 
   @ModelAttribute("containerCommand")
@@ -76,7 +82,7 @@ public class ImporterController extends NavigationSelector {
       return "import/importer";
     }
 
-    final ImportFactory factory = new ImportFactory(uploadCommand, _providerDao);
+    final ImportFactory factory = new ImportFactory(uploadCommand, _providerDao, _startUrlDao, _catalogUrlDao);
     final File file = factory.saveFile();
 
     final IUrlFileParser parser = factory.findFileParser();

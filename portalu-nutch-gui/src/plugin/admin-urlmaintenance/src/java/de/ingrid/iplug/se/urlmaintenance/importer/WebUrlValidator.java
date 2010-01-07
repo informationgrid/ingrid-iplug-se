@@ -11,6 +11,7 @@ import java.util.Set;
 
 import de.ingrid.iplug.se.urlmaintenance.parse.UrlContainer;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IProviderDao;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Url;
 
@@ -19,8 +20,11 @@ public class WebUrlValidator implements IUrlValidator {
   private final Map<String, Set<String>> _supportedMetadatas = new HashMap<String, Set<String>>();
   private final IProviderDao _providerDao;
 
-  public WebUrlValidator(final IProviderDao providerDao) {
+    private final IStartUrlDao _urlDao;
+
+  public WebUrlValidator(final IProviderDao providerDao, final IStartUrlDao urlDao) {
     _providerDao = providerDao;
+        _urlDao = urlDao;
     _supportedMetadatas.put("datatype", new HashSet<String>());
     _supportedMetadatas.put("lang", new HashSet<String>());
   }
@@ -33,6 +37,7 @@ public class WebUrlValidator implements IUrlValidator {
     final Map<String, Map<String, Set<String>>> metadatas = urlContainer.getMetadatas();
     final Serializable providerId = urlContainer.getProviderId();
     int errorCount = 0;
+    errorCount += validateDuple(startUrl, providerId, errorCodes);
     errorCount += validateStartUrlWithWhiteUrl(startUrl, whiteUrls, errorCodes);
     errorCount += validateStartUrlWithBlackUrl(startUrl, blackUrls, errorCodes);
     errorCount += validateWhiteUrlWithMetadatas(whiteUrls, metadatas, errorCodes);
@@ -41,6 +46,14 @@ public class WebUrlValidator implements IUrlValidator {
     urlContainer.setValid(valid);
     return errorCount == 0;
   }
+
+    private int validateDuple(final Url startUrl, Serializable providerId, final Map<String, String> errorCodes) {
+        if (_urlDao.getByUrl(startUrl.getUrl(), providerId).size() > 0) {
+            errorCodes.put("starturl.duple", startUrl.getUrl());
+            return 1;
+    }
+        return 0;
+    }
 
   private int validateStartUrlWithBlackUrl(final Url startUrl, final List<Url> blackUrls,
       final Map<String, String> errorCodes) {
