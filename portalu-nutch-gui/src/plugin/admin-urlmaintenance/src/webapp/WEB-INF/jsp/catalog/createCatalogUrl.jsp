@@ -100,6 +100,19 @@
 							        <desc></desc>
 							    </row>
 							
+							    <row>
+                                     <label>Sprache:</label>
+                                     <field>
+                                        <select name="metadatas" >
+                                             <c:forEach var="lang" items="${langs}">
+                                                 <option value="${lang.id}">${lang.metadataValue}</option>
+                                             </c:forEach>
+                                         </select>
+                                         <div class="error"><form:errors path="metadatas" /></div>
+                                     </field>
+                                     <desc></desc>
+                                 </row>
+							
 								<c:if test="${!empty metadatas['topics']}">
 								<row>
 							        <label>Thema:</label>

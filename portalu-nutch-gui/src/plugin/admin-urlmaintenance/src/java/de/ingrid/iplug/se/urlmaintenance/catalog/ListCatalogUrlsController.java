@@ -33,84 +33,109 @@ public class ListCatalogUrlsController extends NavigationSelector {
   private final IMetadataDao _metadataDao;
 
   @Autowired
-  public ListCatalogUrlsController(ICatalogUrlDao catalogUrlDao, IMetadataDao metadataDao) {
+  public ListCatalogUrlsController(final ICatalogUrlDao catalogUrlDao, final IMetadataDao metadataDao) {
     _catalogUrlDao = catalogUrlDao;
     _metadataDao = metadataDao;
   }
 
   @ModelAttribute("catalogUrlCommand")
   public CatalogUrlCommand injectCatalogUrlCommand(
-      @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand) {
-    CatalogUrlCommand command = new CatalogUrlCommand();
+      @ModelAttribute("partnerProviderCommand") final PartnerProviderCommand partnerProviderCommand) {
+    final CatalogUrlCommand command = new CatalogUrlCommand();
     command.setProvider(partnerProviderCommand.getProvider());
     return command;
   }
 
+  @ModelAttribute("metadatas")
+  public List<Metadata> injectMetadatas() {
+    List<Metadata> arrayList = new ArrayList<Metadata>();
+    arrayList.addAll(_metadataDao.getByKey("lang"));
+    return arrayList;
+  }
+
   @RequestMapping(value = "/catalog/listTopicUrls.html", method = RequestMethod.GET)
-  public String listTopicUrls(@ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand,
+  public String listTopicUrls(@ModelAttribute("partnerProviderCommand") final PartnerProviderCommand partnerProviderCommand,
       @RequestParam(value = "page", required = false) Integer page,
       @RequestParam(value = "hitsPerPage", required = false) Integer hitsPerPage,
-      @RequestParam(value = "sort", required = false) String sort,
-      @RequestParam(value = "dir", required = false) String dir, Model model, HttpServletRequest request) {
+      @RequestParam(value = "sort", required = false) final String sort,
+      @RequestParam(value = "dir", required = false) final String dir,
+      @RequestParam(value = "lang", required = false) String[] langs, final Model model, final HttpServletRequest request) {
     page = page == null ? 1 : page;
     hitsPerPage = hitsPerPage == null ? 10 : hitsPerPage;
 
-    Metadata topics = _metadataDao.getByKeyAndValue("datatype", "topics");
-    ArrayList<Metadata> metadatas = new ArrayList<Metadata>();
+    final Metadata topics = _metadataDao.getByKeyAndValue("datatype", "topics");
+    final ArrayList<Metadata> metadatas = new ArrayList<Metadata>();
     metadatas.add(topics);
+    if (langs != null) {
+        for (String l : langs) {
+            metadatas.add(_metadataDao.getByKeyAndValue("lang", l));
+        }
+    }
 
-    int start = Paging.getStart(page, hitsPerPage);
-    pushUrls(start, hitsPerPage, sort, dir, model, metadatas, partnerProviderCommand.getProvider(), hitsPerPage, page);
+    final int start = Paging.getStart(page, hitsPerPage);
+    pushUrls(start, hitsPerPage, sort, dir, langs, model, metadatas, partnerProviderCommand.getProvider(), hitsPerPage, page);
     return "catalog/listTopicUrls";
   }
 
   @RequestMapping(value = "/catalog/listServiceUrls.html", method = RequestMethod.GET)
   public String listServiceUrls(
-      @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand,
+      @ModelAttribute("partnerProviderCommand") final PartnerProviderCommand partnerProviderCommand,
       @RequestParam(value = "page", required = false) Integer page,
       @RequestParam(value = "hitsPerPage", required = false) Integer hitsPerPage,
-      @RequestParam(value = "sort", required = false) String sort,
-      @RequestParam(value = "dir", required = false) String dir, Model model, HttpServletRequest request) {
+      @RequestParam(value = "sort", required = false) final String sort,
+      @RequestParam(value = "dir", required = false) final String dir,
+      @RequestParam(value = "lang", required = false) String[] langs, final Model model, final HttpServletRequest request) {
 
     page = page == null ? 1 : page;
     hitsPerPage = hitsPerPage == null ? 10 : hitsPerPage;
-    Metadata topics = _metadataDao.getByKeyAndValue("datatype", "service");
-    ArrayList<Metadata> metadatas = new ArrayList<Metadata>();
+    final Metadata topics = _metadataDao.getByKeyAndValue("datatype", "service");
+    final ArrayList<Metadata> metadatas = new ArrayList<Metadata>();
     metadatas.add(topics);
+    if (langs != null) {
+        for (String l : langs) {
+            metadatas.add(_metadataDao.getByKeyAndValue("lang", l));
+        }
+    }
 
-    int start = Paging.getStart(page, hitsPerPage);
-    pushUrls(start, hitsPerPage, sort, dir, model, metadatas, partnerProviderCommand.getProvider(), hitsPerPage, page);
+    final int start = Paging.getStart(page, hitsPerPage);
+    pushUrls(start, hitsPerPage, sort, dir, langs, model, metadatas, partnerProviderCommand.getProvider(), hitsPerPage, page);
 
     return "catalog/listServiceUrls";
   }
 
   @RequestMapping(value = "/catalog/listMeasureUrls.html", method = RequestMethod.GET)
   public String listMeasureUrls(
-      @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand,
+      @ModelAttribute("partnerProviderCommand") final PartnerProviderCommand partnerProviderCommand,
       @RequestParam(value = "page", required = false) Integer page,
       @RequestParam(value = "hitsPerPage", required = false) Integer hitsPerPage,
-      @RequestParam(value = "sort", required = false) String sort,
-      @RequestParam(value = "dir", required = false) String dir, Model model, HttpServletRequest request) {
+      @RequestParam(value = "sort", required = false) final String sort,
+      @RequestParam(value = "dir", required = false) final String dir,
+      @RequestParam(value = "lang", required = false) String[] langs, final Model model, final HttpServletRequest request) {
 
     page = page == null ? 1 : page;
     hitsPerPage = hitsPerPage == null ? 10 : hitsPerPage;
-    Metadata topics = _metadataDao.getByKeyAndValue("datatype", "measure");
-    ArrayList<Metadata> metadatas = new ArrayList<Metadata>();
+    final Metadata topics = _metadataDao.getByKeyAndValue("datatype", "measure");
+    final ArrayList<Metadata> metadatas = new ArrayList<Metadata>();
     metadatas.add(topics);
-
-    int start = Paging.getStart(page, hitsPerPage);
-    pushUrls(start, hitsPerPage, sort, dir, model, metadatas, partnerProviderCommand.getProvider(), hitsPerPage, page);
+    if (langs != null) {
+        for (String l : langs) {
+            metadatas.add(_metadataDao.getByKeyAndValue("lang", l));
+        }
+    }
+    
+    final int start = Paging.getStart(page, hitsPerPage);
+    pushUrls(start, hitsPerPage, sort, dir, langs, model, metadatas, partnerProviderCommand.getProvider(), hitsPerPage, page);
 
     return "catalog/listMeasureUrls";
   }
 
-  private void pushUrls(Integer start, Integer length, String sort, String dir, Model model,
-      ArrayList<Metadata> metadatas, Provider byName, Integer hitsPerPage, Integer page) {
+  private void pushUrls(final Integer start, final Integer length, String sort, String dir, final String[] langs, final Model model,
+      final ArrayList<Metadata> metadatas, final Provider byName, final Integer hitsPerPage, final Integer page) {
 
     sort = sort != null ? sort : "created";
     dir = dir != null ? dir : "desc";
 
-    OrderBy orderBy = "url".equals(sort) ? orderByUrl(dir) : ("edited".equals(sort) ? orderByUpdated(dir)
+    final OrderBy orderBy = "url".equals(sort) ? orderByUrl(dir) : ("edited".equals(sort) ? orderByUpdated(dir)
         : orderByCreated(dir));
     Long count = 0L;
     List<CatalogUrl> catalogUrls = new ArrayList<CatalogUrl>();
@@ -122,20 +147,21 @@ public class ListCatalogUrlsController extends NavigationSelector {
     model.addAttribute("count", count);
     model.addAttribute("sort", sort);
     model.addAttribute("dir", dir);
+    model.addAttribute("langs", langs);
 
-    Paging paging = new Paging(10, hitsPerPage, count.intValue(), page);
+    final Paging paging = new Paging(10, hitsPerPage, count.intValue(), page);
     model.addAttribute("paging", paging);
   }
 
-  private OrderBy orderByUpdated(String dir) {
+  private OrderBy orderByUpdated(final String dir) {
     return "asc".equals(dir) ? OrderBy.UPDATED_ASC : OrderBy.UPDATED_DESC;
   }
 
-  private OrderBy orderByCreated(String dir) {
+  private OrderBy orderByCreated(final String dir) {
     return "asc".equals(dir) ? OrderBy.CREATED_ASC : OrderBy.CREATED_DESC;
   }
 
-  private OrderBy orderByUrl(String dir) {
+  private OrderBy orderByUrl(final String dir) {
     return "asc".equals(dir) ? OrderBy.URL_ASC : OrderBy.URL_DESC;
   }
 

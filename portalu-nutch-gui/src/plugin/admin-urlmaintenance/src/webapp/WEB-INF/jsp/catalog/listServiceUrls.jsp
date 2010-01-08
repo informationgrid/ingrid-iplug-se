@@ -84,7 +84,33 @@
 							<li><a href="<%=request.getContextPath()%>/catalog/listMeasureUrls.html">Messwerte</a></li>
 						</ul>
 					</div>
-					   
+					
+					<div>
+                        <c:set var="selectedFilter" value=""/>
+                        <c:set var="paramString" value=""/>
+                        <form method="get" action="" id="filter">
+                        <input type="hidden" name="sort" value="${sort}"/>
+                        <input type="hidden" name="dir" value="${dir}"/>
+                       <div class="row">  
+                            <label>Filter Sprache:</label>
+                            <c:forEach var="l" items="${langs}">
+                                <c:set var="selectedFilter" value="${selectedFilter} lang:${l}"/>
+                                <c:set var="paramString" value="${paramString}&lang=${l}"/> 
+                            </c:forEach>
+                            <c:forEach items="${metadatas}" var="metadata">
+                                <c:if test="${metadata.metadataKey == 'lang'}">
+                                <input type="checkbox" id="${metadata.metadataKey}_${metadata.metadataValue}" name="${metadata.metadataKey}" value="${metadata.metadataValue}"
+                                <c:if test="${fn:contains(selectedFilter, metadata.metadataValue)}"> checked="checked"</c:if>> ${metadata.metadataValue}&nbsp;&nbsp;
+                                <script>
+                                    function fnCallback(e) { document.getElementById('filter').submit() }
+                                    YAHOO.util.Event.addListener("${metadata.metadataKey}_${metadata.metadataValue}", "click", fnCallback);
+                                </script>
+                                </c:if>
+                            </c:forEach>
+                        </div>  
+                        </form>
+                    </div>
+					
 				    <div>
 				        <div style="margin-top:25px"></div>
 						<div style="float:right">
@@ -102,6 +128,8 @@
 										<th>Geändert</th>
 										<th>Alt. Titel</th>
 										<th>Rubrik</th>
+										<th>Sprache</th>
+										<th>Status</th>
 										<th>Aktion</th>
 									</tr>
 								</thead>
@@ -122,6 +150,14 @@
 												</c:if>
 											</c:forEach>
 										</td>
+										<td>
+                                            <c:forEach var="md" items="${url.metadatas}">
+                                                <c:if test="${md.metadataKey == 'lang'}">
+                                                    ${md.metadataValue}
+                                                </c:if>
+                                            </c:forEach>
+                                        </td>
+                                        <td>&nbsp;${url.statusAsText}</td>
 										<td>
 											<a href="editCatalogUrl.html?id=${url.id}&type=service">EDIT</a>
 							       			<a href="#" id="deleteCatalogUrl_${index.index}" 
@@ -147,6 +183,8 @@
 					                    {key:"edited"},
 					                    {key:"altTitle"},
 					                    {key:"rubric"},
+					                    {key:"lang"},
+					                    {key:"status"},
 					                    {key:"action"}
 					                ]
 							};
@@ -161,6 +199,8 @@
 								{key:"edited", label:"Geändert", sortable:true, sortOptions:{sortFunction:mySortFunction}},
 								{key:"altTitle", label:"Alt. Titel"},
 								{key:"rubric", label:"Rubrik"},
+								{key:"lang", label:"Sprache"},
+								{key:"status", label:"Status"},
 								{key:"action", label:"Aktion", width:100},
 								
 							];

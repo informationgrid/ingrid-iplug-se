@@ -41,6 +41,11 @@ public class CreateCatalogUrlController extends NavigationSelector {
   public void initBinder(WebDataBinder binder) {
     binder.registerCustomEditor(Metadata.class, new EntityEditor(_metadataDao));
   }
+  
+  @ModelAttribute("langs")
+  public List<Metadata> injectLang() {
+    return _metadataDao.getByKey("lang");
+  }
 
   @ModelAttribute("metadatas")
   public Map<String, List<Metadata>> injectMetadatas(
