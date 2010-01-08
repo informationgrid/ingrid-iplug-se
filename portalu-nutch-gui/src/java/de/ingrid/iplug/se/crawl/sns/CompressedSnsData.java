@@ -16,6 +16,8 @@ public class CompressedSnsData extends CompressedWritable {
 
   private Set<Text> _communityCodes = new HashSet<Text>();
 
+  private Set<Text> _locations = new HashSet<Text>();
+
   private Set<Text> _topicIds = new HashSet<Text>();
 
   private Set<Text> _t0s = new HashSet<Text>();
@@ -40,6 +42,7 @@ public class CompressedSnsData extends CompressedWritable {
   public void readFieldsCompressed(DataInput datainput) throws IOException {
     readUtf8IntoList(_buzzwords, datainput);
     readUtf8IntoList(_communityCodes, datainput);
+    readUtf8IntoList(_locations, datainput);
     readUtf8IntoList(_topicIds, datainput);
     readUtf8IntoList(_t0s, datainput);
     readUtf8IntoList(_t1t2s, datainput);
@@ -72,6 +75,7 @@ public class CompressedSnsData extends CompressedWritable {
   public void writeCompressed(DataOutput dataoutput) throws IOException {
     writeUtf8OutOfList(_buzzwords, dataoutput);
     writeUtf8OutOfList(_communityCodes, dataoutput);
+    writeUtf8OutOfList(_locations, dataoutput);
     writeUtf8OutOfList(_topicIds, dataoutput);
     writeUtf8OutOfList(_t0s, dataoutput);
     writeUtf8OutOfList(_t1t2s, dataoutput);
@@ -110,6 +114,11 @@ public class CompressedSnsData extends CompressedWritable {
   public void setCommunityCodes(Set<Text> communityCodes) {
     ensureInflated();
     _communityCodes = communityCodes;
+  }
+
+  public void setLocations(Set<Text> locations) {
+      ensureInflated();
+      _locations = locations;
   }
 
   public void setX1(Text x1) {
@@ -162,6 +171,11 @@ public class CompressedSnsData extends CompressedWritable {
     return _communityCodes;
   }
 
+  public Set<Text> getLocations() {
+      ensureInflated();
+      return _locations;
+  }
+
   public void setTopicIds(Set<Text> topids) {
     ensureInflated();
     _topicIds = topids;
@@ -195,6 +209,7 @@ public class CompressedSnsData extends CompressedWritable {
   public void resetValues() {
     _buzzwords.clear();
     _communityCodes.clear();
+    _locations.clear();
     _t0s.clear();
     _t1t2s.clear();
     _topicIds.clear();
@@ -220,4 +235,5 @@ public class CompressedSnsData extends CompressedWritable {
     ret.readFields(dataInput);
     return ret;
   }
+
 }

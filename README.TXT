@@ -26,6 +26,7 @@ b) run ./start-indexer.sh
 TODO rwe:
 ---------
 * Installation des Searchers erstellen und ggf. Konfigurationstool anpassen, sofern Max das nicht komplett macht (Max hat was vorbereitet: admin-searcher.sh-Skript)
+* persistence.xml muss noch in der Installation berücksichtigt werden!
 * Versionsnummer zum Iplug-SE hinzufügen (neue Maven-Konfiguration im Projekt dazu anpassen) 
 * Management der Segmente, siehe Mail 'Management der Segmente' vom 04.01. und 05.01. von Max und Joachim (?)
 * Report über Status der gefetchten URLs. (Hier muss ich noch mit Martin/Joachim klären, ob auch Mailversand notwendig ist und ob Status in DB gespeichert werden soll)

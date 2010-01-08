@@ -37,11 +37,14 @@ public class CompressedSnsDataTest extends TestCase {
       snsData.setY2(new Text("" + i * 3));
       Set<Text> codes = new HashSet<Text>();
       Set<Text> topcIds = new HashSet<Text>();
+      Set<Text> locations = new HashSet<Text>();
       for (int k = 0; k < i; k++) {
         topcIds.add(new Text("" + k * 2));
         codes.add(new Text("" + k));
+        locations.add(new Text("location-"+k));
       }
       snsData.setCommunityCodes(codes);
+      snsData.setLocations(locations);
       snsData.setTopicIds(topcIds);
       snsData.write(dataOutputStream);
     }
@@ -60,6 +63,8 @@ public class CompressedSnsDataTest extends TestCase {
       assertNotNull(snsData.getCommunityCodes());
       assertNotNull(snsData.getTopicIds());
       assertFalse(snsData.getCommunityCodes().isEmpty());
+      assertTrue(snsData.getLocations().size() > 0);
+      assertTrue(snsData.getLocations().iterator().next().toString().startsWith("location-"));
       assertFalse(snsData.getTopicIds().isEmpty());
       assertTrue(snsData.getBuzzwords().containsAll(buzzwords));
     }

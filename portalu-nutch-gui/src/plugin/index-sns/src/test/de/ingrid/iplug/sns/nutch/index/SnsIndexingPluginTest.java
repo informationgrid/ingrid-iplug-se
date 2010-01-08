@@ -49,18 +49,33 @@ public class SnsIndexingPluginTest extends TestCase {
     NutchDocument document = new NutchDocument();
     Set<Text> communityCodes = new HashSet<Text>();
     communityCodes.add(new Text("a"));
-    CompressedSnsData snsData = new CompressedSnsData();
-    snsData.setCommunityCodes(communityCodes);
+    CompressedSnsData compressedSnsData = new CompressedSnsData();
+    compressedSnsData.setCommunityCodes(communityCodes);
     Set<Text> topids = new HashSet<Text>();
     topids.add(new Text("b"));
-    snsData.setTopicIds(topids);
-    SnsParseImpl snsParseImpl = new SnsParseImpl(/* text */null, null/* data */, snsData);
+    compressedSnsData.setTopicIds(topids);
+    SnsParseImpl snsParseImpl = new SnsParseImpl(/* text */null, null/* data */, compressedSnsData);
     document = new IndexingFilters(this.fConfiguration).filter(document, snsParseImpl, null/* utf8 */, null, null);
     List<String> fieldValues = document.getFieldValues("areaid");
     assertEquals(2, fieldValues.size());
     assertEquals("b", fieldValues.get(0));
     assertEquals("a", fieldValues.get(1));
   }
+
+  public void testLocationCode() throws IndexingException {
+      Set<Text> locationCodes = new HashSet<Text>();
+      locationCodes.add(new Text("location-a"));
+      locationCodes.add(new Text("location-b"));
+      CompressedSnsData compressedSnsData = new CompressedSnsData();
+      compressedSnsData.setLocations(locationCodes);
+      SnsParseImpl snsParseImpl = new SnsParseImpl(null, null, compressedSnsData);
+      NutchDocument document = new NutchDocument();
+      document = new IndexingFilters(this.fConfiguration).filter(document, snsParseImpl, null, null, null);
+      List<String> fieldValues = document.getFieldValues("location");
+      assertEquals(2, fieldValues.size());
+      assertEquals("location-a", fieldValues.get(1));
+      assertEquals("location-b", fieldValues.get(0));
+    }
 
   public void testBuzzwords() throws Exception {
     NutchDocument document = new NutchDocument();

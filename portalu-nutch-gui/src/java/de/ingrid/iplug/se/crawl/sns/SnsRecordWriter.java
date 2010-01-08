@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Properties;
 import java.util.Set;
 
@@ -28,7 +29,7 @@ public class SnsRecordWriter implements RecordWriter<Text, CompressedSnsData> {
   // private MapFile.Writer _writer;
   private SequenceFile.Writer _writer;
 
-  private SNSIndexingInterface _snsInterface;
+  private final SNSIndexingInterface _snsInterface;
 
   private long _time;
 
@@ -45,6 +46,8 @@ public class SnsRecordWriter implements RecordWriter<Text, CompressedSnsData> {
   private int _maxTopicIds;
 
   private int _maxCommunityCodes;
+
+  private int _maxLocationCodes;
 
   private int _maxT0s;
 
@@ -67,6 +70,7 @@ public class SnsRecordWriter implements RecordWriter<Text, CompressedSnsData> {
     _maxBuzzwords = Integer.parseInt((String) properties.get("maxBuzzwords"));
     _maxTopicIds = Integer.parseInt((String) properties.get("maxTopicIds"));
     _maxCommunityCodes = Integer.parseInt((String) properties.get("maxCommunityCodes"));
+    _maxLocationCodes = Integer.parseInt((String) properties.get("maxLocationCodes"));
     _maxT0s = Integer.parseInt((String) properties.get("maxT0s"));
     _maxT1T2s = Integer.parseInt((String) properties.get("maxT1T2s"));
 
@@ -90,6 +94,7 @@ public class SnsRecordWriter implements RecordWriter<Text, CompressedSnsData> {
       addBuzzwords(snsData);
       addCoordinates(snsData);
       addDate(snsData);
+      addLocations(snsData);
 
       _time = _time + (System.currentTimeMillis() - currentTimeMillis);
       _counter++;
@@ -110,6 +115,8 @@ public class SnsRecordWriter implements RecordWriter<Text, CompressedSnsData> {
       return;
     }
     int wordLength = 10;
+    // Call getBuzzwords() first, to get results when calling methods results from
+    // getReferencesToTime() and getReferencesToSpace() later.
     String[] buzzwords = _snsInterface.getBuzzwords(text.length() > (_maxAnalyzing * wordLength) ? text.substring(0,
         _maxAnalyzing * wordLength) : text, _maxAnalyzing, false, null);
     Set<Text> set = new HashSet<Text>();
@@ -167,6 +174,21 @@ public class SnsRecordWriter implements RecordWriter<Text, CompressedSnsData> {
       data.setY1(new Text(DoublePadding.padding(y1)));
       data.setY2(new Text(DoublePadding.padding(y2)));
     }
+  }
+
+  private void addLocations(CompressedSnsData snsData) {
+      // just copy up to _maxLocationCodes locations from SNSIndexingInterface
+      // into the snsData
+      Set<String> locations = _snsInterface.getLocations();
+      Set<Text> locationsAsText = new LinkedHashSet<Text>();
+
+      for (String location : locations) {
+          locationsAsText.add(new Text(location));
+          if (locationsAsText.size() >= _maxLocationCodes) {
+              break;
+          }
+      }
+      snsData.setLocations(locationsAsText);
   }
 
   /**

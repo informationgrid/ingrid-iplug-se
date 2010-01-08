@@ -57,6 +57,11 @@ public class IPlugSNSPlugin extends Plugin {
   /**
    * 
    */
+  public static final String LOCATION = "location";
+
+  /**
+   * 
+   */
   public static final String COMMUNITY_CODE = "communitycode";
 
   /**

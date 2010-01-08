@@ -41,6 +41,8 @@ public class SnsIndexingFilter implements IndexingFilter {
 
   private String fArea;
 
+  private String fLocation;
+
   private String fX1;
 
   private String fY1;
@@ -118,11 +120,17 @@ public class SnsIndexingFilter implements IndexingFilter {
       document.add(fArea, topicId.toString());
     }
 
-    // Community-Codes
+    // Community-Codes (will be stored in areaid-Fields!)
     Set<Text> comunityCodeList = snsData.getCommunityCodes();
     for (Iterator<Text> iterator = comunityCodeList.iterator(); iterator.hasNext();) {
       Text communityCode = iterator.next();
       document.add(fArea, communityCode.toString());
+    }
+
+    // Location
+    Set<Text> locations = snsData.getLocations();
+    for (Text location : locations) {
+      document.add(fLocation, location.toString());
     }
 
     // x1, x2, x3, x4
@@ -176,6 +184,7 @@ public class SnsIndexingFilter implements IndexingFilter {
     this.fT1 = properties.getProperty(IPlugSNSPlugin.T1);
     this.fT2 = properties.getProperty(IPlugSNSPlugin.T2);
     this.fArea = properties.getProperty(IPlugSNSPlugin.AREA);
+    this.fLocation = properties.getProperty(IPlugSNSPlugin.LOCATION);
     this.fIndexOn = "true".equals(System.getProperty("index.sns")) ? true : false;
     if (!this.fIndexOn) {
       this.fIndexOn = this.fConfiguration.getBoolean("index.sns", false);
@@ -195,6 +204,9 @@ public class SnsIndexingFilter implements IndexingFilter {
 
     // area is stored, indexed and tokenized
     LuceneWriter.addFieldOptions(fArea, LuceneWriter.STORE.YES, LuceneWriter.INDEX.TOKENIZED, conf);
+
+    // location is stored, indexed and tokenized
+    LuceneWriter.addFieldOptions(fLocation, LuceneWriter.STORE.YES, LuceneWriter.INDEX.TOKENIZED, conf);
 
     // x1, x2, y1, y2 is stored, indexed and un-tokenized
     LuceneWriter.addFieldOptions(fX1, LuceneWriter.STORE.YES, LuceneWriter.INDEX.UNTOKENIZED, conf);

@@ -27,8 +27,8 @@ public class SnsAnalyzer {
     FileSystem fileSystem = FileSystem.get(jobConf);
     InputFormat<Text, CompressedSnsData> inputFormat = new SnsInputFormat();
     OutputFormat<Text, CompressedSnsData> outputFormat = new SnsOutputFormat();
-    _recordWriter = outputFormat.getRecordWriter(fileSystem, jobConf, "part-00000", null);
     _recordReader = inputFormat.getRecordReader(null, jobConf, null);
+    _recordWriter = outputFormat.getRecordWriter(fileSystem, jobConf, "part-00000", null);
 
     Runnable runnable = new Runnable() {
       public void run() {
