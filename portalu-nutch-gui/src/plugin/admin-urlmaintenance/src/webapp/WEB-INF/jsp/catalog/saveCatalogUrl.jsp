@@ -101,7 +101,7 @@
 												<c:if test="${md.metadataKey == 'topics'}">
 													<c:set var="i" value="${i+1}" />
 													<c:if test="${i > 0}">, </c:if>
-													${md.metadataValue}
+													<fmt:message key="${md.metadataKey}.${md.metadataValue}" />
 												</c:if>
 											</c:forEach>&nbsp;
 						                </td>
@@ -111,7 +111,7 @@
 												<c:if test="${md.metadataKey == 'funct_category'}">
 													<c:set var="i" value="${i+1}" />
 													<c:if test="${i > 0}">, </c:if>
-													${md.metadataValue}
+													<fmt:message key="${md.metadataKey}.${md.metadataValue}" />
 												</c:if>
 											</c:forEach>&nbsp;
 						                </td>
@@ -121,7 +121,7 @@
 												<c:if test="${md.metadataKey == 'service' || md.metadataKey == 'measure'}">
 													<c:set var="i" value="${i+1}" />
 													<c:if test="${i > 0}">, </c:if>
-													${md.metadataValue}
+													<fmt:message key="${md.metadataKey}.${md.metadataValue}" />
 												</c:if>
 											</c:forEach>&nbsp;
 						                </td>

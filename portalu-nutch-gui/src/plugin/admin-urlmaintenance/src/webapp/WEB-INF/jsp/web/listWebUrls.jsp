@@ -94,7 +94,7 @@
 							<c:forEach items="${metadatas}" var="metadata">
 								<c:if test="${metadata.metadataKey == 'datatype'}">
 								<input type="checkbox" id="${metadata.metadataKey}_${metadata.metadataValue}" name="${metadata.metadataKey}" value="${metadata.metadataValue}"
-								<c:if test="${fn:contains(selectedFilter, metadata.metadataValue)}"> checked="checked"</c:if>> ${metadata.metadataValue}&nbsp;&nbsp;
+								<c:if test="${fn:contains(selectedFilter, metadata.metadataValue)}"> checked="checked"</c:if> /> <fmt:message key="${metadata.metadataKey}.${metadata.metadataValue}" />&nbsp;&nbsp;
 								<script>
 									function fnCallback(e) { document.getElementById('filter').submit() }
 									YAHOO.util.Event.addListener("${metadata.metadataKey}_${metadata.metadataValue}", "click", fnCallback);
@@ -111,7 +111,7 @@
 							<c:forEach items="${metadatas}" var="metadata">
 								<c:if test="${metadata.metadataKey == 'lang'}">
 								<input type="checkbox" id="${metadata.metadataKey}_${metadata.metadataValue}" name="${metadata.metadataKey}" value="${metadata.metadataValue}"
-								<c:if test="${fn:contains(selectedFilter, metadata.metadataValue)}"> checked="checked"</c:if>> ${metadata.metadataValue}&nbsp;&nbsp;
+								<c:if test="${fn:contains(selectedFilter, metadata.metadataValue)}"> checked="checked"</c:if> /> <fmt:message key="${metadata.metadataKey}.${metadata.metadataValue}" />&nbsp;&nbsp;
 								<script>
 									function fnCallback(e) { document.getElementById('filter').submit() }
 									YAHOO.util.Event.addListener("${metadata.metadataKey}_${metadata.metadataValue}", "click", fnCallback);
@@ -184,7 +184,7 @@
 						       			&nbsp;<c:if test="${fn:contains(limitUrl.metadatas,'www')}"><img src="<%=request.getContextPath()%>/theme/${theme}/gfx/ok.png"/></c:if>&nbsp;
 						       		</td>
 						       		<td>
-						       			<c:forEach items="${limitUrl.metadatas}" var="meta"><c:if test="${meta.metadataKey == 'lang'}">${meta.metadataValue}</c:if></c:forEach>&nbsp;
+						       			<c:forEach items="${limitUrl.metadatas}" var="meta"><c:if test="${meta.metadataKey == 'lang'}"><fmt:message key="${meta.metadataKey}.${meta.metadataValue}" /></c:if></c:forEach>&nbsp;
 						       		</td>
 						       		<td>&nbsp;${limitUrl.statusAsText}</td>
 						       		<td>&nbsp;</td>

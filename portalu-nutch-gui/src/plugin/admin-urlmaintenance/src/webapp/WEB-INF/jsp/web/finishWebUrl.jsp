@@ -97,7 +97,7 @@
 						                <td><font style="color:green">${limitUrl.url}</font></td>
 						                <td>
 						                	<c:forEach var="meta" items="${limitUrl.metadatas}">
-						                		${meta.metadataKey}:${meta.metadataValue}<br/>
+						                		<fmt:message key="${meta.metadataKey}.${meta.metadataValue}" /><br/>
 						                	</c:forEach>
 						                </td>
 						            </tr>

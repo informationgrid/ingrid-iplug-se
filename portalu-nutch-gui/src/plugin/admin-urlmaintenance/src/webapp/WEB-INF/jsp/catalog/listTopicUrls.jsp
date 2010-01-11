@@ -100,7 +100,7 @@
                             <c:forEach items="${metadatas}" var="metadata">
                                 <c:if test="${metadata.metadataKey == 'lang'}">
                                 <input type="checkbox" id="${metadata.metadataKey}_${metadata.metadataValue}" name="${metadata.metadataKey}" value="${metadata.metadataValue}"
-                                <c:if test="${fn:contains(selectedFilter, metadata.metadataValue)}"> checked="checked"</c:if>> ${metadata.metadataValue}&nbsp;&nbsp;
+                                <c:if test="${fn:contains(selectedFilter, metadata.metadataValue)}"> checked="checked"</c:if> /> <fmt:message key="${metadata.metadataKey}.${metadata.metadataValue}" />&nbsp;&nbsp;
                                 <script>
                                     function fnCallback(e) { document.getElementById('filter').submit() }
                                     YAHOO.util.Event.addListener("${metadata.metadataKey}_${metadata.metadataValue}", "click", fnCallback);
@@ -145,7 +145,7 @@
 											<c:if test="${md.metadataKey == 'topics'}">
 												<c:set var="i" value="${i+1}" />
 												<c:if test="${i > 0}">, </c:if>
-												${md.metadataValue}
+												<fmt:message key="${md.metadataKey}.${md.metadataValue}" />
 											</c:if>
 										</c:forEach>
 									</td>
@@ -155,14 +155,14 @@
 											<c:if test="${md.metadataKey == 'funct_category'}">
 												<c:set var="i" value="${i+1}" />
 												<c:if test="${i > 0}">, </c:if>
-												${md.metadataValue}
+												<fmt:message key="${md.metadataKey}.${md.metadataValue}" />
 											</c:if>
 										</c:forEach>
 									</td>
 									<td>
                                         <c:forEach var="md" items="${url.metadatas}">
                                             <c:if test="${md.metadataKey == 'lang'}">
-                                                ${md.metadataValue}
+                                                <fmt:message key="${md.metadataKey}.${md.metadataValue}" />
                                             </c:if>
                                         </c:forEach>
                                     </td>

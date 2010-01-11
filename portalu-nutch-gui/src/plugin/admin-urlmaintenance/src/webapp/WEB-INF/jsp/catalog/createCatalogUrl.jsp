@@ -86,7 +86,7 @@
 								<row>
 							        <label>Typ:</label>
 							        <field>
-							         	${type}
+							         	<fmt:message key="datatype.${type}" />
 							        </field>
 							        <desc></desc>
 							    </row>
@@ -105,7 +105,7 @@
                                      <field>
                                         <select name="metadatas" >
                                              <c:forEach var="lang" items="${langs}">
-                                                 <option value="${lang.id}">${lang.metadataValue}</option>
+                                                 <option value="${lang.id}"><fmt:message key="${lang.metadataKey}.${lang.metadataValue}" /></option>
                                              </c:forEach>
                                          </select>
                                      </field>
@@ -119,7 +119,7 @@
 							        	<c:forEach items="${metadatas}" var="metadata">
 							        		<c:if test="${metadata.key == 'topics'}">
 							        			<c:forEach var="topic" items="${metadata.value}">
-							        				<input type="checkbox" name="metadatas" value="${topic.id}" <c:if test="${fn:contains(catalogUrlCommand.metadatas , topic.metadataValue)}">checked="ckecked"</c:if>/> ${topic.metadataValue} <br/>
+							        				<input type="checkbox" name="metadatas" value="${topic.id}" <c:if test="${fn:contains(catalogUrlCommand.metadatas , topic.metadataValue)}">checked="ckecked"</c:if>/> <fmt:message key="${topic.metadataKey}.${topic.metadataValue}" /> <br/>
 							        			</c:forEach>
 							        		</c:if>
 							        	</c:forEach>
@@ -135,7 +135,7 @@
 							        	<c:forEach items="${metadatas}" var="metadata">
 							        		<c:if test="${metadata.key == 'funct_category'}">
 							        			<c:forEach var="functCat" items="${metadata.value}">
-							        				<input type="checkbox" name="metadatas" value="${functCat.id}" <c:if test="${fn:contains(catalogUrlCommand.metadatas , functCat.metadataValue)}">checked="ckecked"</c:if>/> ${functCat.metadataValue} <br/>
+							        				<input type="checkbox" name="metadatas" value="${functCat.id}" <c:if test="${fn:contains(catalogUrlCommand.metadatas , functCat.metadataValue)}">checked="ckecked"</c:if>/> <fmt:message key="${functCat.metadataKey}.${functCat.metadataValue}" /> <br/>
 							        			</c:forEach>
 							        		</c:if>
 							        	</c:forEach>
@@ -151,7 +151,7 @@
 							        	<c:forEach items="${metadatas}" var="metadata">
 							        		<c:if test="${metadata.key == 'rubric'}">
 							        			<c:forEach var="rubric" items="${metadata.value}">
-							        				<input type="checkbox" name="metadatas" value="${rubric.id}" <c:if test="${fn:contains(catalogUrlCommand.metadatas , rubric.metadataValue)}">checked="ckecked"</c:if>/> ${rubric.metadataValue} <br/>
+							        				<input type="checkbox" name="metadatas" value="${rubric.id}" <c:if test="${fn:contains(catalogUrlCommand.metadatas , rubric.metadataValue)}">checked="ckecked"</c:if>/> <fmt:message key="${rubric.metadataKey}.${rubric.metadataValue}" /> <br/>
 							        			</c:forEach>
 							        		</c:if>
 							        	</c:forEach>

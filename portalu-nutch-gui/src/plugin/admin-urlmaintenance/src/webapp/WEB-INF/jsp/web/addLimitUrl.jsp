@@ -75,7 +75,7 @@
 								<form:form action="removeLimitUrl.html" method="post" modelAttribute="startUrlCommand">
 									${startUrlCommand.limitUrlCommands[limitUrlCounter].url}
 									(<c:forEach var="metadata" items="${startUrlCommand.limitUrlCommands[limitUrlCounter].metadatas}">
-										${metadata.metadataKey}:${metadata.metadataValue }
+										<fmt:message key="${metadata.metadataKey}.${metadata.metadataValue}" />
 									</c:forEach>)
 									<input type="hidden" name="index" value="${limitUrlCounter}" />
 									<input type="image" src="<%=request.getContextPath()%>/theme/${theme}/gfx/delete.png" align="absmiddle" title="Löschen"/>
@@ -107,7 +107,7 @@
 									        <field>
 									           <select name="limitUrlCommands[${limitUrlCounter}].metadatas" >
 													<c:forEach var="lang" items="${langs}">
-														<option value="${lang.id}">${lang.metadataValue }</option>
+														<option value="${lang.id}"><fmt:message key="${lang.metadataKey}.${lang.metadataValue}" /></option>
 													</c:forEach>
 												</select>
 									        </field>
@@ -118,7 +118,7 @@
 									        <label>Typ:</label>
 									        <field>
 									            <c:forEach var="type" items="${datatypes}">
-									            	<input type="checkbox" name="limitUrlCommands[${limitUrlCounter}].metadatas" value="${type.id}" /> ${type.metadataValue }<br/>
+									            	<input type="checkbox" name="limitUrlCommands[${limitUrlCounter}].metadatas" value="${type.id}" /><fmt:message key="${type.metadataKey}.${type.metadataValue}" /><br/>
 									            </c:forEach>
 									        </field>
 									        <desc></desc>

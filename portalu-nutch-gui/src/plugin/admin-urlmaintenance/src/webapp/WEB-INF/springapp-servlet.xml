@@ -17,9 +17,9 @@
     
     <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource"> 
 		<property name="basenames"> 
-			<list> 
-				<value>messages</value> 
+			<list>
 				<value>portal-u/i18n/urlmaintenance_messages</value>
+				<value>portal-u/i18n/metadatas_messages</value>
 			</list> 
 		</property> 
 	</bean>
