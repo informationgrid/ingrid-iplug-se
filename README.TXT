@@ -19,22 +19,18 @@ Run/Debug searcher:
 a) in eclipse:
  Main class: de.ingrid.iplug.PlugServer
  Params:     --plugdescription portalu-search/conf/plugdescription-search.xml --descriptor portalu-search/conf/communication-search.xml
- VM-Params: 
+ VM-Params:  -Dlog4j.rootLogger=INFO,DRFA,stdout
  
 b) run ./start-indexer.sh 
 
 TODO rwe:
 ---------
-* Installation des Searchers erstellen und ggf. Konfigurationstool anpassen, sofern Max das nicht komplett macht (Max hat was vorbereitet: admin-searcher.sh-Skript)
 * persistence.xml muss noch in der Installation berücksichtigt werden!
-* Versionsnummer zum Iplug-SE hinzufügen (neue Maven-Konfiguration im Projekt dazu anpassen) 
+* Versionsnummer zum Iplug-SE hinzufügen (Manifest-Datei) 
 * Management der Segmente, siehe Mail 'Management der Segmente' vom 04.01. und 05.01. von Max und Joachim (?)
 * Report über Status der gefetchten URLs. (Hier muss ich noch mit Martin/Joachim klären, ob auch Mailversand notwendig ist und ob Status in DB gespeichert werden soll)
-* Bug: Mängelliste aus altem iPlug-SE prüfen, ob Fehler in neuer Version gelöst wurden (siehe Dokument 'nutch-dev-kommentare..' in http://88.198.11.89/jira/browse/INGRID-1777)
-* Bug: Sprache kann bei Katalog-Urls nicht mehr eingestellt werden, siehe http://88.198.11.89/jira/browse/INGRID-1793
-* Erweiterung: Neues Indexfeld 'Location' über SNS-Service, siehe http://88.198.11.89/jira/browse/INGRID21-56
 * optionale Libs zum Parse von PDF hinzufügen/Testen, hier Marko fragen, ob notwendig (?)
-* SNSQuery überarbeiten; die JUnit Tests laufen nicht alle (?)
+* Verzeichnis core/ sollte gelöscht werden, Marko fragen, warum dies überhaupt existiert
 
 
 Deployment:
