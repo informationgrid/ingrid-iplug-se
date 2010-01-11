@@ -17,16 +17,19 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.ExcludeUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.StartUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IExcludeUrlDao;
+import de.ingrid.iplug.se.urlmaintenance.validation.WebUrlCommandValidator;
 
 @Controller
 @SessionAttributes(value = { "partnerProviderCommand", "startUrlCommand" })
 public class AddExcludeUrlController extends NavigationSelector {
 
   private final IExcludeUrlDao _excludeUrlDao;
+  private final WebUrlCommandValidator _validator;
 
   @Autowired
-  public AddExcludeUrlController(IExcludeUrlDao excludeUrlDao) {
+  public AddExcludeUrlController(IExcludeUrlDao excludeUrlDao, final WebUrlCommandValidator validator) {
     _excludeUrlDao = excludeUrlDao;
+    _validator = validator;
   }
 
   @RequestMapping(value = "/web/addExcludeUrl.html", method = RequestMethod.GET)
@@ -39,25 +42,13 @@ public class AddExcludeUrlController extends NavigationSelector {
     // add new command to fill out
     ExcludeUrlCommand excludeUrlCommand = new ExcludeUrlCommand(_excludeUrlDao);
     excludeUrlCommand.setProvider(startUrlCommand.getProvider());
-
-    validateUrl(startUrlCommand, errors, excludeUrlCommand);
-
-    if (errors.hasErrors()) {
-      return "web/addExcludeUrl";
-    } else {
-      startUrlCommand.addExcludeUrlCommand(excludeUrlCommand);
+    
+    if (_validator.validateExcludeUrl(errors).hasErrors()) {
+        return "web/addExcludeUrl";
     }
+    
+    startUrlCommand.addExcludeUrlCommand(excludeUrlCommand);
     return "redirect:/web/addExcludeUrl.html";
-  }
-
-  private void validateUrl(StartUrlCommand startUrlCommand, Errors errors, ExcludeUrlCommand excludeUrlCommand) {
-    try {
-      // verify the url as it will be done in BasicURLNormalizer
-      new URL(startUrlCommand.getExcludeUrlCommands().get(startUrlCommand.getExcludeUrlCommands().size() - 1).getUrl());
-    } catch (MalformedURLException e) {
-      errors.rejectValue("excludeUrlCommands[" + (startUrlCommand.getExcludeUrlCommands().size() - 1) + "].url",
-          "invalid.url", new String[] { e.getMessage() }, e.getMessage());
-    }
   }
 
   @RequestMapping(value = "/web/removeExcludeUrl.html", method = RequestMethod.POST)

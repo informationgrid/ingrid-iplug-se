@@ -110,7 +110,6 @@
 														<option value="${lang.id}">${lang.metadataValue }</option>
 													</c:forEach>
 												</select>
-									            <div class="error"><form:errors path="limitUrlCommands[${limitUrlCounter}].metadatas" /></div>
 									        </field>
 									        <desc></desc>
 									    </row>
@@ -121,11 +120,14 @@
 									            <c:forEach var="type" items="${datatypes}">
 									            	<input type="checkbox" name="limitUrlCommands[${limitUrlCounter}].metadatas" value="${type.id}" /> ${type.metadataValue }<br/>
 									            </c:forEach>
-									            
-									            <div class="error"><form:errors path="limitUrlCommands[${limitUrlCounter}].metadatas" /></div>
 									        </field>
 									        <desc></desc>
 									    </row>
+									    
+									    <row>
+		                                    <form:errors path="limitUrlCommands[${limitUrlCounter}].provider" cssClass="error" element="div"/>
+		                                    <form:errors path="limitUrlCommands[${limitUrlCounter}].metadatas" cssClass="error" element="div"/>
+		                                </row>
 									    
 									    <row>
 									        <label>&nbsp;</label>

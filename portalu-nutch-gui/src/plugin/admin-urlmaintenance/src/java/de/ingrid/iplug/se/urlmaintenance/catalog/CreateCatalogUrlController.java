@@ -8,6 +8,7 @@ import org.apache.nutch.admin.NavigationSelector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -22,6 +23,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ICatalogUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IMetadataDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.CatalogUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
+import de.ingrid.iplug.se.urlmaintenance.validation.CatalogUrlCommandValidator;
 
 @Controller
 @SessionAttributes(value = { "partnerProviderCommand", "catalogUrlCommand" })
@@ -30,18 +32,22 @@ public class CreateCatalogUrlController extends NavigationSelector {
   private final ICatalogUrlDao _catalogUrlDao;
   private final IMetadataDao _metadataDao;
 
+    private final CatalogUrlCommandValidator _validator;
+
   @Autowired
-  public CreateCatalogUrlController(ICatalogUrlDao catalogUrlDao,
-      IMetadataDao metadataDao) {
+  public CreateCatalogUrlController(final ICatalogUrlDao catalogUrlDao,
+ final IMetadataDao metadataDao,
+            final CatalogUrlCommandValidator validator) {
     _catalogUrlDao = catalogUrlDao;
     _metadataDao = metadataDao;
+        _validator = validator;
   }
 
   @InitBinder
-  public void initBinder(WebDataBinder binder) {
+  public void initBinder(final WebDataBinder binder) {
     binder.registerCustomEditor(Metadata.class, new EntityEditor(_metadataDao));
   }
-  
+
   @ModelAttribute("langs")
   public List<Metadata> injectLang() {
     return _metadataDao.getByKey("lang");
@@ -49,8 +55,8 @@ public class CreateCatalogUrlController extends NavigationSelector {
 
   @ModelAttribute("metadatas")
   public Map<String, List<Metadata>> injectMetadatas(
-      @RequestParam(value = "type", required = true) String type) {
-    Map<String, List<Metadata>> metadatas = new HashMap<String, List<Metadata>>();
+      @RequestParam(value = "type", required = true) final String type) {
+    final Map<String, List<Metadata>> metadatas = new HashMap<String, List<Metadata>>();
     if (type.equals("topics")) {
       // push all topics into view
       metadatas.put("topics", _metadataDao.getByKey("topics"));
@@ -68,14 +74,14 @@ public class CreateCatalogUrlController extends NavigationSelector {
 
   @RequestMapping(value = { "/catalog/createCatalogUrl.html",
       "/catalog/editCatalogUrl.html" }, method = RequestMethod.GET)
-  public String editCatalogUrl(Model model,
-      @ModelAttribute("catalogUrlCommand") CatalogUrlCommand catalogUrlCommand,
-      @RequestParam(value = "id", required = false) Long id,
-      @RequestParam(value = "type", required = true) String type) {
+  public String editCatalogUrl(final Model model,
+      @ModelAttribute("catalogUrlCommand") final CatalogUrlCommand catalogUrlCommand,
+      @RequestParam(value = "id", required = false) final Long id,
+      @RequestParam(value = "type", required = true) final String type) {
 
     if (id != null) {
       // load url and fill out command
-      CatalogUrl byId = _catalogUrlDao.getById(id);
+      final CatalogUrl byId = _catalogUrlDao.getById(id);
       catalogUrlCommand.setId(byId.getId());
       catalogUrlCommand.setUrl(byId.getUrl());
       catalogUrlCommand.setMetadatas(byId.getMetadatas());
@@ -88,12 +94,10 @@ public class CreateCatalogUrlController extends NavigationSelector {
   }
 
   @RequestMapping(value = "/catalog/createCatalogUrl.html", method = RequestMethod.POST)
-  public String anotherPostEditCatalogUrl(
-      @ModelAttribute("catalogUrlCommand") CatalogUrlCommand catalogUrlCommand,
-      @RequestParam(value = "type", required = true) String type) {
-
-    Metadata defaultMetadata = _metadataDao.getByKeyAndValue("datatype",
-        "default");
+  public String anotherPostEditCatalogUrl(final Model model,
+      @ModelAttribute("catalogUrlCommand") final CatalogUrlCommand catalogUrlCommand, final Errors errors,
+      @RequestParam(value = "type", required = true) final String type) {
+    final Metadata defaultMetadata = _metadataDao.getByKeyAndValue("datatype", "default");
     catalogUrlCommand.addMetadata(defaultMetadata);
     Metadata datatypeMetadata = null;
     if (type.equals("topics")) {
@@ -104,6 +108,10 @@ public class CreateCatalogUrlController extends NavigationSelector {
       datatypeMetadata = _metadataDao.getByKeyAndValue("datatype", "measure");
     }
     catalogUrlCommand.addMetadata(datatypeMetadata);
+
+    if (_validator.validate(errors).hasErrors()) {
+        return editCatalogUrl(model, catalogUrlCommand, null, type);
+    }
     return "redirect:/catalog/saveCatalogUrl.html";
   }
 }

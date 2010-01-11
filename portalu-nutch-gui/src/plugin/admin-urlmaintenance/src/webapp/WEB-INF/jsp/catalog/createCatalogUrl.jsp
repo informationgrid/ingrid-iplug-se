@@ -95,11 +95,11 @@
 							        <label>URL:</label>
 							        <field>
 							          <form:input path="url"/>
-							            <div class="error"><form:errors path="url" /></div>
+							          <form:errors path="url" cssClass="error" element="div"/>
 							        </field>
 							        <desc></desc>
 							    </row>
-							
+
 							    <row>
                                      <label>Sprache:</label>
                                      <field>
@@ -108,7 +108,6 @@
                                                  <option value="${lang.id}">${lang.metadataValue}</option>
                                              </c:forEach>
                                          </select>
-                                         <div class="error"><form:errors path="metadatas" /></div>
                                      </field>
                                      <desc></desc>
                                  </row>
@@ -157,9 +156,13 @@
 							        		</c:if>
 							        	</c:forEach>
 							        </field>
-							        <desc></desc>
 								</row>
 								</c:if>
+								
+								<row>
+	                                <form:errors path="provider" cssClass="error" element="div"/>
+	                                <form:errors path="metadatas" cssClass="error" element="div"/>
+                                </row>
 								
 								<row>
 							        <label>&nbsp;</label>

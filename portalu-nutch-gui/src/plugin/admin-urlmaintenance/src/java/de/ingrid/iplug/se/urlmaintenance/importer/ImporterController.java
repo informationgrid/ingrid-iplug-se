@@ -10,6 +10,7 @@ import org.apache.nutch.admin.NavigationSelector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,6 +23,7 @@ import de.ingrid.iplug.se.urlmaintenance.parse.UrlContainer;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ICatalogUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IProviderDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao;
+import de.ingrid.iplug.se.urlmaintenance.validation.UploadCommandValidator;
 
 @Controller
 @SessionAttributes(value = { "partnerProviderCommand", "containerCommand" })
@@ -31,11 +33,15 @@ public class ImporterController extends NavigationSelector {
   private final IStartUrlDao _startUrlDao;
   private final ICatalogUrlDao _catalogUrlDao;
 
+    private final UploadCommandValidator _validator;
+
   @Autowired
-  public ImporterController(final IProviderDao providerDao, final IStartUrlDao urlDao, final ICatalogUrlDao catalogUrlDao) {
+    public ImporterController(final IProviderDao providerDao, final IStartUrlDao urlDao,
+            final ICatalogUrlDao catalogUrlDao, final UploadCommandValidator validator) {
     _providerDao = providerDao;
     _startUrlDao = urlDao;
     _catalogUrlDao = catalogUrlDao;
+    _validator = validator;
   }
 
   @ModelAttribute("containerCommand")
@@ -67,19 +73,11 @@ public class ImporterController extends NavigationSelector {
   }
 
   @RequestMapping(value = "/import/importer.html", method = RequestMethod.POST)
-  public String post(@ModelAttribute("errors") final Map<String, String> errors,
-      @ModelAttribute("uploadCommand") final UploadCommand uploadCommand,
+  public String post(@ModelAttribute("uploadCommand") final UploadCommand uploadCommand, final Errors errors,
       @ModelAttribute("containerCommand") final ContainerCommand containerCommand, final HttpSession session)
       throws Exception {
-    errors.clear();
-    final UploadValidator validator = new UploadValidator();
-    boolean valid = validator.validate(uploadCommand.getFile(), errors);
-    if (uploadCommand.getType() == null) {
-      errors.put("type.empty", "urltype");
-      valid = false;
-    }
-    if (!valid) {
-      return "import/importer";
+    if(_validator.validate(errors).hasErrors()) {
+        return "import/importer";
     }
 
     final ImportFactory factory = new ImportFactory(uploadCommand, _providerDao, _startUrlDao, _catalogUrlDao);

@@ -90,13 +90,7 @@
 	                            <label>Datei:</label>
 	                            <field>
 		                            <input name="file" type="file" value="" /><br />
-				                    <c:if test="${!empty errors}">
-				                        <div class="error">
-				                            <c:if test="${!empty errors['suffix.invalid']}">Die Datei muss entweder auf .csv oder .xml enden.<br /></c:if>
-				                            <c:if test="${!empty errors['contentType.invalid']}">Die Datei hat ungültigen Inhalt.<br /></c:if>
-				                            <c:if test="${!empty errors['size.invalid']}">Die Datei ist zu groß. (max. 3 MB)<br /></c:if>
-				                        </div>
-				                    </c:if>
+				                    <form:errors path="file" cssClass="error" element="div"/>
 	                            </field>
                             </row>
                             <row>
@@ -104,9 +98,7 @@
 	                            <field>
                                     <form:radiobutton path="type" value="CATALOG"/> Katalog URLs<br />
                                     <form:radiobutton path="type" value="WEB"/> Web URLs
-                                    <c:if test="${!empty errors['type.empty']}">
-                                        <div class="error">Bitte wählen sie einen URL-Typ aus.</div>
-                                    </c:if>
+                                    <form:errors path="type" cssClass="error" element="div"/>
 	                            </field>
                             </row>
                             <row>

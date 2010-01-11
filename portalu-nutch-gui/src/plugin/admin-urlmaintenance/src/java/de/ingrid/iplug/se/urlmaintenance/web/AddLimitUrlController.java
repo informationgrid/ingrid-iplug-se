@@ -23,6 +23,7 @@ import de.ingrid.iplug.se.urlmaintenance.commandObjects.StartUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ILimitUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IMetadataDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
+import de.ingrid.iplug.se.urlmaintenance.validation.WebUrlCommandValidator;
 
 @Controller
 @SessionAttributes(value = { "partnerProviderCommand", "startUrlCommand" })
@@ -30,11 +31,13 @@ public class AddLimitUrlController extends NavigationSelector {
 
   private final IMetadataDao _metadataDao;
   private final ILimitUrlDao _limitUrlDao;
+  private final WebUrlCommandValidator _validator;
 
   @Autowired
-  public AddLimitUrlController(IMetadataDao metadataDao, ILimitUrlDao limitUrlDao) {
+  public AddLimitUrlController(IMetadataDao metadataDao, ILimitUrlDao limitUrlDao, final WebUrlCommandValidator validator) {
     _metadataDao = metadataDao;
     _limitUrlDao = limitUrlDao;
+    _validator = validator;
   }
 
   @InitBinder
@@ -64,25 +67,13 @@ public class AddLimitUrlController extends NavigationSelector {
     LimitUrlCommand limitUrlCommand = new LimitUrlCommand(_limitUrlDao);
     limitUrlCommand.setProvider(startUrlCommand.getProvider());
 
-    validateUrl(startUrlCommand, errors, limitUrlCommand);
-
-    if (errors.hasErrors()) {
+    if (_validator.validateLimitUrl(errors).hasErrors()) {
       return "web/addLimitUrl";
-    } else {
-      startUrlCommand.addLimitUrlCommand(limitUrlCommand);
     }
+    
+    startUrlCommand.addLimitUrlCommand(limitUrlCommand);
 
     return "redirect:/web/addLimitUrl.html";
-  }
-
-  private void validateUrl(StartUrlCommand startUrlCommand, Errors errors, LimitUrlCommand limitUrlCommand) {
-    try {
-      // verify the url as it will be done in BasicURLNormalizer
-      new URL(startUrlCommand.getLimitUrlCommands().get(startUrlCommand.getLimitUrlCommands().size() - 1).getUrl());
-    } catch (MalformedURLException e) {
-      errors.rejectValue("limitUrlCommands[" + (startUrlCommand.getLimitUrlCommands().size() - 1) + "].url",
-          "invalid.url", new String[] { e.getMessage() }, e.getMessage());
-    }
   }
 
   @RequestMapping(value = "/web/removeLimitUrl.html", method = RequestMethod.POST)
