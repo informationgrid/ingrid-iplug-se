@@ -60,6 +60,7 @@ public class CreateStartUrlController extends NavigationSelector {
       
     final LimitUrlCommand limitUrlCommand = new LimitUrlCommand(_limitUrlDao);
     limitUrlCommand.setProvider(startUrlCommand.getProvider());
+    limitUrlCommand.setUrl(startUrlCommand.getUrl());
     startUrlCommand.addLimitUrlCommand(limitUrlCommand);
 
     final ExcludeUrlCommand excludeUrlCommand = new ExcludeUrlCommand(_excludeUrlDao);

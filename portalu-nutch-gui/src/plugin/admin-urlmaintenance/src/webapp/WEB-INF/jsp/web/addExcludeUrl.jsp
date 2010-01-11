@@ -91,12 +91,14 @@
 											</c:otherwise>
 										</c:choose>
 										<row>
+										  <desc>Das Hinzufügen von Exclude URLs ist optional.</desc>
+										</row>
+										<row>
 									        <label>Exclude URL:</label>
 									        <field>
 									          <form:input path="excludeUrlCommands[${excludeUrlCounter}].url"/>
 									            <form:errors path="excludeUrlCommands[${excludeUrlCounter}].url" cssClass="error" element="div"/>
 									        </field>
-									        <desc></desc>
 									    </row>
 									    
 									    <row>

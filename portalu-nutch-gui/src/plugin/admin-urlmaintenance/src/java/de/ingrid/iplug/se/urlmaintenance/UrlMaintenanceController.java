@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import de.ingrid.iplug.se.security.PortaluPrincipal;
@@ -54,7 +55,7 @@ public class UrlMaintenanceController extends NavigationSelector {
   }
 
   @RequestMapping(method = RequestMethod.GET)
-  public String urlMaintenance(HttpServletRequest httpRequest, Model model) {
+  public String urlMaintenance(@RequestParam(value = "error", required = false) final String error, HttpServletRequest httpRequest, Model model) {
     Principal userPrincipal = httpRequest.getUserPrincipal();
     if (userPrincipal != null && userPrincipal instanceof PortaluPrincipal) {
       List<Map<String, Serializable>> allPartnerWithProvider = ((PortaluPrincipal) userPrincipal)
@@ -70,6 +71,7 @@ public class UrlMaintenanceController extends NavigationSelector {
     model.addAttribute("partnerProviderCommand", new PartnerProviderCommand());
     List<Partner> partners = _partnerDao.getAll();
     model.addAttribute("partners", partners);
+    model.addAttribute("error", error);
 
     model.addAttribute("jsonMap", createPartnerAndProviderJsonMap());
     return "urlmaintenance";
