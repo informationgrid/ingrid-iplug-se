@@ -15,7 +15,6 @@ import org.apache.nutch.util.NutchConfiguration;
 
 /**
  * @author mb
- * TODO rwe: fix test
  * 
  */
 public class SnsQueryGeoFilterTest extends TestCase {
@@ -24,12 +23,10 @@ public class SnsQueryGeoFilterTest extends TestCase {
 
   protected void setUp() throws Exception {
     this.fConfiguration = NutchConfiguration.create();
-    String userDir = System.getProperty("user.dir");
-    String pluginPath = new File(userDir, "src/plugin").getAbsolutePath();
-    this.fConfiguration.set("plugin.folders", pluginPath);
-    this.fConfiguration
-        .set(
-            "plugin.includes",
+    File pluginPath = new File("portalu-nutch-gui/src/plugin");
+    File pluginPathOS = new File("101tec-nutch-a9cddd9/src/plugin");
+    this.fConfiguration.setStrings("plugin.folders", pluginPath.getPath(), pluginPathOS.getPath());
+    this.fConfiguration.set("plugin.includes",
             "protocol-http|urlfilter-regex|parse-(text|html|js)|index-sns|query-(basic|site|url)");
   }
 
@@ -57,7 +54,7 @@ public class SnsQueryGeoFilterTest extends TestCase {
     BooleanQuery booleanQuery = queryFilters.filter(query);
     System.out.println("LuceneQuery :" + booleanQuery);
     assertEquals(
-        "+(url:foo^0.0 anchor:foo^0.0 content:foo title:foo^0.0 host:foo^0.0) +x1:[0000000007,01 TO 0000000008,01] +x2:[0000000007,01 TO 0000000008,01] +y1:[0000000050,21 TO 0000000052] +y2:[0000000050,21 TO 0000000052]",
+        "+(url:foo^4.0 anchor:foo^2.0 content:foo title:foo^1.5 host:foo^2.0) +x1:[0000000007,01 TO 0000000008,01] +x2:[0000000007,01 TO 0000000008,01] +y1:[0000000050,21 TO 0000000052] +y2:[0000000050,21 TO 0000000052]",
         booleanQuery.toString());
   }
 
@@ -77,7 +74,7 @@ public class SnsQueryGeoFilterTest extends TestCase {
     BooleanQuery booleanQuery = queryFilters.filter(query);
     System.out.println("LuceneQuery :" + booleanQuery);
     assertEquals(
-        "+(url:foo^0.0 anchor:foo^0.0 content:foo title:foo^0.0 host:foo^0.0) +x1:[0000000005,3 TO 0000000007,01] +x2:[0000000008,01 TO 0000000014,77] +y1:[0000000046,76 TO 0000000050,21] +y2:[0000000052 TO 0000000054,73]",
+        "+(url:foo^4.0 anchor:foo^2.0 content:foo title:foo^1.5 host:foo^2.0) +x1:[0000000005,3 TO 0000000007,01] +x2:[0000000008,01 TO 0000000014,77] +y1:[0000000046,76 TO 0000000050,21] +y2:[0000000052 TO 0000000054,73]",
         booleanQuery.toString());
   }
 

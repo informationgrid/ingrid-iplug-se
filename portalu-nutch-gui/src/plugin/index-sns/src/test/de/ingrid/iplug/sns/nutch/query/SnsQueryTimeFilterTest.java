@@ -17,7 +17,6 @@ import junit.framework.TestCase;
 
 /**
  * @author mb
- * TODO rwe: fix test
  */
 public class SnsQueryTimeFilterTest extends TestCase {
 
@@ -27,9 +26,9 @@ public class SnsQueryTimeFilterTest extends TestCase {
 
   protected void setUp() throws Exception {
     this.fConfiguration = NutchConfiguration.create();
-    String userDir = System.getProperty("user.dir");
-    String pluginPath = new File(userDir, "portalu-nutch-gui/src/plugin,101tec-nutch-a9cddd9/src/plugin").getAbsolutePath();
-    this.fConfiguration.set("plugin.folders", pluginPath);
+    File pluginPath = new File("portalu-nutch-gui/src/plugin");
+    File pluginPathOS = new File("101tec-nutch-a9cddd9/src/plugin");
+    this.fConfiguration.setStrings("plugin.folders", pluginPath.getPath(), pluginPathOS.getPath());
     this.fConfiguration
         .set(
             "plugin.includes",
@@ -61,7 +60,7 @@ public class SnsQueryTimeFilterTest extends TestCase {
     BooleanQuery booleanQuery = queryFilters.filter(query);
     System.out.println("LuceneQuery :" + booleanQuery);
     assertEquals(
-        "+(url:foo^0.0 anchor:foo^0.0 content:foo title:foo^0.0 host:foo^0.0) +((+t1:[20060101 TO 20060201] +t2:[20060101 TO 20060201]) t0:[20060101 TO 20060201])",
+        "+(url:foo^4.0 anchor:foo^2.0 content:foo title:foo^1.5 host:foo^2.0) +((+t1:[20060101 TO 20060201] +t2:[20060101 TO 20060201]) t0:[20060101 TO 20060201])",
         booleanQuery.toString());
   }
 
@@ -80,7 +79,7 @@ public class SnsQueryTimeFilterTest extends TestCase {
     System.out.println("LuceneQuery :" + booleanQuery);
 
     assertEquals(
-        "+(url:foo^0.0 anchor:foo^0.0 content:foo title:foo^0.0 host:foo^0.0) +((+((+t1:[20060101 TO 20060201] +t2:[20060101 TO 20060201]) t0:[20060101 TO 20060201])) (+t1:[00000000 TO 20060101] +t2:[20060201 TO "
+        "+(url:foo^4.0 anchor:foo^2.0 content:foo title:foo^1.5 host:foo^2.0) +((+((+t1:[20060101 TO 20060201] +t2:[20060101 TO 20060201]) t0:[20060101 TO 20060201])) (+t1:[00000000 TO 20060101] +t2:[20060201 TO "
             + this.fToday + "]))", booleanQuery.toString());
   }
 
@@ -97,7 +96,7 @@ public class SnsQueryTimeFilterTest extends TestCase {
     BooleanQuery booleanQuery = queryFilters.filter(query);
     System.out.println("LuceneQuery :" + booleanQuery);
     assertEquals(
-        "+(url:foo^0.0 anchor:foo^0.0 content:foo title:foo^0.0 host:foo^0.0) +((+t1:[20060101 TO 20060201] +t2:[20060101 TO 20060201]) t0:[20060101 TO 20060201])",
+        "+(url:foo^4.0 anchor:foo^2.0 content:foo title:foo^1.5 host:foo^2.0) +((+t1:[20060101 TO 20060201] +t2:[20060101 TO 20060201]) t0:[20060101 TO 20060201])",
         booleanQuery.toString());
   }
 
@@ -121,7 +120,7 @@ public class SnsQueryTimeFilterTest extends TestCase {
     BooleanQuery booleanQuery = queryFilters.filter(query);
     System.out.println("LuceneQuery :" + booleanQuery);
     assertEquals(
-        "+(url:foo^0.0 anchor:foo^0.0 content:foo title:foo^0.0 host:foo^0.0) +t0:20060101",
+        "+(url:foo^4.0 anchor:foo^2.0 content:foo title:foo^1.5 host:foo^2.0) +t0:20060101",
         booleanQuery.toString());
   }
 
@@ -139,7 +138,7 @@ public class SnsQueryTimeFilterTest extends TestCase {
     BooleanQuery booleanQuery = queryFilters.filter(query);
     System.out.println("LuceneQuery :" + booleanQuery);
     assertEquals(
-        "+(url:foo^0.0 anchor:foo^0.0 content:foo title:foo^0.0 host:foo^0.0) +((+((+t1:[20060101 TO 20060201] +t2:[20060101 TO 20060201]) t0:[20060101 TO 20060201])) (+((+t1:[00000000 TO 20060101] +t2:[20060101 TO 20060201]) (+t1:[20060101 TO 20060201] +t2:[20060201 TO "
+        "+(url:foo^4.0 anchor:foo^2.0 content:foo title:foo^1.5 host:foo^2.0) +((+((+t1:[20060101 TO 20060201] +t2:[20060101 TO 20060201]) t0:[20060101 TO 20060201])) (+((+t1:[00000000 TO 20060101] +t2:[20060101 TO 20060201]) (+t1:[20060101 TO 20060201] +t2:[20060201 TO "
             + this.fToday + "]))))", booleanQuery.toString());
   }
 
@@ -158,7 +157,7 @@ public class SnsQueryTimeFilterTest extends TestCase {
     BooleanQuery booleanQuery = queryFilters.filter(query);
     System.out.println("LuceneQuery :" + booleanQuery);
     assertEquals(
-        "+(url:foo^0.0 anchor:foo^0.0 content:foo title:foo^0.0 host:foo^0.0) +((+((+t1:[20060101 TO 20060201] +t2:[20060101 TO 20060201]) t0:[20060101 TO 20060201])) (+t1:[00000000 TO 20060101] +t2:[20060201 TO "
+        "+(url:foo^4.0 anchor:foo^2.0 content:foo title:foo^1.5 host:foo^2.0) +((+((+t1:[20060101 TO 20060201] +t2:[20060101 TO 20060201]) t0:[20060101 TO 20060201])) (+t1:[00000000 TO 20060101] +t2:[20060201 TO "
             + this.fToday
             + "]) (+((+t1:[00000000 TO 20060101] +t2:[20060101 TO 20060201]) (+t1:[20060101 TO 20060201] +t2:[20060201 TO "
             + this.fToday + "]))))", booleanQuery.toString());

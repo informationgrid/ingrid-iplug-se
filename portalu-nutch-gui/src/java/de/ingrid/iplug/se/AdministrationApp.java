@@ -34,6 +34,7 @@ import org.apache.nutch.admin.ConfigurationUtil;
 import org.apache.nutch.admin.GuiComponentDeployer;
 import org.apache.nutch.admin.HttpServer;
 
+import de.ingrid.iplug.se.crawl.sns.SnsRecordWriter;
 import de.ingrid.utils.PlugDescription;
 import de.ingrid.utils.xml.XMLSerializer;
 
@@ -48,7 +49,7 @@ public class AdministrationApp {
 
     private static final String PARAM_PLUGDESCRIPTION = "plugdescription";
 
-    private static final Log LOG = LogFactory.getLog(AdministrationApp.class.getName());
+    private static final Log LOG = LogFactory.getLog(AdministrationApp.class);
 
     private static final int DEFAULT_PORT = 50060;
 

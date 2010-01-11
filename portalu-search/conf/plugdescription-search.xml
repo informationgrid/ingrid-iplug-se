@@ -15,7 +15,7 @@
     <string>law</string>
   </list>
   <string>proxyServiceUrl</string>
-  <string>/torwald-group:rwehner-eclipse-iplug-se-search</string>
+  <string>/torwald-group:iplug-se-searcher-developer-rwe</string>
   <string>IPLUG_ADMIN_PASSWORD</string>
   <string>password</string>
   <string>connection</string>
@@ -27,7 +27,7 @@
   <string>personTitle</string>
   <string>Dr.</string>
   <string>workingDirectory</string>
-  <string>/tmp/nutchGui</string>
+  <string>/tmp/nutchGui_eclipse</string>
   <string>fields</string>
   <list>
     <string>datatype</string>
@@ -47,6 +47,7 @@
     <string>coord</string>
     <string>buzzword</string>
     <string>areaid</string>
+    <string>location</string>
     <string>site</string>
     <string>url</string>
     <string>incl_meta</string>
