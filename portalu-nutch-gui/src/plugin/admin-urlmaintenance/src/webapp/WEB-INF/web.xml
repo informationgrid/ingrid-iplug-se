@@ -96,15 +96,20 @@ http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 			<form-error-page>/auth/loginFailure.html</form-error-page>
 		</form-login-config>
 	</login-config>
+	
+	<welcome-file-list>
+		<welcome-file>/index.jsp</welcome-file>
+	</welcome-file-list>
 
 	<error-page>
 		<error-code>403</error-code>
 		<location>/auth/roleFailure.html</location>
 	</error-page>
 	
-	<welcome-file-list>
-		<welcome-file>/index.jsp</welcome-file>
-	</welcome-file-list>
+	<error-page>
+        <error-code>500</error-code>
+        <location>/index.html?error=lost</location>
+    </error-page>
 
     <error-page>
        <exception-type>org.springframework.web.HttpSessionRequiredException</exception-type>

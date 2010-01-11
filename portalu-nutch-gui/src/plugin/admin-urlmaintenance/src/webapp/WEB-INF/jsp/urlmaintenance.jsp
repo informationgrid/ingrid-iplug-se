@@ -71,18 +71,24 @@
 					<h3>URL Pflege</h3>
 					
 					<c:if test="${!empty error}">
-					   <c:choose>
-					       <c:when test="${error == 'session'}">
-					           <div class="error">
-	                               <b>Fehler:</b> Ihre Sitzung ist abgelaufen.<br />
+		                <div class="error">
+		                    <b>Fehler:</b>
+					        <c:choose>
+					            <c:when test="${error == 'session'}">
+	                               Ihre Sitzung ist abgelaufen.<br />
 	                               Hierdurch sind ungespeicherte Daten eventuell verloren gegangen.<br />
 	                               Bitte versuchen Sie es erneut.</p>
-	                           </div>
-					       </c:when>
-					   </c:choose>
+	                            </c:when>
+						        <c:when test="${error == 'lost'}">
+                                   Es fehlen notwendige Informationen.<br />
+                                   Hierdurch sind ungespeicherte Daten eventuell verloren gegangen.<br />
+                                   Bitte versuchen Sie es erneut.</p>
+                                </c:when>
+						    </c:choose>
+                        </div>
 					</c:if>
 					
-					<form:form action="index.html" commandName="partnerProviderCommand" method="post">
+					<form:form action="${contextPath}/index.html" commandName="partnerProviderCommand" method="post">
 						<fieldset>
 						    <legend>Partner und Provider auswählen</legend>
 						    

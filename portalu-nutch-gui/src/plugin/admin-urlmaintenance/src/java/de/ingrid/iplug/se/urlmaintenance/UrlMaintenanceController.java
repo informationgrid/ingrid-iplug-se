@@ -53,6 +53,11 @@ public class UrlMaintenanceController extends NavigationSelector {
     _providerDao = providerDao;
     _syncService = syncService;
   }
+  
+  @ModelAttribute("contextPath")
+  public String contextPath(final HttpServletRequest request) {
+      return request.getContextPath();
+  }
 
   @RequestMapping(method = RequestMethod.GET)
   public String urlMaintenance(@RequestParam(value = "error", required = false) final String error, HttpServletRequest httpRequest, Model model) {
