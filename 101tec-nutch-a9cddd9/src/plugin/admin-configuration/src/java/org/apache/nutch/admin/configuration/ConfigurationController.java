@@ -122,7 +122,12 @@ public class ConfigurationController extends NavigationSelector {
         update = true;
         NodeList valueList = documentElement.getElementsByTagName("value");
         Node valueNode = valueList.item(i);
-        valueNode.getFirstChild().setTextContent(value);
+        Node valueText = valueNode.getFirstChild();
+        if (valueText == null) {
+            valueNode.appendChild(document.createTextNode(value));
+        } else {
+            valueText.setTextContent(value);
+        }
         break;
       }
     }
