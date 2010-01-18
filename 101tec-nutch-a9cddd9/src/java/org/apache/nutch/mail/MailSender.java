@@ -83,48 +83,53 @@ public class MailSender implements Configurable {
             }
             LOG.info("[/mail-disabled]");
             return;
-        }
-        final MimeMessagePreparator preparator = new MimeMessagePreparator() {
-            public void prepare(final MimeMessage msg) throws Exception {
-                // set sender
-                final InternetAddress sender = new InternetAddress(senderAddress);
-                sender.setPersonal(senderPersonal, "UTF-8");
-                msg.setFrom(sender);
+        } else {
+            try {
+                final MimeMessagePreparator preparator = new MimeMessagePreparator() {
+                    public void prepare(final MimeMessage msg) throws Exception {
+                        // set sender
+                        final InternetAddress sender = new InternetAddress(senderAddress);
+                        sender.setPersonal(senderPersonal, "UTF-8");
+                        msg.setFrom(sender);
 
-                // set recipients
-                for (int i = 0; i < receiverAddresses.length; i++) {
-                    final InternetAddress receiver = new InternetAddress(receiverAddresses[i]);
-                    if (receiverPersonals != null && receiverPersonals.length > i) {
-                        receiver.setPersonal(receiverPersonals[i], "UTF-8");
+                        // set recipients
+                        for (int i = 0; i < receiverAddresses.length; i++) {
+                            final InternetAddress receiver = new InternetAddress(receiverAddresses[i]);
+                            if (receiverPersonals != null && receiverPersonals.length > i) {
+                                receiver.setPersonal(receiverPersonals[i], "UTF-8");
+                            }
+                            msg.addRecipient(Message.RecipientType.TO, receiver);
+                        }
+
+                        // set subject
+                        msg.setSubject(subject, "UTF-8");
+
+                        // create multipart
+                        final Multipart mp = new MimeMultipart();
+
+                        // add text content
+                        final MimeBodyPart textBody = new MimeBodyPart();
+                        textBody.setText(content, "UTF-8");
+                        mp.addBodyPart(textBody);
+
+                        // attach file
+                        if (attachment != null) {
+                            final MimeBodyPart fileBody = new MimeBodyPart();
+                            final FileDataSource data = new FileDataSource(attachment);
+                            fileBody.setDataHandler(new DataHandler(data));
+                            fileBody.setFileName(attachment.getName());
+                            mp.addBodyPart(fileBody);
+                        }
+
+                        // add multipart to message
+                        msg.setContent(mp);
                     }
-                    msg.addRecipient(Message.RecipientType.TO, receiver);
-                }
-
-                // set subject
-                msg.setSubject(subject, "UTF-8");
-
-                // create multipart
-                final Multipart mp = new MimeMultipart();
-
-                // add text content
-                final MimeBodyPart textBody = new MimeBodyPart();
-                textBody.setText(content, "UTF-8");
-                mp.addBodyPart(textBody);
-
-                // attach file
-                if (attachment != null) {
-                    final MimeBodyPart fileBody = new MimeBodyPart();
-                    final FileDataSource data = new FileDataSource(attachment);
-                    fileBody.setDataHandler(new DataHandler(data));
-                    fileBody.setFileName(attachment.getName());
-                    mp.addBodyPart(fileBody);
-                }
-
-                // add multipart to message
-                msg.setContent(mp);
+                };
+                _mailSender.send(preparator);
+            } catch (final Exception e) {
+                LOG.error("Unable to send email", e);
             }
-        };
-        _mailSender.send(preparator);
+        }
     }
 
     @Override
