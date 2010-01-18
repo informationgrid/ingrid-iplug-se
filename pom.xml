@@ -58,6 +58,11 @@
             <version>1.2.2-SNAPSHOT</version>
             <type>war</type>
         </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4.1</version>
+        </dependency>
 	</dependencies>
 
 	<repositories>

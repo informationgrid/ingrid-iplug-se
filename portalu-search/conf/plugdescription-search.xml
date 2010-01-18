@@ -15,7 +15,7 @@
     <string>law</string>
   </list>
   <string>proxyServiceUrl</string>
-  <string>/torwald-group:iplug-se-searcher-developer-rwe</string>
+  <string>/torwald-group:iplug-se-searcher-dev_me</string>
   <string>IPLUG_ADMIN_PASSWORD</string>
   <string>password</string>
   <string>connection</string>
@@ -27,7 +27,7 @@
   <string>personTitle</string>
   <string>Dr.</string>
   <string>workingDirectory</string>
-  <string>/tmp/nutchGui_eclipse</string>
+  <string>/tmp/nutchGui</string>
   <string>fields</string>
   <list>
     <string>datatype</string>
@@ -47,7 +47,6 @@
     <string>coord</string>
     <string>buzzword</string>
     <string>areaid</string>
-    <string>location</string>
     <string>site</string>
     <string>url</string>
     <string>incl_meta</string>
@@ -55,7 +54,7 @@
   <string>personSureName</string>
   <string>Kruse</string>
   <string>dataSourceDescription</string>
-  <string>Webseiten vom Bund</string>
+  <string>Overmind Search</string>
   <string>IPLUG_ADMIN_GUI_URL</string>
   <string>http://plant.its-technidata.de/iplug-admin-se-search-myles/</string>
   <string>dataSourceName</string>

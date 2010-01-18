@@ -101,6 +101,7 @@ public class AdministrationApp {
                             .info("Using working directory '" + workingDirectory.getPath()
                                     + "' given from plugdescription file '"
                                     + line.getOptionValue(PARAM_PLUGDESCRIPTION) + "'.");
+                    port = plugDescription.getIplugAdminGuiPort();
                 } else {
                     LOG.warn("Named plugdescription file '" + plugDescriptionFile.getAbsolutePath()
                             + "' does not exists.");

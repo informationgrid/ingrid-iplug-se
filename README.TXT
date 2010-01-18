@@ -2,12 +2,12 @@ Run/Debug indexer:
 ---------------------
 a) Run without connection to ibus (eclipse):
  Main class: de.ingrid.iplug.se.AdministrationApp
- Params:     --plugdescription=portalu-nutch-gui/conf/plugdescription-index.xml_blah --descriptor=portalu-nutch-gui/conf/communication-index.xml --workingDirectory=/tmp/nutchGui_eclipse --port=8080
+ Params:     --plugdescription=portalu-nutch-gui/conf/plugdescription-index.xml --descriptor=portalu-nutch-gui/conf/communication-index.xml --workingDirectory=/tmp/nutchGui_eclipse --port=8080
  VM-Params:  -Xmx256m -Dnutch.gui.theme=portal-u
 
 b) Connect to ibus and retrieve actual Partners/Providers (eclipse):
  Main class: de.ingrid.iplug.se.AdministrationApp
- Params:     --plugdescription=portalu-nutch-gui/conf/plugdescription-index.xml_blah --descriptor=portalu-nutch-gui/conf/communication-index.xml --workingDirectory=/tmp/nutchGui_eclipse --secure --port=8080
+ Params:     --plugdescription=portalu-nutch-gui/conf/plugdescription-index.xml --descriptor=portalu-nutch-gui/conf/communication-index.xml --workingDirectory=/tmp/nutchGui_eclipse --secure --port=8080
  VM-Params:  -Xmx256m -Dnutch.gui.theme=portal-u -Djava.security.auth.login.config=portalu-nutch-gui/conf/nutchgui.auth
  (user/passwort: adminportal/adminportal)
  

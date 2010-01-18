@@ -27,6 +27,8 @@ import java.util.LinkedList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.MapWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.net.protocols.Response;
@@ -36,6 +38,7 @@ import org.apache.nutch.protocol.ProtocolException;
 import org.apache.nutch.protocol.ProtocolOutput;
 import org.apache.nutch.protocol.ProtocolStatus;
 import org.apache.nutch.protocol.RobotRules;
+import org.apache.nutch.tools.UrlReporter;
 import org.apache.nutch.util.DeflateUtils;
 import org.apache.nutch.util.GZIPUtils;
 import org.apache.nutch.util.LogUtil;
@@ -218,6 +221,11 @@ public abstract class HttpBase implements Protocol {
       }
       
       int code = response.getCode();
+      // ------ none nutch-specific code starts here
+      // add response code to metadata
+      MapWritable metaData = datum.getMetaData();
+      metaData.put(UrlReporter.RESPONSE_CODE, new IntWritable(code));
+      // ------ none nutch-specific code ends here
       byte[] content = response.getContent();
       Content c = new Content(u.toString(), u.toString(),
                               (content == null ? EMPTY_CONTENT : content),

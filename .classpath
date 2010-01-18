@@ -140,5 +140,7 @@
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/xpp3_min-1.1.3.4.O.jar"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/xstream-1.2.1.jar"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/xtmStubs-3.0.0.1.jar"/>
+	<classpathentry kind="lib" path="portalu-common/ingrid-ext/activation-1.1.jar"/>
+	<classpathentry kind="lib" path="portalu-common/ingrid-ext/mail-1.4.1.jar"/>
 	<classpathentry kind="output" path="eclipse-classes"/>
 </classpath>

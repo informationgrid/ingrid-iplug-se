@@ -106,5 +106,70 @@
   page changes.</description>
 </property>
 
+<property>
+    <name>mail.enabled</name>
+    <value>false</value>
+    <description>If true, sending mail report for each segment is enabled. Otherwise disabled.</description>
+</property>
+
+<property>
+    <name>mail.sender.address</name>
+    <value></value>
+    <description>The email-address of the sender of system mails.</description>
+</property>
+
+<property>
+    <name>mail.sender.personal</name>
+    <value></value>
+    <description>The personal name of the sender of system mails.</description>
+</property>
+
+<property>
+    <name>mail.receiver.address</name>
+    <value></value>
+    <description>The email-address of the default receiver of system mails.</description>
+</property>
+
+<property>
+    <name>mail.receiver.personal</name>
+    <value></value>
+    <description>The personal name of the default receiver of system mails.</description>
+</property>
+
+<property>
+    <name>mail.host</name>
+    <value></value>
+    <description>The host of the email server.</description>
+</property>
+
+<property>
+    <name>mail.port</name>
+    <value></value>
+    <description>The port of the connection with the email server.</description>
+</property>
+
+<property>
+    <name>mail.user</name>
+    <value></value>
+    <description>The username for the authentication with the email server.</description>
+</property>
+
+<property>
+    <name>mail.password</name>
+    <value></value>
+    <description>The password for the authentication with the email server.</description>
+</property>
+
+<property>
+    <name>mail.auth</name>
+    <value>false</value>
+    <description>If true, authentification with email server is enabled. Otherwise disabled.</description>
+</property>
+
+<property>
+    <name>mail.starttls</name>
+    <value>false</value>
+    <description>If true, starting TLS is enabled. Otherwise disabled.</description>
+</property>
 
 </configuration>

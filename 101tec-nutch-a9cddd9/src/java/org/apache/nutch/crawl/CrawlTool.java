@@ -17,8 +17,10 @@ import org.apache.nutch.fetcher.Fetcher;
 import org.apache.nutch.indexer.DeleteDuplicates;
 import org.apache.nutch.indexer.IndexMerger;
 import org.apache.nutch.indexer.Indexer;
+import org.apache.nutch.mail.MailService;
 import org.apache.nutch.parse.ParseSegment;
 import org.apache.nutch.tools.HostStatistic;
+import org.apache.nutch.tools.UrlReporter;
 import org.apache.nutch.util.HadoopFSUtil;
 
 public class CrawlTool {
@@ -73,6 +75,10 @@ public class CrawlTool {
     // other jobs
     Generator generator = new Generator(_configuration);
     Fetcher fetcher = new Fetcher(_configuration);
+    // ------ none nutch-specific code starts here
+    UrlReporter reporter = new UrlReporter(_configuration);
+    MailService mail = MailService.get(_configuration);
+    // ------ none nutch-specific code ends here
     ParseSegment parseSegment = new ParseSegment(_configuration);
     BWUpdateDb bwUpdateDb = new BWUpdateDb(_configuration);
     ParseDataUpdater parseDataUpdater = new ParseDataUpdater(_configuration);
@@ -124,6 +130,10 @@ public class CrawlTool {
       }
       fetcher.fetch(segment, threads, org.apache.nutch.fetcher.Fetcher
               .isParsing(_configuration)); // fetch it
+      // ------ none nutch-specific code starts here
+      reporter.analyze(segment);
+      mail.sendSegmentReport(_fileSystem, segment, i);
+      // ------ none nutch-specific code ends here
       if (!Fetcher.isParsing(_configuration)) {
         parseSegment.parse(segment); // parse it, if needed
       }
