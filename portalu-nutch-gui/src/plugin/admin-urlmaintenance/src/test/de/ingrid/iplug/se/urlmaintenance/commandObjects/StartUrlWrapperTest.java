@@ -40,7 +40,7 @@ public class StartUrlWrapperTest extends DaoTest {
     StartUrlCommand startUrlCommand = new StartUrlCommand(_startUrlDao,
         _limitUrlDao, _excludeUrlDao);
 
-    List<Provider> providers = createProviderInSeparateTransaction("partner", "provider");
+    List<Provider> providers = createProviderInSeparateTransaction("pa", "partner", new String[] { "pr" }, new String[] { "provider" });
     StartUrl model = new StartUrl();
     model.setUrl("http://www.101tec.com");
     model.setProvider(providers.get(0));
@@ -69,7 +69,7 @@ public class StartUrlWrapperTest extends DaoTest {
   public void testWrite_OverwriteExistingStartAndLimitUrls() throws Exception {
     _transactionService.close();
     Metadata lang = createMetadata("lang", "de");
-    List<Provider> providers = createProviderInSeparateTransaction("partner", "provider");
+    List<Provider> providers = createProviderInSeparateTransaction("pa", "partner", new String[] { "pr" }, new String[] { "provider" });
 
     _transactionService.beginTransaction();
     StartUrl startUrl = new StartUrl();
@@ -108,7 +108,7 @@ public class StartUrlWrapperTest extends DaoTest {
   public void testWrite_StartAndLinitUrlsAlreadyExists() throws Exception{
     _transactionService.close();
     Metadata lang = createMetadata("lang", "de");
-    List<Provider> providers = createProviderInSeparateTransaction("partner", "provider");
+    List<Provider> providers = createProviderInSeparateTransaction("pa", "partner", new String[] { "pr" }, new String[] { "provider" });
 
     _transactionService.beginTransaction();
     LimitUrl limitUrl = new LimitUrl();

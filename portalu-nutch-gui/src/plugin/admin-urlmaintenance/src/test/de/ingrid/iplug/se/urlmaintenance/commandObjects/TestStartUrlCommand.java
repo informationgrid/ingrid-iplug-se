@@ -41,7 +41,7 @@ public class TestStartUrlCommand extends DaoTest {
   public void testWrite_StartUrlAndLimitUrl() throws Exception{
     _transactionService.close();
     
-    List<Provider> providers = createProviderInSeparateTransaction("partner", "provider");
+    List<Provider> providers = createProviderInSeparateTransaction("pa", "partner", new String[] { "pr" }, new String[] { "provider" });
     
     _command.setProvider(providers.get(0));
     _command.setUrl("www.starturl.de");

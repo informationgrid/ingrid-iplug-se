@@ -18,6 +18,9 @@ public class Partner extends IdBase {
   // HSQLDB!
   @Column(nullable = false/* , unique=true */)
   private String _name;
+  
+  @Column(nullable = false)
+  private String _shortName;
 
   @OneToMany(cascade = { CascadeType.ALL })
   @JoinColumn(name = "partner_fk")
@@ -42,5 +45,13 @@ public class Partner extends IdBase {
   public void addProvider(Provider provider) {
     _providers.add(provider);
     provider.setPartner(this);
+  }
+
+  public void setShortName(String shortName) {
+    _shortName = shortName;
+  }
+
+  public String getShortName() {
+    return _shortName;
   }
 }

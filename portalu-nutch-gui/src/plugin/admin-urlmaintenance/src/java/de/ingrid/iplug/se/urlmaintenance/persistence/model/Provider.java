@@ -19,6 +19,9 @@ public class Provider extends IdBase {
 
   @Column(nullable = false)
   private String _name;
+  
+  @Column(nullable = false)
+  private String _shortName;
 
   // rwe: The annotation @JoinColumn{nullable="true"} causes intermittent
   // failures when using the eclipselink JPA!
@@ -56,6 +59,14 @@ public class Provider extends IdBase {
 
   public void setUrls(List<Url> urls) {
     _urls = urls;
+  }
+
+  public void setShortName(String shortName) {
+    _shortName = shortName;
+  }
+
+  public String getShortName() {
+    return _shortName;
   }
 
 }

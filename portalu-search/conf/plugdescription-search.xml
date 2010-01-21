@@ -15,7 +15,7 @@
     <string>law</string>
   </list>
   <string>proxyServiceUrl</string>
-  <string>/torwald-group:iplug-se-searcher-dev_me</string>
+  <string>/torwald-group:iplug-se-searcher-dev</string>
   <string>IPLUG_ADMIN_PASSWORD</string>
   <string>password</string>
   <string>connection</string>
@@ -58,7 +58,7 @@
   <string>IPLUG_ADMIN_GUI_URL</string>
   <string>http://plant.its-technidata.de/iplug-admin-se-search-myles/</string>
   <string>dataSourceName</string>
-  <string>PortalU-Internet-Suchmaschine-Suchkomponente-myles</string>
+  <string>PortalU-Internet-Suchmaschine-Suchkomponente-me</string>
   <string>organisationAbbr</string>
   <string></string>
   <string>partner</string>

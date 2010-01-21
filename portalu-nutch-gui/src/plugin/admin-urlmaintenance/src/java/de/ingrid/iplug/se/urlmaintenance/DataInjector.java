@@ -135,6 +135,7 @@ public class DataInjector {
       _transactionService.beginTransaction();
       if (!_partnerDao.exists("devPartner")) {
         Partner partner = new Partner();
+        partner.setShortName("devPa");
         partner.setName("devPartner");
         _partnerDao.makePersistent(partner);
       }
@@ -142,6 +143,7 @@ public class DataInjector {
       Partner partner = _partnerDao.getByName("devPartner");
       if (!_providerDao.exists("devProvider")) {
         Provider provider = new Provider();
+        provider.setShortName("devPr");
         provider.setName("devProvider");
         provider.setPartner(partner);
         _providerDao.makePersistent(provider);

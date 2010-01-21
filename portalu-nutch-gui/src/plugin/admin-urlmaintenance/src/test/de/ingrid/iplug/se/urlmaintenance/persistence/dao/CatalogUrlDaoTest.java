@@ -12,7 +12,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
 public class CatalogUrlDaoTest extends DaoTest {
 
   public void testGetByProviderAndMetadata() throws Exception {
-    createProviderInSeparateTransaction("partner", "provider");
+    createProviderInSeparateTransaction("pa", "partner", new String[] { "pr" }, new String[] { "provider" });
     createMetadata("foo", "bar");
     createMetadata("bar", "foo");
     createMetadata("foobar", "foobar");

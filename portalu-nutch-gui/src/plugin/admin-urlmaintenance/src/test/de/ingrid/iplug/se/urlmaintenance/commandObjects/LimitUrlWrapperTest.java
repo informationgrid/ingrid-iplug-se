@@ -26,7 +26,7 @@ public class LimitUrlWrapperTest extends DaoTest {
   public void testRead() throws Exception {
 
     LimitUrlCommand limitUrlCommand = new LimitUrlCommand(_limitUrlDao);
-    List<Provider> providers = createProviderInSeparateTransaction("partner", "provider");
+    List<Provider> providers = createProviderInSeparateTransaction("pa", "partner", new String[] { "pr" }, new String[] { "provider" });
     Metadata lang = createMetadata("lang", "de");
     LimitUrl model = new LimitUrl();
     model.setUrl("http://www.101tec.com");
@@ -40,7 +40,7 @@ public class LimitUrlWrapperTest extends DaoTest {
 
   public void testWrite() throws Exception {
     Metadata lang = createMetadata("lang", "de");
-    List<Provider> providers = createProviderInSeparateTransaction("partner", "provider");
+    List<Provider> providers = createProviderInSeparateTransaction("pa", "partner", new String[] { "pr" }, new String[] { "provider" });
 
     LimitUrlCommand command = new LimitUrlCommand(_limitUrlDao);
     command.setUrl("http://www.101tec.com");

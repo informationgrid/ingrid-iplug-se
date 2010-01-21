@@ -47,32 +47,35 @@ public abstract class DaoTest extends TestCase {
     transactionService.close();
   }
 
-  protected Provider createProviderForExistingPartner(Partner existingPartner, String providerName) {
+  protected Provider createProviderForExistingPartner(Partner existingPartner, String shortName, String name) {
     Provider provider = new Provider();
-    provider.setName(providerName);
+    provider.setShortName(shortName);
+    provider.setName(name);
     provider.setPartner(existingPartner);
     existingPartner.addProvider(provider);
 
     return provider;
   }
 
-  protected List<Provider> createProviderInSeparateTransaction(String partnerName, String... providerNames) throws Exception {
+  protected List<Provider> createProviderInSeparateTransaction(String partnerShortName, String partnerName, String[] providerShortNames, String[] providerNames) throws Exception {
 
     TransactionService transactionService = new TransactionService();
     transactionService.beginTransaction();
     IProviderDao providerDao = new ProviderDao(transactionService);
     PartnerDao partnerDao = new PartnerDao(transactionService, providerDao);
-    Partner partner = createPartner(partnerName);
+    Partner partner = createPartner(partnerShortName, partnerName);
     partnerDao.makePersistent(partner);
     Partner byName = partnerDao.getByName(partner.getName());
     List<Provider> ret = new ArrayList<Provider>();
     
-    for(String providerName : providerNames){
-      Provider provider = new Provider();
-      provider.setName(providerName);
-      provider.setPartner(byName);
-      providerDao.makePersistent(provider);
-      ret.add(provider);
+    int max = Math.min(providerShortNames.length, providerNames.length);
+    for(int i = 0; i < max; i++) {
+        Provider provider = new Provider();
+        provider.setShortName(providerShortNames[i]);
+        provider.setName(providerNames[i]);
+        provider.setPartner(byName);
+        providerDao.makePersistent(provider);
+        ret.add(provider);
     }
     transactionService.commitTransaction();
     transactionService.close();
@@ -80,10 +83,10 @@ public abstract class DaoTest extends TestCase {
     return ret;
   }
 
-  protected Partner createPartner(String name) throws Exception {
+  protected Partner createPartner(String name, String shortName) throws Exception {
     Partner partner = new Partner();
+    partner.setShortName(shortName);
     partner.setName(name);
-
     return partner;
   }
 

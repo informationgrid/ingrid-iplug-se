@@ -36,7 +36,7 @@ public class UrlDaoTest extends DaoTest {
     MockitoAnnotations.initMocks(this);
     super.setUp();
 
-    createProviderInSeparateTransaction("partner", "provider");
+    createProviderInSeparateTransaction("pa", "partner", new String[] { "pr" }, new String[] { "provider" });
 
     _transactionService = new TransactionService();
     _transactionService.beginTransaction();
@@ -239,7 +239,7 @@ public class UrlDaoTest extends DaoTest {
 
     _transactionService.commitTransaction();
     _transactionService.close();
-    createProviderInSeparateTransaction("2ProviderPartner", "provider-a", "provider-b");
+    createProviderInSeparateTransaction("pa2pr", "2ProviderPartner", new String[] { "prA", "prB" }, new String[] { "provider-a", "provider-b" });
     _transactionService = new TransactionService();
     _transactionService.beginTransaction();
     

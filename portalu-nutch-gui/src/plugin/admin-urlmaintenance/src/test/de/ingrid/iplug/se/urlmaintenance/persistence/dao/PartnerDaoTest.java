@@ -15,10 +15,13 @@ public class PartnerDaoTest extends DaoTest {
     IProviderDao providerDao = new ProviderDao(transactionService);
     IPartnerDao partnerDao = new PartnerDao(transactionService, providerDao);
     Partner partner = new Partner();
+    partner.setShortName("f");
     partner.setName("foo");
     Provider provider1 = new Provider();
+    provider1.setShortName("p1");
     provider1.setName("provider1");
     Provider provider2 = new Provider();
+    provider2.setShortName("p2");
     provider2.setName("provider2");
     partner.addProvider(provider1);
     partner.addProvider(provider2);
@@ -38,8 +41,8 @@ public class PartnerDaoTest extends DaoTest {
     TransactionService transactionService = new TransactionService();
     transactionService.beginTransaction();
 
-    Partner partner = createPartner("partnerA");
-    createProviderForExistingPartner(partner, "providerA");
+    Partner partner = createPartner("paA", "partnerA");
+    createProviderForExistingPartner(partner, "prA", "providerA");
 
     ProviderDao providerDao = new ProviderDao(transactionService);
     IPartnerDao partnerDao = new PartnerDao(transactionService, providerDao);
@@ -69,8 +72,8 @@ public class PartnerDaoTest extends DaoTest {
 
     // setup :
     // partner1 -> providerA
-    Partner partner1 = createPartner("partner1");
-    Provider providerA = createProviderForExistingPartner(partner1, "providerA");
+    Partner partner1 = createPartner("pa1", "partner1");
+    Provider providerA = createProviderForExistingPartner(partner1, "prA", "providerA");
     TransactionService transactionService = new TransactionService();
     transactionService.beginTransaction();
     ProviderDao providerDao = new ProviderDao(transactionService);
@@ -96,7 +99,7 @@ public class PartnerDaoTest extends DaoTest {
                                           // and insert does'nt work within same
                                           // transaction!
     System.out.println("3. Partners: " + partnerDao.getAll() + ", providers: " + providerDao.getAll());
-    createProviderForExistingPartner(partner1, "providerB");
+    createProviderForExistingPartner(partner1, "prB", "providerB");
     transactionService.flipTransaction();
     System.out.println("4. Partners: " + partnerDao.getAll() + ", providers: " + providerDao.getAll());
 
@@ -116,6 +119,7 @@ public class PartnerDaoTest extends DaoTest {
     transactionService.beginTransaction();
 
     Partner partner = new Partner();
+    partner.setShortName("f");
     partner.setName("foo");
     IPartnerDao dao = new PartnerDao(transactionService, new ProviderDao(transactionService));
     dao.makePersistent(partner);

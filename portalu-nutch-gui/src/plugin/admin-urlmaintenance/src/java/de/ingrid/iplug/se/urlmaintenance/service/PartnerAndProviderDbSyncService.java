@@ -152,6 +152,7 @@ public class PartnerAndProviderDbSyncService {
 
   private Partner createPartnerAndProviders(InternalPartner internalPartner) {
     Partner newPartner = new Partner();
+    newPartner.setShortName(internalPartner.getId());
     newPartner.setName(internalPartner.getName());
     LOG.info("Create new partner with name '" + internalPartner.getName() + "'.");
     for (InternalProvider provider : internalPartner.getProviders()) {
@@ -166,6 +167,7 @@ public class PartnerAndProviderDbSyncService {
 
   private Provider craeteProvider(InternalProvider provider) {
     Provider newProvider = new Provider();
+    newProvider.setShortName(provider.getId());
     newProvider.setName(provider.getName());
 
     return newProvider;

@@ -11,7 +11,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
 public class StartUrlDaoTest extends DaoTest {
 
   public void testPaging() throws Exception {
-    List<Provider> providers = createProviderInSeparateTransaction("partner", "provider");
+    List<Provider> providers = createProviderInSeparateTransaction("pa", "partner", new String[] { "pr" }, new String[] { "provider" });
     TransactionService transactionService = new TransactionService();
     transactionService.beginTransaction();
 

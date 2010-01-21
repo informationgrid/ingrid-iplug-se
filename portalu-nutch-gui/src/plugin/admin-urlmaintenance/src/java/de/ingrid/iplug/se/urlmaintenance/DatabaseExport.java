@@ -62,8 +62,8 @@ public class DatabaseExport {
       Provider provider = url.getProvider();
       
       urlString.append(url.getUrl()).append('\t');
-      urlString.append("partner:\t").append(provider.getPartner().getName()).append('\t');
-      urlString.append("provider:\t").append(provider.getName()).append('\t');
+      urlString.append("partner:\t").append(provider.getPartner().getShortName()).append('\t');
+      urlString.append("provider:\t").append(provider.getShortName()).append('\t');
       
       List<Metadata> metadatas = null;
       if (url instanceof LimitUrl) {

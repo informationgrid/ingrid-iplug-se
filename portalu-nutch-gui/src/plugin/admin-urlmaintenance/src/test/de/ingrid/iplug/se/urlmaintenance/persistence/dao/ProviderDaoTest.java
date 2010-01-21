@@ -14,11 +14,12 @@ public class ProviderDaoTest extends DaoTest {
     transactionService.beginTransaction();
     IProviderDao providerDao = new ProviderDao(transactionService);
     PartnerDao partnerDao = new PartnerDao(transactionService, providerDao);
-    Partner partner = createPartner("partner");
+    Partner partner = createPartner("pa", "partner");
     partnerDao.makePersistent(partner);
     Partner byName = partnerDao.getByName(partner.getName());
 
     Provider provider = new Provider();
+    provider.setShortName("f");
     provider.setName("foo");
     provider.setPartner(byName);
     providerDao.makePersistent(provider);
@@ -38,11 +39,12 @@ public class ProviderDaoTest extends DaoTest {
     transactionService.beginTransaction();
     IProviderDao dao = new ProviderDao(transactionService);
     PartnerDao partnerDao = new PartnerDao(transactionService, dao);
-    Partner partner = createPartner("partner");
+    Partner partner = createPartner("pa", "partner");
     partnerDao.makePersistent(partner);
     Partner byName = partnerDao.getByName(partner.getName());
 
     Provider provider = new Provider();
+    provider.setShortName("f");
     provider.setName("foo");
     provider.setPartner(byName);
     dao.makePersistent(provider);
@@ -68,11 +70,12 @@ public class ProviderDaoTest extends DaoTest {
 
     IProviderDao dao = new ProviderDao(transactionService);
     PartnerDao partnerDao = new PartnerDao(transactionService,dao);
-    Partner partner = createPartner("partner");
+    Partner partner = createPartner("pa", "partner");
     partnerDao.makePersistent(partner);
     Partner byName = partnerDao.getByName(partner.getName());
 
     Provider provider = new Provider();
+    provider.setShortName("f");
     provider.setName("foo");
     provider.setPartner(byName);
     dao.makePersistent(provider);
