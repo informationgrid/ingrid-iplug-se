@@ -39,8 +39,11 @@ public class DatabaseExportTest extends TestCase {
     
     _databaseExport = new DatabaseExport(_startUrlDao, _catalogUrlDao, _limitUrlDao, _excludeUrlDao);
     _partner = new Partner();
+    _partner.setShortName("paTest");
     _partner.setName("Partner-Test");
     Provider provider = new Provider();
+    provider.setShortName("prTest");
+    provider.setShortName("prTest");
     provider.setName("Provider-Test");
     _partner.addProvider(provider);
   }
