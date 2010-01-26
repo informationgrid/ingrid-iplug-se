@@ -18,8 +18,12 @@
 package org.apache.nutch.searcher;
 
 // Lucene imports
-import org.apache.hadoop.conf.Configurable;
 import org.apache.lucene.search.BooleanQuery;
+
+// Hadoop imports
+import org.apache.hadoop.conf.Configurable;
+
+// Nutch imports
 import org.apache.nutch.plugin.Pluggable;
 
 

@@ -20,6 +20,7 @@ package org.apache.nutch.ontology;
 // JDK imports
 import java.util.Iterator;
 
+// Nutch imports
 import org.apache.nutch.plugin.Pluggable;
 
 

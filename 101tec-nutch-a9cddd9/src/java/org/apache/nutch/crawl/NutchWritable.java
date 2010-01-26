@@ -18,7 +18,6 @@ package org.apache.nutch.crawl;
 
 import org.apache.hadoop.io.Writable;
 import org.apache.nutch.util.GenericWritableConfigurable;
-
 import de.ingrid.iplug.se.crawl.sns.CompressedSnsData;
 
 public class NutchWritable extends GenericWritableConfigurable {

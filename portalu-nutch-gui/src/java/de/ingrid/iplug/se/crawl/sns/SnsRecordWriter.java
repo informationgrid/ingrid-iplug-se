@@ -179,16 +179,19 @@ public class SnsRecordWriter implements RecordWriter<Text, CompressedSnsData> {
   private void addLocations(CompressedSnsData snsData) {
       // just copy up to _maxLocationCodes locations from SNSIndexingInterface
       // into the snsData
-      Set<String> locations = _snsInterface.getLocations();
-      Set<Text> locationsAsText = new LinkedHashSet<Text>();
-
-      for (String location : locations) {
-          locationsAsText.add(new Text(location));
-          if (locationsAsText.size() >= _maxLocationCodes) {
-              break;
-          }
+      try {
+        Set<String> locations = _snsInterface.getLocations();
+        Set<Text> locationsAsText = new LinkedHashSet<Text>();
+        for (String location : locations) {
+            locationsAsText.add(new Text(location));
+            if (locationsAsText.size() >= _maxLocationCodes) {
+                break;
+            }
+        }
+        snsData.setLocations(locationsAsText);
+      } catch (Exception e) {
+          e.printStackTrace();
       }
-      snsData.setLocations(locationsAsText);
   }
 
   /**

@@ -17,15 +17,17 @@
 
 package org.apache.nutch.searcher;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.index.Term;
+
 import org.apache.nutch.analysis.CommonGrams;
+
 import org.apache.nutch.searcher.Query.Clause;
 import org.apache.nutch.searcher.Query.Phrase;
+import org.apache.hadoop.conf.Configuration;
 
 /** Translate query fields to search the same-named field, as indexed by an
  * IndexingFilter.  Best for tokenized fields. */

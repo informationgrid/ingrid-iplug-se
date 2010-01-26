@@ -17,12 +17,12 @@
 
 package org.apache.nutch.indexer;
 
-import java.io.OutputStreamWriter;
-
+import org.apache.lucene.util.PriorityQueue;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermEnum;
-import org.apache.lucene.util.PriorityQueue;
+
+import java.io.OutputStreamWriter;
 
 /** Lists the most frequent terms in an index. */
 public class HighFreqTerms {

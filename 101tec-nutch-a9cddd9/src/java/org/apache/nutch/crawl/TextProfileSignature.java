@@ -31,8 +31,8 @@ import org.apache.hadoop.io.MD5Hash;
 import org.apache.nutch.parse.Parse;
 import org.apache.nutch.parse.ParseImpl;
 import org.apache.nutch.protocol.Content;
-import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.StringUtil;
+import org.apache.nutch.util.NutchConfiguration;
 
 /**
  * <p>An implementation of a page signature. It calculates an MD5 hash

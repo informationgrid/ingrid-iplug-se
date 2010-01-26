@@ -4,10 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.TermQuery;
 import org.apache.nutch.plugin.Extension;
 import org.apache.nutch.plugin.PluginDescriptor;
 import org.apache.nutch.plugin.PluginRepository;
@@ -16,6 +13,9 @@ import org.apache.nutch.searcher.Query;
 import org.apache.nutch.searcher.QueryException;
 import org.apache.nutch.searcher.QueryFilter;
 import org.apache.nutch.searcher.RawFieldQueryFilter;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.BooleanClause;
 import org.apache.nutch.searcher.Query.Clause;
 
 public class MetadataQueryFilter implements QueryFilter {

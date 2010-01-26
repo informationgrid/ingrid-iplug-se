@@ -17,24 +17,13 @@
 
 package org.apache.nutch.indexer;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.util.Random;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.apache.lucene.store.BufferedIndexInput;
-import org.apache.lucene.store.BufferedIndexOutput;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.IndexInput;
-import org.apache.lucene.store.IndexOutput;
-import org.apache.lucene.store.Lock;
+import org.apache.lucene.store.*;
 import org.apache.nutch.util.HadoopFSUtil;
+import org.apache.hadoop.fs.*;
+import org.apache.hadoop.conf.Configuration;
 
 /** Reads a Lucene index stored in DFS. */
 public class FsDirectory extends Directory {

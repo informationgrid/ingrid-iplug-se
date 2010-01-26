@@ -20,18 +20,17 @@ package org.apache.nutch.indexer;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+// Commons Logging imports
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.apache.nutch.plugin.*;
+import org.apache.nutch.parse.Parse;
+import org.apache.nutch.util.ObjectCache;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.io.Text;
 import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.crawl.Inlinks;
-import org.apache.nutch.parse.Parse;
-import org.apache.nutch.plugin.Extension;
-import org.apache.nutch.plugin.ExtensionPoint;
-import org.apache.nutch.plugin.PluginRepository;
-import org.apache.nutch.plugin.PluginRuntimeException;
-import org.apache.nutch.util.ObjectCache;
+import org.apache.hadoop.io.Text;
 
 /** Creates and caches {@link IndexingFilter} implementing plugins.*/
 public class IndexingFilters {
@@ -69,7 +68,7 @@ public class IndexingFilters {
           Extension extension = extensions[i];
           IndexingFilter filter = (IndexingFilter) extension
               .getExtensionInstance();
-          LOG.debug("Adding " + filter.getClass().getName());
+          LOG.info("Adding " + filter.getClass().getName());
           if (!filterMap.containsKey(filter.getClass().getName())) {
             filter.addIndexBackendOptions(conf);
             filterMap.put(filter.getClass().getName(), filter);

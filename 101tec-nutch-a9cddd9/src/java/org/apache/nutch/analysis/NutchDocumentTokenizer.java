@@ -17,14 +17,10 @@
 
 package org.apache.nutch.analysis;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
 
-import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.Token;
 
 /** The tokenizer used for Nutch document text.  Implemented in terms of our
  * JavaCC-generated lexical analyzer, {@link NutchAnalysisTokenManager}, shared

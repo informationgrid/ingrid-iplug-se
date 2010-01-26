@@ -17,8 +17,8 @@
 
 package org.apache.nutch.searcher.site;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.nutch.searcher.RawFieldQueryFilter;
+import org.apache.hadoop.conf.Configuration;
 
 /** Handles "site:" query clauses, causing them to search the field indexed by
  * SiteIndexingFilter. */

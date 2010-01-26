@@ -19,31 +19,21 @@ package org.apache.nutch.indexer;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Date;
+import java.util.Arrays;
+
+import org.apache.lucene.index.*;
+import org.apache.lucene.document.*;
+import org.apache.lucene.store.*;
+import org.apache.lucene.search.*;
+
+import org.apache.nutch.util.NutchConfiguration;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.util.StringUtils;
-import org.apache.hadoop.util.Tool;
-import org.apache.hadoop.util.ToolRunner;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.FieldSelector;
-import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.FilterIndexReader;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.index.TermDocs;
-import org.apache.lucene.index.TermEnum;
-import org.apache.lucene.index.TermPositions;
-import org.apache.lucene.search.Similarity;
-import org.apache.lucene.store.IndexInput;
-import org.apache.lucene.store.RAMDirectory;
-import org.apache.lucene.store.RAMOutputStream;
-import org.apache.nutch.util.NutchConfiguration;
+import org.apache.hadoop.util.*;
 
 /** Sort a Nutch index by page score.  Higher scoring documents are assigned
  * smaller document numbers. */

@@ -16,6 +16,7 @@
  */
 package org.apache.nutch.urlfilter.api;
 
+import org.apache.nutch.net.*;
 
 
 /**

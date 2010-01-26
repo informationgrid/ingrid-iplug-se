@@ -20,8 +20,10 @@ package org.apache.nutch.util;
 // JDK imports
 import java.util.Enumeration;
 
+// Servlet imports
 import javax.servlet.ServletContext;
 
+// Hadoop imports
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.WritableName;
 

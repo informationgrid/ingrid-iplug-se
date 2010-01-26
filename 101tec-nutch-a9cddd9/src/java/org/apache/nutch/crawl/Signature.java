@@ -17,10 +17,10 @@
 
 package org.apache.nutch.crawl;
 
-import org.apache.hadoop.conf.Configurable;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.nutch.parse.Parse;
 import org.apache.nutch.protocol.Content;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configurable;
 
 public abstract class Signature implements Configurable {
   protected Configuration conf;

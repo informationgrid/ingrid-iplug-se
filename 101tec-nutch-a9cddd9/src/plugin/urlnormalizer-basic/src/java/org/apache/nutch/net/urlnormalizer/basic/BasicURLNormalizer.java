@@ -17,20 +17,19 @@
 
 package org.apache.nutch.net.urlnormalizer.basic;
 
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.MalformedURLException;
 
+// Commons Logging imports
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.conf.Configuration;
+
+// Nutch imports
 import org.apache.nutch.net.URLNormalizer;
 import org.apache.nutch.util.LogUtil;
-import org.apache.oro.text.regex.MalformedPatternException;
-import org.apache.oro.text.regex.Perl5Compiler;
-import org.apache.oro.text.regex.Perl5Matcher;
-import org.apache.oro.text.regex.Perl5Pattern;
-import org.apache.oro.text.regex.Perl5Substitution;
-import org.apache.oro.text.regex.Util;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.oro.text.regex.*;
 
 /** Converts URLs to a normal form . */
 public class BasicURLNormalizer implements URLNormalizer {

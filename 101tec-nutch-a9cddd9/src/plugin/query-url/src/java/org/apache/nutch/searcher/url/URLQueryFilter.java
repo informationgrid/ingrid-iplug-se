@@ -17,8 +17,8 @@
 
 package org.apache.nutch.searcher.url;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.nutch.searcher.FieldQueryFilter;
+import org.apache.hadoop.conf.Configuration;
 
 /**
  * Handles "url:" query clauses, causing them to search the field indexed by

@@ -17,24 +17,27 @@
 
 package org.apache.nutch.searcher;
 
-import java.io.BufferedReader;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+// Commons Logging imports
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Writable;
 import org.apache.nutch.analysis.AnalyzerFactory;
-import org.apache.nutch.analysis.NutchAnalysis;
+
 import org.apache.nutch.searcher.Query.Clause.NutchClause;
+import org.apache.nutch.analysis.NutchAnalysis;
 import org.apache.nutch.util.NutchConfiguration;
 
 /** A Nutch query. */

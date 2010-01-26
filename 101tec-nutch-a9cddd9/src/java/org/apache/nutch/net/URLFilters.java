@@ -21,12 +21,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.nutch.plugin.Extension;
 import org.apache.nutch.plugin.ExtensionPoint;
-import org.apache.nutch.plugin.PluginRepository;
 import org.apache.nutch.plugin.PluginRuntimeException;
+import org.apache.nutch.plugin.PluginRepository;
 import org.apache.nutch.util.ObjectCache;
+
+import org.apache.hadoop.conf.Configuration;
 /** Creates and caches {@link URLFilter} implementing plugins.*/
 public class URLFilters {
 

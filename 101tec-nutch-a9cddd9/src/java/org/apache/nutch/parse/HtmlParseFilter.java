@@ -18,10 +18,14 @@
 package org.apache.nutch.parse;
 
 // JDK imports
+import org.w3c.dom.DocumentFragment;
+
+// Hadoop imports
 import org.apache.hadoop.conf.Configurable;
+
+// Nutch imports
 import org.apache.nutch.plugin.Pluggable;
 import org.apache.nutch.protocol.Content;
-import org.w3c.dom.DocumentFragment;
 
 
 /** Extension point for DOM-based HTML parsers.  Permits one to add additional

@@ -19,10 +19,15 @@ package org.apache.nutch.analysis;
 // JDK imports
 import java.io.Reader;
 
-import org.apache.hadoop.conf.Configurable;
-import org.apache.hadoop.conf.Configuration;
+// Lucene imports
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
+
+// Hadoop imports
+import org.apache.hadoop.conf.Configurable;
+import org.apache.hadoop.conf.Configuration;
+
+// Nutch imports
 import org.apache.nutch.plugin.Pluggable;
 
 

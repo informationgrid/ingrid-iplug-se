@@ -47,13 +47,13 @@ public class StartCrawlRunnable implements Runnable {
       fileSystem.createNewFile(lockPath);
       _crawlTool.preCrawl();
       _crawlTool.crawl(_topN, _depth);
-    } catch (Throwable e) {
+    } catch (IOException e) {
       LOG.warn("can not start crawl.", e);
     } finally {
       try {
         fileSystem.delete(lockPath, false);
       } catch (IOException e) {
-        LOG.warn("Can not delete lock file.", e);
+        LOG.warn("can not delete lock file.", e);
       }
     }
   }

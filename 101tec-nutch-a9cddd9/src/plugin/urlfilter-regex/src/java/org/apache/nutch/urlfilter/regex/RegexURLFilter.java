@@ -17,12 +17,14 @@
 package org.apache.nutch.urlfilter.regex;
 
 // JDK imports
-import java.io.IOException;
 import java.io.Reader;
+import java.io.IOException;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+// Hadoop imports
 import org.apache.hadoop.conf.Configuration;
+import org.apache.nutch.net.*;
 import org.apache.nutch.urlfilter.api.RegexRule;
 import org.apache.nutch.urlfilter.api.RegexURLFilterBase;
 import org.apache.nutch.util.NutchConfiguration;

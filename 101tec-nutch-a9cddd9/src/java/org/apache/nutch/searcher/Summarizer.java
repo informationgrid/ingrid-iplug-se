@@ -18,6 +18,8 @@ package org.apache.nutch.searcher;
 
 // Hadoop imports
 import org.apache.hadoop.conf.Configurable;
+
+// Nutch imports
 import org.apache.nutch.plugin.Pluggable;
 
 

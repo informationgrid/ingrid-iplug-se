@@ -17,19 +17,12 @@
 
 package org.apache.nutch.crawl;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.io.*;
+import java.util.*;
 import java.util.Map.Entry;
 
-import org.apache.hadoop.io.VersionMismatchException;
-import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.io.WritableComparable;
-import org.apache.hadoop.io.WritableComparator;
-import org.apache.nutch.util.StringUtil;
+import org.apache.hadoop.io.*;
+import org.apache.nutch.util.*;
 
 /* The crawl state of a url. */
 public class CrawlDatum implements WritableComparable<CrawlDatum>, Cloneable {

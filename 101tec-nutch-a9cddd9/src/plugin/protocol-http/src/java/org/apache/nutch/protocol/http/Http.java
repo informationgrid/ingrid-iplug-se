@@ -20,9 +20,14 @@ package org.apache.nutch.protocol.http;
 import java.io.IOException;
 import java.net.URL;
 
+// Commons Logging imports
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+// Hadoop imports
 import org.apache.hadoop.conf.Configuration;
+
+// Nutch imports
 import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.net.protocols.Response;
 import org.apache.nutch.protocol.ProtocolException;

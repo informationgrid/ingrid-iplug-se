@@ -38,7 +38,8 @@
       <implementation id="MetadataIndexingFilter"
                       class="org.apache.nutch.indexer.metadata.MetadataIndexingFilter">
 <!--
-        <parameter name="fields" value="foo"/>
+        <parameter name="raw-fields" value="foo"/>
+        <parameter name="fields" value="bar"/>
 -->        
         <parameter name="raw-fields" value="datatype,funct_category,partner,topic,provider,lang"/>
       </implementation> 
@@ -51,7 +52,8 @@
       <implementation id="MetadataQueryFilter"
                       class="org.apache.nutch.indexer.metadata.MetadataQueryFilter">
 <!--   
-        <parameter name="ields" value="foo"/>
+        <parameter name="raw-fields" value="foo"/>
+        <parameter name="fields" value="bar"/>
 -->        
         <parameter name="raw-fields" value="datatype,funct_category,partner,topic,provider,lang"/>
       </implementation>

@@ -17,12 +17,12 @@
 
 package org.apache.nutch.net.protocols;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
 
 /**
  * class to handle HTTP dates.

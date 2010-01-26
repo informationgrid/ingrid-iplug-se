@@ -17,18 +17,23 @@
 package org.apache.nutch.urlfilter.api;
 
 // JDK imports
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.ArrayList;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
 import java.util.List;
+import java.util.ArrayList;
 
+// Commons Logging imports
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+// Hadoop imports
 import org.apache.hadoop.conf.Configuration;
-import org.apache.nutch.net.URLFilter;
+
+// Nutch imports
+import org.apache.nutch.net.*;
 
 
 /**

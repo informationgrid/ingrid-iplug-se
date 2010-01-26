@@ -17,15 +17,13 @@
 
 package org.apache.nutch.crawl;
 
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.MalformedURLException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.Partitioner;
+import org.apache.hadoop.io.*;
+import org.apache.hadoop.mapred.*;
 import org.apache.nutch.net.URLNormalizers;
 
 /** Partition urls by hostname. */

@@ -17,17 +17,16 @@
 
 package org.apache.nutch.crawl;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.io.IOException;
 
+// Commons Logging imports
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reducer;
-import org.apache.hadoop.mapred.Reporter;
+
+import org.apache.hadoop.io.*;
+import org.apache.hadoop.mapred.*;
 import org.apache.nutch.metadata.Nutch;
 import org.apache.nutch.scoring.ScoringFilterException;
 import org.apache.nutch.scoring.ScoringFilters;

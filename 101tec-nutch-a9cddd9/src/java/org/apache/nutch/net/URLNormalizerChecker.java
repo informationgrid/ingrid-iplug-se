@@ -17,14 +17,16 @@
 
 package org.apache.nutch.net;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
-import org.apache.hadoop.conf.Configuration;
 import org.apache.nutch.plugin.Extension;
 import org.apache.nutch.plugin.ExtensionPoint;
 import org.apache.nutch.plugin.PluginRepository;
+
+import org.apache.hadoop.conf.Configuration;
+
 import org.apache.nutch.util.NutchConfiguration;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 /**
  * Checks one given normalizer or all normalizers.

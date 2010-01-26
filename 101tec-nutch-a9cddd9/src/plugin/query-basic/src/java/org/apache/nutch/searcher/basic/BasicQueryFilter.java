@@ -17,6 +17,11 @@
 
 package org.apache.nutch.searcher.basic;
 
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.PhraseQuery;
+import org.apache.lucene.search.TermQuery;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -24,18 +29,13 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.PhraseQuery;
-import org.apache.lucene.search.TermQuery;
-import org.apache.nutch.analysis.CommonGrams;
 import org.apache.nutch.analysis.NutchDocumentAnalyzer;
-import org.apache.nutch.searcher.Query;
+import org.apache.nutch.analysis.CommonGrams;
+
 import org.apache.nutch.searcher.QueryFilter;
-import org.apache.nutch.searcher.Query.Clause;
-import org.apache.nutch.searcher.Query.Phrase;
-import org.apache.nutch.searcher.Query.Term;
+import org.apache.nutch.searcher.Query;
+import org.apache.nutch.searcher.Query.*;
+import org.apache.hadoop.conf.Configuration;
 
 /** The default query filter.  Query terms in the default query field are
  * expanded to search the url, anchor and content document fields.
