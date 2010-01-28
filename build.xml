@@ -1,6 +1,6 @@
 <project default="dist">
 
-	<property name="nutch-version" value="101tec-nutch-a9cddd9" />
+	<property name="nutch-version" value="101tec-nutch-11e55b9" />
 	<property name="dir.nutch.patches.build" value="build_patches" />
 	<property name="dir.nutch.patches" value="patches/nutch_all" />
 	<property name="ingrid.ext.libs" value="${basedir}/portalu-common/ingrid-ext" />
@@ -11,6 +11,7 @@
 
 	<target name="clean">
 		<delete dir="build" />
+		<delete dir="build_patches" />
 	</target>
 
 	<!-- does not work anymore:
@@ -153,7 +154,7 @@
 				<filename name="**/log4j-*.properties"/>
 			</fileset>
 		</copy>
-		<replaceregexp file="build/${nutch-version}/conf/nutch-site.xml" match="101tec-nutch-a9cddd9/src/plugin,portalu-nutch-gui/src/plugin" replace="./plugins" byline="true" />
+		<replaceregexp file="build/${nutch-version}/conf/nutch-site.xml" match="101tec-nutch-11e55b9/src/plugin,portalu-nutch-gui/src/plugin" replace="./plugins" byline="true" />
 	</target>
 
 	<target name="copy-deploy-myles-conf-files" depends="copy-deploy-conf-files">

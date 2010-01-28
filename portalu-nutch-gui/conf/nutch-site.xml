@@ -6,6 +6,13 @@
 <configuration>
 
 <property>
+  <name>index.sns</name>
+  <value>true</value>
+  <description>If true, then the Index-Sns Plugin are index with sns dates. Otherwise, without sns dates.
+  </description>
+</property>
+
+<property>
   <name>plugin.folders</name>
   <value>101tec-nutch-a9cddd9/src/plugin,portalu-nutch-gui/src/plugin</value>
   <description>Directories where nutch plugins are located.  Each

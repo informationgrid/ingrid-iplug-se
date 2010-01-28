@@ -16,7 +16,7 @@ import org.mockito.exceptions.base.MockitoAssertionError;
 public class TestUtil {
 
   private static final Log LOG = LogFactory.getLog(TestUtil.class);
-  public static final String JUNIT_TEST_PLUGIN_FOLDERS = "101tec-nutch-a9cddd9/src/plugin";
+  public static final String JUNIT_TEST_PLUGIN_FOLDERS = "101tec-nutch-11e55b9/src/plugin";
   
   /**
    * This waits until the provided {@link Callable} returns an object that is equals to the given
