@@ -77,6 +77,10 @@ public class SnsIndexingFilter implements IndexingFilter {
         LOGGER.warn("Indexing of sns datas failed", e);
       }
     }
+    System.out.println("SnsIndexingFilter.filter()");
+    for (String n : document.getFieldNames()) {
+      System.out.println(document.getFieldValue(n));
+    }
     return document;
   }
 

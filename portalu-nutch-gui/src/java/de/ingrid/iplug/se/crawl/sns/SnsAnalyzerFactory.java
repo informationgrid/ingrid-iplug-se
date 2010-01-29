@@ -20,6 +20,7 @@ public class SnsAnalyzerFactory {
   }
 
   public static SnsAnalyzer createAnalyzer(String analyzerKey, JobConf jobConf) throws IOException {
+      System.out.println("SnsAnalyzerFactory.createAnalyzer() create sns analyzer");
     SnsAnalyzer snsAnalyzer = new SnsAnalyzer(jobConf);
     LOGGER.info("put new analyzer: " + analyzerKey);
     _analyzers.put(analyzerKey, snsAnalyzer);

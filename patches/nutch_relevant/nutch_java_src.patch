@@ -1,7 +1,7 @@
-Index: 101tec-nutch-a9cddd9/src/java/org/apache/nutch/crawl/NutchWritable.java
+Index: 101tec-nutch-11e55b9/src/java/org/apache/nutch/crawl/NutchWritable.java
 ===================================================================
---- 101tec-nutch-a9cddd9/src/java/org/apache/nutch/crawl/NutchWritable.java	(revision 14285)
-+++ 101tec-nutch-a9cddd9/src/java/org/apache/nutch/crawl/NutchWritable.java	(working copy)
+--- 101tec-nutch-11e55b9/src/java/org/apache/nutch/crawl/NutchWritable.java	(revision 14285)
++++ 101tec-nutch-11e55b9/src/java/org/apache/nutch/crawl/NutchWritable.java	(working copy)
 @@ -19,6 +19,8 @@
  import org.apache.hadoop.io.Writable;
  import org.apache.nutch.util.GenericWritableConfigurable;
@@ -23,10 +23,10 @@ Index: 101tec-nutch-a9cddd9/src/java/org/apache/nutch/crawl/NutchWritable.java
      };
    }
  
-Index: 101tec-nutch-a9cddd9/src/java/org/apache/nutch/indexer/IndexerMapReduce.java
+Index: 101tec-nutch-11e55b9/src/java/org/apache/nutch/indexer/IndexerMapReduce.java
 ===================================================================
---- 101tec-nutch-a9cddd9/src/java/org/apache/nutch/indexer/IndexerMapReduce.java	(revision 14285)
-+++ 101tec-nutch-a9cddd9/src/java/org/apache/nutch/indexer/IndexerMapReduce.java	(working copy)
+--- 101tec-nutch-11e55b9/src/java/org/apache/nutch/indexer/IndexerMapReduce.java	(revision 14285)
++++ 101tec-nutch-11e55b9/src/java/org/apache/nutch/indexer/IndexerMapReduce.java	(working copy)
 @@ -47,6 +47,9 @@
  import org.apache.nutch.scoring.ScoringFilterException;
  import org.apache.nutch.scoring.ScoringFilters;
@@ -78,10 +78,10 @@ Index: 101tec-nutch-a9cddd9/src/java/org/apache/nutch/indexer/IndexerMapReduce.j
      }
  
      FileInputFormat.addInputPath(job, new Path(crawlDb, CrawlDb.CURRENT_NAME));
-Index: 101tec-nutch-a9cddd9/src/java/org/apache/nutch/fetcher/Fetcher.java
+Index: 101tec-nutch-11e55b9/src/java/org/apache/nutch/fetcher/Fetcher.java
 ===================================================================
---- 101tec-nutch-a9cddd9/src/java/org/apache/nutch/fetcher/Fetcher.java	(revision 14342)
-+++ 101tec-nutch-a9cddd9/src/java/org/apache/nutch/fetcher/Fetcher.java	(working copy)
+--- 101tec-nutch-11e55b9/src/java/org/apache/nutch/fetcher/Fetcher.java	(revision 14342)
++++ 101tec-nutch-11e55b9/src/java/org/apache/nutch/fetcher/Fetcher.java	(working copy)
 @@ -68,6 +68,7 @@
  import org.apache.nutch.parse.ParseStatus;
  import org.apache.nutch.parse.ParseText;
@@ -233,10 +233,10 @@ Index: 101tec-nutch-a9cddd9/src/java/org/apache/nutch/fetcher/Fetcher.java
    /** Run the fetcher. */
    public static void main(String[] args) throws Exception {
  
-Index: 101tec-nutch-a9cddd9/src/java/org/apache/nutch/plugin/PluginManifestParser.java
+Index: 101tec-nutch-11e55b9/src/java/org/apache/nutch/plugin/PluginManifestParser.java
 ===================================================================
---- 101tec-nutch-a9cddd9/src/java/org/apache/nutch/plugin/PluginManifestParser.java	(revision 14296)
-+++ 101tec-nutch-a9cddd9/src/java/org/apache/nutch/plugin/PluginManifestParser.java	(working copy)
+--- 101tec-nutch-11e55b9/src/java/org/apache/nutch/plugin/PluginManifestParser.java	(revision 14296)
++++ 101tec-nutch-11e55b9/src/java/org/apache/nutch/plugin/PluginManifestParser.java	(working copy)
 @@ -84,7 +84,7 @@
        }
        LOG.info("Plugins: looking in: " + directory.getAbsolutePath());

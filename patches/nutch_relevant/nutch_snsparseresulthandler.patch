@@ -1,7 +1,7 @@
-Index: 101tec-nutch-a9cddd9/src/java/org/apache/nutch/parse/resulthandler/SnsParseResultHandler.java
+Index: 101tec-nutch-11e55b9/src/java/org/apache/nutch/parse/resulthandler/SnsParseResultHandler.java
 ===================================================================
---- 101tec-nutch-a9cddd9/src/java/org/apache/nutch/parse/resulthandler/SnsParseResultHandler.java	(revision 0)
-+++ 101tec-nutch-a9cddd9/src/java/org/apache/nutch/parse/resulthandler/SnsParseResultHandler.java	(revision 0)
+--- 101tec-nutch-11e55b9/src/java/org/apache/nutch/parse/resulthandler/SnsParseResultHandler.java	(revision 0)
++++ 101tec-nutch-11e55b9/src/java/org/apache/nutch/parse/resulthandler/SnsParseResultHandler.java	(revision 0)
 @@ -0,0 +1,51 @@
 +package org.apache.nutch.parse.resulthandler;
 +

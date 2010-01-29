@@ -213,7 +213,7 @@ public class CrawlTool {
     // delete old segments (after indexing so searching is meanwhile still possible)
     if (segmentsToDelete != null) {
       for (Path p : segmentsToDelete) {
-        _fileSystem.delete(p, true);
+        //_fileSystem.delete(p, true);
       }
     }
     

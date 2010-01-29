@@ -63,6 +63,8 @@ import org.apache.nutch.util.HadoopFSUtil;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
 
+import de.ingrid.iplug.se.crawl.sns.CompressedSnsData;
+
 /**
  * This tool takes several segments and merges their data together. Only the
  * latest versions of data is retained.
@@ -198,6 +200,7 @@ public class SegmentMerger extends Configured implements
         MapFile.Writer pt_out = null;
         SequenceFile.Writer g_out = null;
         SequenceFile.Writer p_out = null;
+        SequenceFile.Writer sns_out = null;
         HashMap sliceWriters = new HashMap();
         String segmentName = job.get("segment.merger.segmentName");
         
@@ -234,26 +237,32 @@ public class SegmentMerger extends Configured implements
           } else if (o instanceof ParseText) {
             pt_out = ensureMapFile(slice, ParseText.DIR_NAME, ParseText.class);
             pt_out.append(key, o);
+          } else if (o instanceof CompressedSnsData) {
+            sns_out = ensureSequenceFile(slice, CompressedSnsData.DIR_NAME, CompressedSnsData.class);
+            sns_out.append(key, o);
           }
         }
         
         // lazily create SequenceFile-s.
         private SequenceFile.Writer ensureSequenceFile(String slice, String dirName) throws IOException {
-          if (slice == null) slice = DEFAULT_SLICE;
-          SequenceFile.Writer res = (SequenceFile.Writer)sliceWriters.get(slice + dirName);
-          if (res != null) return res;
-          Path wname;
-          Path out = FileOutputFormat.getOutputPath(job);
-          if (slice == DEFAULT_SLICE) {
-            wname = new Path(new Path(new Path(out, segmentName), dirName), name);
-          } else {
-            wname = new Path(new Path(new Path(out, segmentName + "-" + slice), dirName), name);
-          }
-          res = SequenceFile.createWriter(fs, job, wname, Text.class, 
-              CrawlDatum.class,
-              SequenceFileOutputFormat.getOutputCompressionType(job), progress);
-          sliceWriters.put(slice + dirName, res);
-          return res;
+          return ensureSequenceFile(slice, dirName, CrawlDatum.class);
+        }
+        
+        private SequenceFile.Writer ensureSequenceFile(String slice, String dirName, Class<? extends Writable> clazz) throws IOException {
+            if (slice == null) slice = DEFAULT_SLICE;
+            SequenceFile.Writer res = (SequenceFile.Writer)sliceWriters.get(slice + dirName);
+            if (res != null) return res;
+            Path wname;
+            Path out = FileOutputFormat.getOutputPath(job);
+            if (slice == DEFAULT_SLICE) {
+              wname = new Path(new Path(new Path(out, segmentName), dirName), name);
+            } else {
+              wname = new Path(new Path(new Path(out, segmentName + "-" + slice), dirName), name);
+            }
+            res = SequenceFile.createWriter(fs, job, wname, Text.class, clazz,
+                SequenceFileOutputFormat.getOutputCompressionType(job), progress);
+            sliceWriters.put(slice + dirName, res);
+            return res;
         }
 
         // lazily create MapFile-s.
@@ -365,12 +374,14 @@ public class SegmentMerger extends Configured implements
     Content lastC = null;
     ParseData lastPD = null;
     ParseText lastPT = null;
+    CompressedSnsData lastSNS = null;
     String lastGname = null;
     String lastFname = null;
     String lastSigname = null;
     String lastCname = null;
     String lastPDname = null;
     String lastPTname = null;
+    String lastSNSname = null;
     TreeMap<String, ArrayList<CrawlDatum>> linked =
       new TreeMap<String, ArrayList<CrawlDatum>>();
     while (values.hasNext()) {
@@ -381,6 +392,7 @@ public class SegmentMerger extends Configured implements
         throw new IOException("Null segment part, key=" + key);        
       }
       SegmentPart sp = SegmentPart.parse(spString);
+      System.out.println("SegmentMerger.reduce() o.class = " + o.getClass());
       if (o instanceof CrawlDatum) {
         CrawlDatum val = (CrawlDatum)o;
         // check which output dir it belongs to
@@ -460,6 +472,19 @@ public class SegmentMerger extends Configured implements
             lastPTname = sp.segmentName;
           }
         }
+      } else if (o instanceof CompressedSnsData) {
+          System.out.println("SegmentMerger.reduce()");
+        if (lastSNS == null) {
+            System.out.println("SegmentMerger.reduce() # 1");
+          lastSNS = (CompressedSnsData)o;
+          lastSNSname = sp.segmentName;
+        } else {
+          if (lastSNSname.compareTo(sp.segmentName) < 0) {
+              System.out.println("SegmentMerger.reduce() # 2");
+            lastSNS = (CompressedSnsData)o;
+            lastSNSname = sp.segmentName;
+          }
+        }
       }
     }
     curCount++;
@@ -511,6 +536,15 @@ public class SegmentMerger extends Configured implements
       sp.partName = ParseText.DIR_NAME;
       sp.segmentName = lastPTname;
       wrapper.setMeta(SEGMENT_PART_KEY, sp.toString());
+      System.out.println("SegmentMerger.reduce() wrapper " + wrapper);
+      output.collect(key, wrapper);
+    }
+    if (lastSNS != null) {
+        System.out.println("SegmentMerger.reduce() # lastSNS");
+      wrapper.set(lastSNS);
+      sp.partName = CompressedSnsData.DIR_NAME;
+      sp.segmentName = lastSNSname;
+      wrapper.setMeta(SEGMENT_PART_KEY, sp.toString());
       output.collect(key, wrapper);
     }
     if (linked.size() > 0) {
@@ -546,6 +580,7 @@ public class SegmentMerger extends Configured implements
     boolean c = true;
     boolean pd = true;
     boolean pt = true;
+    boolean sns = true;
     for (int i = 0; i < segs.length; i++) {
       if (!fs.exists(segs[i])) {
         if (LOG.isWarnEnabled()) {
@@ -563,12 +598,14 @@ public class SegmentMerger extends Configured implements
       Path pDir = new Path(segs[i], CrawlDatum.PARSE_DIR_NAME);
       Path pdDir = new Path(segs[i], ParseData.DIR_NAME);
       Path ptDir = new Path(segs[i], ParseText.DIR_NAME);
+      Path snsDir = new Path(segs[i], CompressedSnsData.DIR_NAME);
       c = c && fs.exists(cDir);
       g = g && fs.exists(gDir);
       f = f && fs.exists(fDir);
       p = p && fs.exists(pDir);
       pd = pd && fs.exists(pdDir);
       pt = pt && fs.exists(ptDir);
+      sns = sns && fs.exists(snsDir);
     }
     StringBuffer sb = new StringBuffer();
     if (c) sb.append(" " + Content.DIR_NAME);
@@ -577,6 +614,7 @@ public class SegmentMerger extends Configured implements
     if (p) sb.append(" " + CrawlDatum.PARSE_DIR_NAME);
     if (pd) sb.append(" " + ParseData.DIR_NAME);
     if (pt) sb.append(" " + ParseText.DIR_NAME);
+    if (sns) sb.append(" " + CompressedSnsData.DIR_NAME);
     if (LOG.isInfoEnabled()) {
       LOG.info("SegmentMerger: using segment data from:" + sb.toString());
     }
@@ -605,6 +643,10 @@ public class SegmentMerger extends Configured implements
       if (pt) {
         Path ptDir = new Path(segs[i], ParseText.DIR_NAME);
         FileInputFormat.addInputPath(job, ptDir);
+      }
+      if (sns) {
+        Path snsDir = new Path (segs[i], CompressedSnsData.DIR_NAME);
+        FileInputFormat.addInputPath(job, snsDir);
       }
     }
     job.setInputFormat(ObjectInputFormat.class);

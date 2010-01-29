@@ -23,6 +23,7 @@ import java.util.Iterator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
@@ -185,7 +186,12 @@ implements Mapper<Text, Writable, Text, NutchWritable>,
       FileInputFormat.addInputPath(job, new Path(segment, ParseData.DIR_NAME));
       FileInputFormat.addInputPath(job, new Path(segment, ParseText.DIR_NAME));
       /// TODO rwe: none nutch specific code start: 
-      FileInputFormat.addInputPath(job, new Path(segment, CompressedSnsData.DIR_NAME));
+      Path path = new Path(segment, CompressedSnsData.DIR_NAME);
+      try {
+        if (FileSystem.get(job).exists(path)) {
+          FileInputFormat.addInputPath(job, path);
+        }
+      } catch (IOException e) { }
       /// none nutch specific code end. 
     }
 

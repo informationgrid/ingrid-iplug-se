@@ -14,7 +14,7 @@
 
 <property>
   <name>plugin.folders</name>
-  <value>101tec-nutch-a9cddd9/src/plugin,portalu-nutch-gui/src/plugin</value>
+  <value>101tec-nutch-11e55b9/src/plugin,portalu-nutch-gui/src/plugin</value>
   <description>Directories where nutch plugins are located.  Each
   element may be a relative or absolute path.  If absolute, it is used
   as is.  If relative, it is searched for on the classpath.</description>

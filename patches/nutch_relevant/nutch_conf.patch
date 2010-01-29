@@ -1,7 +1,7 @@
-Index: 101tec-nutch-a9cddd9/conf/nutch-default.xml
+Index: 101tec-nutch-11e55b9/conf/nutch-default.xml
 ===================================================================
---- 101tec-nutch-a9cddd9/conf/nutch-default.xml	(revision 14285)
-+++ 101tec-nutch-a9cddd9/conf/nutch-default.xml	(working copy)
+--- 101tec-nutch-11e55b9/conf/nutch-default.xml	(revision 14285)
++++ 101tec-nutch-11e55b9/conf/nutch-default.xml	(working copy)
 @@ -681,6 +681,13 @@
    </description>
  </property>
@@ -16,10 +16,10 @@ Index: 101tec-nutch-a9cddd9/conf/nutch-default.xml
  <!-- indexingfilter plugin properties -->
  
  <property>
-Index: 101tec-nutch-a9cddd9/conf/log4j.properties
+Index: 101tec-nutch-11e55b9/conf/log4j.properties
 ===================================================================
---- 101tec-nutch-a9cddd9/conf/log4j.properties	(revision 14296)
-+++ 101tec-nutch-a9cddd9/conf/log4j.properties	(working copy)
+--- 101tec-nutch-11e55b9/conf/log4j.properties	(revision 14296)
++++ 101tec-nutch-11e55b9/conf/log4j.properties	(working copy)
 @@ -9,24 +9,25 @@
  log4j.threshhold=ALL
  

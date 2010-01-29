@@ -863,7 +863,7 @@ diff -crBE ./src/test/org/apache/nutch/admin/GuiComponentExtensionContainerTest.
   
     public void testGeneralGuiComponent() throws Exception {
       Configuration configuration = NutchConfiguration.create();
-!     configuration.set("plugin.folders", "101tec-nutch-a9cddd9/src/plugin,portalu-nutch-gui/src/plugin");
+!     configuration.set("plugin.folders", "101tec-nutch-11e55b9/src/plugin,portalu-nutch-gui/src/plugin");
       GuiComponentExtensionContainer guiComponentContainer = new GuiComponentExtensionContainer(
               configuration);
       List<Extension> list = guiComponentContainer
