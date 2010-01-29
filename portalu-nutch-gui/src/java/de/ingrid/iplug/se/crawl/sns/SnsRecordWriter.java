@@ -95,12 +95,6 @@ public class SnsRecordWriter implements RecordWriter<Text, CompressedSnsData> {
       addCoordinates(snsData);
       addDate(snsData);
       addLocations(snsData);
-      System.out.println("KEY = " + key);
-      System.out.println("SNS DATA");
-      System.out.println(" " + snsData.getBuzzwords());
-      System.out.println(" " + snsData.getCommunityCodes());
-      System.out.println(" " + snsData.getLocations());
-
       _time = _time + (System.currentTimeMillis() - currentTimeMillis);
       _counter++;
       if (_counter % 50 == 0) {
@@ -110,7 +104,7 @@ public class SnsRecordWriter implements RecordWriter<Text, CompressedSnsData> {
       _writer.append(key, snsData);
     } catch (Exception e) {
       _errorCounter++;
-      LOG.warn(e.getMessage(), e);
+      LOG.warn(e.getMessage());
     }
   }
 
@@ -122,10 +116,6 @@ public class SnsRecordWriter implements RecordWriter<Text, CompressedSnsData> {
     int wordLength = 10;
     // Call getBuzzwords() first, to get results when calling methods results from
     // getReferencesToTime() and getReferencesToSpace() later.
-    System.out.println("Text = " + text);
-    System.out.println("snsINterface = " + _snsInterface);
-    System.out.println("maxAnalyzing = " + _maxAnalyzing);
-    System.out.println("word Length = "+ wordLength);
     String[] buzzwords = _snsInterface.getBuzzwords(text.length() > (_maxAnalyzing * wordLength) ? text.substring(0,
         _maxAnalyzing * wordLength) : text, _maxAnalyzing, false, null);
     Set<Text> set = new HashSet<Text>();

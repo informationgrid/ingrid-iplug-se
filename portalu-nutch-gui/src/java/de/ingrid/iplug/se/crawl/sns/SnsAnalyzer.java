@@ -32,13 +32,11 @@ public class SnsAnalyzer {
 
     Runnable runnable = new Runnable() {
       public void run() {
-          System.out.println("SnsAnalyzer.SnsAnalyzer(...).new Runnable() {...}.run() start");
         try {
           Text url = new Text();
           CompressedSnsData snsData = new CompressedSnsData();
           int i = 0;
           while (_recordReader.next(url, snsData)) {
-              System.out.println("SnsAnalyzer.SnsAnalyzer(...).new Runnable() {...}.run() next");
             _recordWriter.write(url, snsData);
             i++;
           }
@@ -46,7 +44,6 @@ public class SnsAnalyzer {
           e.printStackTrace();
         }
         LOG.info("Sns Analyzing finished");
-        System.out.println("SnsAnalyzer.SnsAnalyzer(...).new Runnable() {...}.run() end");
       }
     };
     new Thread(runnable).start();

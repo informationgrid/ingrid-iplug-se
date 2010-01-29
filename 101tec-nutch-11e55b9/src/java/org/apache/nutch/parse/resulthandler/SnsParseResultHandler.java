@@ -20,7 +20,6 @@ public class SnsParseResultHandler {
   public static final Log LOG = LogFactory.getLog(SnsParseResultHandler.class);
 
   public void process(Content content, ParseResult parseResult) {
-      System.out.println("SnsParseResultHandler.process()");
     String segmentName = content.getMetadata().get(Nutch.SEGMENT_NAME_KEY);
     SnsAnalyzer analyzer = SnsAnalyzerFactory.getAnalyzer(segmentName);
 
@@ -30,7 +29,6 @@ public class SnsParseResultHandler {
     }
     for (Entry<Text, Parse> entry : parseResult) {
       Parse value = entry.getValue();
-      System.out.println("SnsParseResultHandler.process() " + content.getUrl());
       analyzer.analyze(new Text(content.getUrl()), value.getText());
     }
   }
@@ -38,7 +36,6 @@ public class SnsParseResultHandler {
   public void beginParsing(String segment, JobConf jobConf) throws IOException {
     LOG.info("Starting SnsParseResultHandlers for segment name '" + segment + "'.");
     try {
-        System.out.println("SnsParseResultHandler.beginParsing() begin parsing");
       SnsAnalyzerFactory.createAnalyzer(segment, jobConf);
     } catch (Throwable e) {
       LOG.error("unable to create SnsAnalyzer", e);

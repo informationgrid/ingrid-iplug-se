@@ -926,7 +926,6 @@ public class Fetcher extends Configured implements
       _snsParseResultHandler = new SnsParseResultHandler();
     }
     // start the sns analyzing
-    System.out.println("Fetcher.run() begin parsing");
     _snsParseResultHandler.beginParsing(getConf().get(Nutch.SEGMENT_NAME_KEY), (JobConf) getConf());
 
     for (int i = 0; i < threadCount; i++) {       // spawn threads

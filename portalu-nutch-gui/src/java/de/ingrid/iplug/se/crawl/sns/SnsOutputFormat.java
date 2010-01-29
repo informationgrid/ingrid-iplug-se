@@ -39,7 +39,7 @@ public class SnsOutputFormat implements OutputFormat<Text, CompressedSnsData> {
     try {
       recordWriter = new SnsRecordWriter(writer);
     } catch (Exception e) {
-      throw new IOException(e.getMessage(), e);
+      throw new IOException(e.getMessage());
     }
     return recordWriter;
   }

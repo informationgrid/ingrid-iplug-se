@@ -41,7 +41,6 @@ public class SnsInMemoryRecordReader implements RecordReader<Text, CompressedSns
       LOGGER.info("Sns Analyzing was stopped. The rest of the urls will be skipped: " + _map.size());
       return false;
     }
-    System.out.println("SnsInMemoryRecordReader.next()");
     synchronized (_map) {
       // wait add-notify or close-notify
       if (_map.isEmpty()) {

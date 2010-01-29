@@ -392,7 +392,6 @@ public class SegmentMerger extends Configured implements
         throw new IOException("Null segment part, key=" + key);        
       }
       SegmentPart sp = SegmentPart.parse(spString);
-      System.out.println("SegmentMerger.reduce() o.class = " + o.getClass());
       if (o instanceof CrawlDatum) {
         CrawlDatum val = (CrawlDatum)o;
         // check which output dir it belongs to
@@ -473,14 +472,11 @@ public class SegmentMerger extends Configured implements
           }
         }
       } else if (o instanceof CompressedSnsData) {
-          System.out.println("SegmentMerger.reduce()");
         if (lastSNS == null) {
-            System.out.println("SegmentMerger.reduce() # 1");
           lastSNS = (CompressedSnsData)o;
           lastSNSname = sp.segmentName;
         } else {
           if (lastSNSname.compareTo(sp.segmentName) < 0) {
-              System.out.println("SegmentMerger.reduce() # 2");
             lastSNS = (CompressedSnsData)o;
             lastSNSname = sp.segmentName;
           }
@@ -536,11 +532,9 @@ public class SegmentMerger extends Configured implements
       sp.partName = ParseText.DIR_NAME;
       sp.segmentName = lastPTname;
       wrapper.setMeta(SEGMENT_PART_KEY, sp.toString());
-      System.out.println("SegmentMerger.reduce() wrapper " + wrapper);
       output.collect(key, wrapper);
     }
     if (lastSNS != null) {
-        System.out.println("SegmentMerger.reduce() # lastSNS");
       wrapper.set(lastSNS);
       sp.partName = CompressedSnsData.DIR_NAME;
       sp.segmentName = lastSNSname;
