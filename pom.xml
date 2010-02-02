@@ -19,6 +19,11 @@
 			<name>Ralf</name>
 			<email>RalfWehner@web.de</email>
 		</developer>
+		<developer>
+            <id>me</id>
+            <name>Max Ender</name>
+            <email>me@101tec.com</email>
+        </developer>
 	</developers>
 
 	<scm>
@@ -110,9 +115,12 @@
 						<phase>compile</phase>
 						<configuration>
 							<tasks>
-								<echo
-									message="Executing original ant build script '${basedir}/build.xml' target=dist." />
+								<echo message="Executing original ant build script '${basedir}/build.xml' target=dist." />
 								<ant antfile="${basedir}/build.xml" inheritRefs="true">
+                                    <property name="maven.version" value="${version}" />
+                                    <property name="maven.buildNumber" value="${buildNumber}" />
+                                    <property name="maven.timestamp" value="${timestamp}" />
+                                    <property name="maven.iplugType" value="IPLUG_SE" />
 									<target name="dist" />
 								</ant>
 							</tasks>

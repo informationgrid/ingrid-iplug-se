@@ -3,6 +3,14 @@
 
 	<import file="../build-plugin.xml" />
 
+	<target name="jar" depends="compile">
+        <jar
+            jarfile="${build.dir}/${name}.jar"
+            basedir="${build.classes}"
+            manifest="../../../../MANIFEST.MF"
+        />
+    </target>
+	
 	<target name="deps-jar">
 		<copy todir="${deploy.dir}/src/webapp">
 			<fileset dir="${basedir}/src/webapp" />

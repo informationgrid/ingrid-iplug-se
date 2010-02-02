@@ -13,7 +13,7 @@ import org.apache.nutch.util.ZipUtil;
 
 public class MailService {
 
-    public static final String TEMP_DIR = "/tmp/nutch_reports/";
+    public static final String TEMP_DIR = "nutch_reports";
 
     protected static Log LOG = LogFactory.getLog(MailService.class);
 
@@ -38,15 +38,14 @@ public class MailService {
         // create file name
         final Path report = new Path(segment, UrlReporter.REPORT);
         final String segmentName = segment.getName();
-        final String crawlName = segment.getParent().getParent().getName();
-        final String path = TEMP_DIR + System.currentTimeMillis() + "/" + crawlName + "_" + segmentName + "("
-                + currentDepth + ")";
+        final Path crawlPath = segment.getParent().getParent();
+        final String crawlName = crawlPath.getName();
+        final Path reportPath = new Path(crawlPath, TEMP_DIR + "/" + segmentName + "_" + currentDepth);
 
         // create temp local file report
-        LOG.debug("creating temp report file");
-        final Path tmpReport = new Path(path);
-        fileSystem.copyToLocalFile(report, tmpReport);
-        final File reportFile = new File(path);
+        LOG.debug("moving report file to local file");
+        fileSystem.copyToLocalFile(report, reportPath);
+        final File reportFile = new File(reportPath.toString());
 
         // load attachment
         LOG.debug("creating attachment");
@@ -62,7 +61,7 @@ public class MailService {
             final StringBuilder sb = new StringBuilder();
             sb.append("crawl: " + crawlName + "\n");
             sb.append("segment: " + segmentName + "\n");
-            sb.append("depth: " + currentDepth + "\n");
+            sb.append("depth: " + currentDepth);
             final String content = sb.toString();
 
             // send email

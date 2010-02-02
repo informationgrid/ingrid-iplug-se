@@ -127,7 +127,7 @@
 	</target>
 
 	<!-- To build the installer, use maven: mvn assembly:assembly -Dmaven.test.skip -->
-	<target name="dist" depends="clean, copy-nutch, copy-ingrid-se-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts,copy-indexer-searcher-configs,copy-deploy-conf-files">
+	<target name="dist" depends="clean, copy-nutch, copy-ingrid-se-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts,copy-indexer-searcher-configs,copy-deploy-conf-files, create-manifest">
 		<ant dir="build/${nutch-version}" target="package" />
 
 		<property file="${basedir}/${nutch-version}/default.properties" />
@@ -148,6 +148,16 @@
 		</copy>
 	</target>
 
+	<target name="create-manifest">
+	    <manifest file="build/MANIFEST.MF">
+	    	<attribute name="Build-By" value="${user.name}"/>
+	    	<attribute name="Build-Timestamp" value="${maven.timestamp}"/>
+	    	<attribute name="Implementation-Build" value="${maven.buildNumber}"/>
+	    	<attribute name="Implementation-Version" value="${maven.version}"/>
+	    	<attribute name="iPlug-Type" value="${maven.iplugType}"/>
+	    </manifest>
+	</target>
+	
 	<target name="copy-deploy-conf-files" depends="copy-indexer-searcher-configs">
 		<copy todir="build/${nutch-version}/conf" overwrite="true" flatten="true">
 			<fileset dir="deploy" casesensitive="yes">

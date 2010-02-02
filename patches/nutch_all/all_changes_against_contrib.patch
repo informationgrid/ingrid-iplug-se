@@ -3,8 +3,8 @@ Only in ./: .gitignore
 Only in ./: .project
 Only in ./: .settings
 diff -crBE ./build.xml ../local/build.xml
-*** ./build.xml	2009-11-18 07:56:50.000000000 +0100
---- ../local/build.xml	2010-01-27 10:07:37.000000000 +0100
+*** ./build.xml	2010-01-26 02:47:32.000000000 +0100
+--- ../local/build.xml	2010-02-02 18:07:52.000000000 +0100
 ***************
 *** 33,38 ****
 --- 33,41 ----
@@ -35,6 +35,25 @@ diff -crBE ./build.xml ../local/build.xml
        debug="${javac.debug}"
        optimize="${javac.optimize}"
 ***************
+*** 139,147 ****
+      <copy file="${conf.dir}/nutch-site.xml"
+            todir="${build.classes}"/>
+      <jar jarfile="${build.dir}/${final.name}.jar"
+!          basedir="${build.classes}">
+!       <manifest>
+!       </manifest>
+      </jar>
+    </target>
+  
+--- 142,148 ----
+      <copy file="${conf.dir}/nutch-site.xml"
+            todir="${build.classes}"/>
+      <jar jarfile="${build.dir}/${final.name}.jar"
+!          basedir="${build.classes}" manifest="../MANIFEST.MF">
+      </jar>
+    </target>
+  
+***************
 *** 531,542 ****
     <!-- ================================================================== -->
     <!--                                                                    -->
@@ -48,7 +67,7 @@ diff -crBE ./build.xml ../local/build.xml
       <mkdir dir="${dist.dir}/plugins"/>
   
       <copy todir="${dist.dir}/lib" includeEmptyDirs="false">
---- 534,543 ----
+--- 532,541 ----
     <!-- ================================================================== -->
     <!--                                                                    -->
     <!-- ================================================================== -->
@@ -68,7 +87,7 @@ diff -crBE ./build.xml ../local/build.xml
   
       <copy todir="${dist.dir}/bin">
         <fileset dir="bin"/>
---- 554,559 ----
+--- 552,557 ----
 ***************
 *** 567,580 ****
           <fileset dir="${dist.dir}/bin"/>
@@ -85,7 +104,7 @@ diff -crBE ./build.xml ../local/build.xml
       <copy todir="${dist.dir}">
         <fileset dir=".">
           <include name="*.txt" />
---- 567,572 ----
+--- 565,570 ----
 ***************
 *** 582,593 ****
         </fileset>
@@ -100,7 +119,7 @@ diff -crBE ./build.xml ../local/build.xml
   
     </target>
   
---- 574,590 ----
+--- 572,588 ----
         </fileset>
       </copy>
   
@@ -117,9 +136,53 @@ diff -crBE ./build.xml ../local/build.xml
 +   	<chmod file="${dist.dir}/start-*.sh" perm="754"/>
   
     </target>
+  
+diff -crBE ./src/java/org/apache/nutch/crawl/CrawlTool.java ../local/src/java/org/apache/nutch/crawl/CrawlTool.java
+*** ./src/java/org/apache/nutch/crawl/CrawlTool.java	2010-01-26 02:47:32.000000000 +0100
+--- ../local/src/java/org/apache/nutch/crawl/CrawlTool.java	2010-02-02 18:07:58.000000000 +0100
+***************
+*** 18,26 ****
+--- 18,28 ----
+  import org.apache.nutch.indexer.DeleteDuplicates;
+  import org.apache.nutch.indexer.IndexMerger;
+  import org.apache.nutch.indexer.Indexer;
++ import org.apache.nutch.mail.MailService;
+  import org.apache.nutch.parse.ParseSegment;
+  import org.apache.nutch.segment.SegmentMerger;
+  import org.apache.nutch.tools.HostStatistic;
++ import org.apache.nutch.tools.UrlReporter;
+  import org.apache.nutch.util.HadoopFSUtil;
+  
+  public class CrawlTool {
+***************
+*** 75,80 ****
+--- 77,86 ----
+      // other jobs
+      Generator generator = new Generator(_configuration);
+      Fetcher fetcher = new Fetcher(_configuration);
++     // ------ none nutch-specific code starts here
++     UrlReporter reporter = new UrlReporter(_configuration);
++     MailService mail = MailService.get(_configuration);
++     // ------ none nutch-specific code ends here
+      ParseSegment parseSegment = new ParseSegment(_configuration);
+      BWUpdateDb bwUpdateDb = new BWUpdateDb(_configuration);
+      ParseDataUpdater parseDataUpdater = new ParseDataUpdater(_configuration);
+***************
+*** 128,133 ****
+--- 134,143 ----
+        segs.add(segment);
+        fetcher.fetch(segment, threads, org.apache.nutch.fetcher.Fetcher
+                .isParsing(_configuration)); // fetch it
++       // ------ none nutch-specific code starts here
++       reporter.analyze(segment);
++       mail.sendSegmentReport(_fileSystem, segment, i);
++       // ------ none nutch-specific code ends here
+        if (!Fetcher.isParsing(_configuration)) {
+          parseSegment.parse(segment); // parse it, if needed
+        }
 diff -crBE ./src/java/org/apache/nutch/crawl/NutchWritable.java ../local/src/java/org/apache/nutch/crawl/NutchWritable.java
-*** ./src/java/org/apache/nutch/crawl/NutchWritable.java	2009-11-18 07:56:50.000000000 +0100
---- ../local/src/java/org/apache/nutch/crawl/NutchWritable.java	2010-01-27 10:07:38.000000000 +0100
+*** ./src/java/org/apache/nutch/crawl/NutchWritable.java	2010-01-26 02:47:32.000000000 +0100
+--- ../local/src/java/org/apache/nutch/crawl/NutchWritable.java	2010-02-02 18:07:27.000000000 +0100
 ***************
 *** 18,23 ****
 --- 18,24 ----
@@ -151,8 +214,8 @@ diff -crBE ./src/java/org/apache/nutch/crawl/NutchWritable.java ../local/src/jav
     }
   
 diff -crBE ./src/java/org/apache/nutch/fetcher/Fetcher.java ../local/src/java/org/apache/nutch/fetcher/Fetcher.java
-*** ./src/java/org/apache/nutch/fetcher/Fetcher.java	2009-11-18 07:56:50.000000000 +0100
---- ../local/src/java/org/apache/nutch/fetcher/Fetcher.java	2010-01-27 10:07:38.000000000 +0100
+*** ./src/java/org/apache/nutch/fetcher/Fetcher.java	2010-01-26 02:47:32.000000000 +0100
+--- ../local/src/java/org/apache/nutch/fetcher/Fetcher.java	2010-02-02 18:07:48.000000000 +0100
 ***************
 *** 47,52 ****
 --- 47,55 ----
@@ -254,11 +317,21 @@ diff -crBE ./src/java/org/apache/nutch/fetcher/Fetcher.java ../local/src/java/or
   
     public void fetch(Path segment, int threads, boolean parsing)
 diff -crBE ./src/java/org/apache/nutch/indexer/IndexerMapReduce.java ../local/src/java/org/apache/nutch/indexer/IndexerMapReduce.java
-*** ./src/java/org/apache/nutch/indexer/IndexerMapReduce.java	2009-11-18 07:56:50.000000000 +0100
---- ../local/src/java/org/apache/nutch/indexer/IndexerMapReduce.java	2010-01-27 10:07:52.000000000 +0100
+*** ./src/java/org/apache/nutch/indexer/IndexerMapReduce.java	2010-01-26 02:47:32.000000000 +0100
+--- ../local/src/java/org/apache/nutch/indexer/IndexerMapReduce.java	2010-02-02 18:07:53.000000000 +0100
+***************
+*** 23,28 ****
+--- 23,29 ----
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.hadoop.conf.Configured;
++ import org.apache.hadoop.fs.FileSystem;
+  import org.apache.hadoop.fs.Path;
+  import org.apache.hadoop.io.Text;
+  import org.apache.hadoop.io.Writable;
 ***************
 *** 47,52 ****
---- 47,55 ----
+--- 48,56 ----
   import org.apache.nutch.scoring.ScoringFilterException;
   import org.apache.nutch.scoring.ScoringFilters;
   
@@ -270,7 +343,7 @@ diff -crBE ./src/java/org/apache/nutch/indexer/IndexerMapReduce.java ../local/sr
             Reducer<Text, NutchWritable, Text, NutchDocument> {
 ***************
 *** 75,80 ****
---- 78,86 ----
+--- 79,87 ----
       CrawlDatum fetchDatum = null;
       ParseData parseData = null;
       ParseText parseText = null;
@@ -282,7 +355,7 @@ diff -crBE ./src/java/org/apache/nutch/indexer/IndexerMapReduce.java ../local/sr
         if (value instanceof Inlinks) {
 ***************
 *** 97,102 ****
---- 103,110 ----
+--- 104,111 ----
           parseData = (ParseData)value;
         } else if (value instanceof ParseText) {
           parseText = (ParseText)value;
@@ -300,7 +373,7 @@ diff -crBE ./src/java/org/apache/nutch/indexer/IndexerMapReduce.java ../local/sr
       try {
         // extract information from dbDatum and pass it to
         // fetchDatum so that indexing filters can use it
---- 129,138 ----
+--- 130,139 ----
       // add digest, used by dedup
       doc.add("digest", metadata.get(Nutch.SIGNATURE_KEY));
   
@@ -313,12 +386,17 @@ diff -crBE ./src/java/org/apache/nutch/indexer/IndexerMapReduce.java ../local/sr
         // fetchDatum so that indexing filters can use it
 ***************
 *** 173,178 ****
---- 184,192 ----
+--- 185,198 ----
         FileInputFormat.addInputPath(job, new Path(segment, CrawlDatum.PARSE_DIR_NAME));
         FileInputFormat.addInputPath(job, new Path(segment, ParseData.DIR_NAME));
         FileInputFormat.addInputPath(job, new Path(segment, ParseText.DIR_NAME));
 +       /// TODO rwe: none nutch specific code start: 
-+       FileInputFormat.addInputPath(job, new Path(segment, CompressedSnsData.DIR_NAME));
++       Path path = new Path(segment, CompressedSnsData.DIR_NAME);
++       try {
++         if (FileSystem.get(job).exists(path)) {
++           FileInputFormat.addInputPath(job, path);
++         }
++       } catch (IOException e) { }
 +       /// none nutch specific code end. 
       }
   
@@ -326,8 +404,8 @@ diff -crBE ./src/java/org/apache/nutch/indexer/IndexerMapReduce.java ../local/sr
 Only in ../local/src/java/org/apache/nutch: mail
 Only in ../local/src/java/org/apache/nutch/parse: resulthandler
 diff -crBE ./src/java/org/apache/nutch/searcher/Hits.java ../local/src/java/org/apache/nutch/searcher/Hits.java
-*** ./src/java/org/apache/nutch/searcher/Hits.java	2009-11-18 07:56:50.000000000 +0100
---- ../local/src/java/org/apache/nutch/searcher/Hits.java	2010-01-27 10:07:38.000000000 +0100
+*** ./src/java/org/apache/nutch/searcher/Hits.java	2010-01-26 02:47:32.000000000 +0100
+--- ../local/src/java/org/apache/nutch/searcher/Hits.java	2010-02-02 18:07:57.000000000 +0100
 ***************
 *** 32,38 ****
     private boolean totalIsExact = true;
@@ -348,8 +426,8 @@ diff -crBE ./src/java/org/apache/nutch/searcher/Hits.java ../local/src/java/org/
     public Hits(long total, Hit[] top) {
       this.total = total;
 diff -crBE ./src/java/org/apache/nutch/searcher/Query.java ../local/src/java/org/apache/nutch/searcher/Query.java
-*** ./src/java/org/apache/nutch/searcher/Query.java	2009-11-18 07:56:50.000000000 +0100
---- ../local/src/java/org/apache/nutch/searcher/Query.java	2010-01-27 10:07:36.000000000 +0100
+*** ./src/java/org/apache/nutch/searcher/Query.java	2010-01-26 02:47:32.000000000 +0100
+--- ../local/src/java/org/apache/nutch/searcher/Query.java	2010-02-02 18:07:26.000000000 +0100
 ***************
 *** 24,29 ****
 --- 24,31 ----
@@ -492,11 +570,198 @@ diff -crBE ./src/java/org/apache/nutch/searcher/Query.java ../local/src/java/org
     public void write(DataOutput out) throws IOException {
       out.writeByte(clauses.size());
       for (int i = 0; i < clauses.size(); i++)
+diff -crBE ./src/java/org/apache/nutch/segment/SegmentMerger.java ../local/src/java/org/apache/nutch/segment/SegmentMerger.java
+*** ./src/java/org/apache/nutch/segment/SegmentMerger.java	2010-01-26 02:47:32.000000000 +0100
+--- ../local/src/java/org/apache/nutch/segment/SegmentMerger.java	2010-02-02 18:08:00.000000000 +0100
+***************
+*** 63,68 ****
+--- 63,70 ----
+  import org.apache.nutch.util.NutchConfiguration;
+  import org.apache.nutch.util.NutchJob;
+  
++ import de.ingrid.iplug.se.crawl.sns.CompressedSnsData;
++ 
+  /**
+   * This tool takes several segments and merges their data together. Only the
+   * latest versions of data is retained.
+***************
+*** 198,203 ****
+--- 200,206 ----
+          MapFile.Writer pt_out = null;
+          SequenceFile.Writer g_out = null;
+          SequenceFile.Writer p_out = null;
++         SequenceFile.Writer sns_out = null;
+          HashMap sliceWriters = new HashMap();
+          String segmentName = job.get("segment.merger.segmentName");
+          
+***************
+*** 234,259 ****
+            } else if (o instanceof ParseText) {
+              pt_out = ensureMapFile(slice, ParseText.DIR_NAME, ParseText.class);
+              pt_out.append(key, o);
+            }
+          }
+          
+          // lazily create SequenceFile-s.
+          private SequenceFile.Writer ensureSequenceFile(String slice, String dirName) throws IOException {
+!           if (slice == null) slice = DEFAULT_SLICE;
+!           SequenceFile.Writer res = (SequenceFile.Writer)sliceWriters.get(slice + dirName);
+!           if (res != null) return res;
+!           Path wname;
+!           Path out = FileOutputFormat.getOutputPath(job);
+!           if (slice == DEFAULT_SLICE) {
+!             wname = new Path(new Path(new Path(out, segmentName), dirName), name);
+!           } else {
+!             wname = new Path(new Path(new Path(out, segmentName + "-" + slice), dirName), name);
+!           }
+!           res = SequenceFile.createWriter(fs, job, wname, Text.class, 
+!               CrawlDatum.class,
+!               SequenceFileOutputFormat.getOutputCompressionType(job), progress);
+!           sliceWriters.put(slice + dirName, res);
+!           return res;
+          }
+  
+          // lazily create MapFile-s.
+--- 237,268 ----
+            } else if (o instanceof ParseText) {
+              pt_out = ensureMapFile(slice, ParseText.DIR_NAME, ParseText.class);
+              pt_out.append(key, o);
++           } else if (o instanceof CompressedSnsData) {
++             sns_out = ensureSequenceFile(slice, CompressedSnsData.DIR_NAME, CompressedSnsData.class);
++             sns_out.append(key, o);
+            }
+          }
+          
+          // lazily create SequenceFile-s.
+          private SequenceFile.Writer ensureSequenceFile(String slice, String dirName) throws IOException {
+!           return ensureSequenceFile(slice, dirName, CrawlDatum.class);
+!         }
+!         
+!         private SequenceFile.Writer ensureSequenceFile(String slice, String dirName, Class<? extends Writable> clazz) throws IOException {
+!             if (slice == null) slice = DEFAULT_SLICE;
+!             SequenceFile.Writer res = (SequenceFile.Writer)sliceWriters.get(slice + dirName);
+!             if (res != null) return res;
+!             Path wname;
+!             Path out = FileOutputFormat.getOutputPath(job);
+!             if (slice == DEFAULT_SLICE) {
+!               wname = new Path(new Path(new Path(out, segmentName), dirName), name);
+!             } else {
+!               wname = new Path(new Path(new Path(out, segmentName + "-" + slice), dirName), name);
+!             }
+!             res = SequenceFile.createWriter(fs, job, wname, Text.class, clazz,
+!                 SequenceFileOutputFormat.getOutputCompressionType(job), progress);
+!             sliceWriters.put(slice + dirName, res);
+!             return res;
+          }
+  
+          // lazily create MapFile-s.
+***************
+*** 365,376 ****
+--- 374,387 ----
+      Content lastC = null;
+      ParseData lastPD = null;
+      ParseText lastPT = null;
++     CompressedSnsData lastSNS = null;
+      String lastGname = null;
+      String lastFname = null;
+      String lastSigname = null;
+      String lastCname = null;
+      String lastPDname = null;
+      String lastPTname = null;
++     String lastSNSname = null;
+      TreeMap<String, ArrayList<CrawlDatum>> linked =
+        new TreeMap<String, ArrayList<CrawlDatum>>();
+      while (values.hasNext()) {
+***************
+*** 460,465 ****
+--- 471,486 ----
+              lastPTname = sp.segmentName;
+            }
+          }
++       } else if (o instanceof CompressedSnsData) {
++         if (lastSNS == null) {
++           lastSNS = (CompressedSnsData)o;
++           lastSNSname = sp.segmentName;
++         } else {
++           if (lastSNSname.compareTo(sp.segmentName) < 0) {
++             lastSNS = (CompressedSnsData)o;
++             lastSNSname = sp.segmentName;
++           }
++         }
+        }
+      }
+      curCount++;
+***************
+*** 513,518 ****
+--- 534,546 ----
+        wrapper.setMeta(SEGMENT_PART_KEY, sp.toString());
+        output.collect(key, wrapper);
+      }
++     if (lastSNS != null) {
++       wrapper.set(lastSNS);
++       sp.partName = CompressedSnsData.DIR_NAME;
++       sp.segmentName = lastSNSname;
++       wrapper.setMeta(SEGMENT_PART_KEY, sp.toString());
++       output.collect(key, wrapper);
++     }
+      if (linked.size() > 0) {
+        String name = linked.lastKey();
+        sp.partName = CrawlDatum.PARSE_DIR_NAME;
+***************
+*** 546,551 ****
+--- 574,580 ----
+      boolean c = true;
+      boolean pd = true;
+      boolean pt = true;
++     boolean sns = true;
+      for (int i = 0; i < segs.length; i++) {
+        if (!fs.exists(segs[i])) {
+          if (LOG.isWarnEnabled()) {
+***************
+*** 563,574 ****
+--- 592,605 ----
+        Path pDir = new Path(segs[i], CrawlDatum.PARSE_DIR_NAME);
+        Path pdDir = new Path(segs[i], ParseData.DIR_NAME);
+        Path ptDir = new Path(segs[i], ParseText.DIR_NAME);
++       Path snsDir = new Path(segs[i], CompressedSnsData.DIR_NAME);
+        c = c && fs.exists(cDir);
+        g = g && fs.exists(gDir);
+        f = f && fs.exists(fDir);
+        p = p && fs.exists(pDir);
+        pd = pd && fs.exists(pdDir);
+        pt = pt && fs.exists(ptDir);
++       sns = sns && fs.exists(snsDir);
+      }
+      StringBuffer sb = new StringBuffer();
+      if (c) sb.append(" " + Content.DIR_NAME);
+***************
+*** 577,582 ****
+--- 608,614 ----
+      if (p) sb.append(" " + CrawlDatum.PARSE_DIR_NAME);
+      if (pd) sb.append(" " + ParseData.DIR_NAME);
+      if (pt) sb.append(" " + ParseText.DIR_NAME);
++     if (sns) sb.append(" " + CompressedSnsData.DIR_NAME);
+      if (LOG.isInfoEnabled()) {
+        LOG.info("SegmentMerger: using segment data from:" + sb.toString());
+      }
+***************
+*** 606,611 ****
+--- 638,647 ----
+          Path ptDir = new Path(segs[i], ParseText.DIR_NAME);
+          FileInputFormat.addInputPath(job, ptDir);
+        }
++       if (sns) {
++         Path snsDir = new Path (segs[i], CompressedSnsData.DIR_NAME);
++         FileInputFormat.addInputPath(job, snsDir);
++       }
+      }
+      job.setInputFormat(ObjectInputFormat.class);
+      job.setMapperClass(SegmentMerger.class);
 Only in ../local/src/java/org/apache/nutch/tools: UrlReporter.java
 Only in ../local/src/java/org/apache/nutch/util: ZipUtil.java
 diff -crBE ./src/plugin/admin-configuration/src/webapp/WEB-INF/web.xml ../local/src/plugin/admin-configuration/src/webapp/WEB-INF/web.xml
-*** ./src/plugin/admin-configuration/src/webapp/WEB-INF/web.xml	2009-11-18 07:56:50.000000000 +0100
---- ../local/src/plugin/admin-configuration/src/webapp/WEB-INF/web.xml	2010-01-27 10:07:51.000000000 +0100
+*** ./src/plugin/admin-configuration/src/webapp/WEB-INF/web.xml	2010-01-26 02:47:32.000000000 +0100
+--- ../local/src/plugin/admin-configuration/src/webapp/WEB-INF/web.xml	2010-02-02 18:07:42.000000000 +0100
 ***************
 *** 55,61 ****
   			<url-pattern>/*</url-pattern>
@@ -518,8 +783,8 @@ diff -crBE ./src/plugin/admin-configuration/src/webapp/WEB-INF/web.xml ../local/
   	</security-constraint>
   
 diff -crBE ./src/plugin/admin-crawl/src/webapp/WEB-INF/web.xml ../local/src/plugin/admin-crawl/src/webapp/WEB-INF/web.xml
-*** ./src/plugin/admin-crawl/src/webapp/WEB-INF/web.xml	2009-11-18 07:56:50.000000000 +0100
---- ../local/src/plugin/admin-crawl/src/webapp/WEB-INF/web.xml	2010-01-27 10:07:40.000000000 +0100
+*** ./src/plugin/admin-crawl/src/webapp/WEB-INF/web.xml	2010-01-26 02:47:32.000000000 +0100
+--- ../local/src/plugin/admin-crawl/src/webapp/WEB-INF/web.xml	2010-02-02 18:07:53.000000000 +0100
 ***************
 *** 63,69 ****
   			<url-pattern>/*</url-pattern>
@@ -541,8 +806,8 @@ diff -crBE ./src/plugin/admin-crawl/src/webapp/WEB-INF/web.xml ../local/src/plug
   	</security-constraint>
   
 diff -crBE ./src/plugin/admin-instance/src/webapp/WEB-INF/web.xml ../local/src/plugin/admin-instance/src/webapp/WEB-INF/web.xml
-*** ./src/plugin/admin-instance/src/webapp/WEB-INF/web.xml	2009-11-18 07:56:50.000000000 +0100
---- ../local/src/plugin/admin-instance/src/webapp/WEB-INF/web.xml	2010-01-27 10:07:49.000000000 +0100
+*** ./src/plugin/admin-instance/src/webapp/WEB-INF/web.xml	2010-01-26 02:47:32.000000000 +0100
+--- ../local/src/plugin/admin-instance/src/webapp/WEB-INF/web.xml	2010-02-02 18:07:54.000000000 +0100
 ***************
 *** 60,66 ****
   			<url-pattern>/*</url-pattern>
@@ -564,8 +829,8 @@ diff -crBE ./src/plugin/admin-instance/src/webapp/WEB-INF/web.xml ../local/src/p
   	</security-constraint>
   
 diff -crBE ./src/plugin/admin-scheduling/src/webapp/WEB-INF/web.xml ../local/src/plugin/admin-scheduling/src/webapp/WEB-INF/web.xml
-*** ./src/plugin/admin-scheduling/src/webapp/WEB-INF/web.xml	2009-11-18 07:56:50.000000000 +0100
---- ../local/src/plugin/admin-scheduling/src/webapp/WEB-INF/web.xml	2010-01-27 10:07:47.000000000 +0100
+*** ./src/plugin/admin-scheduling/src/webapp/WEB-INF/web.xml	2010-01-26 02:47:32.000000000 +0100
+--- ../local/src/plugin/admin-scheduling/src/webapp/WEB-INF/web.xml	2010-02-02 18:07:26.000000000 +0100
 ***************
 *** 61,67 ****
   			<url-pattern>/*</url-pattern>
@@ -587,8 +852,8 @@ diff -crBE ./src/plugin/admin-scheduling/src/webapp/WEB-INF/web.xml ../local/src
   	</security-constraint>
   
 diff -crBE ./src/plugin/admin-search/src/webapp/WEB-INF/web.xml ../local/src/plugin/admin-search/src/webapp/WEB-INF/web.xml
-*** ./src/plugin/admin-search/src/webapp/WEB-INF/web.xml	2009-11-18 07:56:50.000000000 +0100
---- ../local/src/plugin/admin-search/src/webapp/WEB-INF/web.xml	2010-01-27 10:07:52.000000000 +0100
+*** ./src/plugin/admin-search/src/webapp/WEB-INF/web.xml	2010-01-26 02:47:32.000000000 +0100
+--- ../local/src/plugin/admin-search/src/webapp/WEB-INF/web.xml	2010-02-02 18:07:45.000000000 +0100
 ***************
 *** 55,61 ****
   			<url-pattern>/*</url-pattern>
@@ -610,8 +875,8 @@ diff -crBE ./src/plugin/admin-search/src/webapp/WEB-INF/web.xml ../local/src/plu
   	</security-constraint>
   
 diff -crBE ./src/plugin/admin-system/src/webapp/WEB-INF/web.xml ../local/src/plugin/admin-system/src/webapp/WEB-INF/web.xml
-*** ./src/plugin/admin-system/src/webapp/WEB-INF/web.xml	2009-11-18 07:56:50.000000000 +0100
---- ../local/src/plugin/admin-system/src/webapp/WEB-INF/web.xml	2010-01-27 10:07:53.000000000 +0100
+*** ./src/plugin/admin-system/src/webapp/WEB-INF/web.xml	2010-01-26 02:47:32.000000000 +0100
+--- ../local/src/plugin/admin-system/src/webapp/WEB-INF/web.xml	2010-02-02 18:07:46.000000000 +0100
 ***************
 *** 61,67 ****
   			<url-pattern>/*</url-pattern>
@@ -633,8 +898,8 @@ diff -crBE ./src/plugin/admin-system/src/webapp/WEB-INF/web.xml ../local/src/plu
   	</security-constraint>
   
 diff -crBE ./src/plugin/admin-url-upload/src/webapp/WEB-INF/web.xml ../local/src/plugin/admin-url-upload/src/webapp/WEB-INF/web.xml
-*** ./src/plugin/admin-url-upload/src/webapp/WEB-INF/web.xml	2009-11-18 07:56:50.000000000 +0100
---- ../local/src/plugin/admin-url-upload/src/webapp/WEB-INF/web.xml	2010-01-27 10:07:33.000000000 +0100
+*** ./src/plugin/admin-url-upload/src/webapp/WEB-INF/web.xml	2010-01-26 02:47:32.000000000 +0100
+--- ../local/src/plugin/admin-url-upload/src/webapp/WEB-INF/web.xml	2010-02-02 18:07:37.000000000 +0100
 ***************
 *** 55,61 ****
   			<url-pattern>/*</url-pattern>
@@ -656,8 +921,8 @@ diff -crBE ./src/plugin/admin-url-upload/src/webapp/WEB-INF/web.xml ../local/src
   	</security-constraint>
   
 diff -crBE ./src/plugin/build-plugin.xml ../local/src/plugin/build-plugin.xml
-*** ./src/plugin/build-plugin.xml	2009-11-18 07:56:50.000000000 +0100
---- ../local/src/plugin/build-plugin.xml	2010-01-27 10:07:38.000000000 +0100
+*** ./src/plugin/build-plugin.xml	2010-01-26 02:47:32.000000000 +0100
+--- ../local/src/plugin/build-plugin.xml	2010-02-02 18:07:29.000000000 +0100
 ***************
 *** 57,63 ****
       </fileset>
@@ -679,8 +944,8 @@ diff -crBE ./src/plugin/build-plugin.xml ../local/src/plugin/build-plugin.xml
     </path>
   
 diff -crBE ./src/plugin/build.xml ../local/src/plugin/build.xml
-*** ./src/plugin/build.xml	2009-11-18 07:56:50.000000000 +0100
---- ../local/src/plugin/build.xml	2010-01-27 10:07:32.000000000 +0100
+*** ./src/plugin/build.xml	2010-01-26 02:47:32.000000000 +0100
+--- ../local/src/plugin/build.xml	2010-02-02 18:07:32.000000000 +0100
 ***************
 *** 94,99 ****
 --- 94,102 ----
@@ -705,8 +970,8 @@ diff -crBE ./src/plugin/build.xml ../local/src/plugin/build.xml
     </target>
   </project>
 diff -crBE ./src/plugin/index-metadata/plugin.xml ../local/src/plugin/index-metadata/plugin.xml
-*** ./src/plugin/index-metadata/plugin.xml	2009-11-18 07:56:50.000000000 +0100
---- ../local/src/plugin/index-metadata/plugin.xml	2010-01-27 10:07:36.000000000 +0100
+*** ./src/plugin/index-metadata/plugin.xml	2010-01-26 02:47:32.000000000 +0100
+--- ../local/src/plugin/index-metadata/plugin.xml	2010-02-02 18:07:28.000000000 +0100
 ***************
 *** 41,46 ****
 --- 41,47 ----
@@ -728,8 +993,8 @@ diff -crBE ./src/plugin/index-metadata/plugin.xml ../local/src/plugin/index-meta
         
      </extension>
 diff -crBE ./src/plugin/index-metadata/src/java/org/apache/nutch/indexer/metadata/MetadataQueryFilter.java ../local/src/plugin/index-metadata/src/java/org/apache/nutch/indexer/metadata/MetadataQueryFilter.java
-*** ./src/plugin/index-metadata/src/java/org/apache/nutch/indexer/metadata/MetadataQueryFilter.java	2009-11-18 07:56:50.000000000 +0100
---- ../local/src/plugin/index-metadata/src/java/org/apache/nutch/indexer/metadata/MetadataQueryFilter.java	2010-01-27 10:07:53.000000000 +0100
+*** ./src/plugin/index-metadata/src/java/org/apache/nutch/indexer/metadata/MetadataQueryFilter.java	2010-01-26 02:47:32.000000000 +0100
+--- ../local/src/plugin/index-metadata/src/java/org/apache/nutch/indexer/metadata/MetadataQueryFilter.java	2010-02-02 18:07:32.000000000 +0100
 ***************
 *** 13,18 ****
 --- 13,22 ----
@@ -813,8 +1078,8 @@ diff -crBE ./src/plugin/index-metadata/src/java/org/apache/nutch/indexer/metadat
             }
           }
 diff -crBE ./src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java ../local/src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java
-*** ./src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java	2009-11-18 07:56:50.000000000 +0100
---- ../local/src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java	2010-01-27 10:07:45.000000000 +0100
+*** ./src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java	2010-01-26 02:47:32.000000000 +0100
+--- ../local/src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java	2010-02-02 18:07:28.000000000 +0100
 ***************
 *** 37,48 ****
 --- 37,51 ----
@@ -848,8 +1113,8 @@ diff -crBE ./src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/Htt
         Content c = new Content(u.toString(), u.toString(),
                                 (content == null ? EMPTY_CONTENT : content),
 diff -crBE ./src/test/org/apache/nutch/admin/GuiComponentExtensionContainerTest.java ../local/src/test/org/apache/nutch/admin/GuiComponentExtensionContainerTest.java
-*** ./src/test/org/apache/nutch/admin/GuiComponentExtensionContainerTest.java	2009-11-18 07:56:50.000000000 +0100
---- ../local/src/test/org/apache/nutch/admin/GuiComponentExtensionContainerTest.java	2010-01-27 10:07:47.000000000 +0100
+*** ./src/test/org/apache/nutch/admin/GuiComponentExtensionContainerTest.java	2010-01-26 02:47:32.000000000 +0100
+--- ../local/src/test/org/apache/nutch/admin/GuiComponentExtensionContainerTest.java	2010-02-02 18:07:46.000000000 +0100
 ***************
 *** 14,20 ****
   
