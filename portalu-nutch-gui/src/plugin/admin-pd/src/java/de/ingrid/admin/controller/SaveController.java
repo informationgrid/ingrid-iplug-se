@@ -40,26 +40,22 @@ public class SaveController extends AbstractController {
 
     @RequestMapping(value = IUris.SAVE, method = RequestMethod.POST)
     public String postSave(
-            @ModelAttribute("plugDescription") final PlugdescriptionCommandObject plugdescriptionCommandObject)
+            @ModelAttribute("plugDescription") final PlugdescriptionCommandObject plugDescription)
             throws Exception {
 
         boolean restart = false;
 
         // set class and record loader
-        plugdescriptionCommandObject.setIPlugClass(_plug.getClass().getName());
-        plugdescriptionCommandObject.setRecordLoader(_plug instanceof IRecordLoader);
+        plugDescription.setIPlugClass(_plug.getClass().getName());
+        plugDescription.setRecordLoader(_plug instanceof IRecordLoader);
 
-     // if port has changed show a message to the user to restart the iPlug
-        if (plugdescriptionCommandObject.containsKey("originalPort")) {
-            if (plugdescriptionCommandObject.getIplugAdminGuiPort() != plugdescriptionCommandObject.getInt("originalPort")) {
-                restart = true;
-            }
-            // remove entry from PlugDescription again
-            plugdescriptionCommandObject.remove("originalPort");
+        // if port has changed show a message to the user to restart the iPlug
+        if (plugDescription.getIplugAdminGuiPort() != plugDescription.getOriginalPort() || !plugDescription.getWorkinDirectory().equals(plugDescription.getOriginalWorkingDir())) {
+            restart = true;
         }
 
         // save plug description
-        _plugDescriptionService.savePlugDescription(plugdescriptionCommandObject);
+        _plugDescriptionService.savePlugDescription(plugDescription);
 
         // redirect to the restart page
         if (restart) {

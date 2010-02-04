@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
+import de.ingrid.iplug.se.IKeys;
 
 @Service
 public class PlugDescValidator extends AbstractValidator<PlugdescriptionCommandObject> {
@@ -29,15 +30,16 @@ public class PlugDescValidator extends AbstractValidator<PlugdescriptionCommandO
         rejectIfEmptyOrWhitespace(errors, "iplugAdminGuiUrl");
         rejectIfEmptyOrWhitespace(errors, "iplugAdminGuiPort");
         try {
-            final String property = System.getProperty("jetty.port");
-            // if jetty.port is not set, we are in developer mode and use port 8080
-            final Integer jettyPort = property == null ? 8080 : Integer.parseInt(property);
-            final Integer port = (Integer) errors.getFieldValue("iplugAdminGuiPort");
-            if (!port.equals(jettyPort)) {
-                final Socket socket = new Socket(InetAddress.getLocalHost(), port);
-                socket.close();
-                // no errors? then the socket is already taken
-                rejectError(errors, "iplugAdminGuiPort", IErrorKeys.INVALID);
+            final String property = System.getProperty(IKeys.PORT);
+            if (property != null) {
+                final Integer jettyPort = Integer.parseInt(property);
+                final Integer port = (Integer) errors.getFieldValue("iplugAdminGuiPort");
+                if (!port.equals(jettyPort)) {
+                    final Socket socket = new Socket(InetAddress.getLocalHost(), port);
+                    socket.close();
+                    // no errors? then the socket is already taken
+                    rejectError(errors, "iplugAdminGuiPort", IErrorKeys.INVALID);
+                }
             }
         } catch (final Exception e) {
         }

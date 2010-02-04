@@ -48,10 +48,12 @@ public class AdministrationApp {
     private static final String PARAM_COMMUNICATION = "descriptor";
 
     private static final String PARAM_PLUGDESCRIPTION = "plugdescription";
+    
+    private static final String PARAM_PORT = "port";
 
     private static final Log LOG = LogFactory.getLog(AdministrationApp.class);
 
-    private static final int DEFAULT_PORT = 50060;
+    public static final int DEFAULT_PORT = 50060;
 
     private static PlugDescription loadPlugDescriptionFromFile(File plugDescriptionFile) throws IOException {
         LOG.info("load plugdescription: " + plugDescriptionFile.getAbsolutePath());
@@ -68,7 +70,7 @@ public class AdministrationApp {
         CommandLineParser parser = new PosixParser();
 
         Options options = new Options();
-        options.addOption(null, "port", true, "Starts the web-server on given port. (default: " + DEFAULT_PORT + ")");
+        options.addOption(null, PARAM_PORT, true, "Starts the web-server on given port. (default: " + DEFAULT_PORT + ")");
         options.addOption(OptionBuilder.withLongOpt(PARAM_WORKING_DIRECTORY).withDescription(
                 "Runns the indexer in PATH directory.").hasArg(true).withArgName("PATH").create());
         options.addOption(OptionBuilder.withLongOpt("secure").withDescription("Authenticate against IBus users.")
@@ -86,8 +88,8 @@ public class AdministrationApp {
             File workingDirectory = null;
             int port = DEFAULT_PORT;
 
-            if (line.hasOption("port")) {
-                port = Integer.parseInt(line.getOptionValue("port"));
+            if (line.hasOption(PARAM_PORT)) {
+                port = Integer.parseInt(line.getOptionValue(PARAM_PORT));
             }
             // When the plugdescription file is named, only the working
             // directory is read from this file.
@@ -110,6 +112,7 @@ public class AdministrationApp {
                             + "' to be able to run the configuration tool");
                 }
             }
+            System.setProperty(IKeys.PORT, "" + port);
             // When the working directory is named explicitly, we will use this
             if (line.hasOption(PARAM_WORKING_DIRECTORY)) {
                 workingDirectory = new File(line.getOptionValue(PARAM_WORKING_DIRECTORY));
@@ -121,6 +124,7 @@ public class AdministrationApp {
                 throw new IllegalStateException(
                         "To run the Indexer a working directory must be provided in a plugindescription.xml file or by a Program argument.");
             }
+            System.setProperty(IKeys.WORKING_DIR, workingDirectory.getAbsolutePath());
             if (line.hasOption(PARAM_COMMUNICATION)) {
                 System.setProperty(IKeys.COMMUNICATION, line.getOptionValue(PARAM_COMMUNICATION));
             }

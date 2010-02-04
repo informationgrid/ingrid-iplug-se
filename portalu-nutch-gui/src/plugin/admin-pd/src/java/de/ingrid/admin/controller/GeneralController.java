@@ -47,11 +47,6 @@ public class GeneralController extends AbstractController {
         // set up proxy service url
         commandObject.setProxyServiceURL(_communicationInterface.getPeerName());
 
-        // put original port in plugdescription if not already done
-        if (!commandObject.containsKey("originalPort")) {
-            commandObject.putInt("originalPort", commandObject.getIplugAdminGuiPort());
-        }
-
         return IViews.GENERAL;
     }
 

@@ -3,6 +3,7 @@ package de.ingrid.admin.command;
 import java.io.File;
 
 import de.ingrid.admin.StringUtils;
+import de.ingrid.iplug.se.IKeys;
 import de.ingrid.utils.PlugDescription;
 import de.ingrid.utils.xml.XMLSerializer;
 
@@ -79,7 +80,15 @@ public class PlugdescriptionCommandObject extends PlugDescription {
         if (containsKey(PlugDescription.IPLUG_ADMIN_GUI_PORT)) {
             return super.getIplugAdminGuiPort();
         }
-        return 8082;
+        return getOriginalPort();
+    }
+    
+    public int getOriginalPort() {
+        return Integer.parseInt(System.getProperty(IKeys.PORT));
+    }
+    
+    public String getOriginalWorkingDir() {
+        return System.getProperty(IKeys.WORKING_DIR);
     }
 
     @Override

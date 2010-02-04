@@ -91,4 +91,4 @@ if expr `uname` : 'CYGWIN*' > /dev/null; then
 fi
 
 # run it
-exec "$JAVA" $JAVA_HEAP_MAX $INGRID_OPTS -Dlog4j.configuration=conf/log4j-search.properties -classpath "$CLASSPATH" $CLASS 50059 webapp --plugdescription conf/plugdescription-search.xml --descriptor conf/communication-search.xml
+exec "$JAVA" $JAVA_HEAP_MAX $INGRID_OPTS -Dlog4j.configuration=conf/log4j-search.properties -classpath "$CLASSPATH" $CLASS 50059 webapp --plugdescription conf/plugdescription-search.xml --descriptor conf/communication-search.xml &
