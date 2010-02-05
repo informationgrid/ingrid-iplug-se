@@ -90,5 +90,10 @@ if expr `uname` : 'CYGWIN*' > /dev/null; then
   CLASSPATH=`cygpath -p -w "$CLASSPATH"`
 fi
 
+# port
+PORT=${1:-'50059'}
+echo "trying to start configuration user interface on port $PORT";
+
 # run it
-exec "$JAVA" $JAVA_HEAP_MAX $INGRID_OPTS -Dlog4j.configuration=conf/log4j-search.properties -classpath "$CLASSPATH" $CLASS 50059 webapp --plugdescription conf/plugdescription-search.xml --descriptor conf/communication-search.xml &
+nohup "$JAVA" $JAVA_HEAP_MAX $INGRID_OPTS -Dlog4j.configuration=conf/log4j-search.properties -classpath "$CLASSPATH" $CLASS $PORT webapp --plugdescription conf/plugdescription-search.xml --descriptor conf/communication-search.xml > logs/admin-search.log &
+echo "user interface startet with process id $!";
