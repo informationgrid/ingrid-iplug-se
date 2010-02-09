@@ -15,31 +15,31 @@ public class GroupParser extends AbstractTupleParser {
 
   @Override
   public boolean hasNext() {
-    return _next != null || _parser.hasNext();
+    return _next != null || _parser.hasNext() ;
   }
 
   @Override
   public Tuple next() {
     Tuple tuple = loadNext();
+    _next = null;
     if (tuple != null && hasGroupKey(tuple)) {
       tuple = Tuple.create(_key, tuple.getValue(_key)).addChild(tuple.remove(_key));
 
       while (_parser.hasNext()) {
-        _next = _parser.next();
-        if (hasGroupKey(_next)) {
+        final Tuple next = _parser.next();
+        if (hasGroupKey(next)) {
+          _next = next;
           break;
         }
-        tuple = tuple.addChild(_next.remove(_key));
-        _next = null;
+        tuple = tuple.addChild(next.remove(_key));
       }
     }
     return tuple;
   }
 
   private Tuple loadNext() {
-    if (_next != null) {
-      return _next;
-    } else if (_parser.hasNext()) {
+      System.out.println("GroupParser.loadNext()");
+    if (_next == null && _parser.hasNext()) {
       _next = _parser.next();
     }
     return _next;

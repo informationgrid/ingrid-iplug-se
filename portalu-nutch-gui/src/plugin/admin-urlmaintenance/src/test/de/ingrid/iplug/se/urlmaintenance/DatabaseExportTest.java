@@ -68,7 +68,7 @@ public class DatabaseExportTest extends TestCase {
     List<String> metadataAsStringList = _databaseExport.metadataAsStringList(_limitUrlDao);
     
     assertEquals(2, metadataAsStringList.size());
-    assertEquals("http://www.mytestA.com\tpartner:\tPartner-Test\tprovider:\tProvider-Test\tkey2:\tvalue2\tkey1:\tvalue1\t", metadataAsStringList.get(0));
-    assertEquals("http://www.mytestB.com\tpartner:\tPartner-Test\tprovider:\tProvider-Test\tkey1:\tvalue1\tvalue2\t", metadataAsStringList.get(1));
+    assertEquals("http://www.mytestA.com\tpartner:\tpaTest\tprovider:\tprTest\tkey2:\tvalue2\tkey1:\tvalue1\t", metadataAsStringList.get(0));
+    assertEquals("http://www.mytestB.com\tpartner:\tpaTest\tprovider:\tprTest\tkey1:\tvalue1\tvalue2\t", metadataAsStringList.get(1));
   }
 }
