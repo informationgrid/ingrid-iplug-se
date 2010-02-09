@@ -36,10 +36,11 @@ public class UploadCommandValidator extends AbstractValidator<UploadCommand> {
                 rejectError(errors, "file", IErrorKeys.INVALID);
             }
 
-            final String contentType = file.getContentType();
-            if (!_contentTypes.contains(contentType)) {
-                rejectError(errors, "file", IErrorKeys.CONTENT);
-            }
+            // to many different content types
+//            final String contentType = file.getContentType();
+//            if (!_contentTypes.contains(contentType)) {
+//                rejectError(errors, "file", IErrorKeys.CONTENT);
+//            }
 
             final long size = file.getSize();
             if (size > MAX_SIZE) {
