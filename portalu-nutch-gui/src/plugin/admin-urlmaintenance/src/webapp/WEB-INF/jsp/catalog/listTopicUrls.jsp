@@ -183,49 +183,53 @@
 					<%@ include file="/WEB-INF/jsp/includes/paging.jsp" %>	
 					   
 				    <script type="text/javascript">
-						var myDataSource = new YAHOO.util.DataSource(YAHOO.util.Dom.get("myTable"));
-						myDataSource.responseType = YAHOO.util.DataSource.TYPE_HTMLTABLE;
-						myDataSource.responseSchema = {
-								fields: [
-				                    {key:"url"},
-				                    {key:"created"},
-				                    {key:"edited"},
-				                    {key:"altTitle"},
-				                    {key:"topic"},
-				                    {key:"functCategory"},
-				                    {key:"lang"},
-				                    {key:"status"},
-				                    {key:"action"}
-				                ]
-						};
+				    YAHOO.util.Event.addListener(window, "load", function() {
+					    YAHOO.example.EnhanceFromMarkup = function() {
+					    	var myColumnDefs = [
+								{key:"url", label:"Url", sortable:true},
+								{key:"created", label:"Erstellt", sortable:true},
+								{key:"edited", label:"Geändert", sortable:true},
+								{key:"altTitle", label:"Alt. Titel"},
+								{key:"topic", label:"Thema"},
+								{key:"functCategory", label:"Funkt. Kategorie"},
+								{key:"lang", label:"Sprache"},
+								{key:"status", label:"Status"},
+								{key:"action", label:"Aktion", width:100}
+							];
 
-						var mySortFunction = function(a,b,desc) {
-							// do nothing
-							}
-						
-						var myColumnDefs = [
-							{key:"url", label:"Url", sortable:true, sortOptions:{sortFunction:mySortFunction}},
-							{key:"created", label:"Erstellt", sortable:true, sortOptions:{sortFunction:mySortFunction}},
-							{key:"edited", label:"Geändert", sortable:true, sortOptions:{sortFunction:mySortFunction}},
-							{key:"altTitle", label:"Alt. Titel"},
-							{key:"topic", label:"Thema"},
-							{key:"functCategory", label:"Funkt. Kategorie"},
-							{key:"lang", label:"Sprache"},
-							{key:"status", label:"Status"},
-							{key:"action", label:"Aktion", width:100},
+							var myDataSource = new YAHOO.util.DataSource(YAHOO.util.Dom.get("myTable"));
+							myDataSource.responseType = YAHOO.util.DataSource.TYPE_HTMLTABLE;
+							myDataSource.responseSchema = {
+									fields: [
+					                    {key:"url"},
+					                    {key:"created"},
+					                    {key:"edited"},
+					                    {key:"altTitle"},
+					                    {key:"topic"},
+					                    {key:"functCategory"},
+					                    {key:"lang"},
+					                    {key:"status"},
+					                    {key:"action"}
+					                ]
+							};
 							
-						];
-						
-						var sortBy = '${sort}';
-						var sortDir = YAHOO.widget.DataTable.CLASS_ASC;
-						if('${dir}' == 'desc'){
-							 sortDir = YAHOO.widget.DataTable.CLASS_DESC;
+							var sortBy = '${sort}';
+							var sortDir = YAHOO.widget.DataTable.CLASS_ASC;
+							if('${dir}' == 'desc'){
+								sortDir = YAHOO.widget.DataTable.CLASS_DESC;
 							}
-						var myConfig = {
-							sortedBy : {key:sortBy, dir:sortDir},
-						}
-						var myDataTable = new YAHOO.widget.DataTable("dynamicdata", myColumnDefs, myDataSource, myConfig);
-						</script>
+							var myConfig = {
+								sortedBy : {key:sortBy, dir:sortDir}
+							}
+							var myDataTable = new YAHOO.widget.DataTable("dynamicdata", myColumnDefs, myDataSource, myConfig);
+							
+							return {
+					            oDS: myDataSource,
+					            oDT: myDataTable
+					        };
+					    }();
+					});
+					</script>
 						
 						<script>
 							function sort(e, data) { 

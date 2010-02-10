@@ -140,15 +140,15 @@
 					       <table id="myTable">
 					       	<thead>
 					       		<tr>
-						       		<td>URL</td>
-						       		<td>Erstellt</td>
-						       		<td>Geändert</td>
-						       		<td>RV</td>
-						       		<td>FS</td>
-						       		<td>UT</td>
-						       		<td>Sprache</td>
-						       		<td>Status</td>
-						       		<td>Aktion</td>
+						       		<th>URL</th>
+						       		<th>Erstellt</th>
+						       		<th>Geändert</th>
+						       		<th>RV</th>
+						       		<th>FS</th>
+						       		<th>UT</th>
+						       		<th>Sprache</th>
+						       		<th>Status</th>
+						       		<th>Aktion</th>
 					       		</tr>
 					       	</thead>
 					       	<tbody>
@@ -224,47 +224,52 @@
 					   <%@ include file="/WEB-INF/jsp/includes/paging.jsp" %>     
 						
 				       <script type="text/javascript">
-						var myDataSource = new YAHOO.util.DataSource(YAHOO.util.Dom.get("myTable"));
-						myDataSource.responseType = YAHOO.util.DataSource.TYPE_HTMLTABLE;
-						myDataSource.responseSchema = {
-								fields: [
-				                    {key:"url"},
-				                    {key:"created"},
-				                    {key:"edited"},
-				                    {key:"isLaw"},
-				                    {key:"isResearch"},
-				                    {key:"isWWW"},
-				                    {key:"lang"},
-				                    {key:"status"},
-				                    {key:"action"}
-				                ]
-						};
+				       YAHOO.util.Event.addListener(window, "load", function() {
+						    YAHOO.example.EnhanceFromMarkup = function() {
+								var myColumnDefs = [
+									{key:"url", label:"Url", sortable:true},
+									{key:"created", label:"Erstellt", sortable:true},
+									{key:"edited", label:"Geändert", sortable:true},
+									{key:"isLaw", label:"RV"},
+									{key:"isResearch", label:"FS"},
+									{key:"isWWW", label:"UT"},
+									{key:"lang", label:"Sprache"},
+									{key:"status", label:"Status"},
+									{key:"action", label:"Aktion", width:100}
+								];
+								
+								var myDataSource = new YAHOO.util.DataSource(YAHOO.util.Dom.get("myTable"));
+								myDataSource.responseType = YAHOO.util.DataSource.TYPE_HTMLTABLE;
+								myDataSource.responseSchema = {
+										fields: [
+						                    {key:"url"},
+						                    {key:"created"},
+						                    {key:"edited"},
+						                    {key:"isLaw"},
+						                    {key:"isResearch"},
+						                    {key:"isWWW"},
+						                    {key:"lang"},
+						                    {key:"status"},
+						                    {key:"action"}
+						                ]
+								};
 						
-						var mySortFunction = function(a,b,desc) {
-							// do nothing
-							}
-
-						var myColumnDefs = [
-							{key:"url", label:"Url", sortable:true, sortOptions:{sortFunction:mySortFunction}},
-							{key:"created", label:"Erstellt", sortable:true, sortOptions:{sortFunction:mySortFunction}},
-							{key:"edited", label:"Geändert", sortable:true, sortOptions:{sortFunction:mySortFunction}},
-							{key:"isLaw", label:"RV"},
-							{key:"isResearch", label:"FS"},
-							{key:"isWWW", label:"UT"},
-							{key:"lang", label:"Sprache"},
-							{key:"status", label:"Status"},
-							{key:"action", label:"Aktion", width:100},
-							
-						];
-						var sortBy = '${sort}';
-						var sortDir = YAHOO.widget.DataTable.CLASS_ASC;
-						if('${dir}' == 'desc'){
-							 sortDir = YAHOO.widget.DataTable.CLASS_DESC;
-							}
-						var myConfig = {
-							sortedBy : {key:sortBy, dir:sortDir},
-						}
-						var myDataTable = new YAHOO.widget.DataTable("dynamicdata", myColumnDefs, myDataSource, myConfig);
+								var sortBy = '${sort}';
+								var sortDir = YAHOO.widget.DataTable.CLASS_ASC;
+								if('${dir}' == 'desc'){
+									sortDir = YAHOO.widget.DataTable.CLASS_DESC;
+								}
+								var myConfig = {
+									sortedBy : {key:sortBy, dir:sortDir}
+								}
+								var myDataTable = new YAHOO.widget.DataTable("dynamicdata", myColumnDefs, myDataSource, myConfig);
+								
+								return {
+						            oDS: myDataSource,
+						            oDT: myDataTable
+						        };
+						    }();
+						});
 						</script>
 						
 						<script>
