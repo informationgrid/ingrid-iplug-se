@@ -90,7 +90,7 @@
 					
 					<form:form action="${contextPath}/index.html" commandName="partnerProviderCommand" method="post">
 						<fieldset>
-						    <legend>Partner und Provider auswählen</legend>
+						    <legend>Partner und Anbieter auswählen</legend>
 						    
 						    <row>
 						        <label><form:label path="partner" >Partner: </form:label></label>
@@ -101,7 +101,7 @@
 						    </row>
 						    
 						    <row>
-						        <label><form:label path="provider" >Provider: </form:label></label>
+						        <label><form:label path="provider" >Anbieter: </form:label></label>
 						        <field>
 						           <form:select path="provider" items="${providers}" itemLabel="name"/>
 						        </field>
