@@ -18,6 +18,9 @@ THIS_DIR=`dirname "$THIS"`
 INGRID_HOME=`cd "$THIS_DIR" ; pwd`
 PID=$INGRID_HOME/ingrid-admin.pid
 
+# port
+PORT=${2:-'50059'}
+
 # functions
 stopIplug()
 {
@@ -124,9 +127,7 @@ startIplug()
   if expr `uname` : 'CYGWIN*' > /dev/null; then
     CLASSPATH=`cygpath -p -w "$CLASSPATH"`
   fi
-  
-  # port
-  PORT=${2:-'50059'}
+
   echo "trying to start configuration user interface on port $PORT";
   
   nohup "$JAVA" $JAVA_HEAP_MAX $INGRID_OPTS -Dlog4j.configuration=conf/log4j-search.properties -classpath "$CLASSPATH" $CLASS $PORT webapp --plugdescription conf/plugdescription-search.xml --descriptor conf/communication-search.xml > logs/admin-search.log &
