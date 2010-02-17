@@ -26,7 +26,7 @@ public class TranslateParser extends AbstractTupleParser {
       final String[] splits = TokenSplitter.split(value);
       final StringBuilder builder = new StringBuilder();
       for (final String split : splits) {
-        final String property = _properties.getProperty(split.trim());
+        final String property = _properties.containsKey(split.trim()) ? _properties.getProperty(split.trim()) : split.trim();
         if (property != null) {
           if (builder.length() > 0) {
             builder.append(",");

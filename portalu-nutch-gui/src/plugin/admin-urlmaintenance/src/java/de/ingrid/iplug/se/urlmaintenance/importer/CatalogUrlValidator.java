@@ -27,6 +27,7 @@ public class CatalogUrlValidator implements IUrlValidator {
     _supportedMetadatas.put("alt_title", new HashSet<String>());
     _supportedMetadatas.put("topics", new HashSet<String>());
     _supportedMetadatas.put("service", new HashSet<String>());
+    _supportedMetadatas.put("measure", new HashSet<String>());
     _supportedMetadatas.put("funct_category", new HashSet<String>());
   }
 
@@ -112,7 +113,7 @@ public class CatalogUrlValidator implements IUrlValidator {
 
           final Set<String> set = keyValues.get("datatype");
           if (!set.contains("topics") && !set.contains("measure") && !set.contains("service")) {
-            errorCodes.put("metadaty.invalid", set.toString());
+            errorCodes.put("metadata.invalid", set.toString());
             errorCount++;
           }
         }

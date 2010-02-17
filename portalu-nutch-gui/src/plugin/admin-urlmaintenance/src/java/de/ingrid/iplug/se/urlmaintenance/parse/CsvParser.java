@@ -82,6 +82,7 @@ public class CsvParser implements IUrlFileParser {
       if (Boolean.parseBoolean(research)) {
         container.addMetadata(limitUrl, "datatype", "research");
       }
+      container.addMetadata(limitUrl, "datatype", "default");
       container.addMetadata(limitUrl, "lang", lang);
 
     }
@@ -126,8 +127,11 @@ public class CsvParser implements IUrlFileParser {
       final String[] splits = TokenSplitter.split(rubric);
       for (final String split : splits) {
         if (split != null && split.trim().length() > 0) {
-          System.out.println("service: " + split);
-          container.addMetadata(limitUrl, "service", split);
+          if ("press".equals(split) || "publication".equals(split) || "event".equals(split)) {
+            container.addMetadata(limitUrl, "service", split);
+          } else {
+            container.addMetadata(limitUrl, "measure", split);
+          }
         }
       }
     }
@@ -151,7 +155,7 @@ public class CsvParser implements IUrlFileParser {
       _parser = new TranslateParser(_parser, "type", PropertyLoader.load("/labels/type"));
       _parser = new TranslateParser(_parser, "topic", PropertyLoader.load("/labels/topic", true));
       _parser = new TranslateParser(_parser, "funct_category", PropertyLoader.load("/labels/funct_category", true));
-      _parser = new TranslateParser(_parser, "rubric", PropertyLoader.load("/labels/service", true));
+      _parser = new TranslateParser(_parser, "rubric", PropertyLoader.load("/labels/rubric", true));
     }
     _parser.parse(file);
   }

@@ -38,7 +38,6 @@ public class GroupParser extends AbstractTupleParser {
   }
 
   private Tuple loadNext() {
-      System.out.println("GroupParser.loadNext()");
     if (_next == null && _parser.hasNext()) {
       _next = _parser.next();
     }
