@@ -98,7 +98,15 @@ public class CsvParser implements IUrlFileParser {
     final Url limitUrl = new Url(tuple.getValue("url"));
     container.addWhiteUrl(limitUrl);
 
-    container.addMetadata(limitUrl, "datatype", tuple.getValue("type"));
+    final String datatype = tuple.getValue("type");
+    if (datatype != null) {
+        final String[] splits = TokenSplitter.split(datatype);
+        for (final String split : splits) {
+          if (split != null && split.trim().length() > 0) {
+            container.addMetadata(limitUrl, "datatype", split);
+          }
+        }
+      }
     container.addMetadata(limitUrl, "datatype", "www");
     container.addMetadata(limitUrl, "datatype", "default");
 
