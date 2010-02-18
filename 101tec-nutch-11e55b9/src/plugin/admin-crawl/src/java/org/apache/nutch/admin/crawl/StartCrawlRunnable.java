@@ -43,17 +43,25 @@ public class StartCrawlRunnable implements Runnable {
     FileSystem fileSystem = _crawlTool.getFileSystem();
     Path crawlDir = _crawlTool.getCrawlDir();
     Path lockPath = new Path(crawlDir, "crawl.running");
+    boolean alreadyRunning = false;
     try {
-      fileSystem.createNewFile(lockPath);
-      _crawlTool.preCrawl();
-      _crawlTool.crawl(_topN, _depth);
+      alreadyRunning = fileSystem.exists(lockPath);
+      if (!alreadyRunning) {
+        fileSystem.createNewFile(lockPath);
+        _crawlTool.preCrawl();
+        _crawlTool.crawl(_topN, _depth);
+      } else {
+          LOG.warn("crawl is already running");
+      }
     } catch (IOException e) {
       LOG.warn("can not start crawl.", e);
     } finally {
-      try {
-        fileSystem.delete(lockPath, false);
-      } catch (Throwable e) {
-        LOG.warn("Can not delete lock file.", e);
+      if (!alreadyRunning) {
+        try {
+          fileSystem.delete(lockPath, false);
+        } catch (Throwable e) {
+          LOG.warn("Can not delete lock file.", e);
+        }
       }
     }
   }

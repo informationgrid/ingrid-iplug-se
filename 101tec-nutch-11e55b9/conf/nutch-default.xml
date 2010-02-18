@@ -1300,4 +1300,10 @@
   <description>space delimited list of IPreCrawl Implementations to execute these classes in order</description>
 </property>
 
+<property>
+    <name>scheduling.create.crawl</name>
+    <value>false</value>
+    <description>If true, scheduling will create each time a new crawl. Otherwise the last created crawl will be continued. If now crawls exist by now, the scheduler will create one.</description>
+</property>
+
 </configuration>

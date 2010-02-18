@@ -25,8 +25,10 @@ import java.util.Date;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.PathFilter;
 import org.apache.nutch.admin.ConfigurationUtil;
 import org.apache.nutch.crawl.CrawlTool;
 
@@ -63,6 +65,7 @@ public class SchedulingRunnable implements Runnable {
       LOCK = true;
       FileSystem fileSystem = null;
       Path lockPath = null;
+      boolean alreadyRunning = false;
       try {
 
         File crawlDirectory = crawlData.getWorkingDirectory();
@@ -73,25 +76,32 @@ public class SchedulingRunnable implements Runnable {
         Configuration configuration = configurationUtil
                 .loadConfiguration(crawlDirectory.getName());
         fileSystem = FileSystem.get(configuration);
-        String folderName = "Crawl-" + _format.format(new Date());
+        String folderName = createFolderName(configuration, fileSystem, path);
         Path crawlDir = new Path(path, folderName);
         fileSystem.mkdirs(crawlDir);
 
         lockPath = new Path(crawlDir, "crawl.running");
-        fileSystem.createNewFile(lockPath);
-        CrawlTool crawlTool = new CrawlTool(configuration, crawlDir);
-        crawlTool.preCrawl();
-        crawlTool.crawl(crawlData.getTopn(), crawlData.getDepth());
+        alreadyRunning = fileSystem.exists(lockPath);
+        if (!alreadyRunning) {
+          fileSystem.createNewFile(lockPath);
+          CrawlTool crawlTool = new CrawlTool(configuration, crawlDir);
+          crawlTool.preCrawl();
+          crawlTool.crawl(crawlData.getTopn(), crawlData.getDepth());
+        } else {
+            LOG.warn("crawl is already running");
+        }
       } catch (Throwable e) {
         LOG.error("crawl fails.", e);
       } finally {
-        LOG.info("unlock the scheduled crawl: "
-                + crawlData.getWorkingDirectory().getAbsolutePath());
         LOCK = false;
-        try {
-          fileSystem.delete(lockPath, false);
-        } catch (IOException e) {
-          LOG.warn("can not delete lock file.", e);
+        if (!alreadyRunning) {
+          LOG.info("unlock the scheduled crawl: "
+                  + crawlData.getWorkingDirectory().getAbsolutePath());
+          try {
+            fileSystem.delete(lockPath, false);
+          } catch (IOException e) {
+            LOG.warn("can not delete lock file.", e);
+          }
         }
       }
     } else {
@@ -100,6 +110,31 @@ public class SchedulingRunnable implements Runnable {
               + crawlData.getWorkingDirectory().getAbsolutePath());
     }
 
+  }
+  
+  private String createFolderName(final Configuration conf, final FileSystem fs, final Path crawls) throws IOException {
+      if (!conf.getBoolean("scheduling.create.crawl", true)) {
+         final FileStatus[] files = fs.listStatus(crawls, new PathFilter() {
+            public boolean accept(Path p) {
+                try {
+                    return p.getName().startsWith("Crawl-") && !fs.isFile(p);
+                } catch (IOException e) {
+                    return false;
+                }
+            }
+         });
+         if (files != null && files.length > 0) {
+             String last = "";
+             for(final FileStatus file : files) {
+                 final String name = file.getPath().getName();
+                 if (name.compareTo(last) > 0) {
+                     last = name;
+                 }
+             }
+             return last;
+         }
+      }
+      return "Crawl-" + _format.format(new Date());
   }
 
 }
