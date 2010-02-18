@@ -3,7 +3,7 @@ function getLog(lineCount) {
 	var http_request = false;
 	var mode = document.getElementById('mode').value;
 	if(mode == 'start'){
-		var url = 'log.html?file=hadoop.log&lines=' +lineCount +'&ts=' +new Date().getTime();
+		var url = 'log.html?file=log-index.log&lines=' +lineCount +'&ts=' +new Date().getTime();
 	    if (window.XMLHttpRequest) { // Mozilla, Safari,...
 	        http_request = new XMLHttpRequest();
 	        if (http_request.overrideMimeType) {

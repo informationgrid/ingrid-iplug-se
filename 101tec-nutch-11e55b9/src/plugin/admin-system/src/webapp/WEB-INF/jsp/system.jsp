@@ -99,15 +99,15 @@
 						var startImage = document.getElementById('start');
 						var stopImage = document.getElementById('stop');
 						if(action == 'start'){
-							startImage.src = '${theme}/gfx/play_inactive.png';
-							stopImage.src = '${theme}/gfx/pause.png';
+							startImage.src = '<%=request.getContextPath()%>/theme/${theme}/gfx/play_inactive.png';
+							stopImage.src = '<%=request.getContextPath()%>/theme/${theme}/gfx/pause.png';
 							if(document.getElementById('mode').value != 'start'){
 								document.getElementById('mode').value = 'start';
 								getLog(lineCount);
 							}
 						}else if(action == 'stop'){
-							startImage.src = '${theme}/gfx/play.png';
-							stopImage.src = '${theme}/gfx/pause_inactive.png';
+							startImage.src = '<%=request.getContextPath()%>/theme/${theme}/gfx/play.png';
+							stopImage.src = '<%=request.getContextPath()%>/theme/${theme}/gfx/pause_inactive.png';
 							document.getElementById('mode').value = 'stop';
 						}
 					}
