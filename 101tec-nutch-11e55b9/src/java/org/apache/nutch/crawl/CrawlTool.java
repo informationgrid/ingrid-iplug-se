@@ -157,7 +157,7 @@ public class CrawlTool {
     Path[] mergeSegments = HadoopFSUtil.getPaths(listStatus);
     // list of all segments that will be deleted after indexing
     Path[] segmentsToDelete = null;
-    if (i > 0) {
+    if (mergeSegments.length > 1) {
       try {
         // merge segments
         SegmentMerger segmentMerger = new SegmentMerger(_configuration);
@@ -175,7 +175,7 @@ public class CrawlTool {
         segmentsToDelete = mergeSegments;
         mergeSegments = new Path[] { mergeSegment };
       } catch (Exception e) {
-        e.printStackTrace();
+        LOG.warn("error while merging" ,e);
       }
     }
     

@@ -57,7 +57,7 @@ public class MailService {
             }
 
             // create message
-            final String subject = "URL report for crawl '" + crawlName + "' of segment '" + segmentName + "'";
+            final String subject = "[CRAWL] URL report for crawl '" + crawlName + "' of segment '" + segmentName + "'";
             final StringBuilder sb = new StringBuilder();
             sb.append("crawl: " + crawlName + "\n");
             sb.append("segment: " + segmentName + "\n");

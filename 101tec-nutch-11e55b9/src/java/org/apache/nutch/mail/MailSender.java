@@ -32,14 +32,14 @@ public class MailSender implements Configurable {
 
     private boolean _enabled;
 
-    private String _senderAddress;
+    private static final String SENDER_ADDRESS = "mail.sender.address";
 
-    private String _senderPersonal;
-
-    private String _receiverAddress;
-
-    private String _receiverPersonal;
-
+    private static final String SENDER_PERSONAL = "mail.sender.personal";
+    
+    private static final String RECEIVER_ADDRESS = "mail.receiver.address";
+    
+    private static final String RECEIVER_PERSONAL = "mail.receiver.personal";
+    
     private MailSender(final Configuration configuration) {
         _mailSender = new JavaMailSenderImpl();
         setConf(configuration);
@@ -53,11 +53,11 @@ public class MailSender implements Configurable {
     }
 
     public void sendMail(final String subject, final String content) {
-        sendMail(new String[] { _receiverAddress }, new String[] { _receiverPersonal }, subject, content, null);
+        sendMail(new String[] { getReceiverAddress() }, new String[] { getReceiverPersonal() }, subject, content, null);
     }
 
     public void sendMail(final String subject, final String content, final File attachment) {
-        sendMail(new String[] { _receiverAddress }, new String[] { _receiverPersonal }, subject, content, attachment);
+        sendMail(new String[] { getReceiverAddress() }, new String[] { getReceiverPersonal() }, subject, content, attachment);
     }
 
     public void sendMail(final String[] receiverAddress, final String[] receiverPersonl, final String subject,
@@ -67,12 +67,14 @@ public class MailSender implements Configurable {
 
     public void sendMail(final String[] receiverAddress, final String[] receiverPersonl, final String subject,
             final String content, final File attachment) {
-        sendMail(_senderAddress, _senderPersonal, receiverAddress, receiverPersonl, subject, content,
+        sendMail(getSenderAddress(), getSenderPersonal(), receiverAddress, receiverPersonl, subject, content,
                 attachment);
     }
 
     public void sendMail(final String senderAddress, final String senderPersonal, final String receiverAddresses[],
             final String receiverPersonals[], final String subject, final String content, final File attachment) {
+        // refresh conf
+        setConf(_conf);
         if (!_enabled) {
             LOG.info("[mail-disabled]");
             LOG.info("    send to: " + Arrays.asList(receiverAddresses));
@@ -141,10 +143,6 @@ public class MailSender implements Configurable {
     public void setConf(final Configuration conf) {
         _conf = conf;
         _enabled = _conf.getBoolean("mail.enabled", false);
-        _senderAddress = _conf.get("mail.sender.address", "empty");
-        _senderPersonal = _conf.get("mail.sender.personal", "empty");
-        _receiverAddress = _conf.get("mail.receiver.address", "empty");
-        _receiverPersonal = _conf.get("mail.receiver.personal", "empty");
         _mailSender.setHost(_conf.get("mail.host", "empty"));
         _mailSender.setPort(_conf.getInt("mail.port", 25));
         _mailSender.setUsername(_conf.get("mail.user", "empty"));
@@ -156,5 +154,21 @@ public class MailSender implements Configurable {
         }
         properties.setProperty("mail.smtp.auth", _conf.get("mail.auth", "false"));
         properties.setProperty("mail.smtp.starttls.enabled", _conf.get("mail.starttls", "false"));
+    }
+    
+    private String getSenderAddress() {
+        return _conf.get(SENDER_ADDRESS, "empty");
+    }
+    
+    private String getSenderPersonal() {
+        return _conf.get(SENDER_PERSONAL, "empty");
+    }
+    
+    private String getReceiverAddress() {
+        return _conf.get(RECEIVER_ADDRESS, "empty");
+    }
+    
+    private String getReceiverPersonal() {
+        return _conf.get(RECEIVER_PERSONAL, "empty");
     }
 }

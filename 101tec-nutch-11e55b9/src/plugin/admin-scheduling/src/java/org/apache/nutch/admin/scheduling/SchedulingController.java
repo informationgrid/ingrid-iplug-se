@@ -85,7 +85,7 @@ public class SchedulingController extends NavigationSelector {
 
   @ModelAttribute("depths")
   public Integer[] depth() {
-    Integer[] month = new Integer[10];
+    Integer[] month = new Integer[11];
     for (int i = 0; i < month.length; i++) {
       month[i] = i;
     }
