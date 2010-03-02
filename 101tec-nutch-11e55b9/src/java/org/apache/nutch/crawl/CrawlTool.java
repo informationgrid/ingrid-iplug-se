@@ -162,6 +162,9 @@ public class CrawlTool {
         // merge segments
         SegmentMerger segmentMerger = new SegmentMerger(_configuration);
         Path mergeDir = new Path(segments, "merge-segments");
+        if (_fileSystem.exists(mergeDir)) {
+            _fileSystem.delete(mergeDir, true);
+        }
         segmentMerger.merge(mergeDir, mergeSegments, false, false, 0);
         // get merged segment
         Path mergeSegTemp = _fileSystem.listStatus(mergeDir)[0].getPath();
