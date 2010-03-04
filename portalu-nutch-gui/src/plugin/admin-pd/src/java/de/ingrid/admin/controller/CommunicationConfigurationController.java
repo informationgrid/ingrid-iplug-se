@@ -32,6 +32,8 @@ public class CommunicationConfigurationController extends AbstractController {
 
     public static final int DEFAULT_THREAD_COUNT = 100;
 
+    private String _defaultProxyServiceUrl = "";
+    
     private final CommunicationService _communicationService;
 
     private final CommunicationValidator _validator;
@@ -71,7 +73,8 @@ public class CommunicationConfigurationController extends AbstractController {
             communication.registerDocument(inputStream);
             // save all default values
             if (null == commandObject.getProxyServiceUrl()) {
-                commandObject.setProxyServiceUrl(communication.parseAttribute("/communication/client", "name"));
+                _defaultProxyServiceUrl = communication.parseAttribute("/communication/client", "name");
+                commandObject.setProxyServiceUrl(_defaultProxyServiceUrl);
             }
             commandObject.setBusProxyServiceUrl(communication.parseAttribute(
                     "/communication/client/connections/server", "name"));
@@ -79,10 +82,10 @@ public class CommunicationConfigurationController extends AbstractController {
             commandObject.setPort(Integer.parseInt(communication.parseAttribute(
                     "/communication/client/connections/server/socket", "port")));
         }
-        String proxyServiceUrl = commandObject.getProxyServiceUrl();
-        final String userName = System.getProperty("user.name");
-        proxyServiceUrl = proxyServiceUrl.endsWith("_" + userName) ? proxyServiceUrl : proxyServiceUrl + "_" + userName;
-        commandObject.setProxyServiceUrl(proxyServiceUrl);
+//        String proxyServiceUrl = commandObject.getProxyServiceUrl();
+//        final String userName = System.getProperty("user.name");
+//        proxyServiceUrl = proxyServiceUrl.endsWith("_" + userName) ? proxyServiceUrl : proxyServiceUrl + "_" + userName;
+//        commandObject.setProxyServiceUrl(proxyServiceUrl);
 
         // return command object
         return commandObject;
@@ -135,7 +138,7 @@ public class CommunicationConfigurationController extends AbstractController {
 
             if ("submit".equals(action)) {
                 // set proxy url
-                if (_validator.validateProxyUrl(errors).hasErrors()) {
+                if (_validator.validateProxyUrl(errors, _defaultProxyServiceUrl).hasErrors()) {
                     return IViews.COMMUNICATION;
                 }
                 setProxyUrl(communication, commandObject.getProxyServiceUrl());
@@ -147,7 +150,7 @@ public class CommunicationConfigurationController extends AbstractController {
 
             if ("add".equals(action) || tryToAdd) {
                 // set proxy url
-                if (!_validator.validateProxyUrl(errors).hasErrors()) {
+                if (!_validator.validateProxyUrl(errors, _defaultProxyServiceUrl).hasErrors()) {
                     setProxyUrl(communication, commandObject.getProxyServiceUrl());
                 }
                 // add new bus

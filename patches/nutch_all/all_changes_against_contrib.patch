@@ -4,7 +4,7 @@ Only in ./: .project
 Only in ./: .settings
 diff -crBE ./build.xml ../local/build.xml
 *** ./build.xml	2010-01-26 02:47:32.000000000 +0100
---- ../local/build.xml	2010-02-18 08:27:52.000000000 +0100
+--- ../local/build.xml	2010-03-04 13:49:59.000000000 +0100
 ***************
 *** 33,38 ****
 --- 33,41 ----
@@ -137,29 +137,25 @@ diff -crBE ./build.xml ../local/build.xml
   
     </target>
   
-diff -crBE ./conf/webapp/theme/default/js/getLog.js ../local/conf/webapp/theme/default/js/getLog.js
-*** ./conf/webapp/theme/default/js/getLog.js	2010-01-26 02:47:32.000000000 +0100
---- ../local/conf/webapp/theme/default/js/getLog.js	2010-02-18 08:27:24.000000000 +0100
+diff -crBE ./conf/nutch-default.xml ../local/conf/nutch-default.xml
+*** ./conf/nutch-default.xml	2010-01-26 02:47:32.000000000 +0100
+--- ../local/conf/nutch-default.xml	2010-03-04 13:50:09.000000000 +0100
 ***************
-*** 3,9 ****
-  	var http_request = false;
-  	var mode = document.getElementById('mode').value;
-  	if(mode == 'start'){
-! 		var url = 'log.html?file=hadoop.log&lines=' +lineCount +'&ts=' +new Date().getTime();
-  	    if (window.XMLHttpRequest) { // Mozilla, Safari,...
-  	        http_request = new XMLHttpRequest();
-  	        if (http_request.overrideMimeType) {
---- 3,9 ----
-  	var http_request = false;
-  	var mode = document.getElementById('mode').value;
-  	if(mode == 'start'){
-! 		var url = 'log.html?file=log-index.log&lines=' +lineCount +'&ts=' +new Date().getTime();
-  	    if (window.XMLHttpRequest) { // Mozilla, Safari,...
-  	        http_request = new XMLHttpRequest();
-  	        if (http_request.overrideMimeType) {
+*** 1300,1303 ****
+--- 1300,1309 ----
+    <description>space delimited list of IPreCrawl Implementations to execute these classes in order</description>
+  </property>
+  
++ <property>
++     <name>scheduling.create.crawl</name>
++     <value>false</value>
++     <description>If true, scheduling will create each time a new crawl. Otherwise the last created crawl will be continued. If now crawls exist by now, the scheduler will create one.</description>
++ </property>
++ 
+  </configuration>
 diff -crBE ./src/java/org/apache/nutch/crawl/CrawlTool.java ../local/src/java/org/apache/nutch/crawl/CrawlTool.java
 *** ./src/java/org/apache/nutch/crawl/CrawlTool.java	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/java/org/apache/nutch/crawl/CrawlTool.java	2010-02-18 08:27:58.000000000 +0100
+--- ../local/src/java/org/apache/nutch/crawl/CrawlTool.java	2010-03-04 13:50:06.000000000 +0100
 ***************
 *** 18,26 ****
 --- 18,28 ----
@@ -200,9 +196,54 @@ diff -crBE ./src/java/org/apache/nutch/crawl/CrawlTool.java ../local/src/java/or
         if (!Fetcher.isParsing(_configuration)) {
           parseSegment.parse(segment); // parse it, if needed
         }
+***************
+*** 147,157 ****
+      Path[] mergeSegments = HadoopFSUtil.getPaths(listStatus);
+      // list of all segments that will be deleted after indexing
+      Path[] segmentsToDelete = null;
+!     if (i > 0) {
+        try {
+          // merge segments
+          SegmentMerger segmentMerger = new SegmentMerger(_configuration);
+          Path mergeDir = new Path(segments, "merge-segments");
+          segmentMerger.merge(mergeDir, mergeSegments, false, false, 0);
+          // get merged segment
+          Path mergeSegTemp = _fileSystem.listStatus(mergeDir)[0].getPath();
+--- 157,170 ----
+      Path[] mergeSegments = HadoopFSUtil.getPaths(listStatus);
+      // list of all segments that will be deleted after indexing
+      Path[] segmentsToDelete = null;
+!     if (mergeSegments.length > 1) {
+        try {
+          // merge segments
+          SegmentMerger segmentMerger = new SegmentMerger(_configuration);
+          Path mergeDir = new Path(segments, "merge-segments");
++         if (_fileSystem.exists(mergeDir)) {
++             _fileSystem.delete(mergeDir, true);
++         }
+          segmentMerger.merge(mergeDir, mergeSegments, false, false, 0);
+          // get merged segment
+          Path mergeSegTemp = _fileSystem.listStatus(mergeDir)[0].getPath();
+***************
+*** 165,171 ****
+          segmentsToDelete = mergeSegments;
+          mergeSegments = new Path[] { mergeSegment };
+        } catch (Exception e) {
+!         e.printStackTrace();
+        }
+      }
+      
+--- 178,184 ----
+          segmentsToDelete = mergeSegments;
+          mergeSegments = new Path[] { mergeSegment };
+        } catch (Exception e) {
+!         LOG.warn("error while merging" ,e);
+        }
+      }
+      
 diff -crBE ./src/java/org/apache/nutch/crawl/NutchWritable.java ../local/src/java/org/apache/nutch/crawl/NutchWritable.java
 *** ./src/java/org/apache/nutch/crawl/NutchWritable.java	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/java/org/apache/nutch/crawl/NutchWritable.java	2010-02-18 08:27:24.000000000 +0100
+--- ../local/src/java/org/apache/nutch/crawl/NutchWritable.java	2010-03-04 13:49:27.000000000 +0100
 ***************
 *** 18,23 ****
 --- 18,24 ----
@@ -235,7 +276,7 @@ diff -crBE ./src/java/org/apache/nutch/crawl/NutchWritable.java ../local/src/jav
   
 diff -crBE ./src/java/org/apache/nutch/fetcher/Fetcher.java ../local/src/java/org/apache/nutch/fetcher/Fetcher.java
 *** ./src/java/org/apache/nutch/fetcher/Fetcher.java	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/java/org/apache/nutch/fetcher/Fetcher.java	2010-02-18 08:27:48.000000000 +0100
+--- ../local/src/java/org/apache/nutch/fetcher/Fetcher.java	2010-03-04 13:49:52.000000000 +0100
 ***************
 *** 47,52 ****
 --- 47,55 ----
@@ -338,7 +379,7 @@ diff -crBE ./src/java/org/apache/nutch/fetcher/Fetcher.java ../local/src/java/or
     public void fetch(Path segment, int threads, boolean parsing)
 diff -crBE ./src/java/org/apache/nutch/indexer/IndexerMapReduce.java ../local/src/java/org/apache/nutch/indexer/IndexerMapReduce.java
 *** ./src/java/org/apache/nutch/indexer/IndexerMapReduce.java	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/java/org/apache/nutch/indexer/IndexerMapReduce.java	2010-02-18 08:27:53.000000000 +0100
+--- ../local/src/java/org/apache/nutch/indexer/IndexerMapReduce.java	2010-03-04 13:50:00.000000000 +0100
 ***************
 *** 23,28 ****
 --- 23,29 ----
@@ -425,7 +466,7 @@ Only in ../local/src/java/org/apache/nutch: mail
 Only in ../local/src/java/org/apache/nutch/parse: resulthandler
 diff -crBE ./src/java/org/apache/nutch/searcher/Hits.java ../local/src/java/org/apache/nutch/searcher/Hits.java
 *** ./src/java/org/apache/nutch/searcher/Hits.java	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/java/org/apache/nutch/searcher/Hits.java	2010-02-18 08:27:58.000000000 +0100
+--- ../local/src/java/org/apache/nutch/searcher/Hits.java	2010-03-04 13:50:06.000000000 +0100
 ***************
 *** 32,38 ****
     private boolean totalIsExact = true;
@@ -447,7 +488,7 @@ diff -crBE ./src/java/org/apache/nutch/searcher/Hits.java ../local/src/java/org/
       this.total = total;
 diff -crBE ./src/java/org/apache/nutch/searcher/Query.java ../local/src/java/org/apache/nutch/searcher/Query.java
 *** ./src/java/org/apache/nutch/searcher/Query.java	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/java/org/apache/nutch/searcher/Query.java	2010-02-18 08:27:23.000000000 +0100
+--- ../local/src/java/org/apache/nutch/searcher/Query.java	2010-03-04 13:49:27.000000000 +0100
 ***************
 *** 24,29 ****
 --- 24,31 ----
@@ -592,7 +633,7 @@ diff -crBE ./src/java/org/apache/nutch/searcher/Query.java ../local/src/java/org
       for (int i = 0; i < clauses.size(); i++)
 diff -crBE ./src/java/org/apache/nutch/segment/SegmentMerger.java ../local/src/java/org/apache/nutch/segment/SegmentMerger.java
 *** ./src/java/org/apache/nutch/segment/SegmentMerger.java	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/java/org/apache/nutch/segment/SegmentMerger.java	2010-02-18 08:28:00.000000000 +0100
+--- ../local/src/java/org/apache/nutch/segment/SegmentMerger.java	2010-03-04 13:50:09.000000000 +0100
 ***************
 *** 63,68 ****
 --- 63,70 ----
@@ -781,7 +822,7 @@ Only in ../local/src/java/org/apache/nutch/tools: UrlReporter.java
 Only in ../local/src/java/org/apache/nutch/util: ZipUtil.java
 diff -crBE ./src/plugin/admin-configuration/src/webapp/WEB-INF/web.xml ../local/src/plugin/admin-configuration/src/webapp/WEB-INF/web.xml
 *** ./src/plugin/admin-configuration/src/webapp/WEB-INF/web.xml	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/admin-configuration/src/webapp/WEB-INF/web.xml	2010-02-18 08:27:42.000000000 +0100
+--- ../local/src/plugin/admin-configuration/src/webapp/WEB-INF/web.xml	2010-03-04 13:49:45.000000000 +0100
 ***************
 *** 55,61 ****
   			<url-pattern>/*</url-pattern>
@@ -802,9 +843,57 @@ diff -crBE ./src/plugin/admin-configuration/src/webapp/WEB-INF/web.xml ../local/
   		</auth-constraint>
   	</security-constraint>
   
+diff -crBE ./src/plugin/admin-crawl/src/java/org/apache/nutch/admin/crawl/StartCrawlRunnable.java ../local/src/plugin/admin-crawl/src/java/org/apache/nutch/admin/crawl/StartCrawlRunnable.java
+*** ./src/plugin/admin-crawl/src/java/org/apache/nutch/admin/crawl/StartCrawlRunnable.java	2010-01-26 02:47:32.000000000 +0100
+--- ../local/src/plugin/admin-crawl/src/java/org/apache/nutch/admin/crawl/StartCrawlRunnable.java	2010-03-04 13:50:12.000000000 +0100
+***************
+*** 43,59 ****
+      FileSystem fileSystem = _crawlTool.getFileSystem();
+      Path crawlDir = _crawlTool.getCrawlDir();
+      Path lockPath = new Path(crawlDir, "crawl.running");
+      try {
+!       fileSystem.createNewFile(lockPath);
+!       _crawlTool.preCrawl();
+!       _crawlTool.crawl(_topN, _depth);
+      } catch (IOException e) {
+        LOG.warn("can not start crawl.", e);
+      } finally {
+!       try {
+!         fileSystem.delete(lockPath, false);
+!       } catch (Throwable e) {
+!         LOG.warn("Can not delete lock file.", e);
+        }
+      }
+    }
+--- 43,67 ----
+      FileSystem fileSystem = _crawlTool.getFileSystem();
+      Path crawlDir = _crawlTool.getCrawlDir();
+      Path lockPath = new Path(crawlDir, "crawl.running");
++     boolean alreadyRunning = false;
+      try {
+!       alreadyRunning = fileSystem.exists(lockPath);
+!       if (!alreadyRunning) {
+!         fileSystem.createNewFile(lockPath);
+!         _crawlTool.preCrawl();
+!         _crawlTool.crawl(_topN, _depth);
+!       } else {
+!           LOG.warn("crawl is already running");
+!       }
+      } catch (IOException e) {
+        LOG.warn("can not start crawl.", e);
+      } finally {
+!       if (!alreadyRunning) {
+!         try {
+!           fileSystem.delete(lockPath, false);
+!         } catch (Throwable e) {
+!           LOG.warn("Can not delete lock file.", e);
+!         }
+        }
+      }
+    }
 diff -crBE ./src/plugin/admin-crawl/src/webapp/WEB-INF/web.xml ../local/src/plugin/admin-crawl/src/webapp/WEB-INF/web.xml
 *** ./src/plugin/admin-crawl/src/webapp/WEB-INF/web.xml	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/admin-crawl/src/webapp/WEB-INF/web.xml	2010-02-18 08:27:53.000000000 +0100
+--- ../local/src/plugin/admin-crawl/src/webapp/WEB-INF/web.xml	2010-03-04 13:50:01.000000000 +0100
 ***************
 *** 63,69 ****
   			<url-pattern>/*</url-pattern>
@@ -827,7 +916,7 @@ diff -crBE ./src/plugin/admin-crawl/src/webapp/WEB-INF/web.xml ../local/src/plug
   
 diff -crBE ./src/plugin/admin-instance/src/webapp/WEB-INF/web.xml ../local/src/plugin/admin-instance/src/webapp/WEB-INF/web.xml
 *** ./src/plugin/admin-instance/src/webapp/WEB-INF/web.xml	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/admin-instance/src/webapp/WEB-INF/web.xml	2010-02-18 08:27:55.000000000 +0100
+--- ../local/src/plugin/admin-instance/src/webapp/WEB-INF/web.xml	2010-03-04 13:50:03.000000000 +0100
 ***************
 *** 60,66 ****
   			<url-pattern>/*</url-pattern>
@@ -848,9 +937,148 @@ diff -crBE ./src/plugin/admin-instance/src/webapp/WEB-INF/web.xml ../local/src/p
   		</auth-constraint>
   	</security-constraint>
   
+diff -crBE ./src/plugin/admin-scheduling/src/java/org/apache/nutch/admin/scheduling/SchedulingController.java ../local/src/plugin/admin-scheduling/src/java/org/apache/nutch/admin/scheduling/SchedulingController.java
+*** ./src/plugin/admin-scheduling/src/java/org/apache/nutch/admin/scheduling/SchedulingController.java	2010-01-26 02:47:32.000000000 +0100
+--- ../local/src/plugin/admin-scheduling/src/java/org/apache/nutch/admin/scheduling/SchedulingController.java	2010-03-04 13:49:34.000000000 +0100
+***************
+*** 85,91 ****
+  
+    @ModelAttribute("depths")
+    public Integer[] depth() {
+!     Integer[] month = new Integer[10];
+      for (int i = 0; i < month.length; i++) {
+        month[i] = i;
+      }
+--- 85,91 ----
+  
+    @ModelAttribute("depths")
+    public Integer[] depth() {
+!     Integer[] month = new Integer[11];
+      for (int i = 0; i < month.length; i++) {
+        month[i] = i;
+      }
+diff -crBE ./src/plugin/admin-scheduling/src/java/org/apache/nutch/admin/scheduling/SchedulingRunnable.java ../local/src/plugin/admin-scheduling/src/java/org/apache/nutch/admin/scheduling/SchedulingRunnable.java
+*** ./src/plugin/admin-scheduling/src/java/org/apache/nutch/admin/scheduling/SchedulingRunnable.java	2010-01-26 02:47:32.000000000 +0100
+--- ../local/src/plugin/admin-scheduling/src/java/org/apache/nutch/admin/scheduling/SchedulingRunnable.java	2010-03-04 13:49:34.000000000 +0100
+***************
+*** 25,32 ****
+--- 25,34 ----
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.hadoop.conf.Configuration;
++ import org.apache.hadoop.fs.FileStatus;
+  import org.apache.hadoop.fs.FileSystem;
+  import org.apache.hadoop.fs.Path;
++ import org.apache.hadoop.fs.PathFilter;
+  import org.apache.nutch.admin.ConfigurationUtil;
+  import org.apache.nutch.crawl.CrawlTool;
+  
+***************
+*** 63,68 ****
+--- 65,71 ----
+        LOCK = true;
+        FileSystem fileSystem = null;
+        Path lockPath = null;
++       boolean alreadyRunning = false;
+        try {
+  
+          File crawlDirectory = crawlData.getWorkingDirectory();
+***************
+*** 73,97 ****
+          Configuration configuration = configurationUtil
+                  .loadConfiguration(crawlDirectory.getName());
+          fileSystem = FileSystem.get(configuration);
+!         String folderName = "Crawl-" + _format.format(new Date());
+          Path crawlDir = new Path(path, folderName);
+          fileSystem.mkdirs(crawlDir);
+  
+          lockPath = new Path(crawlDir, "crawl.running");
+!         fileSystem.createNewFile(lockPath);
+!         CrawlTool crawlTool = new CrawlTool(configuration, crawlDir);
+!         crawlTool.preCrawl();
+!         crawlTool.crawl(crawlData.getTopn(), crawlData.getDepth());
+        } catch (Throwable e) {
+          LOG.error("crawl fails.", e);
+        } finally {
+-         LOG.info("unlock the scheduled crawl: "
+-                 + crawlData.getWorkingDirectory().getAbsolutePath());
+          LOCK = false;
+!         try {
+!           fileSystem.delete(lockPath, false);
+!         } catch (IOException e) {
+!           LOG.warn("can not delete lock file.", e);
+          }
+        }
+      } else {
+--- 76,107 ----
+          Configuration configuration = configurationUtil
+                  .loadConfiguration(crawlDirectory.getName());
+          fileSystem = FileSystem.get(configuration);
+!         String folderName = createFolderName(configuration, fileSystem, path);
+          Path crawlDir = new Path(path, folderName);
+          fileSystem.mkdirs(crawlDir);
+  
+          lockPath = new Path(crawlDir, "crawl.running");
+!         alreadyRunning = fileSystem.exists(lockPath);
+!         if (!alreadyRunning) {
+!           fileSystem.createNewFile(lockPath);
+!           CrawlTool crawlTool = new CrawlTool(configuration, crawlDir);
+!           crawlTool.preCrawl();
+!           crawlTool.crawl(crawlData.getTopn(), crawlData.getDepth());
+!         } else {
+!             LOG.warn("crawl is already running");
+!         }
+        } catch (Throwable e) {
+          LOG.error("crawl fails.", e);
+        } finally {
+          LOCK = false;
+!         if (!alreadyRunning) {
+!           LOG.info("unlock the scheduled crawl: "
+!                   + crawlData.getWorkingDirectory().getAbsolutePath());
+!           try {
+!             fileSystem.delete(lockPath, false);
+!           } catch (IOException e) {
+!             LOG.warn("can not delete lock file.", e);
+!           }
+          }
+        }
+      } else {
+***************
+*** 101,105 ****
+--- 111,140 ----
+      }
+  
+    }
++   
++   private String createFolderName(final Configuration conf, final FileSystem fs, final Path crawls) throws IOException {
++       if (!conf.getBoolean("scheduling.create.crawl", true)) {
++          final FileStatus[] files = fs.listStatus(crawls, new PathFilter() {
++             public boolean accept(Path p) {
++                 try {
++                     return p.getName().startsWith("Crawl-") && !fs.isFile(p);
++                 } catch (IOException e) {
++                     return false;
++                 }
++             }
++          });
++          if (files != null && files.length > 0) {
++              String last = "";
++              for(final FileStatus file : files) {
++                  final String name = file.getPath().getName();
++                  if (name.compareTo(last) > 0) {
++                      last = name;
++                  }
++              }
++              return last;
++          }
++       }
++       return "Crawl-" + _format.format(new Date());
++   }
+  
+  }
 diff -crBE ./src/plugin/admin-scheduling/src/webapp/WEB-INF/web.xml ../local/src/plugin/admin-scheduling/src/webapp/WEB-INF/web.xml
 *** ./src/plugin/admin-scheduling/src/webapp/WEB-INF/web.xml	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/admin-scheduling/src/webapp/WEB-INF/web.xml	2010-02-18 08:27:23.000000000 +0100
+--- ../local/src/plugin/admin-scheduling/src/webapp/WEB-INF/web.xml	2010-03-04 13:49:27.000000000 +0100
 ***************
 *** 61,67 ****
   			<url-pattern>/*</url-pattern>
@@ -873,7 +1101,7 @@ diff -crBE ./src/plugin/admin-scheduling/src/webapp/WEB-INF/web.xml ../local/src
   
 diff -crBE ./src/plugin/admin-search/src/webapp/WEB-INF/web.xml ../local/src/plugin/admin-search/src/webapp/WEB-INF/web.xml
 *** ./src/plugin/admin-search/src/webapp/WEB-INF/web.xml	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/admin-search/src/webapp/WEB-INF/web.xml	2010-02-18 08:27:45.000000000 +0100
+--- ../local/src/plugin/admin-search/src/webapp/WEB-INF/web.xml	2010-03-04 13:49:48.000000000 +0100
 ***************
 *** 55,61 ****
   			<url-pattern>/*</url-pattern>
@@ -894,9 +1122,45 @@ diff -crBE ./src/plugin/admin-search/src/webapp/WEB-INF/web.xml ../local/src/plu
   		</auth-constraint>
   	</security-constraint>
   
+diff -crBE ./src/plugin/admin-system/src/webapp/WEB-INF/jsp/system.jsp ../local/src/plugin/admin-system/src/webapp/WEB-INF/jsp/system.jsp
+*** ./src/plugin/admin-system/src/webapp/WEB-INF/jsp/system.jsp	2010-01-26 02:47:32.000000000 +0100
+--- ../local/src/plugin/admin-system/src/webapp/WEB-INF/jsp/system.jsp	2010-03-04 13:49:43.000000000 +0100
+***************
+*** 99,113 ****
+  						var startImage = document.getElementById('start');
+  						var stopImage = document.getElementById('stop');
+  						if(action == 'start'){
+! 							startImage.src = '${theme}/gfx/play_inactive.png';
+! 							stopImage.src = '${theme}/gfx/pause.png';
+  							if(document.getElementById('mode').value != 'start'){
+  								document.getElementById('mode').value = 'start';
+  								getLog(lineCount);
+  							}
+  						}else if(action == 'stop'){
+! 							startImage.src = '${theme}/gfx/play.png';
+! 							stopImage.src = '${theme}/gfx/pause_inactive.png';
+  							document.getElementById('mode').value = 'stop';
+  						}
+  					}
+--- 99,113 ----
+  						var startImage = document.getElementById('start');
+  						var stopImage = document.getElementById('stop');
+  						if(action == 'start'){
+! 							startImage.src = '<%=request.getContextPath()%>/theme/${theme}/gfx/play_inactive.png';
+! 							stopImage.src = '<%=request.getContextPath()%>/theme/${theme}/gfx/pause.png';
+  							if(document.getElementById('mode').value != 'start'){
+  								document.getElementById('mode').value = 'start';
+  								getLog(lineCount);
+  							}
+  						}else if(action == 'stop'){
+! 							startImage.src = '<%=request.getContextPath()%>/theme/${theme}/gfx/play.png';
+! 							stopImage.src = '<%=request.getContextPath()%>/theme/${theme}/gfx/pause_inactive.png';
+  							document.getElementById('mode').value = 'stop';
+  						}
+  					}
 diff -crBE ./src/plugin/admin-system/src/webapp/WEB-INF/web.xml ../local/src/plugin/admin-system/src/webapp/WEB-INF/web.xml
 *** ./src/plugin/admin-system/src/webapp/WEB-INF/web.xml	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/admin-system/src/webapp/WEB-INF/web.xml	2010-02-18 08:27:46.000000000 +0100
+--- ../local/src/plugin/admin-system/src/webapp/WEB-INF/web.xml	2010-03-04 13:49:49.000000000 +0100
 ***************
 *** 61,67 ****
   			<url-pattern>/*</url-pattern>
@@ -919,7 +1183,7 @@ diff -crBE ./src/plugin/admin-system/src/webapp/WEB-INF/web.xml ../local/src/plu
   
 diff -crBE ./src/plugin/admin-url-upload/src/webapp/WEB-INF/web.xml ../local/src/plugin/admin-url-upload/src/webapp/WEB-INF/web.xml
 *** ./src/plugin/admin-url-upload/src/webapp/WEB-INF/web.xml	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/admin-url-upload/src/webapp/WEB-INF/web.xml	2010-02-18 08:27:34.000000000 +0100
+--- ../local/src/plugin/admin-url-upload/src/webapp/WEB-INF/web.xml	2010-03-04 13:49:40.000000000 +0100
 ***************
 *** 55,61 ****
   			<url-pattern>/*</url-pattern>
@@ -942,7 +1206,7 @@ diff -crBE ./src/plugin/admin-url-upload/src/webapp/WEB-INF/web.xml ../local/src
   
 diff -crBE ./src/plugin/build-plugin.xml ../local/src/plugin/build-plugin.xml
 *** ./src/plugin/build-plugin.xml	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/build-plugin.xml	2010-02-18 08:27:26.000000000 +0100
+--- ../local/src/plugin/build-plugin.xml	2010-03-04 13:49:31.000000000 +0100
 ***************
 *** 57,63 ****
       </fileset>
@@ -965,7 +1229,7 @@ diff -crBE ./src/plugin/build-plugin.xml ../local/src/plugin/build-plugin.xml
   
 diff -crBE ./src/plugin/build.xml ../local/src/plugin/build.xml
 *** ./src/plugin/build.xml	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/build.xml	2010-02-18 08:27:29.000000000 +0100
+--- ../local/src/plugin/build.xml	2010-03-04 13:49:33.000000000 +0100
 ***************
 *** 94,99 ****
 --- 94,102 ----
@@ -991,7 +1255,7 @@ diff -crBE ./src/plugin/build.xml ../local/src/plugin/build.xml
   </project>
 diff -crBE ./src/plugin/index-metadata/plugin.xml ../local/src/plugin/index-metadata/plugin.xml
 *** ./src/plugin/index-metadata/plugin.xml	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/index-metadata/plugin.xml	2010-02-18 08:27:25.000000000 +0100
+--- ../local/src/plugin/index-metadata/plugin.xml	2010-03-04 13:49:28.000000000 +0100
 ***************
 *** 41,46 ****
 --- 41,47 ----
@@ -1014,7 +1278,7 @@ diff -crBE ./src/plugin/index-metadata/plugin.xml ../local/src/plugin/index-meta
      </extension>
 diff -crBE ./src/plugin/index-metadata/src/java/org/apache/nutch/indexer/metadata/MetadataQueryFilter.java ../local/src/plugin/index-metadata/src/java/org/apache/nutch/indexer/metadata/MetadataQueryFilter.java
 *** ./src/plugin/index-metadata/src/java/org/apache/nutch/indexer/metadata/MetadataQueryFilter.java	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/index-metadata/src/java/org/apache/nutch/indexer/metadata/MetadataQueryFilter.java	2010-02-18 08:27:28.000000000 +0100
+--- ../local/src/plugin/index-metadata/src/java/org/apache/nutch/indexer/metadata/MetadataQueryFilter.java	2010-03-04 13:49:33.000000000 +0100
 ***************
 *** 13,18 ****
 --- 13,22 ----
@@ -1099,7 +1363,7 @@ diff -crBE ./src/plugin/index-metadata/src/java/org/apache/nutch/indexer/metadat
           }
 diff -crBE ./src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java ../local/src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java
 *** ./src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java	2010-02-18 08:27:25.000000000 +0100
+--- ../local/src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java	2010-03-04 13:49:29.000000000 +0100
 ***************
 *** 37,48 ****
 --- 37,51 ----
@@ -1134,7 +1398,7 @@ diff -crBE ./src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/Htt
                                 (content == null ? EMPTY_CONTENT : content),
 diff -crBE ./src/test/org/apache/nutch/admin/GuiComponentExtensionContainerTest.java ../local/src/test/org/apache/nutch/admin/GuiComponentExtensionContainerTest.java
 *** ./src/test/org/apache/nutch/admin/GuiComponentExtensionContainerTest.java	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/test/org/apache/nutch/admin/GuiComponentExtensionContainerTest.java	2010-02-18 08:27:46.000000000 +0100
+--- ../local/src/test/org/apache/nutch/admin/GuiComponentExtensionContainerTest.java	2010-03-04 13:49:49.000000000 +0100
 ***************
 *** 14,20 ****
   

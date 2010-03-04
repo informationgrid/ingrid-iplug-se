@@ -8,8 +8,11 @@ import de.ingrid.admin.command.CommunicationCommandObject;
 @Service
 public class CommunicationValidator extends AbstractValidator<CommunicationCommandObject> {
 
-    public final Errors validateProxyUrl(final Errors errors) {
+    public final Errors validateProxyUrl(final Errors errors, final String defaultUrl) {
         rejectIfEmptyOrWhitespace(errors, "proxyServiceUrl");
+        if (defaultUrl.equals(get(errors, "proxyServiceUrl"))) {
+            rejectError(errors, "proxyServiceUrl", IErrorKeys.INVALID);
+        }
         return errors;
     }
 
