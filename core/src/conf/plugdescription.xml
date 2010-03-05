@@ -51,6 +51,7 @@
     <string>areaid</string>
     <string>code</string>
     <string>incl_meta</string>
+    <string>location</string>
   </list>  
   <string>personSureName</string>
   <string>Kruse</string>
