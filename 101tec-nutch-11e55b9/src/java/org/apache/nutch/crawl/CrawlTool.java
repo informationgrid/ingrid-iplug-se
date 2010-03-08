@@ -223,7 +223,6 @@ public class CrawlTool {
     if (LOG.isInfoEnabled()) {
       LOG.info("crawl finished: " + _crawlDir);
     }
-
   }
 
   public FileSystem getFileSystem() {

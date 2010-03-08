@@ -64,7 +64,9 @@ public class IPlugSeOperatorFinder implements IPlugOperatorFinder {
     // indices
     for (File file : allCrawls) {
       File index = new File(file, "index");
-      indices.add(index);
+      if (index.exists()) {
+          indices.add(index);
+      }
     }
     return indices;
 
