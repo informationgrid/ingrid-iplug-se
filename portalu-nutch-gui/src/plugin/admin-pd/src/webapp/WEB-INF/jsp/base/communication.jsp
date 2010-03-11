@@ -59,12 +59,12 @@
 		<div class="controls">
 			<a href="#" onclick="document.location='welcome.html';">Zurück</a>
 			<a href="#" onclick="document.location='welcome.html';">Abbrechen</a>
-			<a href="#" onclick="document.location='welcome.html';" class="submit">Weiter</a>
+			<a href="#" onclick="document.location='welcome.html';" class="submit">Speichern und Weiter</a>
 		</div>
 		<div class="controls cBottom">
 			<a href="#" onclick="document.location='welcome.html';">Zurück</a>
 			<a href="#" onclick="document.location='welcome.html';">Abbrechen</a>
-			<a href="#" onclick="document.location='welcome.html';" class="submit">Weiter</a>
+			<a href="#" onclick="document.location='welcome.html';" class="submit">Speichern und Weiter</a>
 		</div>
 		<div id="content">
 		
