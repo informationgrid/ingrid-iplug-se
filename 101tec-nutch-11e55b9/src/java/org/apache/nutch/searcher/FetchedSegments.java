@@ -242,9 +242,9 @@ public class FetchedSegments implements RPCSegmentBean {
   public Summary getSummary(HitDetails details, Query query)
     throws IOException {
 
-    if (this.summarizer == null) { return new Summary(); }
-
     final Segment segment = getSegment(details);
+    if (this.summarizer == null || segment == null) { return new Summary(); }
+
     final ParseText parseText = segment.getParseText(getUrl(details));
     final String text = (parseText != null) ? parseText.getText() : "";
 

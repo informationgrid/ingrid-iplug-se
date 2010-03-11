@@ -10,6 +10,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.nutch.admin.searcher.SearcherFactory;
 import org.apache.nutch.crawl.bw.BWInjector;
 import org.apache.nutch.crawl.bw.BWUpdateDb;
 import org.apache.nutch.crawl.metadata.MetadataInjector;
@@ -219,6 +220,8 @@ public class CrawlTool {
         _fileSystem.delete(p, true);
       }
     }
+    
+    SearcherFactory.getInstance(_configuration).reload();
     
     if (LOG.isInfoEnabled()) {
       LOG.info("crawl finished: " + _crawlDir);

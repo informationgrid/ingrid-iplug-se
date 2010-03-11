@@ -4,7 +4,7 @@ Only in ./: .project
 Only in ./: .settings
 diff -crBE ./build.xml ../local/build.xml
 *** ./build.xml	2010-01-26 02:47:32.000000000 +0100
---- ../local/build.xml	2010-03-04 13:49:59.000000000 +0100
+--- ../local/build.xml	2010-03-11 11:38:16.000000000 +0100
 ***************
 *** 33,38 ****
 --- 33,41 ----
@@ -139,7 +139,7 @@ diff -crBE ./build.xml ../local/build.xml
   
 diff -crBE ./conf/nutch-default.xml ../local/conf/nutch-default.xml
 *** ./conf/nutch-default.xml	2010-01-26 02:47:32.000000000 +0100
---- ../local/conf/nutch-default.xml	2010-03-04 13:50:09.000000000 +0100
+--- ../local/conf/nutch-default.xml	2010-03-11 11:38:24.000000000 +0100
 ***************
 *** 1300,1303 ****
 --- 1300,1309 ----
@@ -155,10 +155,20 @@ diff -crBE ./conf/nutch-default.xml ../local/conf/nutch-default.xml
   </configuration>
 diff -crBE ./src/java/org/apache/nutch/crawl/CrawlTool.java ../local/src/java/org/apache/nutch/crawl/CrawlTool.java
 *** ./src/java/org/apache/nutch/crawl/CrawlTool.java	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/java/org/apache/nutch/crawl/CrawlTool.java	2010-03-04 13:50:06.000000000 +0100
+--- ../local/src/java/org/apache/nutch/crawl/CrawlTool.java	2010-03-11 11:38:22.000000000 +0100
+***************
+*** 10,15 ****
+--- 10,16 ----
+  import org.apache.hadoop.fs.FileStatus;
+  import org.apache.hadoop.fs.FileSystem;
+  import org.apache.hadoop.fs.Path;
++ import org.apache.nutch.admin.searcher.SearcherFactory;
+  import org.apache.nutch.crawl.bw.BWInjector;
+  import org.apache.nutch.crawl.bw.BWUpdateDb;
+  import org.apache.nutch.crawl.metadata.MetadataInjector;
 ***************
 *** 18,26 ****
---- 18,28 ----
+--- 19,29 ----
   import org.apache.nutch.indexer.DeleteDuplicates;
   import org.apache.nutch.indexer.IndexMerger;
   import org.apache.nutch.indexer.Indexer;
@@ -172,7 +182,7 @@ diff -crBE ./src/java/org/apache/nutch/crawl/CrawlTool.java ../local/src/java/or
   public class CrawlTool {
 ***************
 *** 75,80 ****
---- 77,86 ----
+--- 78,87 ----
       // other jobs
       Generator generator = new Generator(_configuration);
       Fetcher fetcher = new Fetcher(_configuration);
@@ -185,7 +195,7 @@ diff -crBE ./src/java/org/apache/nutch/crawl/CrawlTool.java ../local/src/java/or
       ParseDataUpdater parseDataUpdater = new ParseDataUpdater(_configuration);
 ***************
 *** 128,133 ****
---- 134,143 ----
+--- 135,144 ----
         segs.add(segment);
         fetcher.fetch(segment, threads, org.apache.nutch.fetcher.Fetcher
                 .isParsing(_configuration)); // fetch it
@@ -209,7 +219,7 @@ diff -crBE ./src/java/org/apache/nutch/crawl/CrawlTool.java ../local/src/java/or
           segmentMerger.merge(mergeDir, mergeSegments, false, false, 0);
           // get merged segment
           Path mergeSegTemp = _fileSystem.listStatus(mergeDir)[0].getPath();
---- 157,170 ----
+--- 158,171 ----
       Path[] mergeSegments = HadoopFSUtil.getPaths(listStatus);
       // list of all segments that will be deleted after indexing
       Path[] segmentsToDelete = null;
@@ -233,7 +243,7 @@ diff -crBE ./src/java/org/apache/nutch/crawl/CrawlTool.java ../local/src/java/or
         }
       }
       
---- 178,184 ----
+--- 179,185 ----
           segmentsToDelete = mergeSegments;
           mergeSegments = new Path[] { mergeSegment };
         } catch (Exception e) {
@@ -241,9 +251,20 @@ diff -crBE ./src/java/org/apache/nutch/crawl/CrawlTool.java ../local/src/java/or
         }
       }
       
+***************
+*** 207,212 ****
+--- 221,228 ----
+        }
+      }
+      
++     SearcherFactory.getInstance(_configuration).reload();
++     
+      if (LOG.isInfoEnabled()) {
+        LOG.info("crawl finished: " + _crawlDir);
+      }
 diff -crBE ./src/java/org/apache/nutch/crawl/NutchWritable.java ../local/src/java/org/apache/nutch/crawl/NutchWritable.java
 *** ./src/java/org/apache/nutch/crawl/NutchWritable.java	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/java/org/apache/nutch/crawl/NutchWritable.java	2010-03-04 13:49:27.000000000 +0100
+--- ../local/src/java/org/apache/nutch/crawl/NutchWritable.java	2010-03-11 11:37:41.000000000 +0100
 ***************
 *** 18,23 ****
 --- 18,24 ----
@@ -276,7 +297,7 @@ diff -crBE ./src/java/org/apache/nutch/crawl/NutchWritable.java ../local/src/jav
   
 diff -crBE ./src/java/org/apache/nutch/fetcher/Fetcher.java ../local/src/java/org/apache/nutch/fetcher/Fetcher.java
 *** ./src/java/org/apache/nutch/fetcher/Fetcher.java	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/java/org/apache/nutch/fetcher/Fetcher.java	2010-03-04 13:49:52.000000000 +0100
+--- ../local/src/java/org/apache/nutch/fetcher/Fetcher.java	2010-03-11 11:38:13.000000000 +0100
 ***************
 *** 47,52 ****
 --- 47,55 ----
@@ -379,7 +400,7 @@ diff -crBE ./src/java/org/apache/nutch/fetcher/Fetcher.java ../local/src/java/or
     public void fetch(Path segment, int threads, boolean parsing)
 diff -crBE ./src/java/org/apache/nutch/indexer/IndexerMapReduce.java ../local/src/java/org/apache/nutch/indexer/IndexerMapReduce.java
 *** ./src/java/org/apache/nutch/indexer/IndexerMapReduce.java	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/java/org/apache/nutch/indexer/IndexerMapReduce.java	2010-03-04 13:50:00.000000000 +0100
+--- ../local/src/java/org/apache/nutch/indexer/IndexerMapReduce.java	2010-03-11 11:38:17.000000000 +0100
 ***************
 *** 23,28 ****
 --- 23,29 ----
@@ -464,9 +485,33 @@ diff -crBE ./src/java/org/apache/nutch/indexer/IndexerMapReduce.java ../local/sr
       FileInputFormat.addInputPath(job, new Path(crawlDb, CrawlDb.CURRENT_NAME));
 Only in ../local/src/java/org/apache/nutch: mail
 Only in ../local/src/java/org/apache/nutch/parse: resulthandler
+diff -crBE ./src/java/org/apache/nutch/searcher/FetchedSegments.java ../local/src/java/org/apache/nutch/searcher/FetchedSegments.java
+*** ./src/java/org/apache/nutch/searcher/FetchedSegments.java	2010-01-26 02:47:32.000000000 +0100
+--- ../local/src/java/org/apache/nutch/searcher/FetchedSegments.java	2010-03-11 11:37:40.000000000 +0100
+***************
+*** 242,250 ****
+    public Summary getSummary(HitDetails details, Query query)
+      throws IOException {
+  
+-     if (this.summarizer == null) { return new Summary(); }
+- 
+      final Segment segment = getSegment(details);
+      final ParseText parseText = segment.getParseText(getUrl(details));
+      final String text = (parseText != null) ? parseText.getText() : "";
+  
+--- 242,250 ----
+    public Summary getSummary(HitDetails details, Query query)
+      throws IOException {
+  
+      final Segment segment = getSegment(details);
++     if (this.summarizer == null || segment == null) { return new Summary(); }
++ 
+      final ParseText parseText = segment.getParseText(getUrl(details));
+      final String text = (parseText != null) ? parseText.getText() : "";
+  
 diff -crBE ./src/java/org/apache/nutch/searcher/Hits.java ../local/src/java/org/apache/nutch/searcher/Hits.java
 *** ./src/java/org/apache/nutch/searcher/Hits.java	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/java/org/apache/nutch/searcher/Hits.java	2010-03-04 13:50:06.000000000 +0100
+--- ../local/src/java/org/apache/nutch/searcher/Hits.java	2010-03-11 11:38:22.000000000 +0100
 ***************
 *** 32,38 ****
     private boolean totalIsExact = true;
@@ -488,7 +533,7 @@ diff -crBE ./src/java/org/apache/nutch/searcher/Hits.java ../local/src/java/org/
       this.total = total;
 diff -crBE ./src/java/org/apache/nutch/searcher/Query.java ../local/src/java/org/apache/nutch/searcher/Query.java
 *** ./src/java/org/apache/nutch/searcher/Query.java	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/java/org/apache/nutch/searcher/Query.java	2010-03-04 13:49:27.000000000 +0100
+--- ../local/src/java/org/apache/nutch/searcher/Query.java	2010-03-11 11:37:40.000000000 +0100
 ***************
 *** 24,29 ****
 --- 24,31 ----
@@ -633,7 +678,7 @@ diff -crBE ./src/java/org/apache/nutch/searcher/Query.java ../local/src/java/org
       for (int i = 0; i < clauses.size(); i++)
 diff -crBE ./src/java/org/apache/nutch/segment/SegmentMerger.java ../local/src/java/org/apache/nutch/segment/SegmentMerger.java
 *** ./src/java/org/apache/nutch/segment/SegmentMerger.java	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/java/org/apache/nutch/segment/SegmentMerger.java	2010-03-04 13:50:09.000000000 +0100
+--- ../local/src/java/org/apache/nutch/segment/SegmentMerger.java	2010-03-11 11:38:24.000000000 +0100
 ***************
 *** 63,68 ****
 --- 63,70 ----
@@ -822,7 +867,7 @@ Only in ../local/src/java/org/apache/nutch/tools: UrlReporter.java
 Only in ../local/src/java/org/apache/nutch/util: ZipUtil.java
 diff -crBE ./src/plugin/admin-configuration/src/webapp/WEB-INF/web.xml ../local/src/plugin/admin-configuration/src/webapp/WEB-INF/web.xml
 *** ./src/plugin/admin-configuration/src/webapp/WEB-INF/web.xml	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/admin-configuration/src/webapp/WEB-INF/web.xml	2010-03-04 13:49:45.000000000 +0100
+--- ../local/src/plugin/admin-configuration/src/webapp/WEB-INF/web.xml	2010-03-11 11:38:02.000000000 +0100
 ***************
 *** 55,61 ****
   			<url-pattern>/*</url-pattern>
@@ -845,7 +890,7 @@ diff -crBE ./src/plugin/admin-configuration/src/webapp/WEB-INF/web.xml ../local/
   
 diff -crBE ./src/plugin/admin-crawl/src/java/org/apache/nutch/admin/crawl/StartCrawlRunnable.java ../local/src/plugin/admin-crawl/src/java/org/apache/nutch/admin/crawl/StartCrawlRunnable.java
 *** ./src/plugin/admin-crawl/src/java/org/apache/nutch/admin/crawl/StartCrawlRunnable.java	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/admin-crawl/src/java/org/apache/nutch/admin/crawl/StartCrawlRunnable.java	2010-03-04 13:50:12.000000000 +0100
+--- ../local/src/plugin/admin-crawl/src/java/org/apache/nutch/admin/crawl/StartCrawlRunnable.java	2010-03-11 11:38:26.000000000 +0100
 ***************
 *** 43,59 ****
       FileSystem fileSystem = _crawlTool.getFileSystem();
@@ -893,7 +938,7 @@ diff -crBE ./src/plugin/admin-crawl/src/java/org/apache/nutch/admin/crawl/StartC
     }
 diff -crBE ./src/plugin/admin-crawl/src/webapp/WEB-INF/web.xml ../local/src/plugin/admin-crawl/src/webapp/WEB-INF/web.xml
 *** ./src/plugin/admin-crawl/src/webapp/WEB-INF/web.xml	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/admin-crawl/src/webapp/WEB-INF/web.xml	2010-03-04 13:50:01.000000000 +0100
+--- ../local/src/plugin/admin-crawl/src/webapp/WEB-INF/web.xml	2010-03-11 11:38:17.000000000 +0100
 ***************
 *** 63,69 ****
   			<url-pattern>/*</url-pattern>
@@ -916,7 +961,7 @@ diff -crBE ./src/plugin/admin-crawl/src/webapp/WEB-INF/web.xml ../local/src/plug
   
 diff -crBE ./src/plugin/admin-instance/src/webapp/WEB-INF/web.xml ../local/src/plugin/admin-instance/src/webapp/WEB-INF/web.xml
 *** ./src/plugin/admin-instance/src/webapp/WEB-INF/web.xml	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/admin-instance/src/webapp/WEB-INF/web.xml	2010-03-04 13:50:03.000000000 +0100
+--- ../local/src/plugin/admin-instance/src/webapp/WEB-INF/web.xml	2010-03-11 11:38:19.000000000 +0100
 ***************
 *** 60,66 ****
   			<url-pattern>/*</url-pattern>
@@ -939,7 +984,7 @@ diff -crBE ./src/plugin/admin-instance/src/webapp/WEB-INF/web.xml ../local/src/p
   
 diff -crBE ./src/plugin/admin-scheduling/src/java/org/apache/nutch/admin/scheduling/SchedulingController.java ../local/src/plugin/admin-scheduling/src/java/org/apache/nutch/admin/scheduling/SchedulingController.java
 *** ./src/plugin/admin-scheduling/src/java/org/apache/nutch/admin/scheduling/SchedulingController.java	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/admin-scheduling/src/java/org/apache/nutch/admin/scheduling/SchedulingController.java	2010-03-04 13:49:34.000000000 +0100
+--- ../local/src/plugin/admin-scheduling/src/java/org/apache/nutch/admin/scheduling/SchedulingController.java	2010-03-11 11:37:47.000000000 +0100
 ***************
 *** 85,91 ****
   
@@ -959,7 +1004,7 @@ diff -crBE ./src/plugin/admin-scheduling/src/java/org/apache/nutch/admin/schedul
       }
 diff -crBE ./src/plugin/admin-scheduling/src/java/org/apache/nutch/admin/scheduling/SchedulingRunnable.java ../local/src/plugin/admin-scheduling/src/java/org/apache/nutch/admin/scheduling/SchedulingRunnable.java
 *** ./src/plugin/admin-scheduling/src/java/org/apache/nutch/admin/scheduling/SchedulingRunnable.java	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/admin-scheduling/src/java/org/apache/nutch/admin/scheduling/SchedulingRunnable.java	2010-03-04 13:49:34.000000000 +0100
+--- ../local/src/plugin/admin-scheduling/src/java/org/apache/nutch/admin/scheduling/SchedulingRunnable.java	2010-03-11 11:37:47.000000000 +0100
 ***************
 *** 25,32 ****
 --- 25,34 ----
@@ -1078,7 +1123,7 @@ diff -crBE ./src/plugin/admin-scheduling/src/java/org/apache/nutch/admin/schedul
   }
 diff -crBE ./src/plugin/admin-scheduling/src/webapp/WEB-INF/web.xml ../local/src/plugin/admin-scheduling/src/webapp/WEB-INF/web.xml
 *** ./src/plugin/admin-scheduling/src/webapp/WEB-INF/web.xml	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/admin-scheduling/src/webapp/WEB-INF/web.xml	2010-03-04 13:49:27.000000000 +0100
+--- ../local/src/plugin/admin-scheduling/src/webapp/WEB-INF/web.xml	2010-03-11 11:37:40.000000000 +0100
 ***************
 *** 61,67 ****
   			<url-pattern>/*</url-pattern>
@@ -1101,7 +1146,7 @@ diff -crBE ./src/plugin/admin-scheduling/src/webapp/WEB-INF/web.xml ../local/src
   
 diff -crBE ./src/plugin/admin-search/src/webapp/WEB-INF/web.xml ../local/src/plugin/admin-search/src/webapp/WEB-INF/web.xml
 *** ./src/plugin/admin-search/src/webapp/WEB-INF/web.xml	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/admin-search/src/webapp/WEB-INF/web.xml	2010-03-04 13:49:48.000000000 +0100
+--- ../local/src/plugin/admin-search/src/webapp/WEB-INF/web.xml	2010-03-11 11:38:05.000000000 +0100
 ***************
 *** 55,61 ****
   			<url-pattern>/*</url-pattern>
@@ -1124,7 +1169,7 @@ diff -crBE ./src/plugin/admin-search/src/webapp/WEB-INF/web.xml ../local/src/plu
   
 diff -crBE ./src/plugin/admin-system/src/webapp/WEB-INF/jsp/system.jsp ../local/src/plugin/admin-system/src/webapp/WEB-INF/jsp/system.jsp
 *** ./src/plugin/admin-system/src/webapp/WEB-INF/jsp/system.jsp	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/admin-system/src/webapp/WEB-INF/jsp/system.jsp	2010-03-04 13:49:43.000000000 +0100
+--- ../local/src/plugin/admin-system/src/webapp/WEB-INF/jsp/system.jsp	2010-03-11 11:38:01.000000000 +0100
 ***************
 *** 99,113 ****
   						var startImage = document.getElementById('start');
@@ -1160,7 +1205,7 @@ diff -crBE ./src/plugin/admin-system/src/webapp/WEB-INF/jsp/system.jsp ../local/
   					}
 diff -crBE ./src/plugin/admin-system/src/webapp/WEB-INF/web.xml ../local/src/plugin/admin-system/src/webapp/WEB-INF/web.xml
 *** ./src/plugin/admin-system/src/webapp/WEB-INF/web.xml	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/admin-system/src/webapp/WEB-INF/web.xml	2010-03-04 13:49:49.000000000 +0100
+--- ../local/src/plugin/admin-system/src/webapp/WEB-INF/web.xml	2010-03-11 11:38:06.000000000 +0100
 ***************
 *** 61,67 ****
   			<url-pattern>/*</url-pattern>
@@ -1183,7 +1228,7 @@ diff -crBE ./src/plugin/admin-system/src/webapp/WEB-INF/web.xml ../local/src/plu
   
 diff -crBE ./src/plugin/admin-url-upload/src/webapp/WEB-INF/web.xml ../local/src/plugin/admin-url-upload/src/webapp/WEB-INF/web.xml
 *** ./src/plugin/admin-url-upload/src/webapp/WEB-INF/web.xml	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/admin-url-upload/src/webapp/WEB-INF/web.xml	2010-03-04 13:49:40.000000000 +0100
+--- ../local/src/plugin/admin-url-upload/src/webapp/WEB-INF/web.xml	2010-03-11 11:37:57.000000000 +0100
 ***************
 *** 55,61 ****
   			<url-pattern>/*</url-pattern>
@@ -1206,7 +1251,7 @@ diff -crBE ./src/plugin/admin-url-upload/src/webapp/WEB-INF/web.xml ../local/src
   
 diff -crBE ./src/plugin/build-plugin.xml ../local/src/plugin/build-plugin.xml
 *** ./src/plugin/build-plugin.xml	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/build-plugin.xml	2010-03-04 13:49:31.000000000 +0100
+--- ../local/src/plugin/build-plugin.xml	2010-03-11 11:37:43.000000000 +0100
 ***************
 *** 57,63 ****
       </fileset>
@@ -1229,7 +1274,7 @@ diff -crBE ./src/plugin/build-plugin.xml ../local/src/plugin/build-plugin.xml
   
 diff -crBE ./src/plugin/build.xml ../local/src/plugin/build.xml
 *** ./src/plugin/build.xml	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/build.xml	2010-03-04 13:49:33.000000000 +0100
+--- ../local/src/plugin/build.xml	2010-03-11 11:37:46.000000000 +0100
 ***************
 *** 94,99 ****
 --- 94,102 ----
@@ -1255,7 +1300,7 @@ diff -crBE ./src/plugin/build.xml ../local/src/plugin/build.xml
   </project>
 diff -crBE ./src/plugin/index-metadata/plugin.xml ../local/src/plugin/index-metadata/plugin.xml
 *** ./src/plugin/index-metadata/plugin.xml	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/index-metadata/plugin.xml	2010-03-04 13:49:28.000000000 +0100
+--- ../local/src/plugin/index-metadata/plugin.xml	2010-03-11 11:37:42.000000000 +0100
 ***************
 *** 41,46 ****
 --- 41,47 ----
@@ -1278,7 +1323,7 @@ diff -crBE ./src/plugin/index-metadata/plugin.xml ../local/src/plugin/index-meta
      </extension>
 diff -crBE ./src/plugin/index-metadata/src/java/org/apache/nutch/indexer/metadata/MetadataQueryFilter.java ../local/src/plugin/index-metadata/src/java/org/apache/nutch/indexer/metadata/MetadataQueryFilter.java
 *** ./src/plugin/index-metadata/src/java/org/apache/nutch/indexer/metadata/MetadataQueryFilter.java	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/index-metadata/src/java/org/apache/nutch/indexer/metadata/MetadataQueryFilter.java	2010-03-04 13:49:33.000000000 +0100
+--- ../local/src/plugin/index-metadata/src/java/org/apache/nutch/indexer/metadata/MetadataQueryFilter.java	2010-03-11 11:37:46.000000000 +0100
 ***************
 *** 13,18 ****
 --- 13,22 ----
@@ -1363,7 +1408,7 @@ diff -crBE ./src/plugin/index-metadata/src/java/org/apache/nutch/indexer/metadat
           }
 diff -crBE ./src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java ../local/src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java
 *** ./src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java	2010-03-04 13:49:29.000000000 +0100
+--- ../local/src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/HttpBase.java	2010-03-11 11:37:42.000000000 +0100
 ***************
 *** 37,48 ****
 --- 37,51 ----
@@ -1398,7 +1443,7 @@ diff -crBE ./src/plugin/lib-http/src/java/org/apache/nutch/protocol/http/api/Htt
                                 (content == null ? EMPTY_CONTENT : content),
 diff -crBE ./src/test/org/apache/nutch/admin/GuiComponentExtensionContainerTest.java ../local/src/test/org/apache/nutch/admin/GuiComponentExtensionContainerTest.java
 *** ./src/test/org/apache/nutch/admin/GuiComponentExtensionContainerTest.java	2010-01-26 02:47:32.000000000 +0100
---- ../local/src/test/org/apache/nutch/admin/GuiComponentExtensionContainerTest.java	2010-03-04 13:49:49.000000000 +0100
+--- ../local/src/test/org/apache/nutch/admin/GuiComponentExtensionContainerTest.java	2010-03-11 11:38:06.000000000 +0100
 ***************
 *** 14,20 ****
   
