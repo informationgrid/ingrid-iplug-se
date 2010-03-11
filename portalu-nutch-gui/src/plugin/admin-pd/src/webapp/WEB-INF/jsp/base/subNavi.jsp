@@ -66,6 +66,11 @@
 	
 	<div class="konf">
        <p class="no">&nbsp;</p>
+        <h2><a href="/general">Zurück zur Nutch Konfiguration</a></h2>
+    </div>
+	
+	<!--div class="konf">
+       <p class="no">&nbsp;</p>
         <h2>Navigation</h2>
     </div>
     <ul>
@@ -95,5 +100,5 @@
 	        </c:forEach>
         </c:if>
 
-    </ul>
+    </ul-->
 </div>
