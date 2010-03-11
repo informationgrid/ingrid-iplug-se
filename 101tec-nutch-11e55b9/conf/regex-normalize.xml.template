@@ -33,6 +33,16 @@
   <substitution>$4</substitution>
 </regex>
 
+<!-- 
+  possible better pattern to exclude /sid_23232323/ from the path. 
+  See also http://issues.apache.org/jira/browse/NUTCH-706
+
+<regex>
+  <pattern>((\\?|&amp;|/|)([;_]?((?i)l|j|bv_|ps_)?((?i)s|sid|phpsessid|sessionid|conversationid|sess_id)(=|_).*?)(\\?|&amp;|#|/|$))</pattern>
+  <substitution>$1</substitution>
+</regex>
+-->
+
 <!-- changes default pages into standard for /index.html, etc. into /
 <regex>
   <pattern>/((?i)index|default)\.((?i)js[pf]{1}?[afx]?|cgi|cfm|asp[x]?|[psx]?htm[l]?|php[3456]?)(\?|&amp;|#|$)</pattern>
