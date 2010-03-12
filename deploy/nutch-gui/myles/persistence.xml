@@ -21,6 +21,7 @@
 			<property name="javax.persistence.jdbc.user" value="myles" />
 			<property name="javax.persistence.jdbc.password" value="eki7y6" />
 			<property name="eclipselink.ddl-generation" value="create-tables"/>
+			<property name="eclipselink.cache.expiry" value="60000"/>
 		</properties>
 	</persistence-unit>
 	
