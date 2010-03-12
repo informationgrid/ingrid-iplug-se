@@ -26,6 +26,8 @@ import org.apache.nutch.tools.HostStatistic;
 import org.apache.nutch.tools.UrlReporter;
 import org.apache.nutch.util.HadoopFSUtil;
 
+import de.ingrid.iplug.se.SearchUpdateScanner;
+
 public class CrawlTool {
 
   private final Configuration _configuration;
@@ -221,6 +223,7 @@ public class CrawlTool {
       }
     }
     
+    SearchUpdateScanner.updateCrawl(_fileSystem, _crawlDir);
     SearcherFactory.getInstance(_configuration).reload();
     
     if (LOG.isInfoEnabled()) {

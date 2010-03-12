@@ -61,6 +61,8 @@ public class NutchSearcher implements IPlug {
   private ProcessorPipe _processorPipe = new ProcessorPipe();
 
   private DirectoryScanningSearcherFactory _searcherFactory;
+  
+  private SearchUpdateScanner _scanner;
 
   /**
    * The default constructor.
@@ -93,6 +95,10 @@ public class NutchSearcher implements IPlug {
     _searcherFactory = new DirectoryScanningSearcherFactory(_configuration, new TimeProvider());
     ProcessorPipeFactory processorPipeFactory = new ProcessorPipeFactory(plugDescription);
     _processorPipe = processorPipeFactory.getProcessorPipe();
+    if (_scanner != null) {
+        _scanner.cancel();
+    }
+    _scanner = new SearchUpdateScanner(workinDirectory, _searcherFactory, 60000);
   }
 
   /*
