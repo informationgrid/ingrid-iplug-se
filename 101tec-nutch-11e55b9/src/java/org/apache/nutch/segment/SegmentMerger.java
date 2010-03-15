@@ -560,12 +560,8 @@ public class SegmentMerger extends Configured implements
     if (LOG.isInfoEnabled()) {
       LOG.info("Merging " + segs.length + " segments to " + out + "/" + segmentName);
     }
-    JobConf job = new NutchJob(getConf());
-    job.setJobName("mergesegs " + out + "/" + segmentName);
-    job.setBoolean("segment.merger.filter", filter);
-    job.setBoolean("segment.merger.normalizer", normalize);
-    job.setLong("segment.merger.slice", slice);
-    job.set("segment.merger.segmentName", segmentName);
+    
+    
     FileSystem fs = FileSystem.get(getConf());
     // prepare the minimal common set of input dirs
     boolean g = true;
@@ -601,60 +597,47 @@ public class SegmentMerger extends Configured implements
       pt = pt && fs.exists(ptDir);
       sns = sns && fs.exists(snsDir);
     }
-    StringBuffer sb = new StringBuffer();
-    if (c) sb.append(" " + Content.DIR_NAME);
-    if (g) sb.append(" " + CrawlDatum.GENERATE_DIR_NAME);
-    if (f) sb.append(" " + CrawlDatum.FETCH_DIR_NAME);
-    if (p) sb.append(" " + CrawlDatum.PARSE_DIR_NAME);
-    if (pd) sb.append(" " + ParseData.DIR_NAME);
-    if (pt) sb.append(" " + ParseText.DIR_NAME);
-    if (sns) sb.append(" " + CompressedSnsData.DIR_NAME);
-    if (LOG.isInfoEnabled()) {
-      LOG.info("SegmentMerger: using segment data from:" + sb.toString());
-    }
-    for (int i = 0; i < segs.length; i++) {
-      if (segs[i] == null) continue;
-      if (g) {
-        Path gDir = new Path(segs[i], CrawlDatum.GENERATE_DIR_NAME);
+    
+    ArrayList<String> directories = new ArrayList<String>();
+    if (c) directories.add(Content.DIR_NAME);
+    if (g) directories.add(CrawlDatum.GENERATE_DIR_NAME);
+    if (f) directories.add(CrawlDatum.FETCH_DIR_NAME);
+    if (p) directories.add(CrawlDatum.PARSE_DIR_NAME);
+    if (pd) directories.add(ParseData.DIR_NAME);
+    if (pt) directories.add(ParseText.DIR_NAME);
+    if (sns) directories.add(CompressedSnsData.DIR_NAME);
+    
+    
+    JobConf job = null;
+    for (int j=0; j<directories.size(); j++) {
+      if (LOG.isInfoEnabled()) {
+        LOG.info("SegmentMerger: using segment data from:" + directories.get(j));
+      }
+      
+      job = new NutchJob(getConf());
+      job.setJobName("mergesegs " + out + "/" + segmentName);
+      job.setBoolean("segment.merger.filter", filter);
+      job.setBoolean("segment.merger.normalizer", normalize);
+      job.setLong("segment.merger.slice", slice);
+      job.set("segment.merger.segmentName", segmentName);
+      for (int i = 0; i < segs.length; i++) {
+        if (segs[i] == null) continue;
+        Path gDir = new Path(segs[i], directories.get(j));
         FileInputFormat.addInputPath(job, gDir);
-      }
-      if (c) {
-        Path cDir = new Path(segs[i], Content.DIR_NAME);
-        FileInputFormat.addInputPath(job, cDir);
-      }
-      if (f) {
-        Path fDir = new Path(segs[i], CrawlDatum.FETCH_DIR_NAME);
-        FileInputFormat.addInputPath(job, fDir);
-      }
-      if (p) {
-        Path pDir = new Path(segs[i], CrawlDatum.PARSE_DIR_NAME);
-        FileInputFormat.addInputPath(job, pDir);
-      }
-      if (pd) {
-        Path pdDir = new Path(segs[i], ParseData.DIR_NAME);
-        FileInputFormat.addInputPath(job, pdDir);
-      }
-      if (pt) {
-        Path ptDir = new Path(segs[i], ParseText.DIR_NAME);
-        FileInputFormat.addInputPath(job, ptDir);
-      }
-      if (sns) {
-        Path snsDir = new Path (segs[i], CompressedSnsData.DIR_NAME);
-        FileInputFormat.addInputPath(job, snsDir);
+        job.setInputFormat(ObjectInputFormat.class);
+        job.setMapperClass(SegmentMerger.class);
+        job.setReducerClass(SegmentMerger.class);
+        FileOutputFormat.setOutputPath(job, out);
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(MetaWrapper.class);
+        job.setOutputFormat(SegmentOutputFormat.class);
+        setConf(job);
+        JobClient.runJob(job);
       }
     }
-    job.setInputFormat(ObjectInputFormat.class);
-    job.setMapperClass(SegmentMerger.class);
-    job.setReducerClass(SegmentMerger.class);
-    FileOutputFormat.setOutputPath(job, out);
-    job.setOutputKeyClass(Text.class);
-    job.setOutputValueClass(MetaWrapper.class);
-    job.setOutputFormat(SegmentOutputFormat.class);
-    
-    setConf(job);
-    
-    JobClient.runJob(job);
+  
   }
+  
 
   /**
    * @param args
