@@ -561,7 +561,7 @@ public class NutchSearcher implements IPlug {
       }
       return ingridDetail;
     }
-    return null;
+    return new IngridHitDetail();
   }
 
   /*
