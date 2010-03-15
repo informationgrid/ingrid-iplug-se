@@ -624,16 +624,16 @@ public class SegmentMerger extends Configured implements
         if (segs[i] == null) continue;
         Path gDir = new Path(segs[i], directories.get(j));
         FileInputFormat.addInputPath(job, gDir);
-        job.setInputFormat(ObjectInputFormat.class);
-        job.setMapperClass(SegmentMerger.class);
-        job.setReducerClass(SegmentMerger.class);
-        FileOutputFormat.setOutputPath(job, out);
-        job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(MetaWrapper.class);
-        job.setOutputFormat(SegmentOutputFormat.class);
-        setConf(job);
-        JobClient.runJob(job);
       }
+      job.setInputFormat(ObjectInputFormat.class);
+      job.setMapperClass(SegmentMerger.class);
+      job.setReducerClass(SegmentMerger.class);
+      FileOutputFormat.setOutputPath(job, out);
+      job.setOutputKeyClass(Text.class);
+      job.setOutputValueClass(MetaWrapper.class);
+      job.setOutputFormat(SegmentOutputFormat.class);
+      setConf(job);
+      JobClient.runJob(job);
     }
   
   }
