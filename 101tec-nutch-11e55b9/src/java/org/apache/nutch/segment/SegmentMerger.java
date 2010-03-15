@@ -254,10 +254,11 @@ public class SegmentMerger extends Configured implements
             if (res != null) return res;
             Path wname;
             Path out = FileOutputFormat.getOutputPath(job);
+            Path realout = new Path(out.getParent(), dirName);
             if (slice == DEFAULT_SLICE) {
-              wname = new Path(new Path(new Path(out, segmentName), dirName), name);
+              wname = new Path(realout, name);
             } else {
-              wname = new Path(new Path(new Path(out, segmentName + "-" + slice), dirName), name);
+              wname = new Path(new Path(new Path(out.getParent().getParent(), segmentName + "-" + slice), dirName), name);
             }
             res = SequenceFile.createWriter(fs, job, wname, Text.class, clazz,
                 SequenceFileOutputFormat.getOutputCompressionType(job), progress);
@@ -272,10 +273,11 @@ public class SegmentMerger extends Configured implements
           if (res != null) return res;
           Path wname;
           Path out = FileOutputFormat.getOutputPath(job);
+          Path realout = new Path(out.getParent(), dirName);
           if (slice == DEFAULT_SLICE) {
-            wname = new Path(new Path(new Path(out, segmentName), dirName), name);
+            wname = new Path(realout, name);
           } else {
-            wname = new Path(new Path(new Path(out, segmentName + "-" + slice), dirName), name);
+            wname = new Path(new Path(new Path(out.getParent().getParent(), segmentName + "-" + slice), dirName), name);
           }
           CompressionType compType = 
               SequenceFileOutputFormat.getOutputCompressionType(job);
@@ -609,13 +611,14 @@ public class SegmentMerger extends Configured implements
     
     
     JobConf job = null;
+    Path segment = new Path(out, segmentName);
     for (int j=0; j<directories.size(); j++) {
       if (LOG.isInfoEnabled()) {
         LOG.info("SegmentMerger: using segment data from:" + directories.get(j));
       }
       
       job = new NutchJob(getConf());
-      job.setJobName("mergesegs " + out + "/" + segmentName);
+      job.setJobName("mergesegs " + out + "/" + segmentName + "/" + directories.get(j));
       job.setBoolean("segment.merger.filter", filter);
       job.setBoolean("segment.merger.normalizer", normalize);
       job.setLong("segment.merger.slice", slice);
@@ -628,7 +631,8 @@ public class SegmentMerger extends Configured implements
       job.setInputFormat(ObjectInputFormat.class);
       job.setMapperClass(SegmentMerger.class);
       job.setReducerClass(SegmentMerger.class);
-      FileOutputFormat.setOutputPath(job, out);
+      Path output = new Path(segment, directories.get(j));
+      FileOutputFormat.setOutputPath(job, output);
       job.setOutputKeyClass(Text.class);
       job.setOutputValueClass(MetaWrapper.class);
       job.setOutputFormat(SegmentOutputFormat.class);

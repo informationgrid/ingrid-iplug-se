@@ -597,7 +597,7 @@
 
 <property>
   <name>fetcher.store.content</name>
-  <value>true</value>
+  <value>false</value>
   <description>If true, fetcher will store content.</description>
 </property>
 
