@@ -33,6 +33,10 @@ public class TestRegExURLNormalizerHelper extends TestCase {
         urlString = Util.substitute(matcher, pattern, new Perl5Substitution(
                 substitution), "http://www.endlager-asse.de/cln_135/sid_EECCBC17C7694EC084DC72B530305DF1/DE/5_AsseService/A_Umgebungsueberwachung/_node.html", Util.SUBSTITUTE_ALL); // actual
         assertEquals("http://www.endlager-asse.de/cln_135/DE/5_AsseService/A_Umgebungsueberwachung/_node.html", urlString);
+        
+        urlString = Util.substitute(matcher, pattern, new Perl5Substitution(
+                substitution), "http://www.endlager-asse.de/cln_135/sidcom/sid_EECCBC17C7694EC084DC72B530305DF1/DE/5_AsseService/A_Umgebungsueberwachung/_node.html", Util.SUBSTITUTE_ALL); // actual
+        assertEquals("http://www.endlager-asse.de/cln_135/sidcom/DE/5_AsseService/A_Umgebungsueberwachung/_node.html", urlString);
     }
     
 }
