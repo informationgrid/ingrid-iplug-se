@@ -1,6 +1,8 @@
 package org.apache.nutch.tools;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,14 +27,18 @@ import org.apache.nutch.crawl.CrawlDatum;
 public class UrlReporter extends Configured {
 
     public static final Text RESPONSE_CODE = new Text("response_code");
+    
+    public static final String CODES = "report.codes";
 
     public static final String REPORT = "report";
 
     protected static final Log LOG = LogFactory.getLog(UrlReporter.class.getName());
 
     private final FileSystem _fileSystem;
-
+    
     public static class ReporterMapper implements Mapper<Text, CrawlDatum, IntWritable, Text> {
+        
+        private CodeFilter _filter;
 
         @Override
         public void map(final Text key, final CrawlDatum value, final OutputCollector<IntWritable, Text> output,
@@ -42,7 +48,7 @@ public class UrlReporter extends Configured {
             if (responseCode != null && responseCode instanceof IntWritable) {
                 final IntWritable code = (IntWritable) responseCode;
                 // only report if code is not success
-                if (code.get() != 200) {
+                if (_filter.accept(code.get())) {
                     output.collect(code, key);
                 }
             }
@@ -50,10 +56,79 @@ public class UrlReporter extends Configured {
 
         @Override
         public void configure(final JobConf conf) {
+            _filter = CodeFilter.parse(conf.get(CODES, "100-505"));
         }
 
         @Override
         public void close() throws IOException {
+        }
+        
+        private static class CodeFilter {
+            private class Range {
+                public int from;
+                public int to;
+                public Range(final int from, final int to) {
+                    this.from = from;
+                    this.to = to;
+                }
+                public boolean inRange(final int code) {
+                    return code >= from  && code <= to;
+                }
+                @Override
+                public boolean equals(final Object obj) {
+                    if (obj instanceof CodeFilter) {
+                        final Range range = (Range) obj;
+                        return range.from == from && range.to == to;
+                    }
+                    return false;
+                }
+            }
+            
+            private Set<Integer> _codes = new HashSet<Integer>();
+            private Set<Range> _ranges = new HashSet<Range>();
+            
+            public static CodeFilter parse(final String codeString) {
+                final CodeFilter filter = new CodeFilter();
+            
+                if (codeString != null) {
+                    final String trimmed = codeString.trim();
+                    if (trimmed.length() >= 0) {
+                        for (final String element : trimmed.split(",")) {
+                            try {
+                                final String[] split = element.trim().split("-");
+                                if (split.length > 1) {
+                                    filter.addRange(Integer.parseInt(split[0].trim()), Integer.parseInt(split[1].trim()));
+                                } else {
+                                    filter.addCode(Integer.parseInt(split[0].trim()));
+                                }
+                            } catch (final Exception e) {
+                            }
+                        }
+                    }
+                }
+                
+                return filter;
+            }
+            
+            public boolean accept(final int code) {
+                if (_codes.contains(code)) {
+                    return true;
+                }
+                for (final Range range : _ranges) {
+                    if (range.inRange(code)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            
+            public void addCode(final int code) {
+                _codes.add(code);
+            }
+            
+            public void addRange(final int from, final int to) {
+                _ranges.add(new Range(from, to));
+            }
         }
     }
 
