@@ -4,12 +4,12 @@
      	<c:choose>
 			<c:when test="${page.currentPage}">
 				<div class="activePage">
-				<a href="?page=${page.page}&hitsPerPage=${hitsPerPage}${paramString}" class="activePage">&nbsp;${page.label}&nbsp;</a>
+				<a href="?page=${page.page}&hitsPerPage=${hitsPerPage}&sort=${sort}&dir=${dir}${paramString}" class="activePage">&nbsp;${page.label}&nbsp;</a>
 				</div>
 			</c:when>
 			<c:otherwise>
 				<div class="inactivePage">
-				<a href="?page=${page.page}&hitsPerPage=${hitsPerPage}${paramString}" class="inactivePage">&nbsp;${page.label}&nbsp;</a>
+				<a href="?page=${page.page}&hitsPerPage=${hitsPerPage}&sort=${sort}&dir=${dir}${paramString}" class="inactivePage">&nbsp;${page.label}&nbsp;</a>
 				</div>
 			</c:otherwise>
 		</c:choose>
