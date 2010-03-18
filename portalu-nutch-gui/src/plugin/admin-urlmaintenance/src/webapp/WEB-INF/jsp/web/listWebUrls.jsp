@@ -304,6 +304,7 @@
 						</div>
 						
 						<script>
+						YAHOO.util.Event.addListener(window, "load", function() {
 						YAHOO.namespace("example.container");
 						var handleYes = function() {
 						    this.form.submit();
@@ -328,6 +329,7 @@
 						<c:forEach items="${urls}" var="url" varStatus="index">
 						YAHOO.util.Event.addListener("deleteWebUrl_${index.index}", "click", YAHOO.example.container.deleteWebUrl.show, YAHOO.example.container.deleteWebUrl, true);
 						</c:forEach>
+						});
 						</script>
 					</div>
 					
