@@ -12,7 +12,7 @@ b) Connect to ibus and retrieve actual Partners/Providers (eclipse):
  (user/passwort: adminportal/adminportal)
  
 c) Start from distribution installation:
- run ./start-indexer.sh 
+ run ./start-index.sh 
  
 Run/Debug searcher:
 ---------------------
@@ -21,7 +21,7 @@ a) in eclipse:
  Params:     --plugdescription portalu-search/conf/plugdescription-search.xml --descriptor portalu-search/conf/communication-search.xml
  VM-Params:  -Dlog4j.rootLogger=INFO,DRFA,stdout
  
-b) run ./start-indexer.sh 
+b) run ./start-search.sh 
 
 TODO rwe:
 ---------
