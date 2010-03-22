@@ -147,6 +147,7 @@ public class UrlReporter extends Configured {
 
         // create job
         final JobConf job = new JobConf();
+        job.set(CODES, getConf().get(CODES));
         job.setJobName("segment-report-" + segment.getName());
 
         FileInputFormat.addInputPath(job, new Path(segment, CrawlDatum.FETCH_DIR_NAME));
