@@ -160,31 +160,42 @@ public class CrawlTool {
     Path[] mergeSegments = HadoopFSUtil.getPaths(listStatus);
     // list of all segments that will be deleted after indexing
     Path[] segmentsToDelete = null;
-    if (mergeSegments.length > 1) {
-      try {
-        // merge segments
-        SegmentMerger segmentMerger = new SegmentMerger(_configuration);
-        Path mergeDir = new Path(segments, "merge-segments");
-        if (_fileSystem.exists(mergeDir)) {
-            _fileSystem.delete(mergeDir, true);
+
+    // ------ none nutch-specific code starts here
+    boolean mergeEnable = _configuration.getBoolean("merge.after.fetch", false);
+    LOG.info("Merge of segments enabled ? merge.after.fetch = " + mergeEnable);
+    if (mergeEnable) {
+    // ------ none nutch-specific code ends here
+
+        if (mergeSegments.length > 1) {
+            try {
+              // merge segments
+              SegmentMerger segmentMerger = new SegmentMerger(_configuration);
+              Path mergeDir = new Path(segments, "merge-segments");
+              if (_fileSystem.exists(mergeDir)) {
+                  _fileSystem.delete(mergeDir, true);
+              }
+              segmentMerger.merge(mergeDir, mergeSegments, false, false, 0);
+              // get merged segment
+              Path mergeSegTemp = _fileSystem.listStatus(mergeDir)[0].getPath();
+              // move merged segment to others
+              Path mergeSegment = new Path(segments, mergeSegTemp.getName());
+              _fileSystem.rename(mergeSegTemp, mergeSegment);
+              _fileSystem.delete(mergeDir, true);
+              // create statistic
+              hostStatistic.statistic(crawlDb, mergeSegment);
+              // use only merged segment
+              segmentsToDelete = mergeSegments;
+              mergeSegments = new Path[] { mergeSegment };
+            } catch (Exception e) {
+              LOG.warn("error while merging" ,e);
+            }
         }
-        segmentMerger.merge(mergeDir, mergeSegments, false, false, 0);
-        // get merged segment
-        Path mergeSegTemp = _fileSystem.listStatus(mergeDir)[0].getPath();
-        // move merged segment to others
-        Path mergeSegment = new Path(segments, mergeSegTemp.getName());
-        _fileSystem.rename(mergeSegTemp, mergeSegment);
-        _fileSystem.delete(mergeDir, true);
-        // create statistic
-        hostStatistic.statistic(crawlDb, mergeSegment);
-        // use only merged segment
-        segmentsToDelete = mergeSegments;
-        mergeSegments = new Path[] { mergeSegment };
-      } catch (Exception e) {
-        LOG.warn("error while merging" ,e);
-      }
+
+    // ------ none nutch-specific code starts here
     }
-    
+    // ------ none nutch-specific code ends here
+
     if (mergeSegments.length > 0) {
       linkDbTool.invert(linkDb, mergeSegments, true, true, false); // invert links
 

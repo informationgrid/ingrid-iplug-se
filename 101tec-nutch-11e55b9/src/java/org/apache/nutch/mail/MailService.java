@@ -4,23 +4,21 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.channels.FileChannel;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.apache.hadoop.io.compress.CompressionInputStream;
 import org.apache.nutch.tools.UrlReporter;
 import org.apache.nutch.util.ZipUtil;
 
-public class MailService {
+public class MailService extends Configured {
 
     public static final String TEMP_DIR = "nutch_reports";
 
@@ -30,10 +28,8 @@ public class MailService {
 
     private final MailSender _mailSender;
     
-    private final Configuration _configuration;
-
     private MailService(final Configuration configuration) {
-        _configuration = configuration;
+        super(configuration);
         _mailSender = MailSender.get(configuration);
     }
 
@@ -55,17 +51,25 @@ public class MailService {
         final Path reportPath = new Path(crawlPath, TEMP_DIR + "/" + segmentName + "_" + currentDepth);
 
         // create temp local file report
-        LOG.debug("moving report file to local file");
+        LOG.debug("moving report data " + report + " to local data " + reportPath);
         fileSystem.copyToLocalFile(report, reportPath);
         final File reportFile = new File(reportPath.toString());
         
         if (reportFile.isDirectory()) {
             File[] listOfFiles = reportFile.listFiles();
-            CompressionCodecFactory ccf = new CompressionCodecFactory(_configuration);
+            CompressionCodecFactory ccf = new CompressionCodecFactory(getConf());
             for (int i=0; i<listOfFiles.length; i++) {
-                Path reportFilePart = new Path(reportPath, listOfFiles[i].getName());                
-                CompressionCodec codec = ccf.getCodec(reportFilePart);
-                String decompressedFileName = CompressionCodecFactory.removeSuffix(reportFilePart.getName(), codec.getDefaultExtension());
+                LOG.debug("processing decompression of file " + listOfFiles[i].getName());
+                Path reportFileWithPath = new Path(reportPath, listOfFiles[i].getName());                
+                CompressionCodec codec = ccf.getCodec(reportFileWithPath);
+                LOG.debug("codec of file " + reportFileWithPath + " = " + codec);
+                if (codec == null) {
+                    LOG.debug("codec not found, skipping file " + reportFileWithPath);
+                    continue;
+                }
+                String decompressedFileName = CompressionCodecFactory.removeSuffix(reportFileWithPath.getName(), codec.getDefaultExtension());
+                Path decompressedFileWithPath = new Path(reportPath, decompressedFileName);
+                LOG.debug("decompressedFile = " + decompressedFileWithPath);
 
                 CompressionInputStream in = null;
                 OutputStream out = null;
@@ -73,12 +77,14 @@ public class MailService {
                 try {
                     byte[] buffer = new byte[32000];
                     int len;
+                    LOG.debug("START: decompressing file " + listOfFiles[i] + " to file " + decompressedFileWithPath);
                     in = codec.createInputStream(new FileInputStream(listOfFiles[i]));
-                    outf = new File(decompressedFileName);
+                    outf = new File(decompressedFileWithPath.toString());
                     out = new FileOutputStream(outf);
                     while( 0 < (len = in.read(buffer)) ) {
                         out.write( buffer, 0, len );
                     }
+                    LOG.debug("END: decompressing file " + listOfFiles[i] + " to file " + decompressedFileWithPath);
                 } finally {
                     if (in != null) {
                        in.close();

@@ -6,6 +6,13 @@
 <configuration>
 
 <property>
+  <name>merge.after.fetch</name>
+  <value>false</value>
+  <description>If true, then segments of crawl are merged after fetch is complete.
+  </description>
+</property>
+
+<property>
   <name>index.sns</name>
   <value>true</value>
   <description>If true, then the Index-Sns Plugin are index with sns dates. Otherwise, without sns dates.
