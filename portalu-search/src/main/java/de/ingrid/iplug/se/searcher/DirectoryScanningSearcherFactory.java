@@ -128,7 +128,12 @@ public class DirectoryScanningSearcherFactory {
   public void reload() throws IOException {
     String instance = _configuration.get("nutch.instance.folder");
     LOG.info("reload searcher for instance: " + instance);
-    clearCache(instance);
+    if (!_map.containsKey(instance)) {
+        LOG.warn("could not find searcher for instance (maybe the crawl have not run at least one time when it was added)");
+        LOG.info("try to get searcher again");
+    } else {
+        clearCache(instance);
+    }
     get();
   }
 

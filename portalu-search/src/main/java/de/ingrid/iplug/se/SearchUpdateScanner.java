@@ -66,6 +66,7 @@ public class SearchUpdateScanner extends TimerTask {
     }
     
     public static void updateCrawl(final FileSystem fs, final Path crawl) throws IOException {
+        LOG.info("updating crawl: " + crawl);
         fs.create(updatePath(crawl), true);
     }
     
