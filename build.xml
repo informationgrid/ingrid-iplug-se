@@ -164,7 +164,7 @@
 				<filename name="**/log4j-*.properties"/>
 			</fileset>
 		</copy>
-		<replaceregexp file="build/${nutch-version}/conf/nutch-site.xml" match="101tec-nutch-11e55b9/src/plugin,portalu-nutch-gui/src/plugin" replace="./plugins" byline="true" />
+		<replaceregexp file="build/${nutch-version}/conf/nutch-site.xml" match="${nutch-version}/src/plugin,portalu-nutch-gui/src/plugin" replace="./plugins" byline="true" />
 	</target>
 
 	<target name="copy-deploy-myles-conf-files" depends="copy-deploy-conf-files">
