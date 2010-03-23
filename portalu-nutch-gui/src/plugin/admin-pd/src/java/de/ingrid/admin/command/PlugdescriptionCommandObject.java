@@ -1,6 +1,7 @@
 package de.ingrid.admin.command;
 
 import java.io.File;
+import java.io.IOException;
 
 import de.ingrid.admin.StringUtils;
 import de.ingrid.iplug.se.IKeys;
@@ -15,7 +16,7 @@ public class PlugdescriptionCommandObject extends PlugDescription {
     }
 
     @SuppressWarnings("unchecked")
-    public PlugdescriptionCommandObject(final File file) throws Exception {
+    public PlugdescriptionCommandObject(final File file) throws IOException {
         if (file.exists()) {
             final XMLSerializer serializer = new XMLSerializer();
             serializer.aliasClass(PlugDescription.class.getName(), PlugDescription.class);

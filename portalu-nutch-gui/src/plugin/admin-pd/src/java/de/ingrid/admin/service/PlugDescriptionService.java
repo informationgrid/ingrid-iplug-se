@@ -37,6 +37,10 @@ public class PlugDescriptionService {
 		return _plugDescription;
 	}
 
+    public PlugdescriptionCommandObject getCommandObect() throws IOException {
+        return new PlugdescriptionCommandObject(_plugDescriptionFile);
+    }
+
 	@SuppressWarnings("unchecked")
 	public void savePlugDescription(final PlugDescription plugDescription)
 			throws Exception {
@@ -55,6 +59,11 @@ public class PlugDescriptionService {
 	public boolean existsPlugDescription() {
 		return _plugDescriptionFile.exists();
 	}
+
+    public PlugDescription reloadPlugDescription() throws IOException {
+        _plugDescription = null;
+        return getPlugDescription();
+    }
 
 	private PlugDescription loadPlugDescription() throws IOException {
 		LOG.info("load plugdescription from file: "

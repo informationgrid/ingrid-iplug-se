@@ -29,7 +29,7 @@
 			target		="communicationIndex">
 			
 			<text property="indexClientName" displayText="Client Name:" defaultValue="/ingrid-group:iplug-se-index-'Ihr-Name'"/>
-			<text property="indexServerName" displayText="Server Name:" defaultValue="/ingrid-group:ibus-'Ihr-Name'"/>
+			<text property="indexServerName" displayText="Server Name:" defaultValue="/'iBus-Name'"/>
 			<text property="indexServerIp"   displayText="Server IP:"   defaultValue="127.0.0.1"/>
 			<text property="indexServerPort" displayText="Server Port:" defaultValue="9900"/>
 			
@@ -44,7 +44,7 @@
 			target		="communicationSearch">
 			
 			<text property="searchClientName" displayText="Client Name:" defaultValue="/ingrid-group:iplug-se-search-'Ihr-Name'"/>
-			<text property="searchServerName" displayText="Server Name:" defaultValue="/ingrid-group:ibus-'Ihr-Name'"/>
+			<text property="searchServerName" displayText="Server Name:" defaultValue="/'iBus-Name'"/>
 			<text property="searchServerIp"   displayText="Server IP:"   defaultValue="127.0.0.1"/>
 			<text property="searchServerPort" displayText="Server Port:" defaultValue="9900"/>
 			

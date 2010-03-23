@@ -118,3 +118,14 @@ ul.tabs li.active a {color:#000}
 /* -- Search Result -- */
 .hitCount {text-align:right; margin-right:40px}
 .searchResult {clear:both; margin:0px 40px 20px 190px;}
+
+.auto { width: auto; }
+.value {
+	width: 20px;
+	height: 15px;
+	border: 1px solid #68A5D2;
+	padding: 2px;
+	cursor: pointer;
+}
+.value:hover { font-weight: bold; }
+.value.marked { color: #fff; background-color: #68A5D2; }

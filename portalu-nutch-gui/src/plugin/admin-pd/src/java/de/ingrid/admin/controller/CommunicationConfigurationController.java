@@ -33,7 +33,7 @@ public class CommunicationConfigurationController extends AbstractController {
     public static final int DEFAULT_THREAD_COUNT = 100;
 
     private String _defaultProxyServiceUrl = "";
-    
+
     private final CommunicationService _communicationService;
 
     private final CommunicationValidator _validator;
@@ -119,6 +119,11 @@ public class CommunicationConfigurationController extends AbstractController {
         return busses;
     }
 
+    @ModelAttribute("noBus")
+    public Boolean noBus() {
+        return _communicationService.hasErrors();
+    }
+
     @RequestMapping(value = IUris.COMMUNICATION, method = RequestMethod.GET)
     public String getCommunication() {
         return IViews.COMMUNICATION;
@@ -191,6 +196,7 @@ public class CommunicationConfigurationController extends AbstractController {
                     // redirect to next step
                     return redirect(IUris.WORKING_DIR);
                 }
+                modelMap.addAttribute("noBus", _communicationService.hasErrors());
             }
         }
 
