@@ -33,6 +33,39 @@
   <substitution>$4</substitution>
 </regex>
 
+<!-- InGrid specific filter -->
+<regex>
+  <pattern>(\?|\&amp;|\&amp;amp;)PHPSESSID=[a-zA-Z0-9]{32}$</pattern>
+  <substitution></substitution>
+</regex>
+<regex>
+  <pattern>(\?|\&amp;|\&amp;amp;)PHPSESSID=[a-zA-Z0-9]{32}(\&amp;|\&amp;amp;)(.*)</pattern>
+  <substitution>$1$3</substitution>
+</regex>
+<regex>
+  <pattern>/sid_[a-zA-Z0-9]{1,32}</pattern>
+  <substitution></substitution>
+</regex>
+<regex>
+  <pattern>;jsessionid?=[a-zA-Z0-9]{1,32}</pattern>
+  <substitution></substitution>
+</regex>
+<regex>
+  <pattern>SID-[A-Z0-9]{8}-[A-Z0-9]{8}\/</pattern>
+  <substitution></substitution>
+</regex>
+<regex>
+  <pattern>(\?|\&amp;|\&amp;amp;)sid=[a-zA-Z0-9]{32}$</pattern>
+  <substitution></substitution>
+</regex>
+<regex>
+  <pattern>(\?|\&amp;|\&amp;amp;)sid=[a-zA-Z0-9]{32}(\&amp;|\&amp;amp;)(.*)</pattern>
+  <substitution>$1$3</substitution>
+</regex>
+<!-- END InGrid specific filter -->
+
+
+
 <!-- 
   possible better pattern to exclude /sid_23232323/ from the path. 
   See also http://issues.apache.org/jira/browse/NUTCH-706
