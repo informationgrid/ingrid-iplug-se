@@ -50,6 +50,7 @@
      <ant dir="protocol-http" target="deploy"/>
      <ant dir="protocol-httpclient" target="deploy"/>
      <ant dir="parse-ext" target="deploy"/>
+     <ant dir="parse-dummy" target="deploy"/>
      <ant dir="parse-html" target="deploy"/>
      <ant dir="parse-js" target="deploy"/>
      <!-- <ant dir="parse-mp3" target="deploy"/> -->
