@@ -70,6 +70,7 @@ fi
 
 JAVA=$JAVA_HOME/bin/java
 JAVA_HEAP_MAX=-Xmx1600m 
+NUTCH_OPTS="$NUTCH_OPTS -XX:MaxPermSize=128m"
 
 # check envvars which might override default args
 if [ "$NUTCH_HEAPSIZE" != "" ]; then
