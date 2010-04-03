@@ -266,15 +266,17 @@ public class Fetcher extends Configured implements
     }
     
     public synchronized void dump() {
-      LOG.info("  maxThreads    = " + maxThreads);
-      LOG.info("  inProgress    = " + inProgress.size());
-      LOG.info("  crawlDelay    = " + crawlDelay);
-      LOG.info("  minCrawlDelay = " + minCrawlDelay);
-      LOG.info("  nextFetchTime = " + nextFetchTime.get());
-      LOG.info("  now           = " + System.currentTimeMillis());
-      for (int i = 0; i < queue.size(); i++) {
-        FetchItem it = queue.get(i);
-        LOG.info("  " + i + ". " + it.url);
+      if (LOG.isInfoEnabled()) {
+          LOG.info("  maxThreads    = " + maxThreads);
+          LOG.info("  inProgress    = " + inProgress.size());
+          LOG.info("  crawlDelay    = " + crawlDelay);
+          LOG.info("  minCrawlDelay = " + minCrawlDelay);
+          LOG.info("  nextFetchTime = " + nextFetchTime.get());
+          LOG.info("  now           = " + System.currentTimeMillis());
+          for (int i = 0; i < queue.size(); i++) {
+              FetchItem it = queue.get(i);
+              LOG.info("  " + i + ". " + it.url);
+          }
       }
     }
     
@@ -378,7 +380,9 @@ public class Fetcher extends Configured implements
       for (String id : queues.keySet()) {
         FetchItemQueue fiq = queues.get(id);
         if (fiq.getQueueSize() == 0) continue;
-        LOG.info("* queue: " + id);
+        if (LOG.isInfoEnabled()) {
+            LOG.info("* queue: " + id);
+        }
         fiq.dump();
       }
     }
@@ -415,7 +419,9 @@ public class Fetcher extends Configured implements
           } catch (Exception e) {};
           continue;
         } else {
-          LOG.debug("-feeding " + feed + " input urls ...");
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("-feeding " + feed + " input urls ...");
+          }
           while (feed > 0 && hasMore) {
             try {
               Text url = new Text();
@@ -433,7 +439,9 @@ public class Fetcher extends Configured implements
           }
         }
       }
-      LOG.info("QueueFeeder finished: total " + cnt + " records.");
+      if (LOG.isInfoEnabled()) {
+          LOG.info("QueueFeeder finished: total " + cnt + " records.");
+      }
     }
   }
   
@@ -482,7 +490,9 @@ public class Fetcher extends Configured implements
           fit = fetchQueues.getFetchItem();
           if (fit == null) {
             if (feeder.isAlive() || fetchQueues.getTotalSize() > 0) {
-              LOG.debug(getName() + " spin-waiting ...");
+              if (LOG.isDebugEnabled()) {
+                  LOG.debug(getName() + " spin-waiting ...");
+              }
               // spin-wait.
               spinWaiting.incrementAndGet();
               try {
@@ -529,7 +539,9 @@ public class Fetcher extends Configured implements
                 if (rules.getCrawlDelay() > maxCrawlDelay) {
                   // unblock
                   fetchQueues.finishFetchItem(fit, true);
-                  LOG.debug("Crawl-Delay for " + fit.url + " too long (" + rules.getCrawlDelay() + "), skipping");
+                  if (LOG.isDebugEnabled()) {
+                      LOG.debug("Crawl-Delay for " + fit.url + " too long (" + rules.getCrawlDelay() + "), skipping");
+                  }
                   output(fit.url, fit.datum, null, ProtocolStatus.STATUS_ROBOTS_DENIED, CrawlDatum.STATUS_FETCH_GONE);
                   continue;
                 } else {
@@ -547,7 +559,9 @@ public class Fetcher extends Configured implements
                   .getInstanceForStringQueues();
               instanceForQueues
                   .offer(InterplugInCommunicationConstants.URLSTATUS_KEY, status.getCode() + ":" + fit.url);
-              LOG.debug("Set status code '" + status.toString() + "' for url '" + fit.url + "'.");
+              if (LOG.isDebugEnabled()) {
+                  LOG.debug("Set status code '" + status.toString() + "' for url '" + fit.url + "'.");
+              }
               // ------ none nutch-specific code ends here
               
               Content content = output.getContent();
@@ -687,7 +701,9 @@ public class Fetcher extends Configured implements
       } finally {
         if (fit != null) fetchQueues.finishFetchItem(fit);
         activeThreads.decrementAndGet(); // count threads
-        LOG.info("-finishing thread " + getName() + ", activeThreads=" + activeThreads);
+        if (LOG.isInfoEnabled()) {
+            LOG.info("-finishing thread " + getName() + ", activeThreads=" + activeThreads);
+        }
       }
     }
 
@@ -942,9 +958,10 @@ public class Fetcher extends Configured implements
       } catch (InterruptedException e) {}
 
       reportStatus();
-      LOG.info("-activeThreads=" + activeThreads + ", spinWaiting=" + spinWaiting.get()
-          + ", fetchQueues.totalSize=" + fetchQueues.getTotalSize());
-
+      if (LOG.isInfoEnabled()) {
+          LOG.info("-activeThreads=" + activeThreads + ", spinWaiting=" + spinWaiting.get()
+              + ", fetchQueues.totalSize=" + fetchQueues.getTotalSize());
+      }
       if (!feeder.isAlive() && fetchQueues.getTotalSize() < 5) {
         fetchQueues.dump();
       }
@@ -957,7 +974,9 @@ public class Fetcher extends Configured implements
       }
 
     } while (activeThreads.get() > 0);
-    LOG.info("-activeThreads=" + activeThreads);
+    if (LOG.isInfoEnabled()) {
+        LOG.info("-activeThreads=" + activeThreads);
+    }
     
     } finally {
       // stop the sns analyzing
