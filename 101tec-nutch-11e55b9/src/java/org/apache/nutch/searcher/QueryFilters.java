@@ -102,8 +102,10 @@ public class QueryFilters {
     Clause[] clauses = input.getClauses();
     for (int i = 0; i < clauses.length; i++) {
       Clause c = clauses[i];
-      if (!isField(c.getField()))
+      if (!isField(c.getField())) {
+        LOG.debug("Available field names: " + FIELD_NAMES.toString());
         throw new QueryException("Not a known field name:"+c.getField());
+      }
     }
 
     // then run each plugin

@@ -20,7 +20,7 @@
 java.security.Principal  principal = request.getUserPrincipal();
 if(principal != null) {
 %>
-	<a href ="../auth/logout.html" style="color:black">Logout</a>
+	<a href ="./auth/logout.html" style="color:black">Logout</a>
 <%
 }
 %>

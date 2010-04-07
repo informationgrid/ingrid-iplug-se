@@ -29,7 +29,7 @@
 			target		="communicationIndex">
 			
 			<text property="indexClientName" displayText="Client Name:" defaultValue="/ingrid-group:iplug-se-index-'Ihr-Name'"/>
-			<text property="indexServerName" displayText="Server Name:" defaultValue="/'iBus-Name'"/>
+			<text property="indexServerName" displayText="Server Name:" defaultValue="/ingrid-group:ibus-'Ihr-Name'"/>
 			<text property="indexServerIp"   displayText="Server IP:"   defaultValue="127.0.0.1"/>
 			<text property="indexServerPort" displayText="Server Port:" defaultValue="9900"/>
 			
@@ -40,11 +40,11 @@
 	<page
 			type		="input"
 			name		="searchOptions"
-			displayText	="iBus-Kommunkations Parameter des Searcher's"
+			displayText	="iBus-Kommunikations Parameter des Searcher's"
 			target		="communicationSearch">
 			
 			<text property="searchClientName" displayText="Client Name:" defaultValue="/ingrid-group:iplug-se-search-'Ihr-Name'"/>
-			<text property="searchServerName" displayText="Server Name:" defaultValue="/'iBus-Name'"/>
+			<text property="searchServerName" displayText="Server Name:" defaultValue="/ingrid-group:ibus-'Ihr-Name'"/>
 			<text property="searchServerIp"   displayText="Server IP:"   defaultValue="127.0.0.1"/>
 			<text property="searchServerPort" displayText="Server Port:" defaultValue="9900"/>
 			
@@ -52,6 +52,18 @@
 			<comment displayText="" explanatoryText="Die Server-IP ist die Adresse des Rechners, auf dem der iBus ueber dem Server-Port angesprochen werden kann."/>
 	</page>
 	
+    <page
+            type        ="input"
+            name        ="mysqlOptions"
+            displayText ="MySQL - Parameter für die URL-Pflege"
+            target      ="mysqlSettings">
+            
+            <text property="mysqlUserName" displayText="MySQL Benutzername:" defaultValue="root"/>
+            <text property="mysqlPassword" displayText="MySQL Passwort:" defaultValue=""/>
+            
+            <comment displayText="" explanatoryText="An access to a MySQL database is needed where a database with the name 'iplugse' must exist! This is where the URLs are stored."/>
+    </page>
+    
 	<page
 			type		="input"
 			name		="properties"

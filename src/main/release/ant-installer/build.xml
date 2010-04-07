@@ -6,6 +6,7 @@
 	<property name="iPlugName" value="${project.artifactId}-${project.version}" />
 	<property name="index-xml-communication" 	value="${installDir}/conf/communication-index.xml"/>
 	<property name="search-xml-communication" 	value="${installDir}/conf/communication-search.xml"/>
+    <property name="persistence-xml"            value="${installDir}/plugins/admin-urlmaintenance/conf/META-INF/persistence.xml"/>
 
 	<target name="install" description="Extract all files to the installation directory.">
 		<unzip src="${antinstaller.jar}" dest="${installDir}">
@@ -42,6 +43,13 @@
 		<replace file="${search-xml-communication}" token="${searchXML.communication.client.connections.server.socket(ip)}" 		value="${searchServerIp}"/>
 		<replace file="${search-xml-communication}" token="${searchXML.communication.client.connections.server.socket(port)}" 	value="${searchServerPort}"/>		
 	</target>
+    
+    <target name="mysqlSettings" description="Set configuration correctly for the mysql-database.">
+        <echo>Schreibe Konfigurations Parameter für die URL-Pflege (MySQL)
+        </echo>
+        <replace file="${persistence-xml}" token="@MYSQL_USERNAME@"    value="${mysqlUserName}"/>
+        <replace file="${persistence-xml}" token="@MYSQL_PASSWORD@"    value="${mysqlPassword}"/>
+    </target>
 
 	<target name="startIPlug">
 		<exec dir="${installDir}" executable="./start-index.sh" spawn="true">

@@ -27,6 +27,15 @@ import de.ingrid.iplug.se.crawl.sns.CompressedSnsData;
 import de.ingrid.iplug.se.crawl.sns.SnsParseImpl;
 import de.ingrid.iplug.sns.nutch.IPlugSNSPlugin;
 
+/**
+ * Add SNS-Data to the Nutch-Document.
+ * This class was moved from the plugin directory since class cast exception
+ * occured after a nutch patch was applied.
+ * 
+ * @author Andre
+ *
+ */
+
 public class SnsIndexingFilter implements IndexingFilter {
 
   private static final Log LOGGER = LogFactory.getLog(SnsIndexingFilter.class);

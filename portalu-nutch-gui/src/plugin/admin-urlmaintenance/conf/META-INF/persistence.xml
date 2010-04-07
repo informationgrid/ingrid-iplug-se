@@ -69,8 +69,8 @@
 
 		<properties>
 			<property name="eclipselink.jdbc.driver" value="com.mysql.jdbc.Driver" />
-			<property name="eclipselink.jdbc.user" value="root" />
-			<property name="eclipselink.jdbc.password" value="" />
+			<property name="eclipselink.jdbc.user" value="@MYSQL_USERNAME@" />
+			<property name="eclipselink.jdbc.password" value="@MYSQL_PASSWORD@" />
 			<property name="eclipselink.jdbc.url" value="jdbc:mysql://localhost/iplugse" />
 			<property name="eclipselink.ddl-generation" value="create-tables"/>
       		<property name="eclipselink.ddl-generation.output-mode" value="both"/>
