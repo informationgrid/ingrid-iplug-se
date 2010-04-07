@@ -21,4 +21,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <fmt:setBundle basename="webapp/theme/${theme}/i18n/messages" var="globalBundle" />
-<fmt:setBundle basename="theme/${theme}/i18n/crawl_messages" var="localBundle" />  
+<fmt:setBundle basename="theme/${theme}/i18n/crawl_messages" var="localBundle" />
+
+<% String rootPath = ".."; %>   

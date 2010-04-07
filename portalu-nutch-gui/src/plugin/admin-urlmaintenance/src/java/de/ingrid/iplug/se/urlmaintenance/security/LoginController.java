@@ -31,7 +31,7 @@ public class LoginController extends NavigationSelector {
   @RequestMapping(value = "/auth/logout.html", method = RequestMethod.GET)
   public String logout(HttpSession session) {
     session.invalidate();
-    return "redirect:/index.html";
+    return "redirect:../index.html";
   }
 
 }

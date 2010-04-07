@@ -20,4 +20,6 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %> 
 
 <fmt:setBundle basename="webapp/theme/${theme}/i18n/messages" var="globalBundle" />
-<fmt:setBundle basename="theme/${theme}/i18n/scheduling_messages" var="localBundle" /> 
+<fmt:setBundle basename="theme/${theme}/i18n/scheduling_messages" var="localBundle" />
+
+<% String rootPath = ".."; %>  

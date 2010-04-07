@@ -43,13 +43,18 @@ public class StartCrawlRunnable implements Runnable {
     FileSystem fileSystem = _crawlTool.getFileSystem();
     Path crawlDir = _crawlTool.getCrawlDir();
     Path lockPath = new Path(crawlDir, "crawl.running");
+    Path urlPath = new Path(crawlDir, "urls/start/urls.txt");
     boolean alreadyRunning = false;
     try {
       alreadyRunning = fileSystem.exists(lockPath);
       if (!alreadyRunning) {
         fileSystem.createNewFile(lockPath);
         _crawlTool.preCrawl();
-        _crawlTool.crawl(_topN, _depth);
+        // if there's any url to fetch then start crawling
+        if (fileSystem.exists(urlPath))
+            _crawlTool.crawl(_topN, _depth);
+        else
+            LOG.warn("It seems that there are no URLs to crawl!");
       } else {
           LOG.warn("crawl is already running");
       }

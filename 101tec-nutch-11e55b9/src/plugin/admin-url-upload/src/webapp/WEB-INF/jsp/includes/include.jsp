@@ -21,3 +21,5 @@
 
 <fmt:setBundle basename="webapp/theme/${theme}/i18n/messages" var="globalBundle" />
 <fmt:setBundle basename="theme/${theme}/i18n/urlupload_messages" var="localBundle" />
+
+<% String rootPath = ".."; %> 

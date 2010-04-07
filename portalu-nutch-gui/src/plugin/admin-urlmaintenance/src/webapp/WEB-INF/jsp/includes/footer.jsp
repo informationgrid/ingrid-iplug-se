@@ -1,1 +1,0 @@
-<fmt:message key="footer" bundle="${globalBundle}"/>

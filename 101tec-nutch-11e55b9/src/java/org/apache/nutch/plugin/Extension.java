@@ -35,7 +35,6 @@ public class Extension {
   private String fClazz;
   private HashMap<String, String> fAttributes;
   private Configuration conf;
-  private PluginRepository pluginRepository;
 
   /**
    * @param pDescriptor
@@ -54,7 +53,6 @@ public class Extension {
     setId(pId);
     setClazz(pExtensionClass);
     this.conf = conf;
-    this.pluginRepository = pluginRepository;
   }
 
   /**
@@ -152,11 +150,12 @@ public class Extension {
     // Suggested by Stefan Groschupf <sg@media-style.com>
     synchronized (getId()) {
       try {
-        PluginClassLoader loader = fDescriptor.getClassLoader();
-        Class extensionClazz = loader.loadClass(getClazz());
+        PluginRepository pluginRepository = PluginRepository.get(conf);
+        Class extensionClazz = 
+          pluginRepository.getCachedClass(fDescriptor, getClazz());
         // lazy loading of Plugin in case there is no instance of the plugin
         // already.
-        this.pluginRepository.getPluginInstance(getDescriptor());
+        pluginRepository.getPluginInstance(getDescriptor());
         Object object = extensionClazz.newInstance();
         if (object instanceof Configurable) {
           ((Configurable) object).setConf(this.conf);

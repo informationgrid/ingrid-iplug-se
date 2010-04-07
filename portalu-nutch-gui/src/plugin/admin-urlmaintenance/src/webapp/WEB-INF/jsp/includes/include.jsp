@@ -6,3 +6,5 @@
 
 <fmt:setBundle basename="webapp/theme/${theme}/i18n/messages" var="globalBundle" />
 <fmt:setBundle basename="${theme}/i18n/configuration_messages" var="localBundle" />  
+
+<% String rootPath = ".."; %> 

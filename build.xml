@@ -105,7 +105,10 @@
 			<fileset dir="portalu-search/src/main/java/de" />
 		</copy>
 		<copy todir="build/${nutch-version}/lib/ingrid-ext">
-			<fileset dir="${ingrid.ext.libs}" />
+			<fileset dir="${ingrid.ext.libs}" >
+                <exclude name="**/*base-webapp*" />
+                <exclude name="**/*cron4j*" />
+            </fileset>
 		</copy>
 	</target>
 
@@ -129,9 +132,41 @@
 	<!-- To build the installer, use maven: mvn assembly:assembly -Dmaven.test.skip -->
 	<target name="dist" depends="clean, copy-nutch, copy-ingrid-se-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts,copy-indexer-searcher-configs,copy-deploy-conf-files, create-manifest">
 		<ant dir="build/${nutch-version}" target="package" />
-
-		<property file="${basedir}/${nutch-version}/default.properties" />
-		<property name="dist.final.name" value="build/dist/ingrid-iplug-se" />
+        
+        <property file="${basedir}/${nutch-version}/default.properties" />
+        <property name="dist.final.name" value="build/dist/ingrid-iplug-se" />
+        
+        <!-- Copy common shared jsp-files to all plugins needing them  -->
+        <property name="jsp-dir" value="src/webapp/WEB-INF/jsp" />
+        <property name="jsp-includes-dir" value="portalu-nutch-gui\jsp-includes" />
+        <copy todir="${dist.final.name}/plugins/admin-configuration/${jsp-dir}">
+            <fileset dir="${jsp-includes-dir}" />
+        </copy>
+        <copy todir="${dist.final.name}/plugins/admin-crawl/${jsp-dir}">
+            <fileset dir="${jsp-includes-dir}" />
+        </copy>
+        <copy todir="${dist.final.name}/plugins/admin-instance/${jsp-dir}">
+            <fileset dir="${jsp-includes-dir}" />
+        </copy>
+        <copy todir="${dist.final.name}/plugins/admin-scheduling/${jsp-dir}">
+            <fileset dir="${jsp-includes-dir}" />
+        </copy>
+        <copy todir="${dist.final.name}/plugins/admin-search/${jsp-dir}">
+            <fileset dir="${jsp-includes-dir}" />
+        </copy>
+        <copy todir="${dist.final.name}/plugins/admin-system/${jsp-dir}">
+            <fileset dir="${jsp-includes-dir}" />
+        </copy>
+        <copy todir="${dist.final.name}/plugins/admin-urlmaintenance/${jsp-dir}">
+            <fileset dir="${jsp-includes-dir}" />
+        </copy>
+        <copy todir="${dist.final.name}/plugins/admin-url-upload/${jsp-dir}">
+            <fileset dir="${jsp-includes-dir}" />
+        </copy>
+        <copy todir="${dist.final.name}/plugins/admin-welcome/${jsp-dir}">
+            <fileset dir="${jsp-includes-dir}" />
+        </copy>        
+        
 		<copy todir="${dist.final.name}/">
 			<fileset dir="build/${nutch-version}/build/${final.name}">
 				<exclude name="nutch-gui-*.*" />

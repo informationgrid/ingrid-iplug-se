@@ -1,69 +1,38 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<%@ include file="/WEB-INF/jsp/includes/include.jsp" %>
+<%@ include file="../includes/include.jsp" %>
 <html>
 <head>
 	<title>Admin URL Pflege - Katalog URLs</title>
-	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/css/reset-fonts-grids.css" />
-	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css">
-	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/container/assets/skins/sam/container.css" />
-	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
-	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/element/element-min.js"></script>
-	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/connection/connection-min.js"></script>
-	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/tabview/tabview-min.js"></script>
+	<link rel="stylesheet" type="text/css" href="../theme/${theme}/css/reset-fonts-grids.css" />
+	<link rel="stylesheet" type="text/css" href="../theme/${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css">
+	<link rel="stylesheet" type="text/css" href="../theme/${theme}/js/yui/build/container/assets/skins/sam/container.css" />
+	<script type="text/javascript" src="../theme/${theme}/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+	<script type="text/javascript" src="../theme/${theme}/js/yui/build/element/element-min.js"></script>
+	<script type="text/javascript" src="../theme/${theme}/js/yui/build/connection/connection-min.js"></script>
+	<script type="text/javascript" src="../theme/${theme}/js/yui/build/tabview/tabview-min.js"></script>
 	
-	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/paginator/assets/skins/sam/paginator.css" />
-	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/datatable/assets/skins/sam/datatable.css" />
-	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/json/json-min.js"></script>
-	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/paginator/paginator-min.js"></script>
-	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/datasource/datasource-min.js"></script>
-	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/datatable/datatable-min.js"></script>
+	<link rel="stylesheet" type="text/css" href="../theme/${theme}/js/yui/build/paginator/assets/skins/sam/paginator.css" />
+	<link rel="stylesheet" type="text/css" href="../theme/${theme}/js/yui/build/datatable/assets/skins/sam/datatable.css" />
+	<script type="text/javascript" src="../theme/${theme}/js/yui/build/json/json-min.js"></script>
+	<script type="text/javascript" src="../theme/${theme}/js/yui/build/paginator/paginator-min.js"></script>
+	<script type="text/javascript" src="../theme/${theme}/js/yui/build/datasource/datasource-min.js"></script>
+	<script type="text/javascript" src="../theme/${theme}/js/yui/build/datatable/datatable-min.js"></script>
 	
-	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/yahoo/yahoo-min.js" ></script>
-	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/event/event-min.js" ></script>
-	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/css/style.css" />
-	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/button/assets/skins/sam/button.css" />
-	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/button/button-min.js"></script>
-	<script type="text/javascript" src="<%=request.getContextPath()%>/theme/${theme}/js/yui/build/container/container-min.js"></script>
+	<script type="text/javascript" src="../theme/${theme}/js/yui/build/yahoo/yahoo-min.js" ></script>
+	<script type="text/javascript" src="../theme/${theme}/js/yui/build/event/event-min.js" ></script>
+	<link rel="stylesheet" type="text/css" href="../theme/${theme}/css/style.css" />
+	<link rel="stylesheet" type="text/css" href="../theme/${theme}/js/yui/build/button/assets/skins/sam/button.css" />
+	<script type="text/javascript" src="../theme/${theme}/js/yui/build/button/button-min.js"></script>
+	<script type="text/javascript" src="../theme/${theme}/js/yui/build/container/container-min.js"></script>
 </head>
 <body class="yui-skin-sam">
+    <% rootPath = "../.."; %> 
 	<div id="doc2">
 		<div id="hd">
-			<%@ include file="/WEB-INF/jsp/includes/header.jsp" %>
+			<%@ include file="../includes/header.jsp" %>
 		</div>
 		
-		<c:if test="${!empty instanceNavigation}">
-		<div class="yui-navset nav">
-		    <ul class="yui-nav">
-				<c:forEach items="${instanceNavigation}" var="navigation">
-					<c:choose>
-						<c:when test="${navigation.name == selectedInstance}">
-							<li class="selected"><a href="${navigation.link}"><em>${navigation.name}</em></a></li>
-						</c:when>
-						<c:otherwise>
-							<li><a href="${navigation.link}"><em>${navigation.name}</em></a></li>
-						</c:otherwise>
-					</c:choose>
-				</c:forEach>
-		    </ul>
-		</div>
-		</c:if>
-		
-		<c:if test="${!empty componentNavigation}">
-		<div id="subnav">
-		    <ul>
-				<c:forEach items="${componentNavigation}" var="navigation">
-					<c:choose>
-						<c:when test="${navigation.name == selectedComponent}">
-							<li class="selected"><a href="${navigation.link}"><em><fmt:message key="plugin.${navigation.name}" bundle="${globalBundle}"/></em></a></li>
-						</c:when>
-						<c:otherwise>
-							<li><a href="${navigation.link}"><em><fmt:message key="plugin.${navigation.name}" bundle="${globalBundle}"/></em></a></li>
-						</c:otherwise>
-					</c:choose>
-				</c:forEach>
-		    </ul>
-		</div>
-		</c:if>
+		<%@ include file="../includes/menu.jsp" %>
 		
 		<div id="bd">
 			<div id="yui-main">
@@ -72,16 +41,16 @@
 					
 					<div id="demo" class="yui-navset">
 					    <ul class="yui-nav">
-					        <li class="selected"><a href="<%=request.getContextPath()%>/catalog/listTopicUrls.html"><em>Katalog Url's</em></a></li>
-					        <li><a href="<%=request.getContextPath()%>/web/listWebUrls.html"><em>Web Url's</em></a></li>
-							<li><a href="<%=request.getContextPath()%>/import/importer.html"><em>Importer</em></a></li>
+					        <li class="selected"><a href="../catalog/listTopicUrls.html"><em>Katalog Url's</em></a></li>
+					        <li><a href="../web/listWebUrls.html"><em>Web Url's</em></a></li>
+							<li><a href="../import/importer.html"><em>Importer</em></a></li>
 					    </ul>            
 					</div>
 					<div id="subnav">
 						<ul>
-							<li class="selected"><a href="<%=request.getContextPath()%>/catalog/listTopicUrls.html">Themen</a></li>
-							<li><a href="<%=request.getContextPath()%>/catalog/listServiceUrls.html">Service</a></li>
-							<li><a href="<%=request.getContextPath()%>/catalog/listMeasureUrls.html">Messwerte</a></li>
+							<li class="selected"><a href="../catalog/listTopicUrls.html">Themen</a></li>
+							<li><a href="../catalog/listServiceUrls.html">Service</a></li>
+							<li><a href="../catalog/listMeasureUrls.html">Messwerte</a></li>
 						</ul>
 					</div>
 					
@@ -113,7 +82,7 @@
                         
 					<div style="margin-top:25px"></div>
 					<div style="float:right">
-						<img src="<%=request.getContextPath()%>/theme/${theme}/gfx/add.png" align="absmiddle"/> <b><a href="<%=request.getContextPath()%>/catalog/createCatalogUrl.html?type=topics">Neue Themen Seite</a></b>
+						<img src="../theme/${theme}/gfx/add.png" align="absmiddle"/> <b><a href="../catalog/createCatalogUrl.html?type=topics">Neue Themen Seite</a></b>
 					</div>
 					<h3>Themen Seiten</h3>
 					
@@ -168,10 +137,10 @@
                                     </td>
 						       		<td>&nbsp;${url.statusAsText}</td>
 									<td>
-										<a href="<%=request.getContextPath()%>/catalog/editCatalogUrl.html?id=${url.id}&type=topics">EDIT</a>
+										<a href="../catalog/editCatalogUrl.html?id=${url.id}&type=topics">EDIT</a>
 						       			<a href="#" id="deleteCatalogUrl_${index.index}" 
 						       				onclick="document.getElementById('urlToDelete').innerHTML='${url.url}';document.getElementById('idToDelete').value='${url.id }'">DEL</a>
-						       			<a href="<%=request.getContextPath()%>/test.html?id=${url.id}">TEST</a>
+						       			<a href="../test.html?id=${url.id}">TEST</a>
 									</td>
 								</tr>	
 							</c:forEach>
@@ -180,7 +149,7 @@
 					</div>
 					
 					<c:set var="label" value="URLs" scope="request"/>
-					<%@ include file="/WEB-INF/jsp/includes/paging.jsp" %>	
+					<%@ include file="../includes/paging.jsp" %>	
 					   
 				    <script type="text/javascript">
 				    YAHOO.util.Event.addListener(window, "load", function() {
@@ -243,7 +212,7 @@
 										dir = 'asc';
 									}
 								}
-								window.location.href = "<%=request.getContextPath()%>/catalog/listTopicUrls.html?sort=" +fieldToSort +"&dir=" +dir;
+								window.location.href = "../catalog/listTopicUrls.html?sort=" +fieldToSort +"&dir=" +dir;
 							}
 							YAHOO.util.Event.addListener("yui-dt0-th-url-liner", "click", sort, ['url', '${sort}', '${dir}']);
 							YAHOO.util.Event.addListener("yui-dt0-th-created-liner", "click", sort, ['created', '${sort}', '${dir}']);
@@ -253,7 +222,7 @@
 						<div id="deleteCatalogUrlForm">
 							<div class="hd">Löschen</div>
 							<div class="bd">
-								<form method="post" action="<%=request.getContextPath()%>/catalog/deleteCatalogUrl.html">
+								<form method="post" action="../catalog/deleteCatalogUrl.html">
 									<font color="red">Möchten Sie wirklich löschen?</font>
 									<br/>
 									<input type="hidden" name="id" id="idToDelete" value=""/>
@@ -293,7 +262,7 @@
 			</div>
 		</div>
 		<div id="ft">
-			<%@ include file="/WEB-INF/jsp/includes/footer.jsp" %>
+			<%@ include file="../includes/footer.jsp" %>
 		</div>
 	</div>
 </body>

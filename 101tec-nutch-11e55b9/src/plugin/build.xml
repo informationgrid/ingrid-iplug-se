@@ -69,6 +69,7 @@
      <ant dir="query-site" target="deploy"/>
   	 <ant dir="query-custom" target="deploy"/>
      <ant dir="query-url" target="deploy"/>
+     <ant dir="query-fileformat" target="deploy"/>
      <ant dir="response-json" target="deploy"/>
      <ant dir="response-xml" target="deploy"/>
      <ant dir="scoring-opic" target="deploy"/>
