@@ -40,9 +40,9 @@
                     
                     <div class="yui-navset">
                         <ul class="yui-nav">
-                            <li><a href="../catalog/listTopicUrls.html"><em>Katalog Url's</em></a></li>
-                            <li><a href="../web/listWebUrls.html"><em>Web Url's</em></a></li>
-                            <li><a href="../import/importer.html"><em>Importer</em></a></li>
+                            <li><a href="./catalog/listTopicUrls.html"><em>Katalog Url's</em></a></li>
+                            <li><a href="./web/listWebUrls.html"><em>Web Url's</em></a></li>
+                            <li><a href="./import/importer.html"><em>Importer</em></a></li>
                         </ul>            
                     </div>
                     
