@@ -233,6 +233,10 @@ public class MoreIndexingFilter implements IndexingFilter {
     // leave this for future improvement
     //MimeTypeParameterList parameterList = mimeType.getParameters()
 
+    if (LOG.isDebugEnabled()) {
+        LOG.debug("Content-Type of '"+url+"' is: " + contentType);
+    }
+
     return doc;
   }
 

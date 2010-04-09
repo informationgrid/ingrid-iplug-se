@@ -3,19 +3,30 @@ package org.apache.nutch.searcher.fileformat;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.TermQuery;
+import org.apache.nutch.indexer.field.CustomFields;
 import org.apache.nutch.searcher.Query;
 import org.apache.nutch.searcher.QueryException;
 import org.apache.nutch.searcher.QueryFilter;
 import org.apache.nutch.searcher.Query.Clause;
 
+/**
+ * This class checks the input query for specific file-formats that were
+ * registered and returns a transformed part of a query that Lucene can
+ * understand. 
+ * 
+ */
 public class FileFormatQueryFilter implements QueryFilter {
+    
+  public static final Log LOG = LogFactory.getLog(FileFormatQueryFilter.class);
 
-  private static final String INDEX_FIELD_NAME = "subType";
+  private static final String INDEX_FIELD_NAME = "type";
 
   private static final String QUERY_FIELD_NAME = "fileformat";
 
@@ -45,7 +56,7 @@ public class FileFormatQueryFilter implements QueryFilter {
               : BooleanClause.Occur.SHOULD)));
 
     }
-
+    //LOG.debug("input was: " + input.toString() + " output was: " + output.toString());
     return output;
 
   }

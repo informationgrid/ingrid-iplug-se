@@ -17,6 +17,8 @@
 
 package org.apache.nutch.crawl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.nutch.crawl.CrawlDatum;
@@ -52,7 +54,8 @@ import org.apache.nutch.util.NutchConfiguration;
  * @author Andrzej Bialecki
  */
 public class AdaptiveFetchSchedule extends AbstractFetchSchedule {
-
+  public static final Log LOG = LogFactory.getLog(AdaptiveFetchSchedule.class);
+    
   private float INC_RATE;
 
   private float DEC_RATE;
@@ -87,9 +90,15 @@ public class AdaptiveFetchSchedule extends AbstractFetchSchedule {
     float interval = datum.getFetchInterval();
     switch (state) {
       case FetchSchedule.STATUS_MODIFIED:
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Interval decreased ("+url.toString()+"): " + interval + " -> " + interval*(1.0f-DEC_RATE));
+        }
         interval *= (1.0f - DEC_RATE);
         break;
       case FetchSchedule.STATUS_NOTMODIFIED:
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Interval increased ("+url.toString()+"): " + interval + " -> " + interval*(1.0f-INC_RATE));
+        }
         interval *= (1.0f + INC_RATE);
         break;
       case FetchSchedule.STATUS_UNKNOWN:
