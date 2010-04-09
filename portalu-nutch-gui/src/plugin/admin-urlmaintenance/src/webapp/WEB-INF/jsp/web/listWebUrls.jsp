@@ -274,30 +274,30 @@
 						
 						<script>
 						YAHOO.util.Event.addListener(window, "load", function() {
-						YAHOO.namespace("example.container");
-						var handleYes = function() {
-						    this.form.submit();
-						};
-						
-						var handleNo = function() {
-						    this.hide();
-						};
-
-						YAHOO.example.container.deleteWebUrl = 
-						    new YAHOO.widget.Dialog("deleteWebUrlForm", 
-						             { width: "300px",
-						               fixedcenter: true,
-						               visible: false,
-						               draggable: false,
-						               close: true,
-						               constraintoviewport: true,
-						               buttons: [ { text:"Löschen", handler:handleYes, isDefault:true },
-						                          { text:"Abbrechen",  handler:handleNo } ]
-						             } );
-						YAHOO.example.container.deleteWebUrl.render();
-						<c:forEach items="${urls}" var="url" varStatus="index">
-						YAHOO.util.Event.addListener("deleteWebUrl_${index.index}", "click", YAHOO.example.container.deleteWebUrl.show, YAHOO.example.container.deleteWebUrl, true);
-						</c:forEach>
+							YAHOO.namespace("example.container");
+							var handleYes = function() {
+							    this.form.submit();
+							};
+							
+							var handleNo = function() {
+							    this.hide();
+							};
+	
+							YAHOO.example.container.deleteWebUrl = 
+							    new YAHOO.widget.Dialog("deleteWebUrlForm", 
+							             { width: "300px",
+							               fixedcenter: true,
+							               visible: false,
+							               draggable: false,
+							               close: true,
+							               constraintoviewport: true,
+							               buttons: [ { text:"Löschen", handler:handleYes, isDefault:true },
+							                          { text:"Abbrechen",  handler:handleNo } ]
+							             } );
+							YAHOO.example.container.deleteWebUrl.render();
+							<c:forEach items="${urls}" var="url" varStatus="index">
+							YAHOO.util.Event.addListener("deleteWebUrl_${index.index}", "click", YAHOO.example.container.deleteWebUrl.show, YAHOO.example.container.deleteWebUrl, true);
+							</c:forEach>
 						});
 						</script>
 					</div>
