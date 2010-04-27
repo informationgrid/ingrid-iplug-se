@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,6 +28,7 @@ import org.apache.nutch.util.NutchConfiguration;
 import de.ingrid.iplug.se.searcher.DirectoryScanningSearcherFactory;
 import de.ingrid.iplug.util.TimeProvider;
 import de.ingrid.utils.IPlug;
+import de.ingrid.utils.IngridDocument;
 import de.ingrid.utils.IngridHit;
 import de.ingrid.utils.IngridHitDetail;
 import de.ingrid.utils.IngridHits;
@@ -559,10 +561,15 @@ public class NutchSearcher implements IPlug {
           ingridDetail.put(EXPLANATION, detailString + " " + hitExplanation);
         }
       }
+      
+      // filter same multiple partner and provider from each detail
+      filterPartnerAndProvider(ingridDetail);
+      
       return ingridDetail;
     }
     return new IngridHitDetail();
   }
+
 
   /*
    * (non-Javadoc)
@@ -575,9 +582,28 @@ public class NutchSearcher implements IPlug {
     for (int i = 0; i < hits.length; i++) {
       hitDetails[i] = getDetail(hits[i], query, requestedFields);
     }
+    
     return hitDetails;
   }
+  
+  private void filterPartnerAndProvider(IngridHitDetail hitDetail) {
+      String[] fields = {"partner", "provider"};
+      for (String field : fields) {
+          String[] values = (String[])hitDetail.get(field);
+          if (values != null)
+              hitDetail.put(field, removeMultipleValues(values));
+      }
+  }
 
+  private String[] removeMultipleValues(String[] values) {
+      List<String> uniqueValues = new ArrayList<String>();
+      for (String value : values) {
+          if (!uniqueValues.contains(value))
+              uniqueValues.add(value);
+      }
+      return uniqueValues.toArray(new String[0]);
+  }
+    
   /**
    * @param args
    * @throws ParseException

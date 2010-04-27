@@ -29,6 +29,8 @@ import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 // Nutch imports
 import org.apache.nutch.crawl.CrawlDatum;
@@ -44,6 +46,7 @@ import org.apache.nutch.protocol.http.api.HttpBase;
  * @author Susam Pal
  */
 public class HttpResponse implements Response {
+  private final static Log LOGGER = LogFactory.getLog(HttpResponse.class);
 
   private URL url;
   private byte[] content;
@@ -86,6 +89,14 @@ public class HttpResponse implements Response {
     params.setContentCharset("UTF-8");
     params.setCookiePolicy(CookiePolicy.BROWSER_COMPATIBILITY);
     params.setBooleanParameter(HttpMethodParams.SINGLE_COOKIE_HEADER, true);
+    
+    if (LOGGER.isDebugEnabled()) {
+        Header[] heads = get.getRequestHeaders();
+        for (int i = 0; i < heads.length; i++) {
+            LOGGER.debug("HTTP-HEADER: " + heads[i].getName() + ": " + heads[i].getValue());
+        }
+    }
+    
     // XXX (ab) not sure about this... the default is to retry 3 times; if
     // XXX the request body was sent the method is not retried, so there is
     // XXX little danger in retrying...
@@ -134,16 +145,21 @@ public class HttpResponse implements Response {
         if (code == 200) throw new IOException(e.toString());
         // for codes other than 200 OK, we are fine with empty content
       } finally {
-        in.close();
+        if (in != null)
+            in.close();
         get.abort();
       }
       
       StringBuilder fetchTrace = null;
       if (Http.LOG.isTraceEnabled()) {
+        String contentStr = "null";
+        if (content != null)
+            contentStr = Integer.toString(content.length);
+        
         // Trace message
         fetchTrace = new StringBuilder("url: " + url +
             "; status code: " + code +
-            "; bytes received: " + content.length);
+            "; bytes received: " + contentStr);
         if (getHeader(Response.CONTENT_LENGTH) != null)
           fetchTrace.append("; Content-Length: " +
               getHeader(Response.CONTENT_LENGTH));

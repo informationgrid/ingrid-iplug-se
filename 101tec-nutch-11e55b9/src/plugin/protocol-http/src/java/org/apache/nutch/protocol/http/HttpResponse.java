@@ -29,6 +29,8 @@ import java.net.Socket;
 import java.net.URL;
 
 // Nutch imports
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.metadata.Metadata;
 import org.apache.nutch.metadata.SpellCheckedMetadata;
@@ -42,7 +44,8 @@ import org.apache.nutch.util.LogUtil;
 
 /** An HTTP response. */
 public class HttpResponse implements Response {
- 
+  private final static Log LOGGER = LogFactory.getLog(HttpResponse.class);
+    
   private HttpBase http; 
   private URL url;
   private String orig;
@@ -123,12 +126,14 @@ public class HttpResponse implements Response {
         reqStr.append(userAgent);
         reqStr.append("\r\n");
       }
-
-      reqStr.append("\r\n");
+      // BUG-FIX: there must not be a newline within the header!
+      //reqStr.append("\r\n");
       if (datum.getModifiedTime() > 0) {
         reqStr.append("If-Modified-Since: " + HttpDateFormat.toString(datum.getModifiedTime()));
         reqStr.append("\r\n");
       }
+      reqStr.append("\r\n");
+      LOGGER.debug("HTTP-HEADER: " + reqStr);
       
       byte[] reqBytes= reqStr.toString().getBytes();
 
@@ -151,6 +156,8 @@ public class HttpResponse implements Response {
         haveSeenNonContinueStatus= code != 100; // 100 is "Continue"
       }
 
+      LOGGER.debug("RESPONSE-CODE: " + this.code);
+      
       readPlainContent(in);
 
       String contentEncoding = getHeader(Response.CONTENT_ENCODING);

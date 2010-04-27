@@ -59,11 +59,13 @@ implements Mapper<Text, Writable, Text, NutchWritable>,
 
   private IndexingFilters filters;
   private ScoringFilters scfilters;
+  private boolean mergeAfterFetch;
 
   public void configure(JobConf job) {
     setConf(job);
     this.filters = new IndexingFilters(getConf());
     this.scfilters = new ScoringFilters(getConf());
+    this.mergeAfterFetch = "true".equals(job.get("merge.after.fetch"));
   }
 
   public void map(Text key, Writable value,
@@ -92,8 +94,10 @@ implements Mapper<Text, Writable, Text, NutchWritable>,
           dbDatum = datum;
         else if (CrawlDatum.hasFetchStatus(datum)) {
           // don't index unmodified (empty) pages
-          if (datum.getStatus() != CrawlDatum.STATUS_FETCH_NOTMODIFIED)
-            fetchDatum = datum;
+          // only index those pages if merging is activated
+          // otherwise they won't get into the index!!!
+          if (mergeAfterFetch || (!mergeAfterFetch && datum.getStatus() != CrawlDatum.STATUS_FETCH_NOTMODIFIED))
+              fetchDatum = datum;
         } else if (CrawlDatum.STATUS_LINKED == datum.getStatus() ||
                    CrawlDatum.STATUS_SIGNATURE == datum.getStatus()) {
           continue;
@@ -116,8 +120,12 @@ implements Mapper<Text, Writable, Text, NutchWritable>,
       return;                                     // only have inlinks
     }
 
+    // do not return if page wasn't modified AND merging is active
+    // otherwise not modified pages won't be in index after merging
     if (!parseData.getStatus().isSuccess() ||
-        fetchDatum.getStatus() != CrawlDatum.STATUS_FETCH_SUCCESS) {
+        (!mergeAfterFetch && (fetchDatum.getStatus() != CrawlDatum.STATUS_FETCH_SUCCESS)) ||
+        ( mergeAfterFetch && (fetchDatum.getStatus() != CrawlDatum.STATUS_FETCH_SUCCESS) && 
+        (fetchDatum.getStatus() != CrawlDatum.STATUS_FETCH_NOTMODIFIED))) {
       return;
     }
 

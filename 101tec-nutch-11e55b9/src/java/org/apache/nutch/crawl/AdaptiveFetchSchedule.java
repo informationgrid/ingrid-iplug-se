@@ -97,7 +97,7 @@ public class AdaptiveFetchSchedule extends AbstractFetchSchedule {
         break;
       case FetchSchedule.STATUS_NOTMODIFIED:
         if (LOG.isDebugEnabled()) {
-          LOG.debug("Interval increased ("+url.toString()+"): " + interval + " -> " + interval*(1.0f-INC_RATE));
+          LOG.debug("Interval increased ("+url.toString()+"): " + interval + " -> " + interval*(1.0f+INC_RATE));
         }
         interval *= (1.0f + INC_RATE);
         break;
@@ -117,6 +117,7 @@ public class AdaptiveFetchSchedule extends AbstractFetchSchedule {
     }
     datum.setFetchInterval(interval);
     datum.setFetchTime(refTime + Math.round(interval * 1000.0));
+    LOG.debug("SET MODIFIED Time: " + modifiedTime);
     datum.setModifiedTime(modifiedTime);
     return datum;
   }
