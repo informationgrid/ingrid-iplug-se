@@ -113,8 +113,9 @@ public class WebUrlValidator implements IUrlValidator {
       for (final Url whiteUrl : whiteUrls) {
         final String urlString = whiteUrl.getUrl();
         if (urlString == null) {
-          errorCodes.put("whiteurl.empty", "null");
-          errorCount++;
+          // FIXME: ignore this error since it doesn't recognize multiple excludes without limit urls!!!
+          //errorCodes.put("whiteurl.empty", "null");
+          //errorCount++;
         } else {
           try {
             new URL(urlString);

@@ -16,7 +16,7 @@ public class TranslateParser extends AbstractTupleParser {
   @Override
   public Tuple next() {
     final Tuple next = _parser.next();
-    replace(next);
+    //replace(next);
     return next;
   }
 

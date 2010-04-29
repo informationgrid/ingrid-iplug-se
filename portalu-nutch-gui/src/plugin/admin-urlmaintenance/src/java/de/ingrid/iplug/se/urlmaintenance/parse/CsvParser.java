@@ -49,8 +49,27 @@ public class CsvParser implements IUrlFileParser {
 
     for (final Tuple child : tuple.getChilds()) {
       final String limitUrlString = child.getValue("limitUrl");
-      final Url limitUrl = new Url(limitUrlString);
-      container.addWhiteUrl(limitUrl);
+      if (limitUrlString != null && limitUrlString.trim().length() > 0) {
+          final Url limitUrl = new Url(limitUrlString);
+          container.addWhiteUrl(limitUrl);
+          
+          final String www = child.getValue("www");
+          final String law = child.getValue("law");
+          final String research = child.getValue("research");
+          final String lang = child.getValue("lang");
+
+          if (Boolean.parseBoolean(www)) {
+            container.addMetadata(limitUrl, "datatype", "www");
+          }
+          if (Boolean.parseBoolean(law)) {
+            container.addMetadata(limitUrl, "datatype", "law");
+          }
+          if (Boolean.parseBoolean(research)) {
+            container.addMetadata(limitUrl, "datatype", "research");
+          }
+          container.addMetadata(limitUrl, "datatype", "default");
+          container.addMetadata(limitUrl, "lang", lang);
+      }
 
       final String excludeUrls = child.getValue("excludeUrl");
       if (excludeUrls != null) {
@@ -67,24 +86,6 @@ public class CsvParser implements IUrlFileParser {
           }
         }
       }
-
-      final String www = child.getValue("www");
-      final String law = child.getValue("law");
-      final String research = child.getValue("research");
-      final String lang = child.getValue("lang");
-
-      if (Boolean.parseBoolean(www)) {
-        container.addMetadata(limitUrl, "datatype", "www");
-      }
-      if (Boolean.parseBoolean(law)) {
-        container.addMetadata(limitUrl, "datatype", "law");
-      }
-      if (Boolean.parseBoolean(research)) {
-        container.addMetadata(limitUrl, "datatype", "research");
-      }
-      container.addMetadata(limitUrl, "datatype", "default");
-      container.addMetadata(limitUrl, "lang", lang);
-
     }
 
     return container;

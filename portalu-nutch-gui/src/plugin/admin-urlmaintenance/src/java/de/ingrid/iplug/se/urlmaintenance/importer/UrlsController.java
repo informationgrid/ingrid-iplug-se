@@ -96,31 +96,36 @@ public class UrlsController extends NavigationSelector {
   }
 
   private void saveWebUrl(final UrlContainer container) {
-    final Date date = new Date();
-    final Provider provider = getProvider(container.getProviderId());
-    final Map<String, Map<String, Set<String>>> metadatas = container.getMetadatas();
-
-    // start url
-    final StartUrl startUrl = saveStartUrl(container.getStartUrl().getUrl(), provider, date);
-
-    // limit urls
-    final List<LimitUrl> limitUrls = new ArrayList<LimitUrl>();
-    for (final Url url : container.getWhiteUrls()) {
-      final LimitUrl limitUrl = saveWhiteUrl(url.getUrl(), provider, date, startUrl, metadatas);
-      limitUrls.add(limitUrl);
+    try {
+        final Date date = new Date();
+        final Provider provider = getProvider(container.getProviderId());
+        final Map<String, Map<String, Set<String>>> metadatas = container.getMetadatas();
+    
+        // start url
+        final StartUrl startUrl = saveStartUrl(container.getStartUrl().getUrl(), provider, date);
+    
+        // limit urls
+        final List<LimitUrl> limitUrls = new ArrayList<LimitUrl>();
+        for (final Url url : container.getWhiteUrls()) {
+          final LimitUrl limitUrl = saveWhiteUrl(url.getUrl(), provider, date, startUrl, metadatas);
+          limitUrls.add(limitUrl);
+        }
+    
+        // exclude urls
+        final List<ExcludeUrl> excludeUrls = new ArrayList<ExcludeUrl>();
+        for (final Url url : container.getBlackUrls()) {
+          final ExcludeUrl excludeUrl = saveBlackUrl(url.getUrl(), provider, date, startUrl);
+          excludeUrls.add(excludeUrl);
+        }
+    
+        // start url again
+        startUrl.setLimitUrls(limitUrls);
+        startUrl.setExcludeUrls(excludeUrls);
+        _startUrlDao.makePersistent(startUrl);
+    } catch (Exception e) {
+        // FIXME: remember url and present the user
+        System.out.println("Problem saving url: " + container.getStartUrl());
     }
-
-    // exclude urls
-    final List<ExcludeUrl> excludeUrls = new ArrayList<ExcludeUrl>();
-    for (final Url url : container.getBlackUrls()) {
-      final ExcludeUrl excludeUrl = saveBlackUrl(url.getUrl(), provider, date, startUrl);
-      excludeUrls.add(excludeUrl);
-    }
-
-    // start url again
-    startUrl.setLimitUrls(limitUrls);
-    startUrl.setExcludeUrls(excludeUrls);
-    _startUrlDao.makePersistent(startUrl);
   }
 
   private StartUrl saveStartUrl(final String urlString, final Provider provider, final Date date) {
@@ -159,22 +164,27 @@ public class UrlsController extends NavigationSelector {
   }
 
   private void saveCatalogUrl(final UrlContainer container) {
-    final CatalogUrl url = new CatalogUrl();
-
-    final Provider provider = getProvider(container.getProviderId());
-    url.setProvider(provider);
-
-    final Url white = container.getWhiteUrls().get(0);
-    url.setUrl(white.getUrl());
-
-    final List<Metadata> metadatas = getMetadatas(white.getUrl(), container.getMetadatas());
-    url.setMetadatas(metadatas);
-
-    final Date date = new Date();
-    url.setCreated(date);
-    url.setUpdated(date);
-
-    _catalogUrlDao.makePersistent(url);
+    try {
+        final CatalogUrl url = new CatalogUrl();
+    
+        final Provider provider = getProvider(container.getProviderId());
+        url.setProvider(provider);
+    
+        final Url white = container.getWhiteUrls().get(0);
+        url.setUrl(white.getUrl());
+    
+        final List<Metadata> metadatas = getMetadatas(white.getUrl(), container.getMetadatas());
+        url.setMetadatas(metadatas);
+    
+        final Date date = new Date();
+        url.setCreated(date);
+        url.setUpdated(date);
+    
+        _catalogUrlDao.makePersistent(url);
+    } catch (Exception e) {
+        // FIXME: remember url and present the user
+        System.out.println("Problem saving url: " + container.getStartUrl());
+    }
   }
 
   private Provider getProvider(final Serializable id) {
@@ -186,6 +196,7 @@ public class UrlsController extends NavigationSelector {
     final List<Metadata> data = new ArrayList<Metadata>();
     if (map != null) {
       for (final String key : map.keySet()) {
+        // will be handeled elsewhere (CsvParser.java)
         if (!"alt_title".equals(key)) {
           for (final String value : map.get(key)) {
             final Metadata meta = _metadataDao.getByKeyAndValue(key, value);
@@ -193,6 +204,11 @@ public class UrlsController extends NavigationSelector {
               data.add(meta);
             }
           }
+        } else {
+            /*final Metadata meta = new Metadata(key, map.get(key).toString());
+            if (meta != null) {
+                data.add(meta);
+            }*/
         }
       }
     }
