@@ -70,6 +70,7 @@
 								</script>
 								</c:if>
 							</c:forEach>
+							<div class="comment">Es werden die URLs gefiltert, die alle oben ausgewählten Eigenschaften gemeinsam besitzen.</div>
 						</div>
 						<div class="row">	
 							<label>Filter Sprache:</label>
@@ -87,6 +88,7 @@
 								</script>
 								</c:if>
 							</c:forEach>
+							<div class="comment">Bei der Auswahl mehrerer Sprachen, werden die URLs angezeigt, die mindestens einer dieser Sprachen entsprechen.</div>
 						</div>	
 						</form>
 						</div>

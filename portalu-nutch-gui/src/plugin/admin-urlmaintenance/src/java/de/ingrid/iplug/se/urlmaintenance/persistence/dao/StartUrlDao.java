@@ -1,6 +1,7 @@
 package de.ingrid.iplug.se.urlmaintenance.persistence.dao;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Query;
@@ -95,14 +96,32 @@ public class StartUrlDao extends Dao<StartUrl> implements IStartUrlDao {
     }
 
     // set parameter to every variable
+    // separate use of language since it makes more sense to use OR-query
     q += " WHERE ";
+    List<Long> languages = new ArrayList<Long>();
     for (final Metadata metadata : metadatas) {
-      q += " md" + metadata.getId() + "._id = :md" + metadata.getId() + " AND ";
+      // collect languages
+      if (metadata.getMetadataKey().equals("lang"))
+        languages.add(metadata.getId());
+      else
+        q += " md" + metadata.getId() + "._id = :md" + metadata.getId() + " AND ";
     }
 
+    // put the languages into the query connected with OR
+    if (languages.size() > 0 ) {
+        q += "(";
+        for (int i = 0; i < languages.size(); i++) {
+            q += " md" + languages.get(i) + "._id = :md" + languages.get(i);
+            // add OR-connection if there's another language 
+            if (i < (languages.size()-1))
+              q += " OR ";
+        }
+        q += ") AND";
+    }
+    
     // end query with provider
     q += " su._provider._id = :providerId  " + orderQuery;
-
+    
     final Query query = _transactionService.createQuery(q);
 
     // fill query with metadata id's

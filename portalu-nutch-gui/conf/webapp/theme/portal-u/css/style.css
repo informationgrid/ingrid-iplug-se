@@ -111,3 +111,9 @@ form input[type='submit']:hover, form input[type='button']:hover, button:hover {
 #paging .activePage a , #paging .inactivePage a {color:#FFFFFF; text-decoration:none; padding:2px}
 #paging .activePage:hover, #paging .inactivePage:hover {background:#68A5D2}
 #paging .meta {padding:2px; color:#AAAAAA} 
+
+.comment {
+	color:#999999;
+	font-size:93%;
+	margin-left:130px;
+}

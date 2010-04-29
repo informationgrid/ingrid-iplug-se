@@ -39,46 +39,8 @@
 				<div class="yui-b">
 					<h3>Katalog URLs</h3>
 					
-					<div class="yui-navset">
-					    <ul class="yui-nav">
-					        <li class="selected"><a href="../catalog/listTopicUrls.html"><em>Katalog Url's</em></a></li>
-					        <li><a href="../web/listWebUrls.html"><em>Web Url's</em></a></li>
-					        <li><a href="../import/importer.html"><em>Importer</em></a></li>
-					    </ul>            
-					</div>
-					<div id="subnav">
-						<ul>
-							<li><a href="../catalog/listTopicUrls.html">Themen</a></li>
-							<li class="selected"><a href="../catalog/listServiceUrls.html">Service</a></li>
-							<li><a href="../catalog/listMeasureUrls.html">Messwerte</a></li>
-						</ul>
-					</div>
-					
-					<div>
-                        <c:set var="selectedFilter" value=""/>
-                        <c:set var="paramString" value=""/>
-                        <form method="get" action="" id="filter">
-                        <input type="hidden" name="sort" value="${sort}"/>
-                        <input type="hidden" name="dir" value="${dir}"/>
-                       <div class="row">  
-                            <label>Filter Sprache:</label>
-                            <c:forEach var="l" items="${langs}">
-                                <c:set var="selectedFilter" value="${selectedFilter} lang:${l}"/>
-                                <c:set var="paramString" value="${paramString}&lang=${l}"/> 
-                            </c:forEach>
-                            <c:forEach items="${metadatas}" var="metadata">
-                                <c:if test="${metadata.metadataKey == 'lang'}">
-                                <input type="checkbox" id="${metadata.metadataKey}_${metadata.metadataValue}" name="${metadata.metadataKey}" value="${metadata.metadataValue}"
-                                <c:if test="${fn:contains(selectedFilter, metadata.metadataValue)}"> checked="checked"</c:if> /> <fmt:message key="${metadata.metadataKey}.${metadata.metadataValue}" />&nbsp;&nbsp;
-                                <script>
-                                    function fnCallback(e) { document.getElementById('filter').submit() }
-                                    YAHOO.util.Event.addListener("${metadata.metadataKey}_${metadata.metadataValue}", "click", fnCallback);
-                                </script>
-                                </c:if>
-                            </c:forEach>
-                        </div>  
-                        </form>
-                    </div>
+					<% String selected = "service"; %>
+					<%@ include file="menuCatalog.jsp" %>
 					
 				    <div>
 				        <div style="margin-top:25px"></div>

@@ -1,6 +1,7 @@
 package de.ingrid.iplug.se.urlmaintenance.persistence.dao;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Query;
@@ -86,7 +87,7 @@ public class CatalogUrlDao extends Dao<CatalogUrl> implements ICatalogUrlDao {
     }
 
     // init query
-    String q = "SELECT cu FROM CatalogUrl cu ";
+    String q = "SELECT DISTINCT cu FROM CatalogUrl cu ";
 
     // join metadatas in separately variables
     for (Metadata metadata : metadatas) {
@@ -95,8 +96,25 @@ public class CatalogUrlDao extends Dao<CatalogUrl> implements ICatalogUrlDao {
 
     // set parameter to every variable
     q += " WHERE ";
+    List<Long> languages = new ArrayList<Long>();
     for (Metadata metadata : metadatas) {
-      q += " md" + metadata.getId() + "._id = :md" + metadata.getId() + " AND ";
+      // collect languages
+      if (metadata.getMetadataKey().equals("lang"))
+        languages.add(metadata.getId());
+      else
+        q += " md" + metadata.getId() + "._id = :md" + metadata.getId() + " AND ";
+    }
+    
+    // put the languages into the query connected with OR
+    if (languages.size() > 0 ) {
+        q += "(";
+        for (int i = 0; i < languages.size(); i++) {
+            q += " md" + languages.get(i) + "._id = :md" + languages.get(i);
+            // add OR-connection if there's another language 
+            if (i < (languages.size()-1))
+              q += " OR ";
+        }
+        q += ") AND";
     }
 
     // end query with provider
@@ -108,8 +126,8 @@ public class CatalogUrlDao extends Dao<CatalogUrl> implements ICatalogUrlDao {
     for (Metadata metadata : metadatas) {
       query.setParameter("md" + metadata.getId(), metadata.getId());
     }
+    
     query.setParameter("providerId", provider.getId());
-
     query.setFirstResult(firstResult);
     query.setMaxResults(maxResult);
     return query.getResultList();
