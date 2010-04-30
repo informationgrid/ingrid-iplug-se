@@ -512,20 +512,33 @@ public class NutchSearcher implements IPlug {
   public IngridHitDetail getDetail(IngridHit ingridHit, IngridQuery ingridQuery, String[] requestedFields)
       throws Exception {
 
-    LOG.debug("creating details for: " + ingridHit.toString());
+      
+    long startTimer = System.currentTimeMillis();
+    if (LOG.isDebugEnabled()) {
+        LOG.debug("creating details: " + ingridHit.toString());
+    }
     // query required for summary calculation
     Query nutchQuery = new Query(_configuration);
     buildNutchQuery(ingridQuery, nutchQuery);
+    if (LOG.isDebugEnabled()) {
+        LOG.debug("creating details: finish building query after " + (System.currentTimeMillis() - startTimer) + " ms");
+    }
     // nutch hit detail
     Hit hit = new Hit(ingridHit.getDataSourceId(), "" + ingridHit.getDocumentId());
     HitDetails details = null;
     MultipleSearcher searcher = _searcherFactory.get();
     details = searcher.getDetails(hit);
+    if (LOG.isDebugEnabled()) {
+        LOG.debug("creating details: get details finished after " + (System.currentTimeMillis() - startTimer) + " ms");
+    }
     if (details != null) {
 
       String summary = null;
       String title = details.getValue("title");
       summary = searcher.getSummary(details, nutchQuery).toString();
+      if (LOG.isDebugEnabled()) {
+          LOG.debug("creating details: summary built after " + (System.currentTimeMillis() - startTimer) + " ms");
+      }
 
       for (int i = 0; i < details.getLength(); i++) {
         String field = details.getField(i);
@@ -559,17 +572,21 @@ public class NutchSearcher implements IPlug {
           String detailString = details.toHtml();
           String hitExplanation = searcher.getExplanation(nutchQuery, hit);
           ingridDetail.put(EXPLANATION, detailString + " " + hitExplanation);
+          if (LOG.isDebugEnabled()) {
+              LOG.debug("creating details: explanation built after " + (System.currentTimeMillis() - startTimer) + " ms");
+          }
         }
       }
-      
       // filter same multiple partner and provider from each detail
       filterPartnerAndProvider(ingridDetail);
       
+      if (LOG.isDebugEnabled()) {
+          LOG.debug("creating details: finished after " + (System.currentTimeMillis() - startTimer) + " ms");
+      }
       return ingridDetail;
     }
     return new IngridHitDetail();
   }
-
 
   /*
    * (non-Javadoc)
@@ -582,7 +599,6 @@ public class NutchSearcher implements IPlug {
     for (int i = 0; i < hits.length; i++) {
       hitDetails[i] = getDetail(hits[i], query, requestedFields);
     }
-    
     return hitDetails;
   }
   
