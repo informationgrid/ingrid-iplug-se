@@ -166,13 +166,24 @@ public class BWUpdateDb extends Configured {
         }
 
         if (_patterns == null) {
-          return;
+          if (LOG.isDebugEnabled()) {
+              LOG.debug("No BW patterns have been set before filtering url: " + (((Entry) value)._url).toString());
+          }
+            return;
         }
 
         String url = (((Entry) value)._url).toString();
         if (_patterns.willPassBWLists(url)) {
           // url is outside the black list and matches the white list
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("BW patterns passed for url: " + (((Entry) value)._url).toString());
+            }
           out.collect(key, objectWritable);
+        } else {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("BW patterns NOT passed for url: " + (((Entry) value)._url).toString());
+            }
+            
         }
       }
     }

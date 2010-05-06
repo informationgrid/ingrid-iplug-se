@@ -96,8 +96,9 @@ implements Mapper<Text, Writable, Text, NutchWritable>,
           // don't index unmodified (empty) pages
           // only index those pages if merging is activated
           // otherwise they won't get into the index!!!
-          if (mergeAfterFetch || (!mergeAfterFetch && datum.getStatus() != CrawlDatum.STATUS_FETCH_NOTMODIFIED))
+          if (mergeAfterFetch || (!mergeAfterFetch && datum.getStatus() != CrawlDatum.STATUS_FETCH_NOTMODIFIED)) {
               fetchDatum = datum;
+          }
         } else if (CrawlDatum.STATUS_LINKED == datum.getStatus() ||
                    CrawlDatum.STATUS_SIGNATURE == datum.getStatus()) {
           continue;

@@ -141,9 +141,14 @@ public class Generator extends Configured implements Tool {
 
       // check fetch schedule
       if (!schedule.shouldFetch(url, crawlDatum, curTime)) {
-        LOG.debug("-shouldFetch rejected '" + url+ "', fetchTime=" + crawlDatum.getFetchTime() + ", curTime=" + curTime);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("-shouldFetch rejected '" + url+ "', fetchTime=" + crawlDatum.getFetchTime() + ", curTime=" + curTime);
+        }
         return;
       }
+      if (LOG.isDebugEnabled()) {
+          LOG.debug("-shouldFetch accepted '" + url+ "', fetchTime=" + crawlDatum.getFetchTime() + ", curTime=" + curTime);
+        }
 
       LongWritable oldGenTime = (LongWritable)crawlDatum.getMetaData().get(Nutch.WRITABLE_GENERATE_TIME_KEY);
       if (oldGenTime != null) { // awaiting fetch & update

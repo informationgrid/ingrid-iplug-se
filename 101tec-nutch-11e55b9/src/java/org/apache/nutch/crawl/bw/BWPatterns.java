@@ -153,8 +153,10 @@ public class BWPatterns implements Writable {
 
   public boolean willPassBWLists(String url) {
     boolean ret = (willPassWhiteList(url) && willPassBlackList(url));
-    LOG.debug("**********Url '" + url + "' will " + (ret ? "pass" : "NOT pass")
+    if (LOG.isDebugEnabled()) {
+        LOG.debug("**********Url '" + url + "' will " + (ret ? "pass" : "NOT pass")
             + ".");
+    }
     return ret;
   }
 }

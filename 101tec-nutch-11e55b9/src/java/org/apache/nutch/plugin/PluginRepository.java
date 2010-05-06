@@ -324,23 +324,23 @@ public class PluginRepository {
   }
   
   private void displayStatus() {
-    LOG.info("Plugin Auto-activation mode: [" + this.auto + "]");
-    LOG.info("Registered Plugins:");
+    LOG.debug("Plugin Auto-activation mode: [" + this.auto + "]");
+    LOG.debug("Registered Plugins:");
 
     if ((fRegisteredPlugins == null) || (fRegisteredPlugins.size() == 0)) {
-      LOG.info("\tNONE");
+      LOG.debug("\tNONE");
     } else {
       for (PluginDescriptor plugin : fRegisteredPlugins) {
-        LOG.info("\t" + plugin.getName() + " (" + plugin.getPluginId() + ")");
+        LOG.debug("\t" + plugin.getName() + " (" + plugin.getPluginId() + ")");
       }
     }
 
     LOG.info("Registered Extension-Points:");
     if ((fExtensionPoints == null) || (fExtensionPoints.size() == 0)) {
-      LOG.info("\tNONE");
+      LOG.debug("\tNONE");
     } else {
       for (ExtensionPoint ep : fExtensionPoints.values()) {
-        LOG.info("\t" + ep.getName() + " (" + ep.getId() + ")");
+        LOG.debug("\t" + ep.getName() + " (" + ep.getId() + ")");
       }
     }
   }

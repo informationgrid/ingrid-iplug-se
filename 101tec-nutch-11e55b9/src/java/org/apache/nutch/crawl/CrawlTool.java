@@ -98,16 +98,25 @@ public class CrawlTool {
     injector.inject(crawlDb, urlDir);
 
     boolean bwEnable = _configuration.getBoolean("bw.enable", false);
+    if (LOG.isDebugEnabled()) {
+        LOG.debug("Use BW filtering: " + bwEnable);
+    }
     if (bwEnable) {
-      // BwInjector deoesnt support update
+      // BwInjector doesnt support update
       if (_fileSystem.exists(bwDb)) {
         LOG.info("bwdb exists, delete it: " + bwDb);
         _fileSystem.delete(bwDb, true);
       }
       if (_fileSystem.exists(limitDir)) {
+          if (LOG.isDebugEnabled()) {
+              LOG.debug("Inject White urls...");
+          }
         bwInjector.inject(bwDb, limitDir, false);
       }
       if (_fileSystem.exists(excludeDir)) {
+          if (LOG.isDebugEnabled()) {
+              LOG.debug("Inject Black urls...");
+          }
         bwInjector.inject(bwDb, excludeDir, true);
       }
     }
@@ -128,28 +137,59 @@ public class CrawlTool {
     int i;
     ArrayList<Path> segs = new ArrayList<Path>();
     for (i = 0; i < depth; i++) { // generate new segment
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Generate new segment...");
+        }
       Path segment = generator.generate(crawlDb, segments, -1, topn, System
               .currentTimeMillis());
       if (segment == null) {
         LOG.info("Stopping at depth=" + i + " - no more URLs to fetch.");
         break;
       }
+      if (LOG.isDebugEnabled()) {
+          LOG.debug("... new segment generated:" + segment);
+      }
       segs.add(segment);
+      if (LOG.isDebugEnabled()) {
+          LOG.debug("Fetch segment:" + segment);
+      }
       fetcher.fetch(segment, threads, org.apache.nutch.fetcher.Fetcher
               .isParsing(_configuration)); // fetch it
       // ------ none nutch-specific code starts here
+      if (LOG.isDebugEnabled()) {
+          LOG.debug("Analyse segment:" + segment);
+      }
       reporter.analyze(segment);
+      if (LOG.isDebugEnabled()) {
+          LOG.debug("Send report mail for segment:" + segment);
+      }
       mail.sendSegmentReport(_fileSystem, segment, i);
       // ------ none nutch-specific code ends here
       if (!Fetcher.isParsing(_configuration)) {
+          if (LOG.isDebugEnabled()) {
+              LOG.debug("Parse segment:" + segment);
+          }
         parseSegment.parse(segment); // parse it, if needed
       }
       if (bwEnable) {
+          if (LOG.isDebugEnabled()) {
+              LOG.debug("Start updating crawldb with bwdb from segment:" + segment);
+          }
         bwUpdateDb.update(crawlDb, bwDb, new Path[] { segment }, true, true); // update
+      } else {
+          if (LOG.isDebugEnabled()) {
+              LOG.debug("Do not update crawldb with bwdb from segment:" + segment);
+          }
+      }
+      if (LOG.isDebugEnabled()) {
+          LOG.debug("Generate host statistics for segment:" + segment);
       }
       hostStatistic.statistic(crawlDb, segment);
       if (metadataEnable) {
         if (_fileSystem.exists(metadataDb)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Update metadata db from segment:" + segment);
+            }
           parseDataUpdater.update(metadataDb, segment);
         }
       }

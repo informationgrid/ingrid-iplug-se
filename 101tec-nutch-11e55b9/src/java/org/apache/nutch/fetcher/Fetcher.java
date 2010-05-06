@@ -266,16 +266,16 @@ public class Fetcher extends Configured implements
     }
     
     public synchronized void dump() {
-      if (LOG.isInfoEnabled()) {
-          LOG.info("  maxThreads    = " + maxThreads);
-          LOG.info("  inProgress    = " + inProgress.size());
-          LOG.info("  crawlDelay    = " + crawlDelay);
-          LOG.info("  minCrawlDelay = " + minCrawlDelay);
-          LOG.info("  nextFetchTime = " + nextFetchTime.get());
-          LOG.info("  now           = " + System.currentTimeMillis());
+      if (LOG.isDebugEnabled()) {
+          LOG.debug("  maxThreads    = " + maxThreads);
+          LOG.debug("  inProgress    = " + inProgress.size());
+          LOG.debug("  crawlDelay    = " + crawlDelay);
+          LOG.debug("  minCrawlDelay = " + minCrawlDelay);
+          LOG.debug("  nextFetchTime = " + nextFetchTime.get());
+          LOG.debug("  now           = " + System.currentTimeMillis());
           for (int i = 0; i < queue.size(); i++) {
               FetchItem it = queue.get(i);
-              LOG.info("  " + i + ". " + it.url);
+              LOG.debug("  " + i + ". " + it.url);
           }
       }
     }
@@ -380,8 +380,8 @@ public class Fetcher extends Configured implements
       for (String id : queues.keySet()) {
         FetchItemQueue fiq = queues.get(id);
         if (fiq.getQueueSize() == 0) continue;
-        if (LOG.isInfoEnabled()) {
-            LOG.info("* queue: " + id);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("* queue: " + id);
         }
         fiq.dump();
       }
@@ -514,7 +514,9 @@ public class Fetcher extends Configured implements
             reprUrl = reprUrlWritable.toString();
           }
           try {
-            if (LOG.isInfoEnabled()) { LOG.info("fetching " + fit.url); }
+            if (LOG.isInfoEnabled()) { 
+                LOG.info("fetching " + fit.url); 
+            }
 
             // fetch the page
             redirecting = false;
@@ -928,7 +930,9 @@ public class Fetcher extends Configured implements
     this.fetchQueues = new FetchItemQueues(getConf());
 
     int threadCount = getConf().getInt("fetcher.threads.fetch", 10);
-    if (LOG.isInfoEnabled()) { LOG.info("Fetcher: threads: " + threadCount); }
+    if (LOG.isInfoEnabled()) { 
+        LOG.info("Fetcher: threads: " + threadCount); 
+    }
 
     feeder = new QueueFeeder(input, fetchQueues, threadCount * 50);
     //feeder.setPriority((Thread.MAX_PRIORITY + Thread.NORM_PRIORITY) / 2);
@@ -958,8 +962,8 @@ public class Fetcher extends Configured implements
       } catch (InterruptedException e) {}
 
       reportStatus();
-      if (LOG.isInfoEnabled()) {
-          LOG.info("-activeThreads=" + activeThreads + ", spinWaiting=" + spinWaiting.get()
+      if (LOG.isDebugEnabled()) {
+          LOG.debug("-activeThreads=" + activeThreads + ", spinWaiting=" + spinWaiting.get()
               + ", fetchQueues.totalSize=" + fetchQueues.getTotalSize());
       }
       if (!feeder.isAlive() && fetchQueues.getTotalSize() < 5) {
@@ -974,8 +978,8 @@ public class Fetcher extends Configured implements
       }
 
     } while (activeThreads.get() > 0);
-    if (LOG.isInfoEnabled()) {
-        LOG.info("-activeThreads=" + activeThreads);
+    if (LOG.isDebugEnabled()) {
+        LOG.debug("-activeThreads=" + activeThreads);
     }
     
     } finally {
@@ -1015,7 +1019,9 @@ public class Fetcher extends Configured implements
     job.setOutputValueClass(NutchWritable.class);
 
     JobClient.runJob(job);
-    if (LOG.isInfoEnabled()) { LOG.info("Fetcher: done"); }
+    if (LOG.isInfoEnabled()) { 
+        LOG.info("Fetcher: done"); 
+    }
   }
 
 

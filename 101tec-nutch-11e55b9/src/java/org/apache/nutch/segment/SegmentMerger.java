@@ -136,6 +136,10 @@ public class SegmentMerger extends Configured implements
     public RecordReader<Text, MetaWrapper> getRecordReader(final InputSplit split,
         final JobConf job, Reporter reporter) throws IOException {
 
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Return RecordReader for '" + split.toString() + "'");
+      }
+      
       reporter.setStatus(split.toString());
       
       // find part name
@@ -163,9 +167,11 @@ public class SegmentMerger extends Configured implements
         return new SequenceFileRecordReader<Text, MetaWrapper>(job, fSplit) {
           
           public synchronized boolean next(Text key, MetaWrapper wrapper) throws IOException {
-            LOG.debug("Running OIF.next()");
 
             boolean res = reader.next(key, w);
+            if (LOG.isDebugEnabled()) {
+              LOG.debug("Running OIF.next(), reading key: '" + key.toString() + "'. Setting Metadata." + SEGMENT_PART_KEY + ": '" + spString + "'");
+            }
             wrapper.set(w);
             wrapper.setMeta(SEGMENT_PART_KEY, spString);
             return res;
@@ -357,6 +363,9 @@ public class SegmentMerger extends Configured implements
       }
     }
     if(url != null) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Calling map() with key: '" + url + "'");
+      }
       newKey.set(url);
       output.collect(newKey, value);
     }
