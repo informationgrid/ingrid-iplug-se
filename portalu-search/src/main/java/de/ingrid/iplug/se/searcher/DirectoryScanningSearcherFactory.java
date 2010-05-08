@@ -66,7 +66,7 @@ public class DirectoryScanningSearcherFactory {
     }
   };
 
-  public static final long NEXTRELOADWAITINGTIME = TimeUnit.SECONDS.toMillis(10);
+  public static final long NEXTRELOADWAITINGTIME = TimeUnit.SECONDS.toMillis(60);
   private static final Log LOG = LogFactory.getLog(DirectoryScanningSearcherFactory.class);
 
   private final Configuration _configuration;
@@ -103,10 +103,16 @@ public class DirectoryScanningSearcherFactory {
       // test for next reload time
       MultipleSearcherContainer multipleSearcherContainer = _map.get(indexerBasePath);
       if (_timeProvider.getTime() >= multipleSearcherContainer.getNextDirScanTime()) {
-        // scan directory for changes
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Check for changed indexes.");
+        }
+          // scan directory for changes
         Path parent = getSearchPath(indexerBasePath);
         Set<Path> paths = findActivatedCrawlPaths(FileSystem.get(_configuration), parent, new HashSet<Path>());
         if (!paths.equals(multipleSearcherContainer.getLastScanDirResult())) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Changed indexes found, reload searcher.");
+            }
           // Changes found, so reload the searcher now
           reload();
         }
@@ -151,11 +157,17 @@ public class DirectoryScanningSearcherFactory {
     FileStatus[] status = fileSystem.listStatus(parent);
 
     for (FileStatus fileStatus : status) {
-      Path path = fileStatus.getPath();
+        Path path = fileStatus.getPath();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Check path for activated crawl: " + path.getName());
+        }
       if (fileStatus.isDir()) {
         findActivatedCrawlPaths(fileSystem, path, list);
       } else if (path.getName().equals("search.done")) {
         Path pathToPush = path.getParent();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Found activated crawl in: " + pathToPush.getName());
+        }
         list.add(pathToPush);
       }
     }
