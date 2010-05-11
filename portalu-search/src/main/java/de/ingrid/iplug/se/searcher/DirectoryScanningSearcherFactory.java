@@ -99,28 +99,10 @@ public class DirectoryScanningSearcherFactory {
           + NEXTRELOADWAITINGTIME, paths);
       _map.put(indexerBasePath, multipleSearcherContainer);
       return searcher;
-    } else {
-      // test for next reload time
-      MultipleSearcherContainer multipleSearcherContainer = _map.get(indexerBasePath);
-      if (_timeProvider.getTime() >= multipleSearcherContainer.getNextDirScanTime()) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Check for changed indexes.");
-        }
-          // scan directory for changes
-        Path parent = getSearchPath(indexerBasePath);
-        Set<Path> paths = findActivatedCrawlPaths(FileSystem.get(_configuration), parent, new HashSet<Path>());
-        if (!paths.equals(multipleSearcherContainer.getLastScanDirResult())) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Changed indexes found, reload searcher.");
-            }
-          // Changes found, so reload the searcher now
-          reload();
-        }
-        return _map.get(indexerBasePath).getSearcher();
-      } else {
-        return multipleSearcherContainer.getSearcher();
-      }
     }
+    
+    // return the already created searcher
+    return _map.get(indexerBasePath).getSearcher();
   }
 
   private Path getSearchPath(String indexerBasePath) {
@@ -157,10 +139,7 @@ public class DirectoryScanningSearcherFactory {
     FileStatus[] status = fileSystem.listStatus(parent);
 
     for (FileStatus fileStatus : status) {
-        Path path = fileStatus.getPath();
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Check path for activated crawl: " + path.getName());
-        }
+      Path path = fileStatus.getPath();
       if (fileStatus.isDir()) {
         findActivatedCrawlPaths(fileSystem, path, list);
       } else if (path.getName().equals("search.done")) {
