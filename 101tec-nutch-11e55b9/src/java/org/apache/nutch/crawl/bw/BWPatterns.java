@@ -88,6 +88,9 @@ public class BWPatterns implements Writable {
   }
 
   public void write(DataOutput out) throws IOException {
+    if (LOG.isDebugEnabled()) {
+        LOG.debug("Write BWPatterns to output stream: " + this.toString());
+    }
     out.writeInt(_positive.size());
     for (Text text : _positive) {
       text.write(out);
@@ -115,10 +118,13 @@ public class BWPatterns implements Writable {
       _negative.add(text);
     }
     syncNegPattern();
+    if (LOG.isDebugEnabled()) {
+        LOG.debug("Read BWPatterns from input stream: " + this.toString());
+    }
   }
 
   public boolean willPassBlackList(String url) {
-    if (_negative == null || _negative.size() == 0) {
+    if (_negPattern == null || _negPattern.size() == 0) {
       // there is no negative list, so every url will be accepted
       if (LOG.isDebugEnabled()) {
         LOG.debug("No negative list available for BLACK LIST!");
@@ -138,11 +144,11 @@ public class BWPatterns implements Writable {
   }
 
   public boolean willPassWhiteList(String url) {
-    if (_positive == null || _positive.size() == 0) {
+    if (_posPattern == null || _posPattern.size() == 0) {
       // there is no positive list, so every url will be accepted
       if (LOG.isDebugEnabled()) {
         LOG.debug("No positive list available for WHITE LIST!");
-        if (_negative == null || _negative.size() == 0) {
+        if (_negPattern == null || _negPattern.size() == 0) {
             LOG.debug("No negative list available for BLACK LIST also!");
         } else {
             LOG.debug("Negative BLACK LIST: " + _negative.toString());
@@ -176,4 +182,31 @@ public class BWPatterns implements Writable {
     }
     return ret;
   }
+  
+  public String toString() {
+      if (LOG.isDebugEnabled()) {
+          if (_posPattern != null && _posPattern.size() > 0) { 
+              for (Pattern pattern : _posPattern) {
+                  LOG.debug("BWPatterns: positive pattern: " + pattern.pattern());
+              }
+          }
+          if (_negPattern != null && _negPattern.size() > 0) { 
+              for (Pattern pattern : _negPattern) {
+                  LOG.debug("BWPatterns: negative pattern: " + pattern.pattern());
+              }
+          }
+          if (_positive != null && _positive.size() > 0) { 
+              for (Text text : _positive) {
+                  LOG.debug("BWPatterns: positive pattern Strings: " + text.toString());
+              }
+          }
+          if (_negative != null && _negative.size() > 0) { 
+              for (Text text : _negative) {
+                  LOG.debug("BWPatterns: negative pattern Strings: " + text.toString());
+              }
+          }
+      }
+      return super.toString();
+  }
+  
 }

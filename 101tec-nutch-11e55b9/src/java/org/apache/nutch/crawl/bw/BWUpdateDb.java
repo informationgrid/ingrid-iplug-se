@@ -188,11 +188,13 @@ public class BWUpdateDb extends Configured {
           // url is outside the black list and matches the white list
             if (LOG.isDebugEnabled()) {
                 LOG.debug("BW patterns passed for url: " + (((Entry) value)._url).toString() + " for HostTypeKey: " + key.toString());
+                LOG.debug("Using BWPatterns: " + _patterns.toString());
             }
           out.collect(key, objectWritable);
         } else {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("BW patterns NOT passed for url: " + (((Entry) value)._url).toString() + " for HostTypeKey: " + key.toString());
+                LOG.debug("Using BWPatterns: " + _patterns.toString());
             }
             
         }
