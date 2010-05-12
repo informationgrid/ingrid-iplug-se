@@ -36,168 +36,187 @@ import org.apache.hadoop.io.Writable;
  */
 public class BWPatterns implements Writable {
 
-  private static final Log LOG = LogFactory.getLog(BWPatterns.class);
+    private static final Log LOG = LogFactory.getLog(BWPatterns.class);
 
-  private List<Text> _positive;
-  private List<Text> _negative;
+    private List<Text> _positive;
 
-  private List<Pattern> _posPattern = new ArrayList<Pattern>();
-  private List<Pattern> _negPattern = new ArrayList<Pattern>();
+    private List<Text> _negative;
 
-  public BWPatterns(Text[] positivePatterns, Text[] negativePatterns) {
-    _positive = new ArrayList<Text>(Arrays.asList(positivePatterns));
-    _negative = new ArrayList<Text>(Arrays.asList(negativePatterns));
-    syncPosPattern();
-    syncNegPattern();
-  }
+    private List<Pattern> _posPattern = new ArrayList<Pattern>();
 
-  private void syncPosPattern() {
-    syncPattern(_positive, _posPattern);
-  }
+    private List<Pattern> _negPattern = new ArrayList<Pattern>();
 
-  private void syncNegPattern() {
-    syncPattern(_negative, _negPattern);
-  }
-
-  private void syncPattern(List<Text> regExpressions, List<Pattern> patterns) {
-    patterns.clear();
-    for (Text text : regExpressions) {
-      patterns.add(Pattern.compile(text.toString().toLowerCase()));
-    }
-  }
-
-  public BWPatterns() {
-  }
-
-  public List<Text> getPositive() {
-    return _positive;
-  }
-
-  public void setPositive(List<Text> positive) {
-    _positive = positive;
-    syncPosPattern();
-  }
-
-  public List<Text> getNegative() {
-    return _negative;
-  }
-
-  public void setNegative(List<Text> negative) {
-    _negative = negative;
-    syncNegPattern();
-  }
-
-  public void write(DataOutput out) throws IOException {
-    out.writeInt(_positive.size());
-    for (Text text : _positive) {
-      text.write(out);
-    }
-    out.writeInt(_negative.size());
-    for (Text text : _negative) {
-      text.write(out);
-    }
-  }
-
-  public void readFields(DataInput in) throws IOException {
-    int count = in.readInt();
-    _positive = new ArrayList<Text>(count);
-    for (int i = 0; i < count; i++) {
-      Text text = new Text();
-      text.readFields(in);
-      _positive.add(text);
-    }
-    syncPosPattern();
-    count = in.readInt();
-    _negative = new ArrayList<Text>(count);
-    for (int i = 0; i < count; i++) {
-      Text text = new Text();
-      text.readFields(in);
-      _negative.add(text);
-    }
-    syncNegPattern();
-  }
-
-  public boolean willPassBlackList(String url) {
-    if (_negPattern == null || _negPattern.size() == 0) {
-      // there is no negative list, so every url will be accepted
-      return true;
+    public BWPatterns(Text[] positivePatterns, Text[] negativePatterns) {
+        _positive = new ArrayList<Text>(Arrays.asList(positivePatterns));
+        _negative = new ArrayList<Text>(Arrays.asList(negativePatterns));
+        syncPosPattern();
+        syncNegPattern();
     }
 
-    String lowerCaseUrl = url.toLowerCase();
-
-    for (Pattern pattern : _negPattern) {
-      Matcher matcher = pattern.matcher(lowerCaseUrl);
-      if (matcher.find()) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  public boolean willPassWhiteList(String url) {
-    if (_posPattern == null || _posPattern.size() == 0) {
-      // there is no positive list, so every url will be accepted
-      if (LOG.isWarnEnabled()) {
-        // this should not be possible, see below
-        LOG.warn("No positive list available for WHITE LIST");
-        dumpPatternsToLog();
-      }
-      // A positive pattern MUST exist! Otherwise all bw entries with only negative patterns
-      // will result in crawling outside the BW url space.
-      // As a result it is not possible anymore to crawl the whole web, excluding urls defined by
-      // negative bw patterns ;-).
-      return false;
+    private void syncPosPattern() {
+        syncPattern(_positive, _posPattern);
     }
 
-    String lowerCaseUrl = url.toLowerCase();
+    private void syncNegPattern() {
+        syncPattern(_negative, _negPattern);
+    }
 
-    for (Pattern pattern : _posPattern) {
-      Matcher matcher = pattern.matcher(lowerCaseUrl);
-      if (matcher.find()) {
-        if (LOG.isDebugEnabled()) {
-          // very special debug code for tracing the out of BW space crawling
-          if (url.contains("vimeo")) {
-            LOG.debug("Vimeo was allowed because of this pattern: " + pattern.toString());
-            LOG.debug("pattern.pattern() returns: " + pattern.pattern());
-            dumpPatternsToLog();
-          }
+    private void syncPattern(List<Text> regExpressions, List<Pattern> patterns) {
+        patterns.clear();
+        for (Text text : regExpressions) {
+            patterns.add(Pattern.compile(text.toString().toLowerCase()));
+        }
+    }
+
+    public BWPatterns() {
+    }
+
+    public List<Text> getPositive() {
+        return _positive;
+    }
+
+    public void setPositive(List<Text> positive) {
+        _positive = positive;
+        syncPosPattern();
+    }
+
+    public List<Text> getNegative() {
+        return _negative;
+    }
+
+    public void setNegative(List<Text> negative) {
+        _negative = negative;
+        syncNegPattern();
+    }
+
+    public void write(DataOutput out) throws IOException {
+        out.writeInt(_positive.size());
+        for (Text text : _positive) {
+            text.write(out);
+        }
+        out.writeInt(_negative.size());
+        for (Text text : _negative) {
+            text.write(out);
+        }
+    }
+
+    public void readFields(DataInput in) throws IOException {
+        int count = in.readInt();
+        _positive = new ArrayList<Text>(count);
+        for (int i = 0; i < count; i++) {
+            Text text = new Text();
+            text.readFields(in);
+            _positive.add(text);
+        }
+        syncPosPattern();
+        count = in.readInt();
+        _negative = new ArrayList<Text>(count);
+        for (int i = 0; i < count; i++) {
+            Text text = new Text();
+            text.readFields(in);
+            _negative.add(text);
+        }
+        syncNegPattern();
+    }
+
+    public boolean willPassBlackList(String url) {
+        if (_negPattern == null || _negPattern.size() == 0) {
+            // there is no negative list, so every url will be accepted
+            return true;
+        }
+
+        String lowerCaseUrl = url.toLowerCase();
+
+        for (Pattern pattern : _negPattern) {
+            Matcher matcher = pattern.matcher(lowerCaseUrl);
+            if (matcher.find()) {
+                return false;
+            }
         }
         return true;
-      }
     }
-    return false;
-  }
 
-  public boolean willPassBWLists(String url) {
-    boolean ret = (willPassWhiteList(url) && willPassBlackList(url));
-    if (LOG.isDebugEnabled()) {
-        LOG.debug("**********Url '" + url + "' will " + (ret ? "pass" : "NOT pass")
-            + ".");
+    /**
+     * Returns <code>true</code> if <code>url</code> passes all positive
+     * patterns or if no positive pattern has been defined.
+     * 
+     * A positive pattern MUST exist! Otherwise all BW entries with only
+     * negative patterns will result in crawling outside the BW url space. (As a
+     * result it is not possible to crawl the whole web, excluding urls defined
+     * by negative bw patterns ;-).)
+     * 
+     * 
+     * @param url
+     * @return
+     */
+    public boolean willPassWhiteList(String url) {
+        if (_posPattern == null || _posPattern.size() == 0) {
+            // there is no positive list, so every url will be accepted
+            if (LOG.isWarnEnabled()) {
+                // this should not be possible, see below
+                LOG.warn("No positive list available for WHITE LIST");
+                dumpPatternsToLog();
+            }
+            return false;
+        }
+
+        String lowerCaseUrl = url.toLowerCase();
+
+        for (Pattern pattern : _posPattern) {
+            Matcher matcher = pattern.matcher(lowerCaseUrl);
+            if (matcher.find()) {
+                if (LOG.isDebugEnabled()) {
+                    // very special debug code for tracing the out of BW space
+                    // crawling
+                    if (url.contains("vimeo")) {
+                        LOG.debug("Vimeo was allowed because of this pattern: " + pattern.toString());
+                        LOG.debug("pattern.pattern() returns: " + pattern.pattern());
+                        dumpPatternsToLog();
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
     }
-    return ret;
-  }
-  
-  private void dumpPatternsToLog() {
-      if (_posPattern != null && _posPattern.size() > 0) { 
-          for (Pattern pattern : _posPattern) {
-              LOG.info("BWPatterns: positive pattern: " + pattern.pattern());
-          }
-      }
-      if (_negPattern != null && _negPattern.size() > 0) { 
-          for (Pattern pattern : _negPattern) {
-              LOG.info("BWPatterns: negative pattern: " + pattern.pattern());
-          }
-      }
-      if (_positive != null && _positive.size() > 0) { 
-          for (Text text : _positive) {
-              LOG.info("BWPatterns: positive pattern Strings: " + text.toString());
-          }
-      }
-      if (_negative != null && _negative.size() > 0) { 
-          for (Text text : _negative) {
-              LOG.info("BWPatterns: negative pattern Strings: " + text.toString());
-          }
-      }
-  }
-  
+
+    /**
+     * Returns <code>true</code> if <code>url</code> passes all positive
+     * patterns AND does NOT pass all negative patterns OR if no positive
+     * pattern has been defined.
+     * 
+     * @param url
+     * @return
+     */
+    public boolean willPassBWLists(String url) {
+        boolean ret = (willPassWhiteList(url) && willPassBlackList(url));
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("**********Url '" + url + "' will " + (ret ? "pass" : "NOT pass") + ".");
+        }
+        return ret;
+    }
+
+    private void dumpPatternsToLog() {
+        if (_posPattern != null && _posPattern.size() > 0) {
+            for (Pattern pattern : _posPattern) {
+                LOG.info("BWPatterns: positive pattern: " + pattern.pattern());
+            }
+        }
+        if (_negPattern != null && _negPattern.size() > 0) {
+            for (Pattern pattern : _negPattern) {
+                LOG.info("BWPatterns: negative pattern: " + pattern.pattern());
+            }
+        }
+        if (_positive != null && _positive.size() > 0) {
+            for (Text text : _positive) {
+                LOG.info("BWPatterns: positive pattern Strings: " + text.toString());
+            }
+        }
+        if (_negative != null && _negative.size() > 0) {
+            for (Text text : _negative) {
+                LOG.info("BWPatterns: negative pattern Strings: " + text.toString());
+            }
+        }
+    }
+
 }
