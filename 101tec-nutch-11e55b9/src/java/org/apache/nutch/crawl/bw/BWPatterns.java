@@ -88,9 +88,6 @@ public class BWPatterns implements Writable {
   }
 
   public void write(DataOutput out) throws IOException {
-    if (LOG.isDebugEnabled()) {
-        LOG.debug("Write BWPatterns to output stream: " + this.toString());
-    }
     out.writeInt(_positive.size());
     for (Text text : _positive) {
       text.write(out);
@@ -118,9 +115,6 @@ public class BWPatterns implements Writable {
       _negative.add(text);
     }
     syncNegPattern();
-    if (LOG.isDebugEnabled()) {
-        LOG.debug("Read BWPatterns from input stream: " + this.toString());
-    }
   }
 
   public boolean willPassBlackList(String url) {
