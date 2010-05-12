@@ -170,9 +170,8 @@ public class BWUpdateDb extends Configured {
         }
 
         if (_patterns == null) {
-          if (LOG.isDebugEnabled()) {
-              LOG.debug("No BW patterns have been set before filtering url: " + (((Entry) value)._url).toString());
-          }
+            // return, because no bw pattern has been set for this url
+            // this results in NOT crawling this url
             return;
         }
 
@@ -181,9 +180,6 @@ public class BWUpdateDb extends Configured {
           // url is outside the black list and matches the white list
             if (LOG.isDebugEnabled()) {
                 LOG.debug("BW patterns passed for url: " + (((Entry) value)._url).toString() + " for HostTypeKey: " + key.toString());
-                if (url.contains("vimeo")) {
-                    LOG.debug("Vimeo was allowed because of this patterns: " + _patterns.toString());
-                }
             }
           out.collect(key, objectWritable);
         } else {
