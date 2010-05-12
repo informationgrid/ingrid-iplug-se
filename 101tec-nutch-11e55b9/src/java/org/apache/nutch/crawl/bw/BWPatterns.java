@@ -120,6 +120,9 @@ public class BWPatterns implements Writable {
   public boolean willPassBlackList(String url) {
     if (_negative == null || _negative.size() == 0) {
       // there is no negative list, so every url will be accepted
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("No negative list available for BLACK LIST!");
+      }
       return true;
     }
 
@@ -137,6 +140,14 @@ public class BWPatterns implements Writable {
   public boolean willPassWhiteList(String url) {
     if (_positive == null || _positive.size() == 0) {
       // there is no positive list, so every url will be accepted
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("No positive list available for WHITE LIST!");
+        if (_negative == null || _negative.size() == 0) {
+            LOG.debug("No negative list available for BLACK LIST also!");
+        } else {
+            LOG.debug("Negative BLACK LIST: " + _negative.toString());
+        }
+      }
       return true;
     }
 
@@ -145,6 +156,12 @@ public class BWPatterns implements Writable {
     for (Pattern pattern : _posPattern) {
       Matcher matcher = pattern.matcher(lowerCaseUrl);
       if (matcher.find()) {
+        if (LOG.isDebugEnabled()) {
+          if (url.contains("vimeo")) {
+            LOG.debug("Vimeo was allowed because of this pattern: " + pattern.toString());
+            LOG.debug("pattern.pattern() returns: " + pattern.pattern());
+          }
+        }
         return true;
       }
     }

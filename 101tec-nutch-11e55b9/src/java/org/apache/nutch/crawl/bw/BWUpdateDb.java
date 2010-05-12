@@ -19,10 +19,12 @@ package org.apache.nutch.crawl.bw;
 
 import java.io.DataInput;
 import java.io.DataOutput;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.logging.Log;
@@ -41,9 +43,11 @@ import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.MapFileOutputFormat;
 import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
+import org.apache.hadoop.mapred.RecordWriter;
 import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
+import org.apache.hadoop.util.Progressable;
 import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.crawl.CrawlDb;
 import org.apache.nutch.crawl.CrawlDbFilter;
@@ -155,6 +159,13 @@ public class BWUpdateDb extends Configured {
             OutputCollector<HostTypeKey, ObjectWritable> out, Reporter report)
             throws IOException {
 
+        if (_patterns != null) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Invalid pattern detected from previous HostTypeKey: " + _patterns.toString());
+            }
+            _patterns = null;
+        }
+        
       while (values.hasNext()) {
         ObjectWritable objectWritable = (ObjectWritable) values.next();
         Object value = objectWritable.get(); // unwrap
@@ -176,12 +187,12 @@ public class BWUpdateDb extends Configured {
         if (_patterns.willPassBWLists(url)) {
           // url is outside the black list and matches the white list
             if (LOG.isDebugEnabled()) {
-                LOG.debug("BW patterns passed for url: " + (((Entry) value)._url).toString());
+                LOG.debug("BW patterns passed for url: " + (((Entry) value)._url).toString() + " for HostTypeKey: " + key.toString());
             }
           out.collect(key, objectWritable);
         } else {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("BW patterns NOT passed for url: " + (((Entry) value)._url).toString());
+                LOG.debug("BW patterns NOT passed for url: " + (((Entry) value)._url).toString() + " for HostTypeKey: " + key.toString());
             }
             
         }
@@ -216,6 +227,50 @@ public class BWUpdateDb extends Configured {
     public void close() throws IOException {
     }
   }
+  
+  public static class BWDbCsvOutputFormat extends FileOutputFormat<HostTypeKey,BWPatterns> {
+      protected static class LineRecordWriter implements RecordWriter<HostTypeKey,BWPatterns> {
+        private DataOutputStream out;
+
+        public LineRecordWriter(DataOutputStream out) {
+          this.out = out;
+          try {
+            out.writeBytes("Black/White list database dump\n");
+          } catch (IOException e) {}
+        }
+
+        public synchronized void write(HostTypeKey key, BWPatterns value) throws IOException {
+            out.writeByte('"');
+            out.writeBytes(key.toString());
+            out.writeByte('"');
+            out.writeByte(';');
+            out.writeBytes("white: ");
+            List<Text> positive = value.getPositive();
+            for (Text text : positive) {
+                out.writeBytes(text.toString());
+                out.writeByte(';');
+            }
+            out.writeBytes("black: ");
+            List<Text> negative = value.getNegative();
+            for (Text text : negative) {
+                out.writeBytes(text.toString());
+                out.writeByte(';');
+            }
+            out.writeByte('\n');
+        }
+
+        public synchronized void close(Reporter reporter) throws IOException {
+          out.close();
+        }
+      }
+
+      public RecordWriter<HostTypeKey,BWPatterns> getRecordWriter(FileSystem fs, JobConf job, String name,
+          Progressable progress) throws IOException {
+        Path dir = FileOutputFormat.getOutputPath(job);
+        DataOutputStream fileOut = fs.create(new Path(dir, name), progress);
+        return new LineRecordWriter(fileOut);
+     }
+    }
 
   public BWUpdateDb(Configuration conf) {
     super(conf);
@@ -310,16 +365,47 @@ public class BWUpdateDb extends Configured {
     LOG.info("bw update: done");
 
   }
+  
+  public void processDumpJob(String bwDb, String output, Configuration config) throws IOException {
+
+      if (LOG.isInfoEnabled()) {
+          LOG.info("BWDb dump: starting");
+          LOG.info("BWDb db: " + bwDb);
+      }
+      
+      Path outFolder = new Path(output);
+
+      JobConf job = new NutchJob(config);
+      job.setJobName("dump " + bwDb);
+
+      FileInputFormat.addInputPath(job, new Path(bwDb, CrawlDb.CURRENT_NAME));
+      job.setInputFormat(SequenceFileInputFormat.class);
+
+      FileOutputFormat.setOutputPath(job, outFolder);
+      job.setOutputFormat(BWDbCsvOutputFormat.class);
+      job.setOutputKeyClass(HostTypeKey.class);
+      job.setOutputValueClass(BWPatterns.class);
+      
+      JobClient.runJob(job);
+      if (LOG.isInfoEnabled()) { LOG.info("BWDb dump: done"); }
+    }
 
   public static void main(String[] args) throws Exception {
-    BWUpdateDb bwDb = new BWUpdateDb(NutchConfiguration.create());
-    if (args.length != 5) {
+    Configuration conf = NutchConfiguration.create();
+    BWUpdateDb bwDb = new BWUpdateDb(conf);
+    if (args.length != 5 && args.length != 3) {
       System.err
               .println("Usage: <crawldb> <bwdb> <segment> <normalize> <filter>");
+      System.err.println("or: <bwdb> -dump <out_dir>");
       return;
     }
-    bwDb.update(new Path(args[0]), new Path(args[1]), new Path[] { new Path(
+    if (args[1].equals("-dump")) {
+            bwDb.processDumpJob(args[0], args[2], conf);
+    } else {
+        bwDb.update(new Path(args[0]), new Path(args[1]), new Path[] { new Path(
             args[2]) }, Boolean.valueOf(args[3]), Boolean.valueOf(args[4]));
+    }
+    
   }
 
 }
