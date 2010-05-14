@@ -515,7 +515,7 @@ public class Fetcher extends Configured implements
           }
           try {
             if (LOG.isInfoEnabled()) { 
-                LOG.info("fetching " + fit.url); 
+                LOG.info("fetching: '" + fit.url + "'; fetcherQueue.totalSize: " + fetchQueues.getTotalSize()); 
             }
 
             // fetch the page

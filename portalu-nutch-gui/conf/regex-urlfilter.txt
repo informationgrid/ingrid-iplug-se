@@ -29,7 +29,7 @@
 -^(file|ftp|mailto):
 
 # skip image and other suffixes we can't yet parse
--\.(gif|GIF|jpg|JPG|png|PNG|ico|ICO|css|sit|eps|wmf|zip|mpg|ppt|mpg|xls|gz|rpm|tgz|mov|MOV|exe|jpeg|JPEG|bmp|BMP|js|mp3|mp4|m4a|wav|WAV)$
+-\.(gif|GIF|jpg|JPG|png|PNG|ico|ICO|css|sit|eps|wmf|mpg|gz|rpm|tgz|mov|MOV|exe|jpeg|JPEG|bmp|BMP|mp3|mp4|m4a|wav|WAV)$
 
 # skip URLs containing certain characters as probable queries, etc.
 -[?*!@=]

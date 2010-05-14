@@ -83,13 +83,17 @@ public class PluginManifestParser {
       if (directory == null) {
         continue;
       }
-      LOG.info("Plugins: looking in: " + directory.getAbsolutePath());
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Plugins: looking in: " + directory.getAbsolutePath());
+      }
       for (File oneSubFolder : directory.listFiles()) {
         if (oneSubFolder.isDirectory()) {
           String manifestPath = oneSubFolder.getAbsolutePath() + File.separator
               + "plugin.xml";
           try {
-            LOG.debug("parsing: " + manifestPath);
+            if (LOG.isDebugEnabled()) {
+              LOG.debug("parsing: " + manifestPath);
+            }
             PluginDescriptor p = parseManifestFile(manifestPath);
             map.put(p.getPluginId(), p);
           } catch (MalformedURLException e) {
@@ -184,8 +188,10 @@ public class PluginManifestParser {
     }
     PluginDescriptor pluginDescriptor = new PluginDescriptor(id, version, name,
         providerName, pluginClazz, pPath, this.conf);
-    LOG.debug("plugin: id=" + id + " name=" + name + " version=" + version
-          + " provider=" + providerName + "class=" + pluginClazz);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("plugin: id=" + id + " name=" + name + " version=" + version
+            + " provider=" + providerName + "class=" + pluginClazz);
+    }
     parseExtension(rootElement, pluginDescriptor);
     parseExtensionPoints(rootElement, pluginDescriptor);
     parseLibraries(rootElement, pluginDescriptor);
@@ -284,7 +290,9 @@ public class PluginManifestParser {
             Element oneImplementation = (Element) node;
             String id = oneImplementation.getAttribute(ATTR_ID);
             String extensionClass = oneImplementation.getAttribute(ATTR_CLASS);
-            LOG.debug("impl: point=" + pointId + " class=" + extensionClass);
+            if (LOG.isDebugEnabled()) {
+              LOG.debug("impl: point=" + pointId + " class=" + extensionClass);
+            }
             Extension extension = new Extension(pPluginDescriptor, pointId, id,
                 extensionClass, this.conf, this.pluginRepository);
             NodeList parameters = oneImplementation

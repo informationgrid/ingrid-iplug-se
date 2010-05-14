@@ -109,7 +109,9 @@ public class PluginRepository {
     for (PluginDescriptor plugin: plugins) {
       for(ExtensionPoint point:plugin.getExtenstionPoints()) {
         String xpId = point.getId();
-        LOG.debug("Adding extension point " + xpId);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Adding extension point " + xpId);
+        }
         fExtensionPoints.put(xpId, point);
       }
     }
@@ -324,24 +326,26 @@ public class PluginRepository {
   }
   
   private void displayStatus() {
-    LOG.debug("Plugin Auto-activation mode: [" + this.auto + "]");
-    LOG.debug("Registered Plugins:");
+    if (LOG.isDebugEnabled()) {
+        LOG.debug("Plugin Auto-activation mode: [" + this.auto + "]");
+        LOG.debug("Registered Plugins:");
 
-    if ((fRegisteredPlugins == null) || (fRegisteredPlugins.size() == 0)) {
-      LOG.debug("\tNONE");
-    } else {
-      for (PluginDescriptor plugin : fRegisteredPlugins) {
-        LOG.debug("\t" + plugin.getName() + " (" + plugin.getPluginId() + ")");
-      }
-    }
-
-    LOG.info("Registered Extension-Points:");
-    if ((fExtensionPoints == null) || (fExtensionPoints.size() == 0)) {
-      LOG.debug("\tNONE");
-    } else {
-      for (ExtensionPoint ep : fExtensionPoints.values()) {
-        LOG.debug("\t" + ep.getName() + " (" + ep.getId() + ")");
-      }
+        if ((fRegisteredPlugins == null) || (fRegisteredPlugins.size() == 0)) {
+          LOG.debug("\tNONE");
+        } else {
+          for (PluginDescriptor plugin : fRegisteredPlugins) {
+            LOG.debug("\t" + plugin.getName() + " (" + plugin.getPluginId() + ")");
+          }
+        }
+    
+        LOG.debug("Registered Extension-Points:");
+        if ((fExtensionPoints == null) || (fExtensionPoints.size() == 0)) {
+          LOG.debug("\tNONE");
+        } else {
+          for (ExtensionPoint ep : fExtensionPoints.values()) {
+            LOG.debug("\t" + ep.getName() + " (" + ep.getId() + ")");
+          }
+        }
     }
   }
 
@@ -376,11 +380,15 @@ public class PluginRepository {
       }
 
       if (!includes.matcher(id).matches()) {
-        LOG.debug("not including: " + id);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("not including: " + id);
+        }
         continue;
       }
       if (excludes.matcher(id).matches()) {
-        LOG.debug("excluding: " + id);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("excluding: " + id);
+        }
         continue;
       }
       map.put(plugin.getPluginId(), plugin);

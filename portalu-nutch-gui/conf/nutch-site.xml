@@ -6,11 +6,38 @@
 <configuration>
 
 <property>
+  <name>file.content.limit</name>
+  <value>3145728</value>
+  <description>The length limit for downloaded content, in bytes.
+  If this value is nonnegative (>=0), content longer than it will be truncated;
+  otherwise, no truncation at all.
+  </description>
+</property>
+
+<property>
+  <name>http.content.limit</name>
+  <value>3145728</value>
+  <description>The length limit for downloaded content, in bytes.
+  If this value is nonnegative (>=0), content longer than it will be truncated;
+  otherwise, no truncation at all.
+  </description>
+</property>
+
+
+<property>
   <name>merge.after.fetch</name>
-  <value>false</value>
+  <value>true</value>
   <description>If true, then segments of crawl are merged after fetch is complete.
   </description>
 </property>
+
+<property>
+  <name>ingrid.fetcher.log.url.status</name>
+  <value>false</value>
+  <description>If true, every fetched URL is logged with it's status in DB.
+  </description>
+</property>
+
 
 <property>
   <name>index.sns</name>
@@ -21,7 +48,7 @@
 
 <property>
   <name>plugin.folders</name>
-  <value>101tec-nutch-11e55b9/src/plugin,portalu-nutch-gui/src/plugin</value>
+  <value>./plugins</value>
   <description>Directories where nutch plugins are located.  Each
   element may be a relative or absolute path.  If absolute, it is used
   as is.  If relative, it is searched for on the classpath.</description>
@@ -29,7 +56,7 @@
 
 <property>
   <name>plugin.includes</name>
-  <value>admin-.*|protocol-httpclient|urlfilter-regex|parse-(text|html|js|pdf|dummy)|index-(basic|anchor|metadata|sns|more)|query-(basic|site|url|fileformat)|response-(json|xml)|summary-basic|scoring-opic|urlnormalizer-(pass|regex|basic)|crawl-prepare-(dbexport)</value>
+  <value>admin-.*|protocol-httpclient|urlfilter-regex|parse-(text|html|js|pdf|rtf|rss|oo|zip|msword|msexcel|mspowerpoint|dummy)|index-(basic|anchor|metadata|sns|more)|query-(basic|site|url|fileformat)|response-(json|xml)|summary-basic|scoring-opic|urlnormalizer-(pass|regex|basic)|crawl-prepare-(dbexport)</value>
   <description>Regular expression naming plugin directory names to
   include.  Any plugin not matching this expression is excluded.
   In any case you need at least include the nutch-extensionpoints plugin. By
@@ -55,7 +82,7 @@
 
 <property>
   <name>url.type</name>
-  <value>catalog</value>
+  <value>web</value>
   <description>catalog or web</description>
 </property>
 
@@ -119,6 +146,51 @@
   adds the original fetchInterval to the last fetch time, regardless of
   page changes.</description>
 </property>
+
+<property>
+  <name>db.max.outlinks.per.page</name>
+  <value>200</value>
+  <description>The maximum number of outlinks that we'll process for a page.
+  If this value is nonnegative (>=0), at most db.max.outlinks.per.page outlinks
+  will be processed for a page; otherwise, all outlinks will be processed.
+  </description>
+</property>
+
+<property>
+  <name>generate.max.per.host</name>
+  <value>1000</value>
+  <description>The maximum number of urls per host in a single
+  fetchlist.  -1 if unlimited.</description>
+</property>
+
+<property>
+  <name>fetcher.threads.per.host.by.ip</name>
+  <value>false</value>
+  <description>If true, then fetcher will count threads by IP address,
+  to which the URL's host name resolves. If false, only host name will be
+  used. NOTE: this should be set to the same value as
+  "generate.max.per.host.by.ip" - default settings are different only for
+  reasons of backward-compatibility.</description>
+</property>
+
+
+<property>
+  <name>fetcher.server.min.delay</name>
+  <value>5.0</value>
+  <description>The minimum number of seconds the fetcher will delay between 
+  successive requests to the same server. This value is applicable ONLY
+  if fetcher.threads.per.host is greater than 1 (i.e. the host blocking
+  is turned off).</description>
+</property>
+
+<property>
+  <name>fetcher.threads.per.host</name>
+  <value>2</value>
+  <description>This number is the maximum number of threads that
+    should be allowed to access a host at one time.</description>
+</property>
+
+
 
 <property>
     <name>mail.enabled</name>
