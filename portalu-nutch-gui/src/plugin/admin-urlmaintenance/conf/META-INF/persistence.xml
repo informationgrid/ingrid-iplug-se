@@ -58,6 +58,7 @@
 	<persistence-unit name="mysql" transaction-type="RESOURCE_LOCAL">
 		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
 		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.Url</class>
+		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.UrlLog</class>
 		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.CatalogUrl</class>
 		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl</class>
 		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.LimitUrl</class>

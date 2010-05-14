@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import de.ingrid.iplug.se.communication.InterplugInCommunicationConstants;
 import de.ingrid.iplug.se.communication.InterplugInQueueCommunication;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IUrlDao;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IUrlLogDao;
 
 @Component
 public class UrlStatusUpdateService {
@@ -23,12 +24,14 @@ public class UrlStatusUpdateService {
 
   private final TransactionService _transactionService;
   private final IUrlDao _urlDao;
+  private final IUrlLogDao _urlLogDao;
 
   @Autowired
-  public UrlStatusUpdateService(TransactionService transactionService, IUrlDao urlDao) {
+  public UrlStatusUpdateService(TransactionService transactionService, IUrlDao urlDao, IUrlLogDao urlLogDao) {
     super();
     _transactionService = transactionService;
     _urlDao = urlDao;
+    _urlLogDao = urlLogDao;
   }
 
   @PostConstruct
@@ -63,7 +66,9 @@ public class UrlStatusUpdateService {
             final String status = statusAndUrl.substring(0, pos);
             final String url = statusAndUrl.substring(pos + 1);
 
-            LOG.info("Try to update status '" + status + "' for url '" + url + "'.");
+            if (LOG.isDebugEnabled()) {
+              LOG.debug("Try to update status '" + status + "' for url '" + url + "'.");
+            }
             _transactionService.executeInTransaction(new Runnable() {
               
               @Override
@@ -86,6 +91,7 @@ public class UrlStatusUpdateService {
 
   private void updateUrlStatus(int status, String url) {
     _urlDao.updateStatus(url, status);
+    _urlLogDao.updateStatus(url, status);
   }
 
   public static String createString(int status, Text url) {
