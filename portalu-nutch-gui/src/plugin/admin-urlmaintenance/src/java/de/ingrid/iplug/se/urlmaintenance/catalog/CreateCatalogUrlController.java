@@ -120,6 +120,7 @@ public class CreateCatalogUrlController extends NavigationSelector {
     
     catalogUrlCommand.addMetadata(_metadataDao.getByKeyAndValue("alt_title", altTitle));
 
+    _validator.setUsedDatatype(type);
     if (_validator.validate(errors).hasErrors()) {
         return editCatalogUrl(model, catalogUrlCommand, null, type);
     }

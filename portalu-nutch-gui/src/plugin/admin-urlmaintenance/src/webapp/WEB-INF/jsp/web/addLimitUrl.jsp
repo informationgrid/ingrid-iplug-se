@@ -87,10 +87,12 @@
 									    <row>
 									        <label>Typ:</label>
 									        <field>
-									            <c:forEach var="type" items="${datatypes}">
-									            	<input type="checkbox" name="limitUrlCommands[${limitUrlCounter}].metadatas" value="${type.id}" /><fmt:message key="${type.metadataKey}.${type.metadataValue}" /><br/>
-									            </c:forEach>
-									        </field>
+                                                <c:forEach var="type" items="${datatypes}">
+					                                <c:if test="${type.metadataValue != 'topics' && type.metadataValue != 'service' && type.metadataValue != 'measure'}">
+					                                    <input type="checkbox" name="limitUrlCommands[${limitUrlCounter}].metadatas" value="${type.id}" /><fmt:message key="${type.metadataKey}.${type.metadataValue}" /><br/>
+					                                </c:if>
+                                                </c:forEach>
+                                            </field>
 									        <desc></desc>
 									    </row>
 									    

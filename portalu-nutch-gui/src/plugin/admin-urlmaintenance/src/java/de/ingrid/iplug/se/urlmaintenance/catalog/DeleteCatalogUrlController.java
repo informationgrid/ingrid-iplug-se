@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import de.ingrid.iplug.se.urlmaintenance.DatabaseExport;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ICatalogUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.CatalogUrl;
 
@@ -14,10 +15,12 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.CatalogUrl;
 public class DeleteCatalogUrlController extends NavigationSelector {
 
   private ICatalogUrlDao _catalogUrlDao;
+  private final DatabaseExport _databaseExport;
 
   @Autowired
-  public DeleteCatalogUrlController(ICatalogUrlDao catalogUrlDao) {
+  public DeleteCatalogUrlController(ICatalogUrlDao catalogUrlDao, DatabaseExport databaseExport) {
     _catalogUrlDao = catalogUrlDao;
+    _databaseExport = databaseExport;
 
   }
 
@@ -30,6 +33,7 @@ public class DeleteCatalogUrlController extends NavigationSelector {
     if (url != null) {
       // TODO: check security user is allowed
       _catalogUrlDao.makeTransient(url);
+      _databaseExport.exportCatalogUrls();
     }
 
     String view = "redirect:/catalog/listTopicUrls.html";

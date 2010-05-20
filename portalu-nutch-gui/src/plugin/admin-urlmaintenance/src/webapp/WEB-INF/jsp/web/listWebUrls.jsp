@@ -62,18 +62,19 @@
 							</c:forEach>
 							<c:forEach items="${metadatas}" var="metadata">
 								<c:if test="${metadata.metadataKey == 'datatype'}">
-								<input type="checkbox" id="${metadata.metadataKey}_${metadata.metadataValue}" name="${metadata.metadataKey}" value="${metadata.metadataValue}"
-								<c:if test="${fn:contains(selectedFilter, metadata.metadataValue)}"> checked="checked"</c:if> /> <fmt:message key="${metadata.metadataKey}.${metadata.metadataValue}" />&nbsp;&nbsp;
-								<script>
-									function fnCallback(e) { document.getElementById('filter').submit() }
-									YAHOO.util.Event.addListener("${metadata.metadataKey}_${metadata.metadataValue}", "click", fnCallback);
-								</script>
+								    <input type="checkbox" id="${metadata.metadataKey}_${metadata.metadataValue}" name="${metadata.metadataKey}" value="${metadata.metadataValue}"
+									<c:if test="${fn:contains(selectedFilter, metadata.metadataValue)}"> checked="checked"</c:if> /> <fmt:message key="${metadata.metadataKey}.${metadata.metadataValue}" />&nbsp;&nbsp;
+									<script>
+										function fnCallback(e) { document.getElementById('filter').submit() }
+										YAHOO.util.Event.addListener("${metadata.metadataKey}_${metadata.metadataValue}", "click", fnCallback);
+									</script>
 								</c:if>
 							</c:forEach>
 							<div class="comment">Es werden die URLs gefiltert, die alle oben ausgewählten Eigenschaften gemeinsam besitzen.</div>
 						</div>
 						<div class="row">	
 							<label>Filter Sprache:</label>
+							<c:set var="selectedFilter" value=""/>
 							<c:forEach var="l" items="${langs}">
 								<c:set var="selectedFilter" value="${selectedFilter} lang:${l}"/>
 								<c:set var="paramString" value="${paramString}&lang=${l}"/> 
@@ -105,7 +106,7 @@
 				        	<li style="float:left; list-style-type:square; color:red; margin-left:20px">Exclude URL</li>
 				        	<li style="float:left; list-style-type:circle; color:#666666; margin-left:50px">RV = Rechtsvorschriften</li>
 				        	<li style="float:left; list-style-type:circle; color:#666666; margin-left:20px">FS = Forschungsseite</li>
-				        	<li style="float:left; list-style-type:circle; color:#666666; margin-left:20px">UT = Umweltthema</li>
+				        	<li style="float:left; list-style-type:circle; color:#666666; margin-left:20px">UI = Umweltinformationen</li>
 				        </ul>
 				        <div id="dynamicdata" style="clear:both">
 					       <table id="myTable">
@@ -116,7 +117,7 @@
 						       		<th>Geändert</th>
 						       		<th>RV</th>
 						       		<th>FS</th>
-						       		<th>UT</th>
+						       		<th>UI</th>
 						       		<th>Sprache</th>
 						       		<th>Status</th>
 						       		<th>Aktion</th>
@@ -152,7 +153,7 @@
 						       			&nbsp;<c:if test="${fn:contains(limitUrl.metadatas,'research')}"><img src="../theme/${theme}/gfx/ok.png"/></c:if>&nbsp;
 						       		</td>
 						       		<td>
-						       			&nbsp;<c:if test="${fn:contains(limitUrl.metadatas,'www')}"><img src="../theme/${theme}/gfx/ok.png"/></c:if>&nbsp;
+						       			&nbsp;<c:if test="${fn:contains(limitUrl.metadatas,'default')}"><img src="../theme/${theme}/gfx/ok.png"/></c:if>&nbsp;
 						       		</td>
 						       		<td>
 						       			<c:forEach items="${limitUrl.metadatas}" var="meta"><c:if test="${meta.metadataKey == 'lang'}"><fmt:message key="${meta.metadataKey}.${meta.metadataValue}" /></c:if></c:forEach>&nbsp;
@@ -203,7 +204,7 @@
 									{key:"edited", label:"Geändert", sortable:true},
 									{key:"isLaw", label:"RV"},
 									{key:"isResearch", label:"FS"},
-									{key:"isWWW", label:"UT"},
+									{key:"isDefault", label:"UI"},
 									{key:"lang", label:"Sprache"},
 									{key:"status", label:"Status"},
 									{key:"action", label:"Aktion", width:100}
@@ -218,7 +219,7 @@
 						                    {key:"edited"},
 						                    {key:"isLaw"},
 						                    {key:"isResearch"},
-						                    {key:"isWWW"},
+						                    {key:"isDefault"},
 						                    {key:"lang"},
 						                    {key:"status"},
 						                    {key:"action"}

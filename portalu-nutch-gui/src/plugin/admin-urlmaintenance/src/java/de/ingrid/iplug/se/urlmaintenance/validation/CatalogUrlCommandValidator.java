@@ -10,6 +10,7 @@ import org.springframework.validation.Errors;
 
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.CatalogUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ICatalogUrlDao;
+import de.ingrid.iplug.se.urlmaintenance.persistence.model.CatalogUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 
@@ -17,6 +18,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 public class CatalogUrlCommandValidator extends AbstractValidator<CatalogUrlCommand> {
 
     private final ICatalogUrlDao _urlDao;
+    private String _datatype = "";
 
     @Autowired
     public CatalogUrlCommandValidator(final ICatalogUrlDao urlDao) {
@@ -40,8 +42,19 @@ public class CatalogUrlCommandValidator extends AbstractValidator<CatalogUrlComm
             rejectError(errors, "provider", IErrorKeys.NULL);
         } else {
             final Long id = (Long) get(errors, "id");
-            if ((id == null || id < 0) && _urlDao.getByUrl(url, provider.getId()).size() > 0) {
-                rejectError(errors, "url", IErrorKeys.DUPLICATE);
+            // check if url was already defined within the same datatype
+            // (topics, service or measure)
+            if (id == null || id < 0) {
+                List<CatalogUrl> catalogUrls = _urlDao.getByUrl(url, provider.getId());
+                for (CatalogUrl catalogUrl : catalogUrls) {
+                    List<Metadata> metadatas = catalogUrl.getMetadatas();
+                    for (Metadata metadata : metadatas) {
+                        if (metadata.getMetadataKey().equals("datatype")
+                                && metadata.getMetadataValue().equals(_datatype)) {
+                            rejectError(errors, "url", IErrorKeys.DUPLICATE);
+                        }
+                    }
+                }
             }
         }
 
@@ -98,5 +111,16 @@ public class CatalogUrlCommandValidator extends AbstractValidator<CatalogUrlComm
         }
 
         return errors;
+    }
+    
+    /**
+     * This method sets the datatype to identify the type of the catalog.
+     * It's mainly used to check if an URL already exists in a catalog of
+     * a certain type, which can be topics, service, measure.
+     * 
+     * @param datatype
+     */
+    public void setUsedDatatype(String datatype) {
+        _datatype = datatype;
     }
 }

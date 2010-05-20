@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import de.ingrid.iplug.se.urlmaintenance.DatabaseExport;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IExcludeUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ILimitUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao;
@@ -26,13 +27,16 @@ public class DeleteWebUrlController extends NavigationSelector {
   private final IExcludeUrlDao _excludeUrlDao;
   private final ILimitUrlDao _limitUrlDao;
   private final IStartUrlDao _startUrlDao;
+  private final DatabaseExport _databaseExport;
 
   @Autowired
   public DeleteWebUrlController(IStartUrlDao startUrlDao,
-      ILimitUrlDao limitUrlDao, IExcludeUrlDao excludeUrlDao) {
+      ILimitUrlDao limitUrlDao, IExcludeUrlDao excludeUrlDao,
+      DatabaseExport databaseExport) {
     _startUrlDao = startUrlDao;
     _limitUrlDao = limitUrlDao;
     _excludeUrlDao = excludeUrlDao;
+    _databaseExport = databaseExport;
   }
 
   @RequestMapping(method = RequestMethod.POST, value = "/web/deleteWebUrl.html")
@@ -55,6 +59,7 @@ public class DeleteWebUrlController extends NavigationSelector {
       }
       LOG.info("delete start url: " + startUrl);
       _startUrlDao.makeTransient(startUrl);
+      _databaseExport.exportWebUrls();
     }
 
     String view = "redirect:/web/listWebUrls.html";
