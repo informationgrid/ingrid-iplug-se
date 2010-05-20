@@ -215,10 +215,17 @@ public class CrawlController extends NavigationSelector {
     FileSystem fileSystem = FileSystem.get(nutchInstance.getConfiguration());
     Path searchDoneFile = new Path(instanceFolder.getAbsolutePath(), "crawls"
             + File.separator + crawlFolder + File.separator + "search.done");
+    Path searchUpdateFile = new Path(instanceFolder.getAbsolutePath(), "crawls"
+            + File.separator + crawlFolder + File.separator + "search.update");
     if (create) {
       fileSystem.createNewFile(searchDoneFile);
+      // create the "search.update" file so that it will be recognized by
+      // the searcher and that it can be reloaded!
+      fileSystem.createNewFile(searchUpdateFile);
     } else {
       fileSystem.delete(searchDoneFile, false);
+      // the same here ... file is needed to let the searcher know
+      fileSystem.createNewFile(searchUpdateFile);
     }
 
     SearcherFactory factory = SearcherFactory.getInstance(nutchInstance

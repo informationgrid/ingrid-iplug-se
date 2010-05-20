@@ -52,14 +52,14 @@ public class CreateCatalogUrlController extends NavigationSelector {
   public List<Metadata> injectLang() {
     return _metadataDao.getByKey("lang");
   }
-
+  
   @ModelAttribute("metadatas")
   public Map<String, List<Metadata>> injectMetadatas(
       @RequestParam(value = "type", required = true) final String type) {
     final Map<String, List<Metadata>> metadatas = new HashMap<String, List<Metadata>>();
     if (type.equals("topics")) {
       // push all topics into view
-      metadatas.put("topics", _metadataDao.getByKey("topics"));
+      metadatas.put("topic", _metadataDao.getByKey("topic"));
       // push funct category into view
       metadatas.put("funct_category", _metadataDao.getByKey("funct_category"));
     } else if (type.equals("service")) {
@@ -69,6 +69,7 @@ public class CreateCatalogUrlController extends NavigationSelector {
       // push all rubrics into view
       metadatas.put("rubric", _metadataDao.getByKey("measure"));
     }
+    metadatas.put("alt_title", _metadataDao.getByKey("alt_title"));
     return metadatas;
   }
 
@@ -88,15 +89,18 @@ public class CreateCatalogUrlController extends NavigationSelector {
       catalogUrlCommand.setProvider(byId.getProvider());
       catalogUrlCommand.setCreated(byId.getCreated());
       catalogUrlCommand.setUpdated(byId.getUpdated());
+      
     }
     model.addAttribute("type", type);
+    model.addAttribute("altTitle", getMetadataValue(catalogUrlCommand.getMetadatas(), "alt_title"));
     return "catalog/createCatalogUrl";
   }
 
   @RequestMapping(value = "/catalog/createCatalogUrl.html", method = RequestMethod.POST)
   public String anotherPostEditCatalogUrl(final Model model,
       @ModelAttribute("catalogUrlCommand") final CatalogUrlCommand catalogUrlCommand, final Errors errors,
-      @RequestParam(value = "type", required = true) final String type) {
+      @RequestParam(value = "type", required = true) final String type,
+      @RequestParam(value = "altTitle", required = true) final String altTitle) {
     final Metadata defaultMetadata = _metadataDao.getByKeyAndValue("datatype", "default");
     catalogUrlCommand.addMetadata(defaultMetadata);
     Metadata datatypeMetadata = null;
@@ -108,10 +112,28 @@ public class CreateCatalogUrlController extends NavigationSelector {
       datatypeMetadata = _metadataDao.getByKeyAndValue("datatype", "measure");
     }
     catalogUrlCommand.addMetadata(datatypeMetadata);
+    
+    Metadata altTitleMeta = new Metadata("alt_title", altTitle);
+    // create new metadata if it doesn't exist
+    if (!_metadataDao.exists("alt_title", altTitle))
+        _metadataDao.makePersistent(altTitleMeta);
+    
+    catalogUrlCommand.addMetadata(_metadataDao.getByKeyAndValue("alt_title", altTitle));
 
     if (_validator.validate(errors).hasErrors()) {
         return editCatalogUrl(model, catalogUrlCommand, null, type);
     }
     return "redirect:/catalog/saveCatalogUrl.html";
+  }
+  
+  private String getMetadataValue(List<Metadata> metadatas, String key) throws NumberFormatException {
+      String ret = "";
+      for (Metadata metadata : metadatas) {
+          if (metadata.getMetadataKey().equals(key)) {
+              ret = metadata.getMetadataValue();
+              break;
+          }
+      }
+      return ret;
   }
 }

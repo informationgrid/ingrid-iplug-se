@@ -41,7 +41,7 @@
         <parameter name="raw-fields" value="foo"/>
         <parameter name="fields" value="bar"/>
 -->        
-        <parameter name="raw-fields" value="datatype,funct_category,partner,topic,provider,lang"/>
+        <parameter name="raw-fields" value="datatype,funct_category,partner,topic,provider,lang,alt_title"/>
       </implementation> 
                       
    </extension>
@@ -55,7 +55,7 @@
         <parameter name="raw-fields" value="foo"/>
         <parameter name="fields" value="bar"/>
 -->        
-        <parameter name="raw-fields" value="datatype,funct_category,partner,topic,provider,lang"/>
+        <parameter name="raw-fields" value="datatype,funct_category,partner,topic,provider,lang,alt_title"/>
       </implementation>
       
    </extension>

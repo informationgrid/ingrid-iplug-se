@@ -61,7 +61,7 @@ public class CatalogUrlCommandValidator extends AbstractValidator<CatalogUrlComm
                 } else {
                     datatype = m.getMetadataValue();
                 }
-            } else if (key.equals("topics")) {
+            } else if (key.equals("topic")) {
                 hasTopic = true;
             } else if (key.equals("funct_category")) {
                 hasFunct = true;

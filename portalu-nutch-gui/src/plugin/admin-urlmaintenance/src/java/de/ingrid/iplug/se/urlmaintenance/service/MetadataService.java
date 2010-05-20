@@ -33,7 +33,7 @@ public class MetadataService {
   }
 
   public List<Metadata> getTopics() {
-    return getMetadatasAsList("topics");
+    return getMetadatasAsList("topic");
   }
 
   public List<Metadata> getFunctCategory() {

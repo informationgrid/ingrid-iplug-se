@@ -70,7 +70,16 @@
 										<td><a href="${url.url}" target="_blank" style="color:black">${url.url}</a></td>
 										<td><fmt:formatDate value="${url.created}" pattern="yyyy-MM-dd"/></td>
 										<td><fmt:formatDate value="${url.updated}" pattern="yyyy-MM-dd"/></td>
-										<td>&nbsp;</td>
+										<td>
+	                                        <c:set var="i" value="-1"/>
+	                                        <c:forEach var="md" items="${url.metadatas}">
+	                                            <c:if test="${md.metadataKey == 'alt_title'}">
+	                                                <c:set var="i" value="${i+1}" />
+	                                                <c:if test="${i > 0}">, </c:if>
+	                                                ${md.metadataValue}
+	                                            </c:if>
+	                                        </c:forEach>
+	                                    </td>
 										<td>
 											<c:set var="i" value="-1"/>
 											<c:forEach var="md" items="${url.metadatas}">

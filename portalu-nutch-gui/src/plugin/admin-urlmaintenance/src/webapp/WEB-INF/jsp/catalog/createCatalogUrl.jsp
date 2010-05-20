@@ -68,6 +68,14 @@
 							        </field>
 							        <desc></desc>
 							    </row>
+							    
+							    <row>
+                                    <label>Alt. Titel:</label>
+                                    <field>
+                                      <input type="text" value="${altTitle}" name="altTitle" id="altTitle">
+                                    </field>
+                                    <desc></desc>
+                                </row>
 
 							    <row>
                                      <label>Sprache:</label>
@@ -81,12 +89,12 @@
                                      <desc></desc>
                                  </row>
 							
-								<c:if test="${!empty metadatas['topics']}">
+								<c:if test="${!empty metadatas['topic']}">
 								<row>
 							        <label>Thema:</label>
 							        <field>
 							        	<c:forEach items="${metadatas}" var="metadata">
-							        		<c:if test="${metadata.key == 'topics'}">
+							        		<c:if test="${metadata.key == 'topic'}">
 							        			<c:forEach var="topic" items="${metadata.value}">
 							        				<input type="checkbox" name="metadatas" value="${topic.id}" <c:if test="${fn:contains(catalogUrlCommand.metadatas , topic.metadataValue)}">checked="ckecked"</c:if>/> <fmt:message key="${topic.metadataKey}.${topic.metadataValue}" /> <br/>
 							        			</c:forEach>

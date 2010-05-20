@@ -59,6 +59,7 @@
 						                <th>Thema</th>
 						                <th>Funkt. Kategorie</th>
 						                <th>Rubrik</th>
+						                <th>Alt. Titel</th>
 						            </tr>
 						        </thead>
 						        <tbody>
@@ -67,7 +68,7 @@
 						                <td>
 						                	<c:set var="i" value="-1"/>
 						                	<c:forEach items="${catalogUrlCommand.metadatas}" var="md">
-												<c:if test="${md.metadataKey == 'topics'}">
+												<c:if test="${md.metadataKey == 'topic'}">
 													<c:set var="i" value="${i+1}" />
 													<c:if test="${i > 0}">, </c:if>
 													<fmt:message key="${md.metadataKey}.${md.metadataValue}" />
@@ -94,6 +95,16 @@
 												</c:if>
 											</c:forEach>&nbsp;
 						                </td>
+						                <td>
+                                            <c:set var="i" value="-1"/>
+                                            <c:forEach items="${catalogUrlCommand.metadatas}" var="md">
+                                                <c:if test="${md.metadataKey == 'alt_title'}">
+                                                    <c:set var="i" value="${i+1}" />
+                                                    <c:if test="${i > 0}">, </c:if>
+                                                    ${md.metadataValue}
+                                                </c:if>
+                                            </c:forEach>&nbsp;
+                                        </td>
 						            </tr>
 						        </tbody>
 						    </table>
@@ -123,6 +134,7 @@
 					            {key:"topic",label:"Thema"},
 					            {key:"functCat",label:"Funkt. Kategorie"},
 					            {key:"rubric",label:"Rubrik"},
+					            {key:"altTitle",label:"Alt. Titel"}
 					        ];
 					
 					        var myDataSource = new YAHOO.util.DataSource(YAHOO.util.Dom.get("urls"));
@@ -132,7 +144,8 @@
 									{key:"url"}, 
 									{key:"topic"}, 
 									{key:"functCat"}, 
-									{key:"rubric"}
+									{key:"rubric"},
+									{key:"altTitle"}
 								]
 					            
 					        };
