@@ -88,7 +88,7 @@
 									        <label>Typ:</label>
 									        <field>
                                                 <c:forEach var="type" items="${datatypes}">
-					                                <c:if test="${type.metadataValue != 'topics' && type.metadataValue != 'service' && type.metadataValue != 'measure'}">
+					                                <c:if test="${type.metadataValue != 'topics' && type.metadataValue != 'service' && type.metadataValue != 'measure' && type.metadataValue != 'www'}">
 					                                    <input type="checkbox" name="limitUrlCommands[${limitUrlCounter}].metadatas" value="${type.id}" /><fmt:message key="${type.metadataKey}.${type.metadataValue}" /><br/>
 					                                </c:if>
                                                 </c:forEach>

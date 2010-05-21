@@ -25,7 +25,7 @@ public class CatalogUrlValidator implements IUrlValidator {
     _supportedMetadatas.put("datatype", new HashSet<String>());
     _supportedMetadatas.put("lang", new HashSet<String>());
     _supportedMetadatas.put("alt_title", new HashSet<String>());
-    _supportedMetadatas.put("topics", new HashSet<String>());
+    _supportedMetadatas.put("topic", new HashSet<String>());
     _supportedMetadatas.put("service", new HashSet<String>());
     _supportedMetadatas.put("measure", new HashSet<String>());
     _supportedMetadatas.put("funct_category", new HashSet<String>());

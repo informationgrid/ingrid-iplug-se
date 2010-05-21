@@ -60,6 +60,7 @@ public class CsvParser implements IUrlFileParser {
 
           if (Boolean.parseBoolean(www)) {
             container.addMetadata(limitUrl, "datatype", "www");
+            container.addMetadata(limitUrl, "datatype", "default");
           }
           if (Boolean.parseBoolean(law)) {
             container.addMetadata(limitUrl, "datatype", "law");
@@ -67,7 +68,6 @@ public class CsvParser implements IUrlFileParser {
           if (Boolean.parseBoolean(research)) {
             container.addMetadata(limitUrl, "datatype", "research");
           }
-          container.addMetadata(limitUrl, "datatype", "default");
           container.addMetadata(limitUrl, "lang", lang);
       }
 
@@ -116,7 +116,7 @@ public class CsvParser implements IUrlFileParser {
       final String[] splits = TokenSplitter.split(topic);
       for (final String split : splits) {
         if (split != null && split.trim().length() > 0) {
-          container.addMetadata(limitUrl, "topics", split);
+          container.addMetadata(limitUrl, "topic", split);
         }
       }
     }
@@ -155,7 +155,7 @@ public class CsvParser implements IUrlFileParser {
   public void parse(final File file) throws Exception {
     _parser = new LineParser(1);
     if (_urlType == UrlType.WEB) {
-      final String[] fields = { "startUrl", "limitUrl", "excludeUrl", "www", "law", "research", "lang" };
+      final String[] fields = { "startUrl", "limitUrl", "excludeUrl", "www", "research", "law", "lang" };
       _parser = new MapParser(_parser, LineParser.KEY, fields);
       _parser = new GroupParser(_parser, "startUrl");
     } else {

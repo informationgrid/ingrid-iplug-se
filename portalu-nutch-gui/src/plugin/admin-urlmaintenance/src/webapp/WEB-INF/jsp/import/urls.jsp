@@ -47,6 +47,16 @@
                         </ul>            
                     </div>
                     <br />
+                    
+                    <c:if test="${!empty importErrors}">
+                        <h2 class="error">Nicht importierte URLs</h2>
+                        <c:forEach items="${importErrors}" var="error">
+                            ${error}<br />                        
+                        </c:forEach>
+                        
+                    </c:if>
+                    
+                <c:if test="${empty importErrors}">
                     <div id="markup"><table id="configurations">
                         <thead>
                             <tr>
@@ -161,6 +171,7 @@
                         </c:when>
                         <c:otherwise><button onclick="document.location='../import/importer.html'">Abbrechen</button></c:otherwise>
                     </c:choose>
+                </c:if>
                 </div>
             </div>
         </div>

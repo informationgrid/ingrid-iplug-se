@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import de.ingrid.iplug.se.urlmaintenance.parse.UrlContainer;
@@ -42,6 +43,8 @@ public class UrlsController extends NavigationSelector {
   private final ICatalogUrlDao _catalogUrlDao;
   private final IProviderDao _providerDao;
   private final IMetadataDao _metadataDao;
+  
+  private List<String> _errorURLs;
 
   @Autowired
   public UrlsController(final IStartUrlDao startUrlDao, final ILimitUrlDao limitUrlDao,
@@ -53,6 +56,7 @@ public class UrlsController extends NavigationSelector {
     _catalogUrlDao = catalogUrlDao;
     _providerDao = providerDao;
     _metadataDao = metadataDao;
+    _errorURLs = new ArrayList<String>();
   }
 
   @ModelAttribute("containerCommand")
@@ -64,9 +68,17 @@ public class UrlsController extends NavigationSelector {
     return command;
   }
 
+  @ModelAttribute("importErrors")
+  public List<String> errorURLList() {
+      return _errorURLs;
+  }
+  
   @RequestMapping(value = "/import/urls.html", method = RequestMethod.GET)
-  public String get() {
-    return "import/urls";
+  public String get(@RequestParam(value = "state", required = false) final String state) {
+      // clear errors we didn't come from the post-call!
+      if (!"failed".equals(state))
+          _errorURLs.clear();
+      return "import/urls";
   }
 
   @RequestMapping(value = "/import/urls.html", method = RequestMethod.POST)
@@ -75,11 +87,16 @@ public class UrlsController extends NavigationSelector {
       return "redirect:/import/importer.html?state=failed";
     }
 
+    _errorURLs.clear();
     for (final UrlContainer container : command.getContainers().keySet()) {
       saveContainer(container);
     }
     command.clear();
-    return "redirect:/import/importer.html?state=succeed";
+    
+    if (_errorURLs.isEmpty())
+        return "redirect:/import/importer.html?state=succeed";
+    
+    return "redirect:/import/urls.html?state=failed";        
   }
 
   private void saveContainer(final UrlContainer container) {
@@ -124,6 +141,7 @@ public class UrlsController extends NavigationSelector {
         _startUrlDao.makePersistent(startUrl);
     } catch (Exception e) {
         // FIXME: remember url and present the user
+        _errorURLs.add(container.getStartUrl().getUrl());
         System.out.println("Problem saving url: " + container.getStartUrl());
     }
   }
@@ -182,7 +200,7 @@ public class UrlsController extends NavigationSelector {
     
         _catalogUrlDao.makePersistent(url);
     } catch (Exception e) {
-        // FIXME: remember url and present the user
+        _errorURLs.add(container.getMetadatas().keySet().toString());
         System.out.println("Problem saving url: " + container.getStartUrl());
     }
   }
@@ -205,10 +223,15 @@ public class UrlsController extends NavigationSelector {
             }
           }
         } else {
-            /*final Metadata meta = new Metadata(key, map.get(key).toString());
-            if (meta != null) {
-                data.add(meta);
-            }*/
+            // alternative title normally have to be added to the metadatas
+            // and do not exist beforehand
+            for (final String value : map.get(key)) {
+                // create new metadata if it doesn't exist
+                if (!_metadataDao.exists("alt_title", value))
+                    _metadataDao.makePersistent(new Metadata("alt_title", value));
+                
+                data.add(_metadataDao.getByKeyAndValue("alt_title", value));
+            }
         }
       }
     }
