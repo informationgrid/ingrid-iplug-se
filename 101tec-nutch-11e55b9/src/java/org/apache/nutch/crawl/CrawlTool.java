@@ -237,7 +237,10 @@ public class CrawlTool {
     // ------ none nutch-specific code ends here
 
     if (mergeSegments.length > 0) {
-      linkDbTool.invert(linkDb, mergeSegments, true, true, false); // invert links
+      if (LOG.isDebugEnabled()) {
+          LOG.debug("Inverting links.");
+      }
+        linkDbTool.invert(linkDb, mergeSegments, true, true, false); // invert links
 
       if (indexes != null) {
         // Delete old indexes
@@ -254,13 +257,22 @@ public class CrawlTool {
       }
 
       // index, dedup & merge
+      if (LOG.isDebugEnabled()) {
+          LOG.debug("Create index...");
+      }
       indexer.index(indexes, crawlDb, linkDb, Arrays.asList(mergeSegments));
       if (indexes != null) {
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Dedup index...");
+        }
         dedup.dedup(new Path[] { indexes });
         FileStatus[] fstats = _fileSystem.listStatus(indexes, HadoopFSUtil
                 .getPassDirectoriesFilter(_fileSystem));
         Path tmpDir = new Path(_configuration.get("mapred.temp.dir", ".")
                 + CrawlTool.class.getName() + "_mergeIndex");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Merge index...");
+        }
         merger.merge(HadoopFSUtil.getPaths(fstats), index, tmpDir);
       }
     } else {
@@ -270,6 +282,9 @@ public class CrawlTool {
     // delete old segments (after indexing so searching is meanwhile still possible)
     if (segmentsToDelete != null) {
       for (Path p : segmentsToDelete) {
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Delete old index: " + p);
+        }
         _fileSystem.delete(p, true);
       }
     }
