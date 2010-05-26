@@ -1306,4 +1306,10 @@
     <description>If true, scheduling will create each time a new crawl. Otherwise the last created crawl will be continued. If now crawls exist by now, the scheduler will create one.</description>
 </property>
 
+<property>
+	<name>crawl.generate.filter</name>
+	<value>true</value>
+	<description>If set true (default) all URLs generated into a fetch list of a segment will be filtered by the filters defined in 'urlfilter.regex.file'.</description>
+</property>
+
 </configuration>

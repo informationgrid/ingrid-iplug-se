@@ -23,21 +23,12 @@
   </description>
 </property>
 
-
 <property>
   <name>merge.after.fetch</name>
   <value>true</value>
   <description>If true, then segments of crawl are merged after fetch is complete.
   </description>
 </property>
-
-<property>
-  <name>ingrid.fetcher.log.url.status</name>
-  <value>false</value>
-  <description>If true, every fetched URL is logged with it's status in DB.
-  </description>
-</property>
-
 
 <property>
   <name>index.sns</name>
@@ -263,5 +254,12 @@
 	<value>101,400-417,500-505</value>
 	<description>Comma seperated http codes, that will be included into the url report mail. You can also define ranges by seperating two codes with a hyphen.</description>
 </property>
+
+<property>
+	<name>crawl.generate.filter</name>
+	<value>false</value>
+	<description>If set true (default) all URLs generated into a fetch list of a segment will be filtered by the filters defined in 'urlfilter.regex.file'.</description>
+</property>
+
 
 </configuration>
