@@ -149,7 +149,7 @@
 
 <property>
   <name>generate.max.per.host</name>
-  <value>1000</value>
+  <value>20000</value>
   <description>The maximum number of urls per host in a single
   fetchlist.  -1 if unlimited.</description>
 </property>
@@ -176,7 +176,7 @@
 
 <property>
   <name>fetcher.threads.per.host</name>
-  <value>2</value>
+  <value>3</value>
   <description>This number is the maximum number of threads that
     should be allowed to access a host at one time.</description>
 </property>
@@ -260,6 +260,5 @@
 	<value>false</value>
 	<description>If set true (default) all URLs generated into a fetch list of a segment will be filtered by the filters defined in 'urlfilter.regex.file'.</description>
 </property>
-
 
 </configuration>

@@ -89,6 +89,8 @@ public final class URLNormalizers {
   public static final String SCOPE_FETCHER = "fetcher";
   /** Scope used when updating the CrawlDb with new URLs. */
   public static final String SCOPE_CRAWLDB = "crawldb";
+  /** Scope used when updating the extracting outlinks from parsed data and update the CrawlDb based on BW db. */
+  public static final String SCOPE_BWDB = "bwdb";
   /** Scope used when updating the LinkDb with new URLs. */
   public static final String SCOPE_LINKDB = "linkdb";
   /** Scope used by {@link org.apache.nutch.crawl.Injector}. */

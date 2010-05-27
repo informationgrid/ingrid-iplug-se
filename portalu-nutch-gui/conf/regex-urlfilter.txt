@@ -26,7 +26,7 @@
 -\.(gif|GIF|jpg|JPG|png|PNG|ico|ICO|css|sit|eps|wmf|mpg|gz|rpm|tgz|mov|MOV|exe|jpeg|JPEG|bmp|BMP|mp3|mp4|m4a|wav|WAV)$
 
 # skip URLs containing certain characters as probable queries, etc.
--[?*!@=]
+#-[?*!@=]
 
 # skip URLs with slash-delimited segment that repeats 3+ times, to break loops
 -.*(/[^/]+)/[^/]+\1/[^/]+\1/
@@ -35,7 +35,7 @@
 -^(file|ftp|mailto):
 
 # skip urls longer than 512 characters
--.*{512}
+-^.{512,}$
 
 # ingrid specific filter
 -^(http://www.roadmap-it.de/)

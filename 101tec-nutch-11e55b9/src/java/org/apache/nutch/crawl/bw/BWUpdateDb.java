@@ -51,6 +51,8 @@ import org.apache.hadoop.util.Progressable;
 import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.crawl.CrawlDb;
 import org.apache.nutch.crawl.CrawlDbFilter;
+import org.apache.nutch.net.URLFilters;
+import org.apache.nutch.net.URLNormalizers;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
 
@@ -202,13 +204,61 @@ public class BWUpdateDb extends Configured {
      * same job
      */
     public static class FormatConverter implements Mapper<HostTypeKey, ObjectWritable, Text, CrawlDatum> {
+        
+        public static final String URL_FILTERING = "bwupdatedb.url.filters";
+
+        public static final String URL_NORMALIZING = "bwupdatedb.url.normalizers";
+
+        public static final String URL_NORMALIZING_SCOPE = "bwupdatedb.url.normalizers.scope";
+        
+        private boolean urlFiltering;
+        
+        private boolean urlNormalizers;
+  
+        private URLFilters filters;
+  
+        private URLNormalizers normalizers;
+        
+        private String scope;
+
+        private Text newKey = new Text();
+      
         public void map(HostTypeKey key, ObjectWritable value, OutputCollector<Text, CrawlDatum> out, Reporter rep)
                 throws IOException {
             Entry entry = (Entry) value.get();
-            out.collect(entry._url, entry._crawlDatum);
+            String url = entry._url.toString();
+            if (urlNormalizers) {
+              try {
+                url = normalizers.normalize(url, scope); // normalize the url
+              } catch (Exception e) {
+                LOG.warn("Skipping " + url + ":" + e);
+                url = null;
+              }
+            }
+            if (url != null && urlFiltering) {
+              try {
+                url = filters.filter(url); // filter the url
+              } catch (Exception e) {
+                LOG.warn("Skipping " + url + ":" + e);
+                url = null;
+              }
+            }
+            if (url != null) { // if it passes
+              newKey.set(url); // collect it
+              out.collect(newKey, entry._crawlDatum);
+            }
         }
 
-        public void configure(JobConf arg0) {
+        public void configure(JobConf job) {
+          urlFiltering = job.getBoolean(URL_FILTERING, false);
+          urlNormalizers = job.getBoolean(URL_NORMALIZING, false);
+          if (urlFiltering) {
+            filters = new URLFilters(job);
+          }
+          if (urlNormalizers) {
+            scope = job.get(URL_NORMALIZING_SCOPE, URLNormalizers.SCOPE_BWDB);
+            normalizers = new URLNormalizers(job, scope);
+          }
         }
 
         public void close() throws IOException {
@@ -328,6 +378,8 @@ public class BWUpdateDb extends Configured {
         convertJob.setOutputFormat(MapFileOutputFormat.class);
         convertJob.setOutputKeyClass(Text.class);
         convertJob.setOutputValueClass(CrawlDatum.class);
+        convertJob.setBoolean(FormatConverter.URL_FILTERING, filter);
+        convertJob.setBoolean(FormatConverter.URL_NORMALIZING, normalize);
         JobClient.runJob(convertJob);
 
         // 
@@ -336,8 +388,11 @@ public class BWUpdateDb extends Configured {
         JobConf updateJob = CrawlDb.createJob(getConf(), crawlDb);
         boolean additionsAllowed = getConf().getBoolean(CrawlDb.CRAWLDB_ADDITIONS_ALLOWED, true);
         updateJob.setBoolean(CrawlDb.CRAWLDB_ADDITIONS_ALLOWED, additionsAllowed);
-        updateJob.setBoolean(CrawlDbFilter.URL_FILTERING, filter);
-        updateJob.setBoolean(CrawlDbFilter.URL_NORMALIZING, normalize);
+        // do not filter/normalize URLs from crawl db again. Presume all 
+        // urls in crawldb are filtered/normalized
+        // joachim@wemove.com at 27.05.2010
+        // updateJob.setBoolean(CrawlDbFilter.URL_FILTERING, filter);
+        // updateJob.setBoolean(CrawlDbFilter.URL_NORMALIZING, normalize);
 
         FileInputFormat.addInputPath(updateJob, tmpFormatOut);
         LOG.info("bw update: Merging bw filtered segment data into db.");
