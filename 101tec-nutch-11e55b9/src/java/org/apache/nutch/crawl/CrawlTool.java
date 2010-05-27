@@ -240,7 +240,9 @@ public class CrawlTool {
       if (LOG.isDebugEnabled()) {
           LOG.debug("Inverting links.");
       }
-        linkDbTool.invert(linkDb, mergeSegments, true, true, false); // invert links
+      // no need of filtering/normalizing URLs again, all base data has been filtered/normalized
+      // linkDbTool.invert(linkDb, mergeSegments, true, true, false); // invert links
+      linkDbTool.invert(linkDb, mergeSegments, false, false, false); // invert links
 
       if (indexes != null) {
         // Delete old indexes

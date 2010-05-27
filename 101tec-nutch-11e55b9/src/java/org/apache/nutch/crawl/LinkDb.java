@@ -178,11 +178,7 @@ public class LinkDb extends Configured implements Tool, Mapper<Text, ParseData, 
       }
       // try to merge
       Path newLinkDb = FileOutputFormat.getOutputPath(job);
-      // presume all urls in current link db AND new link db are filtered/normalized
-      // no need to filter/normalize again
-      // joachim@wemove.com at 27.05.2010
-      // job = LinkDbMerger.createMergeJob(getConf(), linkDb, normalize, filter);
-      job = LinkDbMerger.createMergeJob(getConf(), linkDb, false, false);
+      job = LinkDbMerger.createMergeJob(getConf(), linkDb, normalize, filter);
       FileInputFormat.addInputPath(job, currentLinkDb);
       FileInputFormat.addInputPath(job, newLinkDb);
       try {
