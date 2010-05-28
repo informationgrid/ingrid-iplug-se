@@ -23,7 +23,7 @@ public class UrlStatusUpdateServiceTest extends TestCase {
 
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    _urlStatusUpdateService = new UrlStatusUpdateService(_transactionService, _urlDao);
+    _urlStatusUpdateService = new UrlStatusUpdateService(_transactionService, _urlDao, null);
   }
 
   public void testPoll_validUrl() throws InterruptedException {

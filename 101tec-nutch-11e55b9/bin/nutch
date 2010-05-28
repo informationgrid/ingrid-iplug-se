@@ -55,6 +55,7 @@ if [ $# = 0 ]; then
   echo "  plugin            load a plugin and run one of its classes main()"
   echo "  server            run a search server"
   echo "  admin             run the administration ui"
+    echo "  migrate          migrate URLs from old SE"
   echo " or"
   echo "  CLASSNAME         run the class named CLASSNAME"
   echo "Most commands print help when invoked w/o parameters."
@@ -147,6 +148,14 @@ done
 for f in $NUTCH_HOME/lib/admin-ui-ext/*.jar; do
   CLASSPATH=${CLASSPATH}:$f;
 done
+
+# add admin-urlmaintenance plugin lib
+for f in $NUTCH_HOME/plugins/admin-urlmaintenance/*.jar; do
+  CLASSPATH=${CLASSPATH}:$f;
+done
+
+# add META-INF/persistence.xml to classpath
+CLASSPATH=$NUTCH_HOME/plugins/admin-urlmaintenance/conf:${CLASSPATH}
 
 # cygwin path translation
 if $cygwin; then
@@ -250,9 +259,13 @@ elif [ "$COMMAND" = "server" ] ; then
   CLASS='org.apache.nutch.searcher.DistributedSearch$Server'
 elif [ "$COMMAND" = "admin" ] ; then
   CLASS=org.apache.nutch.admin.AdministrationApplication  
+elif [ "$COMMAND" = "migrate" ] ; then
+  CLASS=de.ingrid.iplug.se.urlmaintenance.importer.Migrator 
 else
   CLASS=$COMMAND
 fi
+
+echo "Classpath: $CLASSPATH"
 
 # run it
 exec "$JAVA" $JAVA_HEAP_MAX $NUTCH_OPTS -classpath "$CLASSPATH" $CLASS "$@"

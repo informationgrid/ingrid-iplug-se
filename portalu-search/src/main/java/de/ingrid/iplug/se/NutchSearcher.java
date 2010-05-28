@@ -101,6 +101,10 @@ public class NutchSearcher implements IPlug {
         _scanner.cancel();
     }
     _scanner = new SearchUpdateScanner(workinDirectory, _searcherFactory, 60000);
+    
+    // warm-up
+    // seems not to be necessary in new SE
+    //search(new IngridQuery(), 1, 1);
   }
 
   /*
@@ -110,6 +114,7 @@ public class NutchSearcher implements IPlug {
    * int, int)
    */
   public IngridHits search(IngridQuery query, int start, int length) throws Exception {
+    long startTimer = System.currentTimeMillis();
     _processorPipe.preProcess(query);
     Query nutchQuery = new Query(_configuration);
     buildNutchQuery(query, nutchQuery);
@@ -140,6 +145,10 @@ public class NutchSearcher implements IPlug {
     IngridHits translateHits = translateHits(searcher, hits, start, max, query.getGrouped());
     IngridHit[] ingridHits = translateHits.getHits();
     _processorPipe.postProcess(query, ingridHits);
+    
+    if (LOG.isDebugEnabled()) {
+        LOG.debug("SE Search: finished after " + (System.currentTimeMillis() - startTimer) + " ms");
+    }
 
     return translateHits;
   }

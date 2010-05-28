@@ -3,5 +3,5 @@
   <string>IPLUG_ADMIN_GUI_PORT</string>
   <int>50060</int>
   <string>workingDirectory</string>
-  <string>.</string>
+  <string>./nutch-instances</string>
 </de.ingrid.utils.PlugDescription>

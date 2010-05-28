@@ -58,6 +58,22 @@ public class UrlsController extends NavigationSelector {
     _metadataDao = metadataDao;
     _errorURLs = new ArrayList<String>();
   }
+  
+  /**
+   * This constructor only is used by the external importer, which migrates
+   * URLs from an old iplug-SE
+   */
+  public UrlsController(final IStartUrlDao startUrlDao, final ILimitUrlDao limitUrlDao,
+          final IExcludeUrlDao excludeUrlDao, final ICatalogUrlDao catalogUrlDao, final IProviderDao providerDao,
+          final IMetadataDao metadataDao, boolean extern) {
+      _startUrlDao = startUrlDao;
+      _limitUrlDao = limitUrlDao;
+      _excludeUrlDao = excludeUrlDao;
+      _catalogUrlDao = catalogUrlDao;
+      _providerDao = providerDao;
+      _metadataDao = metadataDao;
+      _errorURLs = new ArrayList<String>();      
+  }
 
   @ModelAttribute("containerCommand")
   public ContainerCommand injectContainerCommand(final HttpSession session) {
@@ -99,7 +115,7 @@ public class UrlsController extends NavigationSelector {
     return "redirect:/import/urls.html?state=failed";        
   }
 
-  private void saveContainer(final UrlContainer container) {
+  public void saveContainer(final UrlContainer container) {
     switch (container.getUrlType()) {
     case WEB:
       saveWebUrl(container);
@@ -227,10 +243,10 @@ public class UrlsController extends NavigationSelector {
             // and do not exist beforehand
             for (final String value : map.get(key)) {
                 // create new metadata if it doesn't exist
-                if (!_metadataDao.exists("alt_title", value))
+                if (value != null && !_metadataDao.exists("alt_title", value)) {
                     _metadataDao.makePersistent(new Metadata("alt_title", value));
-                
-                data.add(_metadataDao.getByKeyAndValue("alt_title", value));
+                    data.add(_metadataDao.getByKeyAndValue("alt_title", value));
+                }
             }
         }
       }

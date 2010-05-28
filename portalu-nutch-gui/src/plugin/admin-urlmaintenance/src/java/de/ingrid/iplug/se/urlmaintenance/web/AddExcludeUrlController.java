@@ -1,12 +1,11 @@
 package de.ingrid.iplug.se.urlmaintenance.web;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 
 import org.apache.nutch.admin.NavigationSelector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +19,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IExcludeUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.validation.WebUrlCommandValidator;
 
 @Controller
-@SessionAttributes(value = { "partnerProviderCommand", "startUrlCommand" })
+@SessionAttributes(value = { "partnerProviderCommand", "startUrlCommand", "newLimitUrl", "newExcludeUrl" })
 public class AddExcludeUrlController extends NavigationSelector {
 
   private final IExcludeUrlDao _excludeUrlDao;
@@ -31,17 +30,29 @@ public class AddExcludeUrlController extends NavigationSelector {
     _excludeUrlDao = excludeUrlDao;
     _validator = validator;
   }
+  
+  @ModelAttribute("newExcludeUrl")
+  public ExcludeUrlCommand injectLimitUrlCommand() {
+    ExcludeUrlCommand excludeUrlCommand = new ExcludeUrlCommand(_excludeUrlDao);
+    return excludeUrlCommand;
+  }
 
   @RequestMapping(value = "/web/addExcludeUrl.html", method = RequestMethod.GET)
-  public String addExcludeUrl(@ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand) {
+  public String addExcludeUrl(@ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand,
+          Model model) {
+    //model.addAttribute("excludeUrls", startUrlCommand.getExcludeUrlCommands());
+    //model.addAttribute("newExcludeUrl", new ExcludeUrlCommand(_excludeUrlDao));
     return "web/addExcludeUrl";
   }
 
   @RequestMapping(value = "/web/addExcludeUrl.html", method = RequestMethod.POST)
-  public String postAddExcludeUrl(@ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand, Errors errors) {
+  public String postAddExcludeUrl(@ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand,
+          @ModelAttribute("newExcludeUrl") ExcludeUrlCommand excludeUrlCommand, Errors errors,
+          @RequestParam(value = "excludeUrl", required = false) final String excludeUrl) {
     // add new command to fill out
-    ExcludeUrlCommand excludeUrlCommand = new ExcludeUrlCommand(_excludeUrlDao);
+    //ExcludeUrlCommand excludeUrlCommand = new ExcludeUrlCommand(_excludeUrlDao);
     excludeUrlCommand.setProvider(startUrlCommand.getProvider());
+    excludeUrlCommand.setUrl(excludeUrl);
     
     if (_validator.validateExcludeUrl(errors).hasErrors()) {
         return "web/addExcludeUrl";

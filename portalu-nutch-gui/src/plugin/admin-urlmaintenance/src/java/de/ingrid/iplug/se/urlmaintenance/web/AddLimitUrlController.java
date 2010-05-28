@@ -1,13 +1,12 @@
 package de.ingrid.iplug.se.urlmaintenance.web;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 
 import org.apache.nutch.admin.NavigationSelector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.Errors;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -26,7 +25,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
 import de.ingrid.iplug.se.urlmaintenance.validation.WebUrlCommandValidator;
 
 @Controller
-@SessionAttributes(value = { "partnerProviderCommand", "startUrlCommand" })
+@SessionAttributes(value = { "partnerProviderCommand", "startUrlCommand", "newLimitUrl" })
 public class AddLimitUrlController extends NavigationSelector {
 
   private final IMetadataDao _metadataDao;
@@ -54,20 +53,37 @@ public class AddLimitUrlController extends NavigationSelector {
   public List<Metadata> injectDatatypes() {
     return _metadataDao.getByKey("datatype");
   }
+  
+  @ModelAttribute("newLimitUrl")
+  public LimitUrlCommand injectLimitUrlCommand() {
+    LimitUrlCommand limitUrlCommand = new LimitUrlCommand(_limitUrlDao);
+    return limitUrlCommand;
+  }
 
   @RequestMapping(value = "/web/addLimitUrl.html", method = RequestMethod.GET)
-  public String addLimitUrl(@ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand) {
+  public String addLimitUrl(@ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand,
+          Model model) {
     return "web/addLimitUrl";
   }
 
   @RequestMapping(value = "/web/addLimitUrl.html", method = RequestMethod.POST)
-  public String postAddLimitUrl(@ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand, Errors errors,
-      @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand) {
-    // add new command to fill out
-    LimitUrlCommand limitUrlCommand = new LimitUrlCommand(_limitUrlDao);
+  public String postAddLimitUrl(@ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand,
+          @ModelAttribute("newLimitUrl") LimitUrlCommand limitUrlCommand, BindingResult errorsLimit,
+      @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand,
+      @RequestParam(value = "limitUrl", required = false) final String limitUrl) {
     limitUrlCommand.setProvider(startUrlCommand.getProvider());
+    limitUrlCommand.setUrl(limitUrl);
+    
+    // add datatype:www if datatype:default is present
+    List<Metadata> metas = limitUrlCommand.getMetadatas();
+    for (Metadata meta : metas) {
+        if (meta.getMetadataKey().equals("datatype") && meta.getMetadataValue().equals("default")) {
+            metas.add( _metadataDao.getByKeyAndValue("datatype", "www"));
+            break;
+        }        
+    }
 
-    if (_validator.validateLimitUrl(errors).hasErrors()) {
+    if (_validator.validateLimitUrl(errorsLimit).hasErrors()) {
       return "web/addLimitUrl";
     }
     

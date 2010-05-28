@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 
-import de.ingrid.iplug.se.urlmaintenance.commandObjects.ExcludeUrlCommand;
-import de.ingrid.iplug.se.urlmaintenance.commandObjects.LimitUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.StartUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
@@ -50,26 +48,22 @@ public class WebUrlCommandValidator extends AbstractValidator<StartUrlCommand> {
 
     @SuppressWarnings("unchecked")
     public Errors validateLimitUrl(final Errors errors) {
-        final List<LimitUrlCommand> commands = (List<LimitUrlCommand>) get(errors, "limitUrlCommands");
-        final int index = commands.size() - 1;
-        final LimitUrlCommand limitUrl = commands.get(index);
-        
-        final String url = limitUrl.getUrl();
+        final String url = (String)get(errors, "url");//limitUrl.getUrl();
         if (url == null || url.length() == 0) {
-            errors.rejectValue("limitUrlCommands[" + index + "].url", getErrorKey(_typeClass, "limitUrl.url", IErrorKeys.EMPTY));
+            errors.rejectValue("url", getErrorKey(_typeClass, "limitUrl.url", IErrorKeys.EMPTY));
         } else {
             try {
                 new URL(url);
             } catch (final MalformedURLException e) {
-                errors.rejectValue("limitUrlCommands[" + index + "].url", getErrorKey(_typeClass, "limitUrl.url", IErrorKeys.MALFORMED));
+                errors.rejectValue("url", getErrorKey(_typeClass, "limitUrl.url", IErrorKeys.MALFORMED));
             }
         }
-        final Provider provider = limitUrl.getProvider();
+        final Provider provider = (Provider)get(errors, "provider");//limitUrl.getProvider();
         if (provider == null) {
-            errors.rejectValue("limitUrlCommands[" + index + "].provider", getErrorKey(_typeClass, "limitUrl.provider", IErrorKeys.NULL));
+            errors.rejectValue("provider", getErrorKey(_typeClass, "limitUrl.provider", IErrorKeys.NULL));
         }
 
-        final List<Metadata> metadatas = limitUrl.getMetadatas();
+        final List<Metadata> metadatas = (List<Metadata>)get(errors, "metadatas");//limitUrl.getMetadatas();
         boolean hasDatatype = false;
         boolean hasLang = false;
         for (final Metadata m : metadatas) {
@@ -81,12 +75,12 @@ public class WebUrlCommandValidator extends AbstractValidator<StartUrlCommand> {
             }
         }
         if (!hasLang) {
-            errors.rejectValue("limitUrlCommands[" + index + "].metadatas", getErrorKey(_typeClass,
+            errors.rejectValue("metadatas", getErrorKey(_typeClass,
                     "limitUrl.metadatas", "lang." + IErrorKeys.MISSING));
         }
 
         if (!hasDatatype) {
-            errors.rejectValue("limitUrlCommands[" + index + "].metadatas", getErrorKey(_typeClass, "limitUrl.metadatas", "datatype." + IErrorKeys.MISSING));
+            errors.rejectValue("metadatas", getErrorKey(_typeClass, "limitUrl.metadatas", "datatype." + IErrorKeys.MISSING));
         }
 
         return errors;
@@ -94,23 +88,19 @@ public class WebUrlCommandValidator extends AbstractValidator<StartUrlCommand> {
     
     @SuppressWarnings("unchecked")
     public Errors validateExcludeUrl(final Errors errors) {
-        final List<ExcludeUrlCommand> commands = (List<ExcludeUrlCommand>) get(errors, "excludeUrlCommands");
-        final int index = commands.size() - 1;
-        final ExcludeUrlCommand excludeUrl = commands.get(index);
-        
-        final String url = excludeUrl.getUrl();
+        final String url = (String)get(errors, "url");//excludeUrl.getUrl();
         if (url == null || url.length() == 0) {
-            errors.rejectValue("excludeUrlCommands[" + index + "].url", getErrorKey(_typeClass, "excludeUrl.url", IErrorKeys.EMPTY));
+            errors.rejectValue("url", getErrorKey(_typeClass, "excludeUrl.url", IErrorKeys.EMPTY));
         } else {
             try {
                 new URL(url);
             } catch (final MalformedURLException e) {
-                errors.rejectValue("excludeUrlCommands[" + index + "].url", getErrorKey(_typeClass, "excludeUrl.url", IErrorKeys.MALFORMED));
+                errors.rejectValue("url", getErrorKey(_typeClass, "excludeUrl.url", IErrorKeys.MALFORMED));
             }
         }
-        final Provider provider = excludeUrl.getProvider();
+        final Provider provider = (Provider)get(errors, "provider");//excludeUrl.getProvider();
         if (provider == null) {
-            errors.rejectValue("excludeUrlCommands[" + index + "].provider", getErrorKey(_typeClass, "excludeUrl.provider", IErrorKeys.NULL));
+            errors.rejectValue("provider", getErrorKey(_typeClass, "excludeUrl.provider", IErrorKeys.NULL));
         }
         
         return errors;

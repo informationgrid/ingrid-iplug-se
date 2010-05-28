@@ -61,9 +61,10 @@ public class UrlMaintenanceController extends NavigationSelector {
 
   @RequestMapping(method = RequestMethod.GET)
   public String urlMaintenance(@RequestParam(value = "error", required = false) final String error, HttpServletRequest httpRequest, Model model) {
+    List<Map<String, Serializable>> allPartnerWithProvider = null;
     Principal userPrincipal = httpRequest.getUserPrincipal();
     if (userPrincipal != null && userPrincipal instanceof PortaluPrincipal) {
-      List<Map<String, Serializable>> allPartnerWithProvider = ((PortaluPrincipal) userPrincipal)
+      allPartnerWithProvider = ((PortaluPrincipal) userPrincipal)
           .getAllPartnerWithProvider();
       if (allPartnerWithProvider != null && allPartnerWithProvider.size() > 0) {
         try {
@@ -71,10 +72,12 @@ public class UrlMaintenanceController extends NavigationSelector {
         } catch (Throwable ex) {
           LOG.error("Can not sync DB with partner/provider from ibus.", ex);
         }
+        
+        
       }
     }
     model.addAttribute("partnerProviderCommand", new PartnerProviderCommand());
-    List<Partner> partners = _partnerDao.getAll();
+    List<Partner> partners = filterByRights(allPartnerWithProvider, _partnerDao.getAll());
     model.addAttribute("partners", partners);
     model.addAttribute("error", error);
 
@@ -82,7 +85,27 @@ public class UrlMaintenanceController extends NavigationSelector {
     return "urlmaintenance";
   }
 
-  private String createPartnerAndProviderJsonMap() {
+  /**
+   * Only show the partner the user is supposed to see.
+   * 
+   * @param partnerWithProvider, are those partner the user is associated with
+   * @param allPartner, are all available partner
+   * @return
+   */
+  private List<Partner> filterByRights(List<Map<String, Serializable>> partnerWithProvider,
+        List<Partner> allPartner) {
+      List<Partner> filteredList = new ArrayList<Partner>();
+      for (Partner partner : allPartner) {
+          for (Map<String, Serializable> map : partnerWithProvider) {
+              if (map.get("partnerid").equals(partner.getShortName()))
+                  filteredList.add(partner);
+          }
+      }
+      
+      return filteredList;
+  }
+
+private String createPartnerAndProviderJsonMap() {
     StringWriter stringWriter = new StringWriter();
     try {
       JsonGenerator jsonGenerator = new ObjectMapper().getJsonFactory().createJsonGenerator(stringWriter);
