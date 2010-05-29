@@ -201,6 +201,11 @@ public class ParseOutputFormat implements OutputFormat<Text, Parse> {
               if (toUrl == null) {
                 continue;
               }
+              // ignore links to self AFTER normalizing/filtering
+              // joachim@wemove.com at 20100528
+              if (fromUrl.equals(toUrl)) {
+                  continue;
+                }
             } catch (Exception e) {
               continue;
             }

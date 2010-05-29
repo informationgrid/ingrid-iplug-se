@@ -32,6 +32,7 @@ import org.apache.hadoop.conf.*;
 import org.apache.hadoop.mapred.*;
 import org.apache.hadoop.util.*;
 
+import org.apache.nutch.fetcher.Fetcher;
 import org.apache.nutch.net.URLFilters;
 import org.apache.nutch.net.URLNormalizers;
 import org.apache.nutch.parse.*;
@@ -50,6 +51,7 @@ public class LinkDb extends Configured implements Tool, Mapper<Text, ParseData, 
 
   private int maxAnchorLength;
   private boolean ignoreInternalLinks;
+  private boolean normalizeAndFilterOutLinks;
   private URLFilters urlFilters;
   private URLNormalizers urlNormalizers;
   
@@ -67,6 +69,11 @@ public class LinkDb extends Configured implements Tool, Mapper<Text, ParseData, 
     }
     if (job.getBoolean(LinkDbFilter.URL_NORMALIZING, false)) {
       urlNormalizers = new URLNormalizers(job, URLNormalizers.SCOPE_LINKDB);
+    }
+    if (Fetcher.isParsing(job)) {
+        normalizeAndFilterOutLinks = false;
+    } else {
+        normalizeAndFilterOutLinks = true;
     }
   }
 
@@ -106,21 +113,27 @@ public class LinkDb extends Configured implements Tool, Mapper<Text, ParseData, 
           continue;                               // skip it
         }
       }
-      if (urlNormalizers != null) {
-        try {
-          toUrl = urlNormalizers.normalize(toUrl, URLNormalizers.SCOPE_LINKDB); // normalize the url
-        } catch (Exception e) {
-          LOG.warn("Skipping " + toUrl + ":" + e);
-          toUrl = null;
-        }
-      }
-      if (toUrl != null && urlFilters != null) {
-        try {
-          toUrl = urlFilters.filter(toUrl); // filter the url
-        } catch (Exception e) {
-          LOG.warn("Skipping " + toUrl + ":" + e);
-          toUrl = null;
-        }
+      
+      // Filter outlinks only if if necessary. If the Fetcher is parsing the
+      // outlinks are already normalized and filtered
+      // joachim@wemove.com at 20100528
+      if (normalizeAndFilterOutLinks) {
+          if (urlNormalizers != null) {
+            try {
+              toUrl = urlNormalizers.normalize(toUrl, URLNormalizers.SCOPE_LINKDB); // normalize the url
+            } catch (Exception e) {
+              LOG.warn("Skipping " + toUrl + ":" + e);
+              toUrl = null;
+            }
+          }
+          if (toUrl != null && urlFilters != null) {
+            try {
+              toUrl = urlFilters.filter(toUrl); // filter the url
+            } catch (Exception e) {
+              LOG.warn("Skipping " + toUrl + ":" + e);
+              toUrl = null;
+            }
+          }
       }
       if (toUrl == null) continue;
       inlinks.clear();
@@ -178,7 +191,11 @@ public class LinkDb extends Configured implements Tool, Mapper<Text, ParseData, 
       }
       // try to merge
       Path newLinkDb = FileOutputFormat.getOutputPath(job);
-      job = LinkDbMerger.createMergeJob(getConf(), linkDb, normalize, filter);
+      // presume all urls in current link db AND new link db are filtered/normalized
+      // no need to filter/normalize again
+      // joachim@wemove.com at 27.05.2010
+      // job = LinkDbMerger.createMergeJob(getConf(), linkDb, normalize, filter);
+      job = LinkDbMerger.createMergeJob(getConf(), linkDb, false, false);
       FileInputFormat.addInputPath(job, currentLinkDb);
       FileInputFormat.addInputPath(job, newLinkDb);
       try {
