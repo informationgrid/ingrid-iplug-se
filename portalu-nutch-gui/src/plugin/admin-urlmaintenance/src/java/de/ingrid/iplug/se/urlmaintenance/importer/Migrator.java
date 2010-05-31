@@ -2,11 +2,13 @@ package de.ingrid.iplug.se.urlmaintenance.importer;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.ingrid.ibus.client.BusClientFactory;
 import de.ingrid.iplug.se.urlmaintenance.parse.CsvParser;
 import de.ingrid.iplug.se.urlmaintenance.parse.IUrlFileParser;
 import de.ingrid.iplug.se.urlmaintenance.parse.UrlContainer;
@@ -17,14 +19,24 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ICatalogUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IExcludeUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ILimitUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IMetadataDao;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IPartnerDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IProviderDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.LimitUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.MetadataDao;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.PartnerDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ProviderDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.StartUrlDao;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.UrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
+import de.ingrid.iplug.se.urlmaintenance.service.PartnerAndProviderDbSyncService;
+import de.ingrid.iplug.util.TimeProvider;
+import de.ingrid.utils.IBus;
+import de.ingrid.utils.IngridHit;
+import de.ingrid.utils.IngridHits;
+import de.ingrid.utils.query.IngridQuery;
+import de.ingrid.utils.queryparser.QueryStringParser;
 
 public class Migrator {
     
@@ -37,6 +49,8 @@ public class Migrator {
     private IExcludeUrlDao   excludeUrlDao;
     private ICatalogUrlDao   catalogUrlDao;
     private IMetadataDao     metadataDao;
+    private IPartnerDao      partnerDao;
+    private UrlDao           urlDao;
     
     private Map<String, Long>   providerMap             = new HashMap<String, Long>();
     private List<String>        notImportedFiles        = new ArrayList<String>();
@@ -47,9 +61,11 @@ public class Migrator {
     
     private WebUrlValidator     webUrlValidator;
     private CatalogUrlValidator catalogUrlValidator;
+  
     
     
-    public Migrator() {
+    
+    public Migrator(String communicationFile) throws Exception {
         webContainerCommand = new ContainerCommand();
         webContainerCommand.setType(UrlContainer.UrlType.WEB);
         
@@ -64,10 +80,23 @@ public class Migrator {
         excludeUrlDao = new ExcludeUrlDao(tService);
         catalogUrlDao = new CatalogUrlDao(tService);
         metadataDao   = new MetadataDao(tService);
+        partnerDao   = new PartnerDao(tService, providerDao);
+        urlDao        = new UrlDao(tService, new TimeProvider());
         
         // initialize url validators
         webUrlValidator     = new WebUrlValidator(providerDao, startUrlDao);
         catalogUrlValidator = new CatalogUrlValidator(providerDao, catalogUrlDao);
+        
+        // sync db first so that all provider are up to date and present
+        final IBus bus = BusClientFactory.createBusClient(new File(communicationFile)).getNonCacheableIBus();
+        
+        if (bus == null)
+            System.out.println("ERROR: Couldn't connect to iBus through: " + communicationFile);
+        else
+            new PartnerAndProviderDbSyncService(partnerDao,urlDao).syncDb(getAllPartnerWithProvider(bus));
+        
+        // shutdown the iBus again
+        BusClientFactory.getBusClient().shutdown();
         
         tService.beginTransaction();
         List<Provider> provider = providerDao.getAll();
@@ -237,30 +266,54 @@ public class Migrator {
         System.out.println();
     }
     
+    private List<Map<String, Serializable>> getAllPartnerWithProvider(final IBus bus) {
+
+        List<Map<String, Serializable>> list = new ArrayList<Map<String, Serializable>>();
+        try {
+            final String query = "datatype:management management_request_type:1";
+            final IngridQuery ingridQuery = QueryStringParser.parse(query);
+            final IngridHits hits = bus.search(ingridQuery, 1, 1, 1, 1000);
+            if (hits.length() > 0) {
+                final IngridHit hit = hits.getHits()[0];
+                list = hit.getArrayList("partner");
+            }
+        } catch (final Exception e) {
+            //LOG.error("can not send query to bus.", e);
+        }
+        return list;
+    }
+    
     
     /**
      * @param args
+     * @throws Exception 
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         boolean dryRun = false;
+        String communication = "conf/communication-index.xml";
         
         // check preconditions
-        if (args.length < 1 || args.length > 2) {
-            System.out.println("Usage:\n\t Migrator <Path-to-export-directory> [-test]");
+        if (args.length < 1 || args.length > 4) {
+            System.out.println("Usage:\n\t Migrator <Path-to-export-directory> [-test] [-comm <communication-index.xml>]");
             System.out.println("\tThe optional parameter '-test' does a dry-run without " +
             		"storing any URL into the database. This is useful to check the " +
-            		"exported data for errors."); 
+            		"exported data for errors.\n The parameter '-comm' is needed for the communication-index.xml" +
+            		"file. As a default this file will be searched inside the conf-folder."); 
             return;
         }
 
         File exportDirectory = new File(args[0]);
         
-        if (args.length == 2) {
-            if ("-test".equals(args[1]))
-                dryRun = true;
-            else {
-                System.out.println("Do not understand parameter: " + args[1] + "!\nParameter should be '-test'");
-                return;
+        if (args.length > 1 || args.length < 5) {
+            for (int i=1; i<args.length; i++) {
+                if ("-test".equals(args[i]))
+                    dryRun = true;
+                else if ("-comm".equals(args[i]))
+                    communication = args[++i];
+                else {
+                    System.out.println("Do not understand parameter: " + args[1] + "!\nParameter should be '-test' or '-comm'");
+                    return;
+                }
             }
         }
         
@@ -271,7 +324,7 @@ public class Migrator {
         
         
         // start the migration process
-        Migrator migrator = new Migrator();
+        Migrator migrator = new Migrator(communication);
         
         // import WEB-URLs
         migrator.importUrls(exportDirectory, UrlContainer.UrlType.WEB);

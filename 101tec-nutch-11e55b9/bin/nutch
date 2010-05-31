@@ -157,6 +157,10 @@ done
 # add META-INF/persistence.xml to classpath
 CLASSPATH=$NUTCH_HOME/plugins/admin-urlmaintenance/conf:${CLASSPATH}
 
+for f in $NUTCH_HOME/lib/ingrid-ext/*.jar; do
+  CLASSPATH=${CLASSPATH}:$f;
+done
+
 # cygwin path translation
 if $cygwin; then
   CLASSPATH=`cygpath -p -w "$CLASSPATH"`
