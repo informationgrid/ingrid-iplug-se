@@ -195,15 +195,16 @@ public class ParseOutputFormat implements OutputFormat<Text, Parse> {
               }
             }
             try {
+              // check for RFC 2396 valid URLs, not compliant URLs will be ignored due to an exception
+              // joachim@wemove.com at 20100531
+              new URL(toUrl).toURI();
+              
               toUrl = normalizers.normalize(toUrl,
                           URLNormalizers.SCOPE_OUTLINK); // normalize the url
               toUrl = filters.filter(toUrl);   // filter the url
               if (toUrl == null) {
                 continue;
               }
-              // check for RFC 2396 valid URLs, not compliant URLs will be ignored due to an exception
-              // joachim@wemove.com at 20100531
-              new URL(toUrl).toURI();
               // ignore links to self AFTER normalizing/filtering
               // joachim@wemove.com at 20100528
               if (fromUrl.equals(toUrl)) {
