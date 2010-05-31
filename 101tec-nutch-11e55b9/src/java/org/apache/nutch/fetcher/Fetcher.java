@@ -133,6 +133,9 @@ public class Fetcher extends Configured implements
   FetchItemQueues fetchQueues;
   QueueFeeder feeder;
   
+  private List<FetcherThread> fetcherThreads = new ArrayList<FetcherThread>();
+  
+  
   /**
    * This class described the item to be fetched.
    */
@@ -501,6 +504,9 @@ public class Fetcher extends Configured implements
                 spinWaiting.decrementAndGet();
               continue;
             } else {
+              if (LOG.isInfoEnabled()) {
+                LOG.info("Finish fetcher thread (all done): " + getName());
+              }
               // all done, finish this thread
               return;
             }
@@ -949,7 +955,9 @@ public class Fetcher extends Configured implements
     _snsParseResultHandler.beginParsing(getConf().get(Nutch.SEGMENT_NAME_KEY), (JobConf) getConf());
 
     for (int i = 0; i < threadCount; i++) {       // spawn threads
-      new FetcherThread(getConf()).start();
+      FetcherThread t = new FetcherThread(getConf());
+      t.start();
+      fetcherThreads.add(t);
     }
 
     // select a timeout that avoids a task timeout
@@ -974,6 +982,14 @@ public class Fetcher extends Configured implements
         if (LOG.isWarnEnabled()) {
           LOG.warn("Aborting with "+activeThreads+" hung threads.");
         }
+        
+        // try to interrupt the feeder thread
+        feeder.interrupt();
+        // try to interrupt the thread
+        for (FetcherThread fetcherThread: fetcherThreads) {
+          fetcherThread.interrupt();
+        }
+        
         return;
       }
 
