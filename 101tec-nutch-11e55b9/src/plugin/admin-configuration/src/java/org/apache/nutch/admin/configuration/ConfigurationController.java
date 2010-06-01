@@ -113,6 +113,8 @@ public class ConfigurationController extends NavigationSelector {
     Element documentElement = document.getDocumentElement();
 
     // update site.xml
+    // if 'name' was found in nutch-site.xml then we have to update this value
+    // which is done here!
     boolean update = false;
     NodeList nodeList = documentElement.getElementsByTagName("name");
     for (int i = 0; i < nodeList.getLength(); i++) {

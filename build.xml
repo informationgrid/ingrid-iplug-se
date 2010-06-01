@@ -269,5 +269,18 @@
 			<arg line="-crBE ./ ../local/" />
 		</exec>
 	</target>
-
+    
+    <target name="makeUrlMaintenance" depends="copy-ingrid-se-plugins">
+        <ant dir="build/${nutch-version}/src/plugin/admin-urlmaintenance" target="deploy" />
+    </target>
+    <target name="makeAdminCrawl" depends="copy-ingrid-se-plugins">
+        <copy todir="build/${nutch-version}/src/plugin/admin-crawl">
+            <fileset dir="${nutch-version}/src/plugin/admin-crawl" />
+        </copy>
+        <ant dir="build/${nutch-version}/src/plugin/admin-crawl" target="deploy" />
+    </target>
+    
+    <target name="makeNutchJar" depends="copy-nutch, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts,copy-indexer-searcher-configs,copy-deploy-conf-files, create-manifest">
+        <ant dir="build/${nutch-version}" target="jar" />
+    </target>
 </project>

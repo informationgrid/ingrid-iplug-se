@@ -66,7 +66,13 @@ public class PreCrawls {
       } catch (PluginRuntimeException e) {
         throw new RuntimeException(e);
       }
+      
       _preCrawls = (IPreCrawl[]) objectCache.getObject(IPreCrawl.X_POINT_ID);
+    } else {
+      // update configuration in preCrawls since it might have changed
+      for (IPreCrawl preCrawl : _preCrawls) {
+        preCrawl.setConf(configuration);
+      }
     }
   }
 
