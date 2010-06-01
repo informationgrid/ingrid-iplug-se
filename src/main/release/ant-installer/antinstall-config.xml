@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE installer PUBLIC "-//tp23 //DTD Ant Installer Config//EN" "http://antinstaller.sf.net/dtd/antinstall-config-0.8.dtd">
 <installer
-			ui			            ="swing,text,swing-auto,text-auto"
-      		loadDefaults        ="prompt"
-			verbose		          ="true"
-			debug		            ="true"
-			lookAndFeel	        ="org.tp23.jgoodies.plaf.plastic.PlasticXPLookAndFeel"
-			name		            ="iPlug-SE Installation"
-			windowIcon	        ="/resources/icons/logoIcon.gif"
-			defaultImageResource="/resources/makewavesdawn.png"
-			minJavaVersion		  ="1.6"
-      		version             ="1.0">
+			ui                   ="swing,text,swing-auto,text-auto"
+      		loadDefaults         ="prompt"
+			verbose              ="true"
+			debug                ="true"
+			lookAndFeel          ="org.tp23.jgoodies.plaf.plastic.PlasticXPLookAndFeel"
+			name                 ="iPlug-SE Installation"
+			windowIcon	         ="/resources/icons/logoIcon.gif"
+			defaultImageResource ="/resources/makewavesdawn.png"
+			minJavaVersion       ="1.6"
+      		version              ="1.0">
 			
 	<page
 			type		="input"
@@ -25,18 +25,19 @@
 	<page
 			type		="input"
 			name		="indexOptions"
-			displayText	="iBus-Kommunkations Parameter des Indexer's"
+			displayText	="iBus-Kommunikations-Parameter"
 			target		="communicationIndex">
 			
-			<text property="indexClientName" displayText="Client Name:" defaultValue="/ingrid-group:iplug-se-index-'Ihr-Name'"/>
-			<text property="indexServerName" displayText="Server Name:" defaultValue="/ingrid-group:ibus-'Ihr-Name'"/>
-			<text property="indexServerIp"   displayText="Server IP:"   defaultValue="127.0.0.1"/>
-			<text property="indexServerPort" displayText="Server Port:" defaultValue="9900"/>
+			<text property="indexClientName" displayText="Client Name:" defaultValue="/ingrid-group:iplug-se-'Ihr-Name'"/>
+			<text property="indexServerName" displayText="Server Name:" defaultValue="/kug-group:kug-ibus"/>
+			<text property="indexServerIp"   displayText="Server IP:"   defaultValue="192.168.64.117"/>
+			<text property="indexServerPort" displayText="Server Port:" defaultValue="80"/>
 			
 			<comment displayText="" explanatoryText="Der Client-Name muss eindeutig sein, da es sonst zu Kommunikationsproblemen zum iBus fuehren kann."/>
 			<comment displayText="" explanatoryText="Die Server-IP ist die Adresse des Rechners, auf dem der iBus ueber dem Server-Port angesprochen werden kann."/>
 	</page>
 
+    <!--
 	<page
 			type		="input"
 			name		="searchOptions"
@@ -44,13 +45,14 @@
 			target		="communicationSearch">
 			
 			<text property="searchClientName" displayText="Client Name:" defaultValue="/ingrid-group:iplug-se-search-'Ihr-Name'"/>
-			<text property="searchServerName" displayText="Server Name:" defaultValue="/ingrid-group:ibus-'Ihr-Name'"/>
-			<text property="searchServerIp"   displayText="Server IP:"   defaultValue="127.0.0.1"/>
-			<text property="searchServerPort" displayText="Server Port:" defaultValue="9900"/>
+			<text property="searchServerName" displayText="Server Name:" defaultValue="/kug-group:kug-ibus"/>
+			<text property="searchServerIp"   displayText="Server IP:"   defaultValue="192.168.64.117"/>
+			<text property="searchServerPort" displayText="Server Port:" defaultValue="80"/>
 			
 			<comment displayText="" explanatoryText="Der Client-Name muss eindeutig sein, da es sonst zu Kommunikationsproblemen zum iBus fuehren kann."/>
 			<comment displayText="" explanatoryText="Die Server-IP ist die Adresse des Rechners, auf dem der iBus ueber dem Server-Port angesprochen werden kann."/>
 	</page>
+    -->
 	
     <page
             type        ="input"
@@ -59,7 +61,7 @@
             target      ="mysqlSettings">
             
             <text property="mysqlUserName" displayText="MySQL Benutzername:" defaultValue="root"/>
-            <text property="mysqlPassword" displayText="MySQL Passwort:" defaultValue=""/>
+            <text property="mysqlPassword" displayText="MySQL Passwort:"     defaultValue=""/>
             
             <comment displayText="" explanatoryText="An access to a MySQL database is needed where a database with the name 'iplugse' must exist! This is where the URLs are stored."/>
     </page>

@@ -28,21 +28,30 @@
 		<echo>Schreibe Konfigurations Parameter des Indexer's in die communication-index.xml
 		</echo>
 		<xmlproperty file="${index-xml-communication}" prefix="indexXML"/>
-		<replace file="${index-xml-communication}" token="${indexXML.communication.client(name)}" 								value="${indexClientName}-admin"/>
+		<replace file="${index-xml-communication}" token="${indexXML.communication.client(name)}" 								value="${indexClientName}-index"/>
 		<replace file="${index-xml-communication}" token="${indexXML.communication.client.connections.server(name)}" 			value="${indexServerName}"/>
 		<replace file="${index-xml-communication}" token="${indexXML.communication.client.connections.server.socket(ip)}" 		value="${indexServerIp}"/>
-		<replace file="${index-xml-communication}" token="${indexXML.communication.client.connections.server.socket(port)}" 	value="${indexServerPort}"/>		
+		<replace file="${index-xml-communication}" token="${indexXML.communication.client.connections.server.socket(port)}" 	value="${indexServerPort}"/>
+        
+        <echo>Schreibe Konfigurations Parameter des Searchers's in die communication-search.xml
+        </echo>
+        <xmlproperty file="${search-xml-communication}" prefix="searchXML"/>
+        <replace file="${search-xml-communication}" token="${searchXML.communication.client(name)}"                             value="${indexClientName}-search"/>
+        <replace file="${search-xml-communication}" token="${searchXML.communication.client.connections.server(name)}"          value="${indexServerName}"/>
+        <replace file="${search-xml-communication}" token="${searchXML.communication.client.connections.server.socket(ip)}"     value="${indexServerIp}"/>
+        <replace file="${search-xml-communication}" token="${searchXML.communication.client.connections.server.socket(port)}"   value="${indexServerPort}"/>		
 	</target>
 
+    <!--
 	<target name="communicationSearch" description="Set configuration correctly for the iBus.">
-		<echo>Schreibe Konfigurations Parameter des Searchers's in die communication-index.xml
+		<echo>Schreibe Konfigurations Parameter des Searchers's in die communication-search.xml
 		</echo>
 		<xmlproperty file="${search-xml-communication}" prefix="searchXML"/>
 		<replace file="${search-xml-communication}" token="${searchXML.communication.client(name)}" 								value="${searchClientName}-admin"/>
 		<replace file="${search-xml-communication}" token="${searchXML.communication.client.connections.server(name)}" 			value="${searchServerName}"/>
 		<replace file="${search-xml-communication}" token="${searchXML.communication.client.connections.server.socket(ip)}" 		value="${searchServerIp}"/>
 		<replace file="${search-xml-communication}" token="${searchXML.communication.client.connections.server.socket(port)}" 	value="${searchServerPort}"/>		
-	</target>
+	</target>-->
     
     <target name="mysqlSettings" description="Set configuration correctly for the mysql-database.">
         <echo>Schreibe Konfigurations Parameter für die URL-Pflege (MySQL)

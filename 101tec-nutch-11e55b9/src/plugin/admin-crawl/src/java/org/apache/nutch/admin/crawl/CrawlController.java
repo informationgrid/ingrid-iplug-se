@@ -20,7 +20,10 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
@@ -42,6 +45,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import edu.emory.mathcs.backport.java.util.Arrays;
 
 @Controller
 public class CrawlController extends NavigationSelector {
@@ -76,7 +81,8 @@ public class CrawlController extends NavigationSelector {
         return path.getName().startsWith("Crawl");
       }
     });
-    model.addAttribute("crawlPaths", crawlPathArray);
+    
+    model.addAttribute("crawlPaths", sortCrawls(crawlPathArray));
     for (CrawlPath crawlPath : crawlPathArray) {
       if (crawlPath.isRunning()) {
         model.addAttribute("runningCrawl", new Object());
@@ -87,7 +93,19 @@ public class CrawlController extends NavigationSelector {
     return "listCrawls";
   }
 
-  @RequestMapping(value = "/createCrawl.html", method = RequestMethod.POST)
+  private CrawlPath[] sortCrawls(CrawlPath[] crawlPathArray) {
+    List<CrawlPath> paths = Arrays.asList(crawlPathArray);
+    Collections.sort(paths, new Comparator<CrawlPath>() {
+        @Override
+        public int compare(CrawlPath path1, CrawlPath path2) {
+            return path1.getPath().getName().compareTo(path2.getPath().getName());
+        }
+    });
+    
+    return (CrawlPath[])paths.toArray();
+}
+
+@RequestMapping(value = "/createCrawl.html", method = RequestMethod.POST)
   public String createCrawl(HttpSession session) throws IOException {
     ServletContext servletContext = session.getServletContext();
     NutchInstance nutchInstance = (NutchInstance) servletContext
@@ -109,6 +127,7 @@ public class CrawlController extends NavigationSelector {
   public String startCrawl(
           Model model,
           @RequestParam(value = "crawlFolder", required = true) String crawlFolder,
+          @RequestParam(value = "noStatistics", required = false) String noStatistics,
           HttpSession session) throws IOException {
     ServletContext servletContext = session.getServletContext();
     NutchInstance nutchInstance = (NutchInstance) servletContext
@@ -147,6 +166,8 @@ public class CrawlController extends NavigationSelector {
       }
     });
     model.addAttribute("indexes", index);
+    if ("true".equals(noStatistics))
+        model.addAttribute("noStatistics", true);
 
     return "crawlDetails";
   }

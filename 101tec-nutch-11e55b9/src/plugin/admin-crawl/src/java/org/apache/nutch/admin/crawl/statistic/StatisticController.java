@@ -59,16 +59,20 @@ public class StatisticController extends NavigationSelector {
     Configuration configuration = nutchInstance.getConfiguration();
     FileSystem fileSystem = FileSystem.get(configuration);
 
-    // crawldb
-    List<Statistic> crawldbStatistics = satistic(maxCount, configuration,
-        fileSystem, new Path(segmentPath, "statistic/host/crawldb"));
-    model.addAttribute("crawldbStatistic", crawldbStatistics);
-
-    // shard
-    List<Statistic> shardStatistics = satistic(maxCount, configuration,
-        fileSystem, new Path(segmentPath, "statistic/host/shard"));
-    model.addAttribute("shardStatistic", shardStatistics);
-
+    try {
+        // crawldb
+        List<Statistic> crawldbStatistics = satistic(maxCount, configuration,
+            fileSystem, new Path(segmentPath, "statistic/host/crawldb"));
+        model.addAttribute("crawldbStatistic", crawldbStatistics);
+    
+        // shard
+        List<Statistic> shardStatistics = satistic(maxCount, configuration,
+            fileSystem, new Path(segmentPath, "statistic/host/shard"));
+        model.addAttribute("shardStatistic", shardStatistics);
+    } catch (Exception e) {
+        // statistics do not exist yet
+        return "redirect:/crawlDetails.html?noStatistics=true&crawlFolder=" + crawlFolder;
+    }
     return "statistic";
   }
 

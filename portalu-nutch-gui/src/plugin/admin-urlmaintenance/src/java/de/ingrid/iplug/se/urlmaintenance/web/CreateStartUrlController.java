@@ -25,19 +25,13 @@ import de.ingrid.iplug.se.urlmaintenance.validation.WebUrlCommandValidator;
 public class CreateStartUrlController extends NavigationSelector {
 
   private final IStartUrlDao _startUrlDao;
-  private final ILimitUrlDao _limitUrlDao;
-  private final IExcludeUrlDao _excludeUrlDao;
   private final WebUrlCommandValidator _validator;
-  private String _mode;
 
   @Autowired
   public CreateStartUrlController(final IStartUrlDao startUrlDao, final ILimitUrlDao limitUrlDao,
       final IExcludeUrlDao excludeUrlDao, final WebUrlCommandValidator validator) {
     _startUrlDao = startUrlDao;
-    _limitUrlDao = limitUrlDao;
-    _excludeUrlDao = excludeUrlDao;
     _validator = validator;
-    _mode = "new";
   }
 
   @RequestMapping(value = { "/web/createStartUrl.html",
@@ -48,9 +42,6 @@ public class CreateStartUrlController extends NavigationSelector {
     if (id != null) {
       final StartUrl startUrl = _startUrlDao.getById(id);
       startUrlCommand.read(startUrl);
-      _mode = "edit";
-    } else {
-      _mode = "new";
     }
     return "web/createStartUrl";
   }
@@ -61,17 +52,6 @@ public class CreateStartUrlController extends NavigationSelector {
 
     if (_validator.validateStartUrl(errors).hasErrors()) {
         return createStartUrl(startUrlCommand, null);
-    }
-      
-    if ("new".equals(_mode)) {
-      final LimitUrlCommand limitUrlCommand = new LimitUrlCommand(_limitUrlDao);
-      limitUrlCommand.setProvider(startUrlCommand.getProvider());
-      limitUrlCommand.setUrl(startUrlCommand.getUrl());
-      startUrlCommand.addLimitUrlCommand(limitUrlCommand);
-
-      final ExcludeUrlCommand excludeUrlCommand = new ExcludeUrlCommand(_excludeUrlDao);
-      excludeUrlCommand.setProvider(startUrlCommand.getProvider());
-      startUrlCommand.addExcludeUrlCommand(excludeUrlCommand);
     }
     return "redirect:/web/addLimitUrl.html";
   }

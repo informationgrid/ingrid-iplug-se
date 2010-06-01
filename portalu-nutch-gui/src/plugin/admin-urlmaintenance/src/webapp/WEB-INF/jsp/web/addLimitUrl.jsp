@@ -52,7 +52,7 @@
                                 </form:form>
                                 </div>
                             </c:when>
-            </c:choose>
+                        </c:choose>
                     </c:forEach>
           <form:form id="newLimit" action="addLimitUrl.html" method="post" modelAttribute="newLimitUrl">
             <fieldset>
