@@ -989,6 +989,7 @@ public class Fetcher extends Configured implements
         for (FetcherThread fetcherThread: fetcherThreads) {
           fetcherThread.interrupt();
         }
+        fetcherThreads.clear();
         
         return;
       }
