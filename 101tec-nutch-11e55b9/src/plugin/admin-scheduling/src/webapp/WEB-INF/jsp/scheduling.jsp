@@ -43,15 +43,17 @@
 		<div id="yui-main">
 				<div class="yui-b">
 					<h3><fmt:message key="scheduling.headline" bundle="${localBundle}"/></h3>
-					<div class="row">
-						<form action="delete.html" method="post">
-							<label><fmt:message key="scheduling.cronPattern" bundle="${localBundle}"/>:</label>&nbsp;${savedPattern}
-							<input type="image" src="../theme/${theme}/gfx/delete.png" title="Löschen" align="absmiddle">
-						</form>
-					</div>
-					<div class="row">
-						<label><fmt:message key="scheduling.crawlParams" bundle="${localBundle}"/>:</label>&nbsp;${savedCrawlData}
-					</div>
+					<c:if test="${!empty savedPattern}">
+						<div class="row">
+							<form action="delete.html" method="post">
+								<label><fmt:message key="scheduling.cronPattern" bundle="${localBundle}"/>:</label>&nbsp;${savedPattern}
+								<input type="image" src="../theme/${theme}/gfx/delete.png" title="Löschen" align="absmiddle">
+							</form>
+						</div>
+					  <div class="row">
+					  	<label><fmt:message key="scheduling.crawlParams" bundle="${localBundle}"/>:</label>&nbsp;${savedCrawlData}
+					  </div>
+                    </c:if>
 					
 					<div style="margin-top:25px"></div>
 					
