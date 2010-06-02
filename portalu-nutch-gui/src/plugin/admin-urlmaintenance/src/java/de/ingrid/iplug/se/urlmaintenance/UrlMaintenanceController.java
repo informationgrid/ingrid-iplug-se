@@ -81,7 +81,7 @@ public class UrlMaintenanceController extends NavigationSelector {
     model.addAttribute("partners", partners);
     model.addAttribute("error", error);
 
-    model.addAttribute("jsonMap", createPartnerAndProviderJsonMap());
+    model.addAttribute("jsonMap", createPartnerAndProviderJsonMap(getProviderFromPartner(allPartnerWithProvider)));
     return "urlmaintenance";
   }
 
@@ -102,10 +102,27 @@ public class UrlMaintenanceController extends NavigationSelector {
           }
       }
       
+      // sort list of partner
+      Collections.sort(filteredList, new Comparator<Partner>() {
+        @Override
+        public int compare(Partner p1, Partner p2) {
+            return p1.getName().compareTo(p2.getName());
+        }
+      });
       return filteredList;
   }
+  
+  private List<String> getProviderFromPartner(List<Map<String, Serializable>> partnerWithProvider) {
+      List<String> provider = new ArrayList<String>();
+      for (Map<String, Serializable> map : partnerWithProvider) {
+          for (Map<String, Serializable> map2 : (List<Map>) map.get("providers")) {
+              provider.add((String)map2.get("providerid"));
+          }
+      }
+      return provider;
+  }
 
-private String createPartnerAndProviderJsonMap() {
+  private String createPartnerAndProviderJsonMap(List<String> allowedProvider) {
     StringWriter stringWriter = new StringWriter();
     try {
       JsonGenerator jsonGenerator = new ObjectMapper().getJsonFactory().createJsonGenerator(stringWriter);
@@ -121,10 +138,13 @@ private String createPartnerAndProviderJsonMap() {
           }
         });
         for (Provider provider : providers) {
-          jsonGenerator.writeStartObject();
-          jsonGenerator.writeNumberField("id", provider.getId());
-          jsonGenerator.writeStringField("name", StringEscapeUtils.escapeHtml(provider.getName()));
-          jsonGenerator.writeEndObject();
+          // only write provider if user is allowed to see it
+          if (allowedProvider.contains(provider.getShortName())) {
+            jsonGenerator.writeStartObject();
+            jsonGenerator.writeNumberField("id", provider.getId());
+            jsonGenerator.writeStringField("name", StringEscapeUtils.escapeHtml(provider.getName()));
+            jsonGenerator.writeEndObject();
+          }
         }
         jsonGenerator.writeEndArray();
       }

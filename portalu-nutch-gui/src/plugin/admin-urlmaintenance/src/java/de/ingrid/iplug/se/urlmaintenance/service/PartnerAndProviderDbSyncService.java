@@ -173,6 +173,13 @@ public class PartnerAndProviderDbSyncService {
     return newProvider;
   }
 
+  /**
+   * Remove all provider from a partner that are not included in "providers". 
+   * Only have those provider in database that belong to the logged in user.
+   * 
+   * @param partnerInDb, the partner with its provider in the database
+   * @param providers, the provider the user belongs to
+   */
   private void syncProviders(Partner partnerInDb, Set<InternalProvider> providers) {
     Set<String> providersToAdd = new HashSet<String>();
     Set<Provider> providersToRemove = new HashSet<Provider>();
@@ -191,9 +198,15 @@ public class PartnerAndProviderDbSyncService {
     }
 
     // remove provider from partner?
+    // Only remove provider if no URL has any reference on it!!!
     for (Provider provider : providersToRemove) {
-      LOG.info("Remove provider '" + provider.getName() + "' from partner '" + partnerInDb.getName() + "'.");
-      _partnerDao.removeProvider(partnerInDb, provider);
+      List<Long> refProvider = new ArrayList<Long>();
+      refProvider.add(provider.getId());
+      // is this provider referenced by any URL?
+      if (_urlDao.countByProvider(refProvider) == 0L) {
+        LOG.info("Remove provider '" + provider.getName() + "' from partner '" + partnerInDb.getName() + "'.");
+        _partnerDao.removeProvider(partnerInDb, provider);
+      }
     }
     // if (providersToRemove.size() > 0) {
     // _partnerDao.flipTransaction();
@@ -238,66 +251,66 @@ public class PartnerAndProviderDbSyncService {
     // value: (java.lang.String) bund
     // key : providers
     // value: (java.util.ArrayList) [{providerid=bu_bmbf, name=Bundesministerium
-    // fŸr Bildung und Forschung, url=}, {providerid=bu_atest, name=Test1,
+    // fï¿½r Bildung und Forschung, url=}, {providerid=bu_atest, name=Test1,
     // url=http://www.kst.portalu.de}, {providerid=bu_bmu,
-    // name=Bundesministerium fŸr Umwelt, Naturschutz und Reaktorsicherheit,
+    // name=Bundesministerium fï¿½r Umwelt, Naturschutz und Reaktorsicherheit,
     // url=http://www.bmu.de/}, {providerid=bu_uba, name=Umweltbundesamt,
     // url=http://www.umweltbundesamt.de/}, {providerid=bu_bfn, name=Bundesamt
-    // fŸr Naturschutz, url=http://www.bfn.de/}, {providerid=bu_bfs,
-    // name=Bundesamt fŸr Strahlenschutz, url=http://www.bfs.de/},
+    // fï¿½r Naturschutz, url=http://www.bfn.de/}, {providerid=bu_bfs,
+    // name=Bundesamt fï¿½r Strahlenschutz, url=http://www.bfs.de/},
     // {providerid=bu_bmf, name=Bundesministerium der Finanzen,
     // url=http://www.bundesfinanzministerium.de/}, {providerid=bu_bmelv,
-    // name=Bundesministerium fŸr ErnŠhrung, Landwirtschaft und
+    // name=Bundesministerium fï¿½r Ernï¿½hrung, Landwirtschaft und
     // Verbraucherschutz,
     // url=http://www.bmelv.de/cln_044/DE/00-Home/__Homepage__node.html__nnn=true},
-    // {providerid=bu_bmz, name=Bundesministerium fŸr wirtschaftliche
+    // {providerid=bu_bmz, name=Bundesministerium fï¿½r wirtschaftliche
     // Zusammenarbeit und Entwicklung, url=http://www.bmz.de/},
-    // {providerid=bu_aa, name=AuswŠrtiges Amt,
+    // {providerid=bu_aa, name=Auswï¿½rtiges Amt,
     // url=http://www.auswaertiges-amt.de/}, {providerid=bu_bsh, name=Bundesamt
-    // fŸr Seeschifffahrt und Hydrographie, url=http://www.bsh.de/},
-    // {providerid=bu_bvl, name=Bundesamt fŸr Verbraucherschutz und
+    // fï¿½r Seeschifffahrt und Hydrographie, url=http://www.bsh.de/},
+    // {providerid=bu_bvl, name=Bundesamt fï¿½r Verbraucherschutz und
     // Lebensmittelsicherheit, url=http://www.bvl.bund.de/}, {providerid=bu_bgr,
-    // name=Bundesanstalt fŸr Geowissenschaften und Rohstoffe,
-    // url=http://www.bgr.bund.de/}, {providerid=bu_bfg, name=Bundesanstalt fŸr
-    // GewŠsserkunde, url=http://www.bafg.de/}, {providerid=bu_nokis,
-    // name=Bundesanstalt fŸr Wasserbau - Dienststelle Hamburg,
+    // name=Bundesanstalt fï¿½r Geowissenschaften und Rohstoffe,
+    // url=http://www.bgr.bund.de/}, {providerid=bu_bfg, name=Bundesanstalt fï¿½r
+    // Gewï¿½sserkunde, url=http://www.bafg.de/}, {providerid=bu_nokis,
+    // name=Bundesanstalt fï¿½r Wasserbau - Dienststelle Hamburg,
     // url=http://www.hamburg.baw.de/}, {providerid=bu_bfr, name=Bundesinstitut
-    // fŸr Risikobewertung, url=http://www.bfr.bund.de/}, {providerid=bu_bka,
+    // fï¿½r Risikobewertung, url=http://www.bfr.bund.de/}, {providerid=bu_bka,
     // name=Bundeskriminalamt, url=http://www.bka.de/}, {providerid=bu_rki,
     // name=Robert-Koch-Institut, url=http://www.rki.de/}, {providerid=bu_stba,
     // name=Statistisches Bundesamt, url=http://www.destatis.de/},
-    // {providerid=bu_ble, name=Bundesanstalt fŸr Landwirtschaft und ErnŠhrung,
-    // url=http://www.ble.de}, {providerid=bu_bpb, name=Bundeszentrale fŸr
+    // {providerid=bu_ble, name=Bundesanstalt fï¿½r Landwirtschaft und Ernï¿½hrung,
+    // url=http://www.ble.de}, {providerid=bu_bpb, name=Bundeszentrale fï¿½r
     // politische Bildung, url=http://www.bpb.de/}, {providerid=bu_gtz,
-    // name=Deutsche Gesellschaft fŸr Technische Zusammenarbeit (GTZ) GmbH,
+    // name=Deutsche Gesellschaft fï¿½r Technische Zusammenarbeit (GTZ) GmbH,
     // url=http://www.gtz.de/}, {providerid=bu_dwd, name=Deutscher Wetterdienst,
-    // url=http://www.dwd.de/}, {providerid=bu_dlr, name=Deutsches Zentrum fŸr
+    // url=http://www.dwd.de/}, {providerid=bu_dlr, name=Deutsches Zentrum fï¿½r
     // Luft- und Raumfahrt DLR e.V., url=http://www.dlr.de/},
     // {providerid=bu_kug, name=Koordinierungsstelle PortalU,
     // url=http://www.kst.portalu.de/}, {providerid=bu_labo,
-    // name=LŠnderarbeitsgemeinschaft Boden LABO,
+    // name=Lï¿½nderarbeitsgemeinschaft Boden LABO,
     // url=http://www.labo-deutschland.de/}, {providerid=bu_lawa,
-    // name=LŠnderarbeitsgemeinschaft Wasser, url=http://www.lawa.de/},
-    // {providerid=bu_laofdh, name=Leitstelle des Bundes fŸr Abwassertechnik,
-    // Boden- und Grundwasserschutz, KampfmittelrŠumung und das
-    // Liegenschaftsinformationssystem Au§enanlagen LISA,
+    // name=Lï¿½nderarbeitsgemeinschaft Wasser, url=http://www.lawa.de/},
+    // {providerid=bu_laofdh, name=Leitstelle des Bundes fï¿½r Abwassertechnik,
+    // Boden- und Grundwasserschutz, Kampfmittelrï¿½umung und das
+    // Liegenschaftsinformationssystem Auï¿½enanlagen LISA,
     // url=http://www.ofd-hannover.de/la/}, {providerid=bu_bpa, name=Presse- und
     // Informationsamt der Bundesregierung, url=http://www.bundesregierung.de/},
     // {providerid=bu_blauerengel, name=RAL/Umweltbundesamt Umweltzeichen
     // "Blauer Engel", url=http://www.blauer-engel.de/}, {providerid=bu_sru,
-    // name=Rat von SachverstŠndigen fŸr Umweltfragen (SRU),
+    // name=Rat von Sachverstï¿½ndigen fï¿½r Umweltfragen (SRU),
     // url=http://www.umweltrat.de/}, {providerid=bu_ssk,
     // name=Strahlenschutzkommission, url=http://www.ssk.de/},
     // {providerid=bu_umk, name=Umweltministerkonferenz,
     // url=http://www.umweltministerkonferenz.de/}, {providerid=bu_wbgu,
     // name=Wissenschaftlicher Beirat der Bundesregierung Globale
-    // UmweltverŠnderungen - WBGU, url=http://www.wbgu.de/},
-    // {providerid=bu_agenda, name=Agenda-Transfer. Agentur fŸr Nachhaltigkeit
+    // Umweltverï¿½nderungen - WBGU, url=http://www.wbgu.de/},
+    // {providerid=bu_agenda, name=Agenda-Transfer. Agentur fï¿½r Nachhaltigkeit
     // GmbH, url=http://www.agenda-transfer.de/}, {providerid=bu_uga,
     // name=Umweltgutachterausschuss (UGA), url=http://www.uga.de/},
     // {providerid=bu_co2, name=co2online gGmbH Klimaschutzkampagne,
     // url=http://www.co2online.de/}, {providerid=bu_dekade, name=Weltdekade
-    // ?Bildung fŸr nachhaltige Entwicklung?,
+    // ?Bildung fï¿½r nachhaltige Entwicklung?,
     // url=http://www.dekade.org/index.htm}]
     // key : name
     // value: (java.lang.String) Bund
