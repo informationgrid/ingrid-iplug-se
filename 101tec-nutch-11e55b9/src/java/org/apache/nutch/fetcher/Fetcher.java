@@ -322,6 +322,14 @@ public class Fetcher extends Configured implements
       return totalSize.get();
     }
     
+    public void clear() {
+        queues.clear();
+        totalSize.set(0);
+        if (LOG.isInfoEnabled()) {
+            LOG.info("FetchItemQueue Container cleared!");
+        }
+    }
+    
     public int getQueueCount() {
       return queues.size();
     }
@@ -413,7 +421,7 @@ public class Fetcher extends Configured implements
       boolean hasMore = true;
       int cnt = 0;
       
-      while (hasMore) {
+      while (hasMore && !isInterrupted()) {
         int feed = size - queues.getTotalSize();
         if (feed <= 0) {
           // queues are full - spin-wait until they have some free space
@@ -489,7 +497,7 @@ public class Fetcher extends Configured implements
       FetchItem fit = null;
       try {
         
-        while (true) {
+        while (!isInterrupted()) {
           fit = fetchQueues.getFetchItem();
           if (fit == null) {
             if (feeder.isAlive() || fetchQueues.getTotalSize() > 0) {
@@ -700,6 +708,10 @@ public class Fetcher extends Configured implements
             output(fit.url, fit.datum, null, ProtocolStatus.STATUS_FAILED, CrawlDatum.STATUS_FETCH_RETRY);
           }
         }
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Fetcher thread " + getName() + " was interrupted.");
+        }
+        
 
       } catch (Throwable e) {
         if (LOG.isFatalEnabled()) {
@@ -982,6 +994,9 @@ public class Fetcher extends Configured implements
         if (LOG.isWarnEnabled()) {
           LOG.warn("Aborting with "+activeThreads+" hung threads.");
         }
+        
+        // clear fetchQueue to make sure all fetcher threads can be destroyed
+        fetchQueues.clear();
         
         // try to interrupt the feeder thread
         feeder.interrupt();
