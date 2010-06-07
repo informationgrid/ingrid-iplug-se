@@ -80,7 +80,7 @@ if [ "$NUTCH_HEAPSIZE" != "" ]; then
 fi
 
 # CLASSPATH initially contains $NUTCH_CONF_DIR, or defaults to $NUTCH_HOME/conf
-CLASSPATH=${NUTCH_CONF_DIR:=$NUTCH_HOME/conf}
+CLASSPATH=${CLASSPATH}:${NUTCH_CONF_DIR:=$NUTCH_HOME/conf}
 CLASSPATH=${CLASSPATH}:$JAVA_HOME/lib/tools.jar
 
 # so that filenames w/ spaces are handled correctly in loops below
@@ -172,8 +172,11 @@ if expr `uname` : 'CYGWIN*' > /dev/null; then
   CLASSPATH=`cygpath -p -w "$CLASSPATH"`
 fi
 
+export CLASSPATH="$CLASSPATH"
+NUTCH_OPTS="$NUTCH_OPTS -Dingrid_home="$NUTCH_HOME
+
 # run it
-exec "$JAVA" $JAVA_HEAP_MAX $NUTCH_OPTS -Dpid=$$ -classpath "$CLASSPATH" $CLASS "$@"
+exec "$JAVA" $JAVA_HEAP_MAX $NUTCH_OPTS -Dpid=$$ $CLASS "$@"
 # run it in debugging mode
-#exec "$JAVA" $JAVA_HEAP_MAX $NUTCH_OPTS -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=5000,server=y,suspend=n -Dpid=$$ -classpath "$CLASSPATH" $CLASS "$@"
+#exec "$JAVA" $JAVA_HEAP_MAX $NUTCH_OPTS -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=5000,server=y,suspend=n -Dpid=$$ $CLASS "$@"
 
