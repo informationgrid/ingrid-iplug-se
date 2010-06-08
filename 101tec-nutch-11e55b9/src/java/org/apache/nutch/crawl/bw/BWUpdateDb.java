@@ -366,7 +366,7 @@ public class BWUpdateDb extends Configured {
         FileSystem.get(job).delete(wrappedSegOutput, true);
 
         // convert formats
-        LOG.info("bw update: converting (with filtering/normalizing) started.");
+        LOG.info("bw update: converting started.");
         name = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
         Path tmpFormatOut = new Path(crawlDb, name);
         JobConf convertJob = new NutchJob(getConf());

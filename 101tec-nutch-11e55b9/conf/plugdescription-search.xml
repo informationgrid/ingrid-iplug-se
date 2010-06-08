@@ -1,0 +1,11 @@
+<de.ingrid.utils.PlugDescription>
+  <int>4</int>
+  <string>IPLUG_ADMIN_GUI_PORT</string>
+  <int>50059</int>
+  <string>workingDirectory</string>
+  <string>./nutch-instances</string>
+  <string>iPlugClass</string>
+  <string>de.ingrid.iplug.se.NutchSearcher</string>
+  <string>proxyServiceUrl</string>
+  <string>/ingrid-group:iplug-se-search-xxx</string>
+</de.ingrid.utils.PlugDescription>

@@ -31,9 +31,18 @@
 </property>
 
 <property>
+  <name>fetcher.get.snsdata</name>
+  <value>true</value>
+  <description>If true, then additional data is requested from the SNS Service, which
+  can be used within the index (see 'index.sns').
+  </description>
+</property>
+
+<property>
   <name>index.sns</name>
   <value>true</value>
-  <description>If true, then the Index-Sns Plugin are index with sns dates. Otherwise, without sns dates.
+  <description>If true, then the Index-Sns Plugin are indexed with sns data, which only
+  works if 'fetcher.get.snsdata' is also set to true! Otherwise no sns data is put into index.
   </description>
 </property>
 

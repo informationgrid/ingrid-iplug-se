@@ -130,6 +130,7 @@ public class Fetcher extends Configured implements
 
   private boolean storingContent;
   private boolean parsing;
+  private boolean fetchSnsData;
   FetchItemQueues fetchQueues;
   QueueFeeder feeder;
   
@@ -826,7 +827,8 @@ public class Fetcher extends Configured implements
                   new ParseStatus().getEmptyParse(conf));
             datum.setSignature(signature);
           } else {
-            _snsParseResultHandler.process(content, parseResult);
+            if (fetchSnsData)
+              _snsParseResultHandler.process(content, parseResult);
           }
         }
         
@@ -923,13 +925,18 @@ public class Fetcher extends Configured implements
     this.segmentName = job.get(Nutch.SEGMENT_NAME_KEY);
     this.storingContent = isStoringContent(job);
     this.parsing = isParsing(job);
+    this.fetchSnsData = isFetchSnsData(job);
 
 //    if (job.getBoolean("fetcher.verbose", false)) {
 //      LOG.setLevel(Level.FINE);
 //    }
   }
 
-  public void close() {}
+  private boolean isFetchSnsData(JobConf conf) {
+    return conf.getBoolean("fetcher.get.snsdata", true);
+}
+
+public void close() {}
 
   public static boolean isParsing(Configuration conf) {
     return conf.getBoolean("fetcher.parse", true);
@@ -960,11 +967,13 @@ public class Fetcher extends Configured implements
     getConf().setBoolean(Protocol.CHECK_BLOCKING, false);
     getConf().setBoolean(Protocol.CHECK_ROBOTS, false);
 
-    if (_snsParseResultHandler == null) {
-      _snsParseResultHandler = new SnsParseResultHandler();
+    if (fetchSnsData) {
+      if (_snsParseResultHandler == null) {
+        _snsParseResultHandler = new SnsParseResultHandler();
+      }
+      // start the sns analyzing
+      _snsParseResultHandler.beginParsing(getConf().get(Nutch.SEGMENT_NAME_KEY), (JobConf) getConf());
     }
-    // start the sns analyzing
-    _snsParseResultHandler.beginParsing(getConf().get(Nutch.SEGMENT_NAME_KEY), (JobConf) getConf());
 
     for (int i = 0; i < threadCount; i++) {       // spawn threads
       FetcherThread t = new FetcherThread(getConf());
@@ -1016,7 +1025,8 @@ public class Fetcher extends Configured implements
     
     } finally {
       // stop the sns analyzing
-      _snsParseResultHandler.stopParsing(getConf().get(Nutch.SEGMENT_NAME_KEY));
+      if (fetchSnsData)
+        _snsParseResultHandler.stopParsing(getConf().get(Nutch.SEGMENT_NAME_KEY));
     }
   }
 
