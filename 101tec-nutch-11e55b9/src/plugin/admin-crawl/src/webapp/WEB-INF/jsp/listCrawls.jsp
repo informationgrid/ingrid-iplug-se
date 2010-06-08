@@ -169,8 +169,8 @@
 					            ]
 					        };
 					
-					        var myDataTable = new YAHOO.widget.DataTable("markup", myColumnDefs, myDataSource,{sortedBy:{key:"path",dir:"desc"}});
-					        
+					        var myDataTable = new YAHOO.widget.DataTable("markup", myColumnDefs, myDataSource);
+					        myDataTable.sortColumn(myDataTable.getColumn("path"), YAHOO.widget.DataTable.CLASS_ASC);
 					        return {
 					            oDS: myDataSource,
 					            oDT: myDataTable

@@ -82,7 +82,7 @@ public class CrawlController extends NavigationSelector {
       }
     });
     
-    model.addAttribute("crawlPaths", sortCrawls(crawlPathArray));
+    model.addAttribute("crawlPaths", crawlPathArray);
     for (CrawlPath crawlPath : crawlPathArray) {
       if (crawlPath.isRunning()) {
         model.addAttribute("runningCrawl", new Object());
@@ -93,19 +93,7 @@ public class CrawlController extends NavigationSelector {
     return "listCrawls";
   }
 
-  private CrawlPath[] sortCrawls(CrawlPath[] crawlPathArray) {
-    List<CrawlPath> paths = Arrays.asList(crawlPathArray);
-    Collections.sort(paths, new Comparator<CrawlPath>() {
-        @Override
-        public int compare(CrawlPath path1, CrawlPath path2) {
-            return path1.getPath().getName().compareTo(path2.getPath().getName());
-        }
-    });
-    
-    return (CrawlPath[])paths.toArray();
-}
-
-@RequestMapping(value = "/createCrawl.html", method = RequestMethod.POST)
+  @RequestMapping(value = "/createCrawl.html", method = RequestMethod.POST)
   public String createCrawl(HttpSession session) throws IOException {
     ServletContext servletContext = session.getServletContext();
     NutchInstance nutchInstance = (NutchInstance) servletContext

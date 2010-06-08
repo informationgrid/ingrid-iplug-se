@@ -66,7 +66,8 @@
                                     <tr>
                                         <td>${segment.path.name}</td>
                                         <td>${segment.size}</td>
-                                        <td><a href="statistic.html?crawlFolder=${crawlFolder}&segment=${segment.path.name}&maxCount=10"><fmt:message key="crawlDetails.hostStats" bundle="${localBundle}"/></a></td>
+                                        <td>
+                                        <a href="statistic.html?crawlFolder=${crawlFolder}&segment=${segment.path.name}&maxCount=10"><fmt:message key="crawlDetails.hostStats" bundle="${localBundle}"/></a></td>
                                     </tr>
                                 </c:forEach>
                             </tbody>
@@ -93,8 +94,8 @@
                                 ]
                             };
                     
-                            var myDataTable = new YAHOO.widget.DataTable("markup", myColumnDefs, myDataSource, {sortedBy:{key:"path",dir:"desc"}});
-                            
+                            var myDataTable = new YAHOO.widget.DataTable("markup", myColumnDefs, myDataSource);
+                            myDataTable.sortColumn(myDataTable.getColumn("path"), YAHOO.widget.DataTable.CLASS_ASC);
                             return {
                                 oDS: myDataSource,
                                 oDT: myDataTable
@@ -139,8 +140,8 @@
                                 ]
                             };
                     
-                            var myDataTable = new YAHOO.widget.DataTable("markupDbs", myColumnDefs, myDataSource, {sortedBy:{key:"path",dir:"desc"}});
-                            
+                            var myDataTable = new YAHOO.widget.DataTable("markupDbs", myColumnDefs, myDataSource);
+                            myDataTable.sortColumn(myDataTable.getColumn("path"), YAHOO.widget.DataTable.CLASS_ASC);
                             return {
                                 oDS: myDataSource,
                                 oDT: myDataTable
