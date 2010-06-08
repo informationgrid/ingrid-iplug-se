@@ -35,6 +35,7 @@
 		<%@ include file="../includes/menu.jsp" %>
 		
 		<div id="bd">
+      		<div id="blocker" style="display: block; width: 100%; height: 100%; position: absolute; top: 0px; left: 0px;"></div>
 			<div id="yui-main">
 				<div class="yui-b">
 					<h3>Web URLs</h3>
@@ -256,6 +257,8 @@
 										dir = 'asc';
 									}
 								}
+                				// make page blocked during sorting
+                				document.getElementById("blocker").style.display = "block";
 								window.location.href = "listWebUrls.html?sort=" +fieldToSort +"&dir=" +dir +"${paramString}";
 							}
 							YAHOO.util.Event.addListener("yui-dt0-th-url-liner", "click", sort, ['url', '${sort}', '${dir}']);
@@ -301,7 +304,10 @@
 							<c:forEach items="${urls}" var="url" varStatus="index">
 							YAHOO.util.Event.addListener("deleteWebUrl_${index.index}", "click", YAHOO.example.container.deleteWebUrl.show, YAHOO.example.container.deleteWebUrl, true);
 							</c:forEach>
+             				// make page available after it has been loaded completely
+				            document.getElementById("blocker").style.display = "none";
 						});
+            
 						</script>
 					</div>
 					

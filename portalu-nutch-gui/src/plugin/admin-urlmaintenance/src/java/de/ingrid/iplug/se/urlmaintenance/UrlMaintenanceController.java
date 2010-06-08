@@ -94,6 +94,10 @@ public class UrlMaintenanceController extends NavigationSelector {
    */
   private List<Partner> filterByRights(List<Map<String, Serializable>> partnerWithProvider,
         List<Partner> allPartner) {
+      // if not logged in!
+      if (partnerWithProvider == null)
+          return allPartner;
+      
       List<Partner> filteredList = new ArrayList<Partner>();
       for (Partner partner : allPartner) {
           for (Map<String, Serializable> map : partnerWithProvider) {
