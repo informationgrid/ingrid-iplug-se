@@ -27,8 +27,8 @@ public class UrlStatusUpdateServiceTest extends TestCase {
   }
 
   public void testPoll_validUrl() throws InterruptedException {
-    addStatusUrlString("1:http://blah.com");
-    addStatusUrlString("2:http://blah.com?x=y");
+    addStatusUrlString("false:1:http://blah.com");
+    addStatusUrlString("false:2:http://blah.com?x=y");
 
     _urlStatusUpdateService.start();
 
