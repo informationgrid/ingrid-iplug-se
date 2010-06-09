@@ -63,8 +63,11 @@ public class UrlStatusUpdateService {
           if (statusAndUrl != null && statusAndUrl.length() > 0) {
             _shouldSleep = false;
             int pos = statusAndUrl.indexOf(':');
-            final String status = statusAndUrl.substring(0, pos);
-            final String url = statusAndUrl.substring(pos + 1);
+            // if third parameter, written in Fetcher, is true then switch on URL-Logging
+            final boolean isUrlLog = statusAndUrl.substring(0, pos).equals("true");
+            int pos2 = statusAndUrl.indexOf(':', pos + 1);
+            final String status = statusAndUrl.substring(pos + 1, pos2);
+            final String url = statusAndUrl.substring(pos2+1);
 
             if (LOG.isDebugEnabled()) {
               LOG.debug("Try to update status '" + status + "' for url '" + url + "'.");
@@ -73,7 +76,7 @@ public class UrlStatusUpdateService {
               
               @Override
               public void run() {
-                updateUrlStatus(Integer.parseInt(status), url);
+                updateUrlStatus(Integer.parseInt(status), url, isUrlLog);
               }
             });
           } else {
@@ -89,9 +92,10 @@ public class UrlStatusUpdateService {
     LOG.info("Poller " + getClass().getName() + " terminated.");
   }
 
-  private void updateUrlStatus(int status, String url) {
+  private void updateUrlStatus(int status, String url, boolean isUrlLog) {
     _urlDao.updateStatus(url, status);
-    _urlLogDao.updateStatus(url, status);
+    if (isUrlLog)
+        _urlLogDao.updateStatus(url, status);
   }
 
   public static String createString(int status, Text url) {

@@ -574,8 +574,11 @@ public class Fetcher extends Configured implements
               // consumer in another thread will update the database with this information.
               InterplugInQueueCommunication<String> instanceForQueues = InterplugInQueueCommunication
                   .getInstanceForStringQueues();
-              instanceForQueues
-                  .offer(InterplugInCommunicationConstants.URLSTATUS_KEY, status.getCode() + ":" + fit.url);
+              instanceForQueues.offer(InterplugInCommunicationConstants.URLSTATUS_KEY,
+                      conf.get("fetcher.log.url") + ":" +
+                      status.getCode() + ":" +
+                      fit.url);
+              
               if (LOG.isDebugEnabled()) {
                   LOG.debug("Set status code '" + status.toString() + "' for url '" + fit.url + "'.");
               }

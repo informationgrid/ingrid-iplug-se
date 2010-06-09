@@ -31,6 +31,15 @@
 </property>
 
 <property>
+  <name>fetcher.log.url</name>
+  <value>false</value>
+  <description>If true, then all fetched URLs will be stored into DB 'UrlLog' along
+  with their status codes. This should be used only for debugging purpose since it
+  slows down the fetching process.
+  </description>
+</property>
+
+<property>
   <name>fetcher.get.snsdata</name>
   <value>true</value>
   <description>If true, then additional data is requested from the SNS Service, which
