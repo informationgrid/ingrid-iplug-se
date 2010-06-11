@@ -126,10 +126,16 @@ public class BasicQueryFilter implements QueryFilter {
 
     
     addTerms(input, query);
+    // rewritten: since most fields are tokenized queries like "wasser in Berlin"
+    // wouldn't be found or better boosted!
     addSloppyPhrases(input, query);
     
     if(query.getClauses().length >0) {
-      output.add(query, BooleanClause.Occur.MUST);
+      // encapsulate query-part inside an optional one which is necessary when
+      // combined with other Queries like SNSQueryFilter
+      BooleanQuery optionalQuery = new BooleanQuery();
+      optionalQuery.add(query, BooleanClause.Occur.SHOULD);
+      output.add(optionalQuery, BooleanClause.Occur.MUST);
     }
     
     if (LOG.isLoggable(Level.FINE)) {
@@ -173,19 +179,39 @@ public class BasicQueryFilter implements QueryFilter {
     }
   }
 
+  /**
+   * This function creates a lucene query for multiple search terms that are
+   * inside the same field only. This is used for boosting, so that a hit gets
+   * a higher score if all search terms are inside one field.
+   * 
+   * @param input
+   * @param output
+   */
   private void addSloppyPhrases(Query input, BooleanQuery output) {
     Clause[] clauses = input.getClauses();
+    BooleanQuery outerQuery = new BooleanQuery();
+    boolean addSloppyQuery = false;
+    
     for (int f = 0; f < FIELDS.length; f++) {
 
-      PhraseQuery sloppyPhrase = new PhraseQuery();
-      sloppyPhrase.setBoost(FIELD_BOOSTS[f] * PHRASE_BOOST);
-      sloppyPhrase
-          .setSlop("anchor".equals(FIELDS[f]) ? NutchDocumentAnalyzer.INTER_ANCHOR_GAP
-              : SLOP);
+      //PhraseQuery sloppyPhrase = new PhraseQuery();
+      //sloppyPhrase.setBoost(FIELD_BOOSTS[f] * PHRASE_BOOST);
+      //sloppyPhrase
+      //    .setSlop("anchor".equals(FIELDS[f]) ? NutchDocumentAnalyzer.INTER_ANCHOR_GAP
+      //        : SLOP);
+      
+      BooleanQuery sloppyQuery = new BooleanQuery();
+              
       int sloppyTerms = 0;
 
       for (int i = 0; i < clauses.length; i++) {
         Clause c = clauses[i];
+        
+        PhraseQuery sloppyPhrase = new PhraseQuery();
+        sloppyPhrase.setBoost(FIELD_BOOSTS[f] * PHRASE_BOOST);
+        sloppyPhrase.setSlop("anchor".equals(FIELDS[f]) ?
+                NutchDocumentAnalyzer.INTER_ANCHOR_GAP
+                : SLOP);
 
         if (!c.getField().equals(Clause.DEFAULT_FIELD))
           continue; // skip non-default fields
@@ -197,12 +223,23 @@ public class BasicQueryFilter implements QueryFilter {
           continue;
 
         sloppyPhrase.add(luceneTerm(FIELDS[f], c.getTerm()));
+        //TermQuery partQuery = new TermQuery(luceneTerm(FIELDS[f], c.getTerm()));
+        // set a boost
+        //partQuery.setBoost(FIELD_BOOSTS[f] * PHRASE_BOOST);
+        // add Term as a must criteria
+        sloppyQuery.add(sloppyPhrase, BooleanClause.Occur.MUST);
         sloppyTerms++;
       }
 
-      if (sloppyTerms > 1)
-        output.add(sloppyPhrase, BooleanClause.Occur.SHOULD);
+      // put terms in brackets
+      if (sloppyTerms > 1) {
+        outerQuery.add(sloppyQuery, BooleanClause.Occur.SHOULD);
+        addSloppyQuery = true;
+      }
     }
+    // put whole query in (optional) bracket 
+    if (addSloppyQuery)
+      output.add(outerQuery, BooleanClause.Occur.SHOULD);
   }
 
   private void addTerms(Clause[] clauses, BooleanQuery output) {

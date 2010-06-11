@@ -86,8 +86,15 @@ public class LanguageIndexingFilter implements IndexingFilter {
       lang = this.languageIdentifier.identify(text);
     }
 
+    // use language configured in url-maintenance
+    // languages will be put according to the host of the administered URLs
+    // (see MetadataMerger)
     if (lang == null) {
-      lang = "unknown";
+      lang = parse.getData().getParseMeta().get("lang");
+      // this should never happen, only if crawl broke out of a limit url
+      // which would be an error
+      if (lang == null)
+        lang = "unknown";
     }
 
     doc.add("lang", lang);

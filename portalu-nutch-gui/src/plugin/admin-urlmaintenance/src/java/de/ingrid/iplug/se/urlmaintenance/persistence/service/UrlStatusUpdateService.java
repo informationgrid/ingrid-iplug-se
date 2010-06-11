@@ -63,11 +63,14 @@ public class UrlStatusUpdateService {
           if (statusAndUrl != null && statusAndUrl.length() > 0) {
             _shouldSleep = false;
             int pos = statusAndUrl.indexOf(':');
-            // if third parameter, written in Fetcher, is true then switch on URL-Logging
-            final boolean isUrlLog = statusAndUrl.substring(0, pos).equals("true");
+            // if first parameter, written in Fetcher, is true then switch on All-URL-Logging
+            final boolean isAllUrlLog = statusAndUrl.substring(0, pos).equals("true");
             int pos2 = statusAndUrl.indexOf(':', pos + 1);
-            final String status = statusAndUrl.substring(pos + 1, pos2);
-            final String url = statusAndUrl.substring(pos2+1);
+            // if second parameter, written in Fetcher, is true then switch on Start-URL-Logging
+            final boolean isStartUrlLog = statusAndUrl.substring(pos + 1, pos2).equals("true");
+            pos = statusAndUrl.indexOf(':', pos2 + 1);
+            final String status = statusAndUrl.substring(pos2 + 1, pos);
+            final String url = statusAndUrl.substring(pos+1);
 
             if (LOG.isDebugEnabled()) {
               LOG.debug("Try to update status '" + status + "' for url '" + url + "'.");
@@ -76,7 +79,7 @@ public class UrlStatusUpdateService {
               
               @Override
               public void run() {
-                updateUrlStatus(Integer.parseInt(status), url, isUrlLog);
+                updateUrlStatus(Integer.parseInt(status), url, isAllUrlLog, isStartUrlLog);
               }
             });
           } else {
@@ -92,10 +95,11 @@ public class UrlStatusUpdateService {
     LOG.info("Poller " + getClass().getName() + " terminated.");
   }
 
-  private void updateUrlStatus(int status, String url, boolean isUrlLog) {
-    _urlDao.updateStatus(url, status);
-    if (isUrlLog)
-        _urlLogDao.updateStatus(url, status);
+  private void updateUrlStatus(int status, String url, boolean isAllUrlLog, boolean isStartUrlLog) {
+    if (isStartUrlLog)
+      _urlDao.updateStatus(url, status);
+    if (isAllUrlLog)
+      _urlLogDao.updateStatus(url, status);
   }
 
   public static String createString(int status, Text url) {

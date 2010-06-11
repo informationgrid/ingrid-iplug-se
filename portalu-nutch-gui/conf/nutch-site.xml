@@ -31,11 +31,19 @@
 </property>
 
 <property>
-  <name>fetcher.log.url</name>
+  <name>fetcher.log.url.all</name>
   <value>false</value>
   <description>If true, then all fetched URLs will be stored into DB 'UrlLog' along
   with their status codes. This should be used only for debugging purpose since it
   slows down the fetching process.
+  </description>
+</property>
+
+<property>
+  <name>fetcher.log.url.start</name>
+  <value>false</value>
+  <description>If true, then only Start-URLs will be stored and updated in DB 'Url' along
+  with their status codes. 
   </description>
 </property>
 

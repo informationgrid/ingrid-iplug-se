@@ -41,7 +41,8 @@
         <parameter name="raw-fields" value="foo"/>
         <parameter name="fields" value="bar"/>
 -->        
-        <parameter name="raw-fields" value="datatype,funct_category,partner,topic,provider,lang,alt_title"/>
+        <!-- lang will be inserted by language-identifier PlugIn! -->
+        <parameter name="raw-fields" value="datatype,funct_category,partner,topic,provider,alt_title"/>
       </implementation> 
                       
    </extension>

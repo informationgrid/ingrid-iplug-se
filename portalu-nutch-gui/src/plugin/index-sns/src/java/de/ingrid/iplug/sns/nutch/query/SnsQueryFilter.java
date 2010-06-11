@@ -218,17 +218,22 @@ public class SnsQueryFilter implements QueryFilter {
      * @param set
      */
     private void addBuzzwordToBasicQuery(org.apache.lucene.search.Query query2, Set<Term> set) {
+        BooleanQuery buzzwordTermQuery = new BooleanQuery();
         if (query2 instanceof BooleanQuery) {
             for (Term term : set) {
                 if (term.field().equals("url")) {
                     for (String buzzword : fBuzzwordSet) {
                         org.apache.lucene.search.Query buzzwordQuery = new TermQuery(new Term("buzzword", buzzword));
-                        ((BooleanQuery) query2).add(buzzwordQuery, Occur.SHOULD);
+                        ((BooleanQuery) buzzwordTermQuery).add(buzzwordQuery, Occur.MUST);
                     }
                     break;
                 }
             }
+            // add all buzzwords to the query as optional
+            if (buzzwordTermQuery.getClauses().length != 0)
+                ((BooleanQuery) query2).add(buzzwordTermQuery, Occur.SHOULD);
         }
+        
     }
 
     /**

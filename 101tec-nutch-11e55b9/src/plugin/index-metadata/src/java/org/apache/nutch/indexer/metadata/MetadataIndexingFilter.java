@@ -51,7 +51,7 @@ public class MetadataIndexingFilter implements IndexingFilter {
 
     Extension[] extensions = pluginDescriptor.getExtensions();
     for (Extension extension : extensions) {
-      if (MetadataQueryFilter.class.getSimpleName().equals(extension.getId())) {
+      if (MetadataIndexingFilter.class.getSimpleName().equals(extension.getId())) {
         // add raw fields query filter
         String rawFields = extension.getAttribute("raw-fields");
         if (rawFields != null) {

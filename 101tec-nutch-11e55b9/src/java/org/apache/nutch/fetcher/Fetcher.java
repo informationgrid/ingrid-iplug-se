@@ -575,7 +575,8 @@ public class Fetcher extends Configured implements
               InterplugInQueueCommunication<String> instanceForQueues = InterplugInQueueCommunication
                   .getInstanceForStringQueues();
               instanceForQueues.offer(InterplugInCommunicationConstants.URLSTATUS_KEY,
-                      conf.get("fetcher.log.url") + ":" +
+                      conf.get("fetcher.log.url.all") + ":" +
+                      conf.get("fetcher.log.url.start") + ":" +
                       status.getCode() + ":" +
                       fit.url);
               
