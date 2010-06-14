@@ -27,14 +27,15 @@
 			name		="indexOptions"
 			displayText	="iBus-Kommunikations-Parameter"
 			target		="communicationIndex">
+
+            <comment displayText="" explanatoryText="Der Client-Name muss eindeutig sein, da es sonst zu Kommunikationsproblemen zum iBus fuehren kann."/>
+            <comment displayText="" explanatoryText="Die Server-IP ist die Adresse des Rechners, auf dem der iBus ueber dem Server-Port angesprochen werden kann."/>			
 			
-			<text property="indexClientName" displayText="Client Name:" defaultValue="/ingrid-group:iplug-se-'Ihr-Name'"/>
+            <text property="indexClientName" displayText="Client Name:" defaultValue="/ingrid-group:iplug-se-'Ihr-Name'"/>
 			<text property="indexServerName" displayText="Server Name:" defaultValue="/kug-group:kug-ibus"/>
 			<text property="indexServerIp"   displayText="Server IP:"   defaultValue="192.168.64.117"/>
 			<text property="indexServerPort" displayText="Server Port:" defaultValue="80"/>
 			
-			<comment displayText="" explanatoryText="Der Client-Name muss eindeutig sein, da es sonst zu Kommunikationsproblemen zum iBus fuehren kann."/>
-			<comment displayText="" explanatoryText="Die Server-IP ist die Adresse des Rechners, auf dem der iBus ueber dem Server-Port angesprochen werden kann."/>
 	</page>
 
     <!--
@@ -53,17 +54,32 @@
 			<comment displayText="" explanatoryText="Die Server-IP ist die Adresse des Rechners, auf dem der iBus ueber dem Server-Port angesprochen werden kann."/>
 	</page>
     -->
+    
+    <page
+            type        ="input"
+            name        ="adminOptions"
+            displayText ="Ports für die Administration von Indexer und Searcher"
+            target      ="portSettings">
+
+            <comment displayText="" explanatoryText="Eingabe der Ports über die die Adminoberflächen des Indexer und Searcher erreichbar sein soll."/>
+            
+            <text property="adminIndexPort"  displayText="Port für Indexer:"  defaultValue="50060"/>
+            <text property="adminSearchPort" displayText="Port für Searcher:" defaultValue="50059"/>
+            
+    </page>
 	
     <page
             type        ="input"
             name        ="mysqlOptions"
             displayText ="MySQL - Parameter für die URL-Pflege"
             target      ="mysqlSettings">
+
+            <comment displayText="" explanatoryText="An access to a MySQL database is needed where a database with the name 'iplugse' must exist! This is where the URLs are stored."/>
             
+            <text property="mysqlJdbcUrl"  displayText="MySQL JDBC-Url:"     defaultValue="jdbc:mysql://192.168.64.117/iplugse"/>
             <text property="mysqlUserName" displayText="MySQL Benutzername:" defaultValue="root"/>
             <text property="mysqlPassword" displayText="MySQL Passwort:"     defaultValue=""/>
             
-            <comment displayText="" explanatoryText="An access to a MySQL database is needed where a database with the name 'iplugse' must exist! This is where the URLs are stored."/>
     </page>
     
 	<page

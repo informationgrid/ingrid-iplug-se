@@ -41,7 +41,7 @@
 
 <property>
   <name>fetcher.log.url.start</name>
-  <value>false</value>
+  <value>true</value>
   <description>If true, then only Start-URLs will be stored and updated in DB 'Url' along
   with their status codes. 
   </description>

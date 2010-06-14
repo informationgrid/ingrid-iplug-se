@@ -1,7 +1,7 @@
 <de.ingrid.utils.PlugDescription>
   <int>2</int>
   <string>IPLUG_ADMIN_GUI_PORT</string>
-  <int>50060</int>
+  <int>@ADMIN_PORT@</int>
   <string>workingDirectory</string>
   <string>./nutch-instances</string>
 </de.ingrid.utils.PlugDescription>

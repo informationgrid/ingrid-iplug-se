@@ -6,6 +6,8 @@
 	<property name="iPlugName" value="${project.artifactId}-${project.version}" />
 	<property name="index-xml-communication" 	value="${installDir}/conf/communication-index.xml"/>
 	<property name="search-xml-communication" 	value="${installDir}/conf/communication-search.xml"/>
+    <property name="pd-index-xml"               value="${installDir}/conf/plugdescription-index.xml"/>
+    <property name="pd-search-xml"              value="${installDir}/conf/plugdescription-search.xml"/>
     <property name="persistence-xml"            value="${installDir}/plugins/admin-urlmaintenance/conf/META-INF/persistence.xml"/>
 
 	<target name="install" description="Extract all files to the installation directory.">
@@ -53,11 +55,19 @@
 		<replace file="${search-xml-communication}" token="${searchXML.communication.client.connections.server.socket(port)}" 	value="${searchServerPort}"/>		
 	</target>-->
     
+    <target name="portSettings" description="Set ports for the iPlugs.">
+        <echo>Schreibe Ports in die PlugDescriptions
+        </echo>
+        <replace file="${pd-index-xml}"  token="@ADMIN_PORT@"   value="${adminIndexPort}"/>
+        <replace file="${pd-search-xml}" token="@ADMIN_PORT@"   value="${adminSearchPort}"/>
+    </target>
+    
     <target name="mysqlSettings" description="Set configuration correctly for the mysql-database.">
         <echo>Schreibe Konfigurations Parameter für die URL-Pflege (MySQL)
         </echo>
         <replace file="${persistence-xml}" token="@MYSQL_USERNAME@"    value="${mysqlUserName}"/>
         <replace file="${persistence-xml}" token="@MYSQL_PASSWORD@"    value="${mysqlPassword}"/>
+        <replace file="${persistence-xml}" token="@MYSQL_JDBC_URL@"    value="${mysqlJdbcUrl}"/>
     </target>
 
 	<target name="startIPlug">
