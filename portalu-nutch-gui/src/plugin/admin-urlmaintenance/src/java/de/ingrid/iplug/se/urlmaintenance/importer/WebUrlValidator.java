@@ -142,6 +142,9 @@ public class WebUrlValidator implements IUrlValidator {
         if (keyValues.isEmpty()) {
           errorCodes.put("metadata.empty", whiteUrlString);
           errorCount++;
+        } else if (!keyValues.containsKey("datatype")) {
+            errorCodes.put("metadata.missing", whiteUrlString);
+            errorCount++;
         } else {
           for (final String key : keyValues.keySet()) {
             if (!_supportedMetadatas.containsKey(key)) {
