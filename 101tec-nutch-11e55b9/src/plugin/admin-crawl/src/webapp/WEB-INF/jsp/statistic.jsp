@@ -42,6 +42,7 @@
 			<div id="yui-main">
 				<div class="yui-b">
 					<h3><fmt:message key="crawlStatistics.crawlDbStatsTotal" bundle="${localBundle}"/></h3>
+					<br /><a href="javascript:history.back();"><fmt:message key="crawlStatistics.backLink" bundle="${localBundle}"/></a>
 					<div id="chart" style="height:${(fn:length(crawldbStatistic)) * 100}px">Unable to load Flash content.</div>
 
 					<script type="text/javascript">
