@@ -96,9 +96,11 @@
 										    <row>
 										        <label><fmt:message key="scheduling.daytime" bundle="${localBundle}"/>:</label>
 										        <field>
-										           	<form:select path="period">
-								        				<form:options items="${periods}"/>	
-								        			</form:select>
+										        	<form:select path="period">
+										        		<c:forEach var="period" items="${periods}">
+										        			<option value="${period}"><fmt:message key="scheduling.day.${period}" bundle="${localBundle}"/></option>
+										        		</c:forEach>
+										        	</form:select>
 										            <div class="error"><form:errors path="period" /></div>
 										        </field>
 										        <desc></desc>
@@ -171,10 +173,12 @@
 										    <row>
 										        <label><fmt:message key="scheduling.daytime" bundle="${localBundle}"/>:</label>
 										        <field>
-										           	<form:select path="period">
-								        				<form:options items="${periods}"/>	
-								        			</form:select>
-										            <div class="error"><form:errors path="period" /></div>
+													<form:select path="period">
+										        		<c:forEach var="period" items="${periods}">
+										        			<option value="${period}"><fmt:message key="scheduling.day.${period}" bundle="${localBundle}"/></option>
+										        		</c:forEach>
+										        	</form:select>
+                                					<div class="error"><form:errors path="period" /></div>
 										        </field>
 										        <desc></desc>
 										    </row>
@@ -200,7 +204,7 @@
 			
 									    	YAHOO.util.Event.onContentReady("dayOfWeekButtons", function () {
 									    		<c:forEach items="${days}" var="day">
-										            var oCheckButton_${day} = new Button("dayOfWeekButtons_${day}", { label:"${day}"});
+										            var oCheckButton_${day} = new Button("dayOfWeekButtons_${day}", { label:"<fmt:message key="scheduling.day.${day}"  bundle="${localBundle}"/>"});
 									            </c:forEach>
 									        });
 			
@@ -276,10 +280,12 @@
 										    <row>
 										        <label><fmt:message key="scheduling.daytime" bundle="${localBundle}"/>:</label>
 										        <field>
-										           	<form:select path="period">
-								        				<form:options items="${periods}"/>	
-								        			</form:select>
-										            <div class="error"><form:errors path="period" /></div>
+													<form:select path="period">
+										        		<c:forEach var="period" items="${periods}">
+										        			<option value="${period}"><fmt:message key="scheduling.day.${period}" bundle="${localBundle}"/></option>
+										        		</c:forEach>
+										        	</form:select>
+													<div class="error"><form:errors path="period" /></div>
 										        </field>
 										        <desc></desc>
 										    </row>
