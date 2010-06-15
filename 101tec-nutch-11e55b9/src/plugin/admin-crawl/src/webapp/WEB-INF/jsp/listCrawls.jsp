@@ -67,7 +67,8 @@
 					            	<th><fmt:message key="listCrawls.searchable" bundle="${localBundle}"/></th>
 					            	<th><fmt:message key="listCrawls.status" bundle="${localBundle}"/></th>
 					            	<th><fmt:message key="listCrawls.path" bundle="${localBundle}"/></th>
-					                <th><fmt:message key="listCrawls.size" bundle="${localBundle}"/></th>
+					              <th><fmt:message key="listCrawls.size" bundle="${localBundle}"/></th>
+                        <th>&nbsp;</th>
 					            </tr>
 					        </thead>
 					        <tbody>
@@ -129,6 +130,11 @@
 						            		</form>
 						            	</td>
 						            	<td>
+						            		<a href="crawlDetails.html?crawlFolder=${crawlPath.path.name}"><img src="../theme/${theme}/gfx/info.png"/></a>
+						            	</td>
+						            	<td><a href="crawlDetails.html?crawlFolder=${crawlPath.path.name}">${crawlPath.path.name}</a></td>
+						              <td>${crawlPath.size}</td>
+                          <td>
 						            		<c:choose>
 						            			<c:when test="${empty runningCrawl}">
 								            		<a href="#" id="showStartCrawl${i.index}" onclick="document.getElementById('crawlFolder').value = '${crawlPath.path.name}'"><img src="../theme/${theme}/gfx/play.png"/></a>
@@ -144,9 +150,7 @@
 						            				</c:choose>
 						            			</c:otherwise>
 						            		</c:choose>
-						            	</td>
-						            	<td><a href="crawlDetails.html?crawlFolder=${crawlPath.path.name}">${crawlPath.path.name}</a></td>
-						                <td>${crawlPath.size}</td>
+						            	</td>  
 						            </tr>
 								</c:forEach>
 					        </tbody>
@@ -157,25 +161,28 @@
 					    YAHOO.example.EnhanceFromMarkup = function() {
 					        var myColumnDefs = [
 								{key:"searchable",label:"<fmt:message key="listCrawls.searchable" bundle="${localBundle}"/>", sortable:true},
-								{key:"status",label:"<fmt:message key="listCrawls.status" bundle="${localBundle}"/>", sortable:true},
+								{key:"info",label:"<fmt:message key="listCrawls.status" bundle="${localBundle}"/>", sortable:true},
 								{key:"path",label:"<fmt:message key="listCrawls.path" bundle="${localBundle}"/>", sortable:true},
-					            {key:"size",label:"<fmt:message key="listCrawls.size" bundle="${localBundle}"/>", sortable:true},
+					      {key:"size",label:"<fmt:message key="listCrawls.size" bundle="${localBundle}"/>", sortable:true},
+                {key:"status",label:"", sortable:false}      
 					        ];
 					
 					        var myDataSource = new YAHOO.util.DataSource(YAHOO.util.Dom.get("crawls"));
 					        myDataSource.responseType = YAHOO.util.DataSource.TYPE_HTMLTABLE;
 					        myDataSource.responseSchema = {
-					            fields: [{key:"searchable"},{key:"status"}, {key:"path"},{key:"size", parser:"number"},
+					            fields: [{key:"searchable"},{key:"info"}, {key:"path"},{key:"size", parser:"number"},{key:"status"}
 					            ]
 					        };
-					
+
 					        var myDataTable = new YAHOO.widget.DataTable("markup", myColumnDefs, myDataSource);
-					        myDataTable.sortColumn(myDataTable.getColumn("path"), YAHOO.widget.DataTable.CLASS_ASC);
+                  myDataTable.sortColumn(myDataTable.getColumn("path"), YAHOO.widget.DataTable.CLASS_ASC);
+					        
 					        return {
 					            oDS: myDataSource,
 					            oDT: myDataTable
 					        };
 					    }();
+              
 					};
 					</script>						
 		
