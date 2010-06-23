@@ -269,8 +269,6 @@ else
   CLASS=$COMMAND
 fi
 
-echo "Classpath: $CLASSPATH"
-
 # run it
 exec "$JAVA" $JAVA_HEAP_MAX $NUTCH_OPTS -classpath "$CLASSPATH" $CLASS "$@"
 # run it in debugging mode

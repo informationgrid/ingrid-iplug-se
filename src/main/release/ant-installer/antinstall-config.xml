@@ -58,13 +58,14 @@
     <page
             type        ="input"
             name        ="adminOptions"
-            displayText ="Ports für die Administration von Indexer und Searcher"
+            displayText ="Einstellungen für die Administration von Indexer und Searcher"
             target      ="portSettings">
 
-            <comment displayText="" explanatoryText="Eingabe der Ports über die die Adminoberflächen des Indexer und Searcher erreichbar sein soll."/>
+            <comment displayText="" explanatoryText="Eingabe der Ports über die die Adminoberflächen des Indexer und Searcher erreichbar sein soll. Überdies wird das Password für die Adminoberfläche der Searcherkomponente hier festgelegt."/>
             
             <text property="adminIndexPort"  displayText="Port für Indexer:"  defaultValue="50060"/>
             <text property="adminSearchPort" displayText="Port für Searcher:" defaultValue="50059"/>
+            <text property="adminSearchPassword" displayText="Passwort für Searcher-Adminoberfläche:" defaultValue="admin"/>
             
     </page>
 	

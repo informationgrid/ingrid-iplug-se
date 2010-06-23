@@ -56,10 +56,14 @@
 	</target>-->
     
     <target name="portSettings" description="Set ports for the iPlugs.">
-        <echo>Schreibe Ports in die PlugDescriptions
+        <echo>Schreibe Einstellungen in die PlugDescriptions
         </echo>
-        <replace file="${pd-index-xml}"  token="@ADMIN_PORT@"   value="${adminIndexPort}"/>
-        <replace file="${pd-search-xml}" token="@ADMIN_PORT@"   value="${adminSearchPort}"/>
+        <replace file="${pd-index-xml}"  token="@ADMIN_PORT@"       value="${adminIndexPort}"/>
+        
+        <replace file="${pd-search-xml}" token="@ADMIN_PORT@"       value="${adminSearchPort}"/>
+        <replace file="${pd-search-xml}" token="@ADMIN_PASSWORD@"   value="${adminSearchPassword}"/>
+        <replace file="${pd-search-xml}" token="@IBUS_URL@"         value="${indexServerName}"/>
+        <replace file="${pd-search-xml}" token="@PROXYSERVICEURL@"  value="${indexClientName}-search"/>
     </target>
     
     <target name="mysqlSettings" description="Set configuration correctly for the mysql-database.">
