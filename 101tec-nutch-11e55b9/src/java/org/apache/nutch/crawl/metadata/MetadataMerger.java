@@ -43,6 +43,7 @@ import org.apache.nutch.crawl.metadata.ParseDataWrapper.UrlParseDataContainer;
 import org.apache.nutch.metadata.Metadata;
 import org.apache.nutch.parse.ParseData;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 
 public class MetadataMerger extends Configured {
 
@@ -140,7 +141,7 @@ public class MetadataMerger extends Configured {
     mergeJob.setOutputFormat(MapFileOutputFormat.class);
     mergeJob.setOutputKeyClass(HostType.class);
     mergeJob.setOutputValueClass(ObjectWritable.class);
-    JobClient.runJob(mergeJob);
+    SyncUtil.syncJobRun(mergeJob);//JobClient.runJob(mergeJob);
   }
 
 }

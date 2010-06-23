@@ -65,6 +65,7 @@ import org.apache.nutch.scoring.webgraph.Node;
 import org.apache.nutch.scoring.webgraph.WebGraph;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 import org.apache.nutch.util.URLUtil;
 
 /**
@@ -123,7 +124,7 @@ public class BasicFields
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(FieldsWritable.class);
 
-    JobClient.runJob(job);
+    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
     if (LOG.isInfoEnabled()) {
       LOG.info("BasicFields: finished extractor");
     }
@@ -157,7 +158,7 @@ public class BasicFields
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(LinkDatum.class);
 
-    JobClient.runJob(job);
+    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
     if (LOG.isInfoEnabled()) {
       LOG.info("BasicFields: finished flipper");
     }
@@ -191,7 +192,7 @@ public class BasicFields
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(FieldsWritable.class);
 
-    JobClient.runJob(job);
+    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
     if (LOG.isInfoEnabled()) {
       LOG.info("BasicFields: finished scorer");
     }
@@ -222,7 +223,7 @@ public class BasicFields
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(FieldsWritable.class);
 
-    JobClient.runJob(job);
+    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
     if (LOG.isInfoEnabled()) {
       LOG.info("BasicFields: finished merger");
     }

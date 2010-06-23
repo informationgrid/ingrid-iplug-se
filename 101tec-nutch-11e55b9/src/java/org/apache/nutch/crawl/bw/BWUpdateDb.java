@@ -55,6 +55,7 @@ import org.apache.nutch.net.URLFilters;
 import org.apache.nutch.net.URLNormalizers;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 
 /**
  * CrawlDb update tool that only updates urls that passing a white-black list
@@ -342,7 +343,7 @@ public class BWUpdateDb extends Configured {
         job.setOutputValueClass(Entry.class);
         job.setBoolean(BWMapper.URL_FILTERING, filter);
         job.setBoolean(BWMapper.URL_NORMALIZING, normalize);
-        JobClient.runJob(job);
+        SyncUtil.syncJobRun(job);//JobClient.runJob(job);
 
         // filtering
         LOG.info("bw update: filtering started.");
@@ -360,7 +361,7 @@ public class BWUpdateDb extends Configured {
         filterJob.setOutputFormat(MapFileOutputFormat.class);
         filterJob.setOutputKeyClass(HostTypeKey.class);
         filterJob.setOutputValueClass(ObjectWritable.class);
-        JobClient.runJob(filterJob);
+        SyncUtil.syncJobRun(filterJob);//JobClient.runJob(filterJob);
 
         // remove wrappedSegOutput
         FileSystem.get(job).delete(wrappedSegOutput, true);
@@ -378,7 +379,7 @@ public class BWUpdateDb extends Configured {
         convertJob.setOutputFormat(MapFileOutputFormat.class);
         convertJob.setOutputKeyClass(Text.class);
         convertJob.setOutputValueClass(CrawlDatum.class);
-        JobClient.runJob(convertJob);
+        SyncUtil.syncJobRun(convertJob);//JobClient.runJob(convertJob);
 
         // 
         FileSystem.get(job).delete(tmpMergedDb, true);
@@ -394,7 +395,7 @@ public class BWUpdateDb extends Configured {
 
         FileInputFormat.addInputPath(updateJob, tmpFormatOut);
         LOG.info("bw update: Merging bw filtered segment data into db.");
-        JobClient.runJob(updateJob);
+        SyncUtil.syncJobRun(updateJob);//JobClient.runJob(updateJob);
         FileSystem.get(job).delete(tmpFormatOut, true);
 
         LOG.info("install crawldb");
@@ -423,7 +424,7 @@ public class BWUpdateDb extends Configured {
         job.setOutputKeyClass(HostTypeKey.class);
         job.setOutputValueClass(BWPatterns.class);
 
-        JobClient.runJob(job);
+        SyncUtil.syncJobRun(job);//JobClient.runJob(job);
         if (LOG.isInfoEnabled()) {
             LOG.info("BWDb dump: done");
         }

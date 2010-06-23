@@ -17,22 +17,50 @@
 
 package org.apache.nutch.crawl;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.text.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Random;
 
-// Commons Logging imports
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.apache.hadoop.io.*;
-import org.apache.hadoop.conf.*;
-import org.apache.hadoop.mapred.*;
-import org.apache.hadoop.util.*;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-
+import org.apache.hadoop.io.FloatWritable;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.SequenceFile;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.Writable;
+import org.apache.hadoop.io.WritableComparable;
+import org.apache.hadoop.io.WritableComparator;
+import org.apache.hadoop.mapred.FileInputFormat;
+import org.apache.hadoop.mapred.FileOutputFormat;
+import org.apache.hadoop.mapred.JobClient;
+import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapred.MapFileOutputFormat;
+import org.apache.hadoop.mapred.MapReduceBase;
+import org.apache.hadoop.mapred.Mapper;
+import org.apache.hadoop.mapred.OutputCollector;
+import org.apache.hadoop.mapred.Partitioner;
+import org.apache.hadoop.mapred.Reducer;
+import org.apache.hadoop.mapred.Reporter;
+import org.apache.hadoop.mapred.SequenceFileInputFormat;
+import org.apache.hadoop.mapred.SequenceFileOutputFormat;
+import org.apache.hadoop.util.StringUtils;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 import org.apache.nutch.metadata.Nutch;
 import org.apache.nutch.net.URLFilterException;
 import org.apache.nutch.net.URLFilters;
@@ -42,6 +70,7 @@ import org.apache.nutch.scoring.ScoringFilters;
 import org.apache.nutch.util.LockUtil;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 
 /** Generates a subset of a crawl db to fetch. */
 public class Generator extends Configured implements Tool {
@@ -474,7 +503,8 @@ public class Generator extends Configured implements Tool {
     job.setOutputKeyComparatorClass(DecreasingFloatComparator.class);
     job.setOutputValueClass(SelectorEntry.class);
     try {
-      JobClient.runJob(job);
+      //JobClient.runJob(job);    
+      SyncUtil.syncJobRun(job);
     } catch (IOException e) {
       LockUtil.removeLockFile(fs, lock);
       throw e;
@@ -526,7 +556,7 @@ public class Generator extends Configured implements Tool {
     job.setOutputValueClass(CrawlDatum.class);
     job.setOutputKeyComparatorClass(HashComparator.class);
     try {
-      JobClient.runJob(job);
+        SyncUtil.syncJobRun(job);//JobClient.runJob(job);
     } catch (IOException e) {
       LockUtil.removeLockFile(fs, lock);
       fs.delete(tempDir, true);
@@ -551,7 +581,7 @@ public class Generator extends Configured implements Tool {
       job.setOutputValueClass(CrawlDatum.class);
       FileOutputFormat.setOutputPath(job, tempDir2);
       try {
-        JobClient.runJob(job);
+          SyncUtil.syncJobRun(job);//JobClient.runJob(job);
         CrawlDb.install(job, dbDir);
       } catch (IOException e) {
         LockUtil.removeLockFile(fs, lock);

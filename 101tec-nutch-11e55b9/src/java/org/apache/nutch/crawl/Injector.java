@@ -35,6 +35,7 @@ import org.apache.nutch.scoring.ScoringFilterException;
 import org.apache.nutch.scoring.ScoringFilters;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 
 /** This class takes a flat file of URLs and adds them to the of pages to be
  * crawled.  Useful for bootstrapping the system. */
@@ -157,7 +158,7 @@ public class Injector extends Configured implements Tool {
     sortJob.setOutputKeyClass(Text.class);
     sortJob.setOutputValueClass(CrawlDatum.class);
     sortJob.setLong("injector.current.time", System.currentTimeMillis());
-    JobClient.runJob(sortJob);
+    SyncUtil.syncJobRun(sortJob);//JobClient.runJob(sortJob);
 
     // merge with existing crawl db
     if (LOG.isInfoEnabled()) {
@@ -166,7 +167,7 @@ public class Injector extends Configured implements Tool {
     JobConf mergeJob = CrawlDb.createJob(getConf(), crawlDb);
     FileInputFormat.addInputPath(mergeJob, tempDir);
     mergeJob.setReducerClass(InjectReducer.class);
-    JobClient.runJob(mergeJob);
+    SyncUtil.syncJobRun(mergeJob);//JobClient.runJob(mergeJob);
     CrawlDb.install(mergeJob, crawlDb);
 
     // clean up

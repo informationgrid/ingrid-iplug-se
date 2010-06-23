@@ -36,6 +36,7 @@ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.hadoop.mapred.lib.InverseMapper;
 import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.crawl.CrawlDb;
+import org.apache.nutch.util.SyncUtil;
 
 public class HostStatistic extends Configured {
 
@@ -176,27 +177,27 @@ public class HostStatistic extends Configured {
     Path tempCrawldb = new Path(getConf().get("mapred.temp.dir", "."), name);
     JobConf countJob = createCountJob(INPUT_OPTION_CRAWLDB_DIR, crawldb,
         tempCrawldb);
-    JobClient.runJob(countJob);
+    SyncUtil.syncJobRun(countJob);//JobClient.runJob(countJob);
 
     LOG.info("START FETCH STATISTIC");
     name = "shard-statistic-temp-" + id;
     Path tempFetch = new Path(getConf().get("mapred.temp.dir", "."), name);
     countJob = createCountJob(INPUT_OPTION_FETCH_DIR, segment, tempFetch);
-    JobClient.runJob(countJob);
+    SyncUtil.syncJobRun(countJob);//JobClient.runJob(countJob);
 
     name = "crawldb-sequence-temp-" + id;
     Path tempSequenceCrawldb = new Path(getConf().get("mapred.temp.dir", "."),
         name);
     JobConf sequenceCrawldbJob = createSequenceFileJob(tempCrawldb,
         tempSequenceCrawldb);
-    JobClient.runJob(sequenceCrawldbJob);
+    SyncUtil.syncJobRun(sequenceCrawldbJob);//JobClient.runJob(sequenceCrawldbJob);
 
     name = "shard-sequence-temp-" + id;
     Path tempSequenceShard = new Path(getConf().get("mapred.temp.dir", "."),
         name);
     JobConf sequenceShardJob = createSequenceFileJob(tempFetch,
         tempSequenceShard);
-    JobClient.runJob(sequenceShardJob);
+    SyncUtil.syncJobRun(sequenceShardJob);//JobClient.runJob(sequenceShardJob);
 
     // sort the output files into one file
     Sorter sorter = new SequenceFile.Sorter(fileSystem,

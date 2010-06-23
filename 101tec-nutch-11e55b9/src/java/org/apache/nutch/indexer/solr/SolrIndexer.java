@@ -37,6 +37,7 @@ import org.apache.nutch.indexer.IndexerMapReduce;
 import org.apache.nutch.indexer.NutchIndexWriterFactory;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 
 public class SolrIndexer extends Configured implements Tool {
 
@@ -70,7 +71,7 @@ public class SolrIndexer extends Configured implements Tool {
 
     FileOutputFormat.setOutputPath(job, tmp);
     try {
-      JobClient.runJob(job);
+        SyncUtil.syncJobRun(job);//JobClient.runJob(job);
     } finally {
       FileSystem.get(job).delete(tmp, true);
     }

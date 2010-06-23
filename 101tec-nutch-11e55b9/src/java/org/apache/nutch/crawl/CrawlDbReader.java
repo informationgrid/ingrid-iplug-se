@@ -59,6 +59,7 @@ import org.apache.hadoop.util.Progressable;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
 import org.apache.nutch.util.StringUtil;
+import org.apache.nutch.util.SyncUtil;
 
 /**
  * Read utility for the CrawlDB.
@@ -313,7 +314,7 @@ public class CrawlDbReader implements Closeable {
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(LongWritable.class);
 
-    JobClient.runJob(job);
+    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
 
     // reading the result
     FileSystem fileSystem = FileSystem.get(config);
@@ -413,7 +414,7 @@ public class CrawlDbReader implements Closeable {
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(CrawlDatum.class);
 
-    JobClient.runJob(job);
+    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
     if (LOG.isInfoEnabled()) { LOG.info("CrawlDb dump: done"); }
   }
 
@@ -444,7 +445,7 @@ public class CrawlDbReader implements Closeable {
 
     // XXX hmmm, no setFloat() in the API ... :(
     job.setLong("db.reader.topn.min", Math.round(1000000.0 * min));
-    JobClient.runJob(job); 
+    SyncUtil.syncJobRun(job);//JobClient.runJob(job); 
     
     if (LOG.isInfoEnabled()) {
       LOG.info("CrawlDb topN: collecting topN scores.");
@@ -465,7 +466,7 @@ public class CrawlDbReader implements Closeable {
 
     job.setNumReduceTasks(1); // create a single file.
     
-    JobClient.runJob(job);
+    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
     FileSystem fs = FileSystem.get(config);
     fs.delete(tempDir, true);
     if (LOG.isInfoEnabled()) { LOG.info("CrawlDb topN: done"); }

@@ -43,6 +43,7 @@ import org.apache.hadoop.util.ToolRunner;
 import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 import org.apache.nutch.util.URLUtil;
 
 /**
@@ -110,7 +111,7 @@ implements Tool, Mapper<Text, CrawlDatum, Text, LongWritable>,
     job.setCombinerClass(DomainStatisticsCombiner.class);
     job.setNumReduceTasks(numOfReducers);
     
-    JobClient.runJob(job);
+    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
     
     return 0;
   }

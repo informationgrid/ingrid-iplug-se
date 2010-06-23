@@ -62,6 +62,7 @@ import org.apache.nutch.protocol.Content;
 import org.apache.nutch.util.HadoopFSUtil;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 
 import de.ingrid.iplug.se.crawl.sns.CompressedSnsData;
 
@@ -646,7 +647,7 @@ public class SegmentMerger extends Configured implements
       job.setOutputValueClass(MetaWrapper.class);
       job.setOutputFormat(SegmentOutputFormat.class);
       setConf(job);
-      JobClient.runJob(job);
+      SyncUtil.syncJobRun(job);//JobClient.runJob(job);
     }
   
   }

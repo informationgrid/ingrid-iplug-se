@@ -65,6 +65,7 @@ import org.apache.nutch.indexer.NutchSimilarity;
 import org.apache.nutch.util.LogUtil;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 
 public class FieldIndexer
   extends Configured
@@ -264,7 +265,7 @@ public class FieldIndexer
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(LuceneDocumentWrapper.class);
 
-    JobClient.runJob(job);
+    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
     if (LOG.isInfoEnabled()) {
       LOG.info("FieldIndexer: done");
     }

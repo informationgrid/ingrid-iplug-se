@@ -26,6 +26,7 @@ import org.apache.hadoop.util.ToolRunner;
 import org.apache.nutch.indexer.DeleteDuplicates;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -346,7 +347,7 @@ Tool {
     job.setMapperClass(IdentityMapper.class);
     job.setReducerClass(SolrDeleteDuplicates.class);
 
-    JobClient.runJob(job);
+    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
     
     LOG.info("SolrDeleteDuplicates: done.");
   }

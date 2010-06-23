@@ -1064,7 +1064,7 @@ public void close() {}
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(NutchWritable.class);
 
-    JobClient.runJob(job);
+    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
     if (LOG.isInfoEnabled()) { 
         LOG.info("Fetcher: done"); 
     }

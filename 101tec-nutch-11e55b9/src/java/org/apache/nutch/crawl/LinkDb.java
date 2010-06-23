@@ -40,6 +40,7 @@ import org.apache.nutch.util.HadoopFSUtil;
 import org.apache.nutch.util.LockUtil;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 
 /** Maintains an inverted link map, listing incoming links for each url. */
 public class LinkDb extends Configured implements Tool, Mapper<Text, ParseData, Text, Inlinks> {
@@ -180,7 +181,7 @@ public class LinkDb extends Configured implements Tool, Mapper<Text, ParseData, 
       FileInputFormat.addInputPath(job, new Path(segments[i], ParseData.DIR_NAME));
     }
     try {
-      JobClient.runJob(job);
+        SyncUtil.syncJobRun(job);//JobClient.runJob(job);
     } catch (IOException e) {
       LockUtil.removeLockFile(fs, lock);
       throw e;
@@ -199,7 +200,7 @@ public class LinkDb extends Configured implements Tool, Mapper<Text, ParseData, 
       FileInputFormat.addInputPath(job, currentLinkDb);
       FileInputFormat.addInputPath(job, newLinkDb);
       try {
-        JobClient.runJob(job);
+          SyncUtil.syncJobRun(job);//JobClient.runJob(job);
       } catch (IOException e) {
         LockUtil.removeLockFile(fs, lock);
         fs.delete(newLinkDb, true);

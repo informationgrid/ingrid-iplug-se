@@ -62,6 +62,7 @@ import org.apache.nutch.scoring.webgraph.Loops.LoopSet;
 import org.apache.nutch.util.FSUtils;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 
 /**
  * The LinkDumper tool creates a database of node to inlink information that can
@@ -378,7 +379,7 @@ public class LinkDumper
 
     try {
       LOG.info("LinkDumper: running inverter");
-      JobClient.runJob(inverter);
+      SyncUtil.syncJobRun(inverter);//JobClient.runJob(inverter);
       LOG.info("LinkDumper: finished inverter");
     }
     catch (IOException e) {
@@ -401,7 +402,7 @@ public class LinkDumper
 
     try {
       LOG.info("LinkDumper: running merger");
-      JobClient.runJob(merger);
+      SyncUtil.syncJobRun(merger);//JobClient.runJob(merger);
       LOG.info("LinkDumper: finished merger");
     }
     catch (IOException e) {

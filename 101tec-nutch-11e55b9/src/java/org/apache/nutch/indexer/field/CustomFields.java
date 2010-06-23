@@ -62,6 +62,7 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 
 /**
  * Creates custom FieldWritable objects from a text file containing field
@@ -133,7 +134,7 @@ public class CustomFields
 
     LOG.info("Starting converter job");
     try {
-      JobClient.runJob(converter);
+        SyncUtil.syncJobRun(converter);//JobClient.runJob(converter);
     }
     catch (IOException e) {
       LOG.error(StringUtils.stringifyException(e));
@@ -173,7 +174,7 @@ public class CustomFields
 
     LOG.info("Starting collector job");
     try {
-      JobClient.runJob(collector);
+        SyncUtil.syncJobRun(collector);//JobClient.runJob(collector);
     }
     catch (IOException e) {
       LOG.error(StringUtils.stringifyException(e));

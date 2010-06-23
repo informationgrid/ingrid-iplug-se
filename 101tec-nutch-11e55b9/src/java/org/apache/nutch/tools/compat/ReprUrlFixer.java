@@ -59,6 +59,7 @@ import org.apache.nutch.scoring.webgraph.Node;
 import org.apache.nutch.util.FSUtils;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 import org.apache.nutch.util.URLUtil;
 
 /**
@@ -179,9 +180,9 @@ public class ReprUrlFixer
       updater.setOutputFormat(MapFileOutputFormat.class);
 
       try {
-        JobClient.runJob(updater);
-        LOG.info("Installing new crawldb " + crawlDb);
-        CrawlDb.install(updater, crawlDb);
+          SyncUtil.syncJobRun(updater);//JobClient.runJob(updater);
+          LOG.info("Installing new crawldb " + crawlDb);
+          CrawlDb.install(updater, crawlDb);
       }
       catch (IOException e) {
         LOG.error(StringUtils.stringifyException(e));
@@ -212,7 +213,7 @@ public class ReprUrlFixer
         fetch.setOutputFormat(MapFileOutputFormat.class);
 
         try {
-          JobClient.runJob(fetch);
+            SyncUtil.syncJobRun(fetch);//JobClient.runJob(fetch);
           LOG.info("Installing new segment fetch directory " + newSegFetch);
           FSUtils.replace(fs, segFetch, newSegFetch, true);
           LOG.info("ReprUrlFixer: finished installing segment fetch directory");
@@ -238,7 +239,7 @@ public class ReprUrlFixer
         parse.setOutputFormat(MapFileOutputFormat.class);
 
         try {
-          JobClient.runJob(parse);
+            SyncUtil.syncJobRun(parse);//JobClient.runJob(parse);
           LOG.info("Installing new segment parse directry " + newSegParse);
           FSUtils.replace(fs, segParse, newSegParse, true);
           LOG.info("ReprUrlFixer: finished installing segment parse directory");

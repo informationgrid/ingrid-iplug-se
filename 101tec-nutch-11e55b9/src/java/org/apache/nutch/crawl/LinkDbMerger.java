@@ -42,6 +42,7 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 
 /**
  * This tool merges several LinkDb-s into one, optionally filtering
@@ -104,7 +105,7 @@ public class LinkDbMerger extends Configured implements Tool, Reducer<Text, Inli
     for (int i = 0; i < dbs.length; i++) {
       FileInputFormat.addInputPath(job, new Path(dbs[i], LinkDb.CURRENT_NAME));      
     }
-    JobClient.runJob(job);
+    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
     FileSystem fs = FileSystem.get(getConf());
     fs.mkdirs(output);
     fs.rename(FileOutputFormat.getOutputPath(job), new Path(output, LinkDb.CURRENT_NAME));

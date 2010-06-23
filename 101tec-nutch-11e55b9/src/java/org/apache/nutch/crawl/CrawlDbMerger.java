@@ -35,6 +35,7 @@ import org.apache.hadoop.util.*;
 import org.apache.hadoop.conf.*;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 
 /**
  * This tool merges several CrawlDb-s into one, optionally filtering
@@ -116,7 +117,7 @@ public class CrawlDbMerger extends Configured implements Tool {
     for (int i = 0; i < dbs.length; i++) {
       FileInputFormat.addInputPath(job, new Path(dbs[i], CrawlDb.CURRENT_NAME));
     }
-    JobClient.runJob(job);
+    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
     FileSystem fs = FileSystem.get(getConf());
     fs.mkdirs(output);
     fs.rename(FileOutputFormat.getOutputPath(job), new Path(output, CrawlDb.CURRENT_NAME));

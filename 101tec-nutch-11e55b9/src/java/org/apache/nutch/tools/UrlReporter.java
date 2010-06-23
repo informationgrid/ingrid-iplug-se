@@ -23,6 +23,7 @@ import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.TextOutputFormat;
 import org.apache.nutch.crawl.CrawlDatum;
+import org.apache.nutch.util.SyncUtil;
 
 public class UrlReporter extends Configured {
 
@@ -161,6 +162,6 @@ public class UrlReporter extends Configured {
 
         // run job
         LOG.info("start running report job for '" + segment + "'");
-        JobClient.runJob(job);
+        SyncUtil.syncJobRun(job);//JobClient.runJob(job);
     }
 }

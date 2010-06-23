@@ -49,6 +49,7 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 
 /**
  * A tools that dumps out the top urls by number of inlinks, number of outlinks,
@@ -187,7 +188,7 @@ public class NodeDumper
 
     try {
       LOG.info("NodeDumper: running");
-      JobClient.runJob(dumper);
+      SyncUtil.syncJobRun(dumper);//JobClient.runJob(dumper);
     }
     catch (IOException e) {
       LOG.error(StringUtils.stringifyException(e));

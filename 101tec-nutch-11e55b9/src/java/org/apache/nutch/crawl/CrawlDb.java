@@ -34,6 +34,7 @@ import org.apache.nutch.util.HadoopFSUtil;
 import org.apache.nutch.util.LockUtil;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 
 /**
  * This class takes the output of the fetcher and updates the
@@ -91,7 +92,7 @@ public class CrawlDb extends Configured implements Tool {
       LOG.info("CrawlDb update: Merging segment data into db.");
     }
     try {
-      JobClient.runJob(job);
+        SyncUtil.syncJobRun(job);//JobClient.runJob(job);
     } catch (IOException e) {
       LockUtil.removeLockFile(fs, lock);
       Path outPath = FileOutputFormat.getOutputPath(job);

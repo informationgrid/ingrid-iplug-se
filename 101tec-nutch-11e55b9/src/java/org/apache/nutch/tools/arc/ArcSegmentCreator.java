@@ -59,6 +59,7 @@ import org.apache.nutch.util.LogUtil;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
 import org.apache.nutch.util.StringUtil;
+import org.apache.nutch.util.SyncUtil;
 
 /**
  * <p>The <code>ArcSegmentCreator</code> is a replacement for fetcher that will
@@ -363,7 +364,7 @@ public class ArcSegmentCreator
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(NutchWritable.class);
 
-    JobClient.runJob(job);
+    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
     if (LOG.isInfoEnabled()) {
       LOG.info("ArcSegmentCreator: done");
     }

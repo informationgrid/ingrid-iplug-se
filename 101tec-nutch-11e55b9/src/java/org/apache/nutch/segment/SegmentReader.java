@@ -69,6 +69,7 @@ import org.apache.nutch.util.HadoopFSUtil;
 import org.apache.nutch.util.LogUtil;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 
 /** Dump the content of a segment. */
 public class SegmentReader extends Configured implements
@@ -222,7 +223,7 @@ public class SegmentReader extends Configured implements
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(NutchWritable.class);
 
-    JobClient.runJob(job);
+    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
 
     // concatenate the output
     Path dumpFile = new Path(output, job.get("segment.dump.dir", "dump"));

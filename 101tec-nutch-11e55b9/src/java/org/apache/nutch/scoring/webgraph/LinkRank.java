@@ -64,6 +64,7 @@ import org.apache.nutch.scoring.webgraph.Loops.LoopSet;
 import org.apache.nutch.util.FSUtils;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 import org.apache.nutch.util.URLUtil;
 
 public class LinkRank
@@ -107,7 +108,7 @@ public class LinkRank
     // run the counter job, outputs to a single reduce task and file
     LOG.info("Starting link counter job");
     try {
-      JobClient.runJob(counter);
+        SyncUtil.syncJobRun(counter);//JobClient.runJob(counter);
     }
     catch (IOException e) {
       LOG.error(StringUtils.stringifyException(e));
@@ -158,7 +159,7 @@ public class LinkRank
     // run the initializer
     LOG.info("Starting initialization job");
     try {
-      JobClient.runJob(initializer);
+        SyncUtil.syncJobRun(initializer);//JobClient.runJob(initializer);
     }
     catch (IOException e) {
       LOG.error(StringUtils.stringifyException(e));
@@ -209,7 +210,7 @@ public class LinkRank
     // run the inverter job
     LOG.info("Starting inverter job");
     try {
-      JobClient.runJob(inverter);
+        SyncUtil.syncJobRun(inverter);//JobClient.runJob(inverter);
     }
     catch (IOException e) {
       LOG.error(StringUtils.stringifyException(e));
@@ -257,7 +258,7 @@ public class LinkRank
 
     LOG.info("Starting analysis job");
     try {
-      JobClient.runJob(analyzer);
+        SyncUtil.syncJobRun(analyzer);//JobClient.runJob(analyzer);
     }
     catch (IOException e) {
       LOG.error(StringUtils.stringifyException(e));

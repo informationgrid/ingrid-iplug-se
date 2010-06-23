@@ -32,6 +32,7 @@ import org.apache.hadoop.util.*;
 
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.document.DateTools;
@@ -445,7 +446,7 @@ public class DeleteDuplicates extends Configured
     job.setOutputValueClass(IndexDoc.class);
     job.setOutputFormat(SequenceFileOutputFormat.class);
 
-    JobClient.runJob(job);
+    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
 
     Path outDir2 =
       new Path("dedup-hash-"+
@@ -467,7 +468,7 @@ public class DeleteDuplicates extends Configured
     job.setOutputValueClass(IndexDoc.class);
     job.setOutputFormat(SequenceFileOutputFormat.class);
 
-    JobClient.runJob(job);
+    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
 
     // remove outDir1 - no longer needed
     fs.delete(outDir1, true);
@@ -488,7 +489,7 @@ public class DeleteDuplicates extends Configured
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(IntWritable.class);
 
-    JobClient.runJob(job);
+    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
 
     fs.delete(outDir2, true);
 

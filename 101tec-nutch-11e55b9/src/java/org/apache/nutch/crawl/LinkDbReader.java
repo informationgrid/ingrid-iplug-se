@@ -33,6 +33,7 @@ import org.apache.hadoop.conf.Configuration;
 
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 
 import java.util.Iterator;
 
@@ -107,7 +108,7 @@ public class LinkDbReader extends Configured implements Tool, Closeable {
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(Inlinks.class);
 
-    JobClient.runJob(job);
+    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
   }
   
   public static void main(String[] args) throws Exception {

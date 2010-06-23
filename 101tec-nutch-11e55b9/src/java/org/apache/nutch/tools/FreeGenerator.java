@@ -50,6 +50,7 @@ import org.apache.nutch.net.URLNormalizers;
 import org.apache.nutch.scoring.ScoringFilters;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 
 /**
  * This tool generates fetchlists (segments to be fetched) from plain text
@@ -176,7 +177,7 @@ public class FreeGenerator extends Configured implements Tool {
     FileOutputFormat.setOutputPath(job, new Path(args[1],
         new Path(segName, CrawlDatum.GENERATE_DIR_NAME)));
     try {
-      JobClient.runJob(job);
+        SyncUtil.syncJobRun(job);//JobClient.runJob(job);
       return 0;
     } catch (Exception e) {
       LOG.fatal("FAILED: " + StringUtils.stringifyException(e));

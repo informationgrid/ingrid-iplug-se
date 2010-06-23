@@ -41,6 +41,7 @@ import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.nutch.parse.ParseData;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 
 public class ParseDataWrapper extends Configured {
 
@@ -136,7 +137,7 @@ public class ParseDataWrapper extends Configured {
     job.setOutputFormat(MapFileOutputFormat.class);
     job.setOutputKeyClass(HostType.class);
     job.setOutputValueClass(UrlParseDataContainer.class);
-    JobClient.runJob(job);
+    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
   }
 
   public static void main(String[] args) throws IOException {

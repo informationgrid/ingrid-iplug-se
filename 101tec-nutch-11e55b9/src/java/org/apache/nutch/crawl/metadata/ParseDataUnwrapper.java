@@ -36,6 +36,7 @@ import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.nutch.crawl.metadata.ParseDataWrapper.UrlParseDataContainer;
 import org.apache.nutch.parse.ParseData;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 
 public class ParseDataUnwrapper extends Configured {
 
@@ -77,6 +78,6 @@ public class ParseDataUnwrapper extends Configured {
     convertJob.setOutputFormat(MapFileOutputFormat.class);
     convertJob.setOutputKeyClass(Text.class);
     convertJob.setOutputValueClass(ParseData.class);
-    JobClient.runJob(convertJob);
+    SyncUtil.syncJobRun(convertJob);//JobClient.runJob(convertJob);
   }
 }

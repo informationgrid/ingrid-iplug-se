@@ -47,6 +47,7 @@ import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.crawl.CrawlDb;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 
 /**
  * This tool converts CrawlDb created in old &lt;UTF8, CrawlDatum&gt; format
@@ -138,7 +139,7 @@ public class CrawlDbConverter extends Configured implements Tool,
     job.setOutputValueClass(CrawlDatum.class);
     FileOutputFormat.setOutputPath(job, newDb);
     try {
-      JobClient.runJob(job);
+        SyncUtil.syncJobRun(job);//JobClient.runJob(job);
       CrawlDb.install(job, new Path(args[1]));
       return 0;
     } catch (Exception e) {

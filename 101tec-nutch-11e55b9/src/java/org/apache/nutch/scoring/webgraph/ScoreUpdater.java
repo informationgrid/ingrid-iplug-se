@@ -53,6 +53,7 @@ import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.crawl.CrawlDb;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.apache.nutch.util.SyncUtil;
 
 /**
  * Updates the score from the WebGraph node database into the crawl database.
@@ -177,7 +178,7 @@ public class ScoreUpdater
     updater.setOutputFormat(MapFileOutputFormat.class);
 
     try {
-      JobClient.runJob(updater);
+        SyncUtil.syncJobRun(updater);//JobClient.runJob(updater);
     }
     catch (IOException e) {
       LOG.error(StringUtils.stringifyException(e));
