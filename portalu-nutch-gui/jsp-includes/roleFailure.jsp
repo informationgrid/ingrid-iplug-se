@@ -27,7 +27,7 @@
         <link rel="stylesheet" type="text/css" href="../theme/${theme}/css/style.css" />
 </head>
 <body class="yui-skin-sam">
-    <% rootPath = "../.."; %> 
+    <% rootPath = ".."; %> 
         <div id="doc2">
                 <div id="hd">
                         <%@ include file="includes/header.jsp" %>

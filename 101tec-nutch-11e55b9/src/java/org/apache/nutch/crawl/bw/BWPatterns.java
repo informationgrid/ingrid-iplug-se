@@ -165,15 +165,6 @@ public class BWPatterns implements Writable {
         for (Pattern pattern : _posPattern) {
             Matcher matcher = pattern.matcher(lowerCaseUrl);
             if (matcher.find()) {
-                if (LOG.isDebugEnabled()) {
-                    // very special debug code for tracing the out of BW space
-                    // crawling
-                    if (url.contains("vimeo")) {
-                        LOG.debug("Vimeo was allowed because of this pattern: " + pattern.toString());
-                        LOG.debug("pattern.pattern() returns: " + pattern.pattern());
-                        dumpPatternsToLog();
-                    }
-                }
                 return true;
             }
         }

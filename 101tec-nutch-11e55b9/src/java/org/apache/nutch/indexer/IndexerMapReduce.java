@@ -155,6 +155,9 @@ implements Mapper<Text, Writable, Text, NutchWritable>,
     } catch (final IndexingException e) {
       if (LOG.isWarnEnabled()) { LOG.warn("Error indexing "+key+": "+e); }
       return;
+    } catch (Exception e) {
+        if (LOG.isWarnEnabled()) { LOG.warn("Indexing Exception "+key+": "+e); }
+        return;
     }
 
     // skip documents discarded by indexing filters

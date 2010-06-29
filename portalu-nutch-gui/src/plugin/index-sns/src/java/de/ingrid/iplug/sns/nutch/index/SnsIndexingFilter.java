@@ -173,14 +173,20 @@ public class SnsIndexingFilter implements IndexingFilter {
     PluginRepository pluginRepository = PluginRepository.get(this.fConfiguration);
     PluginDescriptor pluginDescriptor = pluginRepository.getPluginDescriptor(IPlugSNSPlugin.PLUGIN_ID);
 
-    Plugin pluginInstance = null;
-    try {
+    //Plugin pluginInstance = null;
+    /*try {
       pluginInstance = pluginRepository.getPluginInstance(pluginDescriptor);
     } catch (PluginRuntimeException e) {
       LOGGER.warn("indexing fails: " + e.getMessage());
+    }*/
+    IPlugSNSPlugin plugin = new IPlugSNSPlugin(pluginDescriptor, this.fConfiguration);//(IPlugSNSPlugin) pluginInstance;
+    try {
+        plugin.startUp();
+    } catch (PluginRuntimeException e) {
+        LOGGER.error("Could not start-up SNS-plugin!");
+        e.printStackTrace();
+        return;
     }
-    IPlugSNSPlugin plugin = (IPlugSNSPlugin) pluginInstance;
-
     Properties properties = plugin.getProperties();
     this.fBuzzword = properties.getProperty(IPlugSNSPlugin.BUZZWORD);
 

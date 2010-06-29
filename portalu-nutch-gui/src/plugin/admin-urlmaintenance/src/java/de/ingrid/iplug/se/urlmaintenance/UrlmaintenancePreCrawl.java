@@ -1,12 +1,14 @@
 package de.ingrid.iplug.se.urlmaintenance;
 
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.nutch.crawl.IPreCrawl;
@@ -70,13 +72,30 @@ public class UrlmaintenancePreCrawl implements IPreCrawl {
   private void writeFromCommunicationObjectIntoFile(String key, Path uploadPath) throws IOException {
     InterplugInCommunication<String> instanceForStringLists = InterplugInCommunication.getInstanceForStringLists();
     List<String> lines = instanceForStringLists.getObjectContent(key);
-    if(lines != null && lines.size() > 0){
-      FSDataOutputStream dataOutputStream = _fileSystem.create(uploadPath, true);
-      for (String line : lines) {
-        dataOutputStream.writeBytes(line);
-        dataOutputStream.writeBytes(_lineSeparator);
-      }
-      dataOutputStream.close();
+    
+    /* save to local fs */
+    String tempKeyFile = new String("file.tmp");
+    try {
+        FileOutputStream fos = new FileOutputStream(tempKeyFile);
+        OutputStreamWriter osw = new OutputStreamWriter(fos , "UTF-8");
+        BufferedWriter bw = new BufferedWriter(osw);
+        for (String line : lines) {
+            bw.write(line);
+            bw.write(_lineSeparator);
+        }
+        bw.close();
+        osw.close();
+        fos.close();
+    } catch (Exception e) {
+      e.printStackTrace();
     }
+
+    /* put local file to hdfs */
+    Path localKeyFilePath = new Path(tempKeyFile);
+    _fileSystem.copyFromLocalFile(localKeyFilePath, uploadPath);
+    
+    /* remove local file*/
+    _fileSystem.delete(localKeyFilePath, true);
   }
+  
 }

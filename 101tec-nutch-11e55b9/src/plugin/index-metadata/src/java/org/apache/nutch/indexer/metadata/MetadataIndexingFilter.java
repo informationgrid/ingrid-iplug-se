@@ -58,6 +58,11 @@ public class MetadataIndexingFilter implements IndexingFilter {
           String[] splits = rawFields.split(",");
           for (String split : splits) {
             _fields.add(split.trim());
+            
+            // skip adding to index, since service and measure are set to topic
+            if (split.equals("service") || split.equals("measure"))
+                continue;
+            
             LuceneWriter.addFieldOptions(split.trim(), STORE.YES,
                     INDEX.UNTOKENIZED, conf);
           }
@@ -108,7 +113,11 @@ public class MetadataIndexingFilter implements IndexingFilter {
   private void addToDoc(NutchDocument doc, String keyName, Metadata metadata) {
     String[] values = metadata.getValues(keyName);
     for (String value : values) {
-      doc.add(keyName, value);
+      // map service and measure to topic since the portal expects this
+      if (keyName.equals("service") || keyName.equals("measure"))
+          doc.add("topic", value);    
+      else
+          doc.add(keyName, value);
     }
   }
 
