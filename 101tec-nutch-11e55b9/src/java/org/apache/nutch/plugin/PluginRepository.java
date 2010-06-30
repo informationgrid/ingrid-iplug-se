@@ -21,7 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.WeakHashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -43,7 +43,19 @@ import org.apache.nutch.util.NutchConfiguration;
  * @author joa23
  */
 public class PluginRepository {
-  private static final WeakHashMap<Configuration, PluginRepository> CACHE = new WeakHashMap<Configuration, PluginRepository>();
+  // removed WeakHashMap and replaced it with an LRU-LinkedHashMap, where entries 
+  // 'older than 50' are removed from the Map, which is used as a cash. This is the
+  // easiest way to stop the memory leak discussed in: 
+  // https://issues.apache.org/jira/browse/NUTCH-356 and
+  // http://lucene.472066.n3.nabble.com/Plugins-initialized-all-the-time-td626640.html
+  private static final Map<Configuration, PluginRepository> CACHE = new LinkedHashMap<Configuration, PluginRepository>() {
+    private static final long serialVersionUID = 1760628230436632209L;
+    
+    @Override
+    protected boolean removeEldestEntry(Map.Entry<Configuration, PluginRepository> eldest) {
+      return size() > 50;
+    } 
+  };
 
   private boolean auto;
 
@@ -93,6 +105,13 @@ public class PluginRepository {
    * @return a cached instance of the plugin repository
    */
   public static synchronized PluginRepository get(Configuration conf) {
+    // FIXME: this conf is different than the one initialized in CrawlTool
+    //        so for each job the toString() method is different and so the
+    //        cache-key! This leads to a memory leak!!! The HashMap should be
+    //        cleaned up ... using only one instance of a plugin might lead
+    //        to problems when executing on a cluster?! A solution found is
+    //        to overwrite the hashcode of Configuration, so that it is only
+    //        written once into the hashmap.
     PluginRepository result = CACHE.get(conf);
     if (result == null) {
       result = new PluginRepository(conf);

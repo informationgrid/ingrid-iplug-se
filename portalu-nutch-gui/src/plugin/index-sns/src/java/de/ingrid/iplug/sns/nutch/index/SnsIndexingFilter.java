@@ -3,6 +3,10 @@
  */
 package de.ingrid.iplug.sns.nutch.index;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
@@ -173,13 +177,15 @@ public class SnsIndexingFilter implements IndexingFilter {
     PluginRepository pluginRepository = PluginRepository.get(this.fConfiguration);
     PluginDescriptor pluginDescriptor = pluginRepository.getPluginDescriptor(IPlugSNSPlugin.PLUGIN_ID);
 
-    //Plugin pluginInstance = null;
-    /*try {
+    /*
+    Plugin pluginInstance = null;
+    try {
       pluginInstance = pluginRepository.getPluginInstance(pluginDescriptor);
     } catch (PluginRuntimeException e) {
       LOGGER.warn("indexing fails: " + e.getMessage());
-    }*/
-    IPlugSNSPlugin plugin = new IPlugSNSPlugin(pluginDescriptor, this.fConfiguration);//(IPlugSNSPlugin) pluginInstance;
+    }
+    //IPlugSNSPlugin plugin = new IPlugSNSPlugin(pluginDescriptor, this.fConfiguration);//(IPlugSNSPlugin) pluginInstance;
+    IPlugSNSPlugin plugin = (IPlugSNSPlugin) pluginInstance;
     try {
         plugin.startUp();
     } catch (PluginRuntimeException e) {
@@ -187,7 +193,17 @@ public class SnsIndexingFilter implements IndexingFilter {
         e.printStackTrace();
         return;
     }
-    Properties properties = plugin.getProperties();
+    */
+    
+    File file = new File(pluginDescriptor.getPluginPath(), "plugin.properties");
+    Properties properties = new Properties();
+    try {
+        properties.load(new FileInputStream(file));
+    } catch (IOException e) {
+        LOGGER.error("Could not load plugin.properties of index-sns plugin!");
+        e.printStackTrace();
+    }
+    
     this.fBuzzword = properties.getProperty(IPlugSNSPlugin.BUZZWORD);
 
     this.fX1 = properties.getProperty(IPlugSNSPlugin.X1);

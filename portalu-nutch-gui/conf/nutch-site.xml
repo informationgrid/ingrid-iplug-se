@@ -287,4 +287,10 @@
 	<description>If set true (default) all URLs generated into a fetch list of a segment will be filtered by the filters defined in 'urlfilter.regex.file'.</description>
 </property>
 
+<property>
+    <name>db.max.inlinks</name>
+    <value>5000</value>
+    <description>Describes how many inlinks to an URL are used. The higher the value you have to be aware of a higher memory usage.</description>
+</property>
+
 </configuration>

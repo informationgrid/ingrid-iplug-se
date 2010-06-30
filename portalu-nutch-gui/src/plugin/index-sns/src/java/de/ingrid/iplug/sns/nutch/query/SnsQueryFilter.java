@@ -3,6 +3,9 @@
  */
 package de.ingrid.iplug.sns.nutch.query;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -677,14 +680,23 @@ public class SnsQueryFilter implements QueryFilter {
         PluginRepository pluginRepository = PluginRepository.get(this.fConfiguration);
         PluginDescriptor pluginDescriptor = pluginRepository.getPluginDescriptor(IPlugSNSPlugin.PLUGIN_ID);
 
-        Plugin pluginInstance = null;
+        /*Plugin pluginInstance = null;
         try {
             pluginInstance = pluginRepository.getPluginInstance(pluginDescriptor);
         } catch (PluginRuntimeException e) {
             LOGGER.warning("query fails: " + e.getMessage());
         }
-        IPlugSNSPlugin plugin = (IPlugSNSPlugin) pluginInstance;
-        Properties properties = plugin.getProperties();
+        IPlugSNSPlugin plugin = (IPlugSNSPlugin) pluginInstance;*/
+        
+        File file = new File(pluginDescriptor.getPluginPath(), "plugin.properties");
+        Properties properties = new Properties();
+        try {
+            properties.load(new FileInputStream(file));
+        } catch (IOException e) {
+            LOGGER.severe("Could not load plugin.properties of index-sns plugin!");
+            e.printStackTrace();
+        }
+        
         this.fX1 = properties.getProperty(IPlugSNSPlugin.X1);
         this.fY1 = properties.getProperty(IPlugSNSPlugin.Y1);
         this.fX2 = properties.getProperty(IPlugSNSPlugin.X2);
