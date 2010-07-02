@@ -67,7 +67,7 @@
               <row>
                     <label>Limit URL:</label>
                     <field>
-                       <input type="text" id="limitUrl" name="limitUrl" value="${limitUrl}" />
+                       <input type="text" id="limitUrl" name="limitUrl" value="${startUrlCommand.url}" />
                        <form:errors path="url" cssClass="error" element="div"/>
                     </field>
                     <desc></desc>

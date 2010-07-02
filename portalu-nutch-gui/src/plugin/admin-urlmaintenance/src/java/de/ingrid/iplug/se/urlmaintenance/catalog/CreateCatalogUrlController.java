@@ -31,16 +31,18 @@ public class CreateCatalogUrlController extends NavigationSelector {
 
   private final ICatalogUrlDao _catalogUrlDao;
   private final IMetadataDao _metadataDao;
+  
+  private Metadata oldAltTitleMD = null;
 
-    private final CatalogUrlCommandValidator _validator;
+  private final CatalogUrlCommandValidator _validator;
 
   @Autowired
   public CreateCatalogUrlController(final ICatalogUrlDao catalogUrlDao,
- final IMetadataDao metadataDao,
-            final CatalogUrlCommandValidator validator) {
+          final IMetadataDao metadataDao,
+          final CatalogUrlCommandValidator validator) {
     _catalogUrlDao = catalogUrlDao;
-    _metadataDao = metadataDao;
-        _validator = validator;
+    _metadataDao   = metadataDao;
+    _validator     = validator;
   }
 
   @InitBinder
@@ -92,7 +94,9 @@ public class CreateCatalogUrlController extends NavigationSelector {
       
     }
     model.addAttribute("type", type);
-    model.addAttribute("altTitle", getMetadataValue(catalogUrlCommand.getMetadatas(), "alt_title"));
+    oldAltTitleMD = getMetadataValue(catalogUrlCommand.getMetadatas(), "alt_title");
+    String altTitle = oldAltTitleMD != null ? oldAltTitleMD.getMetadataValue() : "";
+    model.addAttribute("altTitle", altTitle);
     return "catalog/createCatalogUrl";
   }
 
@@ -113,13 +117,15 @@ public class CreateCatalogUrlController extends NavigationSelector {
     }
     catalogUrlCommand.addMetadata(datatypeMetadata);
     
-    Metadata altTitleMeta = new Metadata("alt_title", altTitle);
-    // create new metadata if it doesn't exist
-    if (!_metadataDao.exists("alt_title", altTitle))
-        _metadataDao.makePersistent(altTitleMeta);
+    // update alternative title but don't make it persistent yet
+    if (oldAltTitleMD != null) {
+        oldAltTitleMD.setMetadataValue(altTitle);
+        catalogUrlCommand.addMetadata(oldAltTitleMD);
+    } else {
+        Metadata altTitleMeta = new Metadata("alt_title", altTitle);
+        catalogUrlCommand.addMetadata(altTitleMeta);
+    }
     
-    catalogUrlCommand.addMetadata(_metadataDao.getByKeyAndValue("alt_title", altTitle));
-
     _validator.setUsedDatatype(type);
     if (_validator.validate(errors).hasErrors()) {
         return editCatalogUrl(model, catalogUrlCommand, null, type);
@@ -127,11 +133,11 @@ public class CreateCatalogUrlController extends NavigationSelector {
     return "redirect:/catalog/saveCatalogUrl.html";
   }
   
-  private String getMetadataValue(List<Metadata> metadatas, String key) throws NumberFormatException {
-      String ret = "";
+  private Metadata getMetadataValue(List<Metadata> metadatas, String key) throws NumberFormatException {
+      Metadata ret = null;
       for (Metadata metadata : metadatas) {
           if (metadata.getMetadataKey().equals(key)) {
-              ret = metadata.getMetadataValue();
+              ret = metadata;//.getMetadataValue();
               break;
           }
       }

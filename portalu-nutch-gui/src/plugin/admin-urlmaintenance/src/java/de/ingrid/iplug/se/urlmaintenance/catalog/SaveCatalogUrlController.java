@@ -6,38 +6,57 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.nutch.admin.NavigationSelector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import de.ingrid.iplug.se.urlmaintenance.DatabaseExport;
+import de.ingrid.iplug.se.urlmaintenance.EntityEditor;
 import de.ingrid.iplug.se.urlmaintenance.PartnerProviderCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.CatalogUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ICatalogUrlDao;
+import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IMetadataDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.CatalogUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
+import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
 
 @Controller
 @SessionAttributes(value = { "partnerProviderCommand", "catalogUrlCommand" })
 public class SaveCatalogUrlController extends NavigationSelector {
-
+  private static final Log LOG = LogFactory.getLog(DatabaseExport.class);
+  
   private final ICatalogUrlDao _catalogUrlDao;
+  private final IMetadataDao _metadataDao;
   private final DatabaseExport _databaseExport;
+  private TransactionService _transactionService;
 
   private static final Set<String> _supportedTypes = new HashSet<String>(Arrays
       .asList(new String[] { "topics", "service", "measure" }));
 
   @Autowired
-  public SaveCatalogUrlController(ICatalogUrlDao catalogUrlDao, DatabaseExport databaseExport) {
-    _catalogUrlDao = catalogUrlDao;
-    _databaseExport = databaseExport;
+  public SaveCatalogUrlController(ICatalogUrlDao catalogUrlDao,
+          final IMetadataDao metadataDao, TransactionService transactionService,
+          DatabaseExport databaseExport) {
+    _catalogUrlDao      = catalogUrlDao;
+    _metadataDao        = metadataDao;
+    _databaseExport     = databaseExport;
+    _transactionService = transactionService;
   }
 
+  @InitBinder
+  public void initBinder(final WebDataBinder binder) {
+    binder.registerCustomEditor(Metadata.class, new EntityEditor(_metadataDao));
+  }
+  
   @RequestMapping(value = "/catalog/saveCatalogUrl.html", method = RequestMethod.GET)
   public String saveCatalogUrl(
       @ModelAttribute("catalogUrlCommand") CatalogUrlCommand catalogUrlCommand,
@@ -71,8 +90,10 @@ public class SaveCatalogUrlController extends NavigationSelector {
     }
     catalogUrl.setUrl(catalogUrlCommand.getUrl());
     catalogUrl.setUpdated(new Date());
-    catalogUrl.setMetadatas(catalogUrlCommand.getMetadatas());
-
+    
+    Metadata altTitleMD = getMetadata(catalogUrl, "alt_title");
+    int indexToReplace = -1;
+    long id = -1;
     String redirectUrl = "redirect:/catalog/listTopicUrls.html";
     List<Metadata> metadatas = catalogUrlCommand.getMetadatas();
     for (Metadata metadata : metadatas) {
@@ -80,15 +101,51 @@ public class SaveCatalogUrlController extends NavigationSelector {
       String metadataValue = metadata.getMetadataValue();
       if (metadataKey.equals("datatype") && metadataValue.equals("service")) {
         redirectUrl = "redirect:/catalog/listServiceUrls.html";
-        break;
       } else if (metadataKey.equals("datatype")
           && metadataValue.equals("measure")) {
         redirectUrl = "redirect:/catalog/listMeasureUrls.html";
+      } else if ("alt_title".equals(metadataKey)) {
+          // update metadata inside a transaction
+          if (altTitleMD != null) {
+            _transactionService.beginTransaction();
+            altTitleMD.setMetadataValue(metadataValue);
+            _transactionService.commitTransaction();
+            _transactionService.close();            
+          } else {
+            Metadata mdNew = new Metadata("alt_title", metadataValue);
+            _metadataDao.makePersistent(mdNew);
+            // since we do allow multiple same key-value pairs, we get the one
+            // with the highest ID, which is the latest created one
+            for (Metadata md : _metadataDao.getByKey("alt_title")) {
+              if (md.getMetadataValue().equals(metadataValue)) {
+                if (md.getId() > id)
+                    id = md.getId();
+              }
+            }
+            if (id != -1)
+              indexToReplace = metadatas.indexOf(metadata);
+            else {
+              LOG.error("Metadata couldn't be created in database!");
+            }
+          }
       }
     }
+    // replace alternative title (metadata)
+    if (indexToReplace != -1)
+      metadatas.set(indexToReplace, _metadataDao.getById(id));
     
+    catalogUrl.setMetadatas(catalogUrlCommand.getMetadatas());
     _databaseExport.exportCatalogUrls();
     
     return redirectUrl;
+  }
+
+  private Metadata getMetadata(CatalogUrl catalogUrl, String key) {
+      for (Metadata metadata : catalogUrl.getMetadatas()) {
+          if (key.equals(metadata.getMetadataKey())) {
+              return metadata;
+          }
+      } 
+      return null;
   }
 }

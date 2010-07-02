@@ -103,7 +103,7 @@ form input[type='submit']:hover, form input[type='button']:hover, button:hover {
 
 .switchOn, .switchOff {width:60px ; height:26px ; background-image:url('../gfx/switch_bg.png'); background-repeat: no-repeat;}
 .switchOn {padding-left:1px; padding-top:1px}
-.switchOff {padding-left:30px; padding-top:1px}
+.switchOff {padding-left:30px; padding-top:1px; width:30px;}
 
 /* Paging */
 #paging .activePage {background:#1B78B1; float:left; ; margin-left:1px}

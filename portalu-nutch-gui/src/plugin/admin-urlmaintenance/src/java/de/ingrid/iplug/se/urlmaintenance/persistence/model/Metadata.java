@@ -8,8 +8,8 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "_metadataKey",
-    "_metadataValue" }) })
+//@Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "_metadataKey", "_metadataValue" }) })
+
 @NamedQueries( {
     @NamedQuery(name = "getMetadataByKeyAndValue", query = "select m from Metadata as m where m._metadataKey = :key and m._metadataValue = :value"),
     @NamedQuery(name = "getMetadatasByKey", query = "select m from Metadata as m where m._metadataKey = :key") })
