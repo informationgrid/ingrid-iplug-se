@@ -145,7 +145,7 @@
 										            		<img src="../theme/${theme}/gfx/loading.gif"/>
 						            					</c:when>
 						            					<c:otherwise>
-										            		<img src="../theme/${theme}/gfx/play_inactive.png"/>
+										            		<img src="../theme/${theme}/gfx/play_inactive.png" title="<fmt:message key="listCrawls.crawl.running" bundle="${localBundle}"/>"/>
 						            					</c:otherwise>
 						            				</c:choose>
 						            			</c:otherwise>

@@ -1,5 +1,6 @@
 package org.apache.nutch.crawl;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,6 +11,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.nutch.admin.ConfigurationUtil;
 import org.apache.nutch.admin.searcher.SearcherFactory;
 import org.apache.nutch.crawl.bw.BWInjector;
 import org.apache.nutch.crawl.bw.BWUpdateDb;
@@ -21,6 +23,7 @@ import org.apache.nutch.indexer.IndexMerger;
 import org.apache.nutch.indexer.Indexer;
 import org.apache.nutch.mail.MailService;
 import org.apache.nutch.parse.ParseSegment;
+import org.apache.nutch.plugin.PluginRepository;
 import org.apache.nutch.segment.SegmentMerger;
 import org.apache.nutch.tools.HostStatistic;
 import org.apache.nutch.tools.UrlReporter;
@@ -83,6 +86,8 @@ public class CrawlTool {
     // ------ none nutch-specific code starts here
     UrlReporter reporter = new UrlReporter(_configuration);
     MailService mail = MailService.get(_configuration);
+    // set configuration since it might have changed
+    mail.setConf(_configuration);
     // ------ none nutch-specific code ends here
     ParseSegment parseSegment = new ParseSegment(_configuration);
     BWUpdateDb bwUpdateDb = new BWUpdateDb(_configuration);
@@ -307,6 +312,57 @@ public class CrawlTool {
 
   public Path getCrawlDir() {
     return _crawlDir;
+  }
+  
+  public static void main(String[] args) throws Exception {
+      
+      
+      LOG.info("Init crawl ...");
+      File workDir = new File(args[3]);
+      Configuration configuration = (new ConfigurationUtil(workDir)).loadConfiguration(args[4]);
+      
+      Integer topN  = Integer.valueOf(args[0]);
+      Integer depth = Integer.valueOf(args[1]);
+      Path crawlDir = new Path(args[2]);
+      
+      // prepare plugins
+      PluginRepository pluginRepository = new PluginRepository(configuration);
+      
+      CrawlTool crawlTool = new CrawlTool(configuration, crawlDir);
+      
+      //=======================
+
+      FileSystem fileSystem = crawlTool.getFileSystem();
+      Path lockPath = new Path(crawlDir, "crawl.running");
+      Path urlPath = new Path(crawlDir, "urls/start/urls.txt");
+      boolean alreadyRunning = false;
+      try {
+        alreadyRunning = fileSystem.exists(lockPath);
+        if (!alreadyRunning) {
+          fileSystem.createNewFile(lockPath);
+          crawlTool.preCrawl();
+          // if there's any url to fetch then start crawling
+          if (fileSystem.exists(urlPath))
+              crawlTool.crawl(topN, depth);
+          else
+              LOG.warn("It seems that there are no URLs to crawl!");
+        } else {
+            LOG.warn("crawl is already running");
+        }
+      } catch (IOException e) {
+        LOG.warn("can not start crawl.", e);
+      } finally {
+        if (!alreadyRunning) {
+          try {
+            fileSystem.delete(lockPath, false);
+          } catch (Throwable e) {
+            LOG.warn("Can not delete lock file.", e);
+          }
+        }
+      }
+      
+      //=======================
+      LOG.info("Crawl finished!");
   }
 
 }

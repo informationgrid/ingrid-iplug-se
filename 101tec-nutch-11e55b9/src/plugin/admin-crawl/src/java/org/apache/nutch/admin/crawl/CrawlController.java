@@ -20,10 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
@@ -46,7 +43,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 @Controller
 public class CrawlController extends NavigationSelector {
@@ -69,8 +65,13 @@ public class CrawlController extends NavigationSelector {
     NutchInstance nutchInstance = (NutchInstance) servletContext
             .getAttribute("nutchInstance");
 
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // check in ALL instances for running crawls since we only allow one
+    // crawl at a time for one iPlug
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // local folder for configuration files
     File instanceFolder = nutchInstance.getInstanceFolder();
+    File[] instanceFolders = instanceFolder.getParentFile().listFiles();
     // look in the same path in hdfs
     Path path = new Path(instanceFolder.getAbsolutePath(), "crawls");
     Configuration configuration = nutchInstance.getConfiguration();
@@ -82,13 +83,34 @@ public class CrawlController extends NavigationSelector {
       }
     });
     
-    model.addAttribute("crawlPaths", crawlPathArray);
-    for (CrawlPath crawlPath : crawlPathArray) {
-      if (crawlPath.isRunning()) {
-        model.addAttribute("runningCrawl", new Object());
-        break;
-      }
+    boolean aCrawlIsRunning = false;
+    for (File instance : instanceFolders) {
+        // the folder "general" is the only non-crawl!
+        if (instance.getName().equals("general"))
+            continue;
+        
+        Path crawlPathDir = new Path(instance.getAbsolutePath(), "crawls");
+        CrawlPath[] crawlPaths = listPaths(crawlPathDir, fileSystem, new PathFilter() {
+            @Override
+            public boolean accept(Path path) {
+              return path.getName().startsWith("Crawl");
+            }
+          });
+        
+        // 
+        for (CrawlPath crawlPath : crawlPaths) {
+          if (crawlPath.isRunning()) {
+            model.addAttribute("runningCrawl", new Object());
+            aCrawlIsRunning = true;
+            break;
+          }
+        }
+        
+        if (aCrawlIsRunning)
+            break;
     }
+    
+    model.addAttribute("crawlPaths", crawlPathArray);
     model.addAttribute("showDialog", false);
     return "listCrawls";
   }
