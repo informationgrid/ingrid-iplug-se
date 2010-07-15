@@ -25,6 +25,7 @@ import org.apache.nutch.admin.scheduling.WeeklyCommand.Day;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -119,9 +120,15 @@ public class SchedulingController extends NavigationSelector {
 
   @RequestMapping(value = "/daily.html", method = RequestMethod.POST)
   public String postDaily(
-      @ModelAttribute("clockCommand") ClockCommand clockCommand)
+      @ModelAttribute("clockCommand") ClockCommand clockCommand, Errors errors)
       throws IOException {
 
+    // validate and return to page on error
+    validate(errors, clockCommand);
+    if (errors.hasErrors()) {
+        return "scheduling";
+    }
+      
     // persist scheduling
     Integer hour = clockCommand.getHour();
     Integer minute = clockCommand.getMinute();
@@ -139,8 +146,15 @@ public class SchedulingController extends NavigationSelector {
 
   @RequestMapping(value = "/weekly.html", method = RequestMethod.POST)
   public String postWeekly(
-      @ModelAttribute("weeklyCommand") WeeklyCommand weeklyCommand)
+      @ModelAttribute("weeklyCommand") WeeklyCommand weeklyCommand, Errors errors)
       throws IOException {
+    
+    // validate and return to page on error
+    validate(errors, weeklyCommand);
+    if (errors.hasErrors()) {
+        return "scheduling";
+    }
+    
     Integer hour = weeklyCommand.getHour();
     Integer minute = weeklyCommand.getMinute();
     Period period = weeklyCommand.getPeriod();
@@ -169,8 +183,14 @@ public class SchedulingController extends NavigationSelector {
 
   @RequestMapping(value = "/monthly.html", method = RequestMethod.POST)
   public String postMonthly(
-      @ModelAttribute("monthlyCommand") MonthlyCommand monthlyCommand)
+      @ModelAttribute("monthlyCommand") MonthlyCommand monthlyCommand, Errors errors)
       throws IOException {
+      
+    // validate and return to page on error
+    validate(errors, monthlyCommand);
+    if (errors.hasErrors()) {
+      return "scheduling";
+    }
     Integer hour = monthlyCommand.getHour();
     Integer minute = monthlyCommand.getMinute();
     Period period = monthlyCommand.getPeriod();
@@ -199,8 +219,14 @@ public class SchedulingController extends NavigationSelector {
 
   @RequestMapping(value = "/advanced.html", method = RequestMethod.POST)
   public String postAdvanced(
-      @ModelAttribute("advancedCommand") AdvancedCommand advancedCommand)
+      @ModelAttribute("advancedCommand") AdvancedCommand advancedCommand, Errors errors)
       throws IOException {
+    
+    // validate and return to page on error
+    validate(errors, advancedCommand);
+    if (errors.hasErrors()) {
+      return "scheduling";
+    }
     String pattern = advancedCommand.getPattern();
     _patternPersistence.savePattern(pattern);
 
@@ -216,6 +242,11 @@ public class SchedulingController extends NavigationSelector {
     _patternPersistence.deletePattern();
     _crawlDataPersistence.deleteCrawlData();
     return "redirect:/index.html";
+  }
+  
+  private void validate(Errors errors, CrawlCommand clockCommand) {
+    if (clockCommand.getTopn() == null )
+      errors.rejectValue("topn", "scheduling.error.empty.topn");
   }
 
 }

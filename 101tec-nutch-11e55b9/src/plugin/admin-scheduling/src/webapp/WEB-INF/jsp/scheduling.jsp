@@ -411,6 +411,15 @@
 					<script  type="text/javascript">
 					(function() {
 					    var tabView = new YAHOO.widget.TabView('schedulingTabs');
+					    var activeTab = 0;
+					    if (location.href.indexOf("weekly.html") != -1) {
+						    activeTab = 1;
+					    } else if (location.href.indexOf("monthly.html") != -1) {
+					    	activeTab = 2;
+					    } else if (location.href.indexOf("advanced.html") != -1) {
+					    	activeTab = 3;
+					    }
+					    tabView.set('activeIndex', activeTab);
 					})();
 					</script>
 					
