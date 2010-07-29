@@ -31,9 +31,15 @@ import org.apache.nutch.protocol.Content;
 public class MD5Signature extends Signature {
 
   public byte[] calculate(Content content, Parse parse) {
-    byte[] data = content.getContent();
-    if (data == null) data = content.getUrl().getBytes();
-    StringBuilder buf = new StringBuilder().append(data).append(parse.getText());
-    return MD5Hash.digest(buf.toString().getBytes()).getDigest();
+    byte[] dataContent = content.getContent();
+    if (dataContent == null) dataContent = content.getUrl().getBytes();
+
+    // fixed wrong concatenation of bytes with a String, which resulted always
+    // into a new MD5-Hash since the address of the byte-array was used 
+    byte[] dataParse = parse.getText().getBytes();
+    byte[] dataNew = new byte[dataContent.length + dataParse.length];
+    System.arraycopy(dataContent, 0, dataNew, 0, dataContent.length); 
+    System.arraycopy(dataParse, 0, dataNew, dataContent.length, dataParse.length);
+    return MD5Hash.digest(dataNew).getDigest();
   }
 }

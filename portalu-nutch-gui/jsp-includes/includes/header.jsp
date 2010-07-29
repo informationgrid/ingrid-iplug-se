@@ -26,3 +26,4 @@ if(principal != null) {
 %>
 </div>
 <img src="<%=rootPath%>/theme/${theme}/gfx/logo.gif" />
+<div class="float_left" style="color: white; font-size: 150%; display: inline-block;">${title}</div>

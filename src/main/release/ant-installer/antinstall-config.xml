@@ -63,6 +63,7 @@
 
             <comment displayText="" explanatoryText="Eingabe der Ports über die die Adminoberflächen des Indexer und Searcher erreichbar sein soll. Überdies wird das Password für die Adminoberfläche der Searcherkomponente hier festgelegt."/>
             
+            <text property="adminIndexTitle"  displayText="Titel in der Oberfläche:"  defaultValue="iPlug-SE"/>
             <text property="adminIndexPort"  displayText="Port für Indexer:"  defaultValue="50060"/>
             <text property="adminSearchPort" displayText="Port für Searcher:" defaultValue="50059"/>
             <text property="adminSearchPassword" displayText="Passwort für Searcher-Adminoberfläche:" defaultValue="admin"/>

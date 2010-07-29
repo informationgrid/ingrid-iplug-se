@@ -9,6 +9,7 @@
     <property name="pd-index-xml"               value="${installDir}/conf/plugdescription-index.xml"/>
     <property name="pd-search-xml"              value="${installDir}/conf/plugdescription-search.xml"/>
     <property name="persistence-xml"            value="${installDir}/plugins/admin-urlmaintenance/conf/META-INF/persistence.xml"/>
+    <property name="nutch-se.sh"                value="${installDir}/bin/nutch-se.sh"/>
 
 	<target name="install" description="Extract all files to the installation directory.">
 		<unzip src="${antinstaller.jar}" dest="${installDir}">
@@ -72,6 +73,8 @@
         <replace file="${persistence-xml}" token="@MYSQL_USERNAME@"    value="${mysqlUserName}"/>
         <replace file="${persistence-xml}" token="@MYSQL_PASSWORD@"    value="${mysqlPassword}"/>
         <replace file="${persistence-xml}" token="@MYSQL_JDBC_URL@"    value="${mysqlJdbcUrl}"/>
+        
+        <replace file="${nutch-se.sh}"     token="@IPLUG_TITLE@"       value="${adminIndexTitle}"/>
     </target>
 
 	<target name="startIPlug">

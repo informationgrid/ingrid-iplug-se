@@ -176,7 +176,7 @@ export CLASSPATH="$CLASSPATH"
 NUTCH_OPTS="$NUTCH_OPTS -Dingrid_home="$NUTCH_HOME
 
 # run it
-exec "$JAVA" $JAVA_HEAP_MAX $NUTCH_OPTS -Dpid=$$ $CLASS "$@"
+exec "$JAVA" $JAVA_HEAP_MAX $NUTCH_OPTS -Dnutch.gui.title="@IPLUG_TITLE@" -Dpid=$$ $CLASS "$@"
 # run it in debugging mode
 #exec "$JAVA" $JAVA_HEAP_MAX $NUTCH_OPTS -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=5000,server=y,suspend=n -Dpid=$$ $CLASS "$@"
 

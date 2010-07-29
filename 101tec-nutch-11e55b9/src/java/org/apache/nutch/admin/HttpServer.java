@@ -79,7 +79,10 @@ public class HttpServer extends Thread {
     String pluginId = extension.getDescriptor().getPluginId();
     String contextPath = "/" + nutchInstance.getInstanceName();
     if (!pluginId.equals("admin-welcome")) {
-      contextPath = contextPath + "/" + pluginId;
+      //if (pluginId.equals("admin-urlmaintenance")) {
+      //  contextPath = "/" + pluginId;
+      //} else
+        contextPath = contextPath + "/" + pluginId;
     }
 
     String webApp = new File(extension.getDescriptor().getPluginPath()
@@ -95,7 +98,9 @@ public class HttpServer extends Thread {
 
     // add theme into view to load different css files
     String theme = System.getProperty("nutch.gui.theme", "default");
+    String title = System.getProperty("nutch.gui.title", "iPlug-SE");
     context.setAttribute("theme", theme);
+    context.setAttribute("title", title);
     context.setAttribute("securityEnabled", _secure);
     ((HashSessionManager) context.getServletHandler().getSessionManager())
             .setCrossContextSessionIDs(true);
