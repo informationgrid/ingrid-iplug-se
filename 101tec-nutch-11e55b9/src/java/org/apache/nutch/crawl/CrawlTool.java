@@ -74,6 +74,7 @@ public class CrawlTool {
     Path segments = new Path(_crawlDir, "segments");
     Path indexes = new Path(_crawlDir, "indexes");
     Path index = new Path(_crawlDir, "index");
+    Path indexTemp = new Path(_crawlDir, "indexTemp");
 
     // injectors
     Injector injector = new Injector(_configuration);
@@ -254,10 +255,10 @@ public class CrawlTool {
           _fileSystem.delete(indexes, true);
         }
 
-        // Delete old index
-        if (_fileSystem.exists(index)) {
-          LOG.info("Deleting old merged index: " + index);
-          _fileSystem.delete(index, true);
+        // Delete old temporary index
+        if (_fileSystem.exists(indexTemp)) {
+          LOG.info("Deleting old merged temp index: " + indexTemp);
+          _fileSystem.delete(indexTemp, true);
         }
       }
 
@@ -278,7 +279,15 @@ public class CrawlTool {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Merge index...");
         }
-        merger.merge(HadoopFSUtil.getPaths(fstats), index, tmpDir);
+        merger.merge(HadoopFSUtil.getPaths(fstats), indexTemp, tmpDir);
+        
+        // Delete old index and use the new index instead
+        if (_fileSystem.exists(index)) {
+          LOG.info("Deleting old merged index: " + index);
+          _fileSystem.delete(index, true);
+          LOG.debug("Rename temp folder of new index");
+          _fileSystem.rename(indexTemp, index);
+        }
       }
     } else {
       LOG.warn("No URLs to fetch - check your seed list and URL filters.");

@@ -21,6 +21,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -44,7 +46,8 @@ import org.apache.nutch.indexer.NutchSimilarity;
 /** Implements {@link Searcher} and {@link HitDetailer} for either a single
  * merged index, or a set of indexes. */
 public class IndexSearcher implements Searcher, HitDetailer {
-
+  public static final Log LOG = LogFactory.getLog(IndexSearcher.class);
+    
   private org.apache.lucene.search.Searcher luceneSearcher;
   private org.apache.lucene.index.IndexReader reader;
   private LuceneQueryOptimizer optimizer;
@@ -95,6 +98,7 @@ public class IndexSearcher implements Searcher, HitDetailer {
     throws IOException {
     org.apache.lucene.search.BooleanQuery luceneQuery =
       this.queryFilters.filter(query);
+    LOG.debug("Lucene Query: " + luceneQuery);
     return translateHits
       (optimizer.optimize(luceneQuery, luceneSearcher, numHits,
                           sortField, reverse),
