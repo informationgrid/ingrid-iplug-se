@@ -23,7 +23,7 @@
 		<unzip src="${installDir}/lib/ingrid-ext/ingrid-iplug-admin-step1-se-1.2.2-SNAPSHOT.war" dest="${installDir}/webapp/step1" />
 
 		<chmod dir="${installDir}" perm="ugo+rx" includes="*.sh" />
-		<chmod dir="${installDir}/bin" perm="ugo+rx" includes="*.sh,nutch*" />
+		<chmod dir="${installDir}/bin" perm="ugo+rx" includes="**/*.sh" />
 		<mkdir dir="${installDir}/logs" />
 	</target>
 
