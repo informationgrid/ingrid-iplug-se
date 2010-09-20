@@ -31,6 +31,23 @@
 		<developerConnection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid-iplug-se/trunk</developerConnection>
 	</scm>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>de.ingrid</groupId>
+        <artifactId>ingrid-base-webapp</artifactId>
+        <version>1.1.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>de.ingrid</groupId>
+        <artifactId>ingrid-base-webapp</artifactId>
+        <version>1.1.0-SNAPSHOT</version>
+        <classifier>res</classifier>
+        <type>zip</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  
 	<dependencies>
 		<dependency>
 			<groupId>de.ingrid</groupId>
@@ -57,18 +74,16 @@
 			<artifactId>ingrid-iplug-sns</artifactId>
 			<version>1.4.2-SNAPSHOT</version>
 		</dependency>
-        <dependency>
-            <groupId>de.ingrid</groupId>
-            <artifactId>ingrid-base-webapp</artifactId>
-            <version>0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-          <groupId>de.ingrid</groupId>
-          <artifactId>ingrid-base-webapp</artifactId>
-          <version>0.1-SNAPSHOT</version>
-          <classifier>res</classifier>
-          <type>zip</type>
-        </dependency>
+    <dependency>
+        <groupId>de.ingrid</groupId>
+        <artifactId>ingrid-base-webapp</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>de.ingrid</groupId>
+      <artifactId>ingrid-base-webapp</artifactId>
+      <classifier>res</classifier>
+      <type>zip</type>
+    </dependency>
 		<dependency>
             <groupId>de.ingrid</groupId>
             <artifactId>ingrid-iplug-admin-step1-se</artifactId>
