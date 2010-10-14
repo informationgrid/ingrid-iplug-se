@@ -120,7 +120,9 @@ public class StartUrlDao extends Dao<StartUrl> implements IStartUrlDao {
     }
     
     // end query with provider
-    q += " su._provider._id = :providerId  " + orderQuery;
+    q += " su._provider._id = :providerId";
+    // do not display deleted urls
+    q += " AND su._deleted is NULL " + orderQuery;
     
     final Query query = _transactionService.createQuery(q);
 
@@ -162,6 +164,8 @@ public class StartUrlDao extends Dao<StartUrl> implements IStartUrlDao {
 
     // end query with provider
     q += " su._provider._id = :providerId";
+    // do not display deleted urls
+    q += " AND su._deleted is NULL";
 
     final Query query = _transactionService.createQuery(q);
 

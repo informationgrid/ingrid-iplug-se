@@ -1,5 +1,6 @@
 package de.ingrid.iplug.se.urlmaintenance.web;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -49,16 +50,19 @@ public class DeleteWebUrlController extends NavigationSelector {
       List<LimitUrl> limitUrls = startUrl.getLimitUrls();
       for (LimitUrl limitUrl : limitUrls) {
         LOG.info("delete limit url: " + limitUrl);
-        _limitUrlDao.makeTransient(limitUrl);
+        limitUrl.setDeleted(new Date());
+        _limitUrlDao.makePersistent(limitUrl);
       }
 
       List<ExcludeUrl> excludeUrls = startUrl.getExcludeUrls();
       for (ExcludeUrl excludeUrl : excludeUrls) {
         LOG.info("delete exclude url: " + excludeUrl);
-        _excludeUrlDao.makeTransient(excludeUrl);
+        excludeUrl.setDeleted(new Date());
+        _excludeUrlDao.makePersistent(excludeUrl);
       }
       LOG.info("delete start url: " + startUrl);
-      _startUrlDao.makeTransient(startUrl);
+      startUrl.setDeleted(new Date());
+      _startUrlDao.makePersistent(startUrl);
       _databaseExport.exportWebUrls();
     }
 

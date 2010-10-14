@@ -27,7 +27,7 @@ import org.apache.nutch.protocol.ProtocolStatus;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "TYPE", discriminatorType = DiscriminatorType.STRING, length = 20)
 @NamedQueries(value = {
-    @NamedQuery(name = "countUrlsThatUsesSpecialProviders", query = "select count(u) from Url as u where u._provider._id in :providersIds") })
+    @NamedQuery(name = "countUrlsThatUsesSpecialProviders", query = "select count(u) from Url as u where u._deleted is NULL and u._provider._id in :providersIds") })
 public class Url extends IdBase {
 
   private String _url;
@@ -38,6 +38,9 @@ public class Url extends IdBase {
   @Temporal(TemporalType.TIMESTAMP)
   private Date _updated = new Date();
 
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date _deleted = null;
+  
   @ManyToOne
   @JoinColumn(nullable = false, name = "provider_fk")
   private Provider _provider;
@@ -96,6 +99,14 @@ public class Url extends IdBase {
     _updated = edited;
   }
 
+  public Date getDeleted() {
+      return _deleted;
+    }
+
+    public void setDeleted(final Date deleted) {
+      _deleted = deleted;
+    }
+  
   public Integer getStatus() {
     return _status;
   }

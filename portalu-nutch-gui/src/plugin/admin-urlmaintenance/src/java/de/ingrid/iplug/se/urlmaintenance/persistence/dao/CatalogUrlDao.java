@@ -43,6 +43,8 @@ public class CatalogUrlDao extends Dao<CatalogUrl> implements ICatalogUrlDao {
 
     // end query with provider
     q += " cu._provider._id = :providerId";
+    // do not display deleted urls
+    q += " AND cu._deleted is NULL";
 
     Query query = _transactionService.createQuery(q);
 
@@ -118,7 +120,9 @@ public class CatalogUrlDao extends Dao<CatalogUrl> implements ICatalogUrlDao {
     }
 
     // end query with provider
-    q += " cu._provider._id = :providerId  " + orderQuery;
+    q += " cu._provider._id = :providerId";
+    // do not display deleted urls
+    q += " AND cu._deleted is NULL " + orderQuery;
 
     Query query = _transactionService.createQuery(q);
 

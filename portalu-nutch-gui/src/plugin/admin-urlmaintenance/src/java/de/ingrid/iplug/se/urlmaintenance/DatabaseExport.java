@@ -58,6 +58,10 @@ public class DatabaseExport {
     List<String> lines = new ArrayList<String>();
 
     for (Url url : urlDao.getAll()) {
+      // skip deleted Urls
+      if (url.getDeleted() != null) {
+          continue;
+      }
       StringBuilder urlString = new StringBuilder();
       Provider provider = url.getProvider();
       
@@ -123,7 +127,10 @@ public class DatabaseExport {
     List<String> ret = new ArrayList<String>();
 
     for (Url url : urlDao.getAll()) {
-      ret.add(url.getUrl());
+        // get only not deleted URLs
+        if (url.getDeleted() == null) {
+            ret.add(url.getUrl());
+        }
     }
     return ret;
   }

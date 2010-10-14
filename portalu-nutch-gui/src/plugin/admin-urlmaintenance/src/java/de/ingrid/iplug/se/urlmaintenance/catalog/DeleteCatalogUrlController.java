@@ -1,5 +1,7 @@
 package de.ingrid.iplug.se.urlmaintenance.catalog;
 
+import java.util.Date;
+
 import org.apache.nutch.admin.NavigationSelector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -31,9 +33,9 @@ public class DeleteCatalogUrlController extends NavigationSelector {
 
     CatalogUrl url = _catalogUrlDao.getById(id);
     if (url != null) {
-      // TODO: check security user is allowed
-      _catalogUrlDao.makeTransient(url);
-      _databaseExport.exportCatalogUrls();
+        url.setDeleted(new Date());
+        _catalogUrlDao.makePersistent(url);
+        _databaseExport.exportCatalogUrls();
     }
 
     String view = "redirect:/catalog/listTopicUrls.html";

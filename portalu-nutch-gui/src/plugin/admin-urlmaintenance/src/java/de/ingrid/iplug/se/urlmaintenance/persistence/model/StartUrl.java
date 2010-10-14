@@ -13,13 +13,13 @@ import javax.persistence.OneToMany;
 @Entity
 @DiscriminatorValue("START")
 @NamedQueries(value = {
-    @NamedQuery(name = "getAllUrlsByProviderOrderByCreatedAsc", query = "select u from StartUrl as u where u._provider._id = :id order by u._created asc"),
-    @NamedQuery(name = "getAllUrlsByProviderOrderByCreatedDesc", query = "select u from StartUrl as u where u._provider._id = :id order by u._created desc"),
-    @NamedQuery(name = "getAllUrlsByProviderOrderByUpdatedAsc", query = "select u from StartUrl as u where u._provider._id = :id order by u._updated asc"),
-    @NamedQuery(name = "getAllUrlsByProviderOrderByUpdatedDesc", query = "select u from StartUrl as u where u._provider._id = :id order by u._updated desc"),
-    @NamedQuery(name = "getAllUrlsByProviderOrderByUrlAsc", query = "select u from StartUrl as u where u._provider._id = :id order by u._url asc"),
-    @NamedQuery(name = "getAllUrlsByProviderOrderByUrlDesc", query = "select u from StartUrl as u where u._provider._id = :id order by u._url desc"),
-    @NamedQuery(name = "countByProvider", query = "select count(u) from StartUrl as u where u._provider._id = :id") })
+    @NamedQuery(name = "getAllUrlsByProviderOrderByCreatedAsc", query = "select u from StartUrl as u where u._deleted is NULL and u._provider._id = :id order by u._created asc"),
+    @NamedQuery(name = "getAllUrlsByProviderOrderByCreatedDesc", query = "select u from StartUrl as u where u._deleted is NULL and u._provider._id = :id order by u._created desc"),
+    @NamedQuery(name = "getAllUrlsByProviderOrderByUpdatedAsc", query = "select u from StartUrl as u where u._deleted is NULL and u._provider._id = :id order by u._updated asc"),
+    @NamedQuery(name = "getAllUrlsByProviderOrderByUpdatedDesc", query = "select u from StartUrl as u where u._deleted is NULL and u._provider._id = :id order by u._updated desc"),
+    @NamedQuery(name = "getAllUrlsByProviderOrderByUrlAsc", query = "select u from StartUrl as u where u._deleted is NULL and u._provider._id = :id order by u._url asc"),
+    @NamedQuery(name = "getAllUrlsByProviderOrderByUrlDesc", query = "select u from StartUrl as u where u._deleted is NULL and u._provider._id = :id order by u._url desc"),
+    @NamedQuery(name = "countByProvider", query = "select count(u) from StartUrl as u where u._deleted is NULL and u._provider._id = :id") })
 public class StartUrl extends WebUrl {
 
   @OneToMany
