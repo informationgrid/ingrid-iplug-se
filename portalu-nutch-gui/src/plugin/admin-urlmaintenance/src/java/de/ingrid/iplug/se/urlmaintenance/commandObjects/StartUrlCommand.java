@@ -1,6 +1,7 @@
 package de.ingrid.iplug.se.urlmaintenance.commandObjects;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.ExcludeUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.IdBase;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.LimitUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl;
+import de.ingrid.iplug.se.urlmaintenance.persistence.model.Url;
 
 public class StartUrlCommand extends StartUrl implements ICommandSerializer<StartUrl> {
 
@@ -93,25 +95,68 @@ public class StartUrlCommand extends StartUrl implements ICommandSerializer<Star
 
   @Override
   public StartUrl write() {
-    StartUrl startUrl = new StartUrl();
-    startUrl.setProvider(getProvider());
+    StartUrl newStartUrl = null;
+    StartUrl oldStartUrl = null;
     if (getId() != null) {
       LOG.info("load start url with id: " + getId());
-      startUrl = _startUrlDao.getById(getId());
+      oldStartUrl = _startUrlDao.getById(getId());
+      if (this.getUrl().equals(oldStartUrl.getUrl())) {
+          newStartUrl = oldStartUrl; 
+      } else {
+          // mark existing old limit and exclude URls deleted
+          Iterator<LimitUrl> iterator = oldStartUrl.getLimitUrls().iterator();
+          while (iterator.hasNext()) {
+            LimitUrl limitUrlFromDb = (LimitUrl) iterator.next();
+            LOG.info("mark limit url as deleted with id: " + limitUrlFromDb.getId());
+            limitUrlFromDb.setDeleted(new Date());
+            _limitUrlDao.makePersistent(limitUrlFromDb);
+          }
+          // disconnect form limit urls commands from DB
+          for (LimitUrlCommand limitUrlCommand : getLimitUrlCommands()) {
+            LimitUrlCommand newLimitUrlCommand = new LimitUrlCommand(_limitUrlDao);
+            newLimitUrlCommand.read(limitUrlCommand);
+            limitUrlCommand = newLimitUrlCommand;
+          }
+          
+          Iterator<ExcludeUrl> itExcludeUrl = oldStartUrl.getExcludeUrls().iterator();
+          while (itExcludeUrl.hasNext()) {
+            ExcludeUrl excludeUrlFromDb = (ExcludeUrl) itExcludeUrl.next();
+            LOG.info("mark exclude url as deleted with id: " + excludeUrlFromDb.getId());
+            excludeUrlFromDb.setDeleted(new Date());
+            _excludeUrlDao.makePersistent(excludeUrlFromDb);
+          }
+          for (ExcludeUrlCommand excludeUrlCommand : getExcludeUrlCommands()) {
+            ExcludeUrlCommand newExcludeUrlCommand = new ExcludeUrlCommand(_excludeUrlDao);
+            newExcludeUrlCommand.read(excludeUrlCommand);
+            excludeUrlCommand = newExcludeUrlCommand;
+          }
+          
+          // mark the old start url as deleted
+          oldStartUrl.setDeleted(new Date());
+          _startUrlDao.makePersistent(oldStartUrl);
+
+          // create a new start URL since the old one will be marked as deleted
+          newStartUrl = new StartUrl();
+          newStartUrl.setProvider(getProvider());
+      }
+    } else {
+      newStartUrl = new StartUrl();
+      newStartUrl.setProvider(getProvider());
     }
-    startUrl.setUrl(getUrl());
-    startUrl.setCreated(getCreated());
-    startUrl.setUpdated(getUpdated());
+    
+    newStartUrl.setUrl(getUrl());
+    newStartUrl.setCreated(getCreated());
+    newStartUrl.setUpdated(getUpdated());
 
-    handleLimitUrls(startUrl);
-    handleExcludeUrls(startUrl);
+    handleLimitUrls(newStartUrl);
+    handleExcludeUrls(newStartUrl);
 
-    if (startUrl.getId() == null) {
-      LOG.info("save new start url: " + startUrl);
-      _startUrlDao.makePersistent(startUrl);
+    if (newStartUrl.getId() == null) {
+      LOG.info("save new start url: " + newStartUrl);
+      _startUrlDao.makePersistent(newStartUrl);
       _startUrlDao.flush();
     }
-    return startUrl;
+    return newStartUrl;
 
   }
 
@@ -119,22 +164,38 @@ public class StartUrlCommand extends StartUrl implements ICommandSerializer<Star
     Iterator<LimitUrl> iterator = out.getLimitUrls().iterator();
     while (iterator.hasNext()) {
       LimitUrl limitUrlFromDb = (LimitUrl) iterator.next();
+      // skip deleted urls
+      if (limitUrlFromDb.getDeleted() != null) {
+          continue;
+      }
       boolean delete = true;
       for (LimitUrlCommand limitUrlCommand : getLimitUrlCommands()) {
+        // do not delete unchanged limit urls, but do mark renamed limit urls deleted
         if (limitUrlFromDb.getId().equals(limitUrlCommand.getId())) {
-          delete = false;
-          break;
+          if (limitUrlFromDb.getUrl().equals(limitUrlCommand.getUrl())) {
+              // urls has not been changed
+              delete = false;
+              break;
+          } else {
+              // url has been renamed, create a new limit URL and let the old url be marked as deleted
+              LimitUrlCommand newLimitUrlCommand = new LimitUrlCommand(_limitUrlDao);
+              newLimitUrlCommand.read(limitUrlCommand);
+              limitUrlCommand = newLimitUrlCommand;
+          }
         }
       }
       if (delete) {
         iterator.remove();
-        LOG.info("delete limit url with id: " + limitUrlFromDb.getId());
-        _limitUrlDao.makeTransient(limitUrlFromDb);
+        LOG.info("mark limit url as deleted with id: " + limitUrlFromDb.getId());
+        limitUrlFromDb.setDeleted(new Date());
+        _limitUrlDao.makePersistent(limitUrlFromDb);
       }
     }
 
     for (LimitUrlCommand limitUrlCommand : getLimitUrlCommands()) {
+      // add limit URL
       LimitUrl limitUrl = limitUrlCommand.write();
+      // check for new limit URL
       if (limitUrl.getId() == null || !containsEntity(out.getLimitUrls(), limitUrl.getId())) {
         LOG.info("add new limit url: " + limitUrl);
         out.addLimitUrl(limitUrl);
@@ -142,9 +203,9 @@ public class StartUrlCommand extends StartUrl implements ICommandSerializer<Star
     }
   }
 
-  private boolean containsEntity(List<? extends IdBase> entityCommands, Long idToTest) {
-    for (IdBase idBase : entityCommands) {
-      if (idToTest.equals(idBase.getId())) {
+  private boolean containsEntity(List<? extends Url> urls, Long idToTest) {
+    for (Url url : urls) {
+      if (idToTest.equals(url.getId())) {
         return true;
       }
     }
@@ -155,22 +216,38 @@ public class StartUrlCommand extends StartUrl implements ICommandSerializer<Star
     Iterator<ExcludeUrl> iterator = out.getExcludeUrls().iterator();
     while (iterator.hasNext()) {
       ExcludeUrl excludeUrlFromDb = (ExcludeUrl) iterator.next();
+      // skip deleted urls
+      if (excludeUrlFromDb.getDeleted() != null) {
+          continue;
+      }
       boolean delete = true;
       for (ExcludeUrlCommand excludeUrlCommand : getExcludeUrlCommands()) {
+        // do not delete unchanged exclude urls, but do mark renamed exclude urls deleted
         if (excludeUrlFromDb.getId().equals(excludeUrlCommand.getId())) {
-          delete = false;
-          break;
+          if (excludeUrlFromDb.getUrl().equals(excludeUrlCommand.getUrl())) {
+              // urls has not been changed
+              delete = false;
+              break;
+          } else {
+              // url has been renamed, create a new exclude URL and let the old url be marked as deleted
+              ExcludeUrlCommand newExcludeUrlCommand = new ExcludeUrlCommand(_excludeUrlDao);
+              newExcludeUrlCommand.read(excludeUrlCommand);
+              excludeUrlCommand = newExcludeUrlCommand;
+          }
         }
       }
       if (delete) {
         iterator.remove();
-        LOG.info("delete exclude url with id: " + excludeUrlFromDb.getId());
-        _excludeUrlDao.makeTransient(excludeUrlFromDb);
+        LOG.info("mark exclude url as deleted with id: " + excludeUrlFromDb.getId());
+        excludeUrlFromDb.setDeleted(new Date());
+        _excludeUrlDao.makePersistent(excludeUrlFromDb);
       }
     }
 
     for (ExcludeUrlCommand excludeUrlCommand : getExcludeUrlCommands()) {
+      // add exclude Url
       ExcludeUrl excludeUrl = excludeUrlCommand.write();
+      // check for new exclude URL
       if (excludeUrl.getId() == null || !containsEntity(_excludeUrlCommands, excludeUrl.getId())) {
         LOG.info("add new exclude url: " + excludeUrl);
         out.addExcludeUrl(excludeUrl);
