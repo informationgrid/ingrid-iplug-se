@@ -104,8 +104,8 @@ public class CrawlTool {
     injector.inject(crawlDb, urlDir);
 
     boolean bwEnable = _configuration.getBoolean("bw.enable", false);
-    if (LOG.isDebugEnabled()) {
-        LOG.debug("Use BW filtering: " + bwEnable);
+    if (LOG.isInfoEnabled()) {
+        LOG.info("Use BW filtering: " + bwEnable);
     }
     if (bwEnable) {
       // BwInjector doesnt support update
@@ -114,14 +114,14 @@ public class CrawlTool {
         _fileSystem.delete(bwDb, true);
       }
       if (_fileSystem.exists(limitDir)) {
-          if (LOG.isDebugEnabled()) {
-              LOG.debug("Inject White urls...");
+          if (LOG.isInfoEnabled()) {
+              LOG.info("Inject White urls...");
           }
         bwInjector.inject(bwDb, limitDir, false);
       }
       if (_fileSystem.exists(excludeDir)) {
-          if (LOG.isDebugEnabled()) {
-              LOG.debug("Inject Black urls...");
+          if (LOG.isInfoEnabled()) {
+              LOG.info("Inject Black urls...");
           }
         bwInjector.inject(bwDb, excludeDir, true);
       }
@@ -143,8 +143,8 @@ public class CrawlTool {
     int i;
     ArrayList<Path> segs = new ArrayList<Path>();
     for (i = 0; i < depth; i++) { // generate new segment
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Generate new segment...");
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Generate new segment...");
         }
       Path segment = generator.generate(crawlDb, segments, -1, topn, System
               .currentTimeMillis());
@@ -152,49 +152,49 @@ public class CrawlTool {
         LOG.info("Stopping at depth=" + i + " - no more URLs to fetch.");
         break;
       }
-      if (LOG.isDebugEnabled()) {
-          LOG.debug("... new segment generated:" + segment);
+      if (LOG.isInfoEnabled()) {
+          LOG.info("... new segment generated:" + segment);
       }
       segs.add(segment);
-      if (LOG.isDebugEnabled()) {
-          LOG.debug("Fetch segment:" + segment);
+      if (LOG.isInfoEnabled()) {
+          LOG.info("Fetch segment:" + segment);
       }
       fetcher.fetch(segment, threads, org.apache.nutch.fetcher.Fetcher
               .isParsing(_configuration)); // fetch it
       // ------ none nutch-specific code starts here
-      if (LOG.isDebugEnabled()) {
-          LOG.debug("Analyse segment:" + segment);
+      if (LOG.isInfoEnabled()) {
+          LOG.info("Analyse segment:" + segment);
       }
       reporter.analyze(segment);
-      if (LOG.isDebugEnabled()) {
-          LOG.debug("Send report mail for segment:" + segment);
+      if (LOG.isInfoEnabled()) {
+          LOG.info("Send report mail for segment:" + segment);
       }
       mail.sendSegmentReport(_fileSystem, segment, i);
       // ------ none nutch-specific code ends here
       if (!Fetcher.isParsing(_configuration)) {
-          if (LOG.isDebugEnabled()) {
-              LOG.debug("Parse segment:" + segment);
+          if (LOG.isInfoEnabled()) {
+              LOG.info("Parse segment:" + segment);
           }
         parseSegment.parse(segment); // parse it, if needed
       }
       if (bwEnable) {
-          if (LOG.isDebugEnabled()) {
-              LOG.debug("Start updating crawldb with bwdb from segment:" + segment);
+          if (LOG.isInfoEnabled()) {
+              LOG.info("Start updating crawldb with bwdb from segment:" + segment);
           }
         bwUpdateDb.update(crawlDb, bwDb, new Path[] { segment }, true, true); // update
       } else {
-          if (LOG.isDebugEnabled()) {
-              LOG.debug("Do not update crawldb with bwdb from segment:" + segment);
+          if (LOG.isInfoEnabled()) {
+              LOG.info("Do not update crawldb with bwdb from segment:" + segment);
           }
       }
-      if (LOG.isDebugEnabled()) {
-          LOG.debug("Generate host statistics for segment:" + segment);
+      if (LOG.isInfoEnabled()) {
+          LOG.info("Generate host statistics for segment:" + segment);
       }
       hostStatistic.statistic(crawlDb, segment);
       if (metadataEnable) {
         if (_fileSystem.exists(metadataDb)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Update metadata db from segment:" + segment);
+            if (LOG.isInfoEnabled()) {
+                LOG.info("Update metadata db from segment:" + segment);
             }
           parseDataUpdater.update(metadataDb, segment);
         }
@@ -243,8 +243,8 @@ public class CrawlTool {
     // ------ none nutch-specific code ends here
 
     if (mergeSegments.length > 0) {
-      if (LOG.isDebugEnabled()) {
-          LOG.debug("Inverting links.");
+      if (LOG.isInfoEnabled()) {
+          LOG.info("Inverting links.");
       }
       linkDbTool.invert(linkDb, mergeSegments, true, true, false); // invert links
 
@@ -263,21 +263,21 @@ public class CrawlTool {
       }
 
       // index, dedup & merge
-      if (LOG.isDebugEnabled()) {
-          LOG.debug("Create index...");
+      if (LOG.isInfoEnabled()) {
+          LOG.info("Create index...");
       }
       indexer.index(indexes, crawlDb, linkDb, Arrays.asList(mergeSegments));
       if (indexes != null) {
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("Dedup index...");
+        if (LOG.isInfoEnabled()) {
+          LOG.info("Dedup index...");
         }
         dedup.dedup(new Path[] { indexes });
         FileStatus[] fstats = _fileSystem.listStatus(indexes, HadoopFSUtil
                 .getPassDirectoriesFilter(_fileSystem));
         Path tmpDir = new Path(_configuration.get("mapred.temp.dir", ".")
                 + CrawlTool.class.getName() + "_mergeIndex");
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Merge index...");
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Merge index...");
         }
         merger.merge(HadoopFSUtil.getPaths(fstats), indexTemp, tmpDir);
         
@@ -285,7 +285,7 @@ public class CrawlTool {
         if (_fileSystem.exists(index)) {
           LOG.info("Deleting old merged index: " + index);
           _fileSystem.delete(index, true);
-          LOG.debug("Rename temp folder of new index");
+          LOG.info("Rename temp folder '" + indexTemp + "' to new index '" + indexTemp + "'.");
           _fileSystem.rename(indexTemp, index);
         }
       }
@@ -296,8 +296,8 @@ public class CrawlTool {
     // delete old segments (after indexing so searching is meanwhile still possible)
     if (segmentsToDelete != null) {
       for (Path p : segmentsToDelete) {
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("Delete old index: " + p);
+        if (LOG.isInfoEnabled()) {
+          LOG.info("Delete old index: " + p);
         }
         _fileSystem.delete(p, true);
       }
