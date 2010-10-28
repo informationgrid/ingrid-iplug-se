@@ -86,7 +86,6 @@ public class WebUrlCommandValidator extends AbstractValidator<StartUrlCommand> {
         return errors;
     }
     
-    @SuppressWarnings("unchecked")
     public Errors validateExcludeUrl(final Errors errors) {
         final String url = (String)get(errors, "url");//excludeUrl.getUrl();
         if (url == null || url.length() == 0) {

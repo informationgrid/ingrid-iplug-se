@@ -135,6 +135,7 @@ public class StartUrlDao extends Dao<StartUrl> implements IStartUrlDao {
     query.setFirstResult(start);
     query.setMaxResults(length);
     return query.getResultList();
+
   }
 
   @Override
@@ -180,7 +181,7 @@ public class StartUrlDao extends Dao<StartUrl> implements IStartUrlDao {
 
   @SuppressWarnings("unchecked")
   public List<StartUrl> getByUrl(final String url, final Serializable providerId) {
-    final String q = "SELECT DISTINCT su FROM StartUrl su WHERE su._url = :url and su._provider._id = :providerId";
+    final String q = "SELECT DISTINCT su FROM StartUrl su WHERE su._url = :url and su._provider._id = :providerId and su._deleted is NULL";
     final Query query = _transactionService.createQuery(q);
     query.setParameter("url", url);
     query.setParameter("providerId", providerId);

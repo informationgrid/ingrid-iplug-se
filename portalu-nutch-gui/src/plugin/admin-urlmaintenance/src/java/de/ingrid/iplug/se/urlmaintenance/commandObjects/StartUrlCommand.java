@@ -12,7 +12,6 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IExcludeUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ILimitUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IStartUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.ExcludeUrl;
-import de.ingrid.iplug.se.urlmaintenance.persistence.model.IdBase;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.LimitUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Url;
@@ -81,12 +80,18 @@ public class StartUrlCommand extends StartUrl implements ICommandSerializer<Star
     List<LimitUrl> limitUrls = startUrl.getLimitUrls();
     _limitUrlCommands.clear();
     for (LimitUrl limitUrl : limitUrls) {
+      if (limitUrl.getDeleted() != null) {
+        continue;
+      }
       LimitUrlCommand limitUrlCommand = new LimitUrlCommand(_limitUrlDao);
       limitUrlCommand.read(limitUrl);
       addLimitUrlCommand(limitUrlCommand);
     }
     List<ExcludeUrl> excludeUrls = startUrl.getExcludeUrls();
     for (ExcludeUrl excludeUrl : excludeUrls) {
+      if (excludeUrl.getDeleted() != null) {
+        continue;
+      }
       ExcludeUrlCommand excludeUrlCommand = new ExcludeUrlCommand(_excludeUrlDao);
       excludeUrlCommand.read(excludeUrl);
       addExcludeUrlCommand(excludeUrlCommand);
@@ -113,9 +118,7 @@ public class StartUrlCommand extends StartUrl implements ICommandSerializer<Star
           }
           // disconnect form limit urls commands from DB
           for (LimitUrlCommand limitUrlCommand : getLimitUrlCommands()) {
-            LimitUrlCommand newLimitUrlCommand = new LimitUrlCommand(_limitUrlDao);
-            newLimitUrlCommand.read(limitUrlCommand);
-            limitUrlCommand = newLimitUrlCommand;
+            limitUrlCommand.setId(null);
           }
           
           Iterator<ExcludeUrl> itExcludeUrl = oldStartUrl.getExcludeUrls().iterator();
@@ -126,9 +129,7 @@ public class StartUrlCommand extends StartUrl implements ICommandSerializer<Star
             _excludeUrlDao.makePersistent(excludeUrlFromDb);
           }
           for (ExcludeUrlCommand excludeUrlCommand : getExcludeUrlCommands()) {
-            ExcludeUrlCommand newExcludeUrlCommand = new ExcludeUrlCommand(_excludeUrlDao);
-            newExcludeUrlCommand.read(excludeUrlCommand);
-            excludeUrlCommand = newExcludeUrlCommand;
+            excludeUrlCommand.setId(null);
           }
           
           // mark the old start url as deleted
@@ -138,15 +139,17 @@ public class StartUrlCommand extends StartUrl implements ICommandSerializer<Star
           // create a new start URL since the old one will be marked as deleted
           newStartUrl = new StartUrl();
           newStartUrl.setProvider(getProvider());
+          
+          newStartUrl.setUpdated(new Date());
       }
     } else {
       newStartUrl = new StartUrl();
       newStartUrl.setProvider(getProvider());
+      newStartUrl.setUpdated(getUpdated());
     }
     
     newStartUrl.setUrl(getUrl());
     newStartUrl.setCreated(getCreated());
-    newStartUrl.setUpdated(getUpdated());
 
     handleLimitUrls(newStartUrl);
     handleExcludeUrls(newStartUrl);
@@ -177,10 +180,9 @@ public class StartUrlCommand extends StartUrl implements ICommandSerializer<Star
               delete = false;
               break;
           } else {
-              // url has been renamed, create a new limit URL and let the old url be marked as deleted
-              LimitUrlCommand newLimitUrlCommand = new LimitUrlCommand(_limitUrlDao);
-              newLimitUrlCommand.read(limitUrlCommand);
-              limitUrlCommand = newLimitUrlCommand;
+              // url has been renamed, disconnect limit URL from DB (and let the old url be marked as deleted)
+              limitUrlCommand.setId(null);
+              limitUrlCommand.setUpdated(new Date());
           }
         }
       }
@@ -229,10 +231,8 @@ public class StartUrlCommand extends StartUrl implements ICommandSerializer<Star
               delete = false;
               break;
           } else {
-              // url has been renamed, create a new exclude URL and let the old url be marked as deleted
-              ExcludeUrlCommand newExcludeUrlCommand = new ExcludeUrlCommand(_excludeUrlDao);
-              newExcludeUrlCommand.read(excludeUrlCommand);
-              excludeUrlCommand = newExcludeUrlCommand;
+              // url has been renamed, disconnect limit URL from DB (and let the old url be marked as deleted)
+              excludeUrlCommand.setId(null);
           }
         }
       }

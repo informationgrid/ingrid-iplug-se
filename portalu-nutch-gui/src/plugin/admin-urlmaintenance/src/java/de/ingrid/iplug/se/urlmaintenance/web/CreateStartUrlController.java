@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import de.ingrid.iplug.se.urlmaintenance.PartnerProviderCommand;
-import de.ingrid.iplug.se.urlmaintenance.commandObjects.ExcludeUrlCommand;
-import de.ingrid.iplug.se.urlmaintenance.commandObjects.LimitUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.StartUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IExcludeUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ILimitUrlDao;

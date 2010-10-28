@@ -13,12 +13,23 @@ public class ExcludeUrlCommand extends ExcludeUrl implements
 
   private static final Log LOG = LogFactory.getLog(ExcludeUrlCommand.class);
 
+  private Long _id;
+  
   public ExcludeUrlCommand(IExcludeUrlDao excludeUrlDao) {
     _excludeUrlDao = excludeUrlDao;
   }
 
+  public Long getId() {
+    return _id;
+  }
+
+  public void setId(Long id) {
+    _id = id;
+  }
+  
   @Override
   public void read(ExcludeUrl in) {
+    setId(in.getId());
     setProvider(in.getProvider());
     setUrl(in.getUrl());
     setCreated(in.getCreated());

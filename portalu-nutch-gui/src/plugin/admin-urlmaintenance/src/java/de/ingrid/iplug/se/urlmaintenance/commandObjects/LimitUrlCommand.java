@@ -12,13 +12,25 @@ public class LimitUrlCommand extends LimitUrl implements
   private final ILimitUrlDao _limitUrlDao;
 
   private static final Log LOG = LogFactory.getLog(LimitUrlCommand.class);
+  
+  private Long _id;
 
   public LimitUrlCommand(ILimitUrlDao limitUrlDao) {
     _limitUrlDao = limitUrlDao;
   }
 
+  public Long getId() {
+    return _id;
+  }
+
+  public void setId(Long id) {
+    _id = id;
+  }
+  
+  
   @Override
   public void read(LimitUrl in) {
+    setId(in.getId());
     setProvider(in.getProvider());
     setUrl(in.getUrl());
     setCreated(in.getCreated());
