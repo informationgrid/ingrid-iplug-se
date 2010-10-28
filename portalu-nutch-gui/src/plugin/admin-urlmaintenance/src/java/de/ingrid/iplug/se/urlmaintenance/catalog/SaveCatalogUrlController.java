@@ -107,10 +107,8 @@ public class SaveCatalogUrlController extends NavigationSelector {
       } else if ("alt_title".equals(metadataKey)) {
           // update metadata inside a transaction
           if (altTitleMD != null) {
-            _transactionService.beginTransaction();
             altTitleMD.setMetadataValue(metadataValue);
-            _transactionService.commitTransaction();
-            _transactionService.close();            
+            _transactionService.flipTransaction();
           } else {
             Metadata mdNew = new Metadata("alt_title", metadataValue);
             _metadataDao.makePersistent(mdNew);
@@ -135,6 +133,8 @@ public class SaveCatalogUrlController extends NavigationSelector {
       metadatas.set(indexToReplace, _metadataDao.getById(id));
     
     catalogUrl.setMetadatas(catalogUrlCommand.getMetadatas());
+    _catalogUrlDao.makePersistent(catalogUrl);
+    _transactionService.flipTransaction();
     _databaseExport.exportCatalogUrls();
     
     return redirectUrl;
