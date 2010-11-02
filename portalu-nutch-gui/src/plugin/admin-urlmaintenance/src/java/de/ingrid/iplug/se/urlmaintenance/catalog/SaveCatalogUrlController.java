@@ -84,11 +84,22 @@ public class SaveCatalogUrlController extends NavigationSelector {
     CatalogUrl catalogUrl = new CatalogUrl();
     if (catalogUrlCommand.getId() > -1) {
       catalogUrl = _catalogUrlDao.getById(catalogUrlCommand.getId());
-    } else {
-      catalogUrl.setProvider(catalogUrlCommand.getProvider());
-      _catalogUrlDao.makePersistent(catalogUrl);
+      if (!catalogUrl.getUrl().equals(catalogUrlCommand.getUrl())) {
+          // url has changed, mark DB Url as deleted
+          catalogUrl.setDeleted(new Date());
+          _catalogUrlDao.makePersistent(catalogUrl);
+          
+          // disconnect url from DB
+          catalogUrl = new CatalogUrl();
+      }
     }
-    catalogUrl.setUrl(catalogUrlCommand.getUrl());
+    
+    // check for new created URLs
+    if (catalogUrl.getId() == null) {
+        catalogUrl.setProvider(catalogUrlCommand.getProvider());
+        catalogUrl.setUrl(catalogUrlCommand.getUrl());
+        _catalogUrlDao.makePersistent(catalogUrl);
+    }
     catalogUrl.setUpdated(new Date());
     
     Metadata altTitleMD = getMetadata(catalogUrl, "alt_title");

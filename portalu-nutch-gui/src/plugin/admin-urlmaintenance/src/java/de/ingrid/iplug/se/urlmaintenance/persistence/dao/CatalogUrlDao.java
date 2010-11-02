@@ -139,7 +139,7 @@ public class CatalogUrlDao extends Dao<CatalogUrl> implements ICatalogUrlDao {
   
   @SuppressWarnings("unchecked")
   public List<CatalogUrl> getByUrl(final String url, final Serializable providerId) {
-    final String q = "SELECT DISTINCT cu FROM CatalogUrl cu WHERE cu._url = :url and cu._provider._id = :providerId";
+    final String q = "SELECT DISTINCT cu FROM CatalogUrl cu WHERE cu._deleted IS NULL and cu._url = :url and cu._provider._id = :providerId";
     final Query query = _transactionService.createQuery(q);
     query.setParameter("url", url);
     query.setParameter("providerId", providerId);
