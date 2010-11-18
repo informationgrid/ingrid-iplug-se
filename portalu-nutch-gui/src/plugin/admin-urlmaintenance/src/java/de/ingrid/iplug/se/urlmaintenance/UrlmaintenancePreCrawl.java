@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -33,6 +34,38 @@ public class UrlmaintenancePreCrawl implements IPreCrawl {
   public void preCrawl(Path crawlDir) throws IOException {
 
     String urlType = _conf.get("url.type");
+    
+    // initialize url database export via interiPlug communication
+    // see class de.ingrid.iplug.se.urlmaintenance.DatabaseExport
+    int counter = 30;
+    LOG.info("Initialize Database Export of URLs. Wait for " + counter + " sec to finish.");
+    InterplugInCommunication<String> instanceForStringLists = InterplugInCommunication.getInstanceForStringLists();
+    List<String> exportNow = instanceForStringLists.getObjectContent(DatabaseExport.EXPORT_NOW);
+    if (exportNow == null) {
+        exportNow = new ArrayList<String>();
+    }
+    exportNow.add(urlType);
+    instanceForStringLists.setObjectContent(DatabaseExport.EXPORT_NOW, exportNow);
+    while (counter > 0) {
+        exportNow = instanceForStringLists.getObjectContent(DatabaseExport.EXPORT_NOW);
+        if (exportNow.isEmpty()) {
+            LOG.info("Database Export of URLs has finished.");
+            break;
+        }
+        counter--;
+        try {
+            Thread.sleep(1000);
+            LOG.info("Database Export running, still waiting " + counter + " sec to finish.");
+        } catch (InterruptedException e) {
+            LOG.error("Waiting for database export to finish was interrupted!");
+        }
+    }
+    
+    if (counter == 0) {
+        LOG.info("Database Export is still running or not triggered. Continue now.");
+    }
+    
+    
     uploadUrlsFromCommunicationObject(urlType, crawlDir);
   }
 
@@ -80,6 +113,9 @@ public class UrlmaintenancePreCrawl implements IPreCrawl {
         OutputStreamWriter osw = new OutputStreamWriter(fos , "UTF-8");
         BufferedWriter bw = new BufferedWriter(osw);
         for (String line : lines) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Write to file: " + line);
+            }
             bw.write(line);
             bw.write(_lineSeparator);
         }

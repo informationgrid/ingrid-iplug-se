@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import net.weta.components.communication.util.PooledThreadExecutor;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +46,49 @@ public class DatabaseExport {
   public static final String CATALOG_URLS = "catalog-urls";
 
   public static final String CATALOG_METADATA = "catalog-metadata";
+  
+  public static final String EXPORT_NOW = "export-now";
+  
+  public static final String WEB = "web";
+  
+  public static final String CATALOG = "catalog";
 
+  
+  private class DatabaseExportPoller extends Thread {
+
+    DatabaseExportPoller() {
+        LOG.info("Database url export poller created.");
+    }
+      
+    @Override
+    public void run() {
+        LOG.info("Database url export poller started.");
+        while (!this.isInterrupted()) {
+            InterplugInCommunication<String> instanceForStringLists = InterplugInCommunication.getInstanceForStringLists();
+            List<String> exportNow = instanceForStringLists.getObjectContent(EXPORT_NOW);
+            if (exportNow != null && !exportNow.isEmpty()) {
+                if (exportNow.contains(WEB)) {
+                    LOG.info("Request for WEB Url Export detected. Trigger export now.");
+                    exportWebUrls();
+                }
+                if (exportNow.contains(CATALOG)) {
+                    LOG.info("Request for CATALOG Url Export detected. Trigger export now.");
+                    exportCatalogUrls();
+                }
+                exportNow.clear();
+                instanceForStringLists.setObjectContent(EXPORT_NOW, exportNow);
+            }
+            try {
+                sleep(1000);
+            } catch (InterruptedException e) {
+                LOG.error("Database url export poller was interrupted while sleeping!");
+            }
+        }
+        LOG.info("Database url export poller was interrupted!");
+    }
+      
+  }
+  
   @Autowired
   public DatabaseExport(IStartUrlDao startUrlDao, ICatalogUrlDao catalogUrlDao, ILimitUrlDao limitUrlDao,
       IExcludeUrlDao excludeUrlDao) {
@@ -52,8 +96,12 @@ public class DatabaseExport {
     _catalogUrlDao = catalogUrlDao;
     _limitUrlDao = limitUrlDao;
     _excludeUrlDao = excludeUrlDao;
+    
+    PooledThreadExecutor.execute(new DatabaseExportPoller());
   }
-
+  
+  
+  
   List<String> metadataAsStringList(IDao<? extends Url> urlDao) {
     List<String> lines = new ArrayList<String>();
 
@@ -101,7 +149,7 @@ public class DatabaseExport {
     return lines;
   }
 
-  public void exportWebUrls() {
+  public synchronized void exportWebUrls() {
     InterplugInCommunication<String> instanceForStringLists = InterplugInCommunication.getInstanceForStringLists();
 
     LOG.info("export web start urls");
@@ -114,7 +162,7 @@ public class DatabaseExport {
     instanceForStringLists.setObjectContent(WEB_METADATA, metadataAsStringList(_limitUrlDao));
   }
 
-  public void exportCatalogUrls() {
+  public synchronized void exportCatalogUrls() {
     InterplugInCommunication<String> instanceForStringLists = InterplugInCommunication.getInstanceForStringLists();
 
     LOG.info("export catalog start/limit urls");
@@ -129,7 +177,14 @@ public class DatabaseExport {
     for (Url url : urlDao.getAll()) {
         // get only not deleted URLs
         if (url.getDeleted() == null) {
+            if (LOG.isDebugEnabled()) {
+                LOG.info("Do export url: " + url.getUrl());
+            }
             ret.add(url.getUrl());
+        } else {
+            if (LOG.isDebugEnabled()) {
+                LOG.info("Do NOT export deleted url: " + url.getUrl());
+            }
         }
     }
     return ret;
