@@ -147,7 +147,7 @@ public class NutchSearcher implements IPlug {
     _processorPipe.postProcess(query, ingridHits);
     
     if (LOG.isDebugEnabled()) {
-        LOG.debug("SE Search: finished after " + (System.currentTimeMillis() - startTimer) + " ms");
+        LOG.debug("SE Search: finished after " + (System.currentTimeMillis() - startTimer) + " ms with " + translateHits.length() + " results.");
     }
 
     return translateHits;

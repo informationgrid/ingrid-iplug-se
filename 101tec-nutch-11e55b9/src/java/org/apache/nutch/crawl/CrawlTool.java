@@ -285,9 +285,9 @@ public class CrawlTool {
         if (_fileSystem.exists(index)) {
           LOG.info("Deleting old merged index: " + index);
           _fileSystem.delete(index, true);
-          LOG.info("Rename temp folder '" + indexTemp + "' to new index '" + indexTemp + "'.");
-          _fileSystem.rename(indexTemp, index);
         }
+        LOG.info("Rename temp folder '" + indexTemp + "' to new index '" + index + "'.");
+        _fileSystem.rename(indexTemp, index);
       }
     } else {
       LOG.warn("No URLs to fetch - check your seed list and URL filters.");
