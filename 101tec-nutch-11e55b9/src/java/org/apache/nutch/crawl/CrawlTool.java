@@ -297,7 +297,7 @@ public class CrawlTool {
     if (segmentsToDelete != null) {
       for (Path p : segmentsToDelete) {
         if (LOG.isInfoEnabled()) {
-          LOG.info("Delete old index: " + p);
+          LOG.info("Delete old segment: " + p);
         }
         _fileSystem.delete(p, true);
       }
