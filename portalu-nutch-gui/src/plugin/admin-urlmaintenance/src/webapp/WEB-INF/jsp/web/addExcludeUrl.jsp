@@ -44,7 +44,7 @@
                                 <form:form action="removeExcludeUrl.html" method="post" modelAttribute="startUrlCommand">
                                     ${startUrlCommand.excludeUrlCommands[excludeUrlCounter].url}
                                     <input type="hidden" name="index" value="${excludeUrlCounter}" />
-                                    <input type="image" src="../theme/${theme}/gfx/delete.png" align="absmiddle" title="Löschen"/>
+                                    <input type="image" src="../theme/${theme}/gfx/delete.png" align="absmiddle" title="Lï¿½schen"/>
                                 </form:form>
                                 </div>
                             </c:when>
@@ -54,14 +54,14 @@
             <fieldset>
               <c:choose>
                 <c:when test="${startUrlCommand.id > -1}">
-                  <legend>Web Url bearbeiten - Exclude Url</legend>
+                  <legend>Web Url bearbeiten - Exclude Url hinzuf&uuml;gen</legend>
                 </c:when>
                 <c:otherwise>
-                  <legend>Web Url anlegen - Exclude Url</legend>                                        
+                  <legend>Web Url anlegen - Exclude Url hinzuf&uuml;gen</legend>                                        
                 </c:otherwise>
               </c:choose>
               <row>
-                <desc>Das Hinzufügen von Exclude URLs ist optional.</desc>
+                <desc>Das Hinzufï¿½gen von Exclude URLs ist optional.</desc>
               </row>
               <row>
                     <label>Exclude URL:</label>
@@ -74,7 +74,7 @@
                 <row>
                     <label>&nbsp;</label>
                     <field>
-                        <input type="submit" value="Hinzufügen"/>
+                        <input type="submit" value="Hinzufï¿½gen"/>
                         <input type="button" value="Weiter" onclick="window.location.href='finishWebUrl.html'" />
                     </field>
                 </row>

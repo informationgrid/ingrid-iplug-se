@@ -48,7 +48,7 @@
                                         <fmt:message key="${metadata.metadataKey}.${metadata.metadataValue}" />
                                     </c:forEach>)
                                     <input type="hidden" name="index" value="${limitUrlCounter}" />
-                                    <input type="image" src="../theme/${theme}/gfx/delete.png" align="absmiddle" title="Löschen"/>
+                                    <input type="image" src="../theme/${theme}/gfx/delete.png" align="absmiddle" title="Lï¿½schen"/>
                                 </form:form>
                                 </div>
                             </c:when>
@@ -58,10 +58,10 @@
             <fieldset>
               <c:choose>
                 <c:when test="${startUrlCommand.id > -1}">
-                  <legend>Web Url bearbeiten - Limit Url</legend>
+                  <legend>Web Url bearbeiten - Limit Url hinzuf&uuml;gen</legend>
                 </c:when>
                 <c:otherwise>
-                  <legend>Web Url anlegen - Limit Url</legend>                                      
+                  <legend>Web Url anlegen - Limit Url hinzuf&uuml;gen</legend>                                      
                 </c:otherwise>
               </c:choose>
               <row>
@@ -105,7 +105,7 @@
                 <row>
                     <label>&nbsp;</label>
                     <field>
-                        <input type="submit" value="Hinzufügen"/>
+                        <input type="submit" value="Hinzufï¿½gen"/>
                         <c:if test="${maxLimitUrls > 0}">
                           <input type="button" value="Weiter" onclick="window.location.href='addExcludeUrl.html'" />
                       </c:if>
