@@ -70,6 +70,12 @@ public class ScoreUpdater
   private JobConf conf;
   private float clearScore = 0.0f;
 
+  public ScoreUpdater() {}
+  
+  public ScoreUpdater(Configuration conf) {
+      setConf(conf);
+  }
+  
   public void configure(JobConf conf) {
     this.conf = conf;
     clearScore = conf.getFloat("link.score.updater.clear.score", 0.0f);

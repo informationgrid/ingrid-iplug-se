@@ -424,6 +424,13 @@ public class WebGraph
     }
   }
 
+  
+  public WebGraph() {}
+  
+  public WebGraph(Configuration conf) {
+      setConf(conf);
+  }
+  
   /**
    * Creates the three different WebGraph databases, Outlinks, Inlinks, and
    * Node. If a current WebGraph exists then it is updated, if it doesn't exist

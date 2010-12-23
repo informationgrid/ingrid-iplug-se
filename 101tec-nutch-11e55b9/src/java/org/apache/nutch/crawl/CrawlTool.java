@@ -30,6 +30,7 @@ import org.apache.nutch.tools.UrlReporter;
 import org.apache.nutch.util.HadoopFSUtil;
 
 import de.ingrid.iplug.se.SearchUpdateScanner;
+import de.ingrid.iplug.se.crawl.WebGraphScoring;
 
 public class CrawlTool {
 
@@ -93,6 +94,7 @@ public class CrawlTool {
     ParseSegment parseSegment = new ParseSegment(_configuration);
     BWUpdateDb bwUpdateDb = new BWUpdateDb(_configuration);
     ParseDataUpdater parseDataUpdater = new ParseDataUpdater(_configuration);
+    WebGraphScoring webGraphScoring = new WebGraphScoring(_configuration);
     LinkDb linkDbTool = new LinkDb(_configuration);
     Indexer indexer = new Indexer(_configuration);
     DeleteDuplicates dedup = new DeleteDuplicates(_configuration);
@@ -200,6 +202,8 @@ public class CrawlTool {
         }
       }
     }
+    
+    webGraphScoring.updateScore(crawlDb, segs);
 
     // list of all segments that will be used
     FileStatus[] listStatus = _fileSystem.listStatus(segments, HadoopFSUtil.getPassDirectoriesFilter(_fileSystem));
