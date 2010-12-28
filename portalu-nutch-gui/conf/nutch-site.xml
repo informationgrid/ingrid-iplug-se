@@ -314,4 +314,29 @@
   <description></description>
 </property>
 
+<!-- linkrank scoring properties -->
+<property>
+  <name>link.ignore.internal.host</name>
+  <value>true</value>
+  <description>Ignore outlinks to the same hostname.</description>
+</property>
+
+<property>
+  <name>link.ignore.internal.domain</name>
+  <value>false</value>
+  <description>Ignore outlinks to the same domain.</description>
+</property>
+
+<property>
+  <name>link.ignore.limit.page</name>
+  <value>true</value>
+  <description>Limit to only a single outlink to the same page.</description>
+</property>
+
+<property>
+  <name>link.ignore.limit.domain</name>
+  <value>false</value>
+  <description>Limit to only a single outlink to the same domain.</description>
+</property> 
+
 </configuration>

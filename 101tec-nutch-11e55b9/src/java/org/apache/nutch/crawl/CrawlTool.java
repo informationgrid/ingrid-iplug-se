@@ -203,6 +203,7 @@ public class CrawlTool {
       }
     }
     
+    LOG.info("Using WebGraph to calculate score");
     webGraphScoring.updateScore(crawlDb, segs);
 
     // list of all segments that will be used
