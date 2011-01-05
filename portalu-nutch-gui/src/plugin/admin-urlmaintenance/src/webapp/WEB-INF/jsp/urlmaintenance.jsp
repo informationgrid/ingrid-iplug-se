@@ -62,7 +62,7 @@
 					
 					<form:form action="./index.html" commandName="partnerProviderCommand" method="post">
 						<fieldset>
-						    <legend>Partner und Anbieter auswählen</legend>
+						    <legend>Partner und Anbieter ausw&auml;hlen</legend>
 						    
 						    <row>
 						        <label><form:label path="partner" >Partner: </form:label></label>

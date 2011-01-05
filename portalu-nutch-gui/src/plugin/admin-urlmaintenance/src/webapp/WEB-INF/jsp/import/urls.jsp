@@ -99,16 +99,16 @@
 	                                <td>
 	                                   <c:if test="${empty container.value}"><span class="success">OK</span><br /></c:if>
 	                                   <c:if test="${!empty container.value['provider.empty']}"><span class="error">fehlender Anbieter</span><br /></c:if>
-	                                   <c:if test="${!empty container.value['provider.invalid']}"><span class="error">ungültiger Anbieter</span><br /></c:if>
+	                                   <c:if test="${!empty container.value['provider.invalid']}"><span class="error">ung&uuml;ltiger Anbieter</span><br /></c:if>
 	                                   <c:if test="${!empty container.value['whiteurl.empty']}"><span class="error">fehlende Limit URL</span><br /></c:if>
 	                                   <c:if test="${!empty container.value['whiteurl.reduntant']}"><span class="error">redundante Limit URL</span><br /></c:if>
 	                                   <c:if test="${!empty container.value['whiteurl.duple']}"><span class="error">doppelte Limit URL</span><br /></c:if>
 	                                   <c:if test="${!empty container.value['metadata.empty']}"><span class="error">fehlende Metadaten</span><br /></c:if>
-	                                   <c:if test="${!empty container.value['metadata.invalid']}"><span class="error">ungültige Metadaten</span><br /></c:if>
+	                                   <c:if test="${!empty container.value['metadata.invalid']}"><span class="error">ung&uuml;ltige Metadaten</span><br /></c:if>
 	                                   <c:if test="${!empty container.value['metadata.missing']}"><span class="error">fehlende Metadaten (datatype?)</span><br /></c:if>
-	                                   <c:if test="${!empty container.value['blackurl.inalid']}"><span class="error">ungültige Exclude URL</span><br /></c:if>
+	                                   <c:if test="${!empty container.value['blackurl.inalid']}"><span class="error">ung&uuml;ltige Exclude URL</span><br /></c:if>
 	                                   <c:if test="${!empty container.value['starturl.empty']}"><span class="error">fehlende Start URL</span><br /></c:if>
-	                                   <c:if test="${!empty container.value['starturl.invalid']}"><span class="error">ungültige Start URL</span><br /></c:if>
+	                                   <c:if test="${!empty container.value['starturl.invalid']}"><span class="error">ung&uuml;ltige Start URL</span><br /></c:if>
 	                                   <c:if test="${!empty container.value['starturl.duple']}"><span class="error">doppelte Start URL</span><br /></c:if>
 	                                   <c:if test="${!empty container.value['whiteurl.empty']}"><span class="error">fehlende Limit URL</span><br /></c:if>
 	                                </td>

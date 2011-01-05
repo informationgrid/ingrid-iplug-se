@@ -71,7 +71,7 @@
 									</script>
 								</c:if>
 							</c:forEach>
-							<div class="comment">Es werden die URLs gefiltert, die alle oben ausgewählten Eigenschaften gemeinsam besitzen.</div>
+							<div class="comment">Es werden die URLs gefiltert, die alle oben ausgew&auml;hlten Eigenschaften gemeinsam besitzen.</div>
 						</div>
 						<div class="row">	
 							<label>Filter Sprache:</label>
@@ -115,7 +115,7 @@
 					       		<tr>
 						       		<th>URL</th>
 						       		<th>Erstellt</th>
-						       		<th>Geändert</th>
+						       		<th>Ge&auml;ndert</th>
 						       		<th>RV</th>
 						       		<th>FS</th>
 						       		<th>UI</th>
@@ -202,7 +202,7 @@
 								var myColumnDefs = [
 									{key:"url", label:"Url", sortable:true},
 									{key:"created", label:"Erstellt", sortable:true},
-									{key:"edited", label:"Geändert", sortable:true},
+									{key:"edited", label:"Ge&auml;ndert", sortable:true},
 									{key:"isLaw", label:"RV"},
 									{key:"isResearch", label:"FS"},
 									{key:"isDefault", label:"UI"},
@@ -267,10 +267,10 @@
 						</script>
 						
 						<div id="deleteWebUrlForm">
-							<div class="hd">Löschen</div>
+							<div class="hd">L&ouml;schen</div>
 							<div class="bd">
 								<form method="post" action="deleteWebUrl.html">
-									<font color="red">Möchten Sie wirklich löschen?</font>
+									<font color="red">M&ouml;chten Sie wirklich l&ouml;schen?</font>
 									<br/>
 									<input type="hidden" name="id" id="idToDelete" value=""/>
 									<span id="urlToDelete"></span>
@@ -297,7 +297,7 @@
 							               draggable: false,
 							               close: true,
 							               constraintoviewport: true,
-							               buttons: [ { text:"Löschen", handler:handleYes, isDefault:true },
+							               buttons: [ { text:"L&ouml;schen", handler:handleYes, isDefault:true },
 							                          { text:"Abbrechen",  handler:handleNo } ]
 							             } );
 							YAHOO.example.container.deleteWebUrl.render();

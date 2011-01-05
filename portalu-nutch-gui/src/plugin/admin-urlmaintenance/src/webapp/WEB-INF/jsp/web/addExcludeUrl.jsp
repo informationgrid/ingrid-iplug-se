@@ -44,7 +44,7 @@
                                 <form:form action="removeExcludeUrl.html" method="post" modelAttribute="startUrlCommand">
                                     ${startUrlCommand.excludeUrlCommands[excludeUrlCounter].url}
                                     <input type="hidden" name="index" value="${excludeUrlCounter}" />
-                                    <input type="image" src="../theme/${theme}/gfx/delete.png" align="absmiddle" title="L�schen"/>
+                                    <input type="image" src="../theme/${theme}/gfx/delete.png" align="absmiddle" title="L&ouml;schen"/>
                                 </form:form>
                                 </div>
                             </c:when>
@@ -61,7 +61,7 @@
                 </c:otherwise>
               </c:choose>
               <row>
-                <desc>Das Hinzuf�gen von Exclude URLs ist optional.</desc>
+                <desc>Das Hinzuf&uuml;gen von Exclude URLs ist optional.</desc>
               </row>
               <row>
                     <label>Exclude URL:</label>
@@ -74,7 +74,7 @@
                 <row>
                     <label>&nbsp;</label>
                     <field>
-                        <input type="submit" value="Hinzuf�gen"/>
+                        <input type="submit" value="Hinzuf&uuml;gen"/>
                         <input type="button" value="Weiter" onclick="window.location.href='finishWebUrl.html'" />
                     </field>
                 </row>

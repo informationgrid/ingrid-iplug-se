@@ -50,7 +50,7 @@
 					</div>
 					
 					<fieldset>
-						<legend>Überprüfen und Speichern</legend>
+						<legend>&Uuml;berpr&uuml;fen und Speichern</legend>
 						<div id="markup">
 						    <table id="urls">
 						        <thead>

@@ -16,8 +16,8 @@
 		<!-- workingDir -->
 		<li <c:if test="${active == 'workingDir'}">class="active"</c:if>>
 		<c:choose>
-            <c:when test="${communicationExists}"><a href="../base/workingDir.html">Arbeitsverzeichnis wählen</a></c:when>
-            <c:otherwise>Arbeitsverzeichnis wählen</c:otherwise>
+            <c:when test="${communicationExists}"><a href="../base/workingDir.html">Arbeitsverzeichnis w&auml;hlen</a></c:when>
+            <c:otherwise>Arbeitsverzeichnis w&auml;hlen</c:otherwise>
 		</c:choose>
 		</li>
 
@@ -66,7 +66,7 @@
 	
 	<div class="konf">
        <p class="no">&nbsp;</p>
-        <h2><a href="../..">Zurück zur Nutch Konfiguration</a></h2>
+        <h2><a href="../..">Zur&uuml;ck zur Nutch Konfiguration</a></h2>
     </div>
 	
 	<!--div class="konf">

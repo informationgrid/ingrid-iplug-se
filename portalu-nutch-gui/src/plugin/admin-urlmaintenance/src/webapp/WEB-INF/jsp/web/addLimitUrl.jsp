@@ -48,7 +48,7 @@
                                         <fmt:message key="${metadata.metadataKey}.${metadata.metadataValue}" />
                                     </c:forEach>)
                                     <input type="hidden" name="index" value="${limitUrlCounter}" />
-                                    <input type="image" src="../theme/${theme}/gfx/delete.png" align="absmiddle" title="L�schen"/>
+                                    <input type="image" src="../theme/${theme}/gfx/delete.png" align="absmiddle" title="L&ouml;schen"/>
                                 </form:form>
                                 </div>
                             </c:when>
@@ -105,7 +105,7 @@
                 <row>
                     <label>&nbsp;</label>
                     <field>
-                        <input type="submit" value="Hinzuf�gen"/>
+                        <input type="submit" value="Hinzuf&uuml;gen"/>
                         <c:if test="${maxLimitUrls > 0}">
                           <input type="button" value="Weiter" onclick="window.location.href='addExcludeUrl.html'" />
                       </c:if>

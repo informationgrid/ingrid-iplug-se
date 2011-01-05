@@ -56,7 +56,7 @@
 									<tr>
 										<th>URL</th>
 										<th>Erstellt</th>
-										<th>Geändert</th>
+										<th>Ge&auml;ndert</th>
 										<th>Alt. Titel</th>
 										<th>Rubrik</th>
 										<th>Sprache</th>
@@ -119,7 +119,7 @@
 								var myColumnDefs = [
 									{key:"url", label:"Url", sortable:true},
 									{key:"created", label:"Erstellt", sortable:true},
-									{key:"edited", label:"Geändert", sortable:true},
+									{key:"edited", label:"Ge&auml;ndert", sortable:true},
 									{key:"altTitle", label:"Alt. Titel"},
 									{key:"rubric", label:"Rubrik"},
 									{key:"lang", label:"Sprache"},
@@ -182,10 +182,10 @@
 						</script>
 						
 						<div id="deleteCatalogUrlForm">
-							<div class="hd">Löschen</div>
+							<div class="hd">L&ouml;schen</div>
 							<div class="bd">
 								<form method="post" action="deleteCatalogUrl.html">
-									<font color="red">Möchten Sie wirklich löschen?</font>
+									<font color="red">M&ouml;chten Sie wirklich l&ouml;schen?</font>
 									<br/>
 									<input type="hidden" name="id" id="idToDelete" value=""/>
 									<input type="hidden" name="type" value="measure" />
@@ -213,7 +213,7 @@
 							               draggable: false,
 							               close: true,
 							               constraintoviewport: true,
-							               buttons: [ { text:"Löschen", handler:handleYes, isDefault:true },
+							               buttons: [ { text:"L&ouml;schen", handler:handleYes, isDefault:true },
 							                          { text:"Abbrechen",  handler:handleNo } ]
 							             } );
 							YAHOO.example.container.deleteCatalogUrl.render();
