@@ -18,9 +18,19 @@
 <div style="text-align:right;float:right;margin:10px">
 <%
 java.security.Principal  principal = request.getUserPrincipal();
+
+String pluginBasePath = ".";
+String[] rootPathElements = rootPath.split("/");
+int rootPathElementCount = rootPathElements.length;
+while (rootPathElementCount > 1) {
+  pluginBasePath += "/..";
+  rootPathElementCount--;
+}
+
+
 if(principal != null) {
 %>
-	<a href ="./auth/logout.html" style="color:black">Logout</a>
+	<a href ="<%=pluginBasePath%>/auth/logout.html" style="color:black">Logout</a>
 <%
 }
 %>
