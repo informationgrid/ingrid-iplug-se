@@ -27,7 +27,7 @@ import org.apache.nutch.protocol.ProtocolStatus;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "TYPE", discriminatorType = DiscriminatorType.STRING, length = 20)
 @NamedQueries(value = {
-    @NamedQuery(name = "countUrlsThatUsesSpecialProviders", query = "select count(u) from Url as u where u._deleted is NULL and u._provider._id in :providersIds") })
+    @NamedQuery(name = "countUrlsThatUsesSpecialProviders", query = "select count(u) from Url as u where u._provider._id in :providersIds") })
 public class Url extends IdBase {
 
   private String _url;
