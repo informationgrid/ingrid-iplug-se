@@ -22,7 +22,7 @@ public class WebGraphScoring {
     ScoreUpdater scoreUpdater;
     
     public WebGraphScoring(Configuration conf) {
-        webGraphDbString = conf.get("webGraphDb");
+        webGraphDbString = conf.get("nutch.instance.folder") + "/webGraphDB";
         webGraph = new WebGraph(conf);
         linkRank = new LinkRank(conf);
         scoreUpdater = new ScoreUpdater(conf);

@@ -311,7 +311,8 @@
 <property>
   <name>webGraphDb</name>
   <value>./webGraphDb</value>
-  <description></description>
+  <description>The location where the webgraph will be created, when calling from command line. 
+  During the normal crawl process, the webgaph will be stored inside the instance folder.</description>
 </property>
 
 <!-- linkrank scoring properties -->
@@ -323,7 +324,7 @@
 
 <property>
   <name>link.ignore.internal.domain</name>
-  <value>false</value>
+  <value>true</value>
   <description>Ignore outlinks to the same domain.</description>
 </property>
 
@@ -335,7 +336,7 @@
 
 <property>
   <name>link.ignore.limit.domain</name>
-  <value>false</value>
+  <value>true</value>
   <description>Limit to only a single outlink to the same domain.</description>
 </property> 
 

@@ -18,7 +18,9 @@ package org.apache.nutch.scoring.webgraph;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -40,14 +42,16 @@ import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.ObjectWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.WritableUtils;
+import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.MapFileOutputFormat;
 import org.apache.hadoop.mapred.Mapper;
@@ -119,11 +123,35 @@ public class LinkRank
     // read the first (and only) line from the file which should be the
     // number of links in the web graph
     LOG.info("Reading numlinks temp file");
+    
+    if (getConf().get("mapred.output.compress").equals("true")) {
+        //fileName = "part-00000.deflate";
+        CompressionCodecFactory ccf = new CompressionCodecFactory(getConf());
+        CompressionCodec codec = ccf.getCodec(new Path(numLinksPath, "part-00000.deflate"));
+        Path decompressedFileWithPath = new Path(numLinksPath, "part-00000");
+        InputStream in = null;
+        OutputStream out = null;
+        try {
+            in = codec.createInputStream(fs.open(new Path(numLinksPath, "part-00000.deflate")));
+            out = fs.create(decompressedFileWithPath);
+            IOUtils.copyBytes(in, out, getConf());
+        } finally {
+            IOUtils.closeStream(in);
+            IOUtils.closeStream(out);
+        }
+    }
+    
     FSDataInputStream readLinks = fs.open(new Path(numLinksPath, "part-00000"));
     BufferedReader buffer = new BufferedReader(new InputStreamReader(readLinks));
     String numLinksLine = buffer.readLine();
     readLinks.close();
 
+    // check if there are links to process, if none, webgraph might be empty
+    if (numLinksLine == null || numLinksLine.length() == 0) {
+      fs.delete(numLinksPath, true);
+      throw new IOException("No links to process, is the webgraph empty?");
+    }
+    
     // delete temp file and convert and return the number of links as an int
     LOG.info("Deleting numlinks temp file");
     fs.delete(numLinksPath, true);
@@ -530,7 +558,7 @@ public class LinkRank
       float linkRankScore = (1 - this.dampingFactor)
         + (this.dampingFactor * totalInlinkScore);
 
-      LOG.info(url + ": score: " + linkRankScore + " num inlinks: "
+      LOG.debug(url + ": score: " + linkRankScore + " num inlinks: "
         + numInlinks + " iteration: " + itNum + "\n");
 
       // store the score in a temporary NodeDb
