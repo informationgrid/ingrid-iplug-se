@@ -54,7 +54,7 @@ public class TestController extends NavigationSelector {
       } catch (final ProtocolNotFound e) {
         code = ProtocolStatus.PROTO_NOT_FOUND;
         info = "ProtocolNotFound";
-        error = "Kein gültiges Protokoll.";
+        error = "Kein g&uuml;ltiges Protokoll.";
       }
 
       if (output != null) {
@@ -125,19 +125,19 @@ public class TestController extends NavigationSelector {
     case ProtocolStatus.NOTFOUND:
       return "Quelle wurde nicht gefunden";
     case ProtocolStatus.NOTMODIFIED:
-      return "Quelle ist unverändert";
+      return "Quelle ist unver&auml;ndert";
     case ProtocolStatus.PROTO_NOT_FOUND:
       return "Protokoll nicht gefunden";
     case ProtocolStatus.REDIR_EXCEEDED:
-      return "Zu viele Verweiße";
+      return "Zu viele Verweise";
     case ProtocolStatus.RETRY:
-      return "Temporärer Fehler";
+      return "Tempor&auml;rer Fehler";
     case ProtocolStatus.ROBOTS_DENIED:
       return "Keine Robots zugelassen";
     case ProtocolStatus.WOULDBLOCK:
-      return "Anfrage würde blocken";
+      return "Anfrage w&uuml;rde blocken. Pr√ºfen Sie die robots.txt";
     case ProtocolStatus.TEMP_MOVED:
-      return "Temporär bewegt";
+      return "Tempor&auml;r bewegt";
     case ProtocolStatus.MOVED:
       return "Quelle wurde dauerhaft bewegt";
     default:
