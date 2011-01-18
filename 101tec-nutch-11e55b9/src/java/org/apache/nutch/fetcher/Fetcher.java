@@ -556,8 +556,8 @@ public class Fetcher extends Configured implements
                 if (rules.getCrawlDelay() > maxCrawlDelay) {
                   // unblock
                   fetchQueues.finishFetchItem(fit, true);
-                  if (LOG.isDebugEnabled()) {
-                      LOG.debug("Crawl-Delay for " + fit.url + " too long (" + rules.getCrawlDelay() + "), skipping");
+                  if (LOG.isInfoEnabled()) {
+                      LOG.info("Crawl-Delay for " + fit.url + " too long (" + rules.getCrawlDelay() + "), skipping");
                   }
                   output(fit.url, fit.datum, null, ProtocolStatus.STATUS_ROBOTS_DENIED, CrawlDatum.STATUS_FETCH_GONE);
                   continue;
