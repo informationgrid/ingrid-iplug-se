@@ -16,13 +16,13 @@ public class WebGraphScoring {
     
     public static final Log LOG = LogFactory.getLog(WebGraphScoring.class);
     
-    String webGraphDbString;
+    Path webGraphPath;
     WebGraph webGraph;
     LinkRank linkRank;
     ScoreUpdater scoreUpdater;
     
-    public WebGraphScoring(Configuration conf) {
-        webGraphDbString = conf.get("nutch.instance.folder") + "/webGraphDB";
+    public WebGraphScoring(Configuration conf, Path crawlDir) {
+        webGraphPath = new Path(crawlDir, "webGraphDB");
         webGraph = new WebGraph(conf);
         linkRank = new LinkRank(conf);
         scoreUpdater = new ScoreUpdater(conf);
@@ -33,16 +33,15 @@ public class WebGraphScoring {
         // using webgraph score
         // see: http://markmail.org/message/cov4lyvg4p6zwdm4#query:nutch%20scoring%20method+page:1+mid:cov4lyvg4p6zwdm4+state:results
         try {
-            Path webGraphDbPath = new Path(webGraphDbString);
             Path[] segPaths = new Path[segments.size()];
             for (int i = 0; i < segments.size(); i++) {
                 segPaths[i] = segments.get(i);
               }
-            webGraph.createWebGraph(webGraphDbPath, segPaths);
+            webGraph.createWebGraph(webGraphPath, segPaths);
 
-            linkRank.analyze(webGraphDbPath);
+            linkRank.analyze(webGraphPath);
             
-            scoreUpdater.update(crawlDb, webGraphDbPath);
+            scoreUpdater.update(crawlDb, webGraphPath);
         } catch (IOException e) {
             LOG.error("Error while updating the score via WebGraph!");
             e.printStackTrace();

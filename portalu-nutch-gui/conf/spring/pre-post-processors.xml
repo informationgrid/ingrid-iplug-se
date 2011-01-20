@@ -15,14 +15,12 @@
 			</list>
 		</property>
 	</bean>
-	<!-- 
     <bean id="postProcessors"
 		class="org.springframework.beans.factory.config.ListFactoryBean">
 		<property name="sourceList">
 			<list>
-                <ref bean="normalizeScoreProcessor" />
+                <!--<ref bean="normalizeScoreProcessor" />-->
             </list>
 		</property>
 	</bean>
-    -->
 </beans>

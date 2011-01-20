@@ -94,7 +94,7 @@ public class CrawlTool {
     ParseSegment parseSegment = new ParseSegment(_configuration);
     BWUpdateDb bwUpdateDb = new BWUpdateDb(_configuration);
     ParseDataUpdater parseDataUpdater = new ParseDataUpdater(_configuration);
-    WebGraphScoring webGraphScoring = new WebGraphScoring(_configuration);
+    WebGraphScoring webGraphScoring = new WebGraphScoring(_configuration, _crawlDir);
     LinkDb linkDbTool = new LinkDb(_configuration);
     Indexer indexer = new Indexer(_configuration);
     DeleteDuplicates dedup = new DeleteDuplicates(_configuration);
