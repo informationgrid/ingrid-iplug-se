@@ -2,7 +2,7 @@
 <%@ include file="../includes/include.jsp" %>
 <html>
 <head>
-	<title>Admin URL Pflege - Start URLs</title>
+	<title>PortalU URL-Pflege - Start URLs</title>
 	<link rel="stylesheet" type="text/css" href="../theme/${theme}/css/reset-fonts-grids.css" />
 	<link rel="stylesheet" type="text/css" href="../theme/${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css">
 	<script type="text/javascript" src="../theme/${theme}/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
@@ -29,8 +29,8 @@
 					
 					<div class="yui-navset">
 					    <ul class="yui-nav">
-					        <li><a href="../catalog/listTopicUrls.html"><em>Katalog Url's</em></a></li>
-					        <li class="selected"><a href="../web/listWebUrls.html"><em>Web Url's</em></a></li>
+					        <li><a href="../catalog/listTopicUrls.html"><em>Katalog-URLs</em></a></li>
+					        <li class="selected"><a href="../web/listWebUrls.html"><em>Web-URLs</em></a></li>
 					        <li><a href="../import/importer.html"><em>Importer</em></a></li>
 					    </ul>            
 					</div>
@@ -39,14 +39,14 @@
 						<fieldset>
 							<c:choose>
 								<c:when test="${startUrlCommand.id > -1}">
-									<legend>Web Url bearbeiten - Start Url</legend>
+									<legend>Web-URL bearbeiten - Start-URL</legend>
 								</c:when>
 								<c:otherwise>
-									<legend>Web Url anlegen - Start Url</legend>										
+									<legend>Web-URL anlegen - Start-URL</legend>										
 								</c:otherwise>
 							</c:choose>
 							<row>
-						        <label>Start URL:</label>
+						        <label>Start-URL:</label>
 						        <field>
 						           <form:input path="url"/>
 						            <div class="error"><form:errors path="url" /></div>

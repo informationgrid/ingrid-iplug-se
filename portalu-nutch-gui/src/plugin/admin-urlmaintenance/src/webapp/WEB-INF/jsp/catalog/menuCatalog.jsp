@@ -28,7 +28,7 @@
     <input type="hidden" name="sort" value="${sort}"/>
     <input type="hidden" name="dir" value="${dir}"/>
    <div class="row">  
-        <label>Filter Sprache:</label>
+        <label>Sprachfilter:</label>
         <c:forEach var="l" items="${langs}">
             <c:set var="selectedFilter" value="${selectedFilter} lang:${l}"/>
             <c:set var="paramString" value="${paramString}&lang=${l}"/> 

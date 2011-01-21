@@ -2,7 +2,7 @@
 <%@ include file="includes/include.jsp" %>
 <html>
 <head>
-    <title>Admin URL Pflege - URL Test</title>
+    <title>PortalU URL-Pflege - URL Test</title>
     <link rel="stylesheet" type="text/css" href="../theme/${theme}/css/reset-fonts-grids.css" />
     <link rel="stylesheet" type="text/css" href="../theme/${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css">
     <script type="text/javascript" src="../theme/${theme}/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>

@@ -2,7 +2,7 @@
 <%@ include file="../includes/include.jsp" %>
 <html>
 <head>
-    <title>Admin URL Pflege - Exclude URL</title>
+    <title>PortalU URL-Pflege - Exclude URL</title>
     <link rel="stylesheet" type="text/css" href="../theme/${theme}/css/reset-fonts-grids.css" />
     <link rel="stylesheet" type="text/css" href="../theme/${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css">
     <script type="text/javascript" src="../theme/${theme}/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
@@ -28,8 +28,8 @@
                     
                     <div class="yui-navset">
                         <ul class="yui-nav">
-                            <li><a href="../catalog/listTopicUrls.html"><em>Katalog Url's</em></a></li>
-                            <li class="selected"><a href="../web/listWebUrls.html"><em>Web Url's</em></a></li>
+                            <li><a href="../catalog/listTopicUrls.html"><em>Katalog-URLs</em></a></li>
+                            <li class="selected"><a href="../web/listWebUrls.html"><em>Web-URLs</em></a></li>
                             <li><a href="../import/importer.html"><em>Importer</em></a></li>
                         </ul>            
                     </div>
@@ -54,17 +54,17 @@
             <fieldset>
               <c:choose>
                 <c:when test="${startUrlCommand.id > -1}">
-                  <legend>Web Url bearbeiten - Exclude Url hinzuf&uuml;gen</legend>
+                  <legend>Web-URL bearbeiten - Exclude-URL hinzuf&uuml;gen</legend>
                 </c:when>
                 <c:otherwise>
-                  <legend>Web Url anlegen - Exclude Url hinzuf&uuml;gen</legend>                                        
+                  <legend>Web-URL anlegen - Exclude-URL hinzuf&uuml;gen</legend>                                        
                 </c:otherwise>
               </c:choose>
               <row>
-                <desc>Das Hinzuf&uuml;gen von Exclude URLs ist optional.</desc>
+                <desc>Das Hinzuf&uuml;gen von Exclude-URLs ist optional.</desc>
               </row>
               <row>
-                    <label>Exclude URL:</label>
+                    <label>Exclude-URL:</label>
                     <field>
                         <input type="text" id="excludeUrl" name="excludeUrl"/>
                         <form:errors path="url" cssClass="error" element="div"/>

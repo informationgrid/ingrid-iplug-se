@@ -2,7 +2,7 @@
 <%@ include file="../includes/include.jsp" %>
 <html>
 <head>
-	<title>Admin URL Pflege - Katalog URLs</title>
+	<title>PortalU URL-Pflege - Katalog URLs</title>
 	<link rel="stylesheet" type="text/css" href="../theme/${theme}/css/reset-fonts-grids.css" />
 	<link rel="stylesheet" type="text/css" href="../theme/${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css">
 	<script type="text/javascript" src="../theme/${theme}/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
@@ -46,9 +46,9 @@
 				    <div>
 						<div style="margin-top:25px"></div>
 						<div style="float:right">
-							<img src="../theme/${theme}/gfx/add.png" align="absmiddle"/> <b><a href="../catalog/createCatalogUrl.html?type=measure">Neue Messwert Seite</a></b>
+							<img src="../theme/${theme}/gfx/add.png" align="absmiddle"/> <b><a href="../catalog/createCatalogUrl.html?type=measure">Neue Messwertseite</a></b>
 						</div>
-						<h3>Messwert Seiten</h3>
+						<h3>Messwertseiten</h3>
 						
 						<div id="dynamicdata">
 							<table id="myTable">
@@ -57,7 +57,7 @@
 										<th>URL</th>
 										<th>Erstellt</th>
 										<th>Ge&auml;ndert</th>
-										<th>Alt. Titel</th>
+										<th>Alternativ. Titel</th>
 										<th>Rubrik</th>
 										<th>Sprache</th>
 										<th>Status</th>
@@ -120,7 +120,7 @@
 									{key:"url", label:"Url", sortable:true},
 									{key:"created", label:"Erstellt", sortable:true},
 									{key:"edited", label:"Ge&auml;ndert", sortable:true},
-									{key:"altTitle", label:"Alt. Titel"},
+									{key:"altTitle", label:"Alternativ. Titel"},
 									{key:"rubric", label:"Rubrik"},
 									{key:"lang", label:"Sprache"},
 									{key:"status", label:"Status"},

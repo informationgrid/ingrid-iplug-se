@@ -52,8 +52,8 @@ public class ListWebUrlsController extends NavigationSelector {
   public List<Metadata> injectMetadatas() {
     List<Metadata> arrayList = new ArrayList<Metadata>();
     arrayList.add(_metadataDao.getByKeyAndValue("datatype", "default"));
-    arrayList.add(_metadataDao.getByKeyAndValue("datatype", "research"));
     arrayList.add(_metadataDao.getByKeyAndValue("datatype", "law"));
+    arrayList.add(_metadataDao.getByKeyAndValue("datatype", "research"));
     arrayList.add(_metadataDao.getByKeyAndValue("lang", "de"));
     arrayList.add(_metadataDao.getByKeyAndValue("lang", "en"));
     return arrayList;

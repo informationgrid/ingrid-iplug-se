@@ -2,7 +2,7 @@
 <%@ include file="../includes/include.jsp" %>
 <html>
 <head>
-	<title>Admin URL Pflege - Exclude URL</title>
+	<title>PortalU URL-Pflege - Exclude URL</title>
 	<link rel="stylesheet" type="text/css" href="../theme/${theme}/css/reset-fonts-grids.css" />
 	<link rel="stylesheet" type="text/css" href="../theme/${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css">
 	<script type="text/javascript" src="../theme/${theme}/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
@@ -56,16 +56,16 @@
 						        <thead>
 						            <tr>
 						                <th>Url</th>
-						                <th>Thema</th>
-						                <th>Funkt. Kategorie</th>
+						                <!--<th>Thema</th>
+						                <th>Funkt. Kategorie</th>-->
 						                <th>Rubrik</th>
-						                <th>Alt. Titel</th>
+						                <th>Alternativ. Titel</th>
 						            </tr>
 						        </thead>
 						        <tbody>
 						            <tr>
 						                <td>${catalogUrlCommand.url}</td>
-						                <td>
+						                <!--<td>
 						                	<c:set var="i" value="-1"/>
 						                	<c:forEach items="${catalogUrlCommand.metadatas}" var="md">
 												<c:if test="${md.metadataKey == 'topic'}">
@@ -84,7 +84,7 @@
 													<fmt:message key="${md.metadataKey}.${md.metadataValue}" />
 												</c:if>
 											</c:forEach>&nbsp;
-						                </td>
+						                </td>-->
 						                <td>
 						                	<c:set var="i" value="-1"/>
 						                	<c:forEach items="${catalogUrlCommand.metadatas}" var="md">
@@ -131,10 +131,10 @@
 					    YAHOO.example.EnhanceFromMarkup = function() {
 					        var myColumnDefs = [
 					            {key:"url",label:"URL"},
-					            {key:"topic",label:"Thema"},
-					            {key:"functCat",label:"Funkt. Kategorie"},
+					            //{key:"topic",label:"Thema"},
+					            //{key:"functCat",label:"Funkt. Kategorie"},
 					            {key:"rubric",label:"Rubrik"},
-					            {key:"altTitle",label:"Alt. Titel"}
+					            {key:"altTitle",label:"Alternativ. Titel"}
 					        ];
 					
 					        var myDataSource = new YAHOO.util.DataSource(YAHOO.util.Dom.get("urls"));
@@ -142,8 +142,8 @@
 					        myDataSource.responseSchema = {
 					            fields: [
 									{key:"url"}, 
-									{key:"topic"}, 
-									{key:"functCat"}, 
+									//{key:"topic"}, 
+									//{key:"functCat"}, 
 									{key:"rubric"},
 									{key:"altTitle"}
 								]

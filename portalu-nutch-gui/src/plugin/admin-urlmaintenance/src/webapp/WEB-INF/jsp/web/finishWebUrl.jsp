@@ -2,7 +2,7 @@
 <%@ include file="../includes/include.jsp" %>
 <html>
 <head>
-<title>Admin URL Pflege - Speichern</title>
+    <title>PortalU URL-Pflege - Speichern</title>
 	<link rel="stylesheet" type="text/css" href="../theme/${theme}/css/reset-fonts-grids.css" />
 	<link rel="stylesheet" type="text/css" href="../theme/${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css">
 	<script type="text/javascript" src="../theme/${theme}/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
@@ -33,8 +33,8 @@
 					
 					<div class="yui-navset">
 					    <ul class="yui-nav">
-					        <li><a href="../catalog/listTopicUrls.html"><em>Katalog Url's</em></a></li>
-					        <li class="selected"><a href="../web/listWebUrls.html"><em>Web Url's</em></a></li>
+					        <li><a href="../catalog/listTopicUrls.html"><em>Katalog-URLs</em></a></li>
+					        <li class="selected"><a href="../web/listWebUrls.html"><em>Web-URLs</em></a></li>
 					        <li><a href="../import/importer.html"><em>Importer</em></a></li>
 					    </ul>            
 					</div>
@@ -42,10 +42,10 @@
 					<fieldset>
 					<c:choose>
 						<c:when test="${startUrlCommand.id > -1}">
-							<legend>Web Url bearbeiten - &Uuml;berpr&uuml;fen und Speichern</legend>
+							<legend>Web-URL bearbeiten - &Uuml;berpr&uuml;fen und Speichern</legend>
 						</c:when>
 						<c:otherwise>
-							<legend>Web Url anlegen - &Uuml;berpr&uuml;fen und Speichern</legend>										
+							<legend>Web-URL anlegen - &Uuml;berpr&uuml;fen und Speichern</legend>										
 						</c:otherwise>
 					</c:choose>
 					<div id="markup">
@@ -82,6 +82,11 @@
 					</div>
 					
 					<row>
+					    <ul>
+                            <li style="float: left; list-style-type: square; color: black; margin-left: 20px;">Start-URL</li>
+                            <li style="float: left; list-style-type: square; color: green; margin-left: 20px;">Limit-URL</li>
+                            <li style="float: left; list-style-type: square; color: red; margin-left: 20px;">Exclude-URL</li>
+                        </ul>
 						<br/>
 						<field>
 							<form action="finishWebUrl.html" method="post">
@@ -95,7 +100,7 @@
 					YAHOO.util.Event.addListener(window, "load", function() {
 					    YAHOO.example.EnhanceFromMarkup = function() {
 					        var myColumnDefs = [
-					            {key:"url",label:"Urls"},
+					            {key:"url",label:"URLs"},
 					            {key:"meta",label:""}
 					        ];
 					

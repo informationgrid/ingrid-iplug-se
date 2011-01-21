@@ -2,7 +2,7 @@
 <%@ include file="includes/include.jsp" %>
 <html>
 <head>
-<title>Admin URL Pflege - Welcome</title>
+    <title>PortalU URL-Pflege - Willkommen</title>
 	<link rel="stylesheet" type="text/css" href="<%=rootPath%>/theme/${theme}/css/reset-fonts-grids.css" />
 	<link rel="stylesheet" type="text/css" href="<%=rootPath%>/theme/${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css" />
 	<script type="text/javascript" src="<%=rootPath%>/theme/${theme}/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
@@ -25,8 +25,8 @@
 					
 					<div id="demo" class="yui-navset">
 					    <ul class="yui-nav">
-					        <li><a href="./catalog/listTopicUrls.html"><em>Katalog Url's</em></a></li>
-					        <li><a href="./web/listWebUrls.html"><em>Web Url's</em></a></li>
+					        <li><a href="./catalog/listTopicUrls.html"><em>Katalog-URLs</em></a></li>
+					        <li><a href="./web/listWebUrls.html"><em>Web-URLs</em></a></li>
 					        <li><a href="./import/importer.html"><em>Importer</em></a></li>
 					    </ul>            
 					</div>						
@@ -34,7 +34,11 @@
 				    <div>
 				        <div>
 				        	<p>&nbsp;</p>
-				        	<p>Willkommen in der Urlpflege. Bitte treffen Sie eine Auswahl.</p>
+				        	<p>Willkommen in der Urlpflege. Möchten Sie Webseiten zur <i>PortalU®-Suche</i> hinzufügen,
+                             bearbeiten oder löschen? Dann klicken Sie bitte auf den Reiter <b>Web-URLs</b>. Wenn Sie
+                             hingegen Webseiten zu den PortalU®-Rubriken <i>Umweltthemen, Messwerte</i> oder <i>Service</i> 
+                             hinzufügen, bearbeiten oder löschen möchten, klicken Sie bitte auf den Reiter 
+                             <b>Katalog-URLs</b>.</p>
 				        </div>
 				    </div>
 

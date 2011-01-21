@@ -2,7 +2,7 @@
 <%@ include file="../includes/include.jsp" %>
 <html>
 <head>
-	<title>Admin URL Pflege - Web URLs</title>
+	<title>PortalU URL-Pflege - Web URLs</title>
 	<link rel="stylesheet" type="text/css" href="../theme/${theme}/css/reset-fonts-grids.css" />
 	<link rel="stylesheet" type="text/css" href="../theme/${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css">
 	<script type="text/javascript" src="../theme/${theme}/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
@@ -42,8 +42,8 @@
 					
 					<div class="yui-navset">
 					    <ul class="yui-nav">
-					        <li><a href="../catalog/listTopicUrls.html"><em>Katalog Url's</em></a></li>
-					        <li class="selected"><a href="../web/listWebUrls.html"><em>Web Url's</em></a></li>
+					        <li><a href="../catalog/listTopicUrls.html"><em>Katalog-URLs</em></a></li>
+					        <li class="selected"><a href="../web/listWebUrls.html"><em>Web-URLs</em></a></li>
 					        <li><a href="../import/importer.html"><em>Importer</em></a></li>
 					    </ul>            
 					</div>
@@ -56,7 +56,7 @@
 						<input type="hidden" name="sort" value="${sort}"/>
 						<input type="hidden" name="dir" value="${dir}"/>
 						<div class="row">	
-							<label>Filter Datatype:</label>
+							<label>Datentypfilter:</label>
 							<c:forEach var="dt" items="${datatypes }">
 								<c:set var="selectedFilter" value="${selectedFilter} datatype:${dt}"/>
 								<c:set var="paramString" value="${paramString}&datatype=${dt}"/>
@@ -74,7 +74,7 @@
 							<div class="comment">Es werden die URLs gefiltert, die alle oben ausgew&auml;hlten Eigenschaften gemeinsam besitzen.</div>
 						</div>
 						<div class="row">	
-							<label>Filter Sprache:</label>
+							<label>Sprachfilter:</label>
 							<c:set var="selectedFilter" value=""/>
 							<c:forEach var="l" items="${langs}">
 								<c:set var="selectedFilter" value="${selectedFilter} lang:${l}"/>
@@ -100,14 +100,14 @@
 					    <div style="float:right">
 							<img src="../theme/${theme}/gfx/add.png" align="absmiddle"/> <b><a href="createStartUrl.html">Neue Webseite</a></b>
 						</div>
-					    <h3>Web Seiten</h3>
+					    <h3>Webseiten</h3>
 				        <ul>
 				        	<li style="float:left; list-style-type:square; color:black; margin-left:20px">Start URL</li>
 				        	<li style="float:left; list-style-type:square; color:green; margin-left:20px">Limit URL</li>
 				        	<li style="float:left; list-style-type:square; color:red; margin-left:20px">Exclude URL</li>
-				        	<li style="float:left; list-style-type:circle; color:#666666; margin-left:50px">RV = Rechtsvorschriften</li>
+				        	<li style="float:left; list-style-type:circle; color:#666666; margin-left:50px">UI = Umweltinformationen</li>
+                            <li style="float:left; list-style-type:circle; color:#666666; margin-left:20px">RV = Rechtsvorschriften</li>
 				        	<li style="float:left; list-style-type:circle; color:#666666; margin-left:20px">FS = Forschungsseite</li>
-				        	<li style="float:left; list-style-type:circle; color:#666666; margin-left:20px">UI = Umweltinformationen</li>
 				        </ul>
 				        <div id="dynamicdata" style="clear:both">
 					       <table id="myTable">
@@ -116,9 +116,9 @@
 						       		<th>URL</th>
 						       		<th>Erstellt</th>
 						       		<th>Ge&auml;ndert</th>
-						       		<th>RV</th>
-						       		<th>FS</th>
 						       		<th>UI</th>
+                                    <th>RV</th>
+						       		<th>FS</th>
 						       		<th>Sprache</th>
 						       		<th>Status</th>
 						       		<th>Aktion</th>
@@ -148,13 +148,13 @@
 						       		<td><fmt:formatDate value="${limitUrl.created}" pattern="yyyy-MM-dd"/></td>
 						       		<td><fmt:formatDate value="${limitUrl.updated}" pattern="yyyy-MM-dd"/></td>
 						       		<td>
+                                        &nbsp;<c:if test="${fn:contains(limitUrl.metadatas,'default')}"><img src="../theme/${theme}/gfx/ok.png"/></c:if>&nbsp;
+                                    </td>
+                                    <td>
 						       			&nbsp;<c:if test="${fn:contains(limitUrl.metadatas,'law')}"><img src="../theme/${theme}/gfx/ok.png"/></c:if>&nbsp;
 						       		</td>
 						       		<td>
 						       			&nbsp;<c:if test="${fn:contains(limitUrl.metadatas,'research')}"><img src="../theme/${theme}/gfx/ok.png"/></c:if>&nbsp;
-						       		</td>
-						       		<td>
-						       			&nbsp;<c:if test="${fn:contains(limitUrl.metadatas,'default')}"><img src="../theme/${theme}/gfx/ok.png"/></c:if>&nbsp;
 						       		</td>
 						       		<td>
 						       			<c:forEach items="${limitUrl.metadatas}" var="meta"><c:if test="${meta.metadataKey == 'lang'}"><fmt:message key="${meta.metadataKey}.${meta.metadataValue}" /></c:if></c:forEach>&nbsp;
@@ -203,9 +203,9 @@
 									{key:"url", label:"Url", sortable:true},
 									{key:"created", label:"Erstellt", sortable:true},
 									{key:"edited", label:"Ge&auml;ndert", sortable:true},
+                                    {key:"isDefault", label:"UI"},
 									{key:"isLaw", label:"RV"},
 									{key:"isResearch", label:"FS"},
-									{key:"isDefault", label:"UI"},
 									{key:"lang", label:"Sprache"},
 									{key:"status", label:"Status"},
 									{key:"action", label:"Aktion", width:100}
@@ -218,9 +218,9 @@
 						                    {key:"url"},
 						                    {key:"created"},
 						                    {key:"edited"},
+                                            {key:"isDefault"},
 						                    {key:"isLaw"},
 						                    {key:"isResearch"},
-						                    {key:"isDefault"},
 						                    {key:"lang"},
 						                    {key:"status"},
 						                    {key:"action"}

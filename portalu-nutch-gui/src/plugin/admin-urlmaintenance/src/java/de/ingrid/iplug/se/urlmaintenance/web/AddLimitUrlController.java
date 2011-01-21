@@ -1,5 +1,6 @@
 package de.ingrid.iplug.se.urlmaintenance.web;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.nutch.admin.NavigationSelector;
@@ -51,7 +52,12 @@ public class AddLimitUrlController extends NavigationSelector {
 
   @ModelAttribute("datatypes")
   public List<Metadata> injectDatatypes() {
-    return _metadataDao.getByKey("datatype");
+      List<Metadata> arrayList = new ArrayList<Metadata>();
+      arrayList.add(_metadataDao.getByKeyAndValue("datatype", "default"));
+      arrayList.add(_metadataDao.getByKeyAndValue("datatype", "law"));
+      arrayList.add(_metadataDao.getByKeyAndValue("datatype", "research"));
+    
+      return arrayList;
   }
   
   @ModelAttribute("newLimitUrl")

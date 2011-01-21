@@ -2,7 +2,7 @@
 <%@ include file="includes/include.jsp" %>
 <html>
 <head>
-<title>Admin URL Pflege - Welcome</title>
+    <title>PortalU URL-Pflege - Willkommen</title>
 	<link rel="stylesheet" type="text/css" href="<%=rootPath%>/theme/${theme}/css/reset-fonts-grids.css" />
 	<link rel="stylesheet" type="text/css" href="<%=rootPath%>/theme/${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css" />
 	<script type="text/javascript" src="<%=rootPath%>/theme/${theme}/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
@@ -40,7 +40,7 @@
 		<div id="bd">
 			<div id="yui-main">
 				<div class="yui-b">
-					<h3>URL Pflege</h3>
+					<h3>URL-Pflege</h3>
 					
 					<c:if test="${!empty error}">
 		                <div class="error">

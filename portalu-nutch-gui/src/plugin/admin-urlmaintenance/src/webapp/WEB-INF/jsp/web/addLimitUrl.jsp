@@ -2,7 +2,7 @@
 <%@ include file="../includes/include.jsp" %>
 <html>
 <head>
-    <title>Admin URL Pflege - Limit URLs</title>
+    <title>PortalU URL-Pflege - Limit URLs</title>
     <link rel="stylesheet" type="text/css" href="../theme/${theme}/css/reset-fonts-grids.css" />
     <link rel="stylesheet" type="text/css" href="../theme/${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css">
     <script type="text/javascript" src="../theme/${theme}/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
@@ -29,8 +29,8 @@
                     
                     <div class="yui-navset">
                         <ul class="yui-nav">
-                            <li><a href="../catalog/listTopicUrls.html"><em>Katalog Url's</em></a></li>
-                            <li class="selected"><a href="../web/listWebUrls.html"><em>Web Url's</em></a></li>
+                            <li><a href="../catalog/listTopicUrls.html"><em>Katalog-URLs</em></a></li>
+                            <li class="selected"><a href="../web/listWebUrls.html"><em>Web-URLs</em></a></li>
                             <li><a href="../import/importer.html"><em>Importer</em></a></li>
                         </ul>            
                     </div>
@@ -58,14 +58,14 @@
             <fieldset>
               <c:choose>
                 <c:when test="${startUrlCommand.id > -1}">
-                  <legend>Web Url bearbeiten - Limit Url hinzuf&uuml;gen</legend>
+                  <legend>Web-URL bearbeiten - Limit-URL hinzuf&uuml;gen</legend>
                 </c:when>
                 <c:otherwise>
-                  <legend>Web Url anlegen - Limit Url hinzuf&uuml;gen</legend>                                      
+                  <legend>Web-URL anlegen - Limit-URL hinzuf&uuml;gen</legend>                                      
                 </c:otherwise>
               </c:choose>
               <row>
-                    <label>Limit URL:</label>
+                    <label>Limit-URL:</label>
                     <field>
                        <input type="text" id="limitUrl" name="limitUrl" value="${startUrlCommand.url}" />
                        <form:errors path="url" cssClass="error" element="div"/>
@@ -76,31 +76,29 @@
                 <row>
                     <label>Sprache:</label>
                     <field>
-                       <select name="metadatas" >
-                    <c:forEach var="lang" items="${langs}">
-                      <option value="${lang.id}"><fmt:message key="${lang.metadataKey}.${lang.metadataValue}" /></option>
-                    </c:forEach>
-                  </select>
+                        <select name="metadatas" >
+                            <c:forEach var="lang" items="${langs}">
+                                <option value="${lang.id}"><fmt:message key="${lang.metadataKey}.${lang.metadataValue}" /></option>
+                            </c:forEach>
+                        </select>
                     </field>
                     <desc></desc>
                 </row>
                 
                 <row>
                     <label>Typ:</label>
-                    <field>
-                                          <c:forEach var="type" items="${datatypes}">
-                                    <c:if test="${type.metadataValue != 'topics' && type.metadataValue != 'service' && type.metadataValue != 'measure' && type.metadataValue != 'www'}">
-                                        <input type="checkbox" name="metadatas" value="${type.id}" /><fmt:message key="${type.metadataKey}.${type.metadataValue}" /><br/>
-                                    </c:if>
-                                          </c:forEach>
-                                      </field>
+                        <field>
+                            <c:forEach var="type" items="${datatypes}">
+                                <input type="checkbox" name="metadatas" value="${type.id}" /><fmt:message key="${type.metadataKey}.${type.metadataValue}" /><br/>
+                            </c:forEach>
+                        </field>
                     <desc></desc>
                 </row>
                 
                 <row>
-                                  <form:errors path="provider" cssClass="error" element="div"/>
-                                  <form:errors path="metadatas" cssClass="error" element="div"/>
-                              </row>
+                    <form:errors path="provider" cssClass="error" element="div"/>
+                    <form:errors path="metadatas" cssClass="error" element="div"/>
+                </row>
                 
                 <row>
                     <label>&nbsp;</label>

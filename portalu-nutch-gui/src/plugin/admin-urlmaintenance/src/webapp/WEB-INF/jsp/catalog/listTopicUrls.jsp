@@ -2,7 +2,7 @@
 <%@ include file="../includes/include.jsp" %>
 <html>
 <head>
-    <title>Admin URL Pflege - Katalog URLs</title>
+    <title>PortalU URL-Pflege - Katalog URLs</title>
     <link rel="stylesheet" type="text/css" href="../theme/${theme}/css/reset-fonts-grids.css" />
     <link rel="stylesheet" type="text/css" href="../theme/${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css">
     <link rel="stylesheet" type="text/css" href="../theme/${theme}/js/yui/build/container/assets/skins/sam/container.css" />
@@ -45,9 +45,9 @@
                         
                     <div style="margin-top:25px"></div>
                     <div style="float:right">
-                        <img src="../theme/${theme}/gfx/add.png" align="absmiddle"/> <b><a href="../catalog/createCatalogUrl.html?type=topics">Neue Themen Seite</a></b>
+                        <img src="../theme/${theme}/gfx/add.png" align="absmiddle"/> <b><a href="../catalog/createCatalogUrl.html?type=topics">Neue Themenseite</a></b>
                     </div>
-                    <h3>Themen Seiten</h3>
+                    <h3>Themenseiten</h3>
                     
                     <div id="dynamicdata">
                         <table id="myTable">
@@ -56,7 +56,7 @@
                                     <th>URL</th>
                                     <th>Erstellt</th>
                                     <th>Ge&auml;ndert</th>
-                                    <th>Alt. Titel</th>
+                                    <th>Alternativ. Titel</th>
                                     <th>Thema</th>
                                     <th>Funkt. Kategorie</th>
                                     <th>Sprache</th>
@@ -130,7 +130,7 @@
                                 {key:"url", label:"Url", sortable:true},
                                 {key:"created", label:"Erstellt", sortable:true},
                                 {key:"edited", label:"Ge&auml;ndert", sortable:true},
-                                {key:"altTitle", label:"Alt. Titel"},
+                                {key:"altTitle", label:"Alternativ. Titel"},
                                 {key:"topic", label:"Thema"},
                                 {key:"functCategory", label:"Funkt. Kategorie"},
                                 {key:"lang", label:"Sprache"},
