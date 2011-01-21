@@ -4,7 +4,8 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 	<bean id="queryExtensionPreProcessor" class="de.ingrid.utils.processor.impl.QueryExtensionPreProcessor" />
     
-    <bean id="normalizeScoreProcessor" class="de.ingrid.utils.processor.impl.NormalizeScoreProcessor" />
+    <!-- this post processor is not needed anymore since normalization is done in ibus -->
+    <!-- <bean id="normalizeScoreProcessor" class="de.ingrid.utils.processor.impl.NormalizeScoreProcessor" /> -->
     
 	<bean id="preProcessors"
 		class="org.springframework.beans.factory.config.ListFactoryBean">
@@ -14,11 +15,11 @@
 			</list>
 		</property>
 	</bean>
-	<bean id="postProcessors"
+    <bean id="postProcessors"
 		class="org.springframework.beans.factory.config.ListFactoryBean">
 		<property name="sourceList">
 			<list>
-                <ref bean="normalizeScoreProcessor" />
+                <!--<ref bean="normalizeScoreProcessor" />-->
             </list>
 		</property>
 	</bean>

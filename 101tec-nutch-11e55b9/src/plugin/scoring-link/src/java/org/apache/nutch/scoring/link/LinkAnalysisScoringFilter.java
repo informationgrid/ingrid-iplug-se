@@ -68,7 +68,7 @@ public class LinkAnalysisScoringFilter
   public float indexerScore(Text url, NutchDocument doc, CrawlDatum dbDatum,
     CrawlDatum fetchDatum, Parse parse, Inlinks inlinks, float initScore)
     throws ScoringFilterException {
-    return (normalizedScore * dbDatum.getScore());
+    return (normalizedScore * dbDatum.getScore())+0.001f;
   }
 
   public void initialScore(Text url, CrawlDatum datum)

@@ -3,12 +3,12 @@
 <html>
 <head>
 <title>Admin URL Pflege - Welcome</title>
-	<link rel="stylesheet" type="text/css" href="../theme/${theme}/css/reset-fonts-grids.css" />
-	<link rel="stylesheet" type="text/css" href="../theme/${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css" />
-	<script type="text/javascript" src="../theme/${theme}/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
-	<script type="text/javascript" src="../theme/${theme}/js/yui/build/element/element-min.js"></script>
-	<script type="text/javascript" src="../theme/${theme}/js/yui/build/tabview/tabview-min.js"></script>
-	<link rel="stylesheet" type="text/css" href="../theme/${theme}/css/style.css" />
+	<link rel="stylesheet" type="text/css" href="<%=rootPath%>/theme/${theme}/css/reset-fonts-grids.css" />
+	<link rel="stylesheet" type="text/css" href="<%=rootPath%>/theme/${theme}/js/yui/build/tabview/assets/skins/sam/tabview.css" />
+	<script type="text/javascript" src="<%=rootPath%>/theme/${theme}/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+	<script type="text/javascript" src="<%=rootPath%>/theme/${theme}/js/yui/build/element/element-min.js"></script>
+	<script type="text/javascript" src="<%=rootPath%>/theme/${theme}/js/yui/build/tabview/tabview-min.js"></script>
+	<link rel="stylesheet" type="text/css" href="<%=rootPath%>/theme/${theme}/css/style.css" />
 </head>
 <body class="yui-skin-sam">
 	<div id="doc2">					

@@ -73,7 +73,7 @@
 
 <property>
   <name>plugin.includes</name>
-  <value>admin-.*|protocol-httpclient|urlfilter-regex|parse-(text|html|js|pdf|rtf|rss|oo|zip|msword|msexcel|mspowerpoint|dummy)|index-(basic|anchor|metadata|sns|more)|query-(basic|site|url|fileformat)|response-(json|xml)|summary-basic|scoring-opic|language-identifier|urlnormalizer-(pass|regex|basic)|crawl-prepare-(dbexport)</value>
+  <value>admin-.*|protocol-httpclient|urlfilter-regex|parse-(text|html|js|pdf|rtf|rss|oo|zip|msword|msexcel|mspowerpoint|dummy)|index-(basic|anchor|metadata|sns|more)|query-(basic|site|url|fileformat)|response-(json|xml)|summary-basic|scoring-link|language-identifier|urlnormalizer-(pass|regex|basic)|crawl-prepare-(dbexport)</value>
   <description>Regular expression naming plugin directory names to
   include.  Any plugin not matching this expression is excluded.
   In any case you need at least include the nutch-extensionpoints plugin. By
@@ -307,5 +307,37 @@
   by shifting the next fetchTime by a fraction (sync_rate) of the difference
   between the last modification time, and the last fetch time.</description>
 </property>
+
+<property>
+  <name>webGraphDb</name>
+  <value>./webGraphDb</value>
+  <description>The location where the webgraph will be created, when calling from command line. 
+  During the normal crawl process, the webgaph will be stored inside the instance folder.</description>
+</property>
+
+<!-- linkrank scoring properties -->
+<property>
+  <name>link.ignore.internal.host</name>
+  <value>true</value>
+  <description>Ignore outlinks to the same hostname.</description>
+</property>
+
+<property>
+  <name>link.ignore.internal.domain</name>
+  <value>true</value>
+  <description>Ignore outlinks to the same domain.</description>
+</property>
+
+<property>
+  <name>link.ignore.limit.page</name>
+  <value>true</value>
+  <description>Limit to only a single outlink to the same page.</description>
+</property>
+
+<property>
+  <name>link.ignore.limit.domain</name>
+  <value>true</value>
+  <description>Limit to only a single outlink to the same domain.</description>
+</property> 
 
 </configuration>
