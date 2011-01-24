@@ -311,7 +311,7 @@
 			
 									    	YAHOO.util.Event.onContentReady("checkboxButtons", function () {
 									    		<c:forEach items="${month}" var="dayOfMonth">
-										            var oCheckButton_${dayOfMonth} = new Button("daysOfMonth_${dayOfMonth}", { label:"<fmt:formatNumber value="${dayOfMonth+1}" pattern="00"/>"});
+										            var oCheckButton_${dayOfMonth} = new Button("daysOfMonth_${dayOfMonth}", { label:"<fmt:formatNumber value="${dayOfMonth}" pattern="00"/>"});
 									            </c:forEach>
 									        });
 			

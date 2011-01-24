@@ -79,7 +79,7 @@ public class SchedulingController extends NavigationSelector {
   public Integer[] month() {
     Integer[] month = new Integer[31];
     for (int i = 0; i < 31; i++) {
-      month[i] = i;
+      month[i] = i+1;
     }
     return month;
   }
