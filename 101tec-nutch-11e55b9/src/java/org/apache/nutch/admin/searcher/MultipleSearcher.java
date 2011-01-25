@@ -17,12 +17,10 @@
 package org.apache.nutch.admin.searcher;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -93,17 +91,11 @@ public class MultipleSearcher implements SearchBean, HitSummarizer {
     }
 
     // create queue to merge all hits
-    PriorityQueue<Hit> hitQueue = new PriorityQueue<Hit>(numHits,
-            new Comparator<Hit>() {
-              @Override
-              public int compare(Hit o1, Hit o2) {
-                return o1.compareTo(o2);
-              }
-            });
+    List<Hit> hitQueue = new ArrayList<Hit>();;
+    long totalHits = 0;
+    boolean hasSeveralSearchBeans = _searchBeans.length > 1 ? true : false;
 
     // merge hits
-
-    long totalHits = 0;
     for (int i = 0; i < _searchBeans.length; i++) {
       SearchBucket bucket = null;
       Hits hits = null;
@@ -121,18 +113,42 @@ public class MultipleSearcher implements SearchBean, HitSummarizer {
       totalHits += hits.getTotal();
       int hitsLength = hits.getLength();
       for (int j = 0; j < hitsLength; j++) {
+        if (hitQueue.size() == numHits) {
+          break;
+        }
         Hit hit = hits.getHit(j);
         Hit newHit = new Hit(bucket.getId(), hit.getUniqueKey(), hit
                 .getSortValue(), hit.getDedupValue());
-        hitQueue.add(newHit);
-        if (hitQueue.size() > numHits) { // if hit queue overfull
-          hitQueue.remove();
-        }
+        // if we have more than one SearchBean, then we have to merge the results
+        // with the other one, otherwise just add it to the list
+        if (hasSeveralSearchBeans)
+            mergeElement(hitQueue, newHit);
+        else 
+            hitQueue.add(newHit);
       }
     }
+    
     Hit[] culledResults = hitQueue.toArray(new Hit[hitQueue.size()]);
-    Arrays.sort(culledResults, Collections.reverseOrder(hitQueue.comparator()));
     return new Hits(totalHits, culledResults);
+  }
+  
+  /**
+   * Merge a hit to a list according to its score. It will added behind the last hit
+   * with a higher or equal score!
+   * @param l is the list to add the the
+   * @param hit is the hit to be added
+   */
+  private void mergeElement(List<Hit> l, Hit hit) {
+      // start from the end (lowest score)
+      for (int i=l.size()-1; i>=0; i--) {
+          Hit hitFromList = l.get(i);
+          if (hit.getSortValue().compareTo(hitFromList.getSortValue()) <= 0) {
+              l.add(i+1,hit);
+              return;
+          }
+      }
+      // add to the front
+      l.add(0,hit);
   }
 
   @Override
