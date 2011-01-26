@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>ingrid-releases-pom</artifactId>
 		<groupId>de.ingrid</groupId>
-		<version>1.1.0</version>
+		<version>2.3.1</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ingrid</groupId>
@@ -31,53 +31,30 @@
 		<developerConnection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid-iplug-se/trunk</developerConnection>
 	</scm>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>de.ingrid</groupId>
-        <artifactId>ingrid-base-webapp</artifactId>
-        <version>1.1.0-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>de.ingrid</groupId>
-        <artifactId>ingrid-base-webapp</artifactId>
-        <version>1.1.0-SNAPSHOT</version>
-        <classifier>res</classifier>
-        <type>zip</type>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-  
 	<dependencies>
 		<dependency>
 			<groupId>de.ingrid</groupId>
 			<artifactId>ingrid-iplug</artifactId>
-			<version>1.3.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>de.ingrid</groupId>
 			<artifactId>ingrid-utils</artifactId>
-			<version>1.3.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>de.ingrid</groupId>
 			<artifactId>ingrid-ibus-client</artifactId>
-			<version>1.4.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>de.ingrid</groupId>
 			<artifactId>ingrid-communication</artifactId>
-			<version>1.4.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>de.ingrid</groupId>
 			<artifactId>ingrid-iplug-sns</artifactId>
-			<version>1.6.0-SNAPSHOT</version>
 		</dependency>
     <dependency>
         <groupId>de.ingrid</groupId>
         <artifactId>ingrid-base-webapp</artifactId>
-        <version>1.1.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>de.ingrid</groupId>
@@ -88,7 +65,7 @@
 		<dependency>
             <groupId>de.ingrid</groupId>
             <artifactId>ingrid-iplug-admin-step1-se</artifactId>
-            <version>1.2.3-SNAPSHOT</version>
+            <version>2.3.1</version>
             <type>war</type>
         </dependency>
         <dependency>
@@ -105,14 +82,9 @@
 
 	<repositories>
 		<repository>
-			<id>harrison.its-technidata.de-archiva</id>
+			<id>de.ingrid.all</id>
 			<name>Harrison Archiva Maven2 Repo InGrid</name>
 			<url>http://harrison.its-technidata.de/archiva/repository/ingrid-all</url>
-		</repository>
-		<repository>
-			<id>repo1.maven.org/maven2</id>
-			<name>Maven2 Repo</name>
-			<url>http://repo1.maven.org/maven2</url>
 		</repository>
 	</repositories>
 
