@@ -4,14 +4,23 @@
     <title>Changes Ingrid iPlug SE</title>
   </properties>
   <body>
-    <release version="2.0" date="???" description="Release">
-      <action dev="rwe" type="add">
-        Fertigstellung des IPlugs, Tests, Erstellung eines Installers, etc...
+    <release version="2.3.1" date="2011-01-26" description="Release - Adaptive Crawling">
+      <action type="add">
+        Added installer with most configurations for the iPlug.
       </action>
       <action type="update">
-      	Neue Version des IPlug-SE. 
-      	Diese Version baut auf dem Projekt 'nutchgui' in der Tagversion 'v03' auf. Intern wird nutch Version 1.0 zum Crawlen verwendet.
-      	Wesentlicher Unterschied ist hier, die Einführung des 'adaptiven Crawlens', wodurch die Crawldauer wesentlich beschleunigt wird.
+        New version of iPlug-SE.
+        This version uses the project 'nutchgui' (version 'v03') and nutch version 1.0 for crawling.
+        The main difference is the introduction of "adaptive crawling", where crawl cycles won't take
+        so much time anymore'
+      </action>
+      <action type="update">
+        Using a new scoring algorithm (WebGraph), which replaces the old and instable OPIC scoring.
+        Scores won't increase permanently anymore, since score will be calculated completely new after
+        each crawl.
+      </action>
+      <action type="update">
+        Administration pages completely rewritten.
       </action>
     </release>
 
