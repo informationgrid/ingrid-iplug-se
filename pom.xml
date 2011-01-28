@@ -91,6 +91,25 @@
 		<finalName>${project.artifactId}-${project.version}</finalName>
 		<plugins>
 
+			<plugin>
+			    <artifactId>maven-clean-plugin</artifactId>
+			    <configuration>
+			      <filesets>
+			        <fileset>
+			          <directory>portalu-common/ingrid-ext</directory>
+                      <includes>
+                        <include>*.*</include>
+                      </includes>
+                      <excludes>
+                        <exclude>.*</exclude>
+                      </excludes>
+			          <followSymlinks>false</followSymlinks>
+			        </fileset>
+			      </filesets>
+			    </configuration>
+		    </plugin>
+
+
 			<!-- Get and put all dependencies into special folder -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -125,6 +144,7 @@
                                     <property name="maven.buildNumber" value="${buildNumber}" />
                                     <property name="maven.timestamp" value="${timestamp}" />
                                     <property name="maven.iplugType" value="IPLUG_SE" />
+                                    <property name="ingrid-base-webapp.version" value="${ingrid-base-webapp.version}" />
 									<target name="dist" />
 								</ant>
 							</tasks>
