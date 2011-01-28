@@ -98,8 +98,11 @@
 			        <fileset>
 			          <directory>portalu-common/ingrid-ext</directory>
 			          <includes>
-			            <include>**/*.*</include>
+			            <include>*.*</include>
 			          </includes>
+                      <excludes>
+                        <exclude>.*</exclude>
+                      </excludes>
 			          <followSymlinks>false</followSymlinks>
 			        </fileset>
 			      </filesets>
@@ -141,6 +144,7 @@
                                     <property name="maven.buildNumber" value="${buildNumber}" />
                                     <property name="maven.timestamp" value="${timestamp}" />
                                     <property name="maven.iplugType" value="IPLUG_SE" />
+                                    <property name="ingrid-base-webapp.version" value="${ingrid-base-webapp.version}" />
 									<target name="dist" />
 								</ant>
 							</tasks>

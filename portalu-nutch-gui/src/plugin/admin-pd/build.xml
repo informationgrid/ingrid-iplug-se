@@ -4,7 +4,7 @@
     <import file="../build-plugin.xml" />
 
   <target name="pre_copy">
-    <unzip src="../../../../../portalu-common/ingrid-ext/ingrid-base-webapp-1.1.0-SNAPSHOT.jar" dest="${build.classes}">
+    <unzip src="../../../../../portalu-common/ingrid-ext/ingrid-base-webapp-${ingrid-base-webapp.version}.jar" dest="${build.classes}">
         <patternset>
             <exclude name="**/search/*"/>
             <exclude name="**/controller/ExtrasController*"/>
@@ -29,7 +29,7 @@
     </target>
     
     <target name="deps-jar">
-        <unzip src="../../../../../portalu-common/ingrid-ext/ingrid-base-webapp-1.1.0-SNAPSHOT-res.zip" dest="${deploy.dir}/src/webapp" />
+        <unzip src="../../../../../portalu-common/ingrid-ext/ingrid-base-webapp-${ingrid-base-webapp.version}-res.zip" dest="${deploy.dir}/src/webapp" />
         <copy todir="${deploy.dir}/src/webapp">
             <fileset dir="${basedir}/src/webapp" />
         </copy>
