@@ -109,7 +109,18 @@ public class TransactionService {
 
   public void flush() {
     EntityManager entityManager = getEntityManager();
-    entityManager.flush();
+    EntityTransaction transaction = entityManager.getTransaction();
+    if (transaction.isActive()) {
+        entityManager.flush();
+    }
+  }
+  
+  public void refresh(Object object) {
+      EntityManager entityManager = getEntityManager();
+      EntityTransaction transaction = entityManager.getTransaction();
+      if (transaction.isActive()) {
+          entityManager.refresh(object);
+      }
   }
 
   public static TransactionService getInstance() {

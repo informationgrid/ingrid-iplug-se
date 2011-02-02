@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.ingrid.iplug.se.communication.InterplugInCommunication;
+import de.ingrid.iplug.se.urlmaintenance.commandObjects.CatalogUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ICatalogUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IExcludeUrlDao;
@@ -24,6 +25,7 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.LimitUrl;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider;
 import de.ingrid.iplug.se.urlmaintenance.persistence.model.Url;
+import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
 
 @Service
 public class DatabaseExport {
@@ -106,6 +108,8 @@ public class DatabaseExport {
     List<String> lines = new ArrayList<String>();
 
     for (Url url : urlDao.getAll()) {
+      // make sure we get the data fresh from the database
+      TransactionService.getInstance().refresh(url);
       // skip deleted Urls
       if (url.getDeleted() != null) {
           continue;
@@ -126,12 +130,17 @@ public class DatabaseExport {
       // summarize all values for one key
       Map<String, List<String>> key2Values = new HashMap<String, List<String>>();
       for (Metadata metadata : metadatas) {
+        // make sure we get the data fresh from the database
+        TransactionService.getInstance().refresh(metadata);
         String metadataKey = metadata.getMetadataKey();
         String metadataValue = metadata.getMetadataValue();
         if (!key2Values.containsKey(metadataKey)) {
           key2Values.put(metadataKey, new ArrayList<String>());
         }
         key2Values.get(metadataKey).add(metadataValue);
+      }
+      if (LOG.isDebugEnabled()) {
+          LOG.debug("Found metadata for '" + url.getUrl() + "' :"+ metadatas.toString());
       }
       
       // for each metadata append its information in form: '<key>:\t<value>\t[<value>\t]..' 
@@ -143,7 +152,10 @@ public class DatabaseExport {
         for (String value : values) {
           urlString.append(value).append('\t');
         }
-      }      
+      }
+      if (LOG.isDebugEnabled()) {
+          LOG.debug("Export metadata: " + urlString.toString());
+      }
       lines.add(urlString.toString());
     }
     return lines;
@@ -175,6 +187,8 @@ public class DatabaseExport {
     List<String> ret = new ArrayList<String>();
 
     for (Url url : urlDao.getAll()) {
+        // make sure we get the data fresh from the database
+        TransactionService.getInstance().refresh(url);
         // get only not deleted URLs
         if (url.getDeleted() == null) {
             if (LOG.isDebugEnabled()) {
