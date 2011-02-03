@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.ingrid.iplug.se.communication.InterplugInCommunication;
-import de.ingrid.iplug.se.urlmaintenance.commandObjects.CatalogUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ICatalogUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IExcludeUrlDao;
