@@ -203,8 +203,12 @@ public class CrawlTool {
       }
     }
     
-    LOG.info("Using WebGraph to calculate score");
-    webGraphScoring.updateScore(crawlDb, segs);
+    if (segs.size() > 0) {
+        LOG.info("Using WebGraph to calculate score");
+        webGraphScoring.updateScore(crawlDb, segs);
+    } else {
+        LOG.info("No new segments, skip calculating WebGraph.");
+    }
 
     // list of all segments that will be used
     FileStatus[] listStatus = _fileSystem.listStatus(segments, HadoopFSUtil.getPassDirectoriesFilter(_fileSystem));
