@@ -120,7 +120,8 @@ public class HostStatistic extends Configured {
       collector.collect(new Text(host), _one);
       collector.collect(new Text("Overall"), _one);
       if ((crawlDatum.getStatus() == CrawlDatum.STATUS_DB_FETCHED)
-          || crawlDatum.getStatus() == CrawlDatum.STATUS_FETCH_SUCCESS) {
+          || crawlDatum.getStatus() == CrawlDatum.STATUS_FETCH_SUCCESS
+          || crawlDatum.getStatus() == CrawlDatum.STATUS_DB_NOTMODIFIED) {
         _one._isFetched.set(true);
         collector.collect(new Text(host), _one);
         collector.collect(new Text("Overall"), _one);
