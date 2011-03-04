@@ -4,6 +4,17 @@
     <title>Changes Ingrid iPlug SE</title>
   </properties>
   <body>
+    <release version="2.3.1.2" date="2011-03-04" description="Bugfix Release">
+      <action type="fix">
+        Fix error with installation. A file was not found.
+      </action>
+      <action type="update">
+        Add modified URLs to statistics count to reflect all crawled URLs in statistics.
+      </action>
+      <action type="fix">
+        Calculate webgraph only if we have new segments available.
+      </action>
+    </release>
     <release version="2.3.1.1" date="2011-02-03" description="Bugfix Release">
       <action type="fix">
         Changes to URL metadata were not reflected in crawl url export after first crawl was running.
