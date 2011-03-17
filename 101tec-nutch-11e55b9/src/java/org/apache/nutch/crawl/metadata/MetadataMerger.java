@@ -18,7 +18,11 @@
 package org.apache.nutch.crawl.metadata;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,7 +34,6 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.MapFileOutputFormat;
 import org.apache.hadoop.mapred.Mapper;
@@ -71,6 +74,7 @@ public class MetadataMerger extends Configured {
   public static class MetadataReducer implements Reducer<HostType, ObjectWritable, HostType, ObjectWritable> {
 
     private MetadataContainer _metadataContainer;
+    private Map<String, Pattern> patternCache = new HashMap<String, Pattern>();
 
     public void reduce(HostType key, Iterator<ObjectWritable> values, OutputCollector<HostType, ObjectWritable> out,
         Reporter report) throws IOException {
@@ -81,6 +85,11 @@ public class MetadataMerger extends Configured {
 
         if (value instanceof MetadataContainer) {
           _metadataContainer = (MetadataContainer) value;
+          patternCache.clear();
+          for (Metadata metadata : _metadataContainer.getMetadatas()) {
+              String patternString = metadata.get("pattern");
+              patternCache.put(patternString, Pattern.compile(patternString));
+          }
           return;
         }
 
@@ -92,8 +101,10 @@ public class MetadataMerger extends Configured {
           Metadata metadataFromSegment = parseData.getParseMeta();
 
           for (Metadata metadata : _metadataContainer.getMetadatas()) {
-            String pattern = metadata.get("pattern");
-            if (url.toString().startsWith(pattern)) {
+            String patternString = metadata.get("pattern");
+            Pattern p = patternCache.get(patternString);
+            Matcher m = p.matcher(url.toString());
+            if (m.find()) {
               String[] names = metadata.names();
               for (String name : names) {
                 String[] metadataValues = metadata.getValues(name);

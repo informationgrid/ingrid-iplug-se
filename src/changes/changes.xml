@@ -6,6 +6,9 @@
   <body>
     <release version="2.3.1.3-SNAPSHOT" date="2011-xx-xx" description="Bugfix Release">
       <action type="update">
+        Make limit/exclude url filtering case sensitive. Match limit patterns with regular expression when merging metadata.
+      </action>
+      <action type="update">
         Link extraction in text files is now more strict to avoid false link extraction.
       </action>
     </release>

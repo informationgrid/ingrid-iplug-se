@@ -64,7 +64,7 @@ public class BWPatterns implements Writable {
     private void syncPattern(List<Text> regExpressions, List<Pattern> patterns) {
         patterns.clear();
         for (Text text : regExpressions) {
-            patterns.add(Pattern.compile(text.toString().toLowerCase()));
+            patterns.add(Pattern.compile(text.toString()));
         }
     }
 
@@ -125,10 +125,8 @@ public class BWPatterns implements Writable {
             return true;
         }
 
-        String lowerCaseUrl = url.toLowerCase();
-
         for (Pattern pattern : _negPattern) {
-            Matcher matcher = pattern.matcher(lowerCaseUrl);
+            Matcher matcher = pattern.matcher(url);
             if (matcher.find()) {
                 return false;
             }
@@ -160,10 +158,8 @@ public class BWPatterns implements Writable {
             return false;
         }
 
-        String lowerCaseUrl = url.toLowerCase();
-
         for (Pattern pattern : _posPattern) {
-            Matcher matcher = pattern.matcher(lowerCaseUrl);
+            Matcher matcher = pattern.matcher(url);
             if (matcher.find()) {
                 return true;
             }

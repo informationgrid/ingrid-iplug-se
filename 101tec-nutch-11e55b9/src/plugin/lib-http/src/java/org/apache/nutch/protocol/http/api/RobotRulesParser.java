@@ -231,6 +231,8 @@ public class RobotRulesParser implements Configurable {
     }
 
     setRobotNames((String[]) agents.toArray(new String[agents.size()]));
+    // clear robot rule cache
+    CACHE.clear();
   }
 
   public Configuration getConf() {
