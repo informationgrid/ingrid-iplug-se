@@ -38,6 +38,7 @@
 	<classpathentry kind="src" path="101tec-nutch-11e55b9/src/plugin/parse-js/src/java"/>
 	<classpathentry kind="src" path="101tec-nutch-11e55b9/src/plugin/protocol-http/src/java"/>
 	<classpathentry kind="src" path="101tec-nutch-11e55b9/src/plugin/scoring-opic/src/java"/>
+	<classpathentry kind="src" path="101tec-nutch-11e55b9/src/plugin/scoring-link/src/java"/>
 	<classpathentry kind="src" path="101tec-nutch-11e55b9/src/plugin/lib-regex-filter/src/java"/>
 	<classpathentry kind="src" path="101tec-nutch-11e55b9/src/plugin/lib-http/src/java"/>
 	<classpathentry kind="src" path="101tec-nutch-11e55b9/src/plugin/index-basic/src/java"/>

@@ -20,6 +20,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.nutch.crawl.CrawlDatum;
@@ -31,10 +33,14 @@ import org.apache.nutch.parse.ParseData;
 import org.apache.nutch.protocol.Content;
 import org.apache.nutch.scoring.ScoringFilter;
 import org.apache.nutch.scoring.ScoringFilterException;
+import org.apache.nutch.util.LogUtil;
 
 public class LinkAnalysisScoringFilter
   implements ScoringFilter {
 
+    private final static Log LOG = LogFactory.getLog(LinkAnalysisScoringFilter.class);
+    
+    
   private Configuration conf;
   private float scoreInjected = 0.001f;
   private float normalizedScore = 1.00f;
@@ -57,7 +63,30 @@ public class LinkAnalysisScoringFilter
     ParseData parseData, Collection<Entry<Text, CrawlDatum>> targets,
     CrawlDatum adjust, int allCount)
     throws ScoringFilterException {
-    return adjust;
+      
+      // set the score of all outlinks to the score of the parent url 
+      // devided by the number of outlinks
+      // 25.03.2011 joachim@wemove.com
+      float score = scoreInjected;
+      String scoreString = parseData.getContentMeta().get(Nutch.SCORE_KEY);
+      if (scoreString != null) {
+        try {
+          score = Float.parseFloat(scoreString);
+        } catch (Exception e) {
+          e.printStackTrace(LogUtil.getWarnStream(LOG));
+        }
+      }
+      int validCount = targets.size();
+      if (validCount == 0) {
+        // no outlinks to distribute score, so just return adjust
+        return adjust;
+      }
+      score /= validCount;
+      for (Entry<Text, CrawlDatum> target : targets) {
+           target.getValue().setScore(score);
+      }
+
+      return adjust;
   }
 
   public float generatorSortValue(Text url, CrawlDatum datum, float initSort)
@@ -95,7 +124,15 @@ public class LinkAnalysisScoringFilter
   public void updateDbScore(Text url, CrawlDatum old, CrawlDatum datum,
     List<CrawlDatum> inlinked)
     throws ScoringFilterException {
-    // nothing to do
+      // set the score of unfetched urls to the score of the first inlinked crawldatum
+      // the inlinked crawldatum represents the score, derived from the parent url
+      // see method distributeScoreToOutlinks()
+      // 25.03.2011 joachim@wemove.com
+      if (datum.getStatus() == CrawlDatum.STATUS_DB_UNFETCHED) {
+          if (inlinked != null && inlinked.size() > 0) {
+              datum.setScore(inlinked.get(0).getScore());
+          }
+      }
   }
 
 }

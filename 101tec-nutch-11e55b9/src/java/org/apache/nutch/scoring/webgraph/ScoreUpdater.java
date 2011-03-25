@@ -130,12 +130,15 @@ public class ScoreUpdater
         LOG.debug(url + ": setting to score " + inlinkScore);
       }
       else {
-        
-        // clear out the score in the crawldb
-        datum.setScore(clearScore);
-        LOG.debug(url + ": setting to clear score of " + clearScore);
+        // do not clear out scores of unfetched urls
+        // we need the scores to derive scores of theer oulinks
+        // 25.03.2011 joachim@wemove.com
+        if (datum.getStatus() != CrawlDatum.STATUS_DB_UNFETCHED) {
+            // clear out the score in the crawldb
+            datum.setScore(clearScore);
+            LOG.debug(url + ": setting to clear score of " + clearScore);
+        }
       }
-
       output.collect(key, datum);
     }
     else {
