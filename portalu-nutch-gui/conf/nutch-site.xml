@@ -356,6 +356,10 @@
   <description>Default score the linkrang score updater applies for not linked pages. Not linked pages will get this score. Default value is 0.0. For adaptive fetch schedules the default value should be slightly bigger than 0.0 because otherwise urls might not be fetched (fetch list is sorted by score). (ingrid specific: since the link scoring filter has been adapted to derive the initial score on an outlink from the parent page score divided by the number of oulinks, this value can be treated as a fetch depth limit. All urls that have a computed initial score lower than this value are less likely to be included in a fetch list (depending on the size of the segments). The lower this value is the deeper the depth can become. This only works with 'link.ignore.internal.domain' set to true.)</description>
 </property> 
 
-
+<property>
+  <name>link.score.updater.clear.without.inlinks</name>
+  <value>false</value>
+  <description>If true, the score of urls with no inlinks will be cleared with link.score.updater.clear.score. This will lead to much less scored entries in crawl db. It makes sure all unfetched urls with a derived score &gt; link.score.updater.clear.score will be sorted into the fetch list (besides the linked of course). If set to false also urls with only outlinks (to any domain) will get a score in the crawl DB. This might lead to the situation that no new urls will be fetched, if the scores of the new urls are lower than a majority of fetched urls in the crawldb.</description>
+</property> 
 
 </configuration>

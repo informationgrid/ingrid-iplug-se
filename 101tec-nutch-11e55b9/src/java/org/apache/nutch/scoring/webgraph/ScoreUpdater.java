@@ -69,6 +69,7 @@ public class ScoreUpdater
 
   private JobConf conf;
   private float clearScore = 0.0f;
+  private boolean ignoreLinksWithoutInlinks = false;
 
   public ScoreUpdater() {}
   
@@ -79,6 +80,7 @@ public class ScoreUpdater
   public void configure(JobConf conf) {
     this.conf = conf;
     clearScore = conf.getFloat("link.score.updater.clear.score", 0.0f);
+    ignoreLinksWithoutInlinks = conf.getBoolean("link.score.updater.clear.without.inlinks", false);
   }
 
   /**
@@ -122,7 +124,8 @@ public class ScoreUpdater
     // normalized or changed after being pulled from the crawldb
     if (datum != null) {
 
-      if (node != null) {
+        // if set, ignore nodes that have no inlinks.
+        if (node != null && (!ignoreLinksWithoutInlinks || (ignoreLinksWithoutInlinks && node.getNumInlinks() > 0))) {
         
         // set the inlink score in the nodedb
         float inlinkScore = node.getInlinkScore();
