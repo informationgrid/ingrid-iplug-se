@@ -109,8 +109,8 @@ public class DatabaseExport {
     for (Url url : urlDao.getAll()) {
       // make sure we get the data fresh from the database
       TransactionService.getInstance().refresh(url);
-      // skip deleted Urls
-      if (url.getDeleted() != null) {
+      // skip deleted Urls and NULL urls (should not happen)
+      if (url.getDeleted() != null || url.getUrl() == null) {
           continue;
       }
       StringBuilder urlString = new StringBuilder();
@@ -189,14 +189,18 @@ public class DatabaseExport {
         // make sure we get the data fresh from the database
         TransactionService.getInstance().refresh(url);
         // get only not deleted URLs
-        if (url.getDeleted() == null) {
+        if (url.getDeleted() == null && url.getUrl() != null) {
             if (LOG.isDebugEnabled()) {
-                LOG.info("Do export url: " + url.getUrl());
+                LOG.debug("Do export url: " + url.getUrl());
             }
             ret.add(url.getUrl());
+        } else if (url.getUrl() == null) {
+            if (LOG.isWarnEnabled()) {
+                LOG.warn("Do NOT export NULL url with DB ID: " + url.getId());
+            }
         } else {
             if (LOG.isDebugEnabled()) {
-                LOG.info("Do NOT export deleted url: " + url.getUrl());
+                LOG.debug("Do NOT export deleted url: " + url.getUrl());
             }
         }
     }
