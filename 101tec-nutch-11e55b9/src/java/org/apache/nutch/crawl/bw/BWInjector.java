@@ -58,6 +58,7 @@ public class BWInjector extends Configured {
   private static final Log LOG = LogFactory.getLog(BWInjector.class);
 
   private static final String PROHIBITED = "prohibited";
+  private static final String NORMALIZE = "normalize";
 
   public BWInjector(Configuration conf) {
     super(conf);
@@ -73,10 +74,12 @@ public class BWInjector extends Configured {
     private URLNormalizers _urlNormalizers;
 
     private boolean _prohibited;
+    private boolean _normalize;
 
     public void configure(JobConf job) {
       _urlNormalizers = new URLNormalizers(job, URLNormalizers.SCOPE_INJECT);
       _prohibited = job.getBoolean(PROHIBITED, true);
+      _normalize = job.getBoolean(NORMALIZE, true);
     }
 
     public void close() {
@@ -88,11 +91,13 @@ public class BWInjector extends Configured {
         throws IOException {
 
       String url = val.toString();
-      try {
-        url = _urlNormalizers.normalize(url, "bw"); // normalize
-      } catch (Exception e) {
-        LOG.warn("Skipping " + url + ":" + e.toString());
-        url = null;
+      if (_normalize) {
+          try {
+            url = _urlNormalizers.normalize(url, "bw"); // normalize
+          } catch (Exception e) {
+            LOG.warn("Skipping " + url + ":" + e.toString());
+            url = null;
+          }
       }
       if (url != null) {
         String host;
@@ -169,6 +174,7 @@ public class BWInjector extends Configured {
     sortJob.setMapperClass(BWInjectMapper.class);
 
     sortJob.setBoolean(PROHIBITED, prohibited);
+    sortJob.setBoolean(NORMALIZE, false);
 
     FileOutputFormat.setOutputPath(sortJob, tempDir);
     sortJob.setOutputFormat(SequenceFileOutputFormat.class);
