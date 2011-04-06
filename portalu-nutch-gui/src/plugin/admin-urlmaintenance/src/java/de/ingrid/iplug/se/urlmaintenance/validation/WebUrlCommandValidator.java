@@ -53,7 +53,12 @@ public class WebUrlCommandValidator extends AbstractValidator<StartUrlCommand> {
             errors.rejectValue("url", getErrorKey(_typeClass, "limitUrl.url", IErrorKeys.EMPTY));
         } else {
             try {
-                new URL(url);
+                // allow regular expression syntax
+                if (url.startsWith("/") && url.endsWith("/")) {
+                    new URL(url.substring(1, url.length() - 1));
+                } else {
+                    new URL(url);
+                }
             } catch (final MalformedURLException e) {
                 errors.rejectValue("url", getErrorKey(_typeClass, "limitUrl.url", IErrorKeys.MALFORMED));
             }
@@ -92,7 +97,12 @@ public class WebUrlCommandValidator extends AbstractValidator<StartUrlCommand> {
             errors.rejectValue("url", getErrorKey(_typeClass, "excludeUrl.url", IErrorKeys.EMPTY));
         } else {
             try {
-                new URL(url);
+                // allow regular expression syntax
+                if (url.startsWith("/") && url.endsWith("/")) {
+                    new URL(url.substring(1, url.length() - 1));
+                } else {
+                    new URL(url);
+                }
             } catch (final MalformedURLException e) {
                 errors.rejectValue("url", getErrorKey(_typeClass, "excludeUrl.url", IErrorKeys.MALFORMED));
             }

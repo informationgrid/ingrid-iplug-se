@@ -77,8 +77,8 @@ public class UrlmaintenancePreCrawl implements IPreCrawl {
       writeFromCommunicationObjectIntoFile(DatabaseExport.WEB_EXCLUDE_URLS, new Path(crawlDir, "urls/exclude/urls.txt"));
       writeFromCommunicationObjectIntoFile(DatabaseExport.WEB_METADATA, new Path(crawlDir, "urls/metadata/urls.txt"));
     } else if (urlType.equals("catalog")) {
-      writeFromCommunicationObjectIntoFile(DatabaseExport.CATALOG_URLS, new Path(crawlDir, "urls/start/urls.txt"));
-      writeFromCommunicationObjectIntoFile(DatabaseExport.CATALOG_URLS, new Path(crawlDir, "urls/limit/urls.txt"));
+      writeFromCommunicationObjectIntoFile(DatabaseExport.CATALOG_START_URLS, new Path(crawlDir, "urls/start/urls.txt"));
+      writeFromCommunicationObjectIntoFile(DatabaseExport.CATALOG_LIMIT_URLS, new Path(crawlDir, "urls/limit/urls.txt"));
       writeFromCommunicationObjectIntoFile(DatabaseExport.CATALOG_METADATA,
           new Path(crawlDir, "urls/metadata/urls.txt"));
     } else {

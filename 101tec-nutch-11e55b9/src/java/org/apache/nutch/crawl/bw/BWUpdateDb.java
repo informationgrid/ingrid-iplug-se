@@ -331,7 +331,7 @@ public class BWUpdateDb extends Configured {
         job.setInputFormat(SequenceFileInputFormat.class);
 
         for (Path segment : segments) {
-            FileInputFormat.addInputPath(job, new Path(segment, CrawlDatum.FETCH_DIR_NAME)); // ??
+            FileInputFormat.addInputPath(job, new Path(segment, CrawlDatum.FETCH_DIR_NAME));
             FileInputFormat.addInputPath(job, new Path(segment, CrawlDatum.PARSE_DIR_NAME));
         }
 

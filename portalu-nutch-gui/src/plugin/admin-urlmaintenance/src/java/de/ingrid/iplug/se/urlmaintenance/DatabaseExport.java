@@ -1,10 +1,14 @@
 package de.ingrid.iplug.se.urlmaintenance;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.weta.components.communication.util.PooledThreadExecutor;
 
@@ -44,8 +48,10 @@ public class DatabaseExport {
 
   public static final String WEB_METADATA = "web-metadata";
 
-  public static final String CATALOG_URLS = "catalog-urls";
+  public static final String CATALOG_START_URLS = "catalog-start-urls";
 
+  public static final String CATALOG_LIMIT_URLS = "catalog-limit-urls";
+  
   public static final String CATALOG_METADATA = "catalog-metadata";
   
   public static final String EXPORT_NOW = "export-now";
@@ -53,8 +59,9 @@ public class DatabaseExport {
   public static final String WEB = "web";
   
   public static final String CATALOG = "catalog";
-
   
+  private static final Pattern REGEXP_SPECIAL_CHARS = Pattern.compile("([\\\\*+\\[\\](){}\\$.?\\^|])");
+
   private class DatabaseExportPoller extends Thread {
 
     DatabaseExportPoller() {
@@ -103,12 +110,14 @@ public class DatabaseExport {
   
   
   
-  List<String> metadataAsStringList(IDao<? extends Url> urlDao) {
+  List<String> metadataAsStringList(IDao<? extends Url> urlDao, boolean checkForRegExpUrl) {
     List<String> lines = new ArrayList<String>();
 
     for (Url url : urlDao.getAll()) {
       // make sure we get the data fresh from the database
-      TransactionService.getInstance().refresh(url);
+      if (TransactionService.getInstance() != null) {
+          TransactionService.getInstance().refresh(url);
+      }
       // skip deleted Urls and NULL urls (should not happen)
       if (url.getDeleted() != null || url.getUrl() == null) {
           continue;
@@ -116,7 +125,9 @@ public class DatabaseExport {
       StringBuilder urlString = new StringBuilder();
       Provider provider = url.getProvider();
       
-      urlString.append(url.getUrl()).append('\t');
+      String urlStr = checkForRegularExpressions(url, checkForRegExpUrl);
+      
+      urlString.append(urlStr).append('\t');
       urlString.append("partner:\t").append(provider.getPartner().getShortName()).append('\t');
       urlString.append("provider:\t").append(provider.getShortName()).append('\t');
       
@@ -130,7 +141,9 @@ public class DatabaseExport {
       Map<String, List<String>> key2Values = new HashMap<String, List<String>>();
       for (Metadata metadata : metadatas) {
         // make sure we get the data fresh from the database
-        TransactionService.getInstance().refresh(metadata);
+          if (TransactionService.getInstance() != null) {
+              TransactionService.getInstance().refresh(metadata);
+          }
         String metadataKey = metadata.getMetadataKey();
         String metadataValue = metadata.getMetadataValue();
         if (!key2Values.containsKey(metadataKey)) {
@@ -159,30 +172,53 @@ public class DatabaseExport {
     }
     return lines;
   }
+  
+  private String checkForRegularExpressions(Url url, boolean checkForRegExpUrl) {
+      String urlStr = url.getUrl().trim();
+      if (checkForRegExpUrl) {
+          if (urlStr.startsWith("/") && urlStr.endsWith("/")) {
+              urlStr = urlStr.substring(1, urlStr.length() - 1);
+          } else {
+              URL uri;
+            try {
+                uri = new URL(urlStr);
+                if (uri.getPath() != null || uri.getQuery() != null) {
+                    Matcher match = REGEXP_SPECIAL_CHARS.matcher((uri.getPath() != null ? uri.getPath():"") + (uri.getQuery() != null ? "?"+uri.getQuery():""));
+                    urlStr = uri.getProtocol() + "://" + uri.getHost() + (uri.getPort() > 0 ? uri.getPort(): "") + match.replaceAll("\\\\$1");
+                }
+            } catch (MalformedURLException e) {
+                LOG.error("The url pattern: '" + urlStr + "' is not a valid url.");
+            }
+          }
+      }
+      return urlStr;
+  }
 
   public synchronized void exportWebUrls() {
     InterplugInCommunication<String> instanceForStringLists = InterplugInCommunication.getInstanceForStringLists();
 
     LOG.info("export web start urls");
-    instanceForStringLists.setObjectContent(WEB_START_URLS, getAsStringList(_startUrlDao));
+    instanceForStringLists.setObjectContent(WEB_START_URLS, getAsStringList(_startUrlDao, false));
     LOG.info("export web limit urls");
-    instanceForStringLists.setObjectContent(WEB_LIMIT_URLS, getAsStringList(_limitUrlDao));
+    instanceForStringLists.setObjectContent(WEB_LIMIT_URLS, getAsStringList(_limitUrlDao, true));
     LOG.info("export web exclude urls");
-    instanceForStringLists.setObjectContent(WEB_EXCLUDE_URLS, getAsStringList(_excludeUrlDao));
+    instanceForStringLists.setObjectContent(WEB_EXCLUDE_URLS, getAsStringList(_excludeUrlDao, true));
     LOG.info("export web metadata urls");
-    instanceForStringLists.setObjectContent(WEB_METADATA, metadataAsStringList(_limitUrlDao));
+    instanceForStringLists.setObjectContent(WEB_METADATA, metadataAsStringList(_limitUrlDao, true));
   }
 
   public synchronized void exportCatalogUrls() {
     InterplugInCommunication<String> instanceForStringLists = InterplugInCommunication.getInstanceForStringLists();
 
-    LOG.info("export catalog start/limit urls");
-    instanceForStringLists.setObjectContent(CATALOG_URLS, getAsStringList(_catalogUrlDao));
+    LOG.info("export catalog start urls");
+    instanceForStringLists.setObjectContent(CATALOG_START_URLS, getAsStringList(_catalogUrlDao, false));
+    LOG.info("export catalog limit urls");
+    instanceForStringLists.setObjectContent(CATALOG_LIMIT_URLS, getAsStringList(_catalogUrlDao, true));
     LOG.info("export catalog metadata urls");
-    instanceForStringLists.setObjectContent(CATALOG_METADATA, metadataAsStringList(_catalogUrlDao));
+    instanceForStringLists.setObjectContent(CATALOG_METADATA, metadataAsStringList(_catalogUrlDao, true));
   }
 
-  private List<String> getAsStringList(IDao<? extends Url> urlDao) {
+  private List<String> getAsStringList(IDao<? extends Url> urlDao, boolean checkForRegExpUrl) {
     List<String> ret = new ArrayList<String>();
 
     for (Url url : urlDao.getAll()) {
@@ -190,10 +226,11 @@ public class DatabaseExport {
         TransactionService.getInstance().refresh(url);
         // get only not deleted URLs
         if (url.getDeleted() == null && url.getUrl() != null) {
+            String urlStr = checkForRegularExpressions(url, checkForRegExpUrl);
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Do export url: " + url.getUrl());
+                LOG.debug("Do export url: " + urlStr);
             }
-            ret.add(url.getUrl());
+            ret.add(urlStr);
         } else if (url.getUrl() == null) {
             if (LOG.isWarnEnabled()) {
                 LOG.warn("Do NOT export NULL url with DB ID: " + url.getId());
