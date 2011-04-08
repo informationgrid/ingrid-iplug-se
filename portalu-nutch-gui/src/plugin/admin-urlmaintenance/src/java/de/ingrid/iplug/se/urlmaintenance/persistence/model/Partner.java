@@ -7,11 +7,14 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 
 @Entity
-@NamedQuery(name = "getPartnerByName", query = "select p from Partner as p where p._name = :name")
+
+@NamedQueries(value = { @NamedQuery(name = "getPartnerByName", query = "select p from Partner as p where p._name = :name"),
+        @NamedQuery(name = "getPartnerByShortName", query = "select p from Partner as p where p._shortName = :shortName") })
 public class Partner extends IdBase {
 
   // rwe: Heads-up: @Column(unique=true) does not work with eclipselink and

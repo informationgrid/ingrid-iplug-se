@@ -64,25 +64,29 @@ public class PartnerAndProviderDbSyncServiceTest extends DaoTest {
     providersFromDb = _providerDao.getAll();
     assertEquals(2, partnersFromDb.size());
     assertEquals(3, providersFromDb.size());
-    assertEquals("partnerA", partnersFromDb.get(0).getName());
+    assertEquals("partnerA", partnersFromDb.get(0).getShortName());
     assertEquals(1, partnersFromDb.get(0).getProviders().size());
-    assertEquals("providerA-A", partnersFromDb.get(0).getProviders().get(0).getName());
-    assertEquals("partnerB", partnersFromDb.get(1).getName());
+    assertEquals("providerA-A", partnersFromDb.get(0).getProviders().get(0).getShortName());
+    assertEquals("partnerB", partnersFromDb.get(1).getShortName());
     List<Provider> providersFromPartner = partnersFromDb.get(1).getProviders();
     assertEquals(2, providersFromPartner.size());
     Collections.sort(providersFromPartner, new Comparator<Provider>() {
 
       @Override
       public int compare(Provider o1, Provider o2) {
-        return o1.getName().compareTo(o2.getName());
+        return o1.getShortName().compareTo(o2.getShortName());
       }
     });
-    assertEquals("providerA", providersFromPartner.get(0).getName());
-    assertEquals("providerB", providersFromPartner.get(1).getName());
+    assertEquals("providerA", providersFromPartner.get(0).getShortName());
+    assertEquals("providerB", providersFromPartner.get(1).getShortName());
 
     // delete the providerB completely and append new provider to partnerA
     allPartnerWithProvider.clear();
     allPartnerWithProvider.add(createPartnerWithProviders("partnerA", "providerA-A", "providerA-B"));
+    // change names of partner, provider
+    allPartnerWithProvider.get(0).put("name", "another-partner-name");
+    ((Map)((List)allPartnerWithProvider.get(0).get("providers")).get(0)).put("name", "another-provider-name");
+    
     _service.syncDb(allPartnerWithProvider);
     _transactionService.flipTransaction();
 
@@ -90,10 +94,12 @@ public class PartnerAndProviderDbSyncServiceTest extends DaoTest {
     providersFromDb = _providerDao.getAll();
     assertEquals(1, partnersFromDb.size());
     assertEquals(providersFromDb.toString(), 2, providersFromDb.size());
-    assertEquals("partnerA", partnersFromDb.get(0).getName());
+    assertEquals("partnerA", partnersFromDb.get(0).getShortName());
+    assertEquals("another-partner-name", partnersFromDb.get(0).getName());
     assertEquals(2, partnersFromDb.get(0).getProviders().size());
-    assertEquals("providerA-A", partnersFromDb.get(0).getProviders().get(0).getName());
-    assertEquals("providerA-B", partnersFromDb.get(0).getProviders().get(1).getName());
+    assertEquals("providerA-A", partnersFromDb.get(0).getProviders().get(0).getShortName());
+    assertEquals("another-provider-name", partnersFromDb.get(0).getProviders().get(0).getName());
+    assertEquals("providerA-B", partnersFromDb.get(0).getProviders().get(1).getShortName());
 
     _transactionService.commitTransaction();
     _transactionService.close();
@@ -121,7 +127,7 @@ public class PartnerAndProviderDbSyncServiceTest extends DaoTest {
     providersFromDb = _providerDao.getAll();
     assertEquals(1, partnersFromDb.size());
     assertEquals(0, providersFromDb.size());
-    assertEquals("partnerA", partnersFromDb.get(0).getName());
+    assertEquals("partnerA", partnersFromDb.get(0).getShortName());
     assertEquals(0, partnersFromDb.get(0).getProviders().size());
 
     // delete the last partner too
@@ -148,7 +154,7 @@ public class PartnerAndProviderDbSyncServiceTest extends DaoTest {
     StartUrlDao startUrlDao = new StartUrlDao(_transactionService);
     StartUrl startUrl = new StartUrl();
     startUrl.setUrl("http://www.start.com");
-    startUrl.setProvider(_providerDao.getByName("providerA1"));
+    startUrl.setProvider(_providerDao.getByShortName("providerA1"));
     startUrlDao.makePersistent(startUrl);
     startUrlDao.flipTransaction();
 
@@ -172,8 +178,8 @@ public class PartnerAndProviderDbSyncServiceTest extends DaoTest {
   private Map<String, Serializable> createPartnerWithProviders(String partnerName, String... providerNames) {
     Map<String, Serializable> ret = new HashMap<String, Serializable>();
 
-    ret.put("partnerid", "id-" + partnerName);
-    ret.put("name", partnerName);
+    ret.put("partnerid", partnerName);
+    ret.put("name", "name-" + partnerName);
     List<Serializable> providerInformation = new ArrayList<Serializable>();
     for (String providerName : providerNames) {
       providerInformation.add(createProviderInformation(providerName));
@@ -185,8 +191,8 @@ public class PartnerAndProviderDbSyncServiceTest extends DaoTest {
   private Serializable createProviderInformation(String providerName) {
     Map<String, String> ret = new HashMap<String, String>();
 
-    ret.put("providerid", "id-" + providerName);
-    ret.put("name", providerName);
+    ret.put("providerid", providerName);
+    ret.put("name", "name-"+providerName);
     ret.put("url", "http://my.dummypage.com");
     return (Serializable) ret;
   }

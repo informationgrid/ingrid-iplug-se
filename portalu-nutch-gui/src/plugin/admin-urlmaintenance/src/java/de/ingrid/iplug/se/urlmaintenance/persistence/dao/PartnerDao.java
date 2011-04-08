@@ -46,4 +46,18 @@ public class PartnerDao extends Dao<Partner> implements IPartnerDao {
     _providerDao.makeTransient(provider);
   }
 
+@Override
+public boolean existsByShortName(String name) {
+    Query query = _transactionService.createNamedQuery("getPartnerByShortName");
+    query.setParameter("shortName", name);
+    return !query.getResultList().isEmpty();
+}
+
+@Override
+public Partner getByShortName(String string) {
+    Query query = _transactionService.createNamedQuery("getPartnerByShortName");
+    query.setParameter("shortName", string);
+    return (Partner) query.getSingleResult();
+}
+
 }

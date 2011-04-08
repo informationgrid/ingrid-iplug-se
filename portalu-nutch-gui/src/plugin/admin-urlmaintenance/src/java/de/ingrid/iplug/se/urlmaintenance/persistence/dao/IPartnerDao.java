@@ -7,7 +7,11 @@ public interface IPartnerDao extends IDao<Partner> {
 
   Partner getByName(String string);
 
+  Partner getByShortName(String string);
+
   boolean exists(String name);
 
+  boolean existsByShortName(String name);
+  
   void removeProvider(Partner partner, Provider provider);
 }

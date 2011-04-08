@@ -13,8 +13,12 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 
 @Entity
-@NamedQueries(value = { @NamedQuery(name = "getProviderByName", query = "select p from Provider as p where p._name = :name"),
-    @NamedQuery(name = "getProviderByNameAndPartner", query = "select p from Provider as p where p._name = :name and p._partner = :partner") })
+@NamedQueries(value = { 
+        @NamedQuery(name = "getProviderByName", query = "select p from Provider as p where p._name = :name"),
+        @NamedQuery(name = "getProviderByShortName", query = "select p from Provider as p where p._shortName = :shortName"),
+        @NamedQuery(name = "getProviderByNameAndPartner", query = "select p from Provider as p where p._name = :name and p._partner = :partner"), 
+        @NamedQuery(name = "getProviderByShortNameNameAndPartner", query = "select p from Provider as p where p._shortName = :shortName and p._partner = :partner") 
+        })
 public class Provider extends IdBase {
 
   @Column(nullable = false)

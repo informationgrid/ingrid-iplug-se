@@ -47,4 +47,34 @@ public class ProviderDao extends Dao<Provider> implements IProviderDao {
     return !query.getResultList().isEmpty();
   }
 
+@Override
+public boolean existsByShortName(String name) {
+    Query query = _transactionService.createNamedQuery("getProviderByShortName");
+    query.setParameter("shirtName", name);
+    return !query.getResultList().isEmpty();
+}
+
+@Override
+public boolean existsByShortName(String name, Partner partner) {
+    Query query = _transactionService.createNamedQuery("getProviderByShortNameAndPartner");
+    query.setParameter("shortName", name);
+    query.setParameter("partner", partner);
+    return !query.getResultList().isEmpty();
+}
+
+@Override
+public Provider getByShortName(String string) {
+    Query query = _transactionService.createNamedQuery("getProviderByShortName");
+    query.setParameter("shortName", string);
+    return (Provider) query.getSingleResult();
+}
+
+@Override
+public Provider getByShortNameAndPartner(String string, Partner partner) {
+    Query query = _transactionService.createNamedQuery("getProviderByShortNameAndPartner");
+    query.setParameter("shortName", string);
+    query.setParameter("partner", partner);
+    return (Provider) query.getSingleResult();
+}
+
 }

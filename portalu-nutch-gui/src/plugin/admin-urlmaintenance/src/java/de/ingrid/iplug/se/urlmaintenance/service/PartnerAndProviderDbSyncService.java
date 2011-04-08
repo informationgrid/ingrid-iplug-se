@@ -2,6 +2,7 @@ package de.ingrid.iplug.se.urlmaintenance.service;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -119,10 +120,15 @@ public class PartnerAndProviderDbSyncService {
     Queue<Partner> partnersInDb = new LinkedList<Partner>(_partnerDao.getAll());
     Partner partnerInDb = partnersInDb.poll();
     while (partnerInDb != null) {
-      InternalPartner partnerWithProvider = findInternalPartnerByPartnerName(partnersAndProviders, partnerInDb
-          .getName());
+      InternalPartner partnerWithProvider = findInternalPartnerByPartnerId(partnersAndProviders, partnerInDb
+          .getShortName());
 
       if (partnerWithProvider != null) {
+        // check if the name has changed, if so, update the name of the partner
+        if (!partnerInDb.getName().equals(partnerWithProvider.getName())) {
+            partnerInDb.setName(partnerWithProvider.getName());
+            _partnerDao.makePersistent(partnerInDb);
+        }
         // there exists the same partner from ibus with partner stored in db
         syncProviders(partnerInDb, partnerWithProvider.getProviders());
         // remove partner from temporary ibus list
@@ -181,19 +187,24 @@ public class PartnerAndProviderDbSyncService {
    * @param providers, the provider the user belongs to
    */
   private void syncProviders(Partner partnerInDb, Set<InternalProvider> providers) {
-    Set<String> providersToAdd = new HashSet<String>();
+    Set<String> providerIdsToAdd = new HashSet<String>();
+    Map<String, InternalProvider> providerMap = new HashMap<String, InternalProvider>();
     Set<Provider> providersToRemove = new HashSet<Provider>();
     for (InternalProvider internalProvider : providers) {
-      providersToAdd.add(internalProvider.getName());
+      providerIdsToAdd.add(internalProvider.getId());
+      providerMap.put(internalProvider.getId(), internalProvider);
     }
 
-    for (Provider provider : partnerInDb.getProviders()) {
-      if (providersToAdd.contains(provider.getName())) {
+    for (Provider providerInDb : partnerInDb.getProviders()) {
+      if (providerIdsToAdd.contains(providerInDb.getShortName())) {
+        if (!providerInDb.getName().equals(providerMap.get(providerInDb.getShortName()).getName())) {
+            providerInDb.setName(providerMap.get(providerInDb.getShortName()).getName());
+        }
         // the partner in database already contains wanted provider
-        providersToAdd.remove(provider.getName());
+        providerIdsToAdd.remove(providerInDb.getShortName());
       } else {
         // the partner in database contains a provider that is no longer wanted
-        providersToRemove.add(provider);
+        providersToRemove.add(providerInDb);
       }
     }
 
@@ -213,31 +224,31 @@ public class PartnerAndProviderDbSyncService {
     // }
 
     // add provider for partner?
-    for (String providerName : providersToAdd) {
-      LOG.info("Add new provider '" + providerName + "' to existing partner '" + partnerInDb.getName() + "'.");
-      Provider newProvider = craeteProvider(findInternalProviderByName(providers, providerName));
+    for (String providerId : providerIdsToAdd) {
+      LOG.info("Add new provider '" + providerId + "' to existing partner '" + partnerInDb.getName() + "'.");
+      Provider newProvider = craeteProvider(findInternalProviderByName(providers, providerId));
       partnerInDb.addProvider(newProvider);
     }
-    if (providersToAdd.size() > 0) {
+    if (providerIdsToAdd.size() > 0) {
       _partnerDao.makePersistent(partnerInDb);
       // _partnerDao.flipTransaction();
     }
   }
 
-  private InternalProvider findInternalProviderByName(Set<InternalProvider> providers, String providerName) {
+  private InternalProvider findInternalProviderByName(Set<InternalProvider> providers, String providerId) {
     for (InternalProvider internalProvider : providers) {
-      if (internalProvider.getName().equals(providerName)) {
+      if (internalProvider.getId().equals(providerId)) {
         return internalProvider;
       }
     }
-    throw new RuntimeException("Can not fine an Internal Provider form name '" + providerName + "' from list: "
+    throw new RuntimeException("Can not fine an Internal Provider form name '" + providerId + "' from list: "
         + providers);
   }
 
-  private static InternalPartner findInternalPartnerByPartnerName(List<InternalPartner> partnersAndProviders,
-      String searchPartnerName) {
+  private static InternalPartner findInternalPartnerByPartnerId(List<InternalPartner> partnersAndProviders,
+      String searchPartnerId) {
     for (InternalPartner partnerWithProvider : partnersAndProviders) {
-      if (searchPartnerName.equals(partnerWithProvider.getName())) {
+      if (searchPartnerId.equals(partnerWithProvider.getId())) {
         return partnerWithProvider;
       }
     }
