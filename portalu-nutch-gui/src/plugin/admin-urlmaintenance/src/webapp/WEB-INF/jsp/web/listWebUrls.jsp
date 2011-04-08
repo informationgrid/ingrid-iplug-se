@@ -138,7 +138,7 @@
 						       		<td>
 						       			<a href="editStartUrl.html?id=${url.id}">EDIT</a>
 						       			<a href="#" id="deleteWebUrl_${index.index}" 
-						       					onclick="document.getElementById('urlToDelete').innerHTML='${url.url}';document.getElementById('idToDelete').value='${url.id }'">DEL</a>
+						       					onclick="doDelete('${url.url}', '${url.id }');">DEL</a>
 						       			<a href="../test.html?id=${url.id}">TEST</a>
 						       		</td>
 					       		</tr>
@@ -301,13 +301,16 @@
 							                          { text:"Abbrechen",  handler:handleNo } ]
 							             } );
 							YAHOO.example.container.deleteWebUrl.render();
-							<c:forEach items="${urls}" var="url" varStatus="index">
-							YAHOO.util.Event.addListener("deleteWebUrl_${index.index}", "click", YAHOO.example.container.deleteWebUrl.show, YAHOO.example.container.deleteWebUrl, true);
-							</c:forEach>
              				// make page available after it has been loaded completely
 				            document.getElementById("blocker").style.display = "none";
 						});
-            
+                        
+                        function doDelete(url, id) {
+                            document.getElementById('urlToDelete').innerHTML=url;
+                            document.getElementById('idToDelete').value=id;                            
+                            YAHOO.example.container.deleteWebUrl.show();
+                        }
+                                    
 						</script>
 					</div>
 					

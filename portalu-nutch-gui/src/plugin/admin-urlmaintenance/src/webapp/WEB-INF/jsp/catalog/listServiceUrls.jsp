@@ -102,7 +102,7 @@
 										<td>
 											<a href="editCatalogUrl.html?id=${url.id}&type=service">EDIT</a>
 							       			<a href="#" id="deleteCatalogUrl_${index.index}" 
-						       					onclick="document.getElementById('urlToDelete').innerHTML='${url.url}';document.getElementById('idToDelete').value='${url.id }'">DEL</a>
+						       					onclick="doDelete('${url.url}', '${url.id }');">DEL</a>
 							       			<a href="../test.html?id=${url.id}">TEST</a>
 										</td>
 									</tr>	
@@ -217,13 +217,17 @@
 							                          { text:"Abbrechen",  handler:handleNo } ]
 							             } );
 							YAHOO.example.container.deleteCatalogUrl.render();
-							<c:forEach items="${urls}" var="url" varStatus="index">
-							YAHOO.util.Event.addListener("deleteCatalogUrl_${index.index}", "click", YAHOO.example.container.deleteCatalogUrl.show, YAHOO.example.container.deleteCatalogUrl, true);
-							</c:forEach>
 
 							// make page available after it has been loaded completely
                             document.getElementById("blocker").style.display = "none";
 						});
+                        
+                        function doDelete(url, id) {
+                            document.getElementById('urlToDelete').innerHTML=url;
+                            document.getElementById('idToDelete').value=id;                            
+                            YAHOO.example.container.deleteCatalogUrl.show();
+                        }
+                                    
 						</script>
 				    </div>
 				</div>
