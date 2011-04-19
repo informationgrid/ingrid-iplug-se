@@ -437,8 +437,13 @@ public class RobotRulesParser implements Configurable {
     
     if (robotRules == null) {                     // cache miss
       if (LOG.isTraceEnabled()) { LOG.trace("cache miss " + url); }
+      URL robotsUrl = null;
       try {
-        Response response = http.getResponse(new URL(url, "/robots.txt"),
+        robotsUrl = new URL(url, "/robots.txt");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Try to fetch robots.txt from: " + robotsUrl.toString());
+        }
+        Response response = http.getResponse(robotsUrl,
                                              new CrawlDatum(), true);
 
         if (response.getCode() == 200)               // found rules: parse them
@@ -452,7 +457,7 @@ public class RobotRulesParser implements Configurable {
           robotRules = EMPTY_RULES;                 // use default rules
       } catch (Throwable t) {
         if (LOG.isInfoEnabled()) {
-          LOG.info("Couldn't get robots.txt for " + url + ": " + t.toString());
+          LOG.info("Couldn't get robots.txt for " + url + " from "+ robotsUrl +": " + t.toString());
         }
         cacheRule = false;
         robotRules = EMPTY_RULES;
