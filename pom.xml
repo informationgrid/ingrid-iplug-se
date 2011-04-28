@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>ingrid-releases-pom</artifactId>
 		<groupId>de.ingrid</groupId>
-		<version>2.3.1</version>
+		<version>3.0.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ingrid</groupId>
@@ -11,19 +11,6 @@
 	<packaging>jar</packaging>
 	<version>3.0.0-SNAPSHOT</version>
 	<name>Ingrid iPlug SE</name>
-
-	<developers>
-		<developer>
-			<id>rwe</id>
-			<name>Ralf</name>
-			<email>RalfWehner@web.de</email>
-		</developer>
-		<developer>
-            <id>me</id>
-            <name>Max Ender</name>
-            <email>me@101tec.com</email>
-        </developer>
-	</developers>
 
 	<scm>
 		<connection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid-iplug-se/trunk</connection>
@@ -64,7 +51,6 @@
 		<dependency>
             <groupId>de.ingrid</groupId>
             <artifactId>ingrid-iplug-admin-step1-se</artifactId>
-            <version>2.3.1</version>
             <type>war</type>
         </dependency>
         <dependency>
