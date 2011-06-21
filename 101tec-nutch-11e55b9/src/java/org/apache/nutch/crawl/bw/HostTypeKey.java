@@ -35,6 +35,10 @@ public class HostTypeKey implements WritableComparable<HostTypeKey> {
 
   public static final long CRAWL_DATUM_TYPE = 2;
 
+  public static final long INLINKS_TYPE = 3;
+
+  public static final long INLINK_TYPE = 4;
+
   private Text _host = new Text();
 
   private LongWritable _type = new LongWritable();
@@ -76,6 +80,10 @@ public class HostTypeKey implements WritableComparable<HostTypeKey> {
   public boolean equals(Object obj) {
     HostTypeKey that = (HostTypeKey) obj;
     return _host.equals(that._host) && _type.equals(that._type);
+  }
+  
+  public long getType() {
+      return _type.get();
   }
 
   public String toString() {
