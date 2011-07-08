@@ -79,6 +79,7 @@ implements Mapper<Text, Writable, Text, NutchWritable>,
     Inlinks inlinks = null;
     CrawlDatum dbDatum = null;
     CrawlDatum fetchDatum = null;
+    CrawlDatum fetchDatumNotModified = null;
     ParseData parseData = null;
     ParseText parseText = null;
     /// TODO rwe: none nutch specific code start:
@@ -99,6 +100,11 @@ implements Mapper<Text, Writable, Text, NutchWritable>,
           if (mergeAfterFetch || (!mergeAfterFetch && datum.getStatus() != CrawlDatum.STATUS_FETCH_NOTMODIFIED)) {
               fetchDatum = datum;
           }
+          if (!mergeAfterFetch && datum.getStatus() == CrawlDatum.STATUS_FETCH_NOTMODIFIED) {
+              if (fetchDatumNotModified == null || fetchDatumNotModified.getFetchTime() < datum.getFetchTime()) {
+                  fetchDatumNotModified = datum;
+              }
+          }
         } else if (CrawlDatum.STATUS_LINKED == datum.getStatus() ||
                    CrawlDatum.STATUS_SIGNATURE == datum.getStatus()) {
           continue;
@@ -115,6 +121,10 @@ implements Mapper<Text, Writable, Text, NutchWritable>,
         LOG.warn("Unrecognized type: "+value.getClass());
       }
     }
+    
+    if (fetchDatum == null) {
+        fetchDatum = fetchDatumNotModified;
+    }
 
     if (fetchDatum == null || dbDatum == null
         || parseText == null || parseData == null) {
@@ -124,9 +134,7 @@ implements Mapper<Text, Writable, Text, NutchWritable>,
     // do not return if page wasn't modified AND merging is active
     // otherwise not modified pages won't be in index after merging
     if (!parseData.getStatus().isSuccess() ||
-        (!mergeAfterFetch && (fetchDatum.getStatus() != CrawlDatum.STATUS_FETCH_SUCCESS)) ||
-        ( mergeAfterFetch && (fetchDatum.getStatus() != CrawlDatum.STATUS_FETCH_SUCCESS) && 
-        (fetchDatum.getStatus() != CrawlDatum.STATUS_FETCH_NOTMODIFIED))) {
+        (fetchDatum.getStatus() != CrawlDatum.STATUS_FETCH_SUCCESS && fetchDatum.getStatus() != CrawlDatum.STATUS_FETCH_NOTMODIFIED)) {
       return;
     }
 
