@@ -4,7 +4,10 @@
     <title>Changes Ingrid iPlug SE</title>
   </properties>
   <body>
-	  <release version="3.0.0" date="2011-05-06" description="Release InGrid3.0">
+    <release version="3.0.1-SNAPSHOT" date="2011-xx-xx" description="Bugfix Release">
+      <action type="fix" dev="wemove">Make sure not-modified URLs from merged segments are indexed even with option "merge.after.fetch" is false.</action>
+    </release>
+    <release version="3.0.0" date="2011-05-06" description="Release InGrid3.0">
       <action type="update" dev="wemove">
 			  Add more strict link extraction to avoid false link detection.
       </action>
