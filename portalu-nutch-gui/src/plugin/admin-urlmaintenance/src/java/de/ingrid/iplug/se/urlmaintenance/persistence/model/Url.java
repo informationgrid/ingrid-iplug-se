@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
@@ -30,6 +31,7 @@ import org.apache.nutch.protocol.ProtocolStatus;
     @NamedQuery(name = "countUrlsThatUsesSpecialProviders", query = "select count(u) from Url as u where u._provider._id in :providersIds") })
 public class Url extends IdBase {
 
+  @Column(columnDefinition = "VARCHAR(1024)")
   private String _url;
 
   @Temporal(TemporalType.TIMESTAMP)
