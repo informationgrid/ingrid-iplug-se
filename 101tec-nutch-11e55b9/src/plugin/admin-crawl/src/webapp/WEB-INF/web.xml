@@ -63,6 +63,7 @@ http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 			<url-pattern>/*</url-pattern>
 		</web-resource-collection>
 		<auth-constraint>
+            <role-name>admin</role-name>
 			<role-name>admin.portal</role-name>
 		</auth-constraint>
 	</security-constraint>

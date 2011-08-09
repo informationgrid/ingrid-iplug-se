@@ -184,7 +184,7 @@ public class DatabaseExport {
                 uri = new URL(urlStr);
                 if (uri.getPath() != null || uri.getQuery() != null) {
                     Matcher match = REGEXP_SPECIAL_CHARS.matcher((uri.getPath() != null ? uri.getPath():"") + (uri.getQuery() != null ? "?"+uri.getQuery():""));
-                    urlStr = uri.getProtocol() + "://" + uri.getHost() + (uri.getPort() > 0 ? uri.getPort(): "") + match.replaceAll("\\\\$1");
+                    urlStr = uri.getProtocol() + "://" + uri.getHost() + (uri.getPort() > 0 ? ":"+uri.getPort(): "") + match.replaceAll("\\\\$1");
                 }
             } catch (MalformedURLException e) {
                 LOG.error("The url pattern: '" + urlStr + "' is not a valid url.");

@@ -158,7 +158,7 @@
             <fileset dir="${jsp-includes-dir}" />
         </copy>
         <copy todir="${dist.final.name}/plugins/admin-urlmaintenance/${jsp-dir}">
-            <fileset dir="${jsp-includes-dir}" />
+            <fileset dir="${jsp-includes-dir}" excludes="roleFailure.jsp"/>
         </copy>
         <copy todir="${dist.final.name}/plugins/admin-url-upload/${jsp-dir}">
             <fileset dir="${jsp-includes-dir}" />

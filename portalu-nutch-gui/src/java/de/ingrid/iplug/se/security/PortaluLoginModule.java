@@ -30,6 +30,8 @@ public class PortaluLoginModule extends AbstractLoginModule {
 
     private static final Log LOG = LogFactory.getLog(PortaluLoginModule.class);
 
+    private static final String ROLE_ADMIN = "admin";
+    
     private static final String ROLE_PORTAL = "admin.portal";
 
     private static final String ROLE_PARTNER = "admin.portal.partner";
@@ -89,7 +91,7 @@ public class PortaluLoginModule extends AbstractLoginModule {
         for (final IngridHit hit : hits) {
             final String permission = (String) hit.get("permission");
             roles.add(permission);
-            if (permission.equals(ROLE_PORTAL)) {
+            if (permission.equals(ROLE_PORTAL) || permission.equals(ROLE_ADMIN)) {
                 partners.add("*");
                 providers.add("*");
             } else if (permission.equals(ROLE_PARTNER)) {
