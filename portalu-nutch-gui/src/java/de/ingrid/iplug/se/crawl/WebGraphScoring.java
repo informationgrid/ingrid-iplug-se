@@ -36,7 +36,7 @@ public class WebGraphScoring {
             Path[] segPaths = new Path[segments.size()];
             for (int i = 0; i < segments.size(); i++) {
                 segPaths[i] = segments.get(i);
-              }
+            }
             webGraph.createWebGraph(webGraphPath, segPaths);
 
             linkRank.analyze(webGraphPath);
@@ -46,5 +46,9 @@ public class WebGraphScoring {
             LOG.error("Error while updating the score via WebGraph!");
             e.printStackTrace();
         }
+    }
+    
+    public Path getWebGraphPath() {
+        return webGraphPath;
     }
 }

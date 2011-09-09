@@ -441,23 +441,36 @@ public class BWLinkDbFilter extends Configured {
         super(conf);
     }
 
-    public void update(Path outputLinkDb, Path linkDb, Path bwdb, boolean normalize, boolean filter,
+    public void update(Path linkDb, Path bwdb, boolean normalize, boolean filter,
             boolean replaceLinkDb) throws IOException {
-        LOG.info("bw linkdb filter: starting");
-        LOG.info("bw linkdb filter: output linkdb " + outputLinkDb);
-        LOG.info("bw linkdb filter: input linkdb " + linkDb);
-        LOG.info("bw linkdb filter: bwdb: " + bwdb);
-        LOG.info("bw linkdb filter: normalize urls: " + normalize);
-        LOG.info("bw linkdb filter: filter urls: " + filter);
-        LOG.info("bw linkdb filter: replace linkdb: " + replaceLinkDb);
+
+        String name = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
+        Path outputLinkDb = new Path(linkDb, name);
+        
+        LOG.info("filter linkdb against bwdb: starting");
+        LOG.info("filter linkdb against bwdb: output linkdb " + outputLinkDb);
+        LOG.info("filter linkdb against bwdb: input linkdb " + linkDb);
+        LOG.info("filter linkdb against bwdb: bwdb: " + bwdb);
+        LOG.info("filter linkdb against bwdb: normalize urls: " + normalize);
+        LOG.info("filter linkdb against bwdb: filter urls: " + filter);
+        LOG.info("filter linkdb against bwdb: replace linkdb: " + replaceLinkDb);
+
+        Configuration conf = getConf();
+        FileSystem fs = FileSystem.get(conf);
+        
+        // return if crawldb does not exist
+        if (!fs.exists(linkDb)) {
+            LOG.info("filter linkDb against bwdb: linkDb does not exist, nothing todo.");
+            return;
+        }
 
         // wrapping inlinks objects
-        LOG.info("bw linkdb filter: wrapping inlinks objects started.");
-        String name = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
+        LOG.info("filter linkdb against bwdb: wrapping INLINKS objects started.");
+        name = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
         Path wrappedInlinksDbOutput = new Path(linkDb, name);
 
         JobConf job = new NutchJob(getConf());
-        job.setJobName("bw linkDb filter: wrap inlinks objects from: " + linkDb);
+        job.setJobName("filter linkdb against bwdb: wrap INLINKS objects from: " + linkDb);
 
         job.setInputFormat(SequenceFileInputFormat.class);
 
@@ -477,12 +490,12 @@ public class BWLinkDbFilter extends Configured {
         SyncUtil.syncJobRun(job);// JobClient.runJob(job);
 
         // wrapping inlink objects
-        LOG.info("bw linkdb filter: wrapping inlink objects started.");
+        LOG.info("filter linkdb against bwdb: wrapping INLINK(!) objects started.");
         name = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
         Path wrappedInlinkDbOutput = new Path(linkDb, name);
 
         job = new NutchJob(getConf());
-        job.setJobName("bw linkDb filter: wrap inlink objects from: " + linkDb);
+        job.setJobName("filter linkdb against bwdb: wrap INLINK(!) objects from: " + linkDb);
 
         job.setInputFormat(SequenceFileInputFormat.class);
 
@@ -502,7 +515,7 @@ public class BWLinkDbFilter extends Configured {
         SyncUtil.syncJobRun(job);// JobClient.runJob(job);
 
         // filtering
-        LOG.info("bw linkDb filter: filtering started.");
+        LOG.info("filter linkdb against bwdb: filtering started.");
         name = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
         Path tmpMergedDb = new Path(linkDb, name);
         JobConf filterJob = new NutchJob(getConf());
@@ -525,9 +538,7 @@ public class BWLinkDbFilter extends Configured {
         FileSystem.get(job).delete(wrappedInlinkDbOutput, true);
 
         // convert formats
-        LOG.info("bw linkDb filter: converting started.");
-        name = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
-        Path tmpFormatOut = new Path(linkDb, name);
+        LOG.info("filter linkdb against bwdb: converting started.");
         JobConf convertJob = new NutchJob(getConf());
         convertJob.setJobName("format converting: " + tmpMergedDb);
         FileInputFormat.addInputPath(convertJob, tmpMergedDb);
@@ -536,7 +547,7 @@ public class BWLinkDbFilter extends Configured {
         convertJob.setMapOutputValueClass(ObjectWritable.class);
         convertJob.setMapperClass(LinkDbFormatConverter.class);
         convertJob.setReducerClass(LinkDbFormatConverter.class);
-        FileOutputFormat.setOutputPath(convertJob, tmpFormatOut);
+        FileOutputFormat.setOutputPath(convertJob, outputLinkDb);
         convertJob.setOutputFormat(MapFileOutputFormat.class);
         convertJob.setOutputKeyClass(Text.class);
         convertJob.setOutputValueClass(Inlinks.class);
@@ -546,26 +557,22 @@ public class BWLinkDbFilter extends Configured {
         FileSystem.get(job).delete(tmpMergedDb, true);
 
         if (replaceLinkDb) {
-            LOG.info("replace linkdb");
+            LOG.info("filter linkdb against bwdb: replace current linkdb");
             LinkDb.install(convertJob, linkDb);
-        } else {
-            FileSystem fs = FileSystem.get(getConf());
-            fs.mkdirs(outputLinkDb);
-            fs.rename(FileOutputFormat.getOutputPath(convertJob), new Path(outputLinkDb, CrawlDb.CURRENT_NAME));
         }
-        LOG.info("bw linkdb filter: finished.");
+        LOG.info("filter linkdb against bwdb: finished.");
 
     }
 
     public static void main(String[] args) throws Exception {
         Configuration conf = NutchConfiguration.create();
         BWLinkDbFilter bwDb = new BWLinkDbFilter(conf);
-        if (args.length != 6) {
+        if (args.length != 5) {
             System.err
-                    .println("Usage: BWLinkDbFilter <output_linkdb> <linkdb> <bwdb> <normalize> <filter> <replace linkdb>");
+                    .println("Usage: BWLinkDbFilter <linkdb> <bwdb> <normalize> <filter> <replace current linkdb>");
             return;
         }
-        bwDb.update(new Path(args[0]), new Path(args[1]), new Path(args[2]), Boolean.valueOf(args[3]), Boolean
+        bwDb.update(new Path(args[1]), new Path(args[2]), Boolean.valueOf(args[3]), Boolean
                 .valueOf(args[4]), Boolean.valueOf(args[5]));
 
     }

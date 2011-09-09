@@ -265,20 +265,36 @@ public class BWCrawlDbFilter extends Configured {
 
     // TODO use normalize and filter inside the bw-job? and not only in the
     // crawldb-job.
-    public void update(Path outputCrawlDb, Path crawlDb, Path bwdb, boolean normalize, boolean filter,
+    public void update(Path crawlDb, Path bwdb, boolean normalize, boolean filter,
             boolean replaceCrawlDb) throws IOException {
-        LOG.info("bw crawldb filter: starting");
-        LOG.info("bw crawldb filter: output crawldb " + outputCrawlDb);
-        LOG.info("bw crawldb filter: input crawldb " + crawlDb);
-        LOG.info("bw crawldb filter: bwdb: " + bwdb);
-
-        // wrapping
-        LOG.info("bw crawldb filter: wrapping started.");
+        
         String name = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
+        Path outputCrawlDb = new Path(crawlDb, name);
+        
+        LOG.info("filter crawldb against bwdb: starting");
+        LOG.info("filter crawldb against bwdb: output crawldb " + outputCrawlDb);
+        LOG.info("filter crawldb against bwdb: input crawldb " + crawlDb);
+        LOG.info("filter crawldb against bwdb: bwdb: " + bwdb);
+        LOG.info("filter crawldb against bwdb: normalize: " + normalize);
+        LOG.info("filter crawldb against bwdb: filter: " + filter);
+        LOG.info("filter crawldb against bwdb: replaceCrawlDb: " + replaceCrawlDb);
+
+        Configuration conf = getConf();
+        FileSystem fs = FileSystem.get(conf);
+        
+        // return if crawldb does not exist
+        if (!fs.exists(crawlDb)) {
+            LOG.info("filter crawldb against bwdb: crawldb does not exist, nothing todo.");
+            return;
+        }
+        
+        // wrapping
+        LOG.info("filter crawldb against bwdb: wrapping started.");
+        name = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
         Path wrappedSegOutput = new Path(crawlDb, name);
 
         JobConf job = new NutchJob(getConf());
-        job.setJobName("bw crawldb filter: wrap crawldb: " + crawlDb);
+        job.setJobName("filter crawldb against bwdb: wrap crawldb: " + crawlDb);
 
         job.setInputFormat(SequenceFileInputFormat.class);
 
@@ -298,7 +314,7 @@ public class BWCrawlDbFilter extends Configured {
         SyncUtil.syncJobRun(job);// JobClient.runJob(job);
 
         // filtering
-        LOG.info("bw crawldb filter: filtering started.");
+        LOG.info("filter crawldb against bwdb: filtering started.");
         name = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
         Path tmpMergedDb = new Path(crawlDb, name);
         JobConf filterJob = new NutchJob(getConf());
@@ -319,15 +335,13 @@ public class BWCrawlDbFilter extends Configured {
         FileSystem.get(job).delete(wrappedSegOutput, true);
 
         // convert formats
-        LOG.info("bw crawldb filter: converting started.");
-        name = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
-        Path tmpFormatOut = new Path(crawlDb, name);
+        LOG.info("filter crawldb against bwdb: converting started.");
         JobConf convertJob = new NutchJob(getConf());
         convertJob.setJobName("format converting: " + tmpMergedDb);
         FileInputFormat.addInputPath(convertJob, tmpMergedDb);
         convertJob.setInputFormat(SequenceFileInputFormat.class);
         convertJob.setMapperClass(FormatConverter.class);
-        FileOutputFormat.setOutputPath(convertJob, tmpFormatOut);
+        FileOutputFormat.setOutputPath(convertJob, outputCrawlDb);
         convertJob.setOutputFormat(MapFileOutputFormat.class);
         convertJob.setOutputKeyClass(Text.class);
         convertJob.setOutputValueClass(CrawlDatum.class);
@@ -337,26 +351,22 @@ public class BWCrawlDbFilter extends Configured {
         FileSystem.get(job).delete(tmpMergedDb, true);
 
         if (replaceCrawlDb) {
-            LOG.info("replace crawldb");
+            LOG.info("filter crawldb against bwdb: replace current crawldb");
             CrawlDb.install(convertJob, crawlDb);
-        } else {
-            FileSystem fs = FileSystem.get(getConf());
-            fs.mkdirs(outputCrawlDb);
-            fs.rename(FileOutputFormat.getOutputPath(convertJob), new Path(outputCrawlDb, CrawlDb.CURRENT_NAME));
         }
-        LOG.info("bw crawldb filter: finished.");
+        LOG.info("filter crawldb against bwdb: finished.");
 
     }
 
     public static void main(String[] args) throws Exception {
         Configuration conf = NutchConfiguration.create();
         BWCrawlDbFilter bwDb = new BWCrawlDbFilter(conf);
-        if (args.length != 6) {
+        if (args.length != 5) {
             System.err
-                    .println("Usage: BWCrawlDbFilter <output_crawldb> <crawldb> <bwdb> <normalize> <filter> <replace crawldb>");
+                    .println("Usage: BWCrawlDbFilter <crawldb> <bwdb> <normalize> <filter> <replace current crawldb>");
             return;
         }
-        bwDb.update(new Path(args[0]), new Path(args[1]), new Path(args[2]), Boolean.valueOf(args[3]), Boolean
+        bwDb.update(new Path(args[1]), new Path(args[2]), Boolean.valueOf(args[3]), Boolean
                 .valueOf(args[4]), Boolean.valueOf(args[5]));
 
     }

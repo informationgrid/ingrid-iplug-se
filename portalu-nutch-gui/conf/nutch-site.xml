@@ -203,7 +203,7 @@
 
 <property>
   <name>fetcher.server.min.delay</name>
-  <value>5.0</value>
+  <value>3.0</value>
   <description>The minimum number of seconds the fetcher will delay between 
   successive requests to the same server. This value is applicable ONLY
   if fetcher.threads.per.host is greater than 1 (i.e. the host blocking
@@ -305,8 +305,10 @@
 
 <property>
   <name>db.fetch.interval.default</name>
-  <value>1209600</value>
-  <description>The default number of seconds between re-fetches of a page (14 days).
+  <value>86400</value>
+  <description>The default number of seconds between re-fetches of a page. (ingrid specific: This is set to 1 day and 
+  works in conjunction with the adaptive fetch schedule. Thus we can detect fast changing websites earlier as if we set 
+  the fetch schedule to a larger value.
   </description>
 </property>
 
@@ -352,14 +354,43 @@
 
 <property>
   <name>link.score.updater.clear.score</name>
-  <value>0.0000000001</value>
-  <description>Default score the linkrang score updater applies for not linked pages. Not linked pages will get this score. Default value is 0.0. For adaptive fetch schedules the default value should be slightly bigger than 0.0 because otherwise urls might not be fetched (fetch list is sorted by score). (ingrid specific: since the link scoring filter has been adapted to derive the initial score on an outlink from the parent page score divided by the number of oulinks, this value can be treated as a fetch depth limit. All urls that have a computed initial score lower than this value are less likely to be included in a fetch list (depending on the size of the segments). The lower this value is the deeper the depth can become. This only works with 'link.ignore.internal.domain' set to true.)</description>
+  <value>0.000001</value>
+  <description>Default score the linkrang score updater applies for not linked pages. 
+  Not linked pages will get this score. Default value is 0.0. For adaptive fetch schedules the default 
+  value should be slightly bigger than 0.0 because otherwise urls might not be fetched (fetch list is sorted by score). 
+  (ingrid specific: since the link scoring filter has been adapted to derive the initial score on an outlink from the parent page score 
+  divided by the number of oulinks, this value can be treated as a fetch depth limit. All urls that have a computed initial score 
+  lower than this value are less likely to be included in a fetch list (depending on the size of the segments). 
+  The lower this value is the deeper the depth can become. This only works with 'link.ignore.internal.domain' set to true.)</description>
 </property> 
 
 <property>
   <name>link.score.updater.clear.without.inlinks</name>
   <value>false</value>
-  <description>If true, the score of urls with no inlinks will be cleared with link.score.updater.clear.score. This will lead to much less scored entries in crawl db. It makes sure all unfetched urls with a derived score &gt; link.score.updater.clear.score will be sorted into the fetch list (besides the linked of course). If set to false also urls with only outlinks (to any domain) will get a score in the crawl DB. This might lead to the situation that no new urls will be fetched, if the scores of the new urls are lower than a majority of fetched urls in the crawldb.</description>
+  <description>If true, the score of urls with no inlinks will be cleared with link.score.updater.clear.score. 
+  This will lead to much less scored entries in crawl db. It makes sure all unfetched urls with a 
+  derived score &gt; link.score.updater.clear.score will be sorted into the fetch list (besides the linked of course). 
+  If set to false also urls with only outlinks (to any domain) will get a score in the crawl DB. 
+  This might lead to the situation that no new urls will be fetched, if the scores of the new urls are 
+  lower than a majority of fetched urls in the crawldb.</description>
+</property> 
+
+<property>
+  <name>bw.filter.crawldb.enable</name>
+  <value>true</value>
+  <description>Filter crawldb against bwdb for every crawl. Filtering takes place right after creating the bw db.</description>
+</property> 
+
+<property>
+  <name>bw.filter.linkdb.enable</name>
+  <value>true</value>
+  <description>Filter linkdb against bwdb for every crawl. Filtering takes place right after creating the bw db.</description>
+</property> 
+
+<property>
+  <name>bw.filter.webgraph.enable</name>
+  <value>true</value>
+  <description>Filter linkdb against bwdb for every crawl. Filtering takes place right after creating the bw db.</description>
 </property> 
 
 </configuration>

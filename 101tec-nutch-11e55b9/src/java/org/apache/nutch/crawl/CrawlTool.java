@@ -13,8 +13,11 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.nutch.admin.ConfigurationUtil;
 import org.apache.nutch.admin.searcher.SearcherFactory;
+import org.apache.nutch.crawl.bw.BWCrawlDbFilter;
 import org.apache.nutch.crawl.bw.BWInjector;
+import org.apache.nutch.crawl.bw.BWLinkDbFilter;
 import org.apache.nutch.crawl.bw.BWUpdateDb;
+import org.apache.nutch.crawl.bw.BWWebgraphFilter;
 import org.apache.nutch.crawl.metadata.MetadataInjector;
 import org.apache.nutch.crawl.metadata.ParseDataUpdater;
 import org.apache.nutch.fetcher.Fetcher;
@@ -127,6 +130,31 @@ public class CrawlTool {
           }
         bwInjector.inject(bwDb, excludeDir, true);
       }
+      
+      boolean filterCrawlDbAgainstBwDb = _configuration
+      .getBoolean("bw.filter.crawldb.enable", false);
+      if (filterCrawlDbAgainstBwDb) {
+          LOG.info("filter crawldb against bwdb.");
+          BWCrawlDbFilter bwCrawlDbFilter = new BWCrawlDbFilter(_configuration);
+          bwCrawlDbFilter.update(crawlDb, bwDb, false, false, true);
+      }
+      
+      boolean filterLinkDbAgainstBwDb = _configuration
+      .getBoolean("bw.filter.linkdb.enable", false);
+      if (filterLinkDbAgainstBwDb) {
+          LOG.info("filter linkdb against bwdb.");
+          BWLinkDbFilter bwLinkDbFilter = new BWLinkDbFilter(_configuration);
+          bwLinkDbFilter.update(crawlDb, bwDb, false, false, true);
+      }
+
+      boolean filterWebgraphAgainstBwDb = _configuration
+      .getBoolean("bw.filter.webgraph.enable", false);
+      if (filterWebgraphAgainstBwDb) {
+          LOG.info("filter webgraph against bwdb.");
+          BWWebgraphFilter bwWebgraphFilter = new BWWebgraphFilter(_configuration);
+          bwWebgraphFilter.update(webGraphScoring.getWebGraphPath(), bwDb, false, false, true);
+      }
+      
     }
 
     boolean metadataEnable = _configuration
@@ -141,6 +169,7 @@ public class CrawlTool {
         metadataInjector.inject(metadataDb, metadataDir);
       }
     }
+    
 
     int i;
     ArrayList<Path> segs = new ArrayList<Path>();
