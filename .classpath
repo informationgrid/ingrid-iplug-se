@@ -107,16 +107,15 @@
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/commons-beanutils-1.7.0.jar"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/commons-beanutils-core-1.7.0.jar"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/commons-betwixt-0.7.jar"/>
-	<classpathentry kind="lib" path="portalu-common/ingrid-ext/commons-codec-1.3.jar"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/commons-collections-3.1.jar"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/commons-digester-1.6.jar"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/commons-discovery-0.2.jar"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/commons-el-1.0.jar"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/commons-logging-1.0.4.jar"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ehcache-1.4.1.jar"/>
-	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-communication-authentication-1.2.1.jar"/>
-	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-external-service-sns-1.0.0.jar"/>
-	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-external-services-api-1.0.0.jar"/>
+	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-communication-authentication-3.0.0.jar"/>
+	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-external-service-sns-3.0.0.jar"/>
+	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-external-services-api-3.0.0.jar"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/jasper-compiler-5.5.9.jar"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/jasper-runtime-5.5.9.jar"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/jsr107cache-1.0.jar"/>
@@ -133,13 +132,13 @@
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/xtmStubs-3.0.0.1.jar"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/activation-1.1.jar"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/mail-1.4.1.jar"/>
-	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-utils-2.3.1.jar"/>
-	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-communication-2.3.1.jar"/>
-	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-ibus-2.3.1.jar"/>
-	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-ibus-client-2.3.1.jar"/>
-	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-iplug-2.3.1.jar"/>
-	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-iplug-sns-2.3.1.jar"/>
-	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-iplug-admin-step1-se-2.3.1.war"/>
-	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-iplug-admin-step1-sns-2.3.1.war"/>
+	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-utils-3.0.0.jar"/>
+	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-communication-3.0.0.jar"/>
+	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-ibus-3.0.0.jar"/>
+	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-ibus-client-3.0.0.jar"/>
+	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-iplug-3.0.0.jar"/>
+	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-iplug-sns-3.0.0.jar"/>
+	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-iplug-admin-step1-se-3.0.0.war"/>
+	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-iplug-admin-step1-sns-3.0.0.war"/>
 	<classpathentry kind="output" path="eclipse-classes"/>
 </classpath>
