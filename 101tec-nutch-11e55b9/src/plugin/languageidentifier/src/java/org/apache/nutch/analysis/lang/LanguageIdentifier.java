@@ -118,8 +118,8 @@ public class LanguageIdentifier {
 
       Enumeration alllanguages = p.keys();
      
-      if (LOG.isInfoEnabled()) { 
-        LOG.info(new StringBuffer()
+      if (LOG.isDebugEnabled()) { 
+        LOG.debug(new StringBuffer()
                   .append("Language identifier configuration [")
                   .append(minLength).append("-").append(maxLength)
                   .append("/").append(analyzeLength).append("]").toString());
@@ -167,7 +167,7 @@ public class LanguageIdentifier {
           ngramsIdx.put(entry.getSeq(), array);
         }
       }
-      if (LOG.isInfoEnabled()) { LOG.info(list.toString()); }
+      if (LOG.isDebugEnabled()) { LOG.debug(list.toString()); }
       // Create the suspect profile
       suspect = new NGramProfile("suspect", minLength, maxLength);
     } catch (Exception e) {

@@ -308,7 +308,7 @@ public class WebGraph
    * OutlinkDb LinkDatum objects and are regenerated each time the WebGraph is
    * updated.
    */
-  private static class InlinkDb
+  public static class InlinkDb
     extends Configured
     implements Mapper<Text, LinkDatum, Text, LinkDatum> {
 
@@ -364,7 +364,7 @@ public class WebGraph
    * Creates the Node database which consists of the number of in and outlinks
    * for each url and a score slot for analysis programs such as LinkRank.
    */
-  private static class NodeDb
+  public static class NodeDb
     extends Configured
     implements Reducer<Text, LinkDatum, Text, Node> {
 

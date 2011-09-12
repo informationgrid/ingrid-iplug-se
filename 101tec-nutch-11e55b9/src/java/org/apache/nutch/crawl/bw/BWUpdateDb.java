@@ -214,6 +214,10 @@ public class BWUpdateDb extends Configured {
                 if (_patterns == null) {
                     // return, because no bw pattern has been set for this url
                     // this results in NOT crawling this url
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("No BW pattern for url: " + (((Entry) value)._url).toString()
+                                + " for HostTypeKey: " + key.toString());
+                    }
                     return;
                 }
 

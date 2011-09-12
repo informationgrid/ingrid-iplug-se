@@ -144,14 +144,14 @@ public class CrawlTool {
       if (filterLinkDbAgainstBwDb) {
           LOG.info("filter linkdb against bwdb.");
           BWLinkDbFilter bwLinkDbFilter = new BWLinkDbFilter(_configuration);
-          bwLinkDbFilter.update(crawlDb, bwDb, false, false, true);
+          bwLinkDbFilter.update(linkDb, bwDb, false, false, true);
       }
 
       boolean filterWebgraphAgainstBwDb = _configuration
       .getBoolean("bw.filter.webgraph.enable", false);
       if (filterWebgraphAgainstBwDb) {
           LOG.info("filter webgraph against bwdb.");
-          BWWebgraphFilter bwWebgraphFilter = new BWWebgraphFilter(_configuration);
+          BWWebgraphFilter bwWebgraphFilter = new BWWebgraphFilter(_configuration, _crawlDir);
           bwWebgraphFilter.update(webGraphScoring.getWebGraphPath(), bwDb, false, false, true);
       }
       

@@ -40,7 +40,9 @@ public class HostTypeKey implements WritableComparable<HostTypeKey> {
   public static final long INLINK_TYPE = 4;
 
   public static final long GENERIC_DATUM_TYPE = 5;
-  
+
+  public static final long LINKED_URL_TYPE = 6;
+
   private Text _host = new Text();
 
   private LongWritable _type = new LongWritable();

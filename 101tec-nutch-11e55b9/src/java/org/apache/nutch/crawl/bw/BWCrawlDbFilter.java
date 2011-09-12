@@ -208,6 +208,10 @@ public class BWCrawlDbFilter extends Configured {
                 }
 
                 if (_patterns == null) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Key url or linked url does not have a valid BW patterns, remove it: " + value
+                                + " for HostTypeKey: " + key.toString());
+                    }
                     // return, because no bw pattern has been set for this url
                     // this results in NOT crawling this url
                     return;
@@ -223,7 +227,7 @@ public class BWCrawlDbFilter extends Configured {
                     out.collect(key, objectWritable);
                 } else {
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("BW patterns NOT passed for url: " + (((Entry) value)._url).toString()
+                        LOG.debug("Crawldatum does not pass BW patterns, remove it: " + (((Entry) value)._url).toString()
                                 + " for HostTypeKey: " + key.toString());
                     }
 

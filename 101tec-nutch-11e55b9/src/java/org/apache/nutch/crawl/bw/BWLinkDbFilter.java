@@ -21,7 +21,9 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.logging.Log;
@@ -42,7 +44,6 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
-import org.apache.nutch.crawl.CrawlDb;
 import org.apache.nutch.crawl.Inlink;
 import org.apache.nutch.crawl.Inlinks;
 import org.apache.nutch.crawl.LinkDb;
@@ -118,7 +119,7 @@ public class BWLinkDbFilter extends Configured {
         }
 
         public String toString() {
-            return _url.toString() + "\n " + _inlink.toString();
+            return _url.toString() + " : " + _inlink.toString();
         }
 
     }
@@ -328,6 +329,10 @@ public class BWLinkDbFilter extends Configured {
                 }
 
                 if (_patterns == null) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Key url or linked url does not have a valid BW patterns, remove it: " + value
+                                + " for HostTypeKey: " + key.toString());
+                    }
                     // return, because no bw pattern has been set for this url
                     return;
                 }
@@ -344,8 +349,8 @@ public class BWLinkDbFilter extends Configured {
                         out.collect(key, objectWritable);
                     } else {
                         if (LOG.isDebugEnabled()) {
-                            LOG.debug("BW patterns NOT passed for url: " + (((InlinksEntry) value)._url).toString()
-                                    + " for HostTypeKey: " + key.toString());
+                            LOG.debug("InlinksEntry does not pass BW patterns, remove it: "
+                                    + (((InlinksEntry) value)._url).toString() + " for HostTypeKey: " + key.toString());
                         }
                     }
                 } else if (value instanceof InlinkEntry) {
@@ -360,8 +365,8 @@ public class BWLinkDbFilter extends Configured {
                         out.collect(key, objectWritable);
                     } else {
                         if (LOG.isDebugEnabled()) {
-                            LOG.debug("BW patterns NOT passed for url: " + (((InlinkEntry) value)._url).toString()
-                                    + " for HostTypeKey: " + key.toString());
+                            LOG.debug("InlinkEntry does not pass BW patterns, remove it: "
+                                    + (((InlinkEntry) value)._url).toString() + " for HostTypeKey: " + key.toString());
                         }
                     }
                 }
@@ -406,6 +411,8 @@ public class BWLinkDbFilter extends Configured {
             } else if (entry instanceof InlinkEntry) {
                 InlinkEntry inlinkEntry = (InlinkEntry) entry;
                 out.collect(inlinkEntry._url, value);
+            } else {
+                LOG.error("Error mapping, unknown type for  " + entry);
             }
         }
 
@@ -413,6 +420,7 @@ public class BWLinkDbFilter extends Configured {
         public void reduce(Text key, Iterator<ObjectWritable> values, OutputCollector<Text, Inlinks> out, Reporter rep)
                 throws IOException {
             Inlinks _inlinks = null;
+            List<Inlink> inLinkEntries = new ArrayList<Inlink>();
             Object entry = null;
             while (values.hasNext()) {
                 entry = values.next().get(); // unwrap
@@ -421,17 +429,18 @@ public class BWLinkDbFilter extends Configured {
                     _inlinks = ((InlinksEntry) entry)._inlinks;
                     _inlinks.clear();
                     continue;
+                } else if (entry instanceof InlinkEntry) {
+                    inLinkEntries.add(((InlinkEntry) entry)._inlink);
                 }
-
-                if (_inlinks == null) {
-                    // return, because no inlinks object exists for this url
-                    return;
-                }
-                Inlink inlink = ((InlinkEntry) entry)._inlink;
-                _inlinks.add(inlink);
             }
-            if (_inlinks != null && _inlinks.size() > 0 && entry != null) {
-                out.collect(((InlinkEntry) entry)._url, _inlinks);
+            if (_inlinks != null && inLinkEntries.size() > 0 && entry != null) {
+                for (Inlink in : inLinkEntries) {
+                    _inlinks.add(in);
+                }
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Collect " + key + " : " + _inlinks);
+                }
+                out.collect(key, _inlinks);
             }
         }
 
@@ -441,12 +450,12 @@ public class BWLinkDbFilter extends Configured {
         super(conf);
     }
 
-    public void update(Path linkDb, Path bwdb, boolean normalize, boolean filter,
-            boolean replaceLinkDb) throws IOException {
+    public void update(Path linkDb, Path bwdb, boolean normalize, boolean filter, boolean replaceLinkDb)
+            throws IOException {
 
         String name = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
         Path outputLinkDb = new Path(linkDb, name);
-        
+
         LOG.info("filter linkdb against bwdb: starting");
         LOG.info("filter linkdb against bwdb: output linkdb " + outputLinkDb);
         LOG.info("filter linkdb against bwdb: input linkdb " + linkDb);
@@ -457,7 +466,7 @@ public class BWLinkDbFilter extends Configured {
 
         Configuration conf = getConf();
         FileSystem fs = FileSystem.get(conf);
-        
+
         // return if crawldb does not exist
         if (!fs.exists(linkDb)) {
             LOG.info("filter linkDb against bwdb: linkDb does not exist, nothing todo.");
@@ -568,12 +577,11 @@ public class BWLinkDbFilter extends Configured {
         Configuration conf = NutchConfiguration.create();
         BWLinkDbFilter bwDb = new BWLinkDbFilter(conf);
         if (args.length != 5) {
-            System.err
-                    .println("Usage: BWLinkDbFilter <linkdb> <bwdb> <normalize> <filter> <replace current linkdb>");
+            System.err.println("Usage: BWLinkDbFilter <linkdb> <bwdb> <normalize> <filter> <replace current linkdb>");
             return;
         }
-        bwDb.update(new Path(args[1]), new Path(args[2]), Boolean.valueOf(args[3]), Boolean
-                .valueOf(args[4]), Boolean.valueOf(args[5]));
+        bwDb.update(new Path(args[1]), new Path(args[2]), Boolean.valueOf(args[3]), Boolean.valueOf(args[4]), Boolean
+                .valueOf(args[5]));
 
     }
 
