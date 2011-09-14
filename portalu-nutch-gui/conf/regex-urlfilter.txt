@@ -37,12 +37,5 @@
 # skip urls longer than 512 characters
 -^.{512,}$
 
-# ingrid specific filter
--.*atlas\.umwelt\.hessen\.de\/cgi-bin\/JSTree_dom\?q=.*
--.*markt\/marktpartner\/suchea_z\/.*
--.*www\.forschung-sachsen-anhalt\.de\/content\/index\.php3.*
--.*www\.nationalpark-harz\.de\/de\/_inkl\/.*
-
-
 # accept anything else
 +.

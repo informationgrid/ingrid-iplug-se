@@ -53,8 +53,10 @@ import org.apache.nutch.util.NutchJob;
 import org.apache.nutch.util.SyncUtil;
 
 /**
- * Webgraph filter tool that filters urls in inlinks, nodes, outlinks that do
- * not pass a white-black list.
+ * Webgraph filter tool that filters urls in outlinks that do
+ * not pass a white-black list. Only outlinks are filtered because the 
+ * new computation of the webgraph will always generate inlinks and nodes
+ * out of the outlinks.
  * 
  * @see BWInjector
  */
@@ -481,6 +483,8 @@ public class BWWebgraphFilter extends Configured {
         SyncUtil.syncJobRun(job);// JobClient.runJob(filterJob);
         FileSystem.get(job).delete(filteredOutlinkDb, true);
 
+
+/*        
         LOG.info("filter webgraph against bwdb: rebuild INLINK db.");
         Path outputInlinkDb = new Path(outputWebgraph, WebGraph.INLINK_DIR);
 
@@ -515,6 +519,7 @@ public class BWWebgraphFilter extends Configured {
         FileOutputFormat.setOutputPath(nodeJob, outputNodeDb);
         nodeJob.setOutputFormat(MapFileOutputFormat.class);
         SyncUtil.syncJobRun(nodeJob);// JobClient.runJob(filterJob);
+*/        
 
         if (replaceWebgraph) {
             LOG.info("filter webgraph against bwdb: replace current webgraph");
@@ -525,9 +530,9 @@ public class BWWebgraphFilter extends Configured {
                 fs.rename(webgraphPath, old);
             }
             fs.mkdirs(webgraphPath);
-            fs.rename(outputNodeDb, new Path(webgraphPath, WebGraph.NODE_DIR));
+//            fs.rename(outputNodeDb, new Path(webgraphPath, WebGraph.NODE_DIR));
             fs.rename(outputOutlinkDb, new Path(webgraphPath, WebGraph.OUTLINK_DIR));
-            fs.rename(outputInlinkDb, new Path(webgraphPath, WebGraph.INLINK_DIR));
+//            fs.rename(outputInlinkDb, new Path(webgraphPath, WebGraph.INLINK_DIR));
             if (fs.exists(old))
                 fs.delete(old, true);
             fs.delete(outputWebgraph, true);

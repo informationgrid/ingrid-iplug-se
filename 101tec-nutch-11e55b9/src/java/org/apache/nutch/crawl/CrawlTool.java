@@ -139,22 +139,6 @@ public class CrawlTool {
           bwCrawlDbFilter.update(crawlDb, bwDb, false, false, true);
       }
       
-      boolean filterLinkDbAgainstBwDb = _configuration
-      .getBoolean("bw.filter.linkdb.enable", false);
-      if (filterLinkDbAgainstBwDb) {
-          LOG.info("filter linkdb against bwdb.");
-          BWLinkDbFilter bwLinkDbFilter = new BWLinkDbFilter(_configuration);
-          bwLinkDbFilter.update(linkDb, bwDb, false, false, true);
-      }
-
-      boolean filterWebgraphAgainstBwDb = _configuration
-      .getBoolean("bw.filter.webgraph.enable", false);
-      if (filterWebgraphAgainstBwDb) {
-          LOG.info("filter webgraph against bwdb.");
-          BWWebgraphFilter bwWebgraphFilter = new BWWebgraphFilter(_configuration, _crawlDir);
-          bwWebgraphFilter.update(webGraphScoring.getWebGraphPath(), bwDb, false, false, true);
-      }
-      
     }
 
     boolean metadataEnable = _configuration
@@ -232,6 +216,13 @@ public class CrawlTool {
       }
     }
     
+    boolean filterWebgraphAgainstBwDb = _configuration
+    .getBoolean("bw.filter.webgraph.enable", false);
+    if (filterWebgraphAgainstBwDb) {
+        LOG.info("filter webgraph against bwdb.");
+        BWWebgraphFilter bwWebgraphFilter = new BWWebgraphFilter(_configuration, _crawlDir);
+        bwWebgraphFilter.update(webGraphScoring.getWebGraphPath(), bwDb, false, false, true);
+    }
     if (segs.size() > 0) {
         LOG.info("Using WebGraph to calculate score");
         webGraphScoring.updateScore(crawlDb, segs);
@@ -286,6 +277,15 @@ public class CrawlTool {
       }
       linkDbTool.invert(linkDb, mergeSegments, true, true, false); // invert links
 
+      boolean filterLinkDbAgainstBwDb = _configuration
+      .getBoolean("bw.filter.linkdb.enable", false);
+      if (filterLinkDbAgainstBwDb) {
+          LOG.info("filter linkdb against bwdb.");
+          BWLinkDbFilter bwLinkDbFilter = new BWLinkDbFilter(_configuration);
+          bwLinkDbFilter.update(linkDb, bwDb, false, false, true);
+      }
+      
+      
       if (indexes != null) {
         // Delete old indexes
         if (_fileSystem.exists(indexes)) {
