@@ -226,8 +226,8 @@ public class BWCrawlDbFilter extends Configured {
                     }
                     out.collect(key, objectWritable);
                 } else {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Crawldatum does not pass BW patterns, remove it: " + (((Entry) value)._url).toString()
+                    if (LOG.isInfoEnabled()) {
+                        LOG.info("Crawldatum does not pass BW patterns, remove it: " + (((Entry) value)._url).toString()
                                 + " for HostTypeKey: " + key.toString());
                     }
 
