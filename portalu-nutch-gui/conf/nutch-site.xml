@@ -393,4 +393,10 @@
   <description>Filter linkdb against bwdb for every crawl. Filtering takes place right after creating the bw db.</description>
 </property> 
 
+<property>
+  <name>segments.filter.against.crawldb</name>
+  <value>true</value>
+  <description>Filter segments against the crawldb. This step is executed after merging of segments, if enabled, and just before the index process starts. All entries that do not match an URL in the crawldb will be removed. This makes sense in combination with bw.filter.crawldb.enable=true, to free segments from useless data.</description>
+</property> 
+
 </configuration>

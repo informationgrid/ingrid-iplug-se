@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -27,6 +30,7 @@ import org.apache.nutch.indexer.Indexer;
 import org.apache.nutch.mail.MailService;
 import org.apache.nutch.parse.ParseSegment;
 import org.apache.nutch.plugin.PluginRepository;
+import org.apache.nutch.segment.SegmentFilter;
 import org.apache.nutch.segment.SegmentMerger;
 import org.apache.nutch.tools.HostStatistic;
 import org.apache.nutch.tools.UrlReporter;
@@ -34,6 +38,7 @@ import org.apache.nutch.util.HadoopFSUtil;
 
 import de.ingrid.iplug.se.SearchUpdateScanner;
 import de.ingrid.iplug.se.crawl.WebGraphScoring;
+import edu.emory.mathcs.backport.java.util.Collections;
 
 public class CrawlTool {
 
@@ -271,6 +276,36 @@ public class CrawlTool {
     }
     // ------ none nutch-specific code ends here
 
+    boolean filterSegmentsAgainstBwDb = _configuration
+    .getBoolean("segments.filter.against.crawldb", false);
+    if (filterSegmentsAgainstBwDb) {
+        LOG.info("filter segments against crawldb.");
+        SegmentFilter segmentFilter = new SegmentFilter(_configuration);
+        Path tmpPath = new Path(_crawlDir, "segments_" + Integer.toString(new Random().nextInt(Integer.MAX_VALUE)));
+        try {
+            segmentFilter.filter(tmpPath, crawlDb, mergeSegments, false, false);
+        } catch (Exception e) {
+            LOG.error("Error filter segments against crawldb.", e);
+            if (_fileSystem.exists(tmpPath)) {
+                _fileSystem.delete(tmpPath, true);
+            }
+        }
+        listStatus = _fileSystem.listStatus(tmpPath, HadoopFSUtil.getPassDirectoriesFilter(_fileSystem));
+        Path[] tmpFilterSegmentPaths = HadoopFSUtil.getPaths(listStatus);
+        Path[] newSegments = new Path[tmpFilterSegmentPaths.length];
+        for (int k = 0; k < tmpFilterSegmentPaths.length; k++) {
+            Path filterSegment = new Path(segments, tmpFilterSegmentPaths[k].getName());
+            newSegments[k] = filterSegment;
+            _fileSystem.rename(tmpFilterSegmentPaths[k], filterSegment);
+            _fileSystem.delete(tmpFilterSegmentPaths[k], true);
+        }
+        _fileSystem.delete(tmpPath, true);
+        // use only filtered segment
+        segmentsToDelete = (Path[])ArrayUtils.addAll(segmentsToDelete == null ? new Path[] { } : segmentsToDelete, mergeSegments);
+        mergeSegments = newSegments;
+    }
+    
+    
     if (mergeSegments.length > 0) {
       if (LOG.isInfoEnabled()) {
           LOG.info("Inverting links.");
