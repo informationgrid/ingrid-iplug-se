@@ -361,8 +361,8 @@ public class SegmentFilter extends Configured implements Mapper<Text, MetaWrappe
                 output.collect(key, wrapper);
             }
         } else {
-            if (LOG.isInfoEnabled()) {
-                LOG.info("Remove entries in segments '" + segments.keySet() + "' for key: " + key);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Remove entries in segments '" + segments.keySet() + "' for key: " + key);
             }
         }
         metaWrappers.clear();
