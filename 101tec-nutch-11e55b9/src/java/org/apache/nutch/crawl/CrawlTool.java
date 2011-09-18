@@ -298,6 +298,8 @@ public class CrawlTool {
             newSegments[k] = filterSegment;
             _fileSystem.rename(tmpFilterSegmentPaths[k], filterSegment);
             _fileSystem.delete(tmpFilterSegmentPaths[k], true);
+            // create statistic
+            hostStatistic.statistic(crawlDb, filterSegment);
         }
         _fileSystem.delete(tmpPath, true);
         // use only filtered segment
