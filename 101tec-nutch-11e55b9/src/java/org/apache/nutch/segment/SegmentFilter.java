@@ -331,42 +331,76 @@ public class SegmentFilter extends Configured implements Mapper<Text, MetaWrappe
     public void reduce(Text key, Iterator<MetaWrapper> values, OutputCollector<Text, MetaWrapper> output,
             Reporter reporter) throws IOException {
 
-        ArrayList<MetaWrapper> metaWrappers = new ArrayList<MetaWrapper>();
+        // stores segment data for every segment/part
+        HashMap<String, Writable> segData = new HashMap<String, Writable>();
+
+        // stores link data for every segment
+        HashMap<String, ArrayList<CrawlDatum>> linked = new HashMap<String, ArrayList<CrawlDatum>>();
 
         boolean hasCrawlDbEntry = false;
         while (values.hasNext()) {
             MetaWrapper wrapper = values.next();
-            Object o = wrapper.get();
+            Writable o = wrapper.get();
+            String spString = wrapper.getMeta(INPUT_PART_KEY);
+            SegmentPart sp = SegmentPart.parse(spString);
+            // check for crawldatum entry
             if (o instanceof CrawlDatum && CrawlDatum.hasDbStatus((CrawlDatum) o)) {
-                String spString = wrapper.getMeta(INPUT_PART_KEY);
-                SegmentPart sp = SegmentPart.parse(spString);
                 if (!sp.partName.equals(CrawlDatum.GENERATE_DIR_NAME)) {
                     hasCrawlDbEntry = true;
                     continue;
                 }
+                // check for link data
+            } else if (o instanceof CrawlDatum && sp.partName.equals(CrawlDatum.PARSE_DIR_NAME)) {
+                CrawlDatum val = (CrawlDatum) o;
+                if (val.getStatus() != CrawlDatum.STATUS_SIGNATURE) {
+                    ArrayList<CrawlDatum> segLinked = linked.get(sp.segmentName);
+                    if (segLinked == null) {
+                        segLinked = new ArrayList<CrawlDatum>();
+                        linked.put(sp.segmentName, segLinked);
+                    }
+                    segLinked.add(val);
+                    continue;
+                }
             }
-            metaWrappers.add(new MetaWrapper(wrapper.getMetadata(), wrapper.get(), wrapper.getConf()));
+            // store segment data for later, remove duplicates using hash map
+            segData.put(spString, o);
         }
 
         if (hasCrawlDbEntry) {
-            for (MetaWrapper wrapper : metaWrappers) {
-                String spString = wrapper.getMeta(INPUT_PART_KEY);
-                if (spString == null) {
-                    throw new IOException("Null segment part, key=" + key);
-                }
-                SegmentPart sp = SegmentPart.parse(spString);
-
+            // ok we had a crawl db entry
+            MetaWrapper wrapper = new MetaWrapper();
+            SegmentPart sp = new SegmentPart();
+            for (String spString : segData.keySet()) {
+                // write out segment data
+                sp = SegmentPart.parse(spString);
+                // translate segment name to the new segment name
                 sp = new SegmentPart(segments.get(sp.segmentName), sp.partName);
                 wrapper.setMeta(INPUT_PART_KEY, sp.toString());
+                wrapper.set(segData.get(spString));
                 output.collect(key, wrapper);
+            }
+            if (linked.size() > 0) {
+                // write out link data
+                for (String name : linked.keySet()) {
+                    sp.partName = CrawlDatum.PARSE_DIR_NAME;
+                    // translate segment name to the new segment name
+                    sp.segmentName = segments.get(name);
+                    wrapper.setMeta(INPUT_PART_KEY, sp.toString());
+                    // write out link data
+                    ArrayList<CrawlDatum> segLinked = linked.get(name);
+                    for (int i = 0; i < segLinked.size(); i++) {
+                        CrawlDatum link = segLinked.get(i);
+                        wrapper.set(link);
+                        output.collect(key, wrapper);
+                    }
+
+                }
             }
         } else {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Remove entries in segments '" + segments.keySet() + "' for key: " + key);
             }
         }
-        metaWrappers.clear();
-
     }
 
     public void filter(Path out, Path crawlDbPath, Path[] segs, boolean filter, boolean normalize) throws Exception {
