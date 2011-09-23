@@ -575,7 +575,9 @@ public class NutchSearcher implements IPlug {
             arrayList.add(details.getValue(i));
           }
         }
-        ingridDetail.put(requestedFields[j], (String[]) arrayList.toArray(new String[arrayList.size()]));
+        if (arrayList.size() > 0) {
+            ingridDetail.put(requestedFields[j], (String[]) arrayList.toArray(new String[arrayList.size()]));
+        }
 
         if (requestedFields[j].equals(EXPLANATION)) {
           String detailString = details.toHtml();
