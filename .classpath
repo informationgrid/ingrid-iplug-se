@@ -140,5 +140,6 @@
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-iplug-sns-3.0.0.jar"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-iplug-admin-step1-se-3.0.0.war"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-iplug-admin-step1-sns-3.0.0.war"/>
+	<classpathentry kind="lib" path="101tec-nutch-11e55b9/lib/lucene-analyzers-2.4.0.jar"/>
 	<classpathentry kind="output" path="eclipse-classes"/>
 </classpath>

@@ -399,4 +399,35 @@
   <description>Filter segments against the crawldb. This step is executed after merging of segments, if enabled, and just before the index process starts. All entries that do not match an URL in the crawldb will be removed. This makes sense in combination with bw.filter.crawldb.enable=true, to free segments from useless data.</description>
 </property> 
 
+<property>
+  <name>ingrid.signature.simhash.min_token_len</name>
+  <value>2</value>
+  <description>minimum token length, shorter tokens are ignored. the token size is computed AFTER non-letters have been removed.</description>
+</property> 
+
+<property>
+  <name>ingrid.signature.simhash.shingle_size</name>
+  <value>3</value>
+  <description>number of shingles, number of words.</description>
+</property> 
+
+<property>
+  <name>ingrid.signature.simhash.min_shingle_frequency</name>
+  <value>1</value>
+  <description>ignore shingles with lower frequency</description>
+</property> 
+
+<property>
+  <name>ingrid.signature.simhash.ignore_digits</name>
+  <value>true</value>
+  <description>ignore digits, use only letters</description>
+</property> 
+
+<property>
+  <name>ingrid.signature.simhash.max_number_of_hashes</name>
+  <value>100</value>
+  <description>number of hash values to use for the simhash. if this number is exceeded keep the number of lowest hash values.</description>
+</property> 
+
+
 </configuration>

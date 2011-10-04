@@ -52,6 +52,7 @@ public class SignatureFactory {
         impl.setConf(conf);
         objectCache.setObject(clazz, impl);
       } catch (Exception e) {
+        LOG.error("Couldn't create " + clazz, e);  
         throw new RuntimeException("Couldn't create " + clazz, e);
       }
     }
