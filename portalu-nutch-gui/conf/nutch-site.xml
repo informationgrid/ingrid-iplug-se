@@ -425,9 +425,22 @@
 
 <property>
   <name>ingrid.signature.simhash.max_number_of_hashes</name>
-  <value>100</value>
+  <value>300</value>
   <description>number of hash values to use for the simhash. if this number is exceeded keep the number of lowest hash values.</description>
 </property> 
+
+<property>
+  <name>index.automatic.activate</name>
+  <value>false</value>
+  <description>If true, automatically enable the current crawl for search. All other search enabled crawls will be disabled. See scheduling.create.crawl.</description>
+</property>
+
+<property>
+  <name>link.analyze.generate.sort.diffdays.weight</name>
+  <value>0.0</value>
+  <description>If > 0.0 the urls that are over due to fetch will get an increased score during the generation phase. The score is raised by the difference between current time and scheduled fetch time in days, multiplied by this weight. The weight should be lower than 1.0, i.e. 0.001, so that the boost does not outperform the score of the crawl datum, which is the base for the url sort order in the generation phase. This is a ingrid specific extension.</description>
+</property>
+
 
 
 </configuration>

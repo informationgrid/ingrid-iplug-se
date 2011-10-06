@@ -44,6 +44,8 @@ public class LinkAnalysisScoringFilter
   private Configuration conf;
   private float scoreInjected = 0.001f;
   private float normalizedScore = 1.00f;
+  
+  private float sortScoreDiffdaysWeight = 0.0f;
 
   public LinkAnalysisScoringFilter() {
 
@@ -57,6 +59,7 @@ public class LinkAnalysisScoringFilter
     this.conf = conf;
     normalizedScore = conf.getFloat("link.analyze.normalize.score", 1.00f);
     scoreInjected = conf.getFloat("link.analyze.injected.score", 1.00f);
+    sortScoreDiffdaysWeight = conf.getFloat("link.analyze.generate.sort.diffdays.weight", 0.00f);
   }
 
   public CrawlDatum distributeScoreToOutlinks(Text fromUrl,
@@ -91,7 +94,17 @@ public class LinkAnalysisScoringFilter
 
   public float generatorSortValue(Text url, CrawlDatum datum, float initSort)
     throws ScoringFilterException {
-    return datum.getScore() * initSort;
+    // increase the sort value
+    long diff =  System.currentTimeMillis() - datum.getFetchTime();
+    // difference between current time and fetch time in days
+    // if the datum is due to fetch, increase the score by this
+    // value multiplied with a weight to push long due entries
+    // 2011-10-05 joachim@wemove.com
+    float diffDays = 0;
+    if (diff > 0) {
+      diffDays = diff * 1.0f / 24.0f / 3600.0f / 1000.0f; 
+    }
+    return datum.getScore() * initSort + diffDays*sortScoreDiffdaysWeight;
   }
 
   public float indexerScore(Text url, NutchDocument doc, CrawlDatum dbDatum,

@@ -1303,7 +1303,7 @@
 <property>
     <name>scheduling.create.crawl</name>
     <value>false</value>
-    <description>If true, scheduling will create each time a new crawl. Otherwise the last created crawl will be continued. If now crawls exist by now, the scheduler will create one.</description>
+    <description>If true, scheduling will create each time a new crawl. Otherwise the last created crawl will be continued. If no crawls exist by now, the scheduler will create one.</description>
 </property>
 
 <property>
