@@ -45,6 +45,10 @@ public class SchedulingRunnable implements Runnable {
 
     private DateFormat _format = new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss");
 
+    private static final String BEFORE_CRAWL = "sh bin/beforeCrawl.sh";
+
+    private static final String AFTER_CRAWL = "sh bin/afterCrawl.sh";
+
     public SchedulingRunnable(CrawlDataPersistence crawlDataPersistence) {
         _crawlDataPersistence = crawlDataPersistence;
     }
@@ -82,15 +86,21 @@ public class SchedulingRunnable implements Runnable {
                 lockPath = new Path(crawlDir, "crawl.running");
                 alreadyRunning = fileSystem.exists(lockPath);
                 if (!alreadyRunning) {
-                    fileSystem.createNewFile(lockPath);
-                    CrawlTool crawlTool = new CrawlTool(configuration, crawlDir);
-                    crawlTool.preCrawl();
-                    crawlTool.crawl(crawlData.getTopn(), crawlData.getDepth());
-                    if (configuration.getBoolean("index.automatic.activate", false)) {
-                        activateCrawl(fileSystem, crawlDir);
+                    if (executeBeforeCrawlScript(crawlDir)) {
+                        fileSystem.createNewFile(lockPath);
+                        CrawlTool crawlTool = new CrawlTool(configuration, crawlDir);
+                        crawlTool.preCrawl();
+                        crawlTool.crawl(crawlData.getTopn(), crawlData.getDepth());
+                        if (configuration.getBoolean("index.automatic.activate", false)) {
+                            activateCrawl(fileSystem, crawlDir);
+                        }
+                        SearcherFactory.getInstance(configuration).reload();
+                        if (!executeAfterCrawlScript(crawlDir)) {
+                            LOG.error("Error executing script: " + AFTER_CRAWL);
+                        }
+                    } else {
+                        LOG.error("Error executing script: " + BEFORE_CRAWL);
                     }
-                    SearcherFactory.getInstance(configuration).reload();
-                    
                 } else {
                     LOG.warn("crawl is already running");
                 }
@@ -156,7 +166,8 @@ public class SchedulingRunnable implements Runnable {
             if (fStatus.getPath().getName().equals(crawl.getName())) {
                 if (!fs.exists(searchDoneFile)) {
                     fs.createNewFile(searchDoneFile);
-                    // create the "search.update" file so that it will be recognized
+                    // create the "search.update" file so that it will be
+                    // recognized
                     // by
                     // the searcher and that it can be reloaded!
                     SearchUpdateScanner.updateCrawl(fs, fStatus.getPath());
@@ -170,6 +181,14 @@ public class SchedulingRunnable implements Runnable {
             }
 
         }
+    }
+
+    private boolean executeAfterCrawlScript(Path dir) throws IOException {
+        return ExecuteProcessTool.execute(AFTER_CRAWL, dir.toString());
+    }
+
+    private boolean executeBeforeCrawlScript(Path dir) throws IOException {
+        return ExecuteProcessTool.execute(BEFORE_CRAWL, dir.toString());
     }
 
 }

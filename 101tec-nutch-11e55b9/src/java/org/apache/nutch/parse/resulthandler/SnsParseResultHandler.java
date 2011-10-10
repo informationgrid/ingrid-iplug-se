@@ -19,6 +19,12 @@ public class SnsParseResultHandler {
 
   public static final Log LOG = LogFactory.getLog(SnsParseResultHandler.class);
 
+  /**
+   * Get's called by the fetcher process when writing fetch result to segment.
+   * 
+ * @param content
+ * @param parseResult
+ */
   public void process(Content content, ParseResult parseResult) {
     String segmentName = content.getMetadata().get(Nutch.SEGMENT_NAME_KEY);
     SnsAnalyzer analyzer = SnsAnalyzerFactory.getAnalyzer(segmentName);

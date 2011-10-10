@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -38,7 +37,6 @@ import org.apache.nutch.util.HadoopFSUtil;
 
 import de.ingrid.iplug.se.SearchUpdateScanner;
 import de.ingrid.iplug.se.crawl.WebGraphScoring;
-import edu.emory.mathcs.backport.java.util.Collections;
 
 public class CrawlTool {
 
