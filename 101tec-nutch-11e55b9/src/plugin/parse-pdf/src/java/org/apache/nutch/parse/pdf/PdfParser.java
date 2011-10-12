@@ -17,14 +17,14 @@
 
 package org.apache.nutch.parse.pdf;
 
-import org.pdfbox.pdfparser.PDFParser;
-import org.pdfbox.pdmodel.PDDocument;
-import org.pdfbox.pdmodel.PDDocumentInformation;
-import org.pdfbox.pdmodel.encryption.BadSecurityHandlerException;
-import org.pdfbox.pdmodel.encryption.StandardDecryptionMaterial;
-import org.pdfbox.util.PDFTextStripper;
+import org.apache.pdfbox.pdfparser.PDFParser;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDDocumentInformation;
+import org.apache.pdfbox.pdmodel.encryption.BadSecurityHandlerException;
+import org.apache.pdfbox.pdmodel.encryption.StandardDecryptionMaterial;
+import org.apache.pdfbox.util.PDFTextStripper;
 
-import org.pdfbox.exceptions.CryptographyException;
+import org.apache.pdfbox.exceptions.CryptographyException;
 
 // Commons Logging imports
 import org.apache.commons.logging.Log;
@@ -126,7 +126,7 @@ public class PdfParser implements Parser {
               "Error decrypting document. " + e).getEmptyParseResult(content.getUrl(), getConf());
     } catch (Exception e) { // run time exception
         if (LOG.isWarnEnabled()) {
-          LOG.warn("General exception in PDF parser: "+e.getMessage());
+          LOG.warn("General exception in PDF parser: ", e);
           e.printStackTrace(LogUtil.getWarnStream(LOG));        
         }
       return new ParseStatus(ParseStatus.FAILED,

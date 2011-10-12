@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="portalu-nutch-gui/conf"/>
+	<classpathentry kind="src" path="101tec-nutch-11e55b9/src/plugin/parse-pdf/src/java"/>
+	<classpathentry kind="src" path="101tec-nutch-11e55b9/src/plugin/parse-pdf/src/test"/>
+	<classpathentry kind="src" path="101tec-nutch-11e55b9/src/plugin/languageidentifier/src/test"/>
+	<classpathentry kind="src" path="101tec-nutch-11e55b9/src/plugin/protocol-httpclient/src/java"/>
+	<classpathentry kind="src" path="101tec-nutch-11e55b9/src/plugin/protocol-httpclient/src/test"/>
+	<classpathentry kind="src" path="101tec-nutch-11e55b9/src/plugin/languageidentifier/src/java"/>
 	<classpathentry kind="src" path="portalu-nutch-gui/src/java"/>
 	<classpathentry kind="src" path="portalu-nutch-gui/src/test"/>
 	<classpathentry kind="src" path="portalu-nutch-gui/src/plugin/admin-pd/conf"/>
@@ -134,12 +140,17 @@
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/mail-1.4.1.jar"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-utils-3.0.0.jar"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-communication-3.0.0.jar"/>
-	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-ibus-3.0.0.jar"/>
+	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-ibus-3.0.0.jar" sourcepath="/ingrid-ibus"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-ibus-client-3.0.0.jar"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-iplug-3.0.0.jar"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-iplug-sns-3.0.0.jar"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-iplug-admin-step1-se-3.0.0.war"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-iplug-admin-step1-sns-3.0.0.war"/>
 	<classpathentry kind="lib" path="101tec-nutch-11e55b9/lib/lucene-analyzers-2.4.0.jar"/>
+	<classpathentry kind="lib" path="101tec-nutch-11e55b9/src/plugin/parse-pdf/lib/jai_codec.jar"/>
+	<classpathentry kind="lib" path="101tec-nutch-11e55b9/src/plugin/parse-pdf/lib/jai_core.jar"/>
+	<classpathentry kind="lib" path="101tec-nutch-11e55b9/src/plugin/parse-pdf/lib/fontbox-1.6.0.jar"/>
+	<classpathentry kind="lib" path="101tec-nutch-11e55b9/src/plugin/parse-pdf/lib/jempbox-1.6.0.jar"/>
+	<classpathentry kind="lib" path="101tec-nutch-11e55b9/src/plugin/parse-pdf/lib/pdfbox-1.6.0.jar"/>
 	<classpathentry kind="output" path="eclipse-classes"/>
 </classpath>
