@@ -5,11 +5,13 @@
   </properties>
   <body>
     <release version="3.1.0-SNAPSHOT" date="2011-xx-xx" description="Bugfix Release">
+      <action type="fix" dev="wemove">Optimized SNSIndexingInterface (from SNS iPlug), added DEBUG output of classify result.</action>
       <action type="add" dev="wemove">Remove all URLs from crawl that do not fit into the Limit/Exclude URL realm. Changes in URL maintenance will be reflected aver the following crawl.</action>
       <action type="fix" dev="wemove">Make sure not-modified URLs from merged segments are indexed even with option "merge.after.fetch" is false.</action>
       <action type="add" dev="wemove">Allow user with role admin to login with same permissions as admin-portal.</action>
       <action type="fix" dev="wemove">Fixed wrong links when user has logged in with wrong permissions (role).</action>
     </release>
+
     <release version="3.0.0" date="2011-05-06" description="Release InGrid3.0">
       <action type="update" dev="wemove">
 			  Add more strict link extraction to avoid false link detection.
@@ -30,6 +32,7 @@
 				Fix problem with IE8: could not delete any URL.
 			</action>
     </release>
+
     <release version="2.3.1.3-SNAPSHOT" date="2011-xx-xx" description="Bugfix Release">
       <action type="update">
         Make limit/exclude url filtering case sensitive. Match limit patterns with regular expression when merging metadata.
