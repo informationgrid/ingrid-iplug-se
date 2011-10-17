@@ -49,7 +49,8 @@ implements SearchBean, SegmentBean, HitInlinks, Closeable {
 //  }
 
   private SearchBean searchBean;
-  private SegmentBean segmentBean;
+
+private SegmentBean segmentBean;
   private final HitInlinks linkDb;
 
   /** BooleanQuery won't permit more than 32 required/prohibited clauses.  We
@@ -429,6 +430,9 @@ implements SearchBean, SegmentBean, HitInlinks, Closeable {
         LOG.error(StringUtils.stringifyException(ex));
       }
     }
+  }
+  public SearchBean getSearchBean() {
+      return searchBean;
   }
 
 }

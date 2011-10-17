@@ -89,7 +89,7 @@ public class LanguageIndexingFilter implements IndexingFilter {
     // use language configured in url-maintenance
     // languages will be put according to the host of the administered URLs
     // (see MetadataMerger)
-    if (lang == null) {
+    if (lang == null || conf.getBoolean("lang.analyze.override.with.metadata", false)) {
       lang = parse.getData().getParseMeta().get("lang");
       // this should never happen, only if crawl broke out of a limit url
       // which would be an error

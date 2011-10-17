@@ -441,6 +441,12 @@
   <description>If > 0.0 the urls that are over due to fetch will get an increased score during the generation phase. The score is raised by the difference between current time and scheduled fetch time in days, multiplied by this weight. The weight should be lower than 1.0, i.e. 0.001, so that the boost does not outperform the score of the crawl datum, which is the base for the url sort order in the generation phase. This is a ingrid specific extension.</description>
 </property>
 
+<property>
+  <name>lang.analyze.override.with.metadata</name>
+  <value>false</value>
+  <description>Override the language extraction result with the vale from the metadata. This setting is ingrid specific and presumes that a metadata 'lang' exists for each entry.
+  </description>
+</property>
 
 
 </configuration>

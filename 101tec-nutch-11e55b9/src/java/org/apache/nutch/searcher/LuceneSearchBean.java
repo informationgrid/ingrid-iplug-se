@@ -34,7 +34,8 @@ public class LuceneSearchBean implements RPCSearchBean {
 
   private IndexSearcher searcher;
 
-  private FileSystem fs;
+
+private FileSystem fs;
 
   private Configuration conf;
 
@@ -108,6 +109,9 @@ public class LuceneSearchBean implements RPCSearchBean {
   public long getProtocolVersion(String protocol, long clientVersion)
   throws IOException {
     return VERSION;
+  }
+  public IndexSearcher getSearcher() {
+      return searcher;
   }
 
 }

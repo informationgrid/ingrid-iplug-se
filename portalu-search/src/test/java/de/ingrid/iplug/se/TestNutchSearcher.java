@@ -444,4 +444,5 @@ public class TestNutchSearcher extends TestCase {
       System.out.println(detail.get("url"));
     }
   }
+  
 }

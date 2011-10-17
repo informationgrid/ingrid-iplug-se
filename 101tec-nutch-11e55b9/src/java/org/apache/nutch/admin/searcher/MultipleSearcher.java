@@ -37,7 +37,8 @@ public class MultipleSearcher implements SearchBean, HitSummarizer {
 
   private final ThreadPool _threadPool;
   private final SearchBean[] _searchBeans;
-  private Map<String, SegmentBean> _segmentBeans = new HashMap<String, SegmentBean>();
+
+private Map<String, SegmentBean> _segmentBeans = new HashMap<String, SegmentBean>();
 
   public MultipleSearcher(ThreadPool threadPool,
           SearchBean[] searchBeans, SegmentBean[] segmentBeans)
@@ -182,5 +183,10 @@ public class MultipleSearcher implements SearchBean, HitSummarizer {
     }
     return summaries;
   }
+  
+  public SearchBean[] getSearchBeans() {
+      return _searchBeans;
+  }
+
 
 }

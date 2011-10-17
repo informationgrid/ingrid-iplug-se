@@ -22,6 +22,7 @@ import org.apache.nutch.admin.searcher.SearcherFactory;
 import org.apache.nutch.admin.searcher.ThreadPool;
 import org.apache.nutch.searcher.NutchBean;
 
+import de.ingrid.iplug.se.NutchSearcher;
 import de.ingrid.iplug.util.TimeProvider;
 
 /**
@@ -71,12 +72,14 @@ public class DirectoryScanningSearcherFactory {
 
   private final Configuration _configuration;
   private final TimeProvider _timeProvider;
+  private final NutchSearcher nutchSearcher;
 
   private Map<String, MultipleSearcherContainer> _map = new HashMap<String, MultipleSearcherContainer>();
 
-  public DirectoryScanningSearcherFactory(Configuration configuration, TimeProvider timeProvider) {
+  public DirectoryScanningSearcherFactory(Configuration configuration, TimeProvider timeProvider, NutchSearcher nutchSearcher) {
     _configuration = configuration;
     _timeProvider = timeProvider;
+    this.nutchSearcher = nutchSearcher;
   }
 
   public MultipleSearcher get() throws IOException {
@@ -123,6 +126,7 @@ public class DirectoryScanningSearcherFactory {
         clearCache(instance);
     }
     get();
+    nutchSearcher.updateFacetManager();
   }
 
   private void clearCache(String instance) throws IOException {

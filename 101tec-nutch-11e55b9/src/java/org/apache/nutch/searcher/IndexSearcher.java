@@ -50,7 +50,8 @@ public class IndexSearcher implements Searcher, HitDetailer {
     
   private org.apache.lucene.search.Searcher luceneSearcher;
   private org.apache.lucene.index.IndexReader reader;
-  private LuceneQueryOptimizer optimizer;
+
+private LuceneQueryOptimizer optimizer;
   private FileSystem fs;
   private Configuration conf;
   private QueryFilters queryFilters;
@@ -174,6 +175,9 @@ public class IndexSearcher implements Searcher, HitDetailer {
   public void close() throws IOException {
     if (luceneSearcher != null) { luceneSearcher.close(); }
     if (reader != null) { reader.close(); }
+  }
+  public org.apache.lucene.index.IndexReader getReader() {
+      return reader;
   }
 
 }
