@@ -36,10 +36,6 @@ public class MetadataService {
     return getMetadatasAsList("topic");
   }
 
-  public List<Metadata> getFunctCategory() {
-    return getMetadatasAsList("funct_category");
-  }
-
   public List<Metadata> getMeasure() {
     return getMetadatasAsList("measure");
   }

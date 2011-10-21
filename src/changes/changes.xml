@@ -7,14 +7,15 @@
     <release version="3.1.0-SNAPSHOT" date="2011-xx-xx" description="Bugfix Release">
       <action type="add" dev="wemove">Add option to prioritize the language definition of the url administration before the nutch find-language mechanism.</action>
       <action type="add" dev="wemove">Add faceting support.</action>
-      <action type="update" dev="wemove">Upgrade PDF parser library to current version, fixing some PDF parsing issues.</action>
       <action type="add" dev="wemove">Add functionality to add scripts that are called before and after a scheduled crawl.</action>
       <action type="add" dev="wemove">Add functionality to enable the current crawl  for search automatically (and disabling others).</action>
       <action type="add" dev="wemove">Add a crawl-db analyser tool for analysing the crawl db in terms on refetch intervals.</action>
-      <action type="fix" dev="wemove">Optimized SNSIndexingInterface (from SNS iPlug), added DEBUG output of classify result.</action>
       <action type="add" dev="wemove">Remove all URLs from crawl that do not fit into the Limit/Exclude URL realm. Changes in URL maintenance will be reflected aver the following crawl.</action>
-      <action type="fix" dev="wemove">Make sure not-modified URLs from merged segments are indexed even with option "merge.after.fetch" is false.</action>
       <action type="add" dev="wemove">Allow user with role admin to login with same permissions as admin-portal.</action>
+      <action type="update" dev="wemove">Upgrade PDF parser library to current version, fixing some PDF parsing issues.</action>
+      <action type="update" dev="wemove">Remove metadata "functional category" from "topics" catalog pages.</action>
+      <action type="fix" dev="wemove">Optimized SNSIndexingInterface (from SNS iPlug), added DEBUG output of classify result.</action>
+      <action type="fix" dev="wemove">Make sure not-modified URLs from merged segments are indexed even with option "merge.after.fetch" is false.</action>
       <action type="fix" dev="wemove">Fixed wrong links when user has logged in with wrong permissions (role).</action>
     </release>
 

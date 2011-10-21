@@ -145,19 +145,6 @@ public class TestNutchSearcher extends TestCase {
 
     }
 
-    public void testFunctCategory() throws Exception {
-        NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId", this.fConfiguration);
-
-        IngridQuery query = new IngridQuery();
-        query.addField(new FieldQuery(true, false, "datatype", "topics"));
-        ClauseQuery cq2 = new ClauseQuery(true, false);
-        cq2.addField(new FieldQuery(true, false, "funct_category", "rechtliches"));
-        query.addClause(cq2);
-        IngridHits hits = searcher.search(query, 0, 100);
-        assertTrue(hits.length() > 0);
-
-    }
-
     public void testGroupByPartner() throws Exception {
         NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId", this.fConfiguration);
         IngridQuery query = new IngridQuery();
@@ -344,7 +331,7 @@ public class TestNutchSearcher extends TestCase {
     public void testAltTitle() throws Exception {
         NutchSearcher searcher = new NutchSearcher(this.fIndex, "testId", this.fConfiguration);
         IngridQuery query = QueryStringParser
-                .parse("datatype:topics funct_category:Rechtliches topic:Strahlung provider:sn_smul");
+                .parse("datatype:topics topic:Strahlung provider:sn_smul");
         IngridHits hits = searcher.search(query, 0, 10);
         IngridHit[] hits2 = hits.getHits();
         assertTrue(hits2.length > 0);

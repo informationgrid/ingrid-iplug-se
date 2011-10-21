@@ -105,22 +105,6 @@
 								</row>
 								</c:if>
 								
-								<c:if test="${!empty metadatas['funct_category']}">
-								<row>
-							        <label>Funkt. Kategorie:</label>
-							        <field>
-							        	<c:forEach items="${metadatas}" var="metadata">
-							        		<c:if test="${metadata.key == 'funct_category'}">
-							        			<c:forEach var="functCat" items="${metadata.value}">
-							        				<input type="checkbox" name="metadatas" value="${functCat.id}" <c:if test="${fn:contains(catalogUrlCommand.metadatas , functCat.metadataValue)}">checked="ckecked"</c:if>/> <fmt:message key="${functCat.metadataKey}.${functCat.metadataValue}" /> <br/>
-							        			</c:forEach>
-							        		</c:if>
-							        	</c:forEach>
-							        </field>
-							        <desc></desc>
-								</row>
-								</c:if>
-								
 								<c:if test="${!empty metadatas['rubric']}">
 								<row>
 							        <label>Rubrik:</label>

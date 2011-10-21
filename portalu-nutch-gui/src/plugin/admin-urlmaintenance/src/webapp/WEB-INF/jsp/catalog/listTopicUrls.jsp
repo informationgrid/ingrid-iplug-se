@@ -58,7 +58,6 @@
                                     <th>Ge&auml;ndert</th>
                                     <th>Alternativ. Titel</th>
                                     <th>Thema</th>
-                                    <th>Funkt. Kategorie</th>
                                     <th>Sprache</th>
                                     <th>Status</th>
                                     <th>Aktion</th>
@@ -84,16 +83,6 @@
                                         <c:set var="i" value="-1"/>
                                         <c:forEach var="md" items="${url.metadatas}">
                                             <c:if test="${md.metadataKey == 'topic'}">
-                                                <c:set var="i" value="${i+1}" />
-                                                <c:if test="${i > 0}">, </c:if>
-                                                <fmt:message key="${md.metadataKey}.${md.metadataValue}" />
-                                            </c:if>
-                                        </c:forEach>
-                                    </td>
-                                    <td>
-                                        <c:set var="i" value="-1"/>
-                                        <c:forEach var="md" items="${url.metadatas}">
-                                            <c:if test="${md.metadataKey == 'funct_category'}">
                                                 <c:set var="i" value="${i+1}" />
                                                 <c:if test="${i > 0}">, </c:if>
                                                 <fmt:message key="${md.metadataKey}.${md.metadataValue}" />
@@ -132,7 +121,6 @@
                                 {key:"edited", label:"Ge&auml;ndert", sortable:true},
                                 {key:"altTitle", label:"Alternativ. Titel"},
                                 {key:"topic", label:"Thema"},
-                                {key:"functCategory", label:"Funkt. Kategorie"},
                                 {key:"lang", label:"Sprache"},
                                 {key:"status", label:"Status"},
                                 {key:"action", label:"Aktion", width:100}
@@ -147,7 +135,6 @@
                                         {key:"edited"},
                                         {key:"altTitle"},
                                         {key:"topic"},
-                                        {key:"functCategory"},
                                         {key:"lang"},
                                         {key:"status"},
                                         {key:"action"}

@@ -121,16 +121,6 @@ public class CsvParser implements IUrlFileParser {
       }
     }
 
-    final String functCategory = tuple.getValue("funct_category");
-    if (functCategory != null) {
-      final String[] splits = TokenSplitter.split(functCategory);
-      for (final String split : splits) {
-        if (split != null && split.trim().length() > 0) {
-          container.addMetadata(limitUrl, "funct_category", split);
-        }
-      }
-    }
-
     final String rubric = tuple.getValue("rubric");
     if (rubric != null) {
       final String[] splits = TokenSplitter.split(rubric);
@@ -159,11 +149,10 @@ public class CsvParser implements IUrlFileParser {
       _parser = new MapParser(_parser, LineParser.KEY, fields);
       _parser = new GroupParser(_parser, "startUrl");
     } else {
-      final String[] fields = { "url", "type", "topic", "funct_category", "rubric", "title", "lang" };
+      final String[] fields = { "url", "type", "topic", "rubric", "title", "lang" };
       _parser = new MapParser(_parser, LineParser.KEY, fields);
       _parser = new TranslateParser(_parser, "type", PropertyLoader.load("/labels/type"));
       _parser = new TranslateParser(_parser, "topic", PropertyLoader.load("/labels/topic", true));
-      _parser = new TranslateParser(_parser, "funct_category", PropertyLoader.load("/labels/funct_category", true));
       _parser = new TranslateParser(_parser, "rubric", PropertyLoader.load("/labels/rubric", true));
     }
     _parser.parse(file);

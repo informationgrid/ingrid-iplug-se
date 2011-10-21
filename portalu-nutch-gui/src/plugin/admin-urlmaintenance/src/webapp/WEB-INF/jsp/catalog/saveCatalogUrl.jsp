@@ -56,8 +56,7 @@
 						        <thead>
 						            <tr>
 						                <th>Url</th>
-						                <!--<th>Thema</th>
-						                <th>Funkt. Kategorie</th>-->
+						                <!--<th>Thema</th>-->
 						                <th>Rubrik</th>
 						                <th>Alternativ. Titel</th>
 						            </tr>
@@ -69,16 +68,6 @@
 						                	<c:set var="i" value="-1"/>
 						                	<c:forEach items="${catalogUrlCommand.metadatas}" var="md">
 												<c:if test="${md.metadataKey == 'topic'}">
-													<c:set var="i" value="${i+1}" />
-													<c:if test="${i > 0}">, </c:if>
-													<fmt:message key="${md.metadataKey}.${md.metadataValue}" />
-												</c:if>
-											</c:forEach>&nbsp;
-						                </td>
-						                <td>
-						                	<c:set var="i" value="-1"/>
-						                	<c:forEach items="${catalogUrlCommand.metadatas}" var="md">
-												<c:if test="${md.metadataKey == 'funct_category'}">
 													<c:set var="i" value="${i+1}" />
 													<c:if test="${i > 0}">, </c:if>
 													<fmt:message key="${md.metadataKey}.${md.metadataValue}" />

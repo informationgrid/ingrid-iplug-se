@@ -64,7 +64,6 @@ public class CatalogUrlCommandValidator extends AbstractValidator<CatalogUrlComm
         boolean hasDefault = false;
         boolean hasLang = false;
         boolean hasTopic = false;
-        boolean hasFunct = false;
         boolean hasRubric = false;
         for (final Metadata m : metadatas) {
             final String key = m.getMetadataKey();
@@ -76,8 +75,6 @@ public class CatalogUrlCommandValidator extends AbstractValidator<CatalogUrlComm
                 }
             } else if (key.equals("topic")) {
                 hasTopic = true;
-            } else if (key.equals("funct_category")) {
-                hasFunct = true;
             } else if (key.equals("lang")) {
                 hasLang = true;
             } else if (key.equals("service") || key.equals("measure")) {
@@ -98,9 +95,6 @@ public class CatalogUrlCommandValidator extends AbstractValidator<CatalogUrlComm
         } else if (datatype.equals("topics")) {
             if (!hasTopic) {
                 rejectError(errors, "metadatas", "topic." + IErrorKeys.MISSING);
-            }
-            if (!hasFunct) {
-                rejectError(errors, "metadatas", "funct." + IErrorKeys.MISSING);
             }
         } else if (datatype.equals("service") || datatype.equals("measure")) {
             if (!hasRubric) {

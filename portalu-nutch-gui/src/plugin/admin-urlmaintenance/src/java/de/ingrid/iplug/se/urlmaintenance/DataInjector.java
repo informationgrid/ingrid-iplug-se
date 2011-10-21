@@ -58,10 +58,6 @@ public class DataInjector {
     List<Metadata> datatypes = _metadataService.getDatatypes();
     createMetadatasIfNotExists(datatypes);
 
-    // funct category
-    List<Metadata> functCategory = _metadataService.getFunctCategory();
-    createMetadatasIfNotExists(functCategory);
-
     // measure
     List<Metadata> measure = _metadataService.getMeasure();
     createMetadatasIfNotExists(measure);

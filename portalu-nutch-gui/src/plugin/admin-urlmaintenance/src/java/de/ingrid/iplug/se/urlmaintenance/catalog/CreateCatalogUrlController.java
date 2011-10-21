@@ -62,8 +62,6 @@ public class CreateCatalogUrlController extends NavigationSelector {
     if (type.equals("topics")) {
       // push all topics into view
       metadatas.put("topic", _metadataDao.getByKey("topic"));
-      // push funct category into view
-      metadatas.put("funct_category", _metadataDao.getByKey("funct_category"));
     } else if (type.equals("service")) {
       // push all rubrics into view
       metadatas.put("rubric", _metadataDao.getByKey("service"));

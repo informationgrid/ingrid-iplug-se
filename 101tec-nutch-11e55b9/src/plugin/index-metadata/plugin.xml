@@ -42,7 +42,7 @@
         <parameter name="fields" value="bar"/>
 -->        
         <!-- lang will be inserted by language-identifier PlugIn! -->
-        <parameter name="raw-fields" value="datatype,funct_category,partner,topic,service,measure,provider,alt_title"/>
+        <parameter name="raw-fields" value="datatype,partner,topic,service,measure,provider,alt_title"/>
       </implementation> 
                       
    </extension>
@@ -56,7 +56,7 @@
         <parameter name="raw-fields" value="foo"/>
         <parameter name="fields" value="bar"/>
 -->        
-        <parameter name="raw-fields" value="datatype,funct_category,partner,topic,provider,lang,alt_title"/>
+        <parameter name="raw-fields" value="datatype,partner,topic,provider,lang,alt_title"/>
       </implementation>
       
    </extension>
