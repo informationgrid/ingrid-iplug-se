@@ -21,7 +21,7 @@
 		<div id="bd">
 			<div id="yui-main">
 				<div class="yui-b">
-					<h3>Willkommen ${partnerProviderCommand.provider.name}</h3>
+					<h3>Willkommen! (${partnerProviderCommand.partner.name} / ${partnerProviderCommand.provider.name})</h3>
 					
 					<div id="demo" class="yui-navset">
 					    <ul class="yui-nav">
@@ -34,10 +34,10 @@
 				    <div>
 				        <div>
 				        	<p>&nbsp;</p>
-				        	<p>Willkommen in der Urlpflege. Möchten Sie Webseiten zur <i>PortalU®-Suche</i> hinzufügen,
-                             bearbeiten oder löschen? Dann klicken Sie bitte auf den Reiter <b>Web-URLs</b>. Wenn Sie
-                             hingegen Webseiten zu den PortalU®-Rubriken <i>Umweltthemen, Messwerte</i> oder <i>Service</i> 
-                             hinzufügen, bearbeiten oder löschen möchten, klicken Sie bitte auf den Reiter 
+				        	<p>Willkommen in der Urlpflege. Mï¿½chten Sie Webseiten zur <i>PortalUï¿½-Suche</i> hinzufï¿½gen,
+                             bearbeiten oder lï¿½schen? Dann klicken Sie bitte auf den Reiter <b>Web-URLs</b>. Wenn Sie
+                             hingegen Webseiten zu den PortalUï¿½-Rubriken <i>Umweltthemen, Messwerte</i> oder <i>Service</i> 
+                             hinzufï¿½gen, bearbeiten oder lï¿½schen mï¿½chten, klicken Sie bitte auf den Reiter 
                              <b>Katalog-URLs</b>.</p>
 				        </div>
 				    </div>

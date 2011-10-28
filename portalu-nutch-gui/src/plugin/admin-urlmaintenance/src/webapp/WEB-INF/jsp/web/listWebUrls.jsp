@@ -38,7 +38,7 @@
       		<div id="blocker" style="display: block; width: 100%; height: 100%; position: absolute; top: 0px; left: 0px;"></div>
 			<div id="yui-main">
 				<div class="yui-b">
-					<h3>Web URLs</h3>
+					<h3>Web URLs (${partnerProviderCommand.partner.name} / ${partnerProviderCommand.provider.name})</h3>
 					
 					<div class="yui-navset">
 					    <ul class="yui-nav">

@@ -5,6 +5,7 @@
   </properties>
   <body>
     <release version="3.1.0-SNAPSHOT" date="2011-xx-xx" description="Bugfix Release">
+      <action type="add" dev="wemove">Display partner and provider in every screen in url maintenance.</action>
       <action type="add" dev="wemove">Add option to prioritize the language definition of the url administration before the nutch find-language mechanism.</action>
       <action type="add" dev="wemove">Add faceting support.</action>
       <action type="add" dev="wemove">Add functionality to add scripts that are called before and after a scheduled crawl.</action>

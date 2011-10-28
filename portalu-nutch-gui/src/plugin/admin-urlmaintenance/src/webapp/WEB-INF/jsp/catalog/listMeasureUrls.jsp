@@ -38,7 +38,7 @@
 			<div id="blocker" style="display: block; width: 100%; height: 100%; position: absolute; top: 0px; left: 0px;"></div>
 			<div id="yui-main">
 				<div class="yui-b">
-					<h3>Katalog URLs</h3>
+					<h3>Katalog URLs (${partnerProviderCommand.partner.name} / ${partnerProviderCommand.provider.name})</h3>
 					
 					<% String selected = "measure"; %>
 					<%@ include file="menuCatalog.jsp" %>

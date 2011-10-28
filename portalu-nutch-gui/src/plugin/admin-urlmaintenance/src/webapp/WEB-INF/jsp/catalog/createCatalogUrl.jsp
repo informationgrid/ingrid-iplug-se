@@ -24,7 +24,7 @@
 		<div id="bd">
 			<div id="yui-main">
 					<div class="yui-b">
-						<h3>Katalog URLs</h3>
+						<h3>Katalog URLs (${partnerProviderCommand.partner.name} / ${partnerProviderCommand.provider.name})</h3>
 						
 						<div class="yui-navset">
 						    <ul class="yui-nav">
