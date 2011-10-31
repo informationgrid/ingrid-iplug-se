@@ -448,5 +448,19 @@
   </description>
 </property>
 
+<property>
+  <name>search.instance.folder</name>
+  <value></value>
+  <description>Folders used for searching for acticated indexes ("search.done" files). Multiple folders can be set, separated by ','. Folders must be nutch instance folders. If not set the nutch.instance.folder is used. After changing this property the search component must be restarted. Changes must be applied to "nutch-instances/conf/nutch-site.xml" (changes via the ingrid specific configuration in the indexer has no effect).
+  </description>
+</property>
+
+<property>
+  <name>search.deduplicate.multiple.searchers</name>
+  <value>false</value>
+  <description>If true, a deduplicating searcher will be used to remove duplicates by url from the result set. This has an impact on performance! After changing this property the search component must be restarted. Changes must be applied to "nutch-instances/conf/nutch-site.xml" (changes via the ingrid specific configuration in the indexer has no effect). 
+  </description>
+</property>
+
 
 </configuration>

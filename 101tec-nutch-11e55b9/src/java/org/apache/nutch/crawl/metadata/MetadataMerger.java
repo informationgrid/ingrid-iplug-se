@@ -34,6 +34,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
+import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.MapFileOutputFormat;
 import org.apache.hadoop.mapred.Mapper;
@@ -46,7 +47,6 @@ import org.apache.nutch.crawl.metadata.ParseDataWrapper.UrlParseDataContainer;
 import org.apache.nutch.metadata.Metadata;
 import org.apache.nutch.parse.ParseData;
 import org.apache.nutch.util.NutchJob;
-import org.apache.nutch.util.SyncUtil;
 
 public class MetadataMerger extends Configured {
 
@@ -152,7 +152,7 @@ public class MetadataMerger extends Configured {
     mergeJob.setOutputFormat(MapFileOutputFormat.class);
     mergeJob.setOutputKeyClass(HostType.class);
     mergeJob.setOutputValueClass(ObjectWritable.class);
-    SyncUtil.syncJobRun(mergeJob);//JobClient.runJob(mergeJob);
+    JobClient.runJob(mergeJob);
   }
 
 }

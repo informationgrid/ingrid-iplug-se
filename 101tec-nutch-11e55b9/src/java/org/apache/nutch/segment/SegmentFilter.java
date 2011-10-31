@@ -37,6 +37,7 @@ import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
 import org.apache.hadoop.mapred.FileSplit;
 import org.apache.hadoop.mapred.InputSplit;
+import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
@@ -61,7 +62,6 @@ import org.apache.nutch.protocol.Content;
 import org.apache.nutch.util.HadoopFSUtil;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
-import org.apache.nutch.util.SyncUtil;
 
 import de.ingrid.iplug.se.crawl.sns.CompressedSnsData;
 
@@ -462,7 +462,7 @@ public class SegmentFilter extends Configured implements Mapper<Text, MetaWrappe
 
         setConf(job);
 
-        SyncUtil.syncJobRun(job);// JobClient.runJob(job);
+        JobClient.runJob(job);
 
     }
 

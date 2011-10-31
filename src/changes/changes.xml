@@ -5,6 +5,9 @@
   </properties>
   <body>
     <release version="3.1.0-SNAPSHOT" date="2011-xx-xx" description="Bugfix Release">
+      <action type="add" dev="wemove">Add new property 'search.instance.folder' to be able to set multiple instance folder for the searcher.</action>
+      <action type="add" dev="wemove">Add deduplicating multi searcher. This searcher removes duplicates by URL. Reduces search performance.</action>
+      <action type="add" dev="wemove">Instances can issue crawls independently, enabling parallel crawls (instance specific hadoop temp directories).</action>
       <action type="add" dev="wemove">Display partner and provider in every screen in url maintenance.</action>
       <action type="add" dev="wemove">Add option to prioritize the language definition of the url administration before the nutch find-language mechanism.</action>
       <action type="add" dev="wemove">Add faceting support.</action>

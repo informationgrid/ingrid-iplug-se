@@ -108,7 +108,7 @@ public class LinkDbReader extends Configured implements Tool, Closeable {
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(Inlinks.class);
 
-    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+    JobClient.runJob(job);
   }
   
   public static void main(String[] args) throws Exception {

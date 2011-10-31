@@ -347,7 +347,7 @@ Tool {
     job.setMapperClass(IdentityMapper.class);
     job.setReducerClass(SolrDeleteDuplicates.class);
 
-    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+    JobClient.runJob(job);
     
     LOG.info("SolrDeleteDuplicates: done.");
   }

@@ -41,108 +41,104 @@ import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.nutch.parse.ParseData;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
-import org.apache.nutch.util.SyncUtil;
 
 public class ParseDataWrapper extends Configured {
 
-  public static final Log LOG = LogFactory.getLog(ParseDataWrapper.class);
+    public static final Log LOG = LogFactory.getLog(ParseDataWrapper.class);
 
-  public static class UrlParseDataContainer implements Writable {
+    public static class UrlParseDataContainer implements Writable {
 
-    private Text _url = new Text();
-    private ParseData _parseData = new ParseData();
+        private Text _url = new Text();
 
-    public UrlParseDataContainer() {
-    }
+        private ParseData _parseData = new ParseData();
 
-    public UrlParseDataContainer(Text url, ParseData parseData) {
-      _url = url;
-      _parseData = parseData;
-    }
+        public UrlParseDataContainer() {
+        }
 
-    public Text getUrl() {
-      return _url;
-    }
+        public UrlParseDataContainer(Text url, ParseData parseData) {
+            _url = url;
+            _parseData = parseData;
+        }
 
-    public void setUrl(Text url) {
-      _url = url;
-    }
+        public Text getUrl() {
+            return _url;
+        }
 
-    public ParseData getParseData() {
-      return _parseData;
-    }
+        public void setUrl(Text url) {
+            _url = url;
+        }
 
-    public void setParseData(ParseData parseData) {
-      _parseData = parseData;
-    }
+        public ParseData getParseData() {
+            return _parseData;
+        }
 
-    @Override
-    public void readFields(DataInput in) throws IOException {
-      _url.readFields(in);
-      _parseData = ParseData.read(in);
-    }
+        public void setParseData(ParseData parseData) {
+            _parseData = parseData;
+        }
 
-    @Override
-    public void write(DataOutput out) throws IOException {
-      _url.write(out);
-      _parseData.write(out);
-    }
+        @Override
+        public void readFields(DataInput in) throws IOException {
+            _url.readFields(in);
+            _parseData = ParseData.read(in);
+        }
 
-  }
-
-  public static class ParseDataWrapperMapper implements
-      Mapper<Text, ParseData, HostType, UrlParseDataContainer> {
-
-    @Override
-    public void map(Text key, ParseData value,
-        OutputCollector<HostType, UrlParseDataContainer> collector,
-        Reporter reporter) throws IOException {
-      String url = key.toString();
-      String host = new URL(url).getHost();
-      UrlParseDataContainer container = new UrlParseDataContainer(
-          new Text(url), value);
-      HostType hostType = new HostType(new Text(host),
-          HostType.URL_PARSEDATA_CONTAINER);
-      collector.collect(hostType, container);
-    }
-
-    @Override
-    public void configure(JobConf arg0) {
+        @Override
+        public void write(DataOutput out) throws IOException {
+            _url.write(out);
+            _parseData.write(out);
+        }
 
     }
 
-    @Override
-    public void close() throws IOException {
+    public static class ParseDataWrapperMapper implements Mapper<Text, ParseData, HostType, UrlParseDataContainer> {
+
+        @Override
+        public void map(Text key, ParseData value, OutputCollector<HostType, UrlParseDataContainer> collector,
+                Reporter reporter) throws IOException {
+            String url = key.toString();
+            String host = new URL(url).getHost();
+            UrlParseDataContainer container = new UrlParseDataContainer(new Text(url), value);
+            HostType hostType = new HostType(new Text(host), HostType.URL_PARSEDATA_CONTAINER);
+            collector.collect(hostType, container);
+        }
+
+        @Override
+        public void configure(JobConf arg0) {
+
+        }
+
+        @Override
+        public void close() throws IOException {
+
+        }
 
     }
 
-  }
+    public ParseDataWrapper(Configuration conf) {
+        super(conf);
+    }
 
-  public ParseDataWrapper(Configuration conf) {
-    super(conf);
-  }
+    public void wrap(Path segment, Path out) throws IOException {
 
-  public void wrap(Path segment, Path out) throws IOException {
+        JobConf job = new NutchJob(getConf());
+        job.setJobName("wrap parse data from segment: " + segment);
 
-    JobConf job = new NutchJob(getConf());
-    job.setJobName("wrap parse data from segment: " + segment);
+        job.setInputFormat(SequenceFileInputFormat.class);
 
-    job.setInputFormat(SequenceFileInputFormat.class);
+        FileInputFormat.addInputPath(job, new Path(segment, ParseData.DIR_NAME));
 
-    FileInputFormat.addInputPath(job, new Path(segment, ParseData.DIR_NAME));
+        job.setMapperClass(ParseDataWrapperMapper.class);
 
-    job.setMapperClass(ParseDataWrapperMapper.class);
+        FileOutputFormat.setOutputPath(job, out);
+        job.setOutputFormat(MapFileOutputFormat.class);
+        job.setOutputKeyClass(HostType.class);
+        job.setOutputValueClass(UrlParseDataContainer.class);
+        JobClient.runJob(job);
+    }
 
-    FileOutputFormat.setOutputPath(job, out);
-    job.setOutputFormat(MapFileOutputFormat.class);
-    job.setOutputKeyClass(HostType.class);
-    job.setOutputValueClass(UrlParseDataContainer.class);
-    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
-  }
-
-  public static void main(String[] args) throws IOException {
-    Configuration configuration = NutchConfiguration.create();
-    ParseDataWrapper wrapper = new ParseDataWrapper(configuration);
-    wrapper.wrap(new Path(args[0]), new Path(args[1]));
-  }
+    public static void main(String[] args) throws IOException {
+        Configuration configuration = NutchConfiguration.create();
+        ParseDataWrapper wrapper = new ParseDataWrapper(configuration);
+        wrapper.wrap(new Path(args[0]), new Path(args[1]));
+    }
 }

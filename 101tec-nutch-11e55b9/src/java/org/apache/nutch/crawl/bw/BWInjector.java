@@ -46,7 +46,6 @@ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.nutch.net.URLNormalizers;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
-import org.apache.nutch.util.SyncUtil;
 
 /**
  * Injects black- or white list urls into a database. Urls will be normalized
@@ -180,7 +179,7 @@ public class BWInjector extends Configured {
     sortJob.setOutputFormat(SequenceFileOutputFormat.class);
     sortJob.setOutputKeyClass(HostTypeKey.class);
     sortJob.setOutputValueClass(BWPatterns.class);
-    SyncUtil.syncJobRun(sortJob);//JobClient.runJob(sortJob);
+    JobClient.runJob(sortJob);
 
     // merge with existing bw db
     LOG.info("BWInjector: Merging injected urls into bwDb.");
@@ -203,7 +202,7 @@ public class BWInjector extends Configured {
     job.setOutputFormat(MapFileOutputFormat.class);
     job.setOutputKeyClass(HostTypeKey.class);
     job.setOutputValueClass(BWPatterns.class);
-    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+    JobClient.runJob(job);
 
     LOG.info("rename bwdb");
     FileSystem fs = new JobClient(job).getFs();

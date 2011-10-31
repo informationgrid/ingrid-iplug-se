@@ -111,7 +111,7 @@ implements Tool, Mapper<Text, CrawlDatum, Text, LongWritable>,
     job.setCombinerClass(DomainStatisticsCombiner.class);
     job.setNumReduceTasks(numOfReducers);
     
-    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+    JobClient.runJob(job);
     
     return 0;
   }

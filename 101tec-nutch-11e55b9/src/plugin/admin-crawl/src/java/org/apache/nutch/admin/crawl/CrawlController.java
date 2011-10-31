@@ -65,13 +65,8 @@ public class CrawlController extends NavigationSelector {
     NutchInstance nutchInstance = (NutchInstance) servletContext
             .getAttribute("nutchInstance");
 
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // check in ALL instances for running crawls since we only allow one
-    // crawl at a time for one iPlug
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // local folder for configuration files
     File instanceFolder = nutchInstance.getInstanceFolder();
-    File[] instanceFolders = instanceFolder.getParentFile().listFiles();
     // look in the same path in hdfs
     Path path = new Path(instanceFolder.getAbsolutePath(), "crawls");
     Configuration configuration = nutchInstance.getConfiguration();
@@ -83,33 +78,23 @@ public class CrawlController extends NavigationSelector {
       }
     });
     
-    boolean aCrawlIsRunning = false;
-    for (File instance : instanceFolders) {
-        // the folder "general" is the only non-crawl!
-        if (instance.getName().equals("general"))
-            continue;
-        
-        Path crawlPathDir = new Path(instance.getAbsolutePath(), "crawls");
-        CrawlPath[] crawlPaths = listPaths(crawlPathDir, fileSystem, new PathFilter() {
-            @Override
-            public boolean accept(Path path) {
-              return path.getName().startsWith("Crawl");
-            }
-          });
-        
-        // 
-        for (CrawlPath crawlPath : crawlPaths) {
-          if (crawlPath.isRunning()) {
-            model.addAttribute("runningCrawl", new Object());
-            aCrawlIsRunning = true;
-            break;
-          }
+    // check in instance for running crawls
+    Path crawlPathDir = new Path(instanceFolder.getAbsolutePath(), "crawls");
+    CrawlPath[] crawlPaths = listPaths(crawlPathDir, fileSystem, new PathFilter() {
+        @Override
+        public boolean accept(Path path) {
+          return path.getName().startsWith("Crawl");
         }
+      });
         
-        if (aCrawlIsRunning)
-            break;
+    // 
+    for (CrawlPath crawlPath : crawlPaths) {
+      if (crawlPath.isRunning()) {
+        model.addAttribute("runningCrawl", new Object());
+        break;
+      }
     }
-    
+        
     model.addAttribute("crawlPaths", crawlPathArray);
     model.addAttribute("showDialog", false);
     return "listCrawls";

@@ -37,6 +37,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
+import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.MapFileOutputFormat;
 import org.apache.hadoop.mapred.Mapper;
@@ -51,7 +52,6 @@ import org.apache.nutch.net.URLFilters;
 import org.apache.nutch.net.URLNormalizers;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
-import org.apache.nutch.util.SyncUtil;
 
 /**
  * LinkDb filter tool that filters urls that do not pass a white-black list. The
@@ -496,7 +496,7 @@ public class BWLinkDbFilter extends Configured {
         job.setOutputValueClass(InlinksEntry.class);
         job.setBoolean(InlinksMapper.URL_FILTERING, filter);
         job.setBoolean(InlinksMapper.URL_NORMALIZING, normalize);
-        SyncUtil.syncJobRun(job);// JobClient.runJob(job);
+        JobClient.runJob(job);
 
         // wrapping inlink objects
         LOG.info("filter linkdb against bwdb: wrapping INLINK(!) objects started.");
@@ -521,7 +521,7 @@ public class BWLinkDbFilter extends Configured {
         job.setOutputValueClass(InlinkEntry.class);
         job.setBoolean(InlinkMapper.URL_FILTERING, filter);
         job.setBoolean(InlinkMapper.URL_NORMALIZING, normalize);
-        SyncUtil.syncJobRun(job);// JobClient.runJob(job);
+        JobClient.runJob(job);
 
         // filtering
         LOG.info("filter linkdb against bwdb: filtering started.");
@@ -540,7 +540,7 @@ public class BWLinkDbFilter extends Configured {
         filterJob.setOutputFormat(MapFileOutputFormat.class);
         filterJob.setOutputKeyClass(HostTypeKey.class);
         filterJob.setOutputValueClass(ObjectWritable.class);
-        SyncUtil.syncJobRun(filterJob);// JobClient.runJob(filterJob);
+        JobClient.runJob(filterJob);
 
         // remove wrappedSegOutput
         FileSystem.get(job).delete(wrappedInlinksDbOutput, true);
@@ -560,7 +560,7 @@ public class BWLinkDbFilter extends Configured {
         convertJob.setOutputFormat(MapFileOutputFormat.class);
         convertJob.setOutputKeyClass(Text.class);
         convertJob.setOutputValueClass(Inlinks.class);
-        SyncUtil.syncJobRun(convertJob);// JobClient.runJob(convertJob);
+        JobClient.runJob(convertJob);
 
         // 
         FileSystem.get(job).delete(tmpMergedDb, true);

@@ -140,7 +140,7 @@ public class NutchSearcher implements IPlug {
         if (_scanner != null) {
             _scanner.cancel();
         }
-        _scanner = new SearchUpdateScanner(workinDirectory, _searcherFactory, 60000);
+        _scanner = new SearchUpdateScanner(_configuration, _searcherFactory, 60000);
 
         updateFacetManager();
 
@@ -156,7 +156,10 @@ public class NutchSearcher implements IPlug {
      * int, int)
      */
     public IngridHits search(IngridQuery query, int start, int length) throws Exception {
-        long startTimer = System.currentTimeMillis();
+        long startTimer = 0;
+        if (LOG.isDebugEnabled()) {
+            startTimer = System.currentTimeMillis();;
+        }
         _processorPipe.preProcess(query);
         Query nutchQuery = new Query(_configuration);
         buildNutchQuery(query, nutchQuery);
@@ -166,6 +169,7 @@ public class NutchSearcher implements IPlug {
 
         Hits hits = null;
         MultipleSearcher searcher = _searcherFactory.get();
+        
         if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
             hits = searcher.search(nutchQuery, start + length, null, "date", true);
         } else {

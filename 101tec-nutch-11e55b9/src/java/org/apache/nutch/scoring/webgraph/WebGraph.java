@@ -63,7 +63,6 @@ import org.apache.nutch.util.FSUtils;
 import org.apache.nutch.util.LockUtil;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
-import org.apache.nutch.util.SyncUtil;
 import org.apache.nutch.util.URLUtil;
 
 /**
@@ -502,7 +501,7 @@ public class WebGraph
     // run the outlinkdb job and replace any old outlinkdb with the new one
     try {
       LOG.info("OutlinkDb: running");
-      SyncUtil.syncJobRun(outlinkJob);//JobClient.runJob(outlinkJob);
+      JobClient.runJob(outlinkJob);
       LOG.info("OutlinkDb: installing " + outlinkDb);
       FSUtils.replace(fs, outlinkDb, tempOutlinkDb, true);
       LOG.info("OutlinkDb: finished");
@@ -540,7 +539,7 @@ public class WebGraph
       
       // run the inlink and replace any old with new
       LOG.info("InlinkDb: running");
-      SyncUtil.syncJobRun(inlinkJob);//JobClient.runJob(inlinkJob);
+      JobClient.runJob(inlinkJob);
       LOG.info("InlinkDb: installing " + inlinkDb);
       FSUtils.replace(fs, inlinkDb, tempInlinkDb, true);
       LOG.info("InlinkDb: finished");
@@ -580,7 +579,7 @@ public class WebGraph
       
       // run the node job and replace old nodedb with new
       LOG.info("NodeDb: running");
-      SyncUtil.syncJobRun(nodeJob);//JobClient.runJob(nodeJob);
+      JobClient.runJob(nodeJob);
       LOG.info("NodeDb: installing " + nodeDb);
       FSUtils.replace(fs, nodeDb, tempNodeDb, true);
       LOG.info("NodeDb: finished");

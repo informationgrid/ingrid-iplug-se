@@ -35,6 +35,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
+import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.MapFileOutputFormat;
 import org.apache.hadoop.mapred.Mapper;
@@ -47,7 +48,6 @@ import org.apache.nutch.net.URLNormalizers;
 import org.apache.nutch.scoring.webgraph.LinkDatum;
 import org.apache.nutch.scoring.webgraph.Node;
 import org.apache.nutch.scoring.webgraph.WebGraph;
-import org.apache.nutch.scoring.webgraph.WebGraph.InlinkDb;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
 import org.apache.nutch.util.SyncUtil;
@@ -440,7 +440,7 @@ public class BWWebgraphFilter extends Configured {
         job.setOutputValueClass(LinkDatumEntry.class);
         job.setBoolean(LinkDatumMapper.URL_FILTERING, filter);
         job.setBoolean(LinkDatumMapper.URL_NORMALIZING, normalize);
-        SyncUtil.syncJobRun(job);// JobClient.runJob(job);
+        JobClient.runJob(job);
 
         // filter outlinks
         name = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
@@ -460,7 +460,7 @@ public class BWWebgraphFilter extends Configured {
         job.setOutputFormat(MapFileOutputFormat.class);
         job.setOutputKeyClass(HostTypeKey.class);
         job.setOutputValueClass(ObjectWritable.class);
-        SyncUtil.syncJobRun(job);// JobClient.runJob(filterJob);
+        JobClient.runJob(job);
         FileSystem.get(job).delete(wrappedOutlinkOutput, true);
 
         // filter for valid entries, keep only entries where key and link url
@@ -480,7 +480,7 @@ public class BWWebgraphFilter extends Configured {
         job.setOutputFormat(MapFileOutputFormat.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(LinkDatum.class);
-        SyncUtil.syncJobRun(job);// JobClient.runJob(filterJob);
+        JobClient.runJob(job);
         FileSystem.get(job).delete(filteredOutlinkDb, true);
 
 

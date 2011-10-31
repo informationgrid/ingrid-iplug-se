@@ -50,7 +50,6 @@ import org.apache.nutch.metadata.Metadata;
 import org.apache.nutch.net.URLNormalizers;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
-import org.apache.nutch.util.SyncUtil;
 
 public class MetadataInjector extends Configured {
 
@@ -230,7 +229,7 @@ public class MetadataInjector extends Configured {
     sortJob.setOutputFormat(SequenceFileOutputFormat.class);
     sortJob.setOutputKeyClass(HostType.class);
     sortJob.setOutputValueClass(MetadataContainer.class);
-    SyncUtil.syncJobRun(sortJob);//JobClient.runJob(sortJob);
+    JobClient.runJob(sortJob);
 
     LOG.info("MetadataInjector: Merging injected urls into metadataDb.");
     String newDbName = Integer
@@ -252,7 +251,7 @@ public class MetadataInjector extends Configured {
     job.setOutputFormat(MapFileOutputFormat.class);
     job.setOutputKeyClass(HostType.class);
     job.setOutputValueClass(MetadataContainer.class);
-    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+    JobClient.runJob(job);
 
     LOG.info("rename metadataDb");
     FileSystem fs = new JobClient(job).getFs();

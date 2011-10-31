@@ -646,7 +646,7 @@ public class SegmentMerger extends Configured implements
       job.setOutputKeyClass(Text.class);
       job.setOutputValueClass(MetaWrapper.class);
       job.setOutputFormat(SegmentOutputFormat.class);
-      SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+      JobClient.runJob(job);
     }
   
   }

@@ -190,7 +190,7 @@ public class ScoreUpdater
     updater.setOutputFormat(MapFileOutputFormat.class);
 
     try {
-        SyncUtil.syncJobRun(updater);//JobClient.runJob(updater);
+        JobClient.runJob(updater);
     }
     catch (IOException e) {
       LOG.error(StringUtils.stringifyException(e));

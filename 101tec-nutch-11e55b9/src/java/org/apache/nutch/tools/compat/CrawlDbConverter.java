@@ -139,7 +139,7 @@ public class CrawlDbConverter extends Configured implements Tool,
     job.setOutputValueClass(CrawlDatum.class);
     FileOutputFormat.setOutputPath(job, newDb);
     try {
-        SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+        JobClient.runJob(job);
       CrawlDb.install(job, new Path(args[1]));
       return 0;
     } catch (Exception e) {

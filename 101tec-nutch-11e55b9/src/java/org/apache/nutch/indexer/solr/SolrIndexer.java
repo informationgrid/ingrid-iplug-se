@@ -71,7 +71,7 @@ public class SolrIndexer extends Configured implements Tool {
 
     FileOutputFormat.setOutputPath(job, tmp);
     try {
-        SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+        JobClient.runJob(job);
     } finally {
       FileSystem.get(job).delete(tmp, true);
     }

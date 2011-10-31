@@ -50,12 +50,10 @@ import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.util.Progressable;
 import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.crawl.CrawlDb;
-import org.apache.nutch.crawl.CrawlDbFilter;
 import org.apache.nutch.net.URLFilters;
 import org.apache.nutch.net.URLNormalizers;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
-import org.apache.nutch.util.SyncUtil;
 
 /**
  * CrawlDb update tool that only updates urls that passing a white-black list
@@ -347,7 +345,7 @@ public class BWUpdateDb extends Configured {
         job.setOutputValueClass(Entry.class);
         job.setBoolean(BWMapper.URL_FILTERING, filter);
         job.setBoolean(BWMapper.URL_NORMALIZING, normalize);
-        SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+        JobClient.runJob(job);
 
         // filtering
         LOG.info("bw update: filtering started.");
@@ -365,7 +363,7 @@ public class BWUpdateDb extends Configured {
         filterJob.setOutputFormat(MapFileOutputFormat.class);
         filterJob.setOutputKeyClass(HostTypeKey.class);
         filterJob.setOutputValueClass(ObjectWritable.class);
-        SyncUtil.syncJobRun(filterJob);//JobClient.runJob(filterJob);
+        JobClient.runJob(filterJob);
 
         // remove wrappedSegOutput
         FileSystem.get(job).delete(wrappedSegOutput, true);
@@ -383,7 +381,7 @@ public class BWUpdateDb extends Configured {
         convertJob.setOutputFormat(MapFileOutputFormat.class);
         convertJob.setOutputKeyClass(Text.class);
         convertJob.setOutputValueClass(CrawlDatum.class);
-        SyncUtil.syncJobRun(convertJob);//JobClient.runJob(convertJob);
+        JobClient.runJob(convertJob);
 
         // 
         FileSystem.get(job).delete(tmpMergedDb, true);
@@ -399,7 +397,7 @@ public class BWUpdateDb extends Configured {
 
         FileInputFormat.addInputPath(updateJob, tmpFormatOut);
         LOG.info("bw update: Merging bw filtered segment data into db.");
-        SyncUtil.syncJobRun(updateJob);//JobClient.runJob(updateJob);
+        JobClient.runJob(updateJob);
         FileSystem.get(job).delete(tmpFormatOut, true);
 
         LOG.info("install crawldb");
@@ -428,7 +426,7 @@ public class BWUpdateDb extends Configured {
         job.setOutputKeyClass(HostTypeKey.class);
         job.setOutputValueClass(BWPatterns.class);
 
-        SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+        JobClient.runJob(job);
         if (LOG.isInfoEnabled()) {
             LOG.info("BWDb dump: done");
         }

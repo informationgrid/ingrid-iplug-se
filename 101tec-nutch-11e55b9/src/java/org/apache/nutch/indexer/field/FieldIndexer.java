@@ -265,7 +265,7 @@ public class FieldIndexer
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(LuceneDocumentWrapper.class);
 
-    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+    JobClient.runJob(job);
     if (LOG.isInfoEnabled()) {
       LOG.info("FieldIndexer: done");
     }

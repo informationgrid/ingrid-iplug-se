@@ -52,6 +52,7 @@ import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
+import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.MapFileOutputFormat;
 import org.apache.hadoop.mapred.Mapper;
@@ -68,7 +69,6 @@ import org.apache.nutch.scoring.webgraph.Loops.LoopSet;
 import org.apache.nutch.util.FSUtils;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
-import org.apache.nutch.util.SyncUtil;
 import org.apache.nutch.util.URLUtil;
 
 public class LinkRank
@@ -112,7 +112,7 @@ public class LinkRank
     // run the counter job, outputs to a single reduce task and file
     LOG.info("Starting link counter job");
     try {
-        SyncUtil.syncJobRun(counter);//JobClient.runJob(counter);
+        JobClient.runJob(counter);
     }
     catch (IOException e) {
       LOG.error(StringUtils.stringifyException(e));
@@ -187,7 +187,7 @@ public class LinkRank
     // run the initializer
     LOG.info("Starting initialization job");
     try {
-        SyncUtil.syncJobRun(initializer);//JobClient.runJob(initializer);
+        JobClient.runJob(initializer);
     }
     catch (IOException e) {
       LOG.error(StringUtils.stringifyException(e));
@@ -238,7 +238,7 @@ public class LinkRank
     // run the inverter job
     LOG.info("Starting inverter job");
     try {
-        SyncUtil.syncJobRun(inverter);//JobClient.runJob(inverter);
+        JobClient.runJob(inverter);
     }
     catch (IOException e) {
       LOG.error(StringUtils.stringifyException(e));
@@ -286,7 +286,7 @@ public class LinkRank
 
     LOG.info("Starting analysis job");
     try {
-        SyncUtil.syncJobRun(analyzer);//JobClient.runJob(analyzer);
+        JobClient.runJob(analyzer);
     }
     catch (IOException e) {
       LOG.error(StringUtils.stringifyException(e));

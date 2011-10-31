@@ -154,6 +154,7 @@ public class ConfigurationUtil {
       factory.setNamespaceAware(true);
       Document document = factory.newDocumentBuilder().parse(nutchSiteXml);
       Element node = document.getDocumentElement();
+      // create nutch.instance.folder
       Element property = document.createElement("property");
       Element name = document.createElement("name");
       name.appendChild(document.createTextNode("nutch.instance.folder"));
@@ -162,6 +163,19 @@ public class ConfigurationUtil {
       Element description = document.createElement("description");
       description.appendChild(document.createTextNode("instance folder"));
       Node propertyNode = node.appendChild(property);
+      propertyNode.appendChild(name);
+      propertyNode.appendChild(value);
+      propertyNode.appendChild(description);
+      // create "hadoop.tmp.dir"
+      Configuration configuration = new Configuration();      
+      property = document.createElement("property");
+      name = document.createElement("name");
+      name.appendChild(document.createTextNode("hadoop.tmp.dir"));
+      value = document.createElement("value");
+      value.appendChild(document.createTextNode(configuration.get("hadoop.tmp.dir") + File.pathSeparator + folderName));
+      description = document.createElement("description");
+      description.appendChild(document.createTextNode("Haddop working directory. Overwritten to isolate the nutch instance jobs."));
+      propertyNode = node.appendChild(property);
       propertyNode.appendChild(name);
       propertyNode.appendChild(value);
       propertyNode.appendChild(description);
@@ -178,5 +192,7 @@ public class ConfigurationUtil {
       throw new IOException(e.getMessage());
     }
   }
+  
+
 
 }

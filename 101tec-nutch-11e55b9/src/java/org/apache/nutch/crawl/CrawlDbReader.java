@@ -314,7 +314,7 @@ public class CrawlDbReader implements Closeable {
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(LongWritable.class);
 
-    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+    JobClient.runJob(job);
 
     // reading the result
     FileSystem fileSystem = FileSystem.get(config);
@@ -414,7 +414,7 @@ public class CrawlDbReader implements Closeable {
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(CrawlDatum.class);
 
-    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+    JobClient.runJob(job);
     if (LOG.isInfoEnabled()) { LOG.info("CrawlDb dump: done"); }
   }
 
@@ -445,7 +445,7 @@ public class CrawlDbReader implements Closeable {
 
     // XXX hmmm, no setFloat() in the API ... :(
     job.setLong("db.reader.topn.min", Math.round(1000000.0 * min));
-    SyncUtil.syncJobRun(job);//JobClient.runJob(job); 
+    JobClient.runJob(job); 
     
     if (LOG.isInfoEnabled()) {
       LOG.info("CrawlDb topN: collecting topN scores.");
@@ -466,7 +466,7 @@ public class CrawlDbReader implements Closeable {
 
     job.setNumReduceTasks(1); // create a single file.
     
-    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+    JobClient.runJob(job);
     FileSystem fs = FileSystem.get(config);
     fs.delete(tempDir, true);
     if (LOG.isInfoEnabled()) { LOG.info("CrawlDb topN: done"); }

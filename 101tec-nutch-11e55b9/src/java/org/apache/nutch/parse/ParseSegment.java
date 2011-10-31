@@ -148,7 +148,7 @@ public class ParseSegment extends Configured implements Tool,
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(ParseImpl.class);
 
-    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+    JobClient.runJob(job);
     if (LOG.isInfoEnabled()) { LOG.info("Parse: done"); }
   }
 

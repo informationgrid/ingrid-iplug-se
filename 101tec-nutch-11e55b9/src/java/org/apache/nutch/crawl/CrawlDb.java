@@ -92,7 +92,7 @@ public class CrawlDb extends Configured implements Tool {
       LOG.info("CrawlDb update: Merging segment data into db.");
     }
     try {
-        SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+        JobClient.runJob(job);
     } catch (IOException e) {
       LockUtil.removeLockFile(fs, lock);
       Path outPath = FileOutputFormat.getOutputPath(job);

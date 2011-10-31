@@ -17,6 +17,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.nutch.admin.searcher.DeduplicatingMultipleSearcher;
 import org.apache.nutch.admin.searcher.MultipleSearcher;
 import org.apache.nutch.admin.searcher.SearcherFactory;
 import org.apache.nutch.admin.searcher.ThreadPool;
@@ -83,29 +84,45 @@ public class DirectoryScanningSearcherFactory {
   }
 
   public MultipleSearcher get() throws IOException {
-    String indexerBasePath = _configuration.get("nutch.instance.folder");
-    if (!_map.containsKey(indexerBasePath)) {
-      LOG.info("Create new searcher for instance: " + indexerBasePath);
-      Path parent = getSearchPath(indexerBasePath);
-      Set<Path> paths = findActivatedCrawlPaths(FileSystem.get(_configuration), parent, new HashSet<Path>());
-      ThreadPool threadPool = new ThreadPool();
-      List<NutchBean> nuchBeans = new ArrayList<NutchBean>(paths.size());
-      for (Path path : paths) {
-        nuchBeans.add(new NutchBean(_configuration, path));
+    String indexerBasePathsString = _configuration.get("search.instance.folder");
+    if (indexerBasePathsString == null || (indexerBasePathsString.trim().length() <= 0)) {
+        indexerBasePathsString = _configuration.get("nutch.instance.folder");
+    }
+    String[] indexerBasePathes = indexerBasePathsString.split(",");
+    if (!_map.containsKey(indexerBasePathsString)) {
+      Set<Path> allPaths = new HashSet<Path>();
+      List<NutchBean> nuchBeans = new ArrayList<NutchBean>();
+      for (String indexerBasePath : indexerBasePathes) {
+          LOG.info("Create new searcher for instance: " + indexerBasePath);
+          Path parent = getSearchPath(indexerBasePath);
+          Set<Path> paths = findActivatedCrawlPaths(FileSystem.get(_configuration), parent, new HashSet<Path>());
+          for (Path path : paths) {
+            nuchBeans.add(new NutchBean(_configuration, path));
+            allPaths.add(path);
+          }
       }
+      
+      ThreadPool threadPool = new ThreadPool();
 
       // create the new searcher
-      MultipleSearcher searcher = new MultipleSearcher(threadPool, nuchBeans.toArray(new NutchBean[0]), nuchBeans
+      MultipleSearcher searcher;
+      if (_configuration.getBoolean("search.deduplicate.multiple.searchers", true)) {
+          LOG.info("Use deduplicating multi searcher.");
+          searcher = new DeduplicatingMultipleSearcher(threadPool, nuchBeans.toArray(new NutchBean[0]), nuchBeans
           .toArray(new NutchBean[0]));
+      } else {
+          searcher = new MultipleSearcher(threadPool, nuchBeans.toArray(new NutchBean[0]), nuchBeans
+                  .toArray(new NutchBean[0]));
+      }
       MultipleSearcherContainer multipleSearcherContainer = new MultipleSearcherContainer(searcher, _timeProvider
           .getTime()
-          + NEXTRELOADWAITINGTIME, paths);
-      _map.put(indexerBasePath, multipleSearcherContainer);
+          + NEXTRELOADWAITINGTIME, allPaths);
+      _map.put(indexerBasePathsString, multipleSearcherContainer);
       return searcher;
     }
     
     // return the already created searcher
-    return _map.get(indexerBasePath).getSearcher();
+    return _map.get(indexerBasePathsString).getSearcher();
   }
 
   private Path getSearchPath(String indexerBasePath) {
@@ -117,13 +134,16 @@ public class DirectoryScanningSearcherFactory {
   }
 
   public void reload() throws IOException {
-    String instance = _configuration.get("nutch.instance.folder");
-    LOG.info("reload searcher for instance: " + instance);
-    if (!_map.containsKey(instance)) {
-        LOG.warn("could not find searcher for instance (maybe the crawl have not run at least one time when it was added)");
+    String indexerBasePathsString = _configuration.get("search.instance.folder");
+    if (indexerBasePathsString == null || (indexerBasePathsString.trim().length() <= 0)) {
+        indexerBasePathsString = _configuration.get("nutch.instance.folder");
+    }
+    LOG.info("reload searcher for instances: " + indexerBasePathsString);
+    if (!_map.containsKey(indexerBasePathsString)) {
+        LOG.warn("could not find searcher for instances (maybe the crawl have not run at least one time when it was added)");
         LOG.info("try to get searcher again");
     } else {
-        clearCache(instance);
+        clearCache(indexerBasePathsString);
     }
     get();
     nutchSearcher.updateFacetManager();

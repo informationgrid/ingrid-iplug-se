@@ -59,7 +59,7 @@
     </property>
     <property>
         <name>io.sort.mb</name>
-        <value>512</value>
+        <value>128</value>
         <description>The total amount of buffer memory to use while
             sorting
             files, in megabytes. By default, gives each merge stream 1MB, which
@@ -100,7 +100,7 @@
 
     <property>
         <name>mapred.min.split.size</name>
-        <value>671088640</value>
+        <value>67108864</value>
     </property>
 
     <property>

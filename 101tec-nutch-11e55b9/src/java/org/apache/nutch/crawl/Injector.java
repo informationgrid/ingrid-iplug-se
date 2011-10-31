@@ -17,25 +17,36 @@
 
 package org.apache.nutch.crawl;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Random;
 
-// Commons Logging imports
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.apache.hadoop.io.*;
-import org.apache.hadoop.fs.*;
-import org.apache.hadoop.conf.*;
-import org.apache.hadoop.mapred.*;
-import org.apache.hadoop.util.*;
-
-import org.apache.nutch.net.*;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.WritableComparable;
+import org.apache.hadoop.mapred.FileInputFormat;
+import org.apache.hadoop.mapred.FileOutputFormat;
+import org.apache.hadoop.mapred.JobClient;
+import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapred.Mapper;
+import org.apache.hadoop.mapred.OutputCollector;
+import org.apache.hadoop.mapred.Reducer;
+import org.apache.hadoop.mapred.Reporter;
+import org.apache.hadoop.mapred.SequenceFileOutputFormat;
+import org.apache.hadoop.util.StringUtils;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
+import org.apache.nutch.net.URLFilters;
+import org.apache.nutch.net.URLNormalizers;
 import org.apache.nutch.scoring.ScoringFilterException;
 import org.apache.nutch.scoring.ScoringFilters;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
-import org.apache.nutch.util.SyncUtil;
 
 /** This class takes a flat file of URLs and adds them to the of pages to be
  * crawled.  Useful for bootstrapping the system. */
@@ -158,7 +169,7 @@ public class Injector extends Configured implements Tool {
     sortJob.setOutputKeyClass(Text.class);
     sortJob.setOutputValueClass(CrawlDatum.class);
     sortJob.setLong("injector.current.time", System.currentTimeMillis());
-    SyncUtil.syncJobRun(sortJob);//JobClient.runJob(sortJob);
+    JobClient.runJob(sortJob);
 
     // merge with existing crawl db
     if (LOG.isInfoEnabled()) {
@@ -167,7 +178,7 @@ public class Injector extends Configured implements Tool {
     JobConf mergeJob = CrawlDb.createJob(getConf(), crawlDb);
     FileInputFormat.addInputPath(mergeJob, tempDir);
     mergeJob.setReducerClass(InjectReducer.class);
-    SyncUtil.syncJobRun(mergeJob);//JobClient.runJob(mergeJob);
+    JobClient.runJob(mergeJob);
     CrawlDb.install(mergeJob, crawlDb);
 
     // clean up

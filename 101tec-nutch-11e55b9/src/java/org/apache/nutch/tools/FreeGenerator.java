@@ -177,7 +177,7 @@ public class FreeGenerator extends Configured implements Tool {
     FileOutputFormat.setOutputPath(job, new Path(args[1],
         new Path(segName, CrawlDatum.GENERATE_DIR_NAME)));
     try {
-        SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+        JobClient.runJob(job);
       return 0;
     } catch (Exception e) {
       LOG.fatal("FAILED: " + StringUtils.stringifyException(e));

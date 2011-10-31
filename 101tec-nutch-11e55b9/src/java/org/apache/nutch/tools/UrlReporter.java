@@ -162,6 +162,6 @@ public class UrlReporter extends Configured {
 
         // run job
         LOG.info("start running report job for '" + segment + "'");
-        SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+        JobClient.runJob(job);
     }
 }

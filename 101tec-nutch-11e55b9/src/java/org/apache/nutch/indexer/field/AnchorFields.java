@@ -58,7 +58,6 @@ import org.apache.nutch.scoring.webgraph.Node;
 import org.apache.nutch.scoring.webgraph.WebGraph;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
-import org.apache.nutch.util.SyncUtil;
 
 /**
  * Creates FieldWritable objects for inbound anchor text.   These FieldWritable
@@ -121,7 +120,7 @@ public class AnchorFields
 
     LOG.info("Starting extractor job");
     try {
-        SyncUtil.syncJobRun(extractor);//JobClient.runJob(extractor);
+        JobClient.runJob(extractor);
     }
     catch (IOException e) {
       LOG.error(StringUtils.stringifyException(e));
@@ -161,7 +160,7 @@ public class AnchorFields
 
     LOG.info("Starting collector job");
     try {
-        SyncUtil.syncJobRun(collector);//JobClient.runJob(collector);
+        JobClient.runJob(collector);
     }
     catch (IOException e) {
       LOG.error(StringUtils.stringifyException(e));

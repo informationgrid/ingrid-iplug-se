@@ -35,6 +35,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
+import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.MapFileOutputFormat;
 import org.apache.hadoop.mapred.Mapper;
@@ -48,7 +49,6 @@ import org.apache.nutch.net.URLFilters;
 import org.apache.nutch.net.URLNormalizers;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
-import org.apache.nutch.util.SyncUtil;
 
 /**
  * CrawlDb filter tool that filters urls that pass a white-black list
@@ -315,7 +315,7 @@ public class BWCrawlDbFilter extends Configured {
         job.setOutputValueClass(Entry.class);
         job.setBoolean(CrawlDbMapper.URL_FILTERING, filter);
         job.setBoolean(CrawlDbMapper.URL_NORMALIZING, normalize);
-        SyncUtil.syncJobRun(job);// JobClient.runJob(job);
+        JobClient.runJob(job);
 
         // filtering
         LOG.info("filter crawldb against bwdb: filtering started.");
@@ -333,7 +333,7 @@ public class BWCrawlDbFilter extends Configured {
         filterJob.setOutputFormat(MapFileOutputFormat.class);
         filterJob.setOutputKeyClass(HostTypeKey.class);
         filterJob.setOutputValueClass(ObjectWritable.class);
-        SyncUtil.syncJobRun(filterJob);// JobClient.runJob(filterJob);
+        JobClient.runJob(filterJob);
 
         // remove wrappedSegOutput
         FileSystem.get(job).delete(wrappedSegOutput, true);
@@ -349,7 +349,7 @@ public class BWCrawlDbFilter extends Configured {
         convertJob.setOutputFormat(MapFileOutputFormat.class);
         convertJob.setOutputKeyClass(Text.class);
         convertJob.setOutputValueClass(CrawlDatum.class);
-        SyncUtil.syncJobRun(convertJob);// JobClient.runJob(convertJob);
+        JobClient.runJob(convertJob);
 
         // 
         FileSystem.get(job).delete(tmpMergedDb, true);

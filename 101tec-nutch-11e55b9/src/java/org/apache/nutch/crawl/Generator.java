@@ -70,7 +70,6 @@ import org.apache.nutch.scoring.ScoringFilters;
 import org.apache.nutch.util.LockUtil;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
-import org.apache.nutch.util.SyncUtil;
 
 /** Generates a subset of a crawl db to fetch. */
 public class Generator extends Configured implements Tool {
@@ -503,8 +502,7 @@ public class Generator extends Configured implements Tool {
     job.setOutputKeyComparatorClass(DecreasingFloatComparator.class);
     job.setOutputValueClass(SelectorEntry.class);
     try {
-      //JobClient.runJob(job);    
-      SyncUtil.syncJobRun(job);
+      JobClient.runJob(job);    
     } catch (IOException e) {
       LockUtil.removeLockFile(fs, lock);
       throw e;
@@ -556,7 +554,7 @@ public class Generator extends Configured implements Tool {
     job.setOutputValueClass(CrawlDatum.class);
     job.setOutputKeyComparatorClass(HashComparator.class);
     try {
-        SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+        JobClient.runJob(job);
     } catch (IOException e) {
       LockUtil.removeLockFile(fs, lock);
       fs.delete(tempDir, true);
@@ -581,7 +579,7 @@ public class Generator extends Configured implements Tool {
       job.setOutputValueClass(CrawlDatum.class);
       FileOutputFormat.setOutputPath(job, tempDir2);
       try {
-          SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+          JobClient.runJob(job);
         CrawlDb.install(job, dbDir);
       } catch (IOException e) {
         LockUtil.removeLockFile(fs, lock);

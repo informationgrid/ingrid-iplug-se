@@ -181,7 +181,7 @@ public class LinkDb extends Configured implements Tool, Mapper<Text, ParseData, 
       FileInputFormat.addInputPath(job, new Path(segments[i], ParseData.DIR_NAME));
     }
     try {
-        SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+        JobClient.runJob(job);
     } catch (IOException e) {
       LockUtil.removeLockFile(fs, lock);
       throw e;
@@ -200,7 +200,7 @@ public class LinkDb extends Configured implements Tool, Mapper<Text, ParseData, 
       FileInputFormat.addInputPath(job, currentLinkDb);
       FileInputFormat.addInputPath(job, newLinkDb);
       try {
-          SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+          JobClient.runJob(job);
       } catch (IOException e) {
         LockUtil.removeLockFile(fs, lock);
         fs.delete(newLinkDb, true);

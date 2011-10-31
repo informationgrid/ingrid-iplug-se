@@ -32,6 +32,7 @@ import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
+import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
@@ -41,7 +42,6 @@ import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
-import org.apache.nutch.util.SyncUtil;
 
 /**
  * Analyse utility for the CrawlDB.
@@ -131,7 +131,7 @@ public class CrawlDbAnalyser implements Closeable {
         job.setOutputKeyClass(LongWritable.class);
         job.setOutputValueClass(LongWritable.class);
 
-        SyncUtil.syncJobRun(job);// JobClient.runJob(job);
+        JobClient.runJob(job);
 
         // reading the result
         FileSystem fileSystem = FileSystem.get(config);
@@ -174,7 +174,7 @@ public class CrawlDbAnalyser implements Closeable {
         
         job.setLong("db.analyser.fetchInterval", Long.parseLong(interval));
 
-        SyncUtil.syncJobRun(job);// JobClient.runJob(job);
+        JobClient.runJob(job);
 
         // reading the result
         FileSystem fileSystem = FileSystem.get(config);

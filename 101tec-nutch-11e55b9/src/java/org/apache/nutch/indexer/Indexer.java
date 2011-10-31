@@ -70,7 +70,7 @@ public class Indexer extends Configured implements Tool {
 
     NutchIndexWriterFactory.addClassToConf(job, LuceneWriter.class);
 
-    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+    JobClient.runJob(job);
     LOG.info("Indexer: done");
   }
 

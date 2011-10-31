@@ -105,7 +105,7 @@ public class LinkDbMerger extends Configured implements Tool, Reducer<Text, Inli
     for (int i = 0; i < dbs.length; i++) {
       FileInputFormat.addInputPath(job, new Path(dbs[i], LinkDb.CURRENT_NAME));      
     }
-    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+    JobClient.runJob(job);
     FileSystem fs = FileSystem.get(getConf());
     fs.mkdirs(output);
     fs.rename(FileOutputFormat.getOutputPath(job), new Path(output, LinkDb.CURRENT_NAME));

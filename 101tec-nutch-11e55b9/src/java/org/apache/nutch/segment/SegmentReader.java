@@ -223,7 +223,7 @@ public class SegmentReader extends Configured implements
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(NutchWritable.class);
 
-    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+    JobClient.runJob(job);
 
     // concatenate the output
     Path dumpFile = new Path(output, job.get("segment.dump.dir", "dump"));

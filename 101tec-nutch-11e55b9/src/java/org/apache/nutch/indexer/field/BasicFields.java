@@ -124,7 +124,7 @@ public class BasicFields
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(FieldsWritable.class);
 
-    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+    JobClient.runJob(job);
     if (LOG.isInfoEnabled()) {
       LOG.info("BasicFields: finished extractor");
     }
@@ -158,7 +158,7 @@ public class BasicFields
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(LinkDatum.class);
 
-    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+    JobClient.runJob(job);
     if (LOG.isInfoEnabled()) {
       LOG.info("BasicFields: finished flipper");
     }
@@ -192,7 +192,7 @@ public class BasicFields
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(FieldsWritable.class);
 
-    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+    JobClient.runJob(job);
     if (LOG.isInfoEnabled()) {
       LOG.info("BasicFields: finished scorer");
     }
@@ -223,7 +223,7 @@ public class BasicFields
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(FieldsWritable.class);
 
-    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+    JobClient.runJob(job);
     if (LOG.isInfoEnabled()) {
       LOG.info("BasicFields: finished merger");
     }

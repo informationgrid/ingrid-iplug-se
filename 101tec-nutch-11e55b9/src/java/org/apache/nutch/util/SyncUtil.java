@@ -10,7 +10,7 @@ import org.apache.hadoop.mapred.JobConf;
 public class SyncUtil {
     private static final Log LOG = LogFactory.getLog(SyncUtil.class);
 
-    public static void syncJobRun(JobConf job) throws IOException {
+    public static void syncJobRunDeprecared(JobConf job) throws IOException {
         long start = System.currentTimeMillis();
         synchronized (JobClient.class) {
             LOG.debug("sync duration in ms: " + String.valueOf(System.currentTimeMillis()-start));

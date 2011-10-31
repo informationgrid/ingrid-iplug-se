@@ -61,7 +61,6 @@ import org.apache.hadoop.util.ToolRunner;
 import org.apache.nutch.util.FSUtils;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
-import org.apache.nutch.util.SyncUtil;
 
 /**
  * The Loops job identifies cycles of loops inside of the web graph. This is
@@ -497,7 +496,7 @@ public class Loops
 
     try {
       LOG.info("Initializer: running");
-      SyncUtil.syncJobRun(init);//JobClient.runJob(init);
+      JobClient.runJob(init);
       LOG.info("Initializer: installing " + routes);
       FSUtils.replace(fs, routes, tempRoute, true);
       LOG.info("Initializer: finished");
@@ -529,7 +528,7 @@ public class Loops
 
       try {
         LOG.info("Looper: running");
-        SyncUtil.syncJobRun(looper);//JobClient.runJob(looper);
+        JobClient.runJob(looper);
         LOG.info("Looper: installing " + routes);
         FSUtils.replace(fs, routes, tempRoute, true);
         LOG.info("Looper: finished");
@@ -556,7 +555,7 @@ public class Loops
 
     try {
       LOG.info("Finalizer: running");
-      SyncUtil.syncJobRun(finalizer);//JobClient.runJob(finalizer);
+      JobClient.runJob(finalizer);
       LOG.info("Finalizer: finished");
     }
     catch (IOException e) {

@@ -35,10 +35,10 @@ import org.apache.nutch.searcher.Summary;
 
 public class MultipleSearcher implements SearchBean, HitSummarizer {
 
-  private final ThreadPool _threadPool;
-  private final SearchBean[] _searchBeans;
+  final ThreadPool _threadPool;
+  final SearchBean[] _searchBeans;
 
-private Map<String, SegmentBean> _segmentBeans = new HashMap<String, SegmentBean>();
+  Map<String, SegmentBean> _segmentBeans = new HashMap<String, SegmentBean>();
 
   public MultipleSearcher(ThreadPool threadPool,
           SearchBean[] searchBeans, SegmentBean[] segmentBeans)
@@ -139,7 +139,7 @@ private Map<String, SegmentBean> _segmentBeans = new HashMap<String, SegmentBean
    * @param l is the list to add the the
    * @param hit is the hit to be added
    */
-  private void mergeElement(List<Hit> l, Hit hit) {
+  protected void mergeElement(List<Hit> l, Hit hit) {
       // start from the end (lowest score)
       for (int i=l.size()-1; i>=0; i--) {
           Hit hitFromList = l.get(i);

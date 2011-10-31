@@ -446,7 +446,7 @@ public class DeleteDuplicates extends Configured
     job.setOutputValueClass(IndexDoc.class);
     job.setOutputFormat(SequenceFileOutputFormat.class);
 
-    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+    JobClient.runJob(job);
 
     Path outDir2 =
       new Path("dedup-hash-"+
@@ -468,7 +468,7 @@ public class DeleteDuplicates extends Configured
     job.setOutputValueClass(IndexDoc.class);
     job.setOutputFormat(SequenceFileOutputFormat.class);
 
-    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+    JobClient.runJob(job);
 
     // remove outDir1 - no longer needed
     fs.delete(outDir1, true);
@@ -489,7 +489,7 @@ public class DeleteDuplicates extends Configured
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(IntWritable.class);
 
-    SyncUtil.syncJobRun(job);//JobClient.runJob(job);
+    JobClient.runJob(job);
 
     fs.delete(outDir2, true);
 
