@@ -21,8 +21,11 @@ public class PreCrawls {
   private static final String PRECRAWLS_ORDER = "crawl-prepare.order";
 
   private IPreCrawl[] _preCrawls;
+  
+  private Configuration conf;
 
   public PreCrawls(Configuration configuration) {
+    this.conf = configuration;
     String order = configuration.get(PRECRAWLS_ORDER);
     ObjectCache objectCache = ObjectCache.get(configuration);
     _preCrawls = (IPreCrawl[]) objectCache.getObject(IPreCrawl.X_POINT_ID);
@@ -78,6 +81,11 @@ public class PreCrawls {
 
   public void preCrawl(Path crawlDir) throws IOException {
     for (IPreCrawl preCrawl : _preCrawls) {
+      // Set configuration to the current value
+      // because during the first run, the configuration in the 
+      // pre crawls is different to the current one
+      // see PluginRepository.get() method code
+      preCrawl.setConf(conf);
       preCrawl.preCrawl(crawlDir);
     }
   }
