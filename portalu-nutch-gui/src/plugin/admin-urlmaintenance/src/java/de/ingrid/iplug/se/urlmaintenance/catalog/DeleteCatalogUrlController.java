@@ -35,7 +35,7 @@ public class DeleteCatalogUrlController extends NavigationSelector {
     if (url != null) {
         url.setDeleted(new Date());
         _catalogUrlDao.makePersistent(url);
-        _databaseExport.exportCatalogUrls();
+//        _databaseExport.exportCatalogUrls();
     }
 
     String view = "redirect:/catalog/listTopicUrls.html";

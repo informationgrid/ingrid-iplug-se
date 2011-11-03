@@ -63,7 +63,7 @@ public class DeleteWebUrlController extends NavigationSelector {
       LOG.info("delete start url: " + startUrl);
       startUrl.setDeleted(new Date());
       _startUrlDao.makePersistent(startUrl);
-      _databaseExport.exportWebUrls();
+//      _databaseExport.exportWebUrls();
     }
 
     String view = "redirect:/web/listWebUrls.html";

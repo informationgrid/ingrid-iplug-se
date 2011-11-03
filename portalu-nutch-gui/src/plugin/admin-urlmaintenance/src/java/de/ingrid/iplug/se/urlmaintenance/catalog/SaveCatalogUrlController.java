@@ -146,7 +146,7 @@ public class SaveCatalogUrlController extends NavigationSelector {
     catalogUrl.setMetadatas(catalogUrlCommand.getMetadatas());
     _catalogUrlDao.makePersistent(catalogUrl);
     _transactionService.flipTransaction();
-    _databaseExport.exportCatalogUrls();
+//    _databaseExport.exportCatalogUrls();
     
     return redirectUrl;
   }

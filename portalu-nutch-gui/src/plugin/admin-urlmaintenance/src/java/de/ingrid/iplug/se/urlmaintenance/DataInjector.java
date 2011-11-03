@@ -72,8 +72,8 @@ public class DataInjector {
 
     createUrls();
     
-    databaseExport.exportWebUrls();
-    databaseExport.exportCatalogUrls();
+//    databaseExport.exportWebUrls();
+//    databaseExport.exportCatalogUrls();
   }
 
   private void createUrls() throws InterruptedException {

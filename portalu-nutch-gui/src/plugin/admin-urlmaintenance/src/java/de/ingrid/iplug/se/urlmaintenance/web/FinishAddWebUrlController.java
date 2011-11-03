@@ -43,7 +43,7 @@ public class FinishAddWebUrlController extends NavigationSelector {
   public String postFinish(@ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand,
       @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand) {
     startUrlCommand.write();
-    _databaseExport.exportWebUrls();
+//    _databaseExport.exportWebUrls();
 
     return "redirect:/web/listWebUrls.html";
   }
