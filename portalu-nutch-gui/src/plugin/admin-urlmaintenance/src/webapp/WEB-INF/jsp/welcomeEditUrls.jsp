@@ -34,10 +34,10 @@
 				    <div>
 				        <div>
 				        	<p>&nbsp;</p>
-				        	<p>Willkommen in der Urlpflege. M�chten Sie Webseiten zur <i>PortalU�-Suche</i> hinzuf�gen,
-                             bearbeiten oder l�schen? Dann klicken Sie bitte auf den Reiter <b>Web-URLs</b>. Wenn Sie
-                             hingegen Webseiten zu den PortalU�-Rubriken <i>Umweltthemen, Messwerte</i> oder <i>Service</i> 
-                             hinzuf�gen, bearbeiten oder l�schen m�chten, klicken Sie bitte auf den Reiter 
+				        	<p>Willkommen in der Urlpflege. M&ouml;chten Sie Webseiten zur <i>PortalU&reg;-Suche</i> hinzuf&uuml;gen,
+                             bearbeiten oder l&ouml;schen? Dann klicken Sie bitte auf den Reiter <b>Web-URLs</b>. Wenn Sie
+                             hingegen Webseiten zu den PortalU&reg;-Rubriken <i>Umweltthemen, Messwerte</i> oder <i>Service</i> 
+                             hinzuf&uuml;gen, bearbeiten oder l&ouml;schen m&ouml;chten, klicken Sie bitte auf den Reiter 
                              <b>Katalog-URLs</b>.</p>
 				        </div>
 				    </div>
