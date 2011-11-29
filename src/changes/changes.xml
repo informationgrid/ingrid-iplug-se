@@ -4,6 +4,11 @@
     <title>Changes Ingrid iPlug SE</title>
   </properties>
   <body>
+    <release version="3.2.0-SNAPSHOT" date="2011-??-??" description="Feature Release">
+      <action type="update" dev="wemove" issue="INGRID-1885">
+        Updated start-index.sh and start-search.sh, which had an issue when being batch-invoked, deleted RSYNC which is no longer used, see https://dev.wemove.com/jira/browse/INGRID-1885
+      </action>
+    </release>   
     <release version="3.1.0-SNAPSHOT" date="2011-xx-xx" description="Bugfix Release">
       <action type="add" dev="wemove">Add new property 'search.instance.folder' to be able to set multiple instance folder for the searcher.</action>
       <action type="add" dev="wemove">Add deduplicating multi searcher. This searcher removes duplicates by URL. Reduces search performance.</action>
