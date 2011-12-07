@@ -26,6 +26,7 @@ import org.apache.nutch.searcher.Hits;
 import org.apache.nutch.searcher.LuceneSearchBean;
 import org.apache.nutch.searcher.NutchBean;
 import org.apache.nutch.searcher.Query;
+import org.apache.nutch.searcher.QueryException;
 import org.apache.nutch.searcher.QueryFilters;
 import org.apache.nutch.searcher.SearchBean;
 import org.apache.nutch.searcher.Query.Clause;
@@ -96,6 +97,13 @@ public class NutchSearcher implements IPlug {
                     LOG.debug("Resulting nutch query: " + bq);
                 }
                 return bq;
+            } catch (QueryException e) {
+                // catch the unknown field in query exception
+                // since we cannot control the facet queries
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Unknown field in query. Returning empty BooleanQuery", e);
+                }
+                return new BooleanQuery();
             } catch (IOException e) {
                 LOG.error("Error parsing ingrid query to nutch query: " + ingridQuery, e);
             }
