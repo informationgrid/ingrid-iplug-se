@@ -134,6 +134,8 @@ public class SimHashSignature extends Signature {
             }
         } catch (IOException e) {
             LOG.error("Error shingling text.", e);
+        } catch (NullPointerException e) {
+            LOG.error("Error shingling text. This seems to be a problem with the org.apache.lucene.analysis.shingle.ShingleMatrixFilter.", e);
         }
 
         SimHasher2 simHasher = new SimHasher2(MAX_NUMBER_OF_HASHES);
