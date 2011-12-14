@@ -66,7 +66,14 @@
               <row>
                     <label>Exclude-URL:</label>
                     <field>
-                        <input type="text" id="excludeUrl" name="excludeUrl"/>
+                      <c:choose>
+                        <c:when test="${newExcludeUrl == null || newExcludeUrl.url == null}">
+                           <input type="text" id="excludeUrl" name="excludeUrl" value="" />
+                        </c:when>
+                        <c:otherwise>
+                           <input type="text" id="excludeUrl" name="excludeUrl" value="${newExcludeUrl.url}" />
+                        </c:otherwise>
+                      </c:choose>
                         <form:errors path="url" cssClass="error" element="div"/>
                     </field>
                 </row>

@@ -89,7 +89,7 @@ public class AddLimitUrlController extends NavigationSelector {
         }        
     }
 
-    if (_validator.validateLimitUrl(errorsLimit).hasErrors()) {
+    if (_validator.validateLimitUrl(errorsLimit, startUrlCommand).hasErrors()) {
       return "web/addLimitUrl";
     }
     

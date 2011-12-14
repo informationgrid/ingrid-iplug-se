@@ -5,11 +5,9 @@
   </properties>
   <body>
     <release version="3.2.0-SNAPSHOT" date="2011-??-??" description="Feature Release">
-      <action type="update" dev="wemove" issue="INGRID-1885">
-        Updated start-index.sh and start-search.sh, which had an issue when being batch-invoked, deleted RSYNC which is no longer used, see https://dev.wemove.com/jira/browse/INGRID-1885
+      <action type="add" dev="wemove" issue="INGRID32-53">
+        Add more restrictive URL validation. Limit and Exclude URLs are forced to have the same domain as the Start-URL. Regular expressions are validated.
       </action>
-    </release>   
-    <release version="3.1.0-SNAPSHOT" date="2011-xx-xx" description="Bugfix Release">
       <action type="add" dev="wemove">Add new property 'search.instance.folder' to be able to set multiple instance folder for the searcher.</action>
       <action type="add" dev="wemove">Add deduplicating multi searcher. This searcher removes duplicates by URL. Reduces search performance.</action>
       <action type="add" dev="wemove">Instances can issue crawls independently, enabling parallel crawls (instance specific hadoop temp directories).</action>
@@ -23,6 +21,9 @@
       <action type="add" dev="wemove">Allow user with role admin to login with same permissions as admin-portal.</action>
       <action type="update" dev="wemove">Upgrade PDF parser library to current version, fixing some PDF parsing issues.</action>
       <action type="update" dev="wemove">Remove metadata "functional category" from "topics" catalog pages.</action>
+      <action type="update" dev="wemove" issue="INGRID-1885">
+        Updated start-index.sh and start-search.sh, which had an issue when being batch-invoked, deleted RSYNC which is no longer used, see https://dev.wemove.com/jira/browse/INGRID-1885
+      </action>
       <action type="fix" dev="wemove">Optimized SNSIndexingInterface (from SNS iPlug), added DEBUG output of classify result.</action>
       <action type="fix" dev="wemove">Make sure not-modified URLs from merged segments are indexed even with option "merge.after.fetch" is false.</action>
       <action type="fix" dev="wemove">Fixed wrong links when user has logged in with wrong permissions (role).</action>

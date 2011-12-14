@@ -3,6 +3,8 @@ package de.ingrid.iplug.se.urlmaintenance.validation;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +30,11 @@ public class WebUrlCommandValidator extends AbstractValidator<StartUrlCommand> {
         rejectIfEmptyOrWhitespace(errors, "url");
         if (url != null && url.length() > 0) {
             try {
-                new URL(url);
+                URL startUrl = new URL(url);
+                if ((url.indexOf(startUrl.getHost()+"/")  == -1 && url.indexOf(startUrl.getHost()+":")  == -1) || 
+                        (url.indexOf(startUrl.getHost()+":")  != -1 && url.indexOf(startUrl.getHost()+":"+startUrl.getPort()+"/")  == -1)) {
+                    rejectError(errors, "url", IErrorKeys.MISSING_SLASH);
+                }
             } catch (final MalformedURLException e) {
                 rejectError(errors, "url", IErrorKeys.MALFORMED);
             }
@@ -47,17 +53,37 @@ public class WebUrlCommandValidator extends AbstractValidator<StartUrlCommand> {
     }
 
     @SuppressWarnings("unchecked")
-    public Errors validateLimitUrl(final Errors errors) {
+    public Errors validateLimitUrl(final Errors errors, final StartUrlCommand startUrlCommand) {
         final String url = (String)get(errors, "url");//limitUrl.getUrl();
         if (url == null || url.length() == 0) {
             errors.rejectValue("url", getErrorKey(_typeClass, "limitUrl.url", IErrorKeys.EMPTY));
         } else {
             try {
                 // allow regular expression syntax
+                URL limitUrl;
                 if (url.startsWith("/") && url.endsWith("/")) {
-                    new URL(url.substring(1, url.length() - 1));
+                    
+                    final String urlStr = url.substring(1, url.length() - 1);
+                    limitUrl = new URL(urlStr);
+                    // check for valid regexp
+                    try {
+                        Pattern.compile(urlStr);
+                    } catch (final PatternSyntaxException e) {
+                        errors.rejectValue("url", getErrorKey(_typeClass, "limitUrl.url", IErrorKeys.INVALID_REGEX));
+                    }
+                    // check for domain-trailing slash
+                    if ((urlStr.indexOf(limitUrl.getHost()+"/")  == -1 && urlStr.indexOf(limitUrl.getHost()+":")  == -1) || 
+                            (urlStr.indexOf(limitUrl.getHost()+":")  != -1 && urlStr.indexOf(limitUrl.getHost()+":"+limitUrl.getPort()+"/")  == -1)) {
+                        errors.rejectValue("url", getErrorKey(_typeClass, "limitUrl.url", IErrorKeys.MISSING_SLASH));
+                    }
+                    
                 } else {
-                    new URL(url);
+                    limitUrl = new URL(url);
+                }
+                // check for same domain as start url
+                URL startUrl = new URL(startUrlCommand.getUrl());
+                if (!startUrl.getHost().equals(limitUrl.getHost())) {
+                    errors.rejectValue("url", getErrorKey(_typeClass, "limitUrl.url", IErrorKeys.HOST_NOT_MATCH));
                 }
             } catch (final MalformedURLException e) {
                 errors.rejectValue("url", getErrorKey(_typeClass, "limitUrl.url", IErrorKeys.MALFORMED));
@@ -91,17 +117,36 @@ public class WebUrlCommandValidator extends AbstractValidator<StartUrlCommand> {
         return errors;
     }
     
-    public Errors validateExcludeUrl(final Errors errors) {
+    public Errors validateExcludeUrl(final Errors errors, final StartUrlCommand startUrlCommand) {
         final String url = (String)get(errors, "url");//excludeUrl.getUrl();
         if (url == null || url.length() == 0) {
             errors.rejectValue("url", getErrorKey(_typeClass, "excludeUrl.url", IErrorKeys.EMPTY));
         } else {
             try {
                 // allow regular expression syntax
+                URL excludeUrl;
                 if (url.startsWith("/") && url.endsWith("/")) {
-                    new URL(url.substring(1, url.length() - 1));
+                    final String urlStr = url.substring(1, url.length() - 1);
+                    excludeUrl = new URL(urlStr);
+                    // check for valid regexp
+                    try {
+                        Pattern.compile(urlStr);
+                    } catch (final PatternSyntaxException e) {
+                        errors.rejectValue("url", getErrorKey(_typeClass, "excludeUrl.url", IErrorKeys.MALFORMED));
+                    }
+                    // check for domain-trailing slash
+                    if ((urlStr.indexOf(excludeUrl.getHost()+"/")  == -1 && urlStr.indexOf(excludeUrl.getHost()+":")  == -1) || 
+                            (urlStr.indexOf(excludeUrl.getHost()+":")  != -1 && urlStr.indexOf(excludeUrl.getHost()+":"+excludeUrl.getPort()+"/")  == -1)) {
+                        errors.rejectValue("url", getErrorKey(_typeClass, "excludeUrl.url", IErrorKeys.MISSING_SLASH));
+                    }
+                    
                 } else {
-                    new URL(url);
+                    excludeUrl = new URL(url);
+                }
+                // check for same domain as start url
+                URL startUrl = new URL(startUrlCommand.getUrl());
+                if (!startUrl.getHost().equals(excludeUrl.getHost())) {
+                    errors.rejectValue("url", getErrorKey(_typeClass, "excludeUrl.url", IErrorKeys.HOST_NOT_MATCH));
                 }
             } catch (final MalformedURLException e) {
                 errors.rejectValue("url", getErrorKey(_typeClass, "excludeUrl.url", IErrorKeys.MALFORMED));

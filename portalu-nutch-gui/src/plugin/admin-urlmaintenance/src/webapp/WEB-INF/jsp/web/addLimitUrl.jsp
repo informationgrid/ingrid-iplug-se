@@ -67,7 +67,14 @@
               <row>
                     <label>Limit-URL:</label>
                     <field>
-                       <input type="text" id="limitUrl" name="limitUrl" value="${startUrlCommand.url}" />
+                      <c:choose>
+                        <c:when test="${newLimitUrl == null || newLimitUrl.url == null}">
+                           <input type="text" id="limitUrl" name="limitUrl" value="${startUrlCommand.url}" />
+                        </c:when>
+                        <c:otherwise>
+                           <input type="text" id="limitUrl" name="limitUrl" value="${newLimitUrl.url}" />
+                        </c:otherwise>
+                      </c:choose>
                        <form:errors path="url" cssClass="error" element="div"/>
                     </field>
                     <desc></desc>

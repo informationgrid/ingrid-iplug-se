@@ -54,7 +54,7 @@ public class AddExcludeUrlController extends NavigationSelector {
     excludeUrlCommand.setProvider(startUrlCommand.getProvider());
     excludeUrlCommand.setUrl(excludeUrl);
     
-    if (_validator.validateExcludeUrl(errors).hasErrors()) {
+    if (_validator.validateExcludeUrl(errors, startUrlCommand).hasErrors()) {
         return "web/addExcludeUrl";
     }
     
