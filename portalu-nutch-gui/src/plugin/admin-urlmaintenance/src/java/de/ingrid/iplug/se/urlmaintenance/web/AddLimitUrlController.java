@@ -67,7 +67,7 @@ public class AddLimitUrlController extends NavigationSelector {
   }
 
   @RequestMapping(value = "/web/addLimitUrl.html", method = RequestMethod.GET)
-  public String addLimitUrl(@ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand,
+  public String addLimitUrl(@ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand, @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand,
           Model model) {
     return "web/addLimitUrl";
   }

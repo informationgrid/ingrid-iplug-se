@@ -36,10 +36,14 @@ public class SearchUpdateScanner extends TimerTask {
         _factory = factory;
         _timer = new Timer(true);
         _timer.schedule(this, 0, period > 0 ? period : 60000);
+        LOG.info("Start search update scanner, check interval [sec]: " + (period > 0 ? period : 60000)/1000);
     }
 
     @Override
     public void run() {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Check for updated search instances.");
+        }
         String indexerBasePathsString = _configuration.get("search.instance.folder");
         if (indexerBasePathsString == null || (indexerBasePathsString.trim().length() <= 0)) {
             indexerBasePathsString = _configuration.get("nutch.instance.folder");
@@ -51,25 +55,27 @@ public class SearchUpdateScanner extends TimerTask {
         for (String dirStr : indexerBasePathes) {
             File dir = new File(dirStr);
             if (dir != null && dir.exists()) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Try to add instance:" + dir);
+                }
                 // nutch instances with crawls
-                LOG.debug("listing all instances");
                 instances.addAll(Arrays.asList(dir.listFiles(new InstancesFilter())));
             }
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Found instances:" + instances.toString());
         }
 
         if (instances.size() > 0) {
             // updated crawls for instances
-            LOG.debug("checking crawls for update");
             final Map<File, List<File>> crawls = getCrawls(instances.toArray(new File[0]));
 
             if (!crawls.isEmpty()) {
                 // remove update files
-                LOG.debug("removing search.update files");
                 for (final File instance : crawls.keySet()) {
                     update(crawls.get(instance));
                 }
                 // update crawls
-                LOG.info("reloading searcher factory");
                 try {
                     _factory.reload();
                 } catch (final Exception e) {
@@ -109,8 +115,14 @@ public class SearchUpdateScanner extends TimerTask {
             final List<File> list = new ArrayList<File>();
             final File crawls = new File(instance, "crawls");
             if (crawls.exists()) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("checking crawl directory: " + crawls);
+                }
                 for (final File crawl : crawls.listFiles()) {
                     if (crawl.isDirectory() && isUpdated(crawl)) {
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("add updated crawl directory: " + crawl);
+                        }
                         list.add(crawl);
                     }
                 }

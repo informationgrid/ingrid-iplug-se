@@ -10,6 +10,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 
+import org.eclipse.persistence.jpa.JpaEntityManager;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -111,6 +112,12 @@ public class TransactionService {
     EntityManager entityManager = getEntityManager();
     entityManager.flush();
   }
+
+  public void evictCache() {
+      EntityManager entityManager = getEntityManager();
+      ((JpaEntityManager)entityManager.getDelegate()).getServerSession().getIdentityMapAccessor().invalidateAll();
+    }
+  
   
   public void refresh(Object object) {
       EntityManager entityManager = getEntityManager();

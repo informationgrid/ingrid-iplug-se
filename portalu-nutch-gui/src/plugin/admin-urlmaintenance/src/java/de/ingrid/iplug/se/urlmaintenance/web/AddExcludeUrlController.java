@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import de.ingrid.iplug.se.urlmaintenance.PartnerProviderCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.ExcludeUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.StartUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IExcludeUrlDao;
@@ -38,7 +39,7 @@ public class AddExcludeUrlController extends NavigationSelector {
   }
 
   @RequestMapping(value = "/web/addExcludeUrl.html", method = RequestMethod.GET)
-  public String addExcludeUrl(@ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand,
+  public String addExcludeUrl(@ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand, @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand,
           Model model) {
     //model.addAttribute("excludeUrls", startUrlCommand.getExcludeUrlCommands());
     //model.addAttribute("newExcludeUrl", new ExcludeUrlCommand(_excludeUrlDao));

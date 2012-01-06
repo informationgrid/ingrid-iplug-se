@@ -18,5 +18,7 @@ public interface IDao<T> {
   void flush();
 
   void flipTransaction();
+  
+  void evictCache();
 
 }

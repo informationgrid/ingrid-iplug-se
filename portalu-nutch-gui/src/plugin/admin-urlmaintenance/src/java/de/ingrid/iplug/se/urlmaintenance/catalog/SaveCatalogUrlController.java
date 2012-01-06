@@ -59,6 +59,7 @@ public class SaveCatalogUrlController extends NavigationSelector {
   
   @RequestMapping(value = "/catalog/saveCatalogUrl.html", method = RequestMethod.GET)
   public String saveCatalogUrl(
+      @ModelAttribute("partnerProviderCommand") final PartnerProviderCommand partnerProviderCommand,
       @ModelAttribute("catalogUrlCommand") CatalogUrlCommand catalogUrlCommand,
       Model model) {
     List<Metadata> metadatas = catalogUrlCommand.getMetadatas();

@@ -62,5 +62,11 @@ public abstract class Dao<T extends IdBase> implements IDao<T> {
   public void flipTransaction() {
     _transactionService.flipTransaction();
   }
+  
+  @Override
+  public void evictCache() {
+    _transactionService.evictCache();
+  }
+  
 
 }

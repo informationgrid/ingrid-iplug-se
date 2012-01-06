@@ -18,6 +18,7 @@ package org.apache.nutch.admin.searcher;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -28,6 +29,7 @@ import java.util.concurrent.BlockingQueue;
 import org.apache.nutch.searcher.Hit;
 import org.apache.nutch.searcher.HitDetails;
 import org.apache.nutch.searcher.Hits;
+import org.apache.nutch.searcher.NutchBean;
 import org.apache.nutch.searcher.Query;
 import org.apache.nutch.searcher.SearchBean;
 import org.apache.nutch.searcher.SegmentBean;
@@ -45,6 +47,11 @@ public class DeduplicatingMultipleSearcher extends MultipleSearcher {
         if (_searchBeans.length == 0) {
             return null;
         }
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Use " + _searchBeans.length + "search beans.");
+        }
+        
         BlockingQueue<SearchBucket> arrayBlockingQueue = new ArrayBlockingQueue<SearchBucket>(_searchBeans.length);
 
         // start searching in thread
@@ -100,9 +107,15 @@ public class DeduplicatingMultipleSearcher extends MultipleSearcher {
                 HitDetails details = _searchBeans[hit.getIndexNo()].getDetails(hit);
                 String url = details.getValue("url");
                 if (urlMap.containsKey(url)) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Deduplicate: " + url + "(source/segment: " + Arrays.toString(((NutchBean)_searchBeans[hit.getIndexNo()]).getSegmentNames()) + ")");
+                    }
                     it.remove();
                     totalHits--;
                 } else {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Add: " + url + "(source/segment: " + Arrays.toString(((NutchBean)_searchBeans[hit.getIndexNo()]).getSegmentNames()) + ")");
+                    }
                     urlMap.put(url, url);
                     cnt++;
                 }

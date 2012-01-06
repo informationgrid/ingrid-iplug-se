@@ -56,7 +56,7 @@
 						        <thead>
 						            <tr>
 						                <th>Url</th>
-						                <!--<th>Thema</th>-->
+						                <th>Thema</th>
 						                <th>Rubrik</th>
 						                <th>Alternativ. Titel</th>
 						            </tr>
@@ -64,7 +64,7 @@
 						        <tbody>
 						            <tr>
 						                <td>${catalogUrlCommand.url}</td>
-						                <!--<td>
+						                <td>
 						                	<c:set var="i" value="-1"/>
 						                	<c:forEach items="${catalogUrlCommand.metadatas}" var="md">
 												<c:if test="${md.metadataKey == 'topic'}">
@@ -73,7 +73,7 @@
 													<fmt:message key="${md.metadataKey}.${md.metadataValue}" />
 												</c:if>
 											</c:forEach>&nbsp;
-						                </td>-->
+						                </td>
 						                <td>
 						                	<c:set var="i" value="-1"/>
 						                	<c:forEach items="${catalogUrlCommand.metadatas}" var="md">
@@ -120,8 +120,7 @@
 					    YAHOO.example.EnhanceFromMarkup = function() {
 					        var myColumnDefs = [
 					            {key:"url",label:"URL"},
-					            //{key:"topic",label:"Thema"},
-					            //{key:"functCat",label:"Funkt. Kategorie"},
+					            {key:"topic",label:"Thema"},
 					            {key:"rubric",label:"Rubrik"},
 					            {key:"altTitle",label:"Alternativ. Titel"}
 					        ];
@@ -131,8 +130,7 @@
 					        myDataSource.responseSchema = {
 					            fields: [
 									{key:"url"}, 
-									//{key:"topic"}, 
-									//{key:"functCat"}, 
+									{key:"topic"}, 
 									{key:"rubric"},
 									{key:"altTitle"}
 								]

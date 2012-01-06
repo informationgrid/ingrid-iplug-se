@@ -31,7 +31,7 @@ public class FinishAddWebUrlController extends NavigationSelector {
   }
 
   @RequestMapping(value = "/web/finishWebUrl.html", method = RequestMethod.GET)
-  public String finish(@ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand) {
+  public String finish(@ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand, @ModelAttribute("startUrlCommand") StartUrlCommand startUrlCommand) {
     List<LimitUrlCommand> limitUrls = startUrlCommand.getLimitUrlCommands();
     List<ExcludeUrlCommand> excludeUrls = startUrlCommand.getExcludeUrlCommands();
     cleanupEmptyUrls(limitUrls);

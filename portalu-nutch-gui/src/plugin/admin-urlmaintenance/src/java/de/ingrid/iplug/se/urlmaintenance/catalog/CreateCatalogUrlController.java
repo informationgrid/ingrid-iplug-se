@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import de.ingrid.iplug.se.urlmaintenance.EntityEditor;
+import de.ingrid.iplug.se.urlmaintenance.PartnerProviderCommand;
 import de.ingrid.iplug.se.urlmaintenance.commandObjects.CatalogUrlCommand;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.ICatalogUrlDao;
 import de.ingrid.iplug.se.urlmaintenance.persistence.dao.IMetadataDao;
@@ -76,6 +77,7 @@ public class CreateCatalogUrlController extends NavigationSelector {
   @RequestMapping(value = { "/catalog/createCatalogUrl.html",
       "/catalog/editCatalogUrl.html" }, method = RequestMethod.GET)
   public String editCatalogUrl(final Model model,
+      @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand,
       @ModelAttribute("catalogUrlCommand") final CatalogUrlCommand catalogUrlCommand,
       @RequestParam(value = "id", required = false) final Long id,
       @RequestParam(value = "type", required = true) final String type) {
@@ -100,6 +102,7 @@ public class CreateCatalogUrlController extends NavigationSelector {
 
   @RequestMapping(value = "/catalog/createCatalogUrl.html", method = RequestMethod.POST)
   public String anotherPostEditCatalogUrl(final Model model,
+      @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand,
       @ModelAttribute("catalogUrlCommand") final CatalogUrlCommand catalogUrlCommand, final Errors errors,
       @RequestParam(value = "type", required = true) final String type,
       @RequestParam(value = "altTitle", required = true) final String altTitle) {
@@ -126,7 +129,7 @@ public class CreateCatalogUrlController extends NavigationSelector {
     
     _validator.setUsedDatatype(type);
     if (_validator.validate(errors).hasErrors()) {
-        return editCatalogUrl(model, catalogUrlCommand, null, type);
+        return editCatalogUrl(model, partnerProviderCommand, catalogUrlCommand, null, type);
     }
     return "redirect:/catalog/saveCatalogUrl.html";
   }

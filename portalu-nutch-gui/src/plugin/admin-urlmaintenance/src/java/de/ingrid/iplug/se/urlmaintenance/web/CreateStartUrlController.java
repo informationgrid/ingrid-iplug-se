@@ -35,6 +35,7 @@ public class CreateStartUrlController extends NavigationSelector {
   @RequestMapping(value = { "/web/createStartUrl.html",
       "/web/editStartUrl.html" }, method = RequestMethod.GET)
   public String createStartUrl(
+      @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand,
       @ModelAttribute("startUrlCommand") final StartUrlCommand startUrlCommand,
       @RequestParam(value = "id", required = false) final Long id) {
     if (id != null) {
@@ -49,7 +50,7 @@ public class CreateStartUrlController extends NavigationSelector {
       final Errors errors, @ModelAttribute("partnerProviderCommand") final PartnerProviderCommand partnerProviderCommand) {
 
     if (_validator.validateStartUrl(errors).hasErrors()) {
-        return createStartUrl(startUrlCommand, null);
+        return createStartUrl(partnerProviderCommand, startUrlCommand, null);
     }
     return "redirect:/web/addLimitUrl.html";
   }
