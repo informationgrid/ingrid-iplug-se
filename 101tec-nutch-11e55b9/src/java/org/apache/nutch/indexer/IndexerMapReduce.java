@@ -76,6 +76,10 @@ implements Mapper<Text, Writable, Text, NutchWritable>,
   public void reduce(Text key, Iterator<NutchWritable> values,
                      OutputCollector<Text, NutchDocument> output, Reporter reporter)
     throws IOException {
+      
+      if (LOG.isDebugEnabled()) {
+          LOG.debug("Working on key: " + key); 
+      }
     Inlinks inlinks = null;
     CrawlDatum dbDatum = null;
     CrawlDatum fetchDatum = null;
@@ -98,11 +102,17 @@ implements Mapper<Text, Writable, Text, NutchWritable>,
           // only index those pages if merging is activated
           // otherwise they won't get into the index!!!
           if (mergeAfterFetch || (!mergeAfterFetch && datum.getStatus() != CrawlDatum.STATUS_FETCH_NOTMODIFIED)) {
+              if (LOG.isDebugEnabled()) {
+                  LOG.debug("Set fetch datum to '"+datum+"'. key: " + key); 
+              }
               fetchDatum = datum;
           }
           if (!mergeAfterFetch && datum.getStatus() == CrawlDatum.STATUS_FETCH_NOTMODIFIED) {
               if (fetchDatumNotModified == null || fetchDatumNotModified.getFetchTime() < datum.getFetchTime()) {
                   fetchDatumNotModified = datum;
+              }
+              if (LOG.isDebugEnabled()) {
+                  LOG.debug("Set fetch fetchDatumNotModified to '"+fetchDatumNotModified+"'. key: " + key); 
               }
           }
         } else if (CrawlDatum.STATUS_LINKED == datum.getStatus() ||
@@ -128,6 +138,9 @@ implements Mapper<Text, Writable, Text, NutchWritable>,
 
     if (fetchDatum == null || dbDatum == null
         || parseText == null || parseData == null) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Ignoring, because of missing data (fetchDatum:"+fetchDatum+",dbDatum:"+dbDatum+",parseText:"+parseText+",parseData:"+parseData+")! key: " + key); 
+        }
       return;                                     // only have inlinks
     }
 
@@ -135,6 +148,9 @@ implements Mapper<Text, Writable, Text, NutchWritable>,
     // otherwise not modified pages won't be in index after merging
     if (!parseData.getStatus().isSuccess() ||
         (fetchDatum.getStatus() != CrawlDatum.STATUS_FETCH_SUCCESS && fetchDatum.getStatus() != CrawlDatum.STATUS_FETCH_NOTMODIFIED)) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Ignoring, because of unsuccessful parsing (false=="+parseData.getStatus().isSuccess()+") or invalid status: "+fetchDatum.getStatus()+" (!fetch_success && !not_modified == "+(fetchDatum.getStatus() != CrawlDatum.STATUS_FETCH_SUCCESS && fetchDatum.getStatus() != CrawlDatum.STATUS_FETCH_NOTMODIFIED)+")! key: " + key); 
+        }
       return;
     }
 
@@ -169,7 +185,12 @@ implements Mapper<Text, Writable, Text, NutchWritable>,
     }
 
     // skip documents discarded by indexing filters
-    if (doc == null) return;
+    if (doc == null) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Skipped discarded by index filter! key: " + key); 
+        }
+        return;
+    }
 
     float boost = 1.0f;
     // run scoring filters
@@ -187,6 +208,9 @@ implements Mapper<Text, Writable, Text, NutchWritable>,
     // store boost for use by explain and dedup
     doc.add("boost", Float.toString(boost));
 
+    if (LOG.isDebugEnabled()) {
+        LOG.debug("Index successfully. key: " + key); 
+    }
     output.collect(key, doc);
   }
 

@@ -396,6 +396,8 @@ public class SegmentMerger extends Configured implements
     String lastSNSname = null;
     TreeMap<String, ArrayList<CrawlDatum>> linked =
       new TreeMap<String, ArrayList<CrawlDatum>>();
+    TreeMap<String, ArrayList<CrawlDatum>> linkedFetchDatum =
+        new TreeMap<String, ArrayList<CrawlDatum>>();
     while (values.hasNext()) {
       MetaWrapper wrapper = values.next();
       Object o = wrapper.get();
@@ -419,7 +421,18 @@ public class SegmentMerger extends Configured implements
             }
           }
         } else if (sp.partName.equals(CrawlDatum.FETCH_DIR_NAME)) {
-          if (lastF == null) {
+          // check for linked entries
+            if (val.getStatus() == CrawlDatum.STATUS_LINKED) {
+                // collect all LINKED values from the latest segment
+                ArrayList<CrawlDatum> segLinkedFetchDatum = linkedFetchDatum.get(sp.segmentName);
+                if (segLinkedFetchDatum == null) {
+                  segLinkedFetchDatum = new ArrayList<CrawlDatum>();
+                  linkedFetchDatum.put(sp.segmentName, segLinkedFetchDatum);
+                }
+                segLinkedFetchDatum.add(val);
+              
+          } else {
+            if (lastF == null) {
             lastF = val;
             lastFname = sp.segmentName;
           } else {
@@ -428,6 +441,7 @@ public class SegmentMerger extends Configured implements
               lastF = val;
               lastFname = sp.segmentName;
             }
+          }
           }
         } else if (sp.partName.equals(CrawlDatum.PARSE_DIR_NAME)) {
           if (val.getStatus() == CrawlDatum.STATUS_SIGNATURE) {
@@ -565,6 +579,19 @@ public class SegmentMerger extends Configured implements
         output.collect(key, wrapper);
       }
     }
+    if (linkedFetchDatum.size() > 0) {
+        String name = linkedFetchDatum.lastKey();
+        sp.partName = CrawlDatum.FETCH_DIR_NAME;
+        sp.segmentName = name;
+        wrapper.setMeta(SEGMENT_PART_KEY, sp.toString());
+        ArrayList<CrawlDatum> segLinkedFetchDatum = linkedFetchDatum.get(name);
+        for (int i = 0; i < segLinkedFetchDatum.size(); i++) {
+          CrawlDatum link = segLinkedFetchDatum.get(i);
+          wrapper.set(link);
+          output.collect(key, wrapper);
+        }
+      }
+    
   }
 
   public void merge(Path out, Path[] segs, boolean filter, boolean normalize, long slice) throws Exception {

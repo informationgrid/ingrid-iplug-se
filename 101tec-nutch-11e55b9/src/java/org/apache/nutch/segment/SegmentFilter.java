@@ -27,6 +27,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.MapFile;
 import org.apache.hadoop.io.SequenceFile;
@@ -336,6 +337,9 @@ public class SegmentFilter extends Configured implements Mapper<Text, MetaWrappe
 
         // stores link data for every segment
         HashMap<String, ArrayList<CrawlDatum>> linked = new HashMap<String, ArrayList<CrawlDatum>>();
+        
+        HashMap<String, ArrayList<CrawlDatum>> linkedFetchDatum = new HashMap<String, ArrayList<CrawlDatum>>();
+        
 
         boolean hasCrawlDbEntry = false;
         while (values.hasNext()) {
@@ -359,6 +363,18 @@ public class SegmentFilter extends Configured implements Mapper<Text, MetaWrappe
                         linked.put(sp.segmentName, segLinked);
                     }
                     segLinked.add(val);
+                    continue;
+                }
+                // check for link data
+            } else if (o instanceof CrawlDatum && sp.partName.equals(CrawlDatum.FETCH_DIR_NAME)) {
+                CrawlDatum val = (CrawlDatum) o;
+                if (val.getStatus() == CrawlDatum.STATUS_LINKED) {
+                    ArrayList<CrawlDatum> segLinkedFetchDatum = linkedFetchDatum.get(sp.segmentName);
+                    if (segLinkedFetchDatum == null) {
+                        segLinkedFetchDatum = new ArrayList<CrawlDatum>();
+                        linkedFetchDatum.put(sp.segmentName, segLinkedFetchDatum);
+                    }
+                    segLinkedFetchDatum.add(val);
                     continue;
                 }
             }
@@ -390,6 +406,23 @@ public class SegmentFilter extends Configured implements Mapper<Text, MetaWrappe
                     ArrayList<CrawlDatum> segLinked = linked.get(name);
                     for (int i = 0; i < segLinked.size(); i++) {
                         CrawlDatum link = segLinked.get(i);
+                        wrapper.set(link);
+                        output.collect(key, wrapper);
+                    }
+
+                }
+            }
+            if (linkedFetchDatum.size() > 0) {
+                // write out link data
+                for (String name : linkedFetchDatum.keySet()) {
+                    sp.partName = CrawlDatum.FETCH_DIR_NAME;
+                    // translate segment name to the new segment name
+                    sp.segmentName = segments.get(name);
+                    wrapper.setMeta(INPUT_PART_KEY, sp.toString());
+                    // write out link data
+                    ArrayList<CrawlDatum> segLinkedFetchDatum = linkedFetchDatum.get(name);
+                    for (int i = 0; i < segLinkedFetchDatum.size(); i++) {
+                        CrawlDatum link = segLinkedFetchDatum.get(i);
                         wrapper.set(link);
                         output.collect(key, wrapper);
                     }
@@ -463,6 +496,21 @@ public class SegmentFilter extends Configured implements Mapper<Text, MetaWrappe
         setConf(job);
 
         JobClient.runJob(job);
+        
+        // ensure empty segment parts are copied
+        // as empty parts will not be created by the merge process
+        for (int i = 0; i < segs.length; i++) {
+            for (int j = 0; j < directories.size(); j++) {
+                Path gDir = new Path(segs[i], directories.get(j));
+                Path oDir = new Path(new Path(out,  outSegs[i]), directories.get(j));
+                if (fs.exists(gDir) && !fs.exists(oDir)) {
+                    if (LOG.isInfoEnabled()) {
+                        LOG.info("Possibly empty source directory? Copy " + gDir + " to " + oDir);
+                    }
+                    FileUtil.copy(fs, gDir, fs, oDir, false, getConf());
+                } 
+            }
+        }
 
     }
 
