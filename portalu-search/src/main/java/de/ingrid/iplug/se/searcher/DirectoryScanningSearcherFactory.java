@@ -37,144 +37,177 @@ import de.ingrid.iplug.util.TimeProvider;
  */
 public class DirectoryScanningSearcherFactory {
 
-  class MultipleSearcherContainer {
+    class MultipleSearcherContainer {
 
-    private final MultipleSearcher _searcher;
-    private final long _nextDirScanTime;
-    private final Set<Path> _lastScanDirResult;
+        private final MultipleSearcher _searcher;
 
-    public MultipleSearcherContainer(MultipleSearcher searcher, long nextDirScanTime, Set<Path> lastScanDirResult) {
-      super();
-      _searcher = searcher;
-      _nextDirScanTime = nextDirScanTime;
-      _lastScanDirResult = lastScanDirResult;
-    }
+        private final long _nextDirScanTime;
 
-    public MultipleSearcher getSearcher() {
-      return _searcher;
-    }
+        private final Set<Path> _lastScanDirResult;
 
-    public long getNextDirScanTime() {
-      return _nextDirScanTime;
-    }
-
-    public Set<Path> getLastScanDirResult() {
-      return _lastScanDirResult;
-    }
-
-    @Override
-    public String toString() {
-      return ReflectionToStringBuilder.toString(this, ToStringStyle.SHORT_PREFIX_STYLE);
-    }
-  };
-
-  public static final long NEXTRELOADWAITINGTIME = TimeUnit.SECONDS.toMillis(60);
-  private static final Log LOG = LogFactory.getLog(DirectoryScanningSearcherFactory.class);
-
-  private final Configuration _configuration;
-  private final TimeProvider _timeProvider;
-  private final NutchSearcher nutchSearcher;
-
-  private Map<String, MultipleSearcherContainer> _map = new HashMap<String, MultipleSearcherContainer>();
-
-  public DirectoryScanningSearcherFactory(Configuration configuration, TimeProvider timeProvider, NutchSearcher nutchSearcher) {
-    _configuration = configuration;
-    _timeProvider = timeProvider;
-    this.nutchSearcher = nutchSearcher;
-  }
-
-  public MultipleSearcher get() throws IOException {
-    String indexerBasePathsString = _configuration.get("search.instance.folder");
-    if (indexerBasePathsString == null || (indexerBasePathsString.trim().length() <= 0)) {
-        indexerBasePathsString = _configuration.get("nutch.instance.folder");
-    }
-    String[] indexerBasePathes = indexerBasePathsString.split(",");
-    if (!_map.containsKey(indexerBasePathsString)) {
-      Set<Path> allPaths = new HashSet<Path>();
-      List<NutchBean> nuchBeans = new ArrayList<NutchBean>();
-      for (String indexerBasePath : indexerBasePathes) {
-          LOG.info("Create new searcher for instance: " + indexerBasePath);
-          Path parent = getSearchPath(indexerBasePath);
-          Set<Path> paths = findActivatedCrawlPaths(FileSystem.get(_configuration), parent, new HashSet<Path>());
-          for (Path path : paths) {
-            nuchBeans.add(new NutchBean(_configuration, path));
-            allPaths.add(path);
-          }
-      }
-      
-      ThreadPool threadPool = new ThreadPool();
-
-      // create the new searcher
-      MultipleSearcher searcher;
-      if (_configuration.getBoolean("search.deduplicate.multiple.searchers", true)) {
-          LOG.info("Use deduplicating multi searcher.");
-          searcher = new DeduplicatingMultipleSearcher(threadPool, nuchBeans.toArray(new NutchBean[0]), nuchBeans
-          .toArray(new NutchBean[0]));
-      } else {
-          searcher = new MultipleSearcher(threadPool, nuchBeans.toArray(new NutchBean[0]), nuchBeans
-                  .toArray(new NutchBean[0]));
-      }
-      MultipleSearcherContainer multipleSearcherContainer = new MultipleSearcherContainer(searcher, _timeProvider
-          .getTime()
-          + NEXTRELOADWAITINGTIME, allPaths);
-      _map.put(indexerBasePathsString, multipleSearcherContainer);
-      return searcher;
-    }
-    
-    // return the already created searcher
-    return _map.get(indexerBasePathsString).getSearcher();
-  }
-
-  private Path getSearchPath(String indexerBasePath) {
-    Path parent = new Path(indexerBasePath);
-    if (indexerBasePath.endsWith("/general")) {
-      parent = parent.getParent();
-    }
-    return parent;
-  }
-
-  public void reload() throws IOException {
-    String indexerBasePathsString = _configuration.get("search.instance.folder");
-    if (indexerBasePathsString == null || (indexerBasePathsString.trim().length() <= 0)) {
-        indexerBasePathsString = _configuration.get("nutch.instance.folder");
-    }
-    LOG.info("reload searcher for instances: " + indexerBasePathsString);
-    if (!_map.containsKey(indexerBasePathsString)) {
-        LOG.warn("could not find searcher for instances (maybe the crawl have not run at least one time when it was added)");
-        LOG.info("try to get searcher again");
-    } else {
-        clearCache(indexerBasePathsString);
-    }
-    get();
-    nutchSearcher.updateFacetManager();
-  }
-
-  private void clearCache(String instance) throws IOException {
-    MultipleSearcher cachedSearcher = _map.remove(instance).getSearcher();
-    if (cachedSearcher != null) {
-      LOG.info("remove and close searcher: " + cachedSearcher);
-      cachedSearcher.close();
-      cachedSearcher = null;
-    }
-  }
-
-  private static Set<Path> findActivatedCrawlPaths(FileSystem fileSystem, Path parent, Set<Path> list)
-      throws IOException {
-    FileStatus[] status = fileSystem.listStatus(parent);
-
-    for (FileStatus fileStatus : status) {
-      Path path = fileStatus.getPath();
-      if (fileStatus.isDir()) {
-        findActivatedCrawlPaths(fileSystem, path, list);
-      } else if (path.getName().equals("search.done")) {
-        Path pathToPush = path.getParent();
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Found activated crawl in: " + pathToPush.getName());
+        public MultipleSearcherContainer(MultipleSearcher searcher, long nextDirScanTime, Set<Path> lastScanDirResult) {
+            super();
+            _searcher = searcher;
+            _nextDirScanTime = nextDirScanTime;
+            _lastScanDirResult = lastScanDirResult;
         }
-        list.add(pathToPush);
-      }
+
+        public MultipleSearcher getSearcher() {
+            return _searcher;
+        }
+
+        public long getNextDirScanTime() {
+            return _nextDirScanTime;
+        }
+
+        public Set<Path> getLastScanDirResult() {
+            return _lastScanDirResult;
+        }
+
+        @Override
+        public String toString() {
+            return ReflectionToStringBuilder.toString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+        }
+    };
+
+    public static final long NEXTRELOADWAITINGTIME = TimeUnit.SECONDS.toMillis(60);
+
+    private static final Log LOG = LogFactory.getLog(DirectoryScanningSearcherFactory.class);
+
+    private final Configuration _configuration;
+
+    private final TimeProvider _timeProvider;
+
+    private final NutchSearcher nutchSearcher;
+
+    private Map<String, MultipleSearcherContainer> _map = new HashMap<String, MultipleSearcherContainer>();
+
+    public DirectoryScanningSearcherFactory(Configuration configuration, TimeProvider timeProvider,
+            NutchSearcher nutchSearcher) {
+        _configuration = configuration;
+        _timeProvider = timeProvider;
+        this.nutchSearcher = nutchSearcher;
     }
-    return list;
-  }
+
+    public MultipleSearcher get() throws IOException {
+        String indexerBasePathsString = _configuration.get("search.instance.folder");
+        if (indexerBasePathsString == null || (indexerBasePathsString.trim().length() <= 0)) {
+            indexerBasePathsString = _configuration.get("nutch.instance.folder");
+        }
+        String[] indexerBasePathes = indexerBasePathsString.split(",");
+        if (!_map.containsKey(indexerBasePathsString)) {
+            Set<Path> allPaths = new HashSet<Path>();
+            List<NutchBean> nuchBeans = new ArrayList<NutchBean>();
+            for (String indexerBasePath : indexerBasePathes) {
+                LOG.info("Create new searcher for instance: " + indexerBasePath);
+                Path parent = getSearchPath(indexerBasePath);
+                Set<Path> paths = findActivatedCrawlPaths(FileSystem.get(_configuration), parent, new HashSet<Path>());
+                for (Path path : paths) {
+                    nuchBeans.add(new NutchBean(_configuration, path));
+                    allPaths.add(path);
+                }
+            }
+
+            ThreadPool threadPool = new ThreadPool();
+
+            // create the new searcher
+            MultipleSearcher searcher;
+            if (_configuration.getBoolean("search.deduplicate.multiple.searchers", true)) {
+                LOG.info("Use deduplicating multi searcher.");
+                searcher = new DeduplicatingMultipleSearcher(threadPool, nuchBeans.toArray(new NutchBean[0]), nuchBeans
+                        .toArray(new NutchBean[0]));
+            } else {
+                searcher = new MultipleSearcher(threadPool, nuchBeans.toArray(new NutchBean[0]), nuchBeans
+                        .toArray(new NutchBean[0]));
+            }
+            MultipleSearcherContainer multipleSearcherContainer = new MultipleSearcherContainer(searcher, _timeProvider
+                    .getTime()
+                    + NEXTRELOADWAITINGTIME, allPaths);
+            _map.put(indexerBasePathsString, multipleSearcherContainer);
+            return searcher;
+        } else {
+            // test for next reload time
+            MultipleSearcherContainer multipleSearcherContainer = _map.get(indexerBasePathsString);
+            if (_timeProvider.getTime() >= multipleSearcherContainer.getNextDirScanTime()) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Check for changed indexes.");
+                }
+                // scan directory for changes
+                Set<Path> allPaths = new HashSet<Path>();
+                for (String indexerBasePath : indexerBasePathes) {
+                    LOG.info("Create new searcher for instance: " + indexerBasePath);
+                    Path parent = getSearchPath(indexerBasePath);
+                    Set<Path> paths = findActivatedCrawlPaths(FileSystem.get(_configuration), parent,
+                            new HashSet<Path>());
+                    for (Path path : paths) {
+                        allPaths.add(path);
+                    }
+                }
+                if (!allPaths.equals(multipleSearcherContainer.getLastScanDirResult())) {
+                    if (LOG.isInfoEnabled()) {
+                        LOG.info("Changed nutch crawls found, reload searcher: " + allPaths);
+                    }
+                    // Changes found, so reload the searcher now
+                    reload();
+                }
+            }
+        }
+
+        // return the already created searcher
+        return _map.get(indexerBasePathsString).getSearcher();
+    }
+
+    private Path getSearchPath(String indexerBasePath) {
+        Path parent = new Path(indexerBasePath);
+        if (indexerBasePath.endsWith("/general")) {
+            parent = parent.getParent();
+        }
+        return parent;
+    }
+
+    public void reload() throws IOException {
+        String indexerBasePathsString = _configuration.get("search.instance.folder");
+        if (indexerBasePathsString == null || (indexerBasePathsString.trim().length() <= 0)) {
+            indexerBasePathsString = _configuration.get("nutch.instance.folder");
+        }
+        LOG.info("reload searcher for instances: " + indexerBasePathsString);
+        if (!_map.containsKey(indexerBasePathsString)) {
+            LOG
+                    .warn("could not find searcher for instances (maybe the crawl have not run at least one time when it was added)");
+            LOG.info("try to get searcher again");
+        } else {
+            clearCache(indexerBasePathsString);
+        }
+        get();
+        nutchSearcher.updateFacetManager();
+    }
+
+    private void clearCache(String instance) throws IOException {
+        MultipleSearcher cachedSearcher = _map.remove(instance).getSearcher();
+        if (cachedSearcher != null) {
+            LOG.info("remove and close searcher: " + cachedSearcher);
+            cachedSearcher.close();
+            cachedSearcher = null;
+        }
+    }
+
+    private static Set<Path> findActivatedCrawlPaths(FileSystem fileSystem, Path parent, Set<Path> list)
+            throws IOException {
+        FileStatus[] status = fileSystem.listStatus(parent);
+
+        for (FileStatus fileStatus : status) {
+            Path path = fileStatus.getPath();
+            if (fileStatus.isDir()) {
+                findActivatedCrawlPaths(fileSystem, path, list);
+            } else if (path.getName().equals("search.done")) {
+                Path pathToPush = path.getParent();
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Found activated crawl in: " + pathToPush.getName());
+                }
+                list.add(pathToPush);
+            }
+        }
+        return list;
+    }
 
 }

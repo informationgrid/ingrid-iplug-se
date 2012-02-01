@@ -5,6 +5,12 @@
   </properties>
   <body>
     <release version="3.2.0-SNAPSHOT" date="2011-??-??" description="Feature Release">
+      <action type="add" dev="wemove">
+        Activate cleanup of hadoop temp data older than 5 days per default (see bin/afterCrawl.sh, tested under UNIX only).
+      </action>
+      <action type="add" dev="wemove">
+        Change searcher update logic, make all searcher observing the same nutch instance update on index change (refresh file search.update, instead of create/remove it).
+      </action>
       <action type="add" dev="wemove" issue="INGRID32-53">
         Add more restrictive URL validation. Limit and Exclude URLs are forced to have the same domain as the Start-URL. Regular expressions are validated.
       </action>

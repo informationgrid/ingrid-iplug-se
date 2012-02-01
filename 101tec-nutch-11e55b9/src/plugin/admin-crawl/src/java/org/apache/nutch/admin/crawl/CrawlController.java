@@ -43,6 +43,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import de.ingrid.iplug.se.SearchUpdateScanner;
+
 
 @Controller
 public class CrawlController extends NavigationSelector {
@@ -231,18 +233,15 @@ public class CrawlController extends NavigationSelector {
     FileSystem fileSystem = FileSystem.get(nutchInstance.getConfiguration());
     Path searchDoneFile = new Path(instanceFolder.getAbsolutePath(), "crawls"
             + File.separator + crawlFolder + File.separator + "search.done");
-    Path searchUpdateFile = new Path(instanceFolder.getAbsolutePath(), "crawls"
-            + File.separator + crawlFolder + File.separator + "search.update");
     if (create) {
       fileSystem.createNewFile(searchDoneFile);
-      // create the "search.update" file so that it will be recognized by
-      // the searcher and that it can be reloaded!
-      fileSystem.createNewFile(searchUpdateFile);
     } else {
       fileSystem.delete(searchDoneFile, false);
-      // the same here ... file is needed to let the searcher know
-      fileSystem.createNewFile(searchUpdateFile);
     }
+    // (re)create the "search.update" file in any case so that it will be recognized by
+    // the searcher and that it can be reloaded!
+    SearchUpdateScanner.updateCrawl(fileSystem, new Path(instanceFolder.getAbsolutePath(), "crawls"
+            + File.separator + crawlFolder));
 
     SearcherFactory factory = SearcherFactory.getInstance(nutchInstance
             .getConfiguration());

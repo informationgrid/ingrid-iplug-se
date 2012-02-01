@@ -5,6 +5,7 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,9 @@ public class SearchUpdateScanner extends TimerTask {
 
     private final Timer _timer;
 
+    private long lastUpdateTimestamp = 0;
+    
+    
     public SearchUpdateScanner(final Configuration configuration, final DirectoryScanningSearcherFactory factory,
             final long period) {
         _configuration = configuration;
@@ -73,10 +77,11 @@ public class SearchUpdateScanner extends TimerTask {
             if (!crawls.isEmpty()) {
                 // remove update files
                 for (final File instance : crawls.keySet()) {
-                    update(crawls.get(instance));
+//                    update(crawls.get(instance));
                 }
                 // update crawls
                 try {
+                    lastUpdateTimestamp = (new Date()).getTime();
                     _factory.reload();
                 } catch (final Exception e) {
                     LOG.error("error while reloading searcher factory", e);
@@ -87,17 +92,16 @@ public class SearchUpdateScanner extends TimerTask {
 
     public static void updateCrawl(final FileSystem fs, final Path crawl) throws IOException {
         LOG.info("updating crawl: " + crawl);
-        fs.create(updatePath(crawl), true);
-    }
-
-    private static boolean isUpdated(final File crawl) {
-        return updateFile(crawl).exists();
-    }
-
-    private static void update(final List<File> crawls) {
-        for (final File crawl : crawls) {
-            updateFile(crawl).delete();
+        Path searchUpdatePath = updatePath(crawl);
+        if (fs.exists(searchUpdatePath)) {
+            fs.delete(searchUpdatePath, true);
         }
+        fs.create(searchUpdatePath, true);
+    }
+
+    private boolean isUpdated(final File crawl) {
+        File searchUpdateFile = updateFile(crawl);
+        return searchUpdateFile.exists() && searchUpdateFile.lastModified() > lastUpdateTimestamp;
     }
 
     private static File updateFile(final File crawl) {
@@ -108,7 +112,7 @@ public class SearchUpdateScanner extends TimerTask {
         return new Path(crawl, SEARCH_UPDATE);
     }
 
-    private static Map<File, List<File>> getCrawls(final File... instances) {
+    private Map<File, List<File>> getCrawls(final File... instances) {
         final Map<File, List<File>> map = new HashMap<File, List<File>>();
         for (final File instance : instances) {
             // list of crawls

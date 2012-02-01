@@ -15,6 +15,7 @@ import org.apache.nutch.util.NutchConfiguration;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import de.ingrid.iplug.se.NutchSearcher;
 import de.ingrid.iplug.se.util.TestUtil;
 import de.ingrid.iplug.util.TimeProvider;
 
@@ -56,14 +57,14 @@ public class DirectoryScanningSearcherFactoryTest extends TestCase {
 
   public void testInstanceCreate() throws Exception {
     Configuration configuration = createConfiguration("testCrawl");
-    DirectoryScanningSearcherFactory instance = new DirectoryScanningSearcherFactory(configuration, _timeProvider);
+    DirectoryScanningSearcherFactory instance = new DirectoryScanningSearcherFactory(configuration, _timeProvider, null);
     MultipleSearcher searcher = instance.get();
     assertEquals(2, searcher.getNutchBeanLength());
   }
 
   public void testInstanceReloadCreate() throws Exception {
     Configuration configuration = createConfiguration("testCrawl");
-    DirectoryScanningSearcherFactory instance = new DirectoryScanningSearcherFactory(configuration, _timeProvider);
+    DirectoryScanningSearcherFactory instance = new DirectoryScanningSearcherFactory(configuration, _timeProvider, new NutchSearcher(new File(_folder, "testCrawl/crawls/Crawl-2009.08.17_00.00.00"), "test-iplug", configuration ));
     MultipleSearcher searcher = instance.get();
     assertEquals(2, searcher.getNutchBeanLength());
     assertTrue(new File(_folder, "testCrawl/crawls/Crawl-2009.08.17_00.00.02/search.done").createNewFile());
@@ -76,7 +77,7 @@ public class DirectoryScanningSearcherFactoryTest extends TestCase {
 
   public void testGeneralReloadCreate() throws Exception {
     Configuration configuration = createConfiguration("general");
-    DirectoryScanningSearcherFactory instance = new DirectoryScanningSearcherFactory(configuration, _timeProvider);
+    DirectoryScanningSearcherFactory instance = new DirectoryScanningSearcherFactory(configuration, _timeProvider, new NutchSearcher(new File(_folder, "testCrawl/crawls/Crawl-2009.08.17_00.00.00"), "test-iplug", configuration ));
     MultipleSearcher searcher = instance.get();
     assertEquals(4, searcher.getNutchBeanLength());
     assertTrue(new File(_folder, "testCrawl/crawls/Crawl-2009.08.17_00.00.02/search.done").createNewFile());
@@ -90,7 +91,7 @@ public class DirectoryScanningSearcherFactoryTest extends TestCase {
 
   public void testRescanDirectoryFolder() throws Exception {
     Configuration configuration = createConfiguration("testCrawl");
-    DirectoryScanningSearcherFactory instance = new DirectoryScanningSearcherFactory(configuration, _timeProvider);
+    DirectoryScanningSearcherFactory instance = new DirectoryScanningSearcherFactory(configuration, _timeProvider, new NutchSearcher(new File(_folder, "testCrawl/crawls/Crawl-2009.08.17_00.00.00"), "test-iplug", configuration ));
     // verify 2 index directories are detected
     assertEquals(2, instance.get().getNutchBeanLength());
 
