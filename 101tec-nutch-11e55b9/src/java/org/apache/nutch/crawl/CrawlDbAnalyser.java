@@ -86,10 +86,49 @@ public class CrawlDbAnalyser implements Closeable {
 
     }
 
+    private static class SignaturStatsMR implements Mapper<Text, CrawlDatum, Text, Text>,
+            Reducer<Text, Text, Text, Text> {
+
+        @Override
+        public void map(Text key, CrawlDatum datum, OutputCollector<Text, Text> output, Reporter rep)
+                throws IOException {
+            if (datum.getSignature() != null) {
+                output.collect(new Text(datum.getSignature()), key);
+            }
+        }
+
+        @Override
+        public void reduce(Text key, Iterator<Text> values,
+                OutputCollector<Text, Text> output, Reporter rep) throws IOException {
+
+            StringBuilder urls = new StringBuilder();
+            int cnt = 0;
+
+            while (values.hasNext()) {
+                cnt++;
+                Text value = values.next();
+                urls.append(value + "::");
+            }
+            
+            if (cnt > 1) {
+                output.collect(new Text(String.valueOf(cnt)), new Text(urls.toString()));
+            }
+        }
+
+        @Override
+        public void close() throws IOException {
+        }
+
+        @Override
+        public void configure(JobConf arg0) {
+        }
+
+    }
+
     private static class DumpUrlsForFetchIntervalMR implements Mapper<Text, CrawlDatum, Text, CrawlDatum> {
 
         long interval = 0;
-        
+
         @Override
         public void map(Text key, CrawlDatum datum, OutputCollector<Text, CrawlDatum> output, Reporter rep)
                 throws IOException {
@@ -150,6 +189,51 @@ public class CrawlDbAnalyser implements Closeable {
         fileSystem.delete(tempDir, true);
     }
 
+    public void processSignaturStats(String crawlDb, Configuration config) throws IOException {
+
+        if (LOG.isInfoEnabled()) {
+            LOG.info("CrawlDb Signature Stats starting");
+            LOG.info("CrawlDb db: " + crawlDb);
+        }
+
+        Path tempDir = new Path(config.get("mapred.temp.dir", ".") + "/signatureStats-temp-"
+                + Integer.toString(new Random().nextInt(Integer.MAX_VALUE)));
+
+        JobConf job = new NutchJob(config);
+        job.setJobName("signatureStats " + crawlDb);
+        FileInputFormat.addInputPath(job, new Path(crawlDb, CrawlDb.CURRENT_NAME));
+        job.setInputFormat(SequenceFileInputFormat.class);
+        job.setMapperClass(SignaturStatsMR.class);
+        job.setReducerClass(SignaturStatsMR.class);
+
+        FileOutputFormat.setOutputPath(job, tempDir);
+        job.setOutputFormat(SequenceFileOutputFormat.class);
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(Text.class);
+
+        JobClient.runJob(job);
+
+        // reading the result
+        FileSystem fileSystem = FileSystem.get(config);
+        SequenceFile.Reader[] readers = SequenceFileOutputFormat.getReaders(config, tempDir);
+
+        Text key = new Text();
+        Text value = new Text();
+        
+        long duplicates = 0;
+
+        for (int i = 0; i < readers.length; i++) {
+            SequenceFile.Reader reader = readers[i];
+            while (reader.next(key, value)) {
+                duplicates = duplicates + Integer.parseInt(key.toString()) - 1;
+                System.out.println(key.toString() + " :: [" + value.toString() + "]");
+            }
+        }
+        System.out.println("Detecting " + duplicates + " duplicates.");
+
+        fileSystem.delete(tempDir, true);
+    }
+
     public void processDumpUrlsForFetchInterval(String crawlDb, String interval, Configuration config)
             throws IOException {
 
@@ -171,7 +255,7 @@ public class CrawlDbAnalyser implements Closeable {
         job.setOutputFormat(SequenceFileOutputFormat.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(CrawlDatum.class);
-        
+
         job.setLong("db.analyser.fetchInterval", Long.parseLong(interval));
 
         JobClient.runJob(job);
@@ -204,6 +288,8 @@ public class CrawlDbAnalyser implements Closeable {
                     .println("\t-fetchIntervalStats \tprint statistic of how many urls are fetched with a fetch interval to System.out");
             System.err
                     .println("\t-dumpUrlsForFetchInterval \tdump all urls for a specifiv fetch interval value to System.out");
+            System.err
+            .println("\t-getSignatureStats \tdump signatures with all duplicates to System.out");
             return;
         }
         String param = null;
@@ -215,6 +301,8 @@ public class CrawlDbAnalyser implements Closeable {
                 dba.processDumpUrlsForFetchInterval(crawlDb, param, conf);
             } else if (args[i].equals("-fetchIntervalStats")) {
                 dba.processFetchIntervalStats(crawlDb, conf);
+            } else if (args[i].equals("-getSignatureStats")) {
+                dba.processSignaturStats(crawlDb, conf);
             } else {
                 System.err.println("\nError: wrong argument " + args[i]);
             }
