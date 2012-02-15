@@ -135,7 +135,9 @@ public class DirectoryScanningSearcherFactory {
                 // scan directory for changes
                 Set<Path> allPaths = new HashSet<Path>();
                 for (String indexerBasePath : indexerBasePathes) {
-                    LOG.info("Create new searcher for instance: " + indexerBasePath);
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Check indexer base path for changes: " + indexerBasePath);
+                    }
                     Path parent = getSearchPath(indexerBasePath);
                     Set<Path> paths = findActivatedCrawlPaths(FileSystem.get(_configuration), parent,
                             new HashSet<Path>());
