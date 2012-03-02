@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
@@ -24,7 +23,6 @@ import org.apache.nutch.admin.searcher.ThreadPool;
 import org.apache.nutch.searcher.NutchBean;
 
 import de.ingrid.iplug.se.NutchSearcher;
-import de.ingrid.iplug.util.TimeProvider;
 
 /**
  * Same as {@linkplain SearcherFactory}, but this class provides the additional
@@ -41,27 +39,13 @@ public class DirectoryScanningSearcherFactory {
 
         private final MultipleSearcher _searcher;
 
-        private final long _nextDirScanTime;
-
-        private final Set<Path> _lastScanDirResult;
-
-        public MultipleSearcherContainer(MultipleSearcher searcher, long nextDirScanTime, Set<Path> lastScanDirResult) {
+        public MultipleSearcherContainer(MultipleSearcher searcher) {
             super();
             _searcher = searcher;
-            _nextDirScanTime = nextDirScanTime;
-            _lastScanDirResult = lastScanDirResult;
         }
 
         public MultipleSearcher getSearcher() {
             return _searcher;
-        }
-
-        public long getNextDirScanTime() {
-            return _nextDirScanTime;
-        }
-
-        public Set<Path> getLastScanDirResult() {
-            return _lastScanDirResult;
         }
 
         @Override
@@ -70,22 +54,16 @@ public class DirectoryScanningSearcherFactory {
         }
     };
 
-    public static final long NEXTRELOADWAITINGTIME = TimeUnit.SECONDS.toMillis(60);
-
     private static final Log LOG = LogFactory.getLog(DirectoryScanningSearcherFactory.class);
 
     private final Configuration _configuration;
-
-    private final TimeProvider _timeProvider;
 
     private final NutchSearcher nutchSearcher;
 
     private Map<String, MultipleSearcherContainer> _map = new HashMap<String, MultipleSearcherContainer>();
 
-    public DirectoryScanningSearcherFactory(Configuration configuration, TimeProvider timeProvider,
-            NutchSearcher nutchSearcher) {
+    public DirectoryScanningSearcherFactory(Configuration configuration, NutchSearcher nutchSearcher) {
         _configuration = configuration;
-        _timeProvider = timeProvider;
         this.nutchSearcher = nutchSearcher;
     }
 
@@ -120,39 +98,9 @@ public class DirectoryScanningSearcherFactory {
                 searcher = new MultipleSearcher(threadPool, nuchBeans.toArray(new NutchBean[0]), nuchBeans
                         .toArray(new NutchBean[0]));
             }
-            MultipleSearcherContainer multipleSearcherContainer = new MultipleSearcherContainer(searcher, _timeProvider
-                    .getTime()
-                    + NEXTRELOADWAITINGTIME, allPaths);
+            MultipleSearcherContainer multipleSearcherContainer = new MultipleSearcherContainer(searcher);
             _map.put(indexerBasePathsString, multipleSearcherContainer);
             return searcher;
-        } else {
-            // test for next reload time
-            MultipleSearcherContainer multipleSearcherContainer = _map.get(indexerBasePathsString);
-            if (_timeProvider.getTime() >= multipleSearcherContainer.getNextDirScanTime()) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Check for changed indexes.");
-                }
-                // scan directory for changes
-                Set<Path> allPaths = new HashSet<Path>();
-                for (String indexerBasePath : indexerBasePathes) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Check indexer base path for changes: " + indexerBasePath);
-                    }
-                    Path parent = getSearchPath(indexerBasePath);
-                    Set<Path> paths = findActivatedCrawlPaths(FileSystem.get(_configuration), parent,
-                            new HashSet<Path>());
-                    for (Path path : paths) {
-                        allPaths.add(path);
-                    }
-                }
-                if (!allPaths.equals(multipleSearcherContainer.getLastScanDirResult())) {
-                    if (LOG.isInfoEnabled()) {
-                        LOG.info("Changed nutch crawls found, reload searcher: " + allPaths);
-                    }
-                    // Changes found, so reload the searcher now
-                    reload();
-                }
-            }
         }
 
         // return the already created searcher
@@ -199,7 +147,7 @@ public class DirectoryScanningSearcherFactory {
 
         for (FileStatus fileStatus : status) {
             Path path = fileStatus.getPath();
-            if (fileStatus.isDir()) {
+            if (fileStatus.isDir() && fileSystem.exists(path)) {
                 findActivatedCrawlPaths(fileSystem, path, list);
             } else if (path.getName().equals("search.done")) {
                 Path pathToPush = path.getParent();

@@ -35,7 +35,6 @@ import org.apache.nutch.searcher.Query.Clause.NutchClause;
 import org.apache.nutch.util.NutchConfiguration;
 
 import de.ingrid.iplug.se.searcher.DirectoryScanningSearcherFactory;
-import de.ingrid.iplug.util.TimeProvider;
 import de.ingrid.search.utils.IQueryParsers;
 import de.ingrid.search.utils.LuceneIndexReaderWrapper;
 import de.ingrid.search.utils.facet.FacetClassProducer;
@@ -128,21 +127,21 @@ public class NutchSearcher implements IPlug {
      * @throws IOException
      */
     public NutchSearcher(File indexFolder, String plugId, Configuration conf) throws IOException {
-        _searcherFactory = new DirectoryScanningSearcherFactory(conf, new TimeProvider(), this);
+        _searcherFactory = new DirectoryScanningSearcherFactory(conf, this);
         this.fPlugId = plugId;
         _configuration = conf;
     }
 
     public void configure(PlugDescription plugDescription) throws Exception {
         LOG.info("Configure called.");
-        
+
         this.fPlugId = plugDescription.getPlugId();
         if (_configuration == null) {
             _configuration = NutchConfiguration.create();
         }
         File workinDirectory = plugDescription.getWorkinDirectory();
         _configuration.set("nutch.instance.folder", workinDirectory.getAbsolutePath());
-        _searcherFactory = new DirectoryScanningSearcherFactory(_configuration, new TimeProvider(), this);
+        _searcherFactory = new DirectoryScanningSearcherFactory(_configuration, this);
         ProcessorPipeFactory processorPipeFactory = new ProcessorPipeFactory(plugDescription);
         _processorPipe = processorPipeFactory.getProcessorPipe();
         if (_scanner != null) {
@@ -166,7 +165,8 @@ public class NutchSearcher implements IPlug {
     public IngridHits search(IngridQuery query, int start, int length) throws Exception {
         long startTimer = 0;
         if (LOG.isDebugEnabled()) {
-            startTimer = System.currentTimeMillis();;
+            startTimer = System.currentTimeMillis();
+            ;
         }
         _processorPipe.preProcess(query);
         Query nutchQuery = new Query(_configuration);
@@ -177,7 +177,7 @@ public class NutchSearcher implements IPlug {
 
         Hits hits = null;
         MultipleSearcher searcher = _searcherFactory.get();
-        
+
         if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
             hits = searcher.search(nutchQuery, start + length, null, "date", true);
         } else {
@@ -730,10 +730,10 @@ public class NutchSearcher implements IPlug {
             }
         }
     }
-    
+
     public void updateFacetManager() throws IOException {
         LOG.info("Update facet manager.");
-        
+
         // initialize facet manager
         IQueryParsers qps = new NutchQueryParser();
 
@@ -763,7 +763,7 @@ public class NutchSearcher implements IPlug {
         fm = new FacetManager();
         fm.setIndexReaderWrapper(new LuceneIndexReaderWrapper(indexReader.toArray(new IndexReader[] {})));
         fm.setQueryParsers(qps);
-        fm.setFacetCounters(Arrays.asList(new IFacetCounter[] { fc }));        
+        fm.setFacetCounters(Arrays.asList(new IFacetCounter[] { fc }));
     }
 
 }

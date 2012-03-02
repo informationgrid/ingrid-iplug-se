@@ -72,13 +72,9 @@ public class SearchUpdateScanner extends TimerTask {
 
         if (instances.size() > 0) {
             // updated crawls for instances
-            final Map<File, List<File>> crawls = getCrawls(instances.toArray(new File[0]));
+            final Map<File, List<File>> crawls = getUpdatedCrawls(instances.toArray(new File[0]));
 
             if (!crawls.isEmpty()) {
-                // remove update files
-                for (final File instance : crawls.keySet()) {
-//                    update(crawls.get(instance));
-                }
                 // update crawls
                 try {
                     lastUpdateTimestamp = (new Date()).getTime();
@@ -112,7 +108,7 @@ public class SearchUpdateScanner extends TimerTask {
         return new Path(crawl, SEARCH_UPDATE);
     }
 
-    private Map<File, List<File>> getCrawls(final File... instances) {
+    private Map<File, List<File>> getUpdatedCrawls(final File... instances) {
         final Map<File, List<File>> map = new HashMap<File, List<File>>();
         for (final File instance : instances) {
             // list of crawls
