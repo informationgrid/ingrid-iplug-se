@@ -164,9 +164,9 @@ public class NutchSearcher implements IPlug {
      */
     public IngridHits search(IngridQuery query, int start, int length) throws Exception {
         long startTimer = 0;
+        long anotherTimer = 0;
         if (LOG.isDebugEnabled()) {
             startTimer = System.currentTimeMillis();
-            ;
         }
         _processorPipe.preProcess(query);
         Query nutchQuery = new Query(_configuration);
@@ -176,13 +176,26 @@ public class NutchSearcher implements IPlug {
         }
 
         Hits hits = null;
+        if (LOG.isDebugEnabled()) {
+            anotherTimer = System.currentTimeMillis();
+        }
         MultipleSearcher searcher = _searcherFactory.get();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Get multi searcher after " + (System.currentTimeMillis() - anotherTimer) + " ms");
+        }
 
+        if (LOG.isDebugEnabled()) {
+            anotherTimer = System.currentTimeMillis();
+        }
         if (IngridQuery.DATE_RANKED.equalsIgnoreCase(query.getRankingType())) {
             hits = searcher.search(nutchQuery, start + length, null, "date", true);
         } else {
             hits = searcher.search(nutchQuery, start + length, "site", null, false);
         }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Get search results from multi searcher after " + (System.currentTimeMillis() - anotherTimer) + " ms");
+        }
+        
 
         if (hits == null) {
             LOG.warn("No searcher Beans are registered in MultipleSearcher. It seems that no index is available.");
