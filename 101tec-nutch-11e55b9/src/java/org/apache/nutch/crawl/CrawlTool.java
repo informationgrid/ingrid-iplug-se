@@ -436,9 +436,13 @@ public class CrawlTool {
       } finally {
         if (!alreadyRunning) {
           try {
-            fileSystem.delete(lockPath, false);
+            if (!fileSystem.delete(lockPath, false)) {
+                LOG.warn("Can not delete lock file: " + lockPath);
+            } else {
+                LOG.info("Deleted lock file: " + lockPath);
+            }
           } catch (Throwable e) {
-            LOG.warn("Can not delete lock file.", e);
+            LOG.warn("Can not delete lock file: " + lockPath, e);
           }
         }
       }

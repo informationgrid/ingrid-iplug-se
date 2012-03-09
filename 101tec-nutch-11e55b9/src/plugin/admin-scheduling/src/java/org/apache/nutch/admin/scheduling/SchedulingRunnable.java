@@ -183,11 +183,11 @@ public class SchedulingRunnable implements Runnable {
         }
     }
 
-    private boolean executeAfterCrawlScript(Path dir) throws IOException {
+    private boolean executeAfterCrawlScript(Path dir) {
         return ExecuteProcessTool.execute(AFTER_CRAWL, dir.toString());
     }
 
-    private boolean executeBeforeCrawlScript(Path dir) throws IOException {
+    private boolean executeBeforeCrawlScript(Path dir) {
         return ExecuteProcessTool.execute(BEFORE_CRAWL, dir.toString());
     }
 
