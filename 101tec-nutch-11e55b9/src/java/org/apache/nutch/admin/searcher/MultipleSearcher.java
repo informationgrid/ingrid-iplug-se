@@ -170,7 +170,13 @@ public class MultipleSearcher implements SearchBean, HitSummarizer {
   public Summary getSummary(HitDetails details, Query query) throws IOException {
     String segmentName = details.getValue("segment");
     SegmentBean segmentBean = _segmentBeans.get(segmentName);
-    Summary summary = segmentBean.getSummary(details, query);
+    Summary summary;
+    if (segmentBean == null) {
+        LOG.error("CrawlDB is corrupt. Referenz to segment '" + segmentName + "' is invalid");
+        summary = new Summary();
+    } else {
+        summary = segmentBean.getSummary(details, query);
+    }
     return summary;
   }
 

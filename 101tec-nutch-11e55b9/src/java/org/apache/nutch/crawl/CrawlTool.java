@@ -369,10 +369,14 @@ public class CrawlTool {
     // delete old segments (after indexing so searching is meanwhile still possible)
     if (segmentsToDelete != null) {
       for (Path p : segmentsToDelete) {
-        if (LOG.isInfoEnabled()) {
-          LOG.info("Delete old segment: " + p);
-        }
+        if (p == null) {
+            LOG.error("Cannot delete null segment!");
+        } else {
+          if (LOG.isInfoEnabled()) {
+              LOG.info("Delete old segment: " + p);
+          }
         _fileSystem.delete(p, true);
+        }
       }
     }
     
