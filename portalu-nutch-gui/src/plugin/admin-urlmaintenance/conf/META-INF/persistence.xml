@@ -77,6 +77,7 @@
       		<property name="eclipselink.ddl-generation.output-mode" value="both"/>
             <property name="eclipselink.logging.level" value="WARNING"/>
 			<property name="eclipselink.cache.expiry" value="60000"/>
+			<property name="eclipselink.cache.shared.default" value="false"/>
 		</properties>
 	</persistence-unit>
 
