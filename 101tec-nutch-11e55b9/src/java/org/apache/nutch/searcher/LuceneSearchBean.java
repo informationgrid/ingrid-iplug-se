@@ -77,6 +77,9 @@ private FileSystem fs;
 
       this.searcher = new IndexSearcher(directories, this.conf);
     }
+    if (LOG.isInfoEnabled()) {
+        LOG.info("Found documents in index: " + this.searcher.getReader().numDocs());
+    }
   }
 
   public Hits search(Query query, int numHits, String dedupField,

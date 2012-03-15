@@ -28,6 +28,8 @@ import org.apache.nutch.searcher.Hit;
 import org.apache.nutch.searcher.HitDetails;
 import org.apache.nutch.searcher.HitSummarizer;
 import org.apache.nutch.searcher.Hits;
+import org.apache.nutch.searcher.LuceneSearchBean;
+import org.apache.nutch.searcher.NutchBean;
 import org.apache.nutch.searcher.Query;
 import org.apache.nutch.searcher.SearchBean;
 import org.apache.nutch.searcher.SegmentBean;
@@ -77,6 +79,9 @@ public class MultipleSearcher implements SearchBean, HitSummarizer {
   @Override
   public Hits search(Query query, int numHits, String dedupField,
           String sortField, boolean reverse) throws IOException {
+      if (LOG.isDebugEnabled()) {
+          LOG.debug("Use " + _searchBeans.length + "search beans.");
+      }
     if (_searchBeans.length == 0) {
       return null;
     }
@@ -103,6 +108,13 @@ public class MultipleSearcher implements SearchBean, HitSummarizer {
       try {
         bucket = arrayBlockingQueue.take();
         hits = bucket.getHits();
+        if (LOG.isDebugEnabled()) {
+            try {
+                LOG.debug("Found " + hits.getLength() + "hits in index '" + ((LuceneSearchBean)((NutchBean)_searchBeans[bucket.getId()]).getSearchBean()).getSearcher().getReader().directory().toString() + "'.");
+            } catch (Exception e) {
+                LOG.debug("Error creating debug message for multiple searchers.", e);
+            }
+        }
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
