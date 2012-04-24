@@ -282,7 +282,7 @@ public class CrawlDbAnalyser implements Closeable {
 
         if (args.length < 1) {
             System.err
-                    .println("Usage: CrawlDbAnalyser <crawldb> (-fetchIntervalStats | -dumpUrlsForFetchInterval <interval_value>)");
+                    .println("Usage: CrawlDbAnalyser <crawldb> (-fetchIntervalStats | -dumpUrlsForFetchInterval <interval_value>) | -getSignatureStats");
             System.err.println("\t<crawldb>\tdirectory name where crawldb is located");
             System.err
                     .println("\t-fetchIntervalStats \tprint statistic of how many urls are fetched with a fetch interval to System.out");
