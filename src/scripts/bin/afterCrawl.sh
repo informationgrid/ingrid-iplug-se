@@ -3,4 +3,4 @@
 
 # remove orphaned hadoop temp files
 find "hadoop-ingrid" -name "job_local*" -mtime +5 -exec rm -r {} \;
-find "hadoop-ingrid" -name "*-sequence-temp-*" -mtime +5 -exec rm -r {} \;
+find "hadoop-ingrid" -name "*-temp-*" -mtime +5 -exec rm -r {} \;
