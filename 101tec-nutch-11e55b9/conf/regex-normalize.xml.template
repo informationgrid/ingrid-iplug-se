@@ -28,10 +28,19 @@
 <regex-normalize>
 
 <!-- removes session ids from urls (such as jsessionid and PHPSESSID) -->
+
+!-- changed joachim@wemove.com 11.06.2012, prevent false detection of ...StationsID=123... 
 <regex>
   <pattern>([;_]?[^g]((?i)l|j|bv_)?((?i)sid|phpsessid|sessionid)=.*?)(\?|&amp;|#|$)</pattern>
   <substitution>$4</substitution>
 </regex>
+-->
+<regex>
+  <pattern>([;_]?[^g]((?i)l|j|bv_)?((?i)sid|phpsessid|sessionid)=[a-zA-Z0-9]{6,}?)(\?|&amp;|#|$)</pattern>
+  <substitution>$4</substitution>
+</regex>
+
+
 
 <!-- InGrid specific filter -->
 <regex>
