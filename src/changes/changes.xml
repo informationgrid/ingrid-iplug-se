@@ -25,6 +25,7 @@
       <action type="add" dev="wemove">Add a crawl-db analyser tool for analysing the crawl db in terms on refetch intervals.</action>
       <action type="add" dev="wemove">Remove all URLs from crawl that do not fit into the Limit/Exclude URL realm. Changes in URL maintenance will be reflected aver the following crawl.</action>
       <action type="add" dev="wemove">Allow user with role admin to login with same permissions as admin-portal.</action>
+      <action type="update" dev="wemove">Prevent false detection of urls with parameter names ending with 'sid' during normalization. Now the following session id mus be at least 6 chars long to be detected as session id.</action>
       <action type="update" dev="wemove">Upgrade PDF parser library to current version, fixing some PDF parsing issues.</action>
       <action type="update" dev="wemove">Remove metadata "functional category" from "topics" catalog pages.</action>
       <action type="update" dev="wemove" issue="INGRID-1885">
