@@ -4,6 +4,9 @@
     <title>Changes Ingrid iPlug SE</title>
   </properties>
   <body>
+    <release version="3.2.0.1-SNAPSHOT" date="2012-xx-xx" description="Bugfix Release InGrid 3.2">
+      <action type="fix" dev="wemove">Prevent frequent deregistration of the indexer iplug in the ibus.</action>
+    </release>
     <release version="3.2.0" date="2012-07-13" description="Release InGrid 3.2">
       <action type="add" dev="wemove">
         Activate cleanup of hadoop temp data older than 5 days per default (see bin/afterCrawl.sh, tested under UNIX only).

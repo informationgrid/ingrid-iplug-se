@@ -21,7 +21,7 @@ public class IndexIPlug implements IPlug {
 
     public IngridHits search(IngridQuery arg0, int arg1, int arg2)
             throws Exception {
-        return new IngridHits();
+        return new IngridHits(null, 0, new IngridHit[] {}, true);
     }
 
     public IngridHitDetail getDetail(IngridHit arg0, IngridQuery arg1,
