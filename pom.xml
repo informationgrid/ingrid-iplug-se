@@ -16,6 +16,24 @@
 		<connection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid-iplug-se/trunk</connection>
 		<developerConnection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid-iplug-se/trunk</developerConnection>
 	</scm>
+    
+    <!-- ==================== DEPENDENCY MANAGEMENT ==================== -->
+	<dependencyManagement>
+		<dependencies>
+            <dependency>
+                <groupId>de.ingrid</groupId>
+                <artifactId>ingrid-base-webapp</artifactId>
+                <version>3.2.1</version>
+            </dependency>
+            <dependency>
+                <groupId>de.ingrid</groupId>
+                <artifactId>ingrid-base-webapp</artifactId>
+                <version>3.2.1</version>
+                <classifier>res</classifier>
+                <type>zip</type>
+            </dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<dependencies>
 		<dependency>
