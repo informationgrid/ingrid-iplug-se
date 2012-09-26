@@ -9,12 +9,12 @@
 	<groupId>de.ingrid</groupId>
 	<artifactId>ingrid-iplug-se</artifactId>
 	<packaging>jar</packaging>
-	<version>3.2.0.1-SNAPSHOT</version>
+	<version>3.2.1</version>
 	<name>Ingrid iPlug SE</name>
 
 	<scm>
-		<connection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid-iplug-se/trunk</connection>
-		<developerConnection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid-iplug-se/trunk</developerConnection>
+		<connection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid-iplug-se/tags/ingrid-iplug-se-3.2.1</connection>
+		<developerConnection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid-iplug-se/tags/ingrid-iplug-se-3.2.1</developerConnection>
 	</scm>
     
 	<dependencies>
