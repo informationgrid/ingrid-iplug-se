@@ -121,7 +121,7 @@ startIplug()
 	echo 'finished syncronize.'
   fi
   
-  export NUTCH_OPTS="-Dlog4j.configuration=conf/log4j-search.properties"
+  export NUTCH_OPTS="-Dlog4j.configuration=conf/log4j-search.properties -Dfile.encoding=UTF8"
   nohup bin/nutch-se.sh de.ingrid.iplug.PlugServer --plugdescription conf/plugdescription-search.xml --descriptor conf/communication-search.xml > logs/console-search.log &
   echo "ingrid component ($INGRID_HOME) started."
   echo $! > $PID

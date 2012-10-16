@@ -130,7 +130,7 @@ startIplug()
 
   echo "trying to start configuration user interface on port $PORT";
   
-  nohup "$JAVA" $JAVA_HEAP_MAX $INGRID_OPTS -Dlog4j.configuration=conf/log4j-search.properties -classpath "$CLASSPATH" $CLASS $PORT webapp --plugdescription conf/plugdescription-search.xml --descriptor conf/communication-search.xml > logs/admin-search.log &
+  nohup "$JAVA" $JAVA_HEAP_MAX $INGRID_OPTS  -Dfile.encoding=UTF8 -Dlog4j.configuration=conf/log4j-search.properties -classpath "$CLASSPATH" $CLASS $PORT webapp --plugdescription conf/plugdescription-search.xml --descriptor conf/communication-search.xml > logs/admin-search.log &
   echo "ingrid component ($INGRID_HOME) started."
   echo $! > $PID
 }
