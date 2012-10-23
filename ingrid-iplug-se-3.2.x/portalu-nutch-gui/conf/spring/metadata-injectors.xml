@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean id="plugOperatorMetadataInjector" class="de.ingrid.iplug.se.IPlugSeOperatorInjector" />
+    <bean id="manifestMetadataInjector" class="de.ingrid.utils.metadata.ManifestMetadataInjector" />
+    <bean id="metadataInjectors"
+        class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list>
+                <ref bean="plugOperatorMetadataInjector" />
+                <ref bean="manifestMetadataInjector" />
+            </list>
+        </property>
+    </bean>
+</beans>

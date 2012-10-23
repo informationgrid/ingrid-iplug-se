@@ -1,0 +1,9 @@
+<de.ingrid.utils.PlugDescription>
+  <int>3</int>
+  <string>IPLUG_ADMIN_GUI_PORT</string>
+  <int>@ADMIN_PORT@</int>
+  <string>workingDirectory</string>
+  <string>./nutch-instances</string>
+  <string>isRecordLoader</string>
+  <boolean>false</boolean>
+</de.ingrid.utils.PlugDescription>

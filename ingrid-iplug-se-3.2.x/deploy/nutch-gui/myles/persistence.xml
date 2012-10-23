@@ -1,0 +1,29 @@
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence persistence_1_0.xsd"
+	version="1.0">
+
+	<persistence-unit name="mysql" transaction-type="RESOURCE_LOCAL">
+		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.Url</class>
+		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.CatalogUrl</class>
+		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl</class>
+		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.LimitUrl</class>
+		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.ExcludeUrl</class>
+		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.Partner</class>
+		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.Provider</class>
+		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.Metadata</class>
+		<class>de.ingrid.iplug.se.urlmaintenance.persistence.model.Crawl</class>
+
+		<properties>
+			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://192.168.64.33/iplugse" />
+			<property name="javax.persistence.jdbc.user" value="myles" />
+			<property name="javax.persistence.jdbc.password" value="eki7y6" />
+			<property name="eclipselink.ddl-generation" value="create-tables"/>
+			<property name="eclipselink.cache.expiry" value="60000"/>
+		</properties>
+	</persistence-unit>
+	
+
+</persistence> 

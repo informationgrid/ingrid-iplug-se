@@ -1,0 +1,65 @@
+Index: 101tec-nutch-11e55b9/conf/nutch-default.xml
+===================================================================
+--- 101tec-nutch-11e55b9/conf/nutch-default.xml	(revision 14285)
++++ 101tec-nutch-11e55b9/conf/nutch-default.xml	(working copy)
+@@ -681,6 +681,13 @@
+   </description>
+ </property>
+ 
++<property>
++  <name>index.sns</name>
++  <value>true</value>
++  <description>If true, then the Index-Sns Plugin are index with sns dates. Otherwise, without sns dates.
++  </description>
++</property>
++
+ <!-- indexingfilter plugin properties -->
+ 
+ <property>
+Index: 101tec-nutch-11e55b9/conf/log4j.properties
+===================================================================
+--- 101tec-nutch-11e55b9/conf/log4j.properties	(revision 14296)
++++ 101tec-nutch-11e55b9/conf/log4j.properties	(working copy)
+@@ -9,24 +9,25 @@
+ log4j.threshhold=ALL
+ 
+ #special logging requirements for some commandline tools
+-log4j.logger.org.apache.nutch.crawl.Crawl=INFO,cmdstdout
+-log4j.logger.org.apache.nutch.crawl.Injector=INFO,cmdstdout
+-log4j.logger.org.apache.nutch.crawl.Generator=INFO,cmdstdout
+-log4j.logger.org.apache.nutch.fetcher.Fetcher=INFO,cmdstdout
+-log4j.logger.org.apache.nutch.parse.ParseSegment=INFO,cmdstdout
+-log4j.logger.org.apache.nutch.crawl.CrawlDbReader=INFO,cmdstdout
+-log4j.logger.org.apache.nutch.crawl.CrawlDbMerger=INFO,cmdstdout
+-log4j.logger.org.apache.nutch.crawl.LinkDbReader=INFO,cmdstdout
+-log4j.logger.org.apache.nutch.segment.SegmentReader=INFO,cmdstdout
+-log4j.logger.org.apache.nutch.segment.SegmentMerger=INFO,cmdstdout
+-log4j.logger.org.apache.nutch.crawl.CrawlDb=INFO,cmdstdout
+-log4j.logger.org.apache.nutch.crawl.LinkDb=INFO,cmdstdout
+-log4j.logger.org.apache.nutch.crawl.LinkDbMerger=INFO,cmdstdout
+-log4j.logger.org.apache.nutch.indexer.Indexer=INFO,cmdstdout
+-log4j.logger.org.apache.nutch.indexer.DeleteDuplicates=INFO,cmdstdout
+-log4j.logger.org.apache.nutch.indexer.IndexMerger=INFO,cmdstdout
++#log4j.logger.org.apache.nutch.crawl.Crawl=INFO,cmdstdout
++#log4j.logger.org.apache.nutch.crawl.Injector=INFO,cmdstdout
++#log4j.logger.org.apache.nutch.crawl.Generator=INFO,cmdstdout
++#log4j.logger.org.apache.nutch.fetcher.Fetcher=INFO,cmdstdout
++#log4j.logger.org.apache.nutch.parse.ParseSegment=INFO,cmdstdout
++#log4j.logger.org.apache.nutch.crawl.CrawlDbReader=INFO,cmdstdout
++#log4j.logger.org.apache.nutch.crawl.CrawlDbMerger=INFO,cmdstdout
++#log4j.logger.org.apache.nutch.crawl.LinkDbReader=INFO,cmdstdout
++#log4j.logger.org.apache.nutch.segment.SegmentReader=INFO,cmdstdout
++#log4j.logger.org.apache.nutch.segment.SegmentMerger=INFO,cmdstdout
++#log4j.logger.org.apache.nutch.crawl.CrawlDb=INFO,cmdstdout
++#log4j.logger.org.apache.nutch.crawl.LinkDb=INFO,cmdstdout
++#log4j.logger.org.apache.nutch.crawl.LinkDbMerger=INFO,cmdstdout
++#log4j.logger.org.apache.nutch.indexer.Indexer=INFO,cmdstdout
++#log4j.logger.org.apache.nutch.indexer.DeleteDuplicates=INFO,cmdstdout
++#log4j.logger.org.apache.nutch.indexer.IndexMerger=INFO,cmdstdout
+ 
+-log4j.logger.org.apache.nutch=INFO
++#log4j.logger.org.apache.nutch=INFO
++log4j.logger.org.apache.nutch.plugin=WARN
+ log4j.logger.org.apache.hadoop=WARN
+ log4j.logger.de.ingrid=INFO
+ 

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document>
+  <properties>
+    <title>Changes Ingrid iPlug SE</title>
+  </properties>
+  <body>
+  	<release version="3.3.0" date="2013-01-??" description="Release InGrid 3.3">
+        <action type="add" dev="wemove">
+            Add support for german stemming during indexing and query analysis.
+        </action>
+        <action type="add" dev="wemove" issue="INGRID-2150">
+            Add java parameter "-Dfile.encoding=UTF8" to start script.
+        </action>
+	</release>
+    <release version="3.2.1" date="2012-09-26" description="Bugfix Release InGrid 3.2.1">
+      <action type="fix" dev="wemove">Prevent frequent deregistration of the indexer iplug in the ibus.</action>
+    </release>
+    <release version="3.2.0" date="2012-07-13" description="Release InGrid 3.2">
+      <action type="add" dev="wemove">
+        Activate cleanup of hadoop temp data older than 5 days per default (see bin/afterCrawl.sh, tested under UNIX only).
+      </action>
+      <action type="add" dev="wemove">
+        Change searcher update logic, make all searcher observing the same nutch instance update on index change (refresh file search.update, instead of create/remove it).
+      </action>
+      <action type="add" dev="wemove" issue="INGRID32-53">
+        Add more restrictive URL validation. Limit and Exclude URLs are forced to have the same domain as the Start-URL. Regular expressions are validated.
+      </action>
+      <action type="add" dev="wemove">Add new property 'search.instance.folder' to be able to set multiple instance folder for the searcher.</action>
+      <action type="add" dev="wemove">Add deduplicating multi searcher. This searcher removes duplicates by URL. Reduces search performance.</action>
+      <action type="add" dev="wemove">Instances can issue crawls independently, enabling parallel crawls (instance specific hadoop temp directories).</action>
+      <action type="add" dev="wemove">Display partner and provider in every screen in url maintenance.</action>
+      <action type="add" dev="wemove">Add option to prioritize the language definition of the url administration before the nutch find-language mechanism.</action>
+      <action type="add" dev="wemove">Add faceting support.</action>
+      <action type="add" dev="wemove">Add functionality to add scripts that are called before and after a scheduled crawl.</action>
+      <action type="add" dev="wemove">Add functionality to enable the current crawl  for search automatically (and disabling others).</action>
+      <action type="add" dev="wemove">Add a crawl-db analyser tool for analysing the crawl db in terms on refetch intervals.</action>
+      <action type="add" dev="wemove">Remove all URLs from crawl that do not fit into the Limit/Exclude URL realm. Changes in URL maintenance will be reflected aver the following crawl.</action>
+      <action type="add" dev="wemove">Allow user with role admin to login with same permissions as admin-portal.</action>
+      <action type="update" dev="wemove">Prevent false detection of urls with parameter names ending with 'sid' during normalization. Now the following session id mus be at least 6 chars long to be detected as session id.</action>
+      <action type="update" dev="wemove">Upgrade PDF parser library to current version, fixing some PDF parsing issues.</action>
+      <action type="update" dev="wemove">Remove metadata "functional category" from "topics" catalog pages.</action>
+      <action type="update" dev="wemove" issue="INGRID-1885">
+        Updated start-index.sh and start-search.sh, which had an issue when being batch-invoked, deleted RSYNC which is no longer used, see https://dev.wemove.com/jira/browse/INGRID-1885
+      </action>
+      <action type="fix" dev="wemove">Optimized SNSIndexingInterface (from SNS iPlug), added DEBUG output of classify result.</action>
+      <action type="fix" dev="wemove">Make sure not-modified URLs from merged segments are indexed even with option "merge.after.fetch" is false.</action>
+      <action type="fix" dev="wemove">Fixed wrong links when user has logged in with wrong permissions (role).</action>
+    </release>
+
+    <release version="3.0.0" date="2011-05-06" description="Release InGrid3.0">
+      <action type="update" dev="wemove">
+			  Add more strict link extraction to avoid false link detection.
+      </action>
+			<action type="update" dev="wemove" issue="INGRID-1907">
+			  Changed partner/provider sync behavior. Partner/provider are synced based on their key now, not their name anymore.
+      </action>
+			<action type="add" dev="wemove">
+			  New Ranking algorithm: Avoid clearing out all unfetched urls by the link rank algorithm, otherwise many urls will never be fetched, because they will not be sorted into the fetch list anymore. Now all outlinks get the score from their parent devided by the number of outlinks of the parent.
+      </action>
+			<action type="add" dev="wemove">
+			  Implement RegExp detection for limit and exclude urls in url maintenance.
+      </action>
+			<action type="fix" dev="wemove">
+				Fix problem with url export and NULL urls.
+			</action>
+			<action type="fix" dev="wemove" issue="INGRID-1903">
+				Fix problem with IE8: could not delete any URL.
+			</action>
+    </release>
+
+    <release version="2.3.1.3-SNAPSHOT" date="2011-xx-xx" description="Bugfix Release">
+      <action type="update">
+        Make limit/exclude url filtering case sensitive. Match limit patterns with regular expression when merging metadata.
+      </action>
+      <action type="update">
+        Link extraction in text files is now more strict to avoid false link extraction.
+      </action>
+    </release>
+    <release version="2.3.1.2" date="2011-03-04" description="Bugfix Release">
+      <action type="fix">
+        Fix error with installation. A file was not found.
+      </action>
+      <action type="update">
+        Add modified URLs to statistics count to reflect all crawled URLs in statistics.
+      </action>
+      <action type="fix">
+        Calculate webgraph only if we have new segments available.
+      </action>
+    </release>
+    <release version="2.3.1.1" date="2011-02-03" description="Bugfix Release">
+      <action type="fix">
+        Changes to URL metadata were not reflected in crawl url export after first crawl was running.
+      </action>
+    </release>
+    <release version="2.3.1" date="2011-01-26" description="Release - Adaptive Crawling">
+      <action type="add">
+        Added installer with most configurations for the iPlug.
+      </action>
+      <action type="update">
+        New version of iPlug-SE.
+        This version uses the project 'nutchgui' (version 'v03') and nutch version 1.0 for crawling.
+        The main difference is the introduction of "adaptive crawling", where crawl cycles won't take
+        so much time anymore'
+      </action>
+      <action type="update">
+        Using a new scoring algorithm (WebGraph), which replaces the old and instable OPIC scoring.
+        Scores won't increase permanently anymore, since score will be calculated completely new after
+        each crawl.
+      </action>
+      <action type="update">
+        Administration pages completely rewritten.
+      </action>
+    </release>
+
+  </body>
+</document>

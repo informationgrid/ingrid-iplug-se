@@ -1,0 +1,145 @@
+Index: 101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/src/java/org/apache/nutch/searcher/Query.java
+===================================================================
+--- 101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/src/java/org/apache/nutch/searcher/Query.java	(revision 13662)
++++ 101tec-nutch-aebe2c3e80012a3d1764d38fd2eb2da6a414c225/src/java/org/apache/nutch/searcher/Query.java	(revision 13663)
+@@ -17,24 +17,24 @@
+ 
+ package org.apache.nutch.searcher;
+ 
++import java.io.BufferedReader;
+ import java.io.DataInput;
+ import java.io.DataOutput;
+ import java.io.IOException;
+-import java.io.BufferedReader;
+ import java.io.InputStreamReader;
++import java.util.ArrayList;
+ import java.util.Arrays;
+-import java.util.ArrayList;
++import java.util.LinkedList;
++import java.util.List;
+ 
+-// Commons Logging imports
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+-
+ import org.apache.hadoop.conf.Configurable;
+ import org.apache.hadoop.conf.Configuration;
+ import org.apache.hadoop.io.Writable;
+ import org.apache.nutch.analysis.AnalyzerFactory;
+-
+ import org.apache.nutch.analysis.NutchAnalysis;
++import org.apache.nutch.searcher.Query.Clause.NutchClause;
+ import org.apache.nutch.util.NutchConfiguration;
+ 
+ /** A Nutch query. */
+@@ -57,6 +57,45 @@
+ 
+     private Configuration conf; 
+ 
++    public static class NutchClause {
++      private boolean _required;
++      private boolean _prohibited;
++      private List<Clause> _clauses;
++      private List<NutchClause> _nutchClauses;
++
++      public NutchClause(boolean required, boolean prohibited) {
++        _required = required;
++        _prohibited = prohibited;
++        _clauses = new LinkedList<Clause>();
++        _nutchClauses = new LinkedList<NutchClause>();
++      }
++
++      public void addClause(Clause clause) {
++        _clauses.add(clause);
++      }
++
++      public Clause[] getClauses() {
++        return (Clause[]) _clauses.toArray(new Clause[_clauses.size()]);
++      }
++
++      public void addNutchClause(NutchClause clause) {
++        _nutchClauses.add(clause);
++      }
++
++      public NutchClause[] getNutchClauses() {
++        return (NutchClause[]) _nutchClauses
++            .toArray(new NutchClause[_nutchClauses.size()]);
++      }
++
++      public boolean isRequired() {
++        return _required;
++      }
++
++      public boolean isProhibited() {
++        return _prohibited;
++      }
++    }
++
+     public Clause(Term term, String field,
+                   boolean isRequired, boolean isProhibited, Configuration conf) {
+       this(term, isRequired, isProhibited, conf);
+@@ -284,6 +323,8 @@
+ 
+   private ArrayList<Clause> clauses = new ArrayList<Clause>();
+ 
++  private ArrayList<NutchClause> _nutchClauses = new ArrayList<NutchClause>();
++
+   private Configuration conf;
+ 
+   private static final Clause[] CLAUSES_PROTO = new Clause[0];
+@@ -318,6 +359,16 @@
+     clauses.add(new Clause(new Term(term), field, true, false, this.conf));
+   }
+ 
++  /** Add a non required term in the default field. */
++  public void addNonRequiredTerm(String term) {
++    addNonRequiredTerm(term, Clause.DEFAULT_FIELD);
++  }
++
++  /** Add a non required term in a specified field. */
++  public void addNonRequiredTerm(String term, String field) {
++    clauses.add(new Clause(new Term(term), field, false, false, this.conf));
++  }
++
+   /** Add a prohibited term in the default field. */
+   public void addProhibitedTerm(String term) {
+     addProhibitedTerm(term, Clause.DEFAULT_FIELD);
+@@ -343,6 +394,22 @@
+     }
+   }
+ 
++  /** Add a non required phrase in the default field. */
++  public void addNonRequiredPhrase(String[] terms) {
++    addNonRequiredPhrase(terms, Clause.DEFAULT_FIELD);
++  }
++
++  /** Add a non required phrase in the specified field. */
++  public void addNonRequiredPhrase(String[] terms, String field) {
++    if (terms.length == 0) { // ignore empty phrase
++    } else if (terms.length == 1) {
++      addNonRequiredTerm(terms[0], field); // optimize to term query
++    } else {
++      clauses
++          .add(new Clause(new Phrase(terms), field, false, false, this.conf));
++    }
++  }
++
+   /** Add a prohibited phrase in the default field. */
+   public void addProhibitedPhrase(String[] terms) {
+     addProhibitedPhrase(terms, Clause.DEFAULT_FIELD);
+@@ -358,6 +425,15 @@
+     }
+   }
+ 
++  public void addNutchClause(NutchClause clause) {
++    _nutchClauses.add(clause);
++  }
++
++  public NutchClause[] getNutchClauses() {
++    return (NutchClause[]) _nutchClauses.toArray(new NutchClause[_nutchClauses
++        .size()]);
++  }
++
+   public void write(DataOutput out) throws IOException {
+     out.writeByte(clauses.size());
+     for (int i = 0; i < clauses.size(); i++)

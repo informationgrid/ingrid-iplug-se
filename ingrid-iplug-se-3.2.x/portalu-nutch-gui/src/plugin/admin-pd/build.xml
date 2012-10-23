@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<project name="admin-pd">
+
+    <import file="../build-plugin.xml" />
+
+  <target name="pre_copy">
+    <unzip src="../../../../../portalu-common/ingrid-ext/ingrid-base-webapp-${ingrid-base-webapp.version}.jar" dest="${build.classes}">
+        <patternset>
+            <exclude name="**/search/*"/>
+            <exclude name="**/controller/ExtrasController*"/>
+            <exclude name="**/controller/FieldQueryController*"/>
+            <exclude name="**/controller/IndexController*"/>
+            <exclude name="**/controller/PartnerController*"/>
+            <exclude name="**/controller/ProviderController*"/>
+            <exclude name="**/controller/SchedulingController*"/>
+        </patternset>
+    </unzip>
+        
+  </target>
+  
+    <target name="jar" depends="pre_copy,compile">
+   
+    <jar
+        jarfile="${build.dir}/${name}.jar"
+        basedir="${build.classes}"
+        manifest="../../../../MANIFEST.MF"
+    />
+        <!--<copy file="../../../../../portalu-common/ingrid-ext/ingrid-base-webapp-0.1-SNAPSHOT.jar" tofile="${build.dir}/${name}.jar" />-->
+    </target>
+    
+    <target name="deps-jar">
+        <unzip src="../../../../../portalu-common/ingrid-ext/ingrid-base-webapp-${ingrid-base-webapp.version}-res.zip" dest="${deploy.dir}/src/webapp" />
+        <copy todir="${deploy.dir}/src/webapp">
+            <fileset dir="${basedir}/src/webapp" />
+        </copy>
+        <copy todir="${deploy.dir}/conf">
+            <fileset dir="${basedir}/conf" />
+        </copy>
+    </target>
+
+</project>

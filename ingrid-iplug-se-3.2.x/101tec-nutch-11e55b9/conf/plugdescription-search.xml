@@ -1,0 +1,17 @@
+<de.ingrid.utils.PlugDescription>
+  <int>6</int>
+  <string>IPLUG_ADMIN_GUI_PORT</string>
+  <int>@ADMIN_PORT@</int>
+  <string>workingDirectory</string>
+  <string>./nutch-instances</string>
+  <string>iPlugClass</string>
+  <string>de.ingrid.iplug.se.NutchSearcher</string>
+  <string>busUrls</string>
+  <list>
+    <string>@IBUS_URL@</string>
+  </list>
+  <string>proxyServiceUrl</string>
+  <string>@PROXYSERVICEURL@</string>
+  <string>IPLUG_ADMIN_PASSWORD</string>
+  <string>@ADMIN_PASSWORD@</string>
+</de.ingrid.utils.PlugDescription>

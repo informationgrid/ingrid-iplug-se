@@ -1,0 +1,120 @@
+<project xmlns:j="jelly:core" xmlns:m="jelly:maven" xmlns:a="jelly:ant" xmlns:deploy="deploy">
+         
+    <property environment="env" />
+    <goal name="checkuser">
+    	<echo message="*****************check user********************"/>
+        <j:if test="${context.getVariable('env.USER') != null}">
+                    <j:if test="${context.getVariable('env.USER') == 'root'}">
+                        <fail>!!!PLEASE, do not run this script as root!!!</fail>
+                    </j:if>
+        </j:if>
+    </goal>
+	
+	<!-- clean single files -->	
+	<postGoal name="clean">
+		<delete>
+			<fileset dir="${basedir}">
+	    	    <include name="**/jcoverage.ser"/>
+			</fileset>
+	   </delete>
+	</postGoal>	
+	
+
+	<preGoal name="site" >
+		<attainGoal name="checkuser"/>
+	</preGoal>
+	
+	<!-- create website with feature tests -->
+	<goal name="site:feature" >
+		<j:set var="faeturetests" value="true"/>
+		<j:set var="testmatchpattern" value="**/*Test.java"/>
+		<j:set var="testnotmatchpattern" value=""/>
+		<attainGoal name="site"/>
+	</goal>
+	
+	<!-- run only feature tests -->
+	<goal name="ftest">
+		<j:set var="faeturetests" value="true"/>
+		<j:set var="testmatchpattern" value="**/v*/*"/>
+		<attainGoal name="test"/>
+	</goal>
+	
+	<!-- run tests without feature test if 'featuretest' is not set to true -->
+	<preGoal name="test:test">
+		<j:if test="${faeturetests != 'true'}">
+			<j:set var="testmatchpattern" value="**/*Test.java"/>
+			<j:set var="testnotmatchpattern" value="**/v*/*"/>
+		</j:if>
+	</preGoal>
+	
+	<goal name="test:test">
+        <j:if test="${context.getVariable('maven.test.skip') != 'true'}">
+			<attainGoal name="test:match" />
+        </j:if>
+	</goal>
+	
+	<preGoal name="maven-jcoverage-plugin:report">
+		<j:set var="maven.test.failure.ignore" value="true"/>
+	</preGoal>
+	
+	<postGoal name="maven-jcoverage-plugin:report">
+		<j:set var="maven.test.failure.ignore" value="false"/>
+	</postGoal>
+	
+	<!-- builds a car archive from the project by collecting the built jar, 
+	     the deployment descriptor and the required jars to a folder -->
+	<goal name="build-component">
+		<j:set var="car" value="${maven.build.dir}/${pom.artifactId}-${pom.currentVersion}.car" />
+		<mkdir dir="${car}" />
+		<copy toDir="${car}" >
+			<fileset dir="${basedir}/src/conf" includes="descriptor.xml" />
+			<fileset dir="${maven.build.dir}" includes="${pom.artifactId}-${pom.currentVersion}.jar" />
+		</copy>
+		<deploy:copy-deps todir="${car}" excludes="weta-g" />
+	</goal>
+	
+	<preGoal name="build-component">
+		<attainGoal name="jar" />
+	</preGoal>	
+	
+	<!--copies the built weta-g component archive and all containing files to the deploy folder
+		of the unpacked weta-g server-->
+	<goal name="deploy">
+		<copy toDir="${maven.build.dir}/work/weta-g-latest/deploy">
+    		<fileset dir="${maven.build.dir}">
+    			<include name="${pom.artifactId}-${pom.currentVersion}.car" />
+    			<include name="${pom.artifactId}-${pom.currentVersion}.car/*" />
+    		</fileset>
+    	</copy>
+    </goal>
+    
+	<preGoal name="deploy">
+		<attainGoal name="build-component" />
+		<attainGoal name="prepare-server" />
+	</preGoal>
+	    
+	<!--unpacks the weta-g server available from the local repository under the folder
+		specified by the property maven.build.dir  -->    
+	<goal name="prepare-server">
+    	<unzip src="${maven.repo.local}/weta-g/zips/${weta.server.name}${weta.server.suffix}"
+             dest="${maven.build.dir}/${weta.server.destination}">
+        </unzip>
+    </goal>
+    
+    <!--starts the unpacked weta-g server with the deployed component archive-->
+	<goal name="run-weta-g">
+		 <j:set var = "server.home" value="${maven.build.dir}/${weta.server.destination}/${weta.server.name}" />
+		 <java classname="net.weta.boot.WetaServerApplication" fork="true" failonerror="true" maxmemory="128M">
+		    <classpath>
+		    	<fileset dir="${server.home}/lib">
+			  <include name="*.jar"/>
+			</fileset>
+			<pathelement path="${server.home}/conf" />	
+		    </classpath>
+		 </java>
+	</goal>
+	
+	<preGoal name="run-weta-g">
+		<attainGoal name="deploy" />
+	</preGoal>
+</project>
