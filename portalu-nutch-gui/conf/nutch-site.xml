@@ -169,9 +169,9 @@
 <property>
   <name>db.fetch.schedule.class</name>
   <value>org.apache.nutch.crawl.AdaptiveFetchSchedule</value>
-  <description>The implementation of fetch schedule. DefaultFetchSchedule simply
+  <description>The implementation of fetch schedule. org.apache.nutch.crawl.DefaultFetchSchedule simply
   adds the original fetchInterval to the last fetch time, regardless of
-  page changes.</description>
+  page changes. org.apache.nutch.crawl.AdaptiveFetchSchedule calculates the fetchInterval depending on the signature of a page.</description>
 </property>
 
 <property>
@@ -306,8 +306,8 @@
 <property>
   <name>db.fetch.interval.default</name>
   <value>86400</value>
-  <description>The default number of seconds between re-fetches of a page. (ingrid specific: This is set to 1 day and 
-  works in conjunction with the adaptive fetch schedule. Thus we can detect fast changing websites earlier as if we set 
+  <description>The default number of seconds between re-fetches of a page (432000 is 5 days). (ingrid specific: Set the to 86400 (1 day) to 
+  work best in conjunction with the adaptive fetch schedule. Thus we can detect fast changing websites earlier as if we set 
   the fetch schedule to a larger value.
   </description>
 </property>
@@ -436,6 +436,12 @@
 </property>
 
 <property>
+    <name>scheduling.create.crawl</name>
+    <value>false</value>
+    <description>If true, scheduling will create each time a new crawl. Otherwise the last created crawl will be continued. If no crawls exist by now, the scheduler will create one.</description>
+</property>
+
+<property>
   <name>link.analyze.generate.sort.diffdays.weight</name>
   <value>0.0</value>
   <description>If > 0.0 the urls that are over due to fetch will get an increased score during the generation phase. The score is raised by the difference between current time and scheduled fetch time in days, multiplied by this weight. The weight should be lower than 1.0, i.e. 0.001, so that the boost does not outperform the score of the crawl datum, which is the base for the url sort order in the generation phase. This is a ingrid specific extension.</description>
@@ -444,7 +450,14 @@
 <property>
   <name>lang.analyze.override.with.metadata</name>
   <value>false</value>
-  <description>Override the language extraction result with the vale from the metadata. This setting is ingrid specific and presumes that a metadata 'lang' exists for each entry.
+  <description>Override the language extraction result with the value from the metadata. This setting is ingrid specific and presumes that a metadata 'lang' exists for each entry.
+  </description>
+</property>
+
+<property>
+  <name>queryfilter.basic.stemming.default.language</name>
+  <value>de</value>
+  <description>Set the default language of the stemming filter. The language must exist as an analysis-[LANGUAGE] plugin and must be enabled. First the query is inspected for the parameter "lang". If no analyzer exists for the language, the default language analyser is used.
   </description>
 </property>
 

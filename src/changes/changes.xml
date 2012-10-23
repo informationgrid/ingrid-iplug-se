@@ -5,6 +5,9 @@
   </properties>
   <body>
   	<release version="3.3.0" date="2013-01-??" description="Release InGrid 3.3">
+        <action type="add" dev="wemove">
+            Add support for german stemming during indexing and query analysis.
+        </action>
         <action type="add" dev="wemove" issue="INGRID-2150">
             Add java parameter "-Dfile.encoding=UTF8" to start script.
         </action>
