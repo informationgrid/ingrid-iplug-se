@@ -19,7 +19,7 @@ public class MetadataDao extends Dao<Metadata> implements IMetadataDao {
   }
 
   public Metadata getByKeyAndValue(String key, String value) {
-    Query query = _transactionService
+    Query query = transactionService
         .createNamedQuery("getMetadataByKeyAndValue");
     query.setParameter("key", key);
     query.setParameter("value", value);
@@ -28,7 +28,7 @@ public class MetadataDao extends Dao<Metadata> implements IMetadataDao {
 
   @Override
   public boolean exists(String key, String value) {
-    Query query = _transactionService
+    Query query = transactionService
         .createNamedQuery("getMetadataByKeyAndValue");
     query.setParameter("key", key);
     query.setParameter("value", value);
@@ -39,7 +39,7 @@ public class MetadataDao extends Dao<Metadata> implements IMetadataDao {
   @SuppressWarnings("unchecked")
   @Override
   public List<Metadata> getByKey(String key) {
-    Query query = _transactionService
+    Query query = transactionService
         .createNamedQuery("getMetadatasByKey");
     query.setParameter("key", key);
     return query.getResultList();

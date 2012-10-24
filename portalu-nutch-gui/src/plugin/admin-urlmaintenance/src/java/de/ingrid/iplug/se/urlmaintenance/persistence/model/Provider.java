@@ -14,18 +14,18 @@ import javax.persistence.OneToMany;
 
 @Entity
 @NamedQueries(value = { 
-        @NamedQuery(name = "getProviderByName", query = "select p from Provider as p where p._name = :name"),
-        @NamedQuery(name = "getProviderByShortName", query = "select p from Provider as p where p._shortName = :shortName"),
-        @NamedQuery(name = "getProviderByNameAndPartner", query = "select p from Provider as p where p._name = :name and p._partner = :partner"), 
-        @NamedQuery(name = "getProviderByShortNameNameAndPartner", query = "select p from Provider as p where p._shortName = :shortName and p._partner = :partner") 
+        @NamedQuery(name = "getProviderByName", query = "select p from Provider as p where p.name = :name"),
+        @NamedQuery(name = "getProviderByShortName", query = "select p from Provider as p where p.shortName = :shortName"),
+        @NamedQuery(name = "getProviderByNameAndPartner", query = "select p from Provider as p where p.name = :name and p.partner = :partner"), 
+        @NamedQuery(name = "getProviderByShortNameNameAndPartner", query = "select p from Provider as p where p.shortName = :shortName and p.partner = :partner") 
         })
 public class Provider extends IdBase {
 
   @Column(nullable = false)
-  private String _name;
+  private String name;
   
   @Column(nullable = false)
-  private String _shortName;
+  private String shortName;
 
   // rwe: The annotation @JoinColumn{nullable="true"} causes intermittent
   // failures when using the eclipselink JPA!
@@ -35,42 +35,42 @@ public class Provider extends IdBase {
   // which sometimes works and sometimes it causes an sql-exception.
   @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
   @JoinColumn(/* nullable = false, */name = "partner_fk")
-  private Partner _partner;
+  private Partner partner;
 
   @OneToMany
   @JoinColumn(name = "provider_fk")
-  private List<Url> _urls = new ArrayList<Url>();
+  private List<Url> urls = new ArrayList<Url>();
 
   public String getName() {
-    return _name;
+    return name;
   }
 
   public void setName(String name) {
-    _name = name;
+    this.name = name;
   }
 
   public Partner getPartner() {
-    return _partner;
+    return partner;
   }
 
   public void setPartner(Partner partner) {
-    _partner = partner;
+    this.partner = partner;
   }
 
   public List<Url> getUrls() {
-    return _urls;
+    return urls;
   }
 
   public void setUrls(List<Url> urls) {
-    _urls = urls;
+    this.urls = urls;
   }
 
   public void setShortName(String shortName) {
-    _shortName = shortName;
+    this.shortName = shortName;
   }
 
   public String getShortName() {
-    return _shortName;
+    return shortName;
   }
 
 }

@@ -13,45 +13,45 @@ import javax.persistence.OneToMany;
 @Entity
 @DiscriminatorValue("START")
 @NamedQueries(value = {
-    @NamedQuery(name = "getAllUrlsByProviderOrderByCreatedAsc", query = "select u from StartUrl as u where u._deleted is NULL and u._provider._id = :id order by u._created asc"),
-    @NamedQuery(name = "getAllUrlsByProviderOrderByCreatedDesc", query = "select u from StartUrl as u where u._deleted is NULL and u._provider._id = :id order by u._created desc"),
-    @NamedQuery(name = "getAllUrlsByProviderOrderByUpdatedAsc", query = "select u from StartUrl as u where u._deleted is NULL and u._provider._id = :id order by u._updated asc"),
-    @NamedQuery(name = "getAllUrlsByProviderOrderByUpdatedDesc", query = "select u from StartUrl as u where u._deleted is NULL and u._provider._id = :id order by u._updated desc"),
-    @NamedQuery(name = "getAllUrlsByProviderOrderByUrlAsc", query = "select u from StartUrl as u where u._deleted is NULL and u._provider._id = :id order by u._url asc"),
-    @NamedQuery(name = "getAllUrlsByProviderOrderByUrlDesc", query = "select u from StartUrl as u where u._deleted is NULL and u._provider._id = :id order by u._url desc"),
-    @NamedQuery(name = "countByProvider", query = "select count(u) from StartUrl as u where u._deleted is NULL and u._provider._id = :id") })
+    @NamedQuery(name = "getAllUrlsByProviderOrderByCreatedAsc", query = "select u from StartUrl as u where u.deleted is NULL and u.provider.id = :id order by u.created asc"),
+    @NamedQuery(name = "getAllUrlsByProviderOrderByCreatedDesc", query = "select u from StartUrl as u where u.deleted is NULL and u.provider.id = :id order by u.created desc"),
+    @NamedQuery(name = "getAllUrlsByProviderOrderByUpdatedAsc", query = "select u from StartUrl as u where u.deleted is NULL and u.provider.id = :id order by u.updated asc"),
+    @NamedQuery(name = "getAllUrlsByProviderOrderByUpdatedDesc", query = "select u from StartUrl as u where u.deleted is NULL and u.provider.id = :id order by u.updated desc"),
+    @NamedQuery(name = "getAllUrlsByProviderOrderByUrlAsc", query = "select u from StartUrl as u where u.deleted is NULL and u.provider.id = :id order by u.url asc"),
+    @NamedQuery(name = "getAllUrlsByProviderOrderByUrlDesc", query = "select u from StartUrl as u where u.deleted is NULL and u.provider.id = :id order by u.url desc"),
+    @NamedQuery(name = "countByProvider", query = "select count(u) from StartUrl as u where u.deleted is NULL and u.provider.id = :id") })
 public class StartUrl extends WebUrl {
 
   @OneToMany
   @JoinColumn(name = "startUrl_fk")
-  private List<LimitUrl> _limitUrls = new ArrayList<LimitUrl>();
+  private List<LimitUrl> limitUrls = new ArrayList<LimitUrl>();
 
   @OneToMany
   @JoinColumn(name = "startUrl_fk")
-  private List<ExcludeUrl> _excludeUrls = new ArrayList<ExcludeUrl>();
+  private List<ExcludeUrl> excludeUrls = new ArrayList<ExcludeUrl>();
 
   public List<LimitUrl> getLimitUrls() {
-    return _limitUrls;
+    return limitUrls;
   }
 
   public void setLimitUrls(List<LimitUrl> limitUrls) {
-    _limitUrls = limitUrls;
+    this.limitUrls = limitUrls;
   }
 
   public List<ExcludeUrl> getExcludeUrls() {
-    return _excludeUrls;
+    return excludeUrls;
   }
 
   public void setExcludeUrls(List<ExcludeUrl> excludeUrls) {
-    _excludeUrls = excludeUrls;
+    this.excludeUrls = excludeUrls;
   }
 
   public void addLimitUrl(LimitUrl limitUrl) {
-    _limitUrls.add(limitUrl);
+    limitUrls.add(limitUrl);
   }
 
   public void addExcludeUrl(ExcludeUrl excludeUrl) {
-    _excludeUrls.add(excludeUrl);
+    excludeUrls.add(excludeUrl);
   }
 
 }

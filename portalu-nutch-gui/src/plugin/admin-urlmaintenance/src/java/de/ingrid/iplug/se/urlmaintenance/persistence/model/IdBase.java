@@ -14,17 +14,17 @@ public class IdBase {
   @Id
   // @GeneratedValue(strategy = GenerationType.SEQUENCE)
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long _id;
+  private Long id;
 
   public Long getId() {
-    return _id;
+    return id;
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((_id == null) ? 0 : _id.hashCode());
+    result = prime * result + ((id == null) ? 0 : id.hashCode());
     return result;
   }
 
@@ -37,17 +37,17 @@ public class IdBase {
     if (getClass() != obj.getClass())
       return false;
     IdBase other = (IdBase) obj;
-    if (_id == null) {
-      if (other._id != null)
+    if (id == null) {
+      if (other.id != null)
         return false;
-    } else if (!_id.equals(other._id))
+    } else if (!id.equals(other.id))
       return false;
     return true;
   }
 
   @Override
   public String toString() {
-    return "id: " + _id;
+    return "id: " + id;
   }
 
   public static List<Long> toIds(List<? extends IdBase> objects) {

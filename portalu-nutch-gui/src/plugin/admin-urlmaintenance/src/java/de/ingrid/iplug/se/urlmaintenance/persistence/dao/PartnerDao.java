@@ -12,24 +12,24 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.service.TransactionService;
 @Service
 public class PartnerDao extends Dao<Partner> implements IPartnerDao {
 
-  private final IProviderDao _providerDao;
+  private final IProviderDao providerDao;
 
   @Autowired
   public PartnerDao(TransactionService transactionService, IProviderDao providerDao) {
     super(Partner.class, transactionService);
-    _providerDao = providerDao;
+    this.providerDao = providerDao;
   }
 
   @Override
   public Partner getByName(String name) {
-    Query query = _transactionService.createNamedQuery("getPartnerByName");
+    Query query = transactionService.createNamedQuery("getPartnerByName");
     query.setParameter("name", name);
     return (Partner) query.getSingleResult();
   }
 
   @Override
   public boolean exists(String name) {
-    Query query = _transactionService.createNamedQuery("getPartnerByName");
+    Query query = transactionService.createNamedQuery("getPartnerByName");
     query.setParameter("name", name);
     return !query.getResultList().isEmpty();
   }
@@ -43,19 +43,19 @@ public class PartnerDao extends Dao<Partner> implements IPartnerDao {
 
     partner.getProviders().remove(provider);
     makePersistent(partner);
-    _providerDao.makeTransient(provider);
+    providerDao.makeTransient(provider);
   }
 
 @Override
 public boolean existsByShortName(String name) {
-    Query query = _transactionService.createNamedQuery("getPartnerByShortName");
+    Query query = transactionService.createNamedQuery("getPartnerByShortName");
     query.setParameter("shortName", name);
     return !query.getResultList().isEmpty();
 }
 
 @Override
 public Partner getByShortName(String string) {
-    Query query = _transactionService.createNamedQuery("getPartnerByShortName");
+    Query query = transactionService.createNamedQuery("getPartnerByShortName");
     query.setParameter("shortName", string);
     return (Partner) query.getSingleResult();
 }

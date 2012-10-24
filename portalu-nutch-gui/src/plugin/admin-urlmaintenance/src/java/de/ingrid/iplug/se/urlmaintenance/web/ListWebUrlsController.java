@@ -33,29 +33,29 @@ import de.ingrid.iplug.se.urlmaintenance.persistence.model.StartUrl;
 @SessionAttributes(value = { "partnerProviderCommand", "startUrlCommand" })
 public class ListWebUrlsController extends NavigationSelector {
 
-  private final IStartUrlDao _startUrlDao;
-  private final IMetadataDao _metadataDao;
+  private final IStartUrlDao startUrlDao;
+  private final IMetadataDao metadataDao;
   private static final Log LOG = LogFactory.getLog(ListWebUrlsController.class);
-  private final ILimitUrlDao _limitUrlDao;
-  private final IExcludeUrlDao _excludeUrlDao;
+  private final ILimitUrlDao limitUrlDao;
+  private final IExcludeUrlDao excludeUrlDao;
 
   @Autowired
   public ListWebUrlsController(IStartUrlDao startUrlDao, ILimitUrlDao limitUrlDao, IExcludeUrlDao excludeUrlDao,
       IMetadataDao metadataDao) {
-    _startUrlDao = startUrlDao;
-    _limitUrlDao = limitUrlDao;
-    _excludeUrlDao = excludeUrlDao;
-    _metadataDao = metadataDao;
+    this.startUrlDao = startUrlDao;
+    this.limitUrlDao = limitUrlDao;
+    this.excludeUrlDao = excludeUrlDao;
+    this.metadataDao = metadataDao;
   }
 
   @ModelAttribute("metadatas")
   public List<Metadata> injectMetadatas() {
     List<Metadata> arrayList = new ArrayList<Metadata>();
-    arrayList.add(_metadataDao.getByKeyAndValue("datatype", "default"));
-    arrayList.add(_metadataDao.getByKeyAndValue("datatype", "law"));
-    arrayList.add(_metadataDao.getByKeyAndValue("datatype", "research"));
-    arrayList.add(_metadataDao.getByKeyAndValue("lang", "de"));
-    arrayList.add(_metadataDao.getByKeyAndValue("lang", "en"));
+    arrayList.add(metadataDao.getByKeyAndValue("datatype", "default"));
+    arrayList.add(metadataDao.getByKeyAndValue("datatype", "law"));
+    arrayList.add(metadataDao.getByKeyAndValue("datatype", "research"));
+    arrayList.add(metadataDao.getByKeyAndValue("lang", "de"));
+    arrayList.add(metadataDao.getByKeyAndValue("lang", "en"));
     return arrayList;
   }
 
@@ -77,11 +77,11 @@ public class ListWebUrlsController extends NavigationSelector {
     // filter by metadata
     List<Metadata> metadatas = new ArrayList<Metadata>();
     for (String lang : langs) {
-      Metadata metadata = _metadataDao.getByKeyAndValue("lang", lang);
+      Metadata metadata = metadataDao.getByKeyAndValue("lang", lang);
       metadatas.add(metadata);
     }
     for (String datatype : datatypes) {
-      Metadata metadata = _metadataDao.getByKeyAndValue("datatype", datatype);
+      Metadata metadata = metadataDao.getByKeyAndValue("datatype", datatype);
       metadatas.add(metadata);
     }
 
@@ -91,10 +91,10 @@ public class ListWebUrlsController extends NavigationSelector {
     Provider provider = partnerProviderCommand.getProvider();
     Long count = 0L;
     if (provider != null) {
-      count = _startUrlDao.countByProviderAndMetadatas(provider, metadatas);
+      count = startUrlDao.countByProviderAndMetadatas(provider, metadatas);
       LOG.debug("load start by provider [" + provider.getId() + "] with metadatas [" + metadatas + "] start: [" + start
           + "] hitsPerPage: [" + hitsPerPage + "] orderBy: [" + orderBy + "]");
-      List<StartUrl> startUrls = _startUrlDao.getByProviderAndMetadatas(provider, metadatas, start, hitsPerPage,
+      List<StartUrl> startUrls = startUrlDao.getByProviderAndMetadatas(provider, metadatas, start, hitsPerPage,
           orderBy);
       model.addAttribute("urls", startUrls);
     }
@@ -111,7 +111,7 @@ public class ListWebUrlsController extends NavigationSelector {
   @ModelAttribute("startUrlCommand")
   public StartUrlCommand injectStartUrlCommand(
       @ModelAttribute("partnerProviderCommand") PartnerProviderCommand partnerProviderCommand) {
-    StartUrlCommand startUrlCommand = new StartUrlCommand(_startUrlDao, _limitUrlDao, _excludeUrlDao);
+    StartUrlCommand startUrlCommand = new StartUrlCommand(startUrlDao, limitUrlDao, excludeUrlDao);
     startUrlCommand.setProvider(partnerProviderCommand.getProvider());
     return startUrlCommand;
   }

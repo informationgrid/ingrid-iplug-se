@@ -36,6 +36,9 @@
      <library name="jackson-core-asl-0.9.9-6.jar">
         <export name="*"/>
      </library>
+     <library name="ojdbc14.jar">
+        <export name="*"/>
+     </library>
 
      <library name="conf">
         <export name="*"/>

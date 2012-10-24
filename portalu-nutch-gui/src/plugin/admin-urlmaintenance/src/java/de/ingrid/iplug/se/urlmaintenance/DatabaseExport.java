@@ -146,8 +146,13 @@ public class DatabaseExport {
           }
         String metadataKey = metadata.getMetadataKey();
         String metadataValue = metadata.getMetadataValue();
+        // compatibility code for oracle because oracle treats empty strings 
+        // as null values. But null vales are not allowed here.
+        if (metadataValue == null) {
+            metadataValue = "";
+        }
         if (!key2Values.containsKey(metadataKey)) {
-          key2Values.put(metadataKey, new ArrayList<String>());
+           key2Values.put(metadataKey, new ArrayList<String>());
         }
         key2Values.get(metadataKey).add(metadataValue);
       }

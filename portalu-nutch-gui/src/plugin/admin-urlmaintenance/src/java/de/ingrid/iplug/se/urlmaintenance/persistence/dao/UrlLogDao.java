@@ -18,25 +18,25 @@ import de.ingrid.iplug.util.TimeProvider;
 public class UrlLogDao extends Dao<UrlLog> implements IUrlLogDao {
 
   private static final Log LOG = LogFactory.getLog(UrlLogDao.class);
-  private TimeProvider _timeProvider;
+  private TimeProvider timeProvider;
 
   @Autowired
   public UrlLogDao(TransactionService transactionService, TimeProvider timeProvider) {
     super(UrlLog.class, transactionService);
-    _timeProvider = timeProvider;
+    this.timeProvider = timeProvider;
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public void updateStatus(String url, Integer status) {
-    Query q = _transactionService.createQuery("select ulog from UrlLog ulog where ulog._url = :url");
+    Query q = transactionService.createQuery("select ulog from UrlLog ulog where ulog.url = :url");
     q.setParameter("url", url);
     List<? extends UrlLog> urlLogs = q.getResultList();
 
     if (urlLogs != null && urlLogs.size() > 0) {
       for (UrlLog urlLogFromDb : urlLogs) {
         urlLogFromDb.setStatus(status);
-        urlLogFromDb.setStatusUpdated(new Date(_timeProvider.getTime()));
+        urlLogFromDb.setStatusUpdated(new Date(timeProvider.getTime()));
         makePersistent(urlLogFromDb);
         if (LOG.isDebugEnabled()) {
           LOG.debug("Status updated to '" + status + "' for url '" + url + "' (" + urlLogFromDb.getId() + ") in database.");
@@ -45,7 +45,7 @@ public class UrlLogDao extends Dao<UrlLog> implements IUrlLogDao {
     } else {
       UrlLog urlLog = new UrlLog();
       urlLog.setStatus(status);
-      urlLog.setStatusUpdated(new Date(_timeProvider.getTime()));
+      urlLog.setStatusUpdated(new Date(timeProvider.getTime()));
       urlLog.setUrl(url);
       urlLog.setCreated(new Date());
       urlLog.setUpdated(new Date());

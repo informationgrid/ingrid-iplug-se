@@ -49,7 +49,7 @@ public class StartUrlDao extends Dao<StartUrl> implements IStartUrlDao {
     default:
       break;
     }
-    final Query query = _transactionService.createNamedQuery(namedQuery);
+    final Query query = transactionService.createNamedQuery(namedQuery);
     query.setParameter("id", provider.getId());
     query.setFirstResult(start);
     query.setMaxResults(length);
@@ -66,33 +66,33 @@ public class StartUrlDao extends Dao<StartUrl> implements IStartUrlDao {
     String orderQuery = null;
     switch (orderBy) {
     case CREATED_ASC:
-      orderQuery = "ORDER BY su._created asc";
+      orderQuery = "ORDER BY su.created asc";
       break;
     case CREATED_DESC:
-      orderQuery = "ORDER BY su._created desc";
+      orderQuery = "ORDER BY su.created desc";
       break;
     case UPDATED_ASC:
-      orderQuery = "ORDER BY su._updated asc";
+      orderQuery = "ORDER BY su.updated asc";
       break;
     case UPDATED_DESC:
-      orderQuery = "ORDER BY su._updated desc";
+      orderQuery = "ORDER BY su.updated desc";
       break;
     case URL_ASC:
-      orderQuery = "ORDER BY su._url asc";
+      orderQuery = "ORDER BY su.url asc";
       break;
     case URL_DESC:
-      orderQuery = "ORDER BY su._url desc";
+      orderQuery = "ORDER BY su.url desc";
       break;
     default:
       break;
     }
 
     // init query
-    String q = "SELECT DISTINCT su FROM StartUrl su JOIN su._limitUrls lu ";
+    String q = "SELECT DISTINCT su FROM StartUrl su JOIN su.limitUrls lu ";
 
     // join metadatas in separately variables
     for (final Metadata metadata : metadatas) {
-      q += " JOIN lu._metadatas md" + metadata.getId();
+      q += " JOIN lu.metadatas md" + metadata.getId();
     }
 
     // set parameter to every variable
@@ -104,14 +104,14 @@ public class StartUrlDao extends Dao<StartUrl> implements IStartUrlDao {
       if (metadata.getMetadataKey().equals("lang"))
         languages.add(metadata.getId());
       else
-        q += " md" + metadata.getId() + "._id = :md" + metadata.getId() + " AND ";
+        q += " md" + metadata.getId() + ".id = :md" + metadata.getId() + " AND ";
     }
 
     // put the languages into the query connected with OR
     if (languages.size() > 0 ) {
         q += "(";
         for (int i = 0; i < languages.size(); i++) {
-            q += " md" + languages.get(i) + "._id = :md" + languages.get(i);
+            q += " md" + languages.get(i) + ".id = :md" + languages.get(i);
             // add OR-connection if there's another language 
             if (i < (languages.size()-1))
               q += " OR ";
@@ -120,11 +120,11 @@ public class StartUrlDao extends Dao<StartUrl> implements IStartUrlDao {
     }
     
     // end query with provider
-    q += " su._provider._id = :providerId";
+    q += " su.provider.id = :providerId";
     // do not display deleted urls
-    q += " AND su._deleted is NULL " + orderQuery;
+    q += " AND su.deleted is NULL " + orderQuery;
     
-    final Query query = _transactionService.createQuery(q);
+    final Query query = transactionService.createQuery(q);
 
     // fill query with metadata id's
     for (final Metadata metadata : metadatas) {
@@ -140,7 +140,7 @@ public class StartUrlDao extends Dao<StartUrl> implements IStartUrlDao {
 
   @Override
   public Long countByProvider(final Provider provider) {
-    final Query query = _transactionService.createNamedQuery("countByProvider");
+    final Query query = transactionService.createNamedQuery("countByProvider");
     query.setParameter("id", provider.getId());
     return (Long) query.getSingleResult();
   }
@@ -150,25 +150,25 @@ public class StartUrlDao extends Dao<StartUrl> implements IStartUrlDao {
       final List<Metadata> metadatas) {
 
     // init query
-    String q = "SELECT COUNT(DISTINCT su) FROM StartUrl su JOIN su._limitUrls lu ";
+    String q = "SELECT COUNT(DISTINCT su) FROM StartUrl su JOIN su.limitUrls lu ";
 
     // join metadatas in separately variables
     for (final Metadata metadata : metadatas) {
-      q += " JOIN lu._metadatas md" + metadata.getId();
+      q += " JOIN lu.metadatas md" + metadata.getId();
     }
 
     // set parameter to every variable
     q += " WHERE ";
     for (final Metadata metadata : metadatas) {
-      q += " md" + metadata.getId() + "._id = :md" + metadata.getId() + " AND ";
+      q += " md" + metadata.getId() + ".id = :md" + metadata.getId() + " AND ";
     }
 
     // end query with provider
-    q += " su._provider._id = :providerId";
+    q += " su.provider.id = :providerId";
     // do not display deleted urls
-    q += " AND su._deleted is NULL";
+    q += " AND su.deleted is NULL";
 
-    final Query query = _transactionService.createQuery(q);
+    final Query query = transactionService.createQuery(q);
 
     // fill query with metadata id's
     for (final Metadata metadata : metadatas) {
@@ -181,8 +181,8 @@ public class StartUrlDao extends Dao<StartUrl> implements IStartUrlDao {
 
   @SuppressWarnings("unchecked")
   public List<StartUrl> getByUrl(final String url, final Serializable providerId) {
-    final String q = "SELECT DISTINCT su FROM StartUrl su WHERE su._url = :url and su._provider._id = :providerId and su._deleted is NULL";
-    final Query query = _transactionService.createQuery(q);
+    final String q = "SELECT DISTINCT su FROM StartUrl su WHERE su.url = :url and su.provider.id = :providerId and su.deleted is NULL";
+    final Query query = transactionService.createQuery(q);
     query.setParameter("url", url);
     query.setParameter("providerId", providerId);
     return query.getResultList();

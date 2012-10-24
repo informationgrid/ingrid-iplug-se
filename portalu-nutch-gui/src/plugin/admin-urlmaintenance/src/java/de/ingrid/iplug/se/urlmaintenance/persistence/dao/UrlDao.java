@@ -18,25 +18,25 @@ import de.ingrid.iplug.util.TimeProvider;
 public class UrlDao extends Dao<Url> implements IUrlDao {
 
   private static final Log LOG = LogFactory.getLog(UrlDao.class);
-  private TimeProvider _timeProvider;
+  private TimeProvider timeProvider;
 
   @Autowired
   public UrlDao(TransactionService transactionService, TimeProvider timeProvider) {
     super(Url.class, transactionService);
-    _timeProvider = timeProvider;
+    this.timeProvider = timeProvider;
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public void updateStatus(String url, Integer status) {
-    Query q = _transactionService.createQuery("select u from Url u where u._url = :url");
+    Query q = transactionService.createQuery("select u from Url u where u.url = :url");
     q.setParameter("url", url);
     List<? extends Url> urls = q.getResultList();
 
     if (urls != null && urls.size() > 0) {
       for (Url urlFromDb : urls) {
         urlFromDb.setStatus(status);
-        urlFromDb.setStatusUpdated(new Date(_timeProvider.getTime()));
+        urlFromDb.setStatusUpdated(new Date(timeProvider.getTime()));
         makePersistent(urlFromDb);
         LOG.info("Status updated to '" + status + "' for url '" + url + "' (" + urlFromDb.getId() + ") in database.");
       }
@@ -48,7 +48,7 @@ public class UrlDao extends Dao<Url> implements IUrlDao {
     if (providersIds.size() == 0) {
       return 0;
     }
-    Query query = _transactionService.createNamedQuery("countUrlsThatUsesSpecialProviders");
+    Query query = transactionService.createNamedQuery("countUrlsThatUsesSpecialProviders");
     query.setParameter("providersIds", providersIds);
     Number count = (Number) query.getSingleResult();
     return count.intValue();
