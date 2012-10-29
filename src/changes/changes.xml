@@ -5,6 +5,9 @@
   </properties>
   <body>
   	<release version="3.2.1.1-SNAPSHOT" date="2013-01-??" description="Bugfix Release InGrid 3.2.1-SNAPSHOT">
+        <action type="add" dev="wemove">
+            Show redirect states including the redirect URL in URL tests.
+        </action>
         <action type="add" dev="wemove" issue="INGRID-2155">
             Add support for Oracle as DB.
         </action>
