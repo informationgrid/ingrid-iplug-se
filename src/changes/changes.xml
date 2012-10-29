@@ -6,6 +6,9 @@
   <body>
   	<release version="3.2.1.1-SNAPSHOT" date="2013-01-??" description="Bugfix Release InGrid 3.2.1-SNAPSHOT">
         <action type="add" dev="wemove">
+            Set agent string to "Mozilla/5.0 (compatible; portalu;  +http://www.portalu.de/; crawler@portalu.de)"
+        </action>
+        <action type="add" dev="wemove">
             Show redirect states including the redirect URL in URL tests.
         </action>
         <action type="add" dev="wemove" issue="INGRID-2155">
