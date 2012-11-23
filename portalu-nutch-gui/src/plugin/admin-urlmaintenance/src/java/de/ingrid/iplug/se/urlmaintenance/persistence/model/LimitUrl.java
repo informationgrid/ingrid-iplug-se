@@ -13,26 +13,26 @@ public class LimitUrl extends WebUrl {
 
   @ManyToOne
   @JoinColumn(name = "startUrl_fk")
-  private StartUrl _startUrl;
+  private StartUrl startUrl;
 
   public StartUrl getStartUrl() {
-    return _startUrl;
+    return startUrl;
   }
 
   public void setStartUrl(StartUrl startUrl) {
-    _startUrl = startUrl;
+    this.startUrl = startUrl;
   }
 
   public List<Metadata> getMetadatas() {
-    return _metadatas;
+    return metadatas;
   }
 
   public void setMetadatas(List<Metadata> metadatas) {
-    _metadatas = metadatas;
+    this.metadatas = metadatas;
   }
 
   public void addMetadata(Metadata metadata) {
-    _metadatas.add(metadata);
+    this.metadatas.add(metadata);
   }
 
 }

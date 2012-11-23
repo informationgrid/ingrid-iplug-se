@@ -50,16 +50,20 @@ public class TestController extends NavigationSelector {
       Outlink[] outlinks = null;
 
       try {
-        output = getOutput(config, urlString, 3);
+        output = getOutput(config, urlString, 0);
       } catch (final ProtocolNotFound e) {
         code = ProtocolStatus.PROTO_NOT_FOUND;
         info = "ProtocolNotFound";
         error = "Kein g&uuml;ltiges Protokoll.";
       }
 
+      String redirectUrl = "";
       if (output != null) {
         code = output.getStatus().getCode();
         info = getInfoForCode(code);
+        if (code == ProtocolStatus.MOVED || code == ProtocolStatus.TEMP_MOVED) {
+            redirectUrl = output.getStatus().getMessage();
+          }
 
         if (code == ProtocolStatus.SUCCESS) {
           try {
@@ -75,6 +79,7 @@ public class TestController extends NavigationSelector {
       map.addAttribute("code", code);
       map.addAttribute("url", urlString);
       map.addAttribute("error", error);
+      map.addAttribute("redirectUrl", redirectUrl);
       map.addAttribute("status", info);
       map.addAttribute("outlinks", outlinks);
     }
@@ -86,7 +91,7 @@ public class TestController extends NavigationSelector {
       throws ProtocolNotFound {
     final ProtocolFactory pf = new ProtocolFactory(config);
     final CrawlDatum date = new CrawlDatum();
-    int tries = 0;
+    int tries = -1;
     int code = ProtocolStatus.NOTFETCHING;
     ProtocolOutput output = null;
 

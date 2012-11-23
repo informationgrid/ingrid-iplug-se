@@ -10,15 +10,15 @@ import javax.persistence.Entity;
 public class CatalogUrl extends Url {
 
   public List<Metadata> getMetadatas() {
-    return _metadatas;
+    return metadatas;
   }
 
   public void setMetadatas(List<Metadata> metadatas) {
-    _metadatas = metadatas;
+    this.metadatas = metadatas;
   }
 
   public void addMetadata(Metadata metadata) {
-    _metadatas.add(metadata);
+    this.metadatas.add(metadata);
   }
 
 }

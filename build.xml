@@ -118,6 +118,12 @@
 		</copy>
 	</target>
 
+    <target name="copy-sql-scripts">
+        <copy todir="build/${nutch-version}/sql">
+            <fileset dir="src/main/release/sql" />
+        </copy>
+    </target>
+	
 	<target name="copy-indexer-searcher-configs">
 		<copy todir="build/${nutch-version}/conf/" overwrite="true">
 			<fileset dir="portalu-nutch-gui/conf">
@@ -130,7 +136,7 @@
 	</target>
 
 	<!-- To build the installer, use maven: mvn assembly:assembly -Dmaven.test.skip -->
-	<target name="dist" depends="clean, copy-nutch, copy-ingrid-se-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts,copy-indexer-searcher-configs,copy-deploy-conf-files, create-manifest">
+	<target name="dist" depends="clean, copy-nutch, copy-ingrid-se-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts,copy-sql-scripts,copy-indexer-searcher-configs,copy-deploy-conf-files, create-manifest">
 		<ant dir="build/${nutch-version}" target="package" />
         
         <property file="${basedir}/${nutch-version}/default.properties" />
@@ -212,7 +218,7 @@
 		<copy todir="build/${nutch-version}/src/plugin/admin-urlmaintenance/conf/META-INF/" file="deploy/nutch-gui/myles/persistence.xml" overwrite="true" />
 	</target>
 
-	<target name="mylesDistribution" depends="copy-nutch, copy-ingrid-se-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts, copy-indexer-searcher-configs,copy-deploy-myles-conf-files">
+	<target name="mylesDistribution" depends="copy-nutch, copy-ingrid-se-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts,copy-sql-scripts, copy-indexer-searcher-configs,copy-deploy-myles-conf-files">
 		<ant dir="build/${nutch-version}" target="package" />
 	</target>
 
@@ -280,7 +286,7 @@
         <ant dir="build/${nutch-version}/src/plugin/admin-crawl" target="deploy" />
     </target>
     
-    <target name="makeNutchJar" depends="copy-nutch, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts,copy-indexer-searcher-configs,copy-deploy-conf-files, create-manifest">
+    <target name="makeNutchJar" depends="copy-nutch, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts,copy-sql-scripts,copy-indexer-searcher-configs,copy-deploy-conf-files, create-manifest">
         <ant dir="build/${nutch-version}" target="jar" />
     </target>
 </project>

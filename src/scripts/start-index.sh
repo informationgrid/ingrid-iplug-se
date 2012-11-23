@@ -121,7 +121,9 @@ startIplug()
 	echo 'finished syncronize.'
   fi
   
-  export NUTCH_OPTS="-Dnutch.gui.theme=portal-u -Djava.security.auth.login.config=conf/nutchgui.auth -Dlog4j.configuration=conf/log4j-index.properties -Dfile.encoding=UTF8"
+  # to change the DB to Oracle change the db.mode to "oracle" here and 
+  # adapt the configuration in plugins/admin-urlmaintenance/conf/META-INF/persistence.xml
+  export NUTCH_OPTS="-Dnutch.gui.theme=portal-u -Djava.security.auth.login.config=conf/nutchgui.auth -Dlog4j.configuration=conf/log4j-index.properties -Dfile.encoding=UTF8 -Ddb.mode=mysql"
   nohup bin/nutch-se.sh de.ingrid.iplug.se.AdministrationApp --plugdescription conf/plugdescription-index.xml --descriptor conf/communication-index.xml --secure > logs/console-index.log &
   echo "ingrid component ($INGRID_HOME) started."
   echo $! > $PID

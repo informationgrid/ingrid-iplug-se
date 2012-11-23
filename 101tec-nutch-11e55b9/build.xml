@@ -581,6 +581,10 @@
 			<include name="*.sh" />
 		</fileset>
 	</copy>
+    <copy todir="${dist.dir}/sql">
+      <fileset dir="./sql"/>
+    </copy>
+  	
   	<chmod file="${dist.dir}/bin/*" perm="754"/>
   	<chmod file="${dist.dir}/start-*.sh" perm="754"/>
 

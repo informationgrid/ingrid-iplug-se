@@ -54,6 +54,11 @@
                         <legend>Ergebnisse</legend>
                         <label>Status:</label>
                         <b>${status}</b><br />
+                        <c:if test="${!empty redirectUrl}">
+                            <label>Redirect-Url:</label>
+                            <b>${redirectUrl}</b><br />
+                        </c:if>
+                        <br />
                         <c:if test="${!empty error}">
                             <label>Fehler:</label>
                             <b>${error}</b><br />

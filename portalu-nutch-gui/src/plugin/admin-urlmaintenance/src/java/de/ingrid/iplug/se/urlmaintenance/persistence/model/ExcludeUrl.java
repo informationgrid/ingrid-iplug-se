@@ -11,14 +11,14 @@ public class ExcludeUrl extends WebUrl {
 
   @ManyToOne
   @JoinColumn(name = "startUrl_fk")
-  private StartUrl _startUrl;
+  private StartUrl startUrl;
 
   public StartUrl getStartUrl() {
-    return _startUrl;
+    return startUrl;
   }
 
   public void setStartUrl(StartUrl startUrl) {
-    _startUrl = startUrl;
+    this.startUrl = startUrl;
   }
 
 }
