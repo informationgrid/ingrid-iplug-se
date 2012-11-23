@@ -13,6 +13,7 @@ import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -28,116 +29,122 @@ import org.apache.nutch.protocol.ProtocolStatus;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "TYPE", discriminatorType = DiscriminatorType.STRING, length = 20)
 @NamedQueries(value = {
-    @NamedQuery(name = "countUrlsThatUsesSpecialProviders", query = "select count(u) from Url as u where u._provider._id in :providersIds") })
+    @NamedQuery(name = "countUrlsThatUsesSpecialProviders", query = "select count(u) from Url as u where u.provider.id in :providersIds") })
 public class Url extends IdBase {
 
   @Column(columnDefinition = "VARCHAR(1024)")
-  private String _url;
+  private String url;
 
   @Temporal(TemporalType.TIMESTAMP)
-  private Date _created = new Date();
+  private Date created = new Date();
 
   @Temporal(TemporalType.TIMESTAMP)
-  private Date _updated = new Date();
+  private Date updated = new Date();
 
   @Temporal(TemporalType.TIMESTAMP)
-  private Date _deleted = null;
+  private Date deleted = null;
   
   @ManyToOne
   @JoinColumn(nullable = false, name = "provider_fk")
-  private Provider _provider;
+  private Provider provider;
 
   @ManyToMany(fetch = FetchType.EAGER)
-  protected List<Metadata> _metadatas = new ArrayList<Metadata>();
+  @JoinTable(name="URL_METADATA",
+                 joinColumns=
+                      @JoinColumn(name="Url__ID"),
+                 inverseJoinColumns=
+                      @JoinColumn(name="metadatas__ID")
+     )
+  protected List<Metadata> metadatas = new ArrayList<Metadata>();
 
   /**
    * The status given as defined in {@link ProtocolStatus}. db-update: alter
    * table url add column _STATUS INTEGER;
    */
-  protected Integer _status = null;
+  protected Integer status = null;
   /**
    * The timestamp, the status was updated by a fetch for this url db-update:
    * alter table url add column _STATUSUPDATED DATETIME;
    */
   @Temporal(TemporalType.TIMESTAMP)
-  private Date _statusUpdated = null;
+  private Date statusUpdated = null;
 
   public Url() {
   }
 
   public Url(final String url) {
-    _url = url;
+    this.url = url;
   }
 
   public String getUrl() {
-    return _url;
+    return url;
   }
 
   public void setUrl(final String url) {
-    _url = url;
+    this.url = url;
   }
 
   public Provider getProvider() {
-    return _provider;
+    return provider;
   }
 
   public void setProvider(final Provider provider) {
-    _provider = provider;
+    this.provider = provider;
   }
 
   public Date getCreated() {
-    return _created;
+    return created;
   }
 
   public void setCreated(final Date timeStamp) {
-    _created = timeStamp;
+    created = timeStamp;
   }
 
   public Date getUpdated() {
-    return _updated;
+    return updated;
   }
 
   public void setUpdated(final Date edited) {
-    _updated = edited;
+    updated = edited;
   }
 
   public Date getDeleted() {
-      return _deleted;
+      return deleted;
     }
 
     public void setDeleted(final Date deleted) {
-      _deleted = deleted;
+      this.deleted = deleted;
     }
   
   public Integer getStatus() {
-    return _status;
+    return status;
   }
 
   public void setStatus(Integer status) {
-    _status = status;
+    this.status = status;
   }
 
   public Date getStatusUpdated() {
-    return _statusUpdated;
+    return statusUpdated;
   }
 
   public void setStatusUpdated(Date statusUpdated) {
-    _statusUpdated = statusUpdated;
+    this.statusUpdated = statusUpdated;
   }
 
   public String getStatusAsText() {
-    if (_status == null) {
+    if (status == null) {
       return "";
     }
     // As the ProtocollStatus does not provide a method to resolve the code to a
     // human readable message, we have to fix it here.
-    String strOutput = new ProtocolStatus(_status).toString();
+    String strOutput = new ProtocolStatus(status).toString();
     int pos = strOutput.indexOf('(');
     String ret = "";
     if (pos > 0) {
       ret = strOutput.substring(0, pos);
-      if (_statusUpdated != null) {
-        ret += " (" + new SimpleDateFormat("yyyy-MM-dd").format(_statusUpdated) + ")";
+      if (statusUpdated != null) {
+        ret += " (" + new SimpleDateFormat("yyyy-MM-dd").format(statusUpdated) + ")";
       }
     }
     return ret;
@@ -146,6 +153,6 @@ public class Url extends IdBase {
   @Override
   public String toString() {
     String s = super.toString();
-    return s += (" url:" + _url);
+    return s += (" url:" + url);
   }
 }

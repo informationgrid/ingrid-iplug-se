@@ -19,86 +19,86 @@ import org.apache.nutch.protocol.ProtocolStatus;
 public class UrlLog extends IdBase {
 
   @Column(length=2048)
-  private String _url;
+  private String url;
 
   @Temporal(TemporalType.TIMESTAMP)
-  private Date _created = new Date();
+  private Date created = new Date();
 
   @Temporal(TemporalType.TIMESTAMP)
-  private Date _updated = new Date();
+  private Date updated = new Date();
 
   /**
    * The status given as defined in {@link ProtocolStatus}. db-update: alter
    * table url add column _STATUS INTEGER;
    */
-  protected Integer _status = null;
+  protected Integer status = null;
   /**
    * The timestamp, the status was updated by a fetch for this url db-update:
    * alter table url add column _STATUSUPDATED DATETIME;
    */
   @Temporal(TemporalType.TIMESTAMP)
-  private Date _statusUpdated = null;
+  private Date statusUpdated = null;
 
   public UrlLog() {
   }
 
   public UrlLog(final String url) {
-    _url = url;
+    this.url = url;
   }
 
   public String getUrl() {
-    return _url;
+    return url;
   }
 
   public void setUrl(final String url) {
-    _url = url;
+    this.url = url;
   }
 
   public Date getCreated() {
-    return _created;
+    return created;
   }
 
   public void setCreated(final Date timeStamp) {
-    _created = timeStamp;
+    created = timeStamp;
   }
 
   public Date getUpdated() {
-    return _updated;
+    return updated;
   }
 
   public void setUpdated(final Date edited) {
-    _updated = edited;
+    updated = edited;
   }
 
   public Integer getStatus() {
-    return _status;
+    return status;
   }
 
   public void setStatus(Integer status) {
-    _status = status;
+    this.status = status;
   }
 
   public Date getStatusUpdated() {
-    return _statusUpdated;
+    return statusUpdated;
   }
 
   public void setStatusUpdated(Date statusUpdated) {
-    _statusUpdated = statusUpdated;
+    this.statusUpdated = statusUpdated;
   }
 
   public String getStatusAsText() {
-    if (_status == null) {
+    if (status == null) {
       return "";
     }
     // As the ProtocollStatus does not provide a method to resolve the code to a
     // human readable message, we have to fix it here.
-    String strOutput = new ProtocolStatus(_status).toString();
+    String strOutput = new ProtocolStatus(status).toString();
     int pos = strOutput.indexOf('(');
     String ret = "";
     if (pos > 0) {
       ret = strOutput.substring(0, pos);
-      if (_statusUpdated != null) {
-        ret += " (" + new SimpleDateFormat("yyyy-MM-dd").format(_statusUpdated) + ")";
+      if (statusUpdated != null) {
+        ret += " (" + new SimpleDateFormat("yyyy-MM-dd").format(statusUpdated) + ")";
       }
     }
     return ret;
@@ -107,6 +107,6 @@ public class UrlLog extends IdBase {
   @Override
   public String toString() {
     String s = super.toString();
-    return s += (" url:" + _url);
+    return s += (" url:" + url);
   }
 }

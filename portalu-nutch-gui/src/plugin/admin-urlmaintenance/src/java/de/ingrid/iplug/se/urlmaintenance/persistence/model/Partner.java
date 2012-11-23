@@ -13,48 +13,48 @@ import javax.persistence.OneToMany;
 
 @Entity
 
-@NamedQueries(value = { @NamedQuery(name = "getPartnerByName", query = "select p from Partner as p where p._name = :name"),
-        @NamedQuery(name = "getPartnerByShortName", query = "select p from Partner as p where p._shortName = :shortName") })
+@NamedQueries(value = { @NamedQuery(name = "getPartnerByName", query = "select p from Partner as p where p.name = :name"),
+        @NamedQuery(name = "getPartnerByShortName", query = "select p from Partner as p where p.shortName = :shortName") })
 public class Partner extends IdBase {
 
   // rwe: Heads-up: @Column(unique=true) does not work with eclipselink and
   // HSQLDB!
   @Column(nullable = false/* , unique=true */)
-  private String _name;
+  private String name;
   
   @Column(nullable = false)
-  private String _shortName;
+  private String shortName;
 
   @OneToMany(cascade = { CascadeType.ALL })
   @JoinColumn(name = "partner_fk")
-  private List<Provider> _providers = new ArrayList<Provider>();
+  private List<Provider> providers = new ArrayList<Provider>();
 
   public String getName() {
-    return _name;
+    return name;
   }
 
   public void setName(String name) {
-    _name = name;
+    this.name = name;
   }
 
   public List<Provider> getProviders() {
-    return _providers;
+    return providers;
   }
 
   public void setProviders(List<Provider> providers) {
-    _providers = providers;
+    this.providers = providers;
   }
 
   public void addProvider(Provider provider) {
-    _providers.add(provider);
+    providers.add(provider);
     provider.setPartner(this);
   }
 
   public void setShortName(String shortName) {
-    _shortName = shortName;
+    this.shortName = shortName;
   }
 
   public String getShortName() {
-    return _shortName;
+    return shortName;
   }
 }

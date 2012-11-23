@@ -32,21 +32,21 @@ public class CatalogUrlDao extends Dao<CatalogUrl> implements ICatalogUrlDao {
 
     // join metadatas in separately variables
     for (Metadata metadata : metadatas) {
-      q += " JOIN cu._metadatas md" + metadata.getId();
+      q += " JOIN cu.metadatas md" + metadata.getId();
     }
 
     // set parameter to every variable
     q += " WHERE ";
     for (Metadata metadata : metadatas) {
-      q += " md" + metadata.getId() + "._id = :md" + metadata.getId() + " AND ";
+      q += " md" + metadata.getId() + ".id = :md" + metadata.getId() + " AND ";
     }
 
     // end query with provider
-    q += " cu._provider._id = :providerId";
+    q += " cu.provider.id = :providerId";
     // do not display deleted urls
-    q += " AND cu._deleted is NULL";
+    q += " AND cu.deleted is NULL";
 
-    Query query = _transactionService.createQuery(q);
+    Query query = transactionService.createQuery(q);
 
     // fill query with metadata id's
     for (Metadata metadata : metadatas) {
@@ -67,22 +67,22 @@ public class CatalogUrlDao extends Dao<CatalogUrl> implements ICatalogUrlDao {
     String orderQuery = null;
     switch (orderBy) {
     case CREATED_ASC:
-      orderQuery = "ORDER BY cu._created asc";
+      orderQuery = "ORDER BY cu.created asc";
       break;
     case CREATED_DESC:
-      orderQuery = "ORDER BY cu._created desc";
+      orderQuery = "ORDER BY cu.created desc";
       break;
     case UPDATED_ASC:
-      orderQuery = "ORDER BY cu._updated asc";
+      orderQuery = "ORDER BY cu.updated asc";
       break;
     case UPDATED_DESC:
-      orderQuery = "ORDER BY cu._updated desc";
+      orderQuery = "ORDER BY cu.updated desc";
       break;
     case URL_ASC:
-      orderQuery = "ORDER BY cu._url asc";
+      orderQuery = "ORDER BY cu.url asc";
       break;
     case URL_DESC:
-      orderQuery = "ORDER BY cu._url desc";
+      orderQuery = "ORDER BY cu.url desc";
       break;
     default:
       break;
@@ -93,7 +93,7 @@ public class CatalogUrlDao extends Dao<CatalogUrl> implements ICatalogUrlDao {
 
     // join metadatas in separately variables
     for (Metadata metadata : metadatas) {
-      q += " JOIN cu._metadatas md" + metadata.getId();
+      q += " JOIN cu.metadatas md" + metadata.getId();
     }
 
     // set parameter to every variable
@@ -104,14 +104,14 @@ public class CatalogUrlDao extends Dao<CatalogUrl> implements ICatalogUrlDao {
       if (metadata.getMetadataKey().equals("lang"))
         languages.add(metadata.getId());
       else
-        q += " md" + metadata.getId() + "._id = :md" + metadata.getId() + " AND ";
+        q += " md" + metadata.getId() + ".id = :md" + metadata.getId() + " AND ";
     }
     
     // put the languages into the query connected with OR
     if (languages.size() > 0 ) {
         q += "(";
         for (int i = 0; i < languages.size(); i++) {
-            q += " md" + languages.get(i) + "._id = :md" + languages.get(i);
+            q += " md" + languages.get(i) + ".id = :md" + languages.get(i);
             // add OR-connection if there's another language 
             if (i < (languages.size()-1))
               q += " OR ";
@@ -120,11 +120,11 @@ public class CatalogUrlDao extends Dao<CatalogUrl> implements ICatalogUrlDao {
     }
 
     // end query with provider
-    q += " cu._provider._id = :providerId";
+    q += " cu.provider.id = :providerId";
     // do not display deleted urls
-    q += " AND cu._deleted is NULL " + orderQuery;
+    q += " AND cu.deleted is NULL " + orderQuery;
 
-    Query query = _transactionService.createQuery(q);
+    Query query = transactionService.createQuery(q);
 
     // fill query with metadata id's
     for (Metadata metadata : metadatas) {
@@ -139,8 +139,8 @@ public class CatalogUrlDao extends Dao<CatalogUrl> implements ICatalogUrlDao {
   
   @SuppressWarnings("unchecked")
   public List<CatalogUrl> getByUrl(final String url, final Serializable providerId) {
-    final String q = "SELECT DISTINCT cu FROM CatalogUrl cu WHERE cu._deleted IS NULL and cu._url = :url and cu._provider._id = :providerId";
-    final Query query = _transactionService.createQuery(q);
+    final String q = "SELECT DISTINCT cu FROM CatalogUrl cu WHERE cu.deleted IS NULL and cu.url = :url and cu.provider.id = :providerId";
+    final Query query = transactionService.createQuery(q);
     query.setParameter("url", url);
     query.setParameter("providerId", providerId);
     return query.getResultList();

@@ -118,7 +118,7 @@
 													 }
 												 );
 											}
-											YAHOO.util.Event.onAvailable("switch_${i.index}", init_${i.index});
+											YAHOO.util.Event.on(window, "load", init_${i.index});
 											</script>
 						            		
 						            		
