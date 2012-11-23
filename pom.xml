@@ -16,6 +16,16 @@
 		<connection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid-iplug-se/branches/ingrid-iplug-se-3.2.x</connection>
 		<developerConnection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid-iplug-se/branches/ingrid-iplug-se-3.2.x</developerConnection>
 	</scm>
+	
+	<dependencyManagement>
+	   <dependencies>
+	       <dependency>
+            <groupId>de.ingrid</groupId>
+            <artifactId>ingrid-search-utils</artifactId>
+            <version>1.0.1</version>
+	       </dependency>
+	   </dependencies>
+	</dependencyManagement>
     
 	<dependencies>
 		<dependency>

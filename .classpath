@@ -138,8 +138,6 @@
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/activation-1.1.jar"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/mail-1.4.1.jar"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-communication-3.0.0.jar"/>
-	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-ibus-client-3.0.0.jar"/>
-	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-iplug-3.2.0-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-iplug-admin-step1-se-3.0.0.war"/>
 	<classpathentry kind="lib" path="101tec-nutch-11e55b9/lib/lucene-analyzers-2.4.0.jar"/>
 	<classpathentry kind="lib" path="101tec-nutch-11e55b9/src/plugin/parse-pdf/lib/jai_codec.jar"/>
@@ -148,11 +146,14 @@
 	<classpathentry kind="lib" path="101tec-nutch-11e55b9/src/plugin/parse-pdf/lib/jempbox-1.6.0.jar"/>
 	<classpathentry kind="lib" path="101tec-nutch-11e55b9/src/plugin/parse-pdf/lib/pdfbox-1.6.0.jar"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-external-service-sns-3.1.0.jar"/>
-	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-ibus-3.1.0.jar" sourcepath="/ingrid-ibus"/>
-	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-iplug-sns-3.1.0.jar"/>
-	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-utils-3.2.0-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-iplug-admin-step1-sns-3.1.0.war"/>
 	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-base-webapp-3.2.0-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-search-utils-1.0.0-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-base-webapp-3.2.0.jar"/>
+	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-ibus-3.2.0.jar"/>
+	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-ibus-client-3.2.0.jar"/>
+	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-iplug-3.2.0.jar"/>
+	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-iplug-sns-3.2.0.jar"/>
+	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-search-utils-1.0.1.jar"/>
+	<classpathentry kind="lib" path="portalu-common/ingrid-ext/ingrid-utils-3.2.0.jar"/>
 	<classpathentry kind="output" path="eclipse-classes"/>
 </classpath>
