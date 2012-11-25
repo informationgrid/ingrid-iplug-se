@@ -4,7 +4,7 @@
     <title>Changes Ingrid iPlug SE</title>
   </properties>
   <body>
-  	<release version="3.3.0-SNAPSHOT" date="2013-01-??" description="Bugfix Release InGrid 3.2.1-SNAPSHOT">
+  	<release version="3.2.2" date="2012-01-??" description="Bugfix Release InGrid 3.2.2">
         <action type="add" dev="wemove" issue="INGRID-2175">
             Add support for fetching redirected pages in one crawl, even if redirects point to a different domain. 
         </action>
