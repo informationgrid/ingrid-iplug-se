@@ -224,7 +224,7 @@ public class CrawlTool {
     
     boolean filterWebgraphAgainstBwDb = _configuration
     .getBoolean("bw.filter.webgraph.enable", false);
-    if (filterWebgraphAgainstBwDb) {
+    if (filterWebgraphAgainstBwDb && bwEnable) {
         LOG.info("filter webgraph against bwdb.");
         BWWebgraphFilter bwWebgraphFilter = new BWWebgraphFilter(_configuration, _crawlDir);
         bwWebgraphFilter.update(webGraphScoring.getWebGraphPath(), bwDb, false, false, true);
@@ -279,7 +279,7 @@ public class CrawlTool {
 
     boolean filterSegmentsAgainstBwDb = _configuration
     .getBoolean("segments.filter.against.crawldb", false);
-    if (filterSegmentsAgainstBwDb) {
+    if (filterSegmentsAgainstBwDb && bwEnable) {
         LOG.info("filter segments against crawldb.");
         SegmentFilter segmentFilter = new SegmentFilter(_configuration);
         Path tmpPath = new Path(_crawlDir, "segments_" + Integer.toString(new Random().nextInt(Integer.MAX_VALUE)));
@@ -317,7 +317,7 @@ public class CrawlTool {
 
       boolean filterLinkDbAgainstBwDb = _configuration
       .getBoolean("bw.filter.linkdb.enable", false);
-      if (filterLinkDbAgainstBwDb) {
+      if (filterLinkDbAgainstBwDb && bwEnable) {
           LOG.info("filter linkdb against bwdb.");
           BWLinkDbFilter bwLinkDbFilter = new BWLinkDbFilter(_configuration);
           bwLinkDbFilter.update(linkDb, bwDb, false, false, true);

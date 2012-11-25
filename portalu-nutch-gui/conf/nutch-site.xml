@@ -378,25 +378,25 @@
 <property>
   <name>bw.filter.crawldb.enable</name>
   <value>true</value>
-  <description>Filter crawldb against bwdb for every crawl. Filtering takes place right after creating the bw db.</description>
+  <description>Filter crawldb against bwdb for every crawl. Filtering takes place right after creating the bw db. Works only if bw.enable=true.</description>
 </property> 
 
 <property>
   <name>bw.filter.linkdb.enable</name>
   <value>true</value>
-  <description>Filter linkdb against bwdb for every crawl. Filtering takes place right after creating the bw db.</description>
+  <description>Filter linkdb against bwdb for every crawl. Filtering takes place right after creating the bw db. Works only if bw.enable=true.</description>
 </property> 
 
 <property>
   <name>bw.filter.webgraph.enable</name>
   <value>true</value>
-  <description>Filter linkdb against bwdb for every crawl. Filtering takes place right after creating the bw db.</description>
+  <description>Filter linkdb against bwdb for every crawl. Filtering takes place right after creating the bw db. Works only if bw.enable=true.</description>
 </property> 
 
 <property>
   <name>segments.filter.against.crawldb</name>
   <value>true</value>
-  <description>Filter segments against the crawldb. This step is executed after merging of segments, if enabled, and just before the index process starts. All entries that do not match an URL in the crawldb will be removed. This makes sense in combination with bw.filter.crawldb.enable=true, to free segments from useless data.</description>
+  <description>Filter segments against the crawldb. This step is executed after merging of segments, if enabled, and just before the index process starts. All entries that do not match an URL in the crawldb will be removed. This makes sense in combination with bw.filter.crawldb.enable=true, to free segments from useless data. Works only if bw.enable=true.</description>
 </property> 
 
 <property>
