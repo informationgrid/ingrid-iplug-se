@@ -202,8 +202,11 @@ public class CrawlTool {
         bwUpdateDb.update(crawlDb, bwDb, new Path[] { segment }, true, true); // update
       } else {
           if (LOG.isInfoEnabled()) {
-              LOG.info("Do not update crawldb with bwdb from segment:" + segment);
+              LOG.info("Update crawldb with from segment:" + segment + ". DO NOT USE BWDB.");
           }
+          CrawlDb updateCrawlDb = new CrawlDb(_configuration);
+          updateCrawlDb.update(crawlDb, new Path[] { segment }, true, true);
+          LOG.info("crawldb update: done");      
       }
       if (LOG.isInfoEnabled()) {
           LOG.info("Generate host statistics for segment:" + segment);
