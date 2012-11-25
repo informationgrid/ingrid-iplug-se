@@ -4,7 +4,10 @@
     <title>Changes Ingrid iPlug SE</title>
   </properties>
   <body>
-  	<release version="3.2.1.1-SNAPSHOT" date="2013-01-??" description="Bugfix Release InGrid 3.2.1-SNAPSHOT">
+  	<release version="3.3.0-SNAPSHOT" date="2013-01-??" description="Bugfix Release InGrid 3.2.1-SNAPSHOT">
+        <action type="add" dev="wemove" issue="INGRID-2175">
+            Add support for fetching redirected pages in one crawl, even if redirects point to a different domain. 
+        </action>
         <action type="add" dev="wemove">
             Set agent string to "Mozilla/5.0 (compatible; portalu;  +http://www.portalu.de/; crawler@portalu.de)"
         </action>
