@@ -23,6 +23,9 @@
         <action type="add" dev="wemove" issue="INGRID-2150">
             Add java parameter "-Dfile.encoding=UTF8" to start script.
         </action>
+        <action type="update" dev="wemove" issue="INGRID-2156">
+          Connect to iBus even if the iBus was started after the iPlug.
+        </action>
 	</release>
     <release version="3.2.1" date="2012-09-26" description="Bugfix Release InGrid 3.2.1">
       <action type="fix" dev="wemove">Prevent frequent deregistration of the indexer iplug in the ibus.</action>
