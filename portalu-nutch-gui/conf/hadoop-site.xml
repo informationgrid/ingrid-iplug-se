@@ -7,7 +7,7 @@
 
     <property>
         <name>mapred.child.java.opts</name>
-        <value>-Xmxm768</value>
+        <value>-Xmx768m</value>
         <description>Java opts for the task tracker child processes.
             The following symbol, if present, will be interpolated: @taskid@ is
             replaced
