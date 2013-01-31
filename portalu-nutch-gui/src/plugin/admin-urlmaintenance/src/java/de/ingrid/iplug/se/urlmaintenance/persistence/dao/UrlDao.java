@@ -29,7 +29,7 @@ public class UrlDao extends Dao<Url> implements IUrlDao {
   @SuppressWarnings("unchecked")
   @Override
   public void updateStatus(String url, Integer status) {
-    Query q = transactionService.createQuery("select u from Url u where u.url = :url");
+    Query q = transactionService.createQuery("select u from Url u where u.url = :url AND u.deleted is NULL");
     q.setParameter("url", url);
     List<? extends Url> urls = q.getResultList();
 
