@@ -3,6 +3,7 @@ package de.ingrid.iplug.se.urlmaintenance.persistence.model;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
@@ -14,6 +15,7 @@ import javax.persistence.TemporalType;
 import org.apache.nutch.protocol.ProtocolStatus;
 
 @Entity
+@Cacheable(false)
 @Table(name = "URL_LOG")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class UrlLog extends IdBase {

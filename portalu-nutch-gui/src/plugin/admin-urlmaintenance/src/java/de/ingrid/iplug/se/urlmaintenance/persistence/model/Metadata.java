@@ -1,5 +1,6 @@
 package de.ingrid.iplug.se.urlmaintenance.persistence.model;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.NamedQueries;
@@ -7,7 +8,7 @@ import javax.persistence.NamedQuery;
 
 @Entity
 //@Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "_metadataKey", "_metadataValue" }) })
-
+@Cacheable(false)
 @NamedQueries( {
     @NamedQuery(name = "getMetadataByKeyAndValue", query = "select m from Metadata as m where m.metadataKey = :key and m.metadataValue = :value"),
     @NamedQuery(name = "getMetadatasByKey", query = "select m from Metadata as m where m.metadataKey = :key") })

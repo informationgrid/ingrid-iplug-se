@@ -3,6 +3,7 @@ package de.ingrid.iplug.se.urlmaintenance.persistence.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Cacheable;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -11,6 +12,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 
 @Entity
+@Cacheable(false)
 @DiscriminatorValue("START")
 @NamedQueries(value = {
     @NamedQuery(name = "getAllUrlsByProviderOrderByCreatedAsc", query = "select u from StartUrl as u where u.deleted is NULL and u.provider.id = :id order by u.created asc"),

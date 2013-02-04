@@ -2,10 +2,12 @@ package de.ingrid.iplug.se.urlmaintenance.persistence.model;
 
 import java.util.List;
 
+import javax.persistence.Cacheable;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 @Entity
+@Cacheable(false)
 @DiscriminatorValue("CATALOG")
 public class CatalogUrl extends Url {
 

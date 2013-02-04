@@ -3,6 +3,7 @@ package de.ingrid.iplug.se.urlmaintenance.persistence.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,6 +14,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 
 @Entity
+@Cacheable(false)
 @NamedQueries(value = { 
         @NamedQuery(name = "getProviderByName", query = "select p from Provider as p where p.name = :name"),
         @NamedQuery(name = "getProviderByShortName", query = "select p from Provider as p where p.shortName = :shortName"),
