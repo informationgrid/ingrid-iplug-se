@@ -4,29 +4,40 @@
     <title>Changes Ingrid iPlug SE</title>
   </properties>
   <body>
-  	<release version="3.3.0-SNAPSHOT" date="2013-01-??" description="Release InGrid 3.3.0">
+  	<release version="3.3.0" date="2013-03-06" description="Release InGrid 3.3">
+        <action type="add" dev="wemove">
+            Add documentation of duplicate analysis.
+        </action>
+        <action type="add" dev="wemove">
+            Add Cacheble(false) to prevent caching.
+        </action>
         <action type="add" dev="wemove" issue="INGRID-2175">
             Add support for fetching redirected pages in one crawl, even if redirects point to a different domain. 
         </action>
         <action type="add" dev="wemove">
-            Set agent string to "Mozilla/5.0 (compatible; portalu;  +http://www.portalu.de/; crawler@portalu.de)"
+            Show redirect states including the redirect URL in URL tests.
         </action>
         <action type="add" dev="wemove">
-            Show redirect states including the redirect URL in URL tests.
+            Set agent string to "Mozilla/5.0 (compatible; portalu;  +http://www.portalu.de/; crawler@portalu.de)"
         </action>
         <action type="add" dev="wemove" issue="INGRID-2155">
             Add support for Oracle as DB.
         </action>
         <action type="add" dev="wemove">
             Add support for german stemming during indexing and query analysis.
+            Enable german analysis plugin per default.
         </action>
         <action type="add" dev="wemove" issue="INGRID-2150">
             Add java parameter "-Dfile.encoding=UTF8" to start script.
+        </action>
+        <action type="update" dev="wemove">
+          Only update status on non deleted urls.
         </action>
         <action type="update" dev="wemove" issue="INGRID-2156">
           Connect to iBus even if the iBus was started after the iPlug.
         </action>
 	</release>
+
     <release version="3.2.1" date="2012-09-26" description="Bugfix Release InGrid 3.2.1">
       <action type="fix" dev="wemove">Prevent frequent deregistration of the indexer iplug in the ibus.</action>
     </release>

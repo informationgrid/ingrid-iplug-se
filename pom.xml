@@ -3,13 +3,13 @@
 	<parent>
 		<artifactId>ingrid-releases-pom</artifactId>
 		<groupId>de.ingrid</groupId>
-		<version>3.3.0-SNAPSHOT</version>
+		<version>3.3.0</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ingrid</groupId>
 	<artifactId>ingrid-iplug-se</artifactId>
 	<packaging>jar</packaging>
-	<version>3.3.0-SNAPSHOT</version>
+	<version>3.3.0-RELEASE-SNAPSHOT</version>
 	<name>Ingrid iPlug SE</name>
 
 	<scm>
