@@ -4,6 +4,11 @@
     <title>Changes Ingrid iPlug SE</title>
   </properties>
   <body>
+    <release version="3.3.0.1-SNAPSHOT" date="2013-xx-xx" description="Bugfix Release InGrid 3.3">
+        <action type="add" dev="wemove" issue="INGRID-2175">
+            Fix bug where partner/provider structure from management iPlug  was parsed wrongly, resulting in false partner/provider assignment.
+        </action>
+    </release>
   	<release version="3.3.0" date="2013-03-06" description="Release InGrid 3.3">
         <action type="add" dev="wemove">
             Add documentation of duplicate analysis.

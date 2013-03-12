@@ -326,20 +326,20 @@ public class PartnerAndProviderDbSyncService {
     // key : name
     // value: (java.lang.String) Bund
     List<InternalPartner> ret = new ArrayList<InternalPartner>();
-    InternalPartner actualPartner = new InternalPartner();
+    InternalPartner actualPartner = null;
 
     for (Map<String, Serializable> partner : allPartnerWithProvider) {
-      for (Entry<String, Serializable> obj : partner.entrySet()) {
+        actualPartner = new InternalPartner();
+        for (Entry<String, Serializable> obj : partner.entrySet()) {
         String key = obj.getKey();
         Serializable value = obj.getValue();
 
         if (key.equals("partnerid")) {
-          if (actualPartner.getId() != null) {
+          if (actualPartner.getId() == null) {
             ret.add(actualPartner);
-            LOG.debug("parsed: '" + actualPartner + "'.");
-            actualPartner = new InternalPartner();
           }
           actualPartner.setId((String) value);
+          LOG.debug("parsed: '" + actualPartner + "'.");
         } else if (key.equals("providers")) {
           if (value instanceof List<?>) {
             // contains information about all providers to this partner
@@ -371,9 +371,6 @@ public class PartnerAndProviderDbSyncService {
           actualPartner.setName((String) value);
         }
       }
-    }
-    if (actualPartner.getName() != null) {
-      ret.add(actualPartner);
     }
     return ret;
   }
