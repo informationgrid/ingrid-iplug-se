@@ -285,6 +285,13 @@
         </copy>
         <ant dir="build/${nutch-version}/src/plugin/admin-crawl" target="deploy" />
     </target>
+
+    <target name="makeAdminWelcome" depends="copy-ingrid-se-plugins">
+        <copy todir="build/${nutch-version}/src/plugin/admin-welcome">
+            <fileset dir="${nutch-version}/src/plugin/admin-welcome" />
+        </copy>
+        <ant dir="build/${nutch-version}/src/plugin/admin-welcome" target="deploy" />
+    </target>
     
     <target name="makeNutchJar" depends="copy-nutch, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts,copy-sql-scripts,copy-indexer-searcher-configs,copy-deploy-conf-files, create-manifest">
         <ant dir="build/${nutch-version}" target="jar" />

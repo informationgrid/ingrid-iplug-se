@@ -32,9 +32,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.nutch.admin.ConfigurationUtil;
 import org.apache.nutch.admin.GuiComponentDeployer;
-import org.apache.nutch.admin.HttpServer;
 
-import de.ingrid.iplug.se.crawl.sns.SnsRecordWriter;
 import de.ingrid.utils.PlugDescription;
 import de.ingrid.utils.xml.XMLSerializer;
 
@@ -129,8 +127,8 @@ public class AdministrationApp {
                 System.setProperty(IKeys.COMMUNICATION, line.getOptionValue(PARAM_COMMUNICATION));
             }
             boolean secure = line.hasOption("secure");
-            HttpServer httpServer = new HttpServer(port, secure);
-            httpServer.startHttpServer();
+            IngridHttpServer httpServer = new IngridHttpServer(port, secure);
+            httpServer.startHttpServer();            
 
             ConfigurationUtil configurationUtil = new ConfigurationUtil(workingDirectory);
             if (!configurationUtil.existsConfiguration("general")) {

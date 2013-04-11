@@ -475,5 +475,11 @@
   </description>
 </property>
 
+<property>
+  <name>shib_header_name</name>
+  <value>bvbwIdentifier</value>
+  <description>The attribute in the request header containing the externally logged in user (e.g. Shibboleth).  
+  </description>
+</property>
 
 </configuration>
