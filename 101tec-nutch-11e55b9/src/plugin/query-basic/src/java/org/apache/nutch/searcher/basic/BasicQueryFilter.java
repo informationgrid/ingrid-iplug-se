@@ -66,6 +66,8 @@ public class BasicQueryFilter implements QueryFilter {
     private float[] FIELD_BOOSTS = { URL_BOOST, ANCHOR_BOOST, 1.0f, TITLE_BOOST, HOST_BOOST };
 
     private AnalyzerFactory analyzerFactory = null;
+    
+    private String[] tokenizedFields = { "url", "anchor", "content", "title", "host" };
 
     /**
      * Set the boost factor for url matches, relative to content and anchor
@@ -335,7 +337,8 @@ public class BasicQueryFilter implements QueryFilter {
             query = new TermQuery(luceneTerm(field, term));
         }
 
-        if ((query instanceof TermQuery) && "content".equals(field)) {
+        // tokenized are the following fields: host, url, content, anchor, title
+        if ((query instanceof TermQuery) && isTokenizedField(field)) {
             String stemmedText = null;
             try {
                 stemmedText = stemming(((TermQuery) query).getTerm().text(), analyzer);
@@ -346,6 +349,14 @@ public class BasicQueryFilter implements QueryFilter {
         }
         query.setBoost(boost);
         return query;
+    }
+
+    private boolean isTokenizedField(String field) {
+        for (String tokField : tokenizedFields) {
+            if (tokField.equals(field))
+                return true;
+        }
+        return false;
     }
 
     /** Utility to construct a Lucene exact phrase query for a Nutch phrase. */

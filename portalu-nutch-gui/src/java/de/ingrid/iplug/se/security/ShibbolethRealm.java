@@ -163,7 +163,10 @@ public class ShibbolethRealm implements UserRealm, SSORealm {
         try {
             Configuration conf = configurationUtil.loadConfiguration("general");
             this._headerName = conf.get("shib_header_name");
-            if ( this._headerName == null)  this._headerName = "NOT_CONFIGURED";
+            if ( this._headerName == null) {
+                this._headerName = "NOT_CONFIGURED";
+                LOG.debug("Shibboleth not configured in general/nutch-site.xml ... searched for 'shib_header_name'");
+            }
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
