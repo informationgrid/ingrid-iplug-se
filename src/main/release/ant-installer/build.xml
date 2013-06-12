@@ -1,6 +1,6 @@
-<project name="PortalU Installation">
+<project name="PortalU Installation" basedir=".">
 	<description>
-        iPlug-DSC Installation Script
+        iPlug-SE Installation Script
     </description>
 	<!-- set global properties for this build -->
 	<property name="iPlugName" value="${project.artifactId}-${project.version}" />
@@ -11,7 +11,26 @@
     <property name="persistence-xml"            value="${installDir}/plugins/admin-urlmaintenance/conf/META-INF/persistence.xml"/>
     <property name="nutch-se.sh"                value="${installDir}/bin/nutch-se.sh"/>
 
-	<target name="install" description="Extract all files to the installation directory.">
+    <!-- THESE PORPERTIES ARE NECESSARY FOR UPDATES -->
+    <property name="libraryDir"         value="lib" />
+    <property name="libraryIdent"       value="nutch-gui-" />
+    <!-- <property name="libraryIdent"       value="MANIFEST.MF" /> -->
+    <property name="versionsWithConfigurations"  value="" />
+    <property name="minSupportedVersion" value="3.3.0" />
+
+    <import file="build-installer-utils.xml"  as="utils" />
+    <import file="build-patch.xml"            as="patch" />
+
+    <target name="setUpdateProperty" depends="checkPreconditionsForUpdate, extractUpdate">
+        <property name="installType" value="update" />
+        <property name="updateProcedure" value="true" />
+    </target>
+    
+    <target name="setInstallProperty" depends="extract">
+        <property name="installProcedure" value="true" />
+    </target>
+
+	<target name="extract" description="Extract all files to the installation directory.">
 		<unzip src="${antinstaller.jar}" dest="${installDir}">
 			<patternset>
 				<include name="${iPlugName}/**/*" />
@@ -31,6 +50,28 @@
 		<chmod dir="${installDir}/bin" perm="ugo+rx" includes="**/*.sh" />
 		<mkdir dir="${installDir}/logs" />
 	</target>
+
+    <target name="extractUpdate">
+        <unzip src="${antinstaller.jar}" dest=".">
+            <patternset>
+                <include name="**/*.*"/>
+                <exclude name="${iPlugName}/conf/communication-index.xml" />
+                <exclude name="${iPlugName}/conf/communication-search.xml" />
+                <exclude name="${iPlugName}/conf/plugdescription-index.xml" />
+                <exclude name="${iPlugName}/conf/plugdescription-search.xml" />
+                <exclude name="${iPlugName}/plugins/admin-urlmaintenance/conf/META-INF/persistence.xml" />
+                <exclude name="${iPlugName}/bin/nutch-se.sh" />
+            </patternset>
+        </unzip>
+        
+        <delete>
+            <fileset dir="${installDir}/lib" includes="**/*"/>
+        </delete>
+        
+        <move toDir="${installDir}">
+            <fileset dir="./${iPlugName}"/>
+        </move>
+    </target>
 
 	<target name="communicationIndex" description="Set configuration correctly for the iBus.">
 		<echo>Schreibe Konfigurations Parameter des Indexer's in die communication-index.xml
