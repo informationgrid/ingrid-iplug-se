@@ -96,6 +96,9 @@ public abstract class HttpBase implements Protocol {
                         "http://lucene.apache.org/nutch/bot.html",
                         "nutch-agent@lucene.apache.org");
 
+  /** The Nutch 'Accept-Language' request header. Configurable ! */
+//  protected String acceptLanguage = "en-us,en-gb,en;q=0.7,*;q=0.3";
+  protected String acceptLanguage = "de-de,de;q=0.8,en-us;q=0.5,en-gb;q=0.5,en;q=0.3,*;q=0.1";
     
   /**
    * Maps from host to a Long naming the time it should be unblocked.
@@ -165,6 +168,7 @@ public abstract class HttpBase implements Protocol {
         this.maxThreadsPerHost = conf.getInt("fetcher.threads.per.host", 1);
         this.userAgent = getAgentString(conf.get("http.agent.name"), conf.get("http.agent.version"), conf
                 .get("http.agent.description"), conf.get("http.agent.url"), conf.get("http.agent.email"));
+        this.acceptLanguage = conf.get("http.accept.language", "de-de,de;q=0.8,en-us;q=0.5,en-gb;q=0.5,en;q=0.3,*;q=0.1");
         this.serverDelay = (long) (conf.getFloat("fetcher.server.delay", 1.0f) * 1000);
         this.maxCrawlDelay = (long)(conf.getInt("fetcher.max.crawl.delay", -1) * 1000);
         // backward-compatible default setting
@@ -477,6 +481,7 @@ public abstract class HttpBase implements Protocol {
       logger.info("http.timeout = " + timeout);
       logger.info("http.content.limit = " + maxContent);
       logger.info("http.agent = " + userAgent);
+      logger.info("http.accept.language = " + acceptLanguage);
       logger.info(Protocol.CHECK_BLOCKING + " = " + checkBlocking);
       logger.info(Protocol.CHECK_ROBOTS + " = " + checkRobots);
       if (checkBlocking) {

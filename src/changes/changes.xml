@@ -4,11 +4,18 @@
     <title>Changes Ingrid iPlug SE</title>
   </properties>
   <body>
+    <release version="3.4.0-SNAPSHOT" date="???" description="???">
+        <action type="add" dev="wemove" issue="GEOPORTALWSV-55">
+            HTTP 'Accept-Language' request header now configurable via GUI.
+        </action>
+    </release>
+
     <release version="3.3.0.1" date="2013-03-15" description="Bugfix Release InGrid 3.3">
         <action type="add" dev="wemove" issue="INGRID-2175">
             Fix Java7 related bug where partner/provider structure from management iPlug  was parsed wrongly, resulting in false partner/provider assignment.
         </action>
     </release>
+
   	<release version="3.3.0" date="2013-03-06" description="Release InGrid 3.3">
         <action type="add" dev="wemove">
             Add documentation of duplicate analysis.

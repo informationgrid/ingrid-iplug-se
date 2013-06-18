@@ -184,8 +184,9 @@ public class Http extends HttpBase {
     ArrayList headers = new ArrayList();
     // Set the User Agent in the header
     headers.add(new Header("User-Agent", userAgent));
-    // prefer English
-    headers.add(new Header("Accept-Language", "en-us,en-gb,en;q=0.7,*;q=0.3"));
+    // prefer English. NO, now configurable !
+//    headers.add(new Header("Accept-Language", "en-us,en-gb,en;q=0.7,*;q=0.3"));
+    headers.add(new Header("Accept-Language", acceptLanguage));
     // prefer UTF-8
     headers.add(new Header("Accept-Charset", "utf-8,ISO-8859-1;q=0.7,*;q=0.7"));
     // prefer understandable formats

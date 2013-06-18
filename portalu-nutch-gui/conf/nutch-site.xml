@@ -482,4 +482,12 @@
   </description>
 </property>
 
+<property>
+  <name>http.accept.language</name>
+  <value>de-de,de;q=0.8,en-us;q=0.5,en-gb;q=0.5,en;q=0.3,*;q=0.1</value>
+  <description>HTTP 'Accept-Language' request header.
+  List of acceptable languages for response.
+  </description>
+</property>
+
 </configuration>
