@@ -1,5 +1,51 @@
 <project name="SE-iPlug Patches">
-    <target name="patchFiles" depends="">
+
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+
+    <property name="pathToPatches"      value="./patches"/>
+
+    <!--
+    ***************************************************************************************
+    * PATCHES
+    ***************************************************************************************
+    -->
+
+    <target name="patchFromVersion3.3.0.1">
+        <compareVersion value1="${oldVersion}" value2="3.3.0.1" prop="compResult"/>
+        <if>
+            <not>
+                <equals arg1="${compResult}" arg2="1" />
+            </not>
+            <then>
+            	<!-- set confDir to containing directory and patch nutch-site.xml -->
+            	<!-- just to be sure, unset property so it can be set -->
+            	<var name="confDir" unset="true"/>
+            	<var name="confDir" value="${installDir}/conf"/>
+            	<runtarget target="patchNutchSite"/>
+
+                <!-- also patch in all nutch-instances -->
+                <for param="instanceDir">
+                  <path>
+                    <dirset dir="${installDir}/nutch-instances" includes="*"/>
+                  </path>
+                  <sequential>
+                    <var name="confDir" value="@{instanceDir}/conf"/>
+                    <runtarget target="patchNutchSite"/>
+                  </sequential>
+                </for>
+
+            </then>
+        </if>
+    </target>
+
+    <!-- Patch nutch-site.xml. ${confDir} has to be set to directory containing nutch-site.xml ! -->
+    <!-- NO CHECK whether set (with if="confDir" in target) to throw error if not set ! --> 
+    <target name="patchNutchSite">
+    	<echo>Patching nutch-site.xml in ${confDir}:</echo>
+    	<patchFile patchFile="${pathToPatches}/3.4.0/nutch-site.xml.patch" originalFile="${confDir}/nutch-site.xml" />
+    </target>
+
+    <target name="patchFiles" depends="patchFromVersion3.3.0.1">
         <!-- patch order determined through depends-order -->
     </target>
 </project>
