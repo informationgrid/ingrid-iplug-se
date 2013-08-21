@@ -150,9 +150,17 @@ public class ShibbolethRealm implements UserRealm, SSORealm {
                 credential = new Password("ignore");
 
                 setSingleSignOn(request, response, principal, credential);
+            } else {
+                LOG.warn("User might not exist in Portal! No roles found for user: " + userName);
             }
         }
-        LOG.info("found credential for id: " + id);
+        
+        if (LOG.isDebugEnabled()) {
+            if (credential != null)
+                LOG.debug("found credential for session-id: " + id);
+            else
+                LOG.debug("did not found credential for session-id: " + id);
+        }
 
         return credential;
     }
