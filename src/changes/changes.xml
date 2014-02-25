@@ -4,7 +4,10 @@
     <title>Changes Ingrid iPlug SE</title>
   </properties>
   <body>
-    <release version="3.4.0-SNAPSHOT" date="???" description="???">
+    <release version="3.4.0" date="2014-02-25" description="Release InGrid 3.4">
+		<action type="add" dev="wemove">
+            Add more logging during login.
+        </action>
         <action type="add" dev="wemove" issue="GEOPORTALWSV-55">
             HTTP 'Accept-Language' request header now configurable via GUI.
         </action>
