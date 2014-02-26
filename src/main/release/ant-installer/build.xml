@@ -61,6 +61,8 @@
                 <exclude name="${iPlugName}/conf/plugdescription-search.xml" />
                 <exclude name="${iPlugName}/plugins/admin-urlmaintenance/conf/META-INF/persistence.xml" />
                 <exclude name="${iPlugName}/bin/nutch-se.sh" />
+                <exclude name="${iPlugName}/start-index.sh" />
+                <exclude name="${iPlugName}/start-search.sh" />
             </patternset>
         </unzip>
         
