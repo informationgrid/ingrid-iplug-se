@@ -30,8 +30,8 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.nutch.admin.ConfigurationUtil;
-import org.apache.nutch.admin.GuiComponentDeployer;
+import de.ingrid.nutch.admin.ConfigurationUtil;
+import de.ingrid.nutch.admin.GuiComponentDeployer;
 
 import de.ingrid.utils.PlugDescription;
 import de.ingrid.utils.xml.XMLSerializer;

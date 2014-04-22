@@ -7,13 +7,13 @@ import junit.framework.TestCase;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileUtil;
-import org.apache.nutch.admin.searcher.MultipleSearcher;
-import org.apache.nutch.admin.searcher.TestSearcherFactory;
 import org.apache.nutch.util.NutchConfiguration;
 import org.mockito.MockitoAnnotations;
 
 import de.ingrid.iplug.se.NutchSearcher;
 import de.ingrid.iplug.se.util.TestUtil;
+import de.ingrid.nutch.admin.searcher.MultipleSearcher;
+import de.ingrid.nutch.admin.searcher.TestSearcherFactory;
 
 public class DirectoryScanningSearcherFactoryTest extends TestCase {
 

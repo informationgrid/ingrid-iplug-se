@@ -19,24 +19,23 @@ package de.ingrid.iplug.se;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.nutch.admin.HttpServer;
-import org.apache.nutch.admin.IGuiComponent;
-import org.apache.nutch.admin.NutchInstance;
-import org.apache.nutch.admin.security.NutchGuiRealm;
 import org.apache.nutch.plugin.Extension;
-import org.mortbay.http.HttpContext;
-import org.mortbay.http.SocketListener;
+import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.HashSessionManager;
-import org.mortbay.jetty.servlet.WebApplicationContext;
+import org.mortbay.jetty.security.UserRealm;
+import org.mortbay.jetty.servlet.HashSessionIdManager;
+import org.mortbay.jetty.webapp.WebAppContext;
 
 import de.ingrid.iplug.se.security.ShibbolethRealm;
+import de.ingrid.nutch.admin.HttpServer;
+import de.ingrid.nutch.admin.IGuiComponent;
+import de.ingrid.nutch.admin.NutchInstance;
 
 public class IngridHttpServer extends HttpServer {
 
@@ -44,7 +43,7 @@ public class IngridHttpServer extends HttpServer {
 
     private final int _port;
 
-    private Server _server = new Server();
+    private Server _server = null;
 
     private Map<String, Object> _contextAttributes = new HashMap<String, Object>();
 
@@ -67,23 +66,22 @@ public class IngridHttpServer extends HttpServer {
 
     @Override
     public void startHttpServer() throws Exception {
-        if (!_server.isStarted()) {
-            SocketListener listener = new SocketListener();
-            listener.setPort(_port);
-            _server.addListener(listener);
-            //_server.addRealm(new NutchGuiRealm(_secure));
-            /*
-             * Exchanged Realm for Shibboleth Authentication
-             */
-            _server.addRealm(new ShibbolethRealm(_secure));
-            start();
+        if (_server == null) {
+            _server = new Server(_port);
+            _server.setUserRealms(new UserRealm[]{new ShibbolethRealm(_secure)});
+            _server.setSessionIdManager(new HashSessionIdManager());
+            _server.start();
         }
     }
 
     @Override
     public void stopHttpServer() throws InterruptedException {
         if (_server.isStarted()) {
-            _server.stop();
+            try {
+                _server.stop();
+            } catch (Exception e) {
+                throw new InterruptedException();
+            }
         }
     }
 
@@ -104,7 +102,11 @@ public class IngridHttpServer extends HttpServer {
                 + File.separator).getCanonicalPath();
 
         LOG.info("add webapplication [" + webApp + "] with contextPath [" + contextPath + "] to webserver");
-        WebApplicationContext context = _server.addWebApplication(contextPath, webApp);
+        WebAppContext context = new WebAppContext();
+        context.setContextPath(contextPath);
+        context.setWar(webApp);        
+        _server.setHandler(context);
+        
         context.setClassLoader(extension.getDescriptor().getClassLoader());
         context.setAttribute("nutchInstance", nutchInstance);
 
@@ -114,7 +116,7 @@ public class IngridHttpServer extends HttpServer {
         context.setAttribute("theme", theme);
         context.setAttribute("title", title);
         context.setAttribute("securityEnabled", _secure);
-        ((HashSessionManager) context.getServletHandler().getSessionManager()).setCrossContextSessionIDs(true);
+//        ((HashSessionManager) context.getServletHandler().getSessionManager()).setCrossContextSessionIDs(true);
 
         Set<Entry<String, Object>> entrySet = _contextAttributes.entrySet();
         for (Entry<String, Object> entry : entrySet) {
@@ -123,12 +125,12 @@ public class IngridHttpServer extends HttpServer {
         context.start();
 
         Set<String> contextNames = new TreeSet<String>();
-        HttpContext[] contexts = _server.getContexts();
-        for (HttpContext httpContext : contexts) {
-            contextNames.add(httpContext.getName());
+        Handler[] contexts = _server.getHandlers();
+        for (Handler httpContext : contexts) {
+            contextNames.add(((WebAppContext)httpContext).getDisplayName());
         }
-        for (HttpContext httpContext : contexts) {
-            httpContext.setAttribute("contextNames", contextNames);
+        for (Handler httpContext : contexts) {
+            ((WebAppContext)httpContext).setAttribute("contextNames", contextNames);
         }
 
     }

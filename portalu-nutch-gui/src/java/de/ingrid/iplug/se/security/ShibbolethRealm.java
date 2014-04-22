@@ -21,19 +21,20 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.nutch.admin.ConfigurationUtil;
-import org.apache.nutch.admin.security.JUserJPasswordCallbackHandler;
-import org.apache.nutch.admin.security.NutchGuiPrincipal;
-import org.apache.nutch.admin.security.NutchGuiPrincipal.KnownPrincipal;
-import org.mortbay.http.HttpRequest;
-import org.mortbay.http.HttpResponse;
-import org.mortbay.http.SSORealm;
-import org.mortbay.http.UserRealm;
-import org.mortbay.jetty.servlet.ServletHttpRequest;
-import org.mortbay.util.Credential;
-import org.mortbay.util.Password;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
+import org.mortbay.jetty.Request;
+import org.mortbay.jetty.Response;
+import org.mortbay.jetty.security.Credential;
+import org.mortbay.jetty.security.Password;
+import org.mortbay.jetty.security.SSORealm;
+import org.mortbay.jetty.security.UserRealm;
 
 import de.ingrid.ibus.client.BusClientFactory;
+import de.ingrid.nutch.admin.ConfigurationUtil;
+import de.ingrid.nutch.admin.security.JUserJPasswordCallbackHandler;
+import de.ingrid.nutch.admin.security.NutchGuiPrincipal;
+import de.ingrid.nutch.admin.security.NutchGuiPrincipal.KnownPrincipal;
 import de.ingrid.utils.IBus;
 import de.ingrid.utils.IngridHit;
 import de.ingrid.utils.IngridHits;
@@ -98,14 +99,14 @@ public class ShibbolethRealm implements UserRealm, SSORealm {
     }
 
     @Override
-    public Credential getSingleSignOn(HttpRequest request, HttpResponse response) {
+    public Credential getSingleSignOn(Request request, Response response) {
         Credential credential = null;
         Principal principal = null;
         
         if (this._headerName == null)
             setHeaderName(request);
         
-        String userName = ((HttpServletRequest) request.getWrapper()).getHeader(this._headerName);
+        String userName = request.getHeader(this._headerName);
 
         String id = generateId(request);
         LOG.info("try to load sso token with id: " + id);
@@ -114,9 +115,9 @@ public class ShibbolethRealm implements UserRealm, SSORealm {
             SSOToken ssoToken = _ssoMap.get(id);
             principal = ssoToken._principal;
             LOG.info("found principal: " + principal);
-            if (response.getHttpContext().getRealm().reauthenticate(principal)) {
+            if (request.getUserRealm().reauthenticate(principal)) {
                 request.setUserPrincipal(principal);
-                request.setAuthUser(principal.getName());
+//                request.setAuthUser(principal.getName());
                 credential = ssoToken._credential;
             } else {
                 _ssoMap.remove(id);
@@ -126,7 +127,7 @@ public class ShibbolethRealm implements UserRealm, SSORealm {
             if (userName == null) {
                 if (LOG.isDebugEnabled()) {
                     String header = "";
-                    Enumeration headerNames = ((HttpServletRequest) request.getWrapper()).getHeaderNames();
+                    Enumeration headerNames =  request.getHeaderNames();
                     while (headerNames.hasMoreElements()) 
                         header += headerNames.nextElement() + ";";
 
@@ -146,7 +147,7 @@ public class ShibbolethRealm implements UserRealm, SSORealm {
                 // de.ingrid.iplug.se.security.PortaluPrincipal(userName,
                 // "ignore", "admin", "admin.portal");
                 request.setUserPrincipal(principal);
-                request.setAuthUser(principal.getName());
+//                request.setAuthUser(principal.getName());
                 credential = new Password("ignore");
 
                 setSingleSignOn(request, response, principal, credential);
@@ -165,9 +166,8 @@ public class ShibbolethRealm implements UserRealm, SSORealm {
         return credential;
     }
 
-    private void setHeaderName(HttpRequest request) {
-        HttpServletRequest servletReq = (HttpServletRequest) request.getWrapper();
-        ConfigurationUtil configurationUtil = (ConfigurationUtil) servletReq.getSession().getServletContext().getAttribute("configurationUtil");
+    private void setHeaderName(Request request) {
+        ConfigurationUtil configurationUtil = (ConfigurationUtil) request.getSession().getServletContext().getAttribute("configurationUtil");
         try {
             Configuration conf = configurationUtil.loadConfiguration("general");
             this._headerName = conf.get("shib_header_name");
@@ -182,7 +182,7 @@ public class ShibbolethRealm implements UserRealm, SSORealm {
     }
 
     @Override
-    public void setSingleSignOn(HttpRequest request, HttpResponse response, Principal principal, Credential credential) {
+    public void setSingleSignOn(Request request, Response response, Principal principal, Credential credential) {
         Set<String> keySet = _ssoMap.keySet();
         Iterator<String> iterator = keySet.iterator();
         while (iterator.hasNext()) {
@@ -201,7 +201,7 @@ public class ShibbolethRealm implements UserRealm, SSORealm {
     }
 
     @Override
-    public Principal authenticate(String userName, Object password, HttpRequest request) {
+    public Principal authenticate(String userName, Object password, Request request) {
         Principal principal = new NutchGuiPrincipal.SuperAdmin("Admin");
         if (_securityEnabled) {
             principal = null;
@@ -288,9 +288,8 @@ public class ShibbolethRealm implements UserRealm, SSORealm {
         return (principal instanceof KnownPrincipal);
     }
 
-    private String generateId(HttpRequest request) {
-        ServletHttpRequest servletHttpRequest = (ServletHttpRequest) request.getWrapper();
-        return servletHttpRequest.getSession().getId();
+    private String generateId(Request request) {
+        return request.getSession().getId();
     }
 
     private IngridHits getRolesFromPortal(final IBus bus, final String userName) {
@@ -386,4 +385,5 @@ public class ShibbolethRealm implements UserRealm, SSORealm {
 
         return new PortaluPrincipal(userName, "ignore", roles, allPartnerWithProvider);
     }
+
 }

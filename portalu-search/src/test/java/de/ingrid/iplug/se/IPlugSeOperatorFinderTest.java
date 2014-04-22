@@ -8,6 +8,8 @@ import junit.framework.TestCase;
 
 import org.apache.hadoop.fs.FileUtil;
 
+import de.ingrid.iplug.se.IPlugSeOperatorFinder;
+
 public class IPlugSeOperatorFinderTest extends TestCase {
 
   private File _folder = new File(System.getProperty("java.io.tmpdir"), "" + System.currentTimeMillis()

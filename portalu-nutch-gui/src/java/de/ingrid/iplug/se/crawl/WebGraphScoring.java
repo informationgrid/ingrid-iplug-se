@@ -23,9 +23,11 @@ public class WebGraphScoring {
     
     public WebGraphScoring(Configuration conf, Path crawlDir) {
         webGraphPath = new Path(crawlDir, "webGraphDB");
-        webGraph = new WebGraph(conf);
+        webGraph = new WebGraph();
+        webGraph.setConf(conf);
         linkRank = new LinkRank(conf);
-        scoreUpdater = new ScoreUpdater(conf);
+        scoreUpdater = new ScoreUpdater();
+        scoreUpdater.setConf(conf);
         scoreUpdater.configure(new NutchJob(conf));
     }
     
@@ -37,7 +39,7 @@ public class WebGraphScoring {
             for (int i = 0; i < segments.size(); i++) {
                 segPaths[i] = segments.get(i);
             }
-            webGraph.createWebGraph(webGraphPath, segPaths);
+            webGraph.createWebGraph(webGraphPath, segPaths, false, false);
 
             linkRank.analyze(webGraphPath);
             

@@ -15,8 +15,8 @@ import java.util.Set;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.nutch.admin.security.AbstractLoginModule;
-import org.apache.nutch.admin.security.NutchGuiPrincipal;
+import de.ingrid.nutch.admin.security.AbstractLoginModule;
+import de.ingrid.nutch.admin.security.NutchGuiPrincipal;
 
 import de.ingrid.ibus.client.BusClientFactory;
 import de.ingrid.utils.IBus;

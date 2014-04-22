@@ -1,299 +1,261 @@
 <project default="dist">
 
-	<property name="nutch-version" value="101tec-nutch-11e55b9" />
-	<property name="dir.nutch.patches.build" value="build_patches" />
-	<property name="dir.nutch.patches" value="patches/nutch_all" />
-	<property name="ingrid.ext.libs" value="${basedir}/portalu-common/ingrid-ext" />
+    <property name="nutch-version" value="apache-nutch-1.8" />
+    <property name="ingrid.ext.libs" value="${basedir}/portalu-common/ingrid-ext" />
 
-	<target name="init">
-		<mkdir dir="build" />
-	</target>
+    <target name="init">
+        <mkdir dir="build" />
+    </target>
 
-	<target name="clean">
-		<delete dir="build" />
-		<delete dir="build_patches" />
-	</target>
+    <target name="clean">
+        <delete dir="build" />
+    </target>
 
-	<!-- does not work anymore:
-		<target name="unzip-nutch" depends="init">
-		<unzip src="contrib/${nutch-version}.zip" dest="build" />
-	</target>-->
+    <target name="copy-nutch">
+        <copy todir="build/${nutch-version}">
+            <fileset dir="${nutch-version}">
+                <exclude name=".*/**" />
+            </fileset>
+        </copy>
+    </target>
 
-	<!-- does not work anymore:
-		<target name="patch-nutch">
-		<patch patchfile="patches/build.xml.patch" dir="build/${nutch-version}" strip="1" />
-		<patch patchfile="patches/Query.patch" dir="build/${nutch-version}" strip="1" />
-		<patch patchfile="patches/core-build.xml.patch" dir="build/${nutch-version}" strip="1" />
-		<patch patchfile="patches/build-plugin.xml.patch" dir="build/${nutch-version}" strip="1" />
-		<patch patchfile="patches/nutch.patch" dir="build/${nutch-version}" strip="1" />
-	</target>-->
+    <target name="copy-ingrid-se-plugins">
+        <copy todir="build/${nutch-version}/src/plugin">
+            <fileset dir="ingrid-nutch-plugins" />
+        </copy>
+    </target>
 
-	<target name="copy-nutch">
-		<copy todir="build/${nutch-version}">
-			<fileset dir="${nutch-version}">
-				<exclude name=".*/**" />
-			</fileset>
-		</copy>
-	</target>
+    <target name="copy-css">
+        <copy todir="build/${nutch-version}/conf/webapp/theme/portal-u">
+            <fileset dir="portalu-nutch-gui/conf/webapp/theme/portal-u" />
+        </copy>
+    </target>
 
-	<target name="copy-ingrid-se-plugins" depends="copy-admin-url-maintenance,copy-admin-pd,copy-index-sns-filter" />
+    <target name="copy-i18n">
+        <!-- configuration -->
+        <copy todir="build/${nutch-version}/src/plugin/admin-configuration/src/conf/theme/portal-u/i18n">
+            <fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n">
+                <include name="configuration*" />
+            </fileset>
+        </copy>
+        <!-- crawl -->
+        <copy todir="build/${nutch-version}/src/plugin/admin-crawl/src/conf/theme/portal-u/i18n">
+            <fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n">
+                <include name="crawl*" />
+            </fileset>
+        </copy>
+        <!-- instance -->
+        <copy todir="build/${nutch-version}/src/plugin/admin-instance/src/conf/theme/portal-u/i18n">
+            <fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n">
+                <include name="instance*" />
+            </fileset>
+        </copy>
+        <!-- scheduling -->
+        <copy todir="build/${nutch-version}/src/plugin/admin-scheduling/src/conf/theme/portal-u/i18n">
+            <fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n">
+                <include name="scheduling*" />
+            </fileset>
+        </copy>
+        <!-- system -->
+        <copy todir="build/${nutch-version}/src/plugin/admin-system/src/conf/theme/portal-u/i18n">
+            <fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n">
+                <include name="system*" />
+            </fileset>
+        </copy>
+        <!-- welcome -->
+        <copy todir="build/${nutch-version}/src/plugin/admin-welcome/src/conf/theme/portal-u/i18n">
+            <fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n">
+                <include name="welcome*" />
+            </fileset>
+        </copy>
+    </target>
 
-	<target name="copy-admin-url-maintenance">
-		<copy todir="build/${nutch-version}/src/plugin/admin-urlmaintenance">
-			<fileset dir="portalu-nutch-gui/src/plugin/admin-urlmaintenance" />
-		</copy>
-	</target>
-	<target name="copy-admin-pd">
-		<copy todir="build/${nutch-version}/src/plugin/admin-pd">
-			<fileset dir="portalu-nutch-gui/src/plugin/admin-pd" />
-		</copy>
-	</target>
-	<target name="copy-index-sns-filter">
-		<copy todir="build/${nutch-version}/src/plugin/index-sns">
-			<fileset dir="portalu-nutch-gui/src/plugin/index-sns" />
-		</copy>
-	</target>
-
-	<target name="copy-css">
-		<copy todir="build/${nutch-version}/conf/webapp/theme/portal-u">
-			<fileset dir="portalu-nutch-gui/conf/webapp/theme/portal-u" />
-		</copy>
-	</target>
-
-	<target name="copy-i18n">
-		<!-- configuration -->
-		<copy todir="build/${nutch-version}/src/plugin/admin-configuration/src/conf/theme/portal-u/i18n">
-			<fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n">
-				<include name="configuration*" />
-			</fileset>
-		</copy>
-		<!-- crawl -->
-		<copy todir="build/${nutch-version}/src/plugin/admin-crawl/src/conf/theme/portal-u/i18n">
-			<fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n">
-				<include name="crawl*" />
-			</fileset>
-		</copy>
-		<!-- instance -->
-		<copy todir="build/${nutch-version}/src/plugin/admin-instance/src/conf/theme/portal-u/i18n">
-			<fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n">
-				<include name="instance*" />
-			</fileset>
-		</copy>
-		<!-- scheduling -->
-		<copy todir="build/${nutch-version}/src/plugin/admin-scheduling/src/conf/theme/portal-u/i18n">
-			<fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n">
-				<include name="scheduling*" />
-			</fileset>
-		</copy>
-		<!-- system -->
-		<copy todir="build/${nutch-version}/src/plugin/admin-system/src/conf/theme/portal-u/i18n">
-			<fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n">
-				<include name="system*" />
-			</fileset>
-		</copy>
-		<!-- welcome -->
-		<copy todir="build/${nutch-version}/src/plugin/admin-welcome/src/conf/theme/portal-u/i18n">
-			<fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n">
-				<include name="welcome*" />
-			</fileset>
-		</copy>
-	</target>
-
-	<target name="copy-ingrid-se-part">
-		<copy todir="build/${nutch-version}/src/java/de">
-			<fileset dir="portalu-nutch-gui/src/java/de" />
-			<fileset dir="portalu-search/src/main/java/de" />
-		</copy>
-		<copy todir="build/${nutch-version}/lib/ingrid-ext">
-			<fileset dir="${ingrid.ext.libs}" >
+    <target name="copy-ingrid-se-part">
+        <copy todir="build/${nutch-version}/src/java">
+            <fileset dir="portalu-nutch-gui/src/java" />
+            <fileset dir="portalu-search/src/main/java" />
+        </copy>
+        <copy todir="build/${nutch-version}/lib/ingrid-ext">
+            <fileset dir="${ingrid.ext.libs}">
                 <exclude name="**/*base-webapp*" />
                 <exclude name="**/*cron4j*" />
             </fileset>
-		</copy>
-	</target>
+        </copy>
+    </target>
 
-	<target name="copy-start-scripts">
-		<copy todir="build/${nutch-version}">
-			<fileset dir="src/scripts" />
-		</copy>
-	</target>
+    <target name="copy-start-scripts">
+        <copy todir="build/${nutch-version}">
+            <fileset dir="src/scripts" />
+        </copy>
+    </target>
 
     <target name="copy-sql-scripts">
         <copy todir="build/${nutch-version}/sql">
             <fileset dir="src/main/release/sql" />
         </copy>
     </target>
-	
-	<target name="copy-indexer-searcher-configs">
-		<copy todir="build/${nutch-version}/conf/" overwrite="true">
-			<fileset dir="portalu-nutch-gui/conf">
-			    <exclude name="**/*plugdescription*.xml"/>
-			</fileset>
-			<fileset dir="portalu-search/conf">
-			    <exclude name="**/*plugdescription*.xml"/>
-			</fileset>
-		</copy>
-	</target>
 
-	<!-- To build the installer, use maven: mvn assembly:assembly -Dmaven.test.skip -->
-	<target name="dist" depends="clean, copy-nutch, copy-ingrid-se-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts,copy-sql-scripts,copy-indexer-searcher-configs,copy-deploy-conf-files, create-manifest">
-		<ant dir="build/${nutch-version}" target="package" />
-        
-        <property file="${basedir}/${nutch-version}/default.properties" />
-        <property name="dist.final.name" value="build/dist/ingrid-iplug-se" />
-        
-        <!-- Copy common shared jsp-files to all plugins needing them  -->
-        <property name="jsp-dir" value="src/webapp/WEB-INF/jsp" />
-        <property name="jsp-includes-dir" value="portalu-nutch-gui\jsp-includes" />
-        <copy todir="${dist.final.name}/plugins/admin-configuration/${jsp-dir}">
-            <fileset dir="${jsp-includes-dir}" />
+    <target name="copy-indexer-searcher-configs">
+        <copy todir="build/${nutch-version}/conf/" overwrite="true">
+            <fileset dir="portalu-nutch-gui/conf">
+                <exclude name="**/*plugdescription*.xml" />
+            </fileset>
+            <fileset dir="portalu-search/conf">
+                <exclude name="**/*plugdescription*.xml" />
+            </fileset>
         </copy>
-        <copy todir="${dist.final.name}/plugins/admin-crawl/${jsp-dir}">
-            <fileset dir="${jsp-includes-dir}" />
-        </copy>
-        <copy todir="${dist.final.name}/plugins/admin-instance/${jsp-dir}">
-            <fileset dir="${jsp-includes-dir}" />
-        </copy>
-        <copy todir="${dist.final.name}/plugins/admin-scheduling/${jsp-dir}">
-            <fileset dir="${jsp-includes-dir}" />
-        </copy>
-        <copy todir="${dist.final.name}/plugins/admin-search/${jsp-dir}">
-            <fileset dir="${jsp-includes-dir}" />
-        </copy>
-        <copy todir="${dist.final.name}/plugins/admin-system/${jsp-dir}">
-            <fileset dir="${jsp-includes-dir}" />
-        </copy>
-        <copy todir="${dist.final.name}/plugins/admin-urlmaintenance/${jsp-dir}">
-            <fileset dir="${jsp-includes-dir}" excludes="roleFailure.jsp"/>
-        </copy>
-        <copy todir="${dist.final.name}/plugins/admin-url-upload/${jsp-dir}">
-            <fileset dir="${jsp-includes-dir}" />
-        </copy>
-        <copy todir="${dist.final.name}/plugins/admin-welcome/${jsp-dir}">
-            <fileset dir="${jsp-includes-dir}" />
-        </copy>        
-        
-		<copy todir="${dist.final.name}/">
-			<fileset dir="build/${nutch-version}/build/${final.name}">
-				<exclude name="nutch-gui-*.*" />
-				<exclude name="*.xml" />
-				<exclude name="*.txt" />
-				<exclude name="*.properties" />
-				<exclude name="KEYS" />
-			</fileset>
-		</copy>
-		<copy todir="${dist.final.name}/lib">
-			<fileset dir="build/${nutch-version}/build/${final.name}">
-				<include name="nutch-*.jar" />
-			</fileset>
-		</copy>
-	</target>
-
-	<target name="create-manifest">
-	    <manifest file="build/MANIFEST.MF">
-	    	<attribute name="Build-By" value="${user.name}"/>
-	    	<attribute name="Build-Timestamp" value="${maven.timestamp}"/>
-	    	<attribute name="Implementation-Build" value="${maven.buildNumber}"/>
-	    	<attribute name="Implementation-Version" value="${maven.version}"/>
-	    	<attribute name="iPlug-Type" value="${maven.iplugType}"/>
-	    </manifest>
-	</target>
-	
-	<target name="copy-deploy-conf-files" depends="copy-indexer-searcher-configs">
-		<copy todir="build/${nutch-version}/conf" overwrite="true" flatten="true">
-			<fileset dir="deploy" casesensitive="yes">
-				<filename name="**/log4j-*.properties"/>
-			</fileset>
-		</copy>
-		<replaceregexp file="build/${nutch-version}/conf/nutch-site.xml" match="${nutch-version}/src/plugin,portalu-nutch-gui/src/plugin" replace="./plugins" byline="true" />
-	</target>
-
-	<target name="copy-deploy-myles-conf-files" depends="copy-deploy-conf-files">
-		<copy todir="build/${nutch-version}/conf" overwrite="true">
-			<fileset dir="deploy/ingrid-search/myles/" />
-			<fileset dir="deploy/nutch-gui/myles/">
-				<exclude name="**/persistence.xml" />
-			</fileset>
-		</copy>
-		<copy todir="build/${nutch-version}/src/plugin/admin-urlmaintenance/conf/META-INF/" file="deploy/nutch-gui/myles/persistence.xml" overwrite="true" />
-	</target>
-
-	<target name="mylesDistribution" depends="copy-nutch, copy-ingrid-se-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts,copy-sql-scripts, copy-indexer-searcher-configs,copy-deploy-myles-conf-files">
-		<ant dir="build/${nutch-version}" target="package" />
-	</target>
-
-	<target name="deployMyles">
-		<property name="nutch.gui.name" value="nutch-gui-0.3" />
-		<tar destfile="build/${nutch.gui.name}-dev.tar.gz" basedir="build/${nutch-version}/build/${nutch.gui.name}" compression="gzip" />
-		<echo message="use: scp build/${nutch.gui.name}-dev.tar.gz tec@213.144.28.218:/home/tec/temp" />
-		<echo message="from staging use: scp -P882 /home/tec/temp/nutch-gui-0.3-dev.tar.gz ingrid@192.168.64.34:/opt/ingrid/ingrid-iplug-se-dev/" />
-
-		<exec executable="rsync">
-			<arg line=" -c -a -r --progress -e 'ssh -l tec' --delete build/${nutch-version}/build/${nutch.gui.name} tec@213.144.28.218:/home/tec/temp" />
-		</exec>
-	</target>
-
-	<target name="download-portalu-libs-for-eclipse">
-		<delete>
-			<fileset dir="${ingrid.ext.libs}" includes="**/*" />
-		</delete>
-		<!-- We use the pom.xml in projects base directory for (transitiv) jar dependencies -->
-		<exec executable="mvn">
-			<arg line="dependency:copy-dependencies -U -DoutputDirectory=${ingrid.ext.libs} -DexcludeArtifactIds=ingrid-installer" />
-		</exec>
-	</target>
-
-	<!-- Targets to create patches from local 101tec...-folder and the zip-content (OS nutch-gui Release) in contrib-folder -->
-	<target name="clean_patch">
-		<delete dir="${dir.nutch.patches.build}" />
-		<delete dir="${dir.nutch.patches}" />
-	</target>
-
-	<target name="patch_init">
-		<mkdir dir="${dir.nutch.patches.build}" />
-		<mkdir dir="${dir.nutch.patches}" />
-	</target>
-
-	<target name="create_full_nutch_patch" depends="patch_unzip-nutch,patch_copy-local-nutch">
-		<antcall target="patch_run_diff" />
-	</target>
-
-	<target name="patch_unzip-nutch" depends="patch_init">
-		<unzip src="contrib/${nutch-version}.zip" dest="${dir.nutch.patches.build}" />
-	</target>
-
-	<target name="patch_copy-local-nutch" depends="patch_init">
-		<copy todir="${dir.nutch.patches.build}/local">
-			<fileset dir="${nutch-version}">
-				<exclude name=".*/**" />
-			</fileset>
-		</copy>
-	</target>
-
-	<target name="patch_run_diff" depends="patch_init">
-		<exec dir="${dir.nutch.patches.build}/${nutch-version}" executable="diff" output="${dir.nutch.patches}/all_changes_against_contrib.patch">
-			<arg line="-crBE ./ ../local/" />
-		</exec>
-	</target>
-    
-    <target name="makeUrlMaintenance" depends="copy-ingrid-se-plugins">
-        <ant dir="build/${nutch-version}/src/plugin/admin-urlmaintenance" target="deploy" />
-    </target>
-    <target name="makeAdminCrawl" depends="copy-ingrid-se-plugins">
-        <copy todir="build/${nutch-version}/src/plugin/admin-crawl">
-            <fileset dir="${nutch-version}/src/plugin/admin-crawl" />
-        </copy>
-        <ant dir="build/${nutch-version}/src/plugin/admin-crawl" target="deploy" />
     </target>
 
-    <target name="makeAdminWelcome" depends="copy-ingrid-se-plugins">
-        <copy todir="build/${nutch-version}/src/plugin/admin-welcome">
-            <fileset dir="${nutch-version}/src/plugin/admin-welcome" />
-        </copy>
-        <ant dir="build/${nutch-version}/src/plugin/admin-welcome" target="deploy" />
-    </target>
-    
-    <target name="makeNutchJar" depends="copy-nutch, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts,copy-sql-scripts,copy-indexer-searcher-configs,copy-deploy-conf-files, create-manifest">
-        <ant dir="build/${nutch-version}" target="jar" />
-    </target>
+    <!-- To build the installer, use maven: mvn assembly:assembly -Dmaven.test.skip -->
+    <target name="dist" depends="clean, copy-nutch, copy-ingrid-se-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts,copy-sql-scripts,copy-indexer-searcher-configs,copy-deploy-conf-files, create-manifest">
+        <echo>add custom plugins to the nutch build process to build/${nutch-version}/src/plugin/build.xml</echo>
+        <!-- add custom plugins to the nutch build process -->
+        <replace file="build/${nutch-version}/src/plugin/build.xml">
+            <replacetoken><![CDATA[<target name="deploy">]]></replacetoken>
+            <replacevalue><![CDATA[<target name="deploy">
+                <ant dir="admin-welcome" target="deploy" />
+                <ant dir="admin-instance" target="deploy" />
+                <ant dir="admin-configuration" target="deploy" />
+                <ant dir="admin-system" target="deploy" />
+                <ant dir="admin-crawl" target="deploy" />
+                <ant dir="admin-scheduling" target="deploy" />
+                <ant dir="admin-url-upload" target="deploy" />
+                <ant dir="admin-search" target="deploy" />
+                <ant dir="index-metadata" target="deploy" />
+                <ant dir="admin-urlmaintenance" target="deploy" />
+                <ant dir="admin-pd" target="deploy" />
+                <ant dir="index-sns" target="deploy" />
+                <ant dir="indexer-ingrid" target="deploy" />
+                <ant dir="analysis-de" target="deploy" />]]></replacevalue>
+        </replace>
+
+        <!-- force nutch to build all packages -->
+        <echo>force nutch to build all packages in build/${nutch-version}/build.xml</echo>
+        <replace file="build/${nutch-version}/build.xml">
+            <replacetoken><![CDATA[includes="org/apache/nutch/**/*.java"]]></replacetoken>
+            <replacevalue><![CDATA[includes="**/*.java"]]></replacevalue>
+        </replace>
+
+        <!-- add ingrid specific jars to classpath -->
+        <echo>add ingrid specific jars to classpath in build/${nutch-version}/build.xml</echo>
+        <replace file="build/${nutch-version}/build.xml">
+            <replacetoken><![CDATA[<pathelement location="${build.classes}"/>]]></replacetoken>
+            <replacevalue><![CDATA[<pathelement location="${build.classes}"/>
+            <fileset dir="${build.lib.dir}/ingrid-ext">
+                <include name="*.jar" />
+            </fileset>]]></replacevalue>
+        </replace>
+        <echo>add ingrid specific jars to classpath in build/${nutch-version}/src/plugin/build-plugin.xml</echo>
+        <replace file="build/${nutch-version}/src/plugin/build-plugin.xml">
+            <replacetoken><![CDATA[<pathelement location="${nutch.root}/build/classes"/>]]></replacetoken>
+            <replacevalue><![CDATA[<pathelement location="${nutch.root}/build/classes"/>
+            <fileset dir="${nutch.root}/build/lib/ingrid-ext">
+               <include name="*.jar" />
+            </fileset>]]></replacevalue>
+        </replace>
+
+
+        <!-- echo classpath for debug purpose -->
+        <echo>echo classpath for debug purpose</echo>
+        <replace file="build/${nutch-version}/build.xml">
+            <replacetoken><![CDATA[<target name="compile-core" depends="init, resolve-default" description="--> compile core Java files only">]]></replacetoken>
+            <replacevalue><![CDATA[<target name="compile-core" depends="init, resolve-default" description="--> compile core Java files only"><pathconvert property="classpathProp" refid="classpath"/><echo>Classpath is ${classpathProp}</echo>]]></replacevalue>
+        </replace>
+
+
+    <ant dir="build/${nutch-version}" target="runtime" />
+
+
+    <property file="${basedir}/${nutch-version}/default.properties" />
+    <property name="dist.final.name" value="build/dist/ingrid-iplug-se" />
+
+    <!-- Copy common shared jsp-files to all plugins needing them  -->
+    <property name="jsp-dir" value="src/webapp/WEB-INF/jsp" />
+    <property name="jsp-includes-dir" value="portalu-nutch-gui\jsp-includes" />
+    <copy todir="${dist.final.name}/plugins/admin-configuration/${jsp-dir}">
+        <fileset dir="${jsp-includes-dir}" />
+    </copy>
+    <copy todir="${dist.final.name}/plugins/admin-crawl/${jsp-dir}">
+        <fileset dir="${jsp-includes-dir}" />
+    </copy>
+    <copy todir="${dist.final.name}/plugins/admin-instance/${jsp-dir}">
+        <fileset dir="${jsp-includes-dir}" />
+    </copy>
+    <copy todir="${dist.final.name}/plugins/admin-scheduling/${jsp-dir}">
+        <fileset dir="${jsp-includes-dir}" />
+    </copy>
+    <copy todir="${dist.final.name}/plugins/admin-search/${jsp-dir}">
+        <fileset dir="${jsp-includes-dir}" />
+    </copy>
+    <copy todir="${dist.final.name}/plugins/admin-system/${jsp-dir}">
+        <fileset dir="${jsp-includes-dir}" />
+    </copy>
+    <copy todir="${dist.final.name}/plugins/admin-urlmaintenance/${jsp-dir}">
+        <fileset dir="${jsp-includes-dir}" excludes="roleFailure.jsp" />
+    </copy>
+    <copy todir="${dist.final.name}/plugins/admin-url-upload/${jsp-dir}">
+        <fileset dir="${jsp-includes-dir}" />
+    </copy>
+    <copy todir="${dist.final.name}/plugins/admin-welcome/${jsp-dir}">
+        <fileset dir="${jsp-includes-dir}" />
+    </copy>
+
+    <copy todir="${dist.final.name}/">
+        <fileset dir="build/${nutch-version}/runtime/local">
+            <exclude name="nutch-gui-*.*" />
+            <exclude name="*.xml" />
+            <exclude name="*.txt" />
+            <exclude name="*.properties" />
+            <exclude name="KEYS" />
+        </fileset>
+    </copy>
+    <copy todir="${dist.final.name}/lib">
+        <fileset dir="build/${nutch-version}/build">
+            <include name="nutch-*.jar" />
+        </fileset>
+    </copy>
+</target>
+
+<target name="create-manifest">
+    <manifest file="build/MANIFEST.MF">
+        <attribute name="Build-By" value="${user.name}" />
+        <attribute name="Build-Timestamp" value="${maven.timestamp}" />
+        <attribute name="Implementation-Build" value="${maven.buildNumber}" />
+        <attribute name="Implementation-Version" value="${maven.version}" />
+        <attribute name="iPlug-Type" value="${maven.iplugType}" />
+    </manifest>
+</target>
+
+<target name="copy-deploy-conf-files" depends="copy-indexer-searcher-configs">
+    <copy todir="build/${nutch-version}/conf" overwrite="true" flatten="true">
+        <fileset dir="deploy" casesensitive="yes">
+            <filename name="**/log4j-*.properties" />
+        </fileset>
+    </copy>
+    <replaceregexp file="build/${nutch-version}/conf/nutch-site.xml" match="${nutch-version}/src/plugin,ingrid-nutch/src/plugin" replace="./plugins" byline="true" />
+</target>
+
+<target name="copy-deploy-myles-conf-files" depends="copy-deploy-conf-files">
+    <copy todir="build/${nutch-version}/conf" overwrite="true">
+        <fileset dir="deploy/ingrid-search/myles/" />
+        <fileset dir="deploy/nutch-gui/myles/">
+            <exclude name="**/persistence.xml" />
+        </fileset>
+    </copy>
+    <copy todir="build/${nutch-version}/src/plugin/admin-urlmaintenance/conf/META-INF/" file="deploy/nutch-gui/myles/persistence.xml" overwrite="true" />
+</target>
+
+<target name="mylesDistribution" depends="copy-nutch, copy-ingrid-se-plugins, copy-css, copy-i18n, copy-ingrid-se-part, copy-start-scripts,copy-sql-scripts, copy-indexer-searcher-configs,copy-deploy-myles-conf-files">
+    <ant dir="build/${nutch-version}" target="package" />
+</target>
+
+<target name="download-ingrid-libs-for-eclipse">
+    <delete>
+        <fileset dir="${ingrid.ext.libs}" includes="**/*" />
+    </delete>
+    <!-- We use the pom.xml in projects base directory for (transitiv) jar dependencies -->
+    <exec executable="mvn">
+        <arg line="dependency:copy-dependencies -U -DoutputDirectory=${ingrid.ext.libs} -DexcludeArtifactIds=ingrid-installer" />
+    </exec>
+</target>
 </project>

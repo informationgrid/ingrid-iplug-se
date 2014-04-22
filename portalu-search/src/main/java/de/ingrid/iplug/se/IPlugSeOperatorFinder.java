@@ -12,6 +12,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiReader;
+import org.apache.lucene.store.NIOFSDirectory;
 
 import de.ingrid.utils.PlugDescription;
 import de.ingrid.utils.metadata.IPlugOperatorFinder;
@@ -84,7 +85,7 @@ public class IPlugSeOperatorFinder implements IPlugOperatorFinder {
     List<File> indices = findIndices(workingFolder);
     IndexReader[] readers = new IndexReader[indices.size()];
     for (int i = 0; i < indices.size(); i++) {
-      readers[i] = IndexReader.open(indices.get(i));
+      readers[i] = IndexReader.open(new NIOFSDirectory(indices.get(i)));
     }
     MultiReader multiReader = new MultiReader(readers);
     Set<String> valueSet = new HashSet<String>();

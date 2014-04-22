@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.nutch.admin.security.NutchGuiPrincipal.KnownPrincipal;
+import de.ingrid.nutch.admin.security.NutchGuiPrincipal.KnownPrincipal;
 
 public class PortaluPrincipal extends KnownPrincipal {
 
