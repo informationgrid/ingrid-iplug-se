@@ -207,6 +207,8 @@
             <exclude name="*.txt" />
             <exclude name="*.properties" />
             <exclude name="KEYS" />
+            <exclude name="bin/" />
+            <exclude name="test/" />
         </fileset>
     </copy>
     <copy todir="${dist.final.name}/lib">
@@ -214,6 +216,15 @@
             <include name="nutch-*.jar" />
         </fileset>
     </copy>
+    <!-- copy ingrid specific resources -->
+    <copy todir="${dist.final.name}/">
+        <fileset dir="src/scripts" />
+    </copy>
+    <chmod perm="ugo+x" type="file">
+        <fileset dir="${dist.final.name}/bin"/>
+    </chmod>
+    <mkdir dir="${dist.final.name}/logs"/>
+    	
 </target>
 
 <target name="create-manifest">

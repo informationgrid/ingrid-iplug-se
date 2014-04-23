@@ -17,6 +17,10 @@
         <connection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid-iplug-se/trunk</connection>
         <developerConnection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid-iplug-se/trunk</developerConnection>
     </scm>
+    
+    <properties>
+        <skipTests>true</skipTests>
+    </properties>
 
     <dependencyManagement>
         <dependencies>
