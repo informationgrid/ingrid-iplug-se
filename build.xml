@@ -1,7 +1,7 @@
 <project default="dist">
 
     <property name="nutch-version" value="apache-nutch-1.8" />
-    <property name="ingrid.ext.libs" value="${basedir}/portalu-common/ingrid-ext" />
+    <property name="ingrid.ext.libs" value="${basedir}/ingrid-nutch-common/ingrid-ext" />
 
     <target name="init">
         <mkdir dir="build" />
@@ -27,44 +27,44 @@
 
     <target name="copy-css">
         <copy todir="build/${nutch-version}/conf/webapp/theme/portal-u">
-            <fileset dir="portalu-nutch-gui/conf/webapp/theme/portal-u" />
+            <fileset dir="ingrid-nutch/conf/webapp/theme/portal-u" />
         </copy>
     </target>
 
     <target name="copy-i18n">
         <!-- configuration -->
         <copy todir="build/${nutch-version}/src/plugin/admin-configuration/src/conf/theme/portal-u/i18n">
-            <fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n">
+            <fileset dir="ingrid-nutch/conf/theme/portal-u/i18n">
                 <include name="configuration*" />
             </fileset>
         </copy>
         <!-- crawl -->
         <copy todir="build/${nutch-version}/src/plugin/admin-crawl/src/conf/theme/portal-u/i18n">
-            <fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n">
+            <fileset dir="ingrid-nutch/conf/theme/portal-u/i18n">
                 <include name="crawl*" />
             </fileset>
         </copy>
         <!-- instance -->
         <copy todir="build/${nutch-version}/src/plugin/admin-instance/src/conf/theme/portal-u/i18n">
-            <fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n">
+            <fileset dir="ingrid-nutch/conf/theme/portal-u/i18n">
                 <include name="instance*" />
             </fileset>
         </copy>
         <!-- scheduling -->
         <copy todir="build/${nutch-version}/src/plugin/admin-scheduling/src/conf/theme/portal-u/i18n">
-            <fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n">
+            <fileset dir="ingrid-nutch/conf/theme/portal-u/i18n">
                 <include name="scheduling*" />
             </fileset>
         </copy>
         <!-- system -->
         <copy todir="build/${nutch-version}/src/plugin/admin-system/src/conf/theme/portal-u/i18n">
-            <fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n">
+            <fileset dir="ingrid-nutch/conf/theme/portal-u/i18n">
                 <include name="system*" />
             </fileset>
         </copy>
         <!-- welcome -->
         <copy todir="build/${nutch-version}/src/plugin/admin-welcome/src/conf/theme/portal-u/i18n">
-            <fileset dir="portalu-nutch-gui/conf/theme/portal-u/i18n">
+            <fileset dir="ingrid-nutch/conf/theme/portal-u/i18n">
                 <include name="welcome*" />
             </fileset>
         </copy>
@@ -72,8 +72,8 @@
 
     <target name="copy-ingrid-se-part">
         <copy todir="build/${nutch-version}/src/java">
-            <fileset dir="portalu-nutch-gui/src/java" />
-            <fileset dir="portalu-search/src/main/java" />
+            <fileset dir="ingrid-nutch/src/java" />
+            <fileset dir="ingrid-nutch-search/src/main/java" />
         </copy>
         <copy todir="build/${nutch-version}/lib/ingrid-ext">
             <fileset dir="${ingrid.ext.libs}">
@@ -97,10 +97,10 @@
 
     <target name="copy-indexer-searcher-configs">
         <copy todir="build/${nutch-version}/conf/" overwrite="true">
-            <fileset dir="portalu-nutch-gui/conf">
+            <fileset dir="ingrid-nutch/conf">
                 <exclude name="**/*plugdescription*.xml" />
             </fileset>
-            <fileset dir="portalu-search/conf">
+            <fileset dir="ingrid-nutch-search/conf">
                 <exclude name="**/*plugdescription*.xml" />
             </fileset>
         </copy>
@@ -171,7 +171,7 @@
 
     <!-- Copy common shared jsp-files to all plugins needing them  -->
     <property name="jsp-dir" value="src/webapp/WEB-INF/jsp" />
-    <property name="jsp-includes-dir" value="portalu-nutch-gui\jsp-includes" />
+    <property name="jsp-includes-dir" value="ingrid-nutch\jsp-includes" />
     <copy todir="${dist.final.name}/plugins/admin-configuration/${jsp-dir}">
         <fileset dir="${jsp-includes-dir}" />
     </copy>

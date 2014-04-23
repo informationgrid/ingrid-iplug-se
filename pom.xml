@@ -447,7 +447,7 @@
                 <configuration>
                     <filesets>
                         <fileset>
-                            <directory>ingrid-common/ingrid-ext</directory>
+                            <directory>ingrid-nutch-common/ingrid-ext</directory>
                             <includes>
                                 <include>*.*</include>
                             </includes>
@@ -472,11 +472,11 @@
                         <configuration>
                             <sources>
 
-                                <source>portalu-nutch-gui/src/java</source>
-                                <source>portalu-nutch-gui/src/test</source>
+                                <source>ingrid-nutch/src/java</source>
+                                <source>ingrid-nutch/src/test</source>
 
-                                <source>portalu-search/src/main/java</source>
-                                <source>portalu-search/src/test/java</source>
+                                <source>ingrid-nutch-search/src/main/java</source>
+                                <source>ingrid-nutch-search/src/test/java</source>
 
 
                                 <source>ingrid-nutch-plugins/admin-configuration/src/java</source>
@@ -613,8 +613,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>**/portalu-nutch-gui/**</exclude>
-                        <exclude>**/portalu-search/**</exclude>
+                        <exclude>**/ingrid-nutch/**</exclude>
+                        <exclude>**/ingrid-nutch-search/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -631,7 +631,7 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>portalu-common/ingrid-ext</outputDirectory>
+                            <outputDirectory>ingrid-nutch-common/ingrid-ext</outputDirectory>
                             <excludeTransitive>false</excludeTransitive>
                             <excludeArtifactIds>ingrid-installer</excludeArtifactIds>
                         </configuration>
