@@ -41,9 +41,9 @@ public class IPlugSeOperatorFinderTest extends TestCase {
 
   public void testFindIndexValues() throws Exception {
     IPlugSeOperatorFinder finder = new IPlugSeOperatorFinder();
-    Set<String> providerSet = finder.findIndexValues(new File("portalu-search/src/test/resources/instances"),
+    Set<String> providerSet = finder.findIndexValues(new File("ingrid-nutch-search/src/test/resources/instances"),
         "provider");
-    Set<String> partnerSet = finder.findIndexValues(new File("portalu-search/src/test/resources/instances"), "partner");
+    Set<String> partnerSet = finder.findIndexValues(new File("ingrid-nutch-search/src/test/resources/instances"), "partner");
     assertEquals(1, providerSet.size());
     assertTrue(providerSet.contains("bw_lu"));
     assertEquals(5, partnerSet.size());

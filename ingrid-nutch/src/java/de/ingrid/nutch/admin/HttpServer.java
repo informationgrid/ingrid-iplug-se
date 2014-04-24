@@ -19,9 +19,9 @@ package de.ingrid.nutch.admin;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,10 +30,8 @@ import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.security.UserRealm;
 import org.mortbay.jetty.servlet.HashSessionIdManager;
-import org.mortbay.jetty.servlet.HashSessionManager;
 import org.mortbay.jetty.webapp.WebAppContext;
 
-import de.ingrid.iplug.se.security.ShibbolethRealm;
 import de.ingrid.nutch.admin.security.NutchGuiRealm;
 
 public class HttpServer extends Thread {

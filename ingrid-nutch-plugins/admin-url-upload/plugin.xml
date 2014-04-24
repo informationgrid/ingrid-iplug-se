@@ -31,12 +31,12 @@
      </library>
    </runtime>
 
-   <extension point="org.apache.nutch.admin.IGuiComponent"
-              id="org.apache.nutch.admin.IGuiComponent"
+   <extension point="de.ingrid.nutch.admin.IGuiComponent"
+              id="de.ingrid.nutch.admin.IGuiComponent"
               name="Administration Url Upload">
 
-      <implementation class="org.apache.nutch.admin.DefaultGuiComponent"
-                      id="org.apache.nutch.admin.DefaultGuiComponent" >
+      <implementation class="de.ingrid.nutch.admin.DefaultGuiComponent"
+                      id="de.ingrid.nutch.admin.DefaultGuiComponent" >
 			<parameter name="isInstanceComponent" value="true"/>
       </implementation>
    </extension>
@@ -45,8 +45,8 @@
               id="org.apache.nutch.crawl.IPreCrawl"
               name="Pre Crawl">
 
-      <implementation class="org.apache.nutch.admin.urlupload.UrlExporter"
-                      id="org.apache.nutch.admin.urlupload.UrlExporter" >
+      <implementation class="de.ingrid.nutch.admin.urlupload.UrlExporter"
+                      id="de.ingrid.nutch.admin.urlupload.UrlExporter" >
       </implementation>
    </extension>   
    

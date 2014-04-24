@@ -105,7 +105,8 @@ public class IngridHttpServer extends HttpServer {
         WebAppContext context = new WebAppContext();
         context.setContextPath(contextPath);
         context.setWar(webApp);        
-        _server.setHandler(context);
+        context.getSecurityHandler().setUserRealm(new ShibbolethRealm(_secure));
+        _server.addHandler(context);
         
         context.setClassLoader(extension.getDescriptor().getClassLoader());
         context.setAttribute("nutchInstance", nutchInstance);
@@ -125,14 +126,20 @@ public class IngridHttpServer extends HttpServer {
         context.start();
 
         Set<String> contextNames = new TreeSet<String>();
-        Handler[] contexts = _server.getHandlers();
+        Handler[] contexts = _server.getChildHandlers();
         for (Handler httpContext : contexts) {
-            contextNames.add(((WebAppContext)httpContext).getDisplayName());
+            if (httpContext instanceof WebAppContext) {
+                contextNames.add(((WebAppContext)httpContext).getContextPath());
+            }
         }
         for (Handler httpContext : contexts) {
-            ((WebAppContext)httpContext).setAttribute("contextNames", contextNames);
+            if (httpContext instanceof WebAppContext) {
+                ((WebAppContext)httpContext).setAttribute("contextNames", contextNames);
+            }
         }
-
+        
+        _server.stop();
+        _server.start();
     }
 
     @Override

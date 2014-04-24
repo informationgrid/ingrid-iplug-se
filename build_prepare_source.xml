@@ -2,6 +2,10 @@
 	<target name="prepare-source">
 		<delete dir="../apache-nutch-1.8" />
 		<unzip src="../apache-nutch-1.8-src.zip" dest="../" />
+		<!-- remove not needed nutch resources -->
+        <delete dir="../apache-nutch-1.8/docs" />
+        <delete dir="../apache-nutch-1.8/src/test" />
+        <delete dir="../apache-nutch-1.8/src/testresources" />
 		<!-- generate a pom file -->
 
 		<typedef uri="antlib:org.apache.ivy.ant" onerror="fail" loaderRef="ivyLoader">

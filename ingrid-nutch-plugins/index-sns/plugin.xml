@@ -14,10 +14,15 @@
 		<implementation class="de.ingrid.iplug.sns.nutch.index.SnsIndexingFilter" id="SnsIndexingFilter"/>
 	</extension>
 	
-	<extension id="de.ingrid.iplug.sns.nutch.query" name="Ingrid SNS Query Filter" point="org.apache.nutch.searcher.QueryFilter">
+	<extension id="de.ingrid.iplug.sns.nutch.query" name="Ingrid SNS Query Filter" point="de.ingrid.nutch.searcher.QueryFilter">
 		<implementation class="de.ingrid.iplug.sns.nutch.query.SnsQueryFilter" id="SnsQueryFilter">
 	        <parameter name="fields" value="t0,t1,t2,x1,x2,y1,y2,time,coord,buzzword,code,areaid,incl_meta,location"/>
 		</implementation>
 	</extension>
+	
+	<extension-point
+      id="de.ingrid.nutch.searcher.QueryFilter"
+      name="Nutch Query Filter"/>
+	
 	
 </plugin>

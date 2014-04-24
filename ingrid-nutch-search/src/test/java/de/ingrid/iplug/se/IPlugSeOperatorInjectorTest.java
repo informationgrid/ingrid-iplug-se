@@ -125,7 +125,7 @@ public class IPlugSeOperatorInjectorTest extends TestCase {
     injector.setIBus(new BusProxy());
     PlugDescription plugdescription = new PlugDescription();
     plugdescription.setWorkinDirectory(new File(
-        "portalu-search/src/test/resources",
+        "ingrid-nutch-search/src/test/resources",
         "instances"));
     injector.configure(plugdescription);
 

@@ -32,7 +32,7 @@
     <import plugin="nutch-extensionpoints" />
   </requires>
 
-  <extension id="org.apache.nutch.indexer.solr"
+  <extension id="org.apache.nutch.indexer.ingrid"
     name="InGrid Index Writer"
     point="org.apache.nutch.indexer.IndexWriter">
     <implementation id="InGridIndexWriter"

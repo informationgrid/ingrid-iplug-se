@@ -26,8 +26,8 @@ public class SnsQueryTimeFilterTest extends TestCase {
 
   protected void setUp() throws Exception {
     this.fConfiguration = NutchConfiguration.create();
-    File pluginPath = new File("portalu-nutch-gui/src/plugin");
-    File pluginPathOS = new File("101tec-nutch-11e55b9/src/plugin");
+    File pluginPath = new File("ingrid-nutch/src/plugin");
+    File pluginPathOS = new File("apache-nutch-1.8/src/plugin");
     this.fConfiguration.setStrings("plugin.folders", pluginPath.getPath(), pluginPathOS.getPath());
     this.fConfiguration
         .set(

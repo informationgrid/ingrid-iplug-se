@@ -8,7 +8,7 @@ import de.ingrid.iplug.se.urlmaintenance.parse.UrlContainer.UrlType;
 
 public class CsvParserTest extends TestCase {
 
-  public static String RESOURCE_PATH = "portalu-nutch-gui/src/plugin/admin-urlmaintenance/conf/test";
+  public static String RESOURCE_PATH = "ingrid-nutch/src/plugin/admin-urlmaintenance/conf/test";
 
   public CsvParserTest() {
   }

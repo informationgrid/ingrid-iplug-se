@@ -23,8 +23,8 @@ public class SnsBuzzwordTest extends TestCase {
     protected void setUp() throws Exception {
         this.fConfiguration = NutchConfiguration.create();
         String userDir = System.getProperty("user.dir");
-        String pluginPath = new File(userDir, "portalu-nutch-gui/src/plugin").getAbsolutePath();
-        String pluginPathOS = new File(userDir, "101tec-nutch-11e55b9/src/plugin").getAbsolutePath();
+        String pluginPath = new File(userDir, "ingrid-nutch/src/plugin").getAbsolutePath();
+        String pluginPathOS = new File(userDir, "apache-nutch-1.8/src/plugin").getAbsolutePath();
         this.fConfiguration.setStrings("plugin.folders", pluginPath, pluginPathOS);
         this.fConfiguration.set("plugin.includes",
                 "protocol-http|urlfilter-regex|parse-(text|html|js)|index-sns|query-(basic|site|url)");

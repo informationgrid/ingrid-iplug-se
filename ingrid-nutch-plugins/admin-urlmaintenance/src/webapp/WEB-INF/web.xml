@@ -22,7 +22,7 @@ http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 	</filter-mapping>
 	<servlet>
 		<servlet-name>resourceLoader</servlet-name>
-		<servlet-class>org.apache.nutch.admin.ResourceLoader</servlet-class>
+		<servlet-class>de.ingrid.nutch.admin.ResourceLoader</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>

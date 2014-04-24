@@ -19,7 +19,7 @@
    id="admin-welcome"
    name="Administration Welcoome"
    version="1.0"
-   provider-name="org.apache.nutch">
+   provider-name="de.ingrid.nutch">
 
    
    <runtime>
@@ -31,12 +31,12 @@
      </library>
    </runtime>
 
-   <extension point="org.apache.nutch.admin.IGuiComponent"
-              id="org.apache.nutch.admin.IGuiComponent"
+   <extension point="de.ingrid.nutch.admin.IGuiComponent"
+              id="de.ingrid.nutch.admin.IGuiComponent"
               name="Administration Welcome">
 
-      <implementation class="org.apache.nutch.admin.DefaultGuiComponent"
-                      id="org.apache.nutch.admin.DefaultGuiComponent" >
+      <implementation class="de.ingrid.nutch.admin.DefaultGuiComponent"
+                      id="de.ingrid.nutch.admin.DefaultGuiComponent" >
     	  	<parameter name="isGeneralComponent" value="true"/>
 			<parameter name="isInstanceComponent" value="true"/>
       </implementation>
