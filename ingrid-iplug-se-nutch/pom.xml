@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+        <groupId>de.ingrid</groupId>
+        <artifactId>ingrid-iplug-se</artifactId>
+        <version>3.5.0-SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>de.ingrid</groupId>
+	<artifactId>ingrid-iplug-se-nutch</artifactId>
+	<packaging>jar</packaging>
+	<name>ingrid-iplug-se-nutch</name>
+	<scm>
+		<connection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid/ingrid-iplug-se/branches/3.5.x_new_architecture/ingrid-iplug-se-nutch</connection>
+		<developerConnection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid-mdek/trunk/ingrid-iplug-se/branches/3.5.x_new_architecture/ingrid-iplug-se-nutch</developerConnection>
+	</scm>
+	<repositories>
+		<!-- Repo of parent pom needed, parent pom may not be installed locally 
+			yet -->
+		<repository>
+			<id>de.ingrid.all</id>
+			<name>Maven Repo InGrid</name>
+			<url>http://harrison.its-technidata.de/archiva/repository/ingrid-all</url>
+		</repository>
+	</repositories>
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.nutch</groupId>
+			<artifactId>nutch</artifactId>
+			<version>2.0-dev</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<!-- "DISABLE" WAGON PLUGIN TO AVOID EMPTY UPLOAD DIRECTORIES FROM SUBMODULES -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>wagon-maven-plugin</artifactId>
+				<configuration>
+					<fromDir>NOT_EXISITING_DIRECTORY</fromDir>
+					<url>/dev/null</url>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

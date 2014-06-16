@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <groupId>de.ingrid</groupId>
+    <artifactId>ingrid-releases-pom</artifactId>
+    <version>3.4.0</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>de.ingrid</groupId>
+  <artifactId>ingrid-iplug-se</artifactId>
+  <packaging>pom</packaging>
+  <version>3.5.0-SNAPSHOT</version>
+  <name>ingrid-iplug-se</name>
+
+  <scm>
+    <connection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid-iplug-se/branches/3.5.x_new_architecture</connection>
+    <developerConnection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid-iplug-se/branches/3.5.x_new_architecture</developerConnection>
+  </scm>
+  <repositories>
+    <!-- Repo of parent pom needed, parent pom may not be installed locally yet -->
+    <repository>
+      <id>de.ingrid.all</id>
+      <name>Maven Repo InGrid</name>
+      <url>http://harrison.its-technidata.de/archiva/repository/ingrid-all</url>
+    </repository>
+  </repositories>
+
+  <modules>
+    <module>ingrid-iplug-se-nutch</module>
+    <module>ingrid-iplug-se-iplug</module>
+  </modules>
+  <dependencyManagement>
+  </dependencyManagement>
+
+  <dependencies>
+  </dependencies>
+  <build>
+    <finalName>${name}-${version}</finalName>
+    
+    <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <inherited>false</inherited>
+			<!-- Add Type of Component to Manifest of Installer for Upgrade Server -->
+			<configuration>
+				<archive>
+				  <manifestEntries>
+					  <ingridComponentType>IPLUG_SE</ingridComponentType>
+				</manifestEntries>
+				</archive>
+			</configuration>
+      </plugin>
+      <!-- DISABLE RELEASE / ASSEMBLY STUFF FOR SUBMODULES ! RELEASE/BUNDLE ONLY IN TOP MODULE !!! -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <inherited>false</inherited>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <inherited>false</inherited>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-changes-plugin</artifactId>
+        <inherited>false</inherited>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>wagon-maven-plugin</artifactId>
+        <inherited>false</inherited>
+        <configuration>
+<!-- NOTICE: REDEFINE directory on distribution server -->
+          <url>file:///opt/ingrid/distributions/${project.name}/${project.version}</url>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-release-plugin</artifactId>
+        <inherited>false</inherited>
+      </plugin>
+    </plugins>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <excludes>
+          <exclude>*.xml</exclude>
+          <exclude>*.properties</exclude>
+          <exclude>*.bak</exclude>
+        </excludes>
+      </resource>
+    </resources>
+  </build>
+  <reporting>
+    <plugins>
+      <plugin>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>dependencies</report>
+              <report>project-team</report>
+              <report>mailing-list</report>
+              <report>license</report>
+              <report>surefire</report>
+              <report>cobertura</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>jxr-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>cobertura-maven-plugin</artifactId>
+        <version>2.0</version>
+      </plugin>
+    </plugins>
+  </reporting>
+  <profiles>
+    <profile>
+      <!-- This profile is only used for deploying the installer into the repository during a normal build!
+           Used in Hudson! -->
+      <id>noRelease</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>wagon-maven-plugin</artifactId>
+            <inherited>false</inherited>
+            <configuration>
+              <!-- NOTICE: REDEFINE directory on distribution server -->
+              <url>file:///srv/www/htdocs/ingrid/maven2/de/ingrid/mdek/${project.name}/${project.version}</url>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
