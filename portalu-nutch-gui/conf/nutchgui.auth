@@ -1,3 +1,0 @@
-NutchGuiLogin {
-   de.ingrid.iplug.se.security.PortaluLoginModule required;
-};

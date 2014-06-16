@@ -1,2 +1,0 @@
-#this script will be execute before the crawl startet. with one parameter. this parameter is the crawldirectory of the crawl. you can get this parameter with $1
-# for example: create a file before.txt in the specified crawldir: touch $1/before.txt

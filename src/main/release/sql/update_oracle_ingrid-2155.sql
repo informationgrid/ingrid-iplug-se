@@ -1,1 +1,0 @@
-ALTER TABLE metadata MODIFY ( METADATAVALUE varchar2(255) NULL );
