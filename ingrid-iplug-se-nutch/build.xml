@@ -1,0 +1,68 @@
+<project default="dist">
+
+	<property name="nutch-version" value="apache-nutch-1.8" />
+	<property name="ingrid.ext.libs" value="${basedir}/ingrid-nutch-libs" />
+
+	<target name="init">
+		<mkdir dir="build" />
+	</target>
+
+	<target name="clean">
+		<delete dir="build" />
+	</target>
+
+	<target name="copy-nutch">
+        <unzip src="${nutch-version}-src.zip" dest="build/" />
+	</target>
+
+	<target name="copy-ingrid-se-plugins">
+		<copy todir="build/${nutch-version}/src/plugin">
+			<fileset dir="ingrid-nutch-plugins" />
+		</copy>
+	</target>
+
+	<target name="copy-ingrid-se-part">
+		<copy todir="build/${nutch-version}/src/java">
+			<fileset dir="src/main/java" />
+		</copy>
+		<copy todir="build/${nutch-version}/lib">
+			<fileset dir="${ingrid.ext.libs}">
+				<exclude name="**/*base-webapp*" />
+				<exclude name="**/*cron4j*" />
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- To build the installer, use maven: mvn assembly:assembly -Dmaven.test.skip -->
+	<target name="dist" depends="clean, copy-nutch, copy-ingrid-se-plugins, copy-ingrid-se-part,create-manifest">
+		
+        <echo>override nutch build files to extend build custom source code</echo>
+        <copy todir="build/${nutch-version}">
+            <fileset dir="ingrid-nutch-override" />
+        </copy>
+		
+		<!-- echo classpath for debug purpose -->
+		<echo>echo classpath for debug purpose</echo>
+		<replace file="build/${nutch-version}/build.xml">
+			<replacetoken>
+				<![CDATA[<target name="compile-core" depends="init, resolve-default" description="--> compile core Java files only">]]></replacetoken>
+			<replacevalue>
+				<![CDATA[<target name="compile-core" depends="init, resolve-default" description="--> compile core Java files only"><pathconvert property="classpathProp" refid="classpath"/>
+				<echo>Classpath is ${classpathProp}</echo>]]></replacevalue>
+		</replace>
+
+
+		<ant dir="build/${nutch-version}" target="runtime" />
+
+	</target>
+
+	<target name="create-manifest">
+		<manifest file="build/MANIFEST.MF">
+			<attribute name="Build-By" value="${user.name}" />
+			<attribute name="Build-Timestamp" value="${maven.timestamp}" />
+			<attribute name="Implementation-Build" value="${maven.buildNumber}" />
+			<attribute name="Implementation-Version" value="${maven.version}" />
+			<attribute name="iPlug-Type" value="${maven.iplugType}" />
+		</manifest>
+	</target>
+</project>
