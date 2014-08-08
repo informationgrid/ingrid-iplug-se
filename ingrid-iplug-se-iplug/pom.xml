@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <parent>
-        <groupId>de.ingrid</groupId>
-        <artifactId>ingrid-iplug-se</artifactId>
-        <version>3.5.0-SNAPSHOT</version>
-    </parent>
+	<parent>
+		<groupId>de.ingrid</groupId>
+		<artifactId>ingrid-iplug-se</artifactId>
+		<version>3.5.0-SNAPSHOT</version>
+	</parent>
 	<modelVersion>4.0.0</modelVersion>
-  <groupId>de.ingrid</groupId>
+	<groupId>de.ingrid</groupId>
 	<artifactId>ingrid-iplug-se-iplug</artifactId>
 	<packaging>jar</packaging>
 	<name>ingrid-iplug-se-iplug</name>
@@ -24,7 +24,73 @@
 			<url>http://harrison.its-technidata.de/archiva/repository/ingrid-all</url>
 		</repository>
 	</repositories>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-beans</artifactId>
+				<version>4.0.0.RELEASE</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-core</artifactId>
+				<version>4.0.0.RELEASE</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context</artifactId>
+				<version>4.0.0.RELEASE</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
+		<dependency>
+			<groupId>de.ingrid</groupId>
+			<artifactId>ingrid-base-webapp</artifactId>
+			<version>3.5.0_Spring4-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.lucene</groupId>
+					<artifactId>lucene-analyzers</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>de.ingrid</groupId>
+			<artifactId>ingrid-base-webapp</artifactId>
+			<version>3.5.0_Spring4-SNAPSHOT</version>
+			<classifier>res</classifier>
+			<type>zip</type>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.lucene</groupId>
+					<artifactId>lucene-analyzers</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.elasticsearch</groupId>
+			<artifactId>elasticsearch</artifactId>
+			<version>1.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.5.6</version>
+			<!-- <scope>test</scope> -->
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.5.6</version>
+			<!-- <scope>test</scope> -->
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -35,6 +101,54 @@
 				<configuration>
 					<fromDir>NOT_EXISITING_DIRECTORY</fromDir>
 					<url>/dev/null</url>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack-base-webapp</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>de.ingrid</groupId>
+									<artifactId>ingrid-base-webapp</artifactId>
+									<classifier>res</classifier>
+									<type>zip</type>
+									<outputDirectory>${project.build.directory}/base-webapp</outputDirectory>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifestEntries>
+							<!-- one of these: IPLUG_SE, IPLUG_DSC, IPLUG_SNS, IPLUG_TAMINO, IPLUG_FPN, 
+								IPLUG_G2K, IPLUG_CSW, IPLUG_CSW_DSC, OTHER see ingrid-utils:de.ingrid.utils.metadata.IPlugType -->
+							<iPlug-Type>IPLUG_SE</iPlug-Type>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<!-- Add Type of Component to Manifest of Installer for Upgrade Server -->
+				<configuration>
+					<archive>
+						<manifestEntries>
+							<ingridComponentType>IPLUG_SE</ingridComponentType>
+						</manifestEntries>
+					</archive>
 				</configuration>
 			</plugin>
 		</plugins>

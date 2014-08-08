@@ -1,0 +1,20 @@
+{ "index" : { "_index" : "test", "_type" : "web", "_id" : "1" } }
+{ "url" : "http://www.wemove.com", "title": "wemove" }
+{ "index" : { "_index" : "test", "_type" : "web", "_id" : "2" } }
+{ "url" : "http://www.heise.de", "title": "Heise" }
+{ "index" : { "_index" : "test", "_type" : "web", "_id" : "3" } }
+{ "url" : "http://www.spiegel.de", "title": "Spiegel" }
+{ "index" : { "_index" : "test", "_type" : "web", "_id" : "4" } }
+{ "url" : "http://www.golem.de", "title": "golem computer news" }
+{ "index" : { "_index" : "test", "_type" : "web", "_id" : "5" } }
+{ "url" : "http://www.wemove.com/about.html", "title": "wemove - about" }
+{ "index" : { "_index" : "test", "_type" : "web", "_id" : "6" } }
+{ "url" : "http://www.wemove.com/contact", "title": "wemove - contact" }
+{ "index" : { "_index" : "test", "_type" : "web", "_id" : "7" } }
+{ "url" : "http://www.wemove.com/jobs", "title": "wemove - jobs" }
+{ "index" : { "_index" : "test", "_type" : "web", "_id" : "8" } }
+{ "url" : "http://www.spiegel.de/ausland", "title": "Ausland" }
+{ "index" : { "_index" : "test", "_type" : "web", "_id" : "9" } }
+{ "url" : "http://www.spiegel.de/wirtschaft", "title": "Wirtschaft" }
+{ "index" : { "_index" : "test", "_type" : "web", "_id" : "10" } }
+{ "url" : "http://www.spiegel.de/reise", "title": "Reisen" }

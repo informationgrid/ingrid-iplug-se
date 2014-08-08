@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+				http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+    <!-- import spring beans for the iPlug -->
+    <import resource="spring.xml"/>    
+    
+    <!-- the application context definition for the springapp DispatcherServlet -->
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"></property>
+        <property name="prefix" value="/WEB-INF/jsp/"></property>
+        <property name="suffix" value=".jsp"></property>
+    </bean>
+
+	<bean id="messageSource"
+		class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>classpath:messages_base</value>
+				<value>classpath:messages</value>
+			</list>
+		</property>
+		<property name="cacheSeconds" value="0" />
+		<property name="fallbackToSystemLocale" value="false"></property>
+    <property name="defaultEncoding">
+      <value>UTF-8</value>
+    </property>
+	</bean>
+    
+    <!-- STEMMER: Create stemmer explicitly via xml ! Will be autowired to parsers, index writer ... ! -->
+    <!--  <bean id="stemmerGERMAN" class="de.ingrid.admin.search.GermanStemmer"/> -->
+
+    <!-- XML DEFINED BEANS WITH ACCORDING QUALIFIER TO BE AUTOWIRED VIA QUALIFIER ! -->
+
+    <!--
+        Wraps one ore more lucene index reader. The wrapper is injected via
+        XMLconfiguredIndexWrapper into IngridIndexSearcher constructor, so it
+        can be updated in the configure phase.
+    -->
+    <bean id="indexWrapper" class="de.ingrid.search.utils.LuceneIndexReaderWrapper">
+        <qualifier value="XMLconfiguredIndexWrapper" />
+    </bean>
+    
+    <!-- Single parsers are injected explicitly (but created via annotation mechanism) -->
+    <!-- Adapt number, type and order of parsers dependent from iPlug -->
+    <!-- <bean class="de.ingrid.admin.search.QueryParsers">
+        <qualifier value="XMLconfigured"/>
+        <property name="queryParsers">
+            <list>
+                <ref bean="contentQueryParser" />
+                NO datatype in lucene query !
+                ref bean="dataTypeQueryParser" /
+                <ref bean="fieldQueryParser" />
+                <ref bean="titleQueryParser" />
+                <ref bean="allResultsOnEmptyQueryParser" />
+            </list>
+        </property>
+    </bean> -->
+
+    
+    <!--
+        Wraps a plugdescription object. The wrapper implements IConfigurable
+        and will be updated every time the configure phase takes place (i.e.
+        after changing the iplug configuration).
+    -->
+    <bean id="plugDescriptionWrapper"
+        class="de.ingrid.search.utils.ConfigurablePlugDescriptionWrapper" />
+
+    <bean id="plugDescriptionFacetCounter"
+        class="de.ingrid.search.utils.facet.counter.DscPlugdescriptionFacetCounter">
+        <property name="plugDescriptionWrapper">
+            <ref bean="plugDescriptionWrapper" />
+        </property>
+        <property name="facetClassDefinitions">
+            <list>
+            <!-- 
+                Add facets for this iplug. 
+                If facet fits, all results will be added to the facet
+
+
+                <value>type:www</value>  
+            -->
+            </list>
+        </property>
+    </bean>
+
+<!--     <bean id="facetManager" class="de.ingrid.search.utils.facet.NoIndexFacetManager">
+        <property name="queryParsers">
+            <ref bean="de.ingrid.admin.search.QueryParsers" />
+        </property>
+        <property name="facetCounters">
+            <list>
+                <ref bean="plugDescriptionFacetCounter" />
+            </list>
+        </property>
+    </bean> -->
+    
+    <context:component-scan base-package="de.ingrid" >
+<!--         <context:exclude-filter type="regex" expression="de\.ingrid\.admin\.controller\.WorkingDirController"/> -->
+		<!-- <context:exclude-filter type="regex" expression="de.ingrid.admin.search.*Stemmer*" /> -->
+		<context:exclude-filter type="regex" expression="de.ingrid.admin.search.*" />
+		<context:exclude-filter type="regex" expression="de.ingrid.admin.controller.IndexController*" />
+		<context:exclude-filter type="regex" expression="de.ingrid.admin.controller.SchedulingController*" />
+    </context:component-scan>
+    
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"> 
+        <property name="maxUploadSize" value="1000000"/> 
+    </bean> 
+    
+    
+</beans>
