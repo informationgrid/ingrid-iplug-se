@@ -1,0 +1,21 @@
+{
+    "web": {
+        "properties": {
+            "fetched": {
+                "format": "dateOptionalTime",
+                "type": "date"
+            },
+            "title": {
+                "analyzer": "german",
+                "type": "string"
+            },
+            "abstract": {
+                "analyzer": "german",
+                "type": "string"
+            },
+            "url": {
+                "type": "string"
+            }
+        }
+    }
+}

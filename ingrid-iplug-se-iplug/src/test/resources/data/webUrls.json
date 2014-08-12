@@ -1,20 +1,22 @@
 { "index" : { "_index" : "test", "_type" : "web", "_id" : "1" } }
-{ "url" : "http://www.wemove.com", "title": "wemove" }
+{ "url" : "http://www.wemove.com", "title": "wemove", "abstract": "Die beste IT-Firma auf der Welt!", "fetched": "2014-06-03" }
 { "index" : { "_index" : "test", "_type" : "web", "_id" : "2" } }
-{ "url" : "http://www.heise.de", "title": "Heise" }
+{ "url" : "http://www.heise.de", "title": "Heise", "abstract": "Informationen über IT stets aktuell", "fetched": "2014-04-13" }
 { "index" : { "_index" : "test", "_type" : "web", "_id" : "3" } }
-{ "url" : "http://www.spiegel.de", "title": "Spiegel" }
+{ "url" : "http://www.spiegel.de", "title": "Spiegel", "abstract": "Nachrichten von heute mit genialen Beiträgen", "fetched": "2014-05-22" }
 { "index" : { "_index" : "test", "_type" : "web", "_id" : "4" } }
-{ "url" : "http://www.golem.de", "title": "golem computer news" }
+{ "url" : "http://www.golem.de", "title": "golem computer news", "abstract": "Neuigkeiten aus der Welt der Computer", "fetched": "2014-03-14" }
 { "index" : { "_index" : "test", "_type" : "web", "_id" : "5" } }
-{ "url" : "http://www.wemove.com/about.html", "title": "wemove - about" }
+{ "url" : "http://www.golem.de/special", "title": "golem computer news", "abstract": "Die besten Artikel", "fetched": "2014-03-16" }
 { "index" : { "_index" : "test", "_type" : "web", "_id" : "6" } }
-{ "url" : "http://www.wemove.com/contact", "title": "wemove - contact" }
+{ "url" : "http://www.wemove.com/about.html", "title": "wemove - about", "abstract": "Über uns und unsere Entstehung", "fetched": "2013-02-08" }
 { "index" : { "_index" : "test", "_type" : "web", "_id" : "7" } }
-{ "url" : "http://www.wemove.com/jobs", "title": "wemove - jobs" }
+{ "url" : "http://www.wemove.com/contact", "title": "wemove - contact", "abstract": "Hier können Sie uns erreichen", "fetched": "2014-08-01" }
 { "index" : { "_index" : "test", "_type" : "web", "_id" : "8" } }
-{ "url" : "http://www.spiegel.de/ausland", "title": "Ausland" }
+{ "url" : "http://www.wemove.com/jobs", "title": "wemove - jobs", "abstract": "Diese Stellen haben wir für Sie", "fetched": "2014-04-24" }
 { "index" : { "_index" : "test", "_type" : "web", "_id" : "9" } }
-{ "url" : "http://www.spiegel.de/wirtschaft", "title": "Wirtschaft" }
+{ "url" : "http://www.spiegel.de/ausland", "title": "Ausland", "abstract": "Was geht ab außerhalb von Deutschland?", "fetched": "2014-05-18" }
 { "index" : { "_index" : "test", "_type" : "web", "_id" : "10" } }
-{ "url" : "http://www.spiegel.de/reise", "title": "Reisen" }
+{ "url" : "http://www.spiegel.de/wirtschaft", "title": "Wirtschaft", "abstract": "Neues aus der Wirtschaft", "fetched": "2014-03-11" }
+{ "index" : { "_index" : "test", "_type" : "web", "_id" : "11" } }
+{ "url" : "http://www.spiegel.de/reise", "title": "Reisen", "abstract": "Wohin in den Urlaub, wenn man die Welt bereisen will? Warum überhaupt ins Ausland?", "fetched": "2014-01-09" }

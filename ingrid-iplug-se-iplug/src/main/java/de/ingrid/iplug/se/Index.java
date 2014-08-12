@@ -26,6 +26,7 @@ public interface Index {
 	
 	
 	/**
+	 * TODO: Move to another interface!
 	 * 
 	 * @param url
 	 * @return

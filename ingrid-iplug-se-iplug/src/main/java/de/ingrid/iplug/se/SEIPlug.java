@@ -20,6 +20,7 @@ import de.ingrid.utils.metadata.IMetadataInjector;
 import de.ingrid.utils.processor.IPostProcessor;
 import de.ingrid.utils.processor.IPreProcessor;
 import de.ingrid.utils.query.IngridQuery;
+import de.ingrid.utils.tool.QueryUtil;
 
 /**
  * TODO Describe your created type (class, etc.) here.
@@ -83,9 +84,9 @@ public class SEIPlug extends HeartBeatPlug {
 //            // TODO Auto-generated catch block
 //            e.printStackTrace();
 //        }
-
         
-        index.search( null, 0, 10 );
+        // TODO: add plug id as index information
+        // ...
     }
 
     /**
@@ -105,7 +106,18 @@ public class SEIPlug extends HeartBeatPlug {
             log.debug("incomming query : " + query.toString());
         }
         
-        return new IngridHits(this.fPlugId, 0, new IngridHit[0], true);
+        // check if query is rejected and return 0 hits instead of search within
+        // the iplug
+        if (query.isRejected()) {
+            return new IngridHits(fPlugId, 0, new IngridHit[] {}, true);
+        }
+        
+        // remove "meta" field from query so search works !
+        QueryUtil.removeFieldFromQuery(query, QueryUtil.FIELDNAME_METAINFO);
+        QueryUtil.removeFieldFromQuery(query, QueryUtil.FIELDNAME_INCL_META);
+        
+        return index.search( query, 0, 10 );
+        
     }
 
     /**
