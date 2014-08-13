@@ -1,16 +1,22 @@
 package de.ingrid.iplug.se.elasticsearch;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
+import de.ingrid.admin.JettyStarter;
 import de.ingrid.iplug.se.Index;
+import de.ingrid.iplug.se.IndexFields;
+import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.elasticsearch.bean.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.elasticsearch.converter.QueryConverter;
 import de.ingrid.utils.IngridHit;
@@ -18,7 +24,7 @@ import de.ingrid.utils.IngridHitDetail;
 import de.ingrid.utils.IngridHits;
 import de.ingrid.utils.query.IngridQuery;
 
-@Service
+@Component
 public class IndexImpl implements Index {
 
     private static Logger log = Logger.getLogger( IndexImpl.class );
@@ -28,6 +34,16 @@ public class IndexImpl implements Index {
     private Client client;
 
     private QueryConverter queryConverter;
+    
+    private final static String[] detailFields =  { "url", "title", "abstract" };
+    
+    // TODO: get all active indices to search for
+    private String instances = "test";
+
+    private String plugId = null;
+
+    // SearchType see: http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-request-search-type.html
+    private SearchType searchType = null;
 
     @Autowired
     public IndexImpl(ElasticsearchNodeFactoryBean elasticSearch, QueryConverter qc) {
@@ -42,29 +58,27 @@ public class IndexImpl implements Index {
             log.error( "Error during initialization of ElasticSearch-Client!" );
             e.printStackTrace();
         }
+        
+        this.searchType = SEIPlug.conf.searchType;
+        this.plugId = JettyStarter.getInstance().config.communicationProxyUrl;
     }
 
     @Override
     public IngridHits search(IngridQuery ingridQuery, int startHit, int num) {
 
-        // TODO: get all active indices to search for
-        String instances = "test";
-
         // convert InGrid-query to QueryBuilder
-        // see:
-        // http://www.elasticsearch.org/guide/en/elasticsearch/client/java-api/current/query-dsl-queries.html
-        // QueryBuilder query = QueryBuilders.termQuery("message", "out");
         QueryBuilder query = queryConverter.convert( ingridQuery );
 
         // search prepare
         SearchRequestBuilder srb = client.prepareSearch( instances )
                 // .setTypes("type1", "type2")
-                .setSearchType( SearchType.DFS_QUERY_THEN_FETCH )
+                .setSearchType( searchType  )
                 .setQuery( query ) // Query
                 // .addAggregation( aggregation ) // Facets
                 // .setPostFilter(FilterBuilders.rangeFilter("age").from(12).to(18))
                 // Filter
-                .setFrom( startHit ).setSize( num ).setExplain( true );
+                .setFrom( startHit ).setSize( num )
+                .setExplain( true );
 
         // TODO: add facets/aggregations
 
@@ -83,18 +97,40 @@ public class IndexImpl implements Index {
         // the size will not be bigger than it was requested in the query with
         // 'num'
         // so we can convert from long to int here!
-        int length = (int) hits.totalHits();
+        int length = (int) hits.getHits().length;
+        int totalHits = (int) hits.getTotalHits();
         IngridHit[] hitArray = new IngridHit[length];
+        int pos = 0;
+        for (SearchHit hit : hits.hits()) {
+            int docId = Integer.valueOf( hit.getId() );
+            hitArray[pos] = new IngridHit(this.plugId, docId, -1, hit.getScore() );
+            pos++;
+        }
 
-        IngridHits ingridHits = new IngridHits( length, hitArray );
+        IngridHits ingridHits = new IngridHits( totalHits, hitArray );
 
         return ingridHits;
     }
 
     @Override
-    public IngridHitDetail getDetail(IngridHit hit) {
-        // TODO Auto-generated method stub
-        return null;
+    public IngridHitDetail getDetail(IngridHit hit, String[] requestedFields) {
+        String documentId = String.valueOf( hit.getDocumentId() );
+        String[] allFields = (String[]) ArrayUtils.addAll( detailFields, requestedFields );
+        
+        GetResponse response = client.prepareGet( instances, "_all", documentId )
+                .setFields( allFields )
+                .execute()
+                .actionGet();
+
+        String title = (String) response.getField( IndexFields.TITLE ).getValue();
+        String summary = (String) response.getField( IndexFields.ABSTRACT ).getValue();
+        IngridHitDetail detail = new IngridHitDetail( hit.getPlugId(), hit.getDocumentId(), hit.getDataSourceId(), hit.getScore(), title, summary );
+        if (requestedFields != null) {
+            for (String field : requestedFields) {
+                detail.put( field, response.getField( field ).getValue());
+            }
+        }
+        return detail;
     }
 
     @Override

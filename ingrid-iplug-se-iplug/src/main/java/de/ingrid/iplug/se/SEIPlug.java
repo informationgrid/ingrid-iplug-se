@@ -35,7 +35,7 @@ public class SEIPlug extends HeartBeatPlug {
      */
     private static Logger log = Logger.getLogger( SEIPlug.class );
 
-	private static Configuration conf;
+	public static Configuration conf;
 
     /**
      * The <code>PlugDescription</code> object passed at startup
@@ -125,7 +125,7 @@ public class SEIPlug extends HeartBeatPlug {
      *      de.ingrid.utils.query.IngridQuery, java.lang.String[])
      */
     public IngridHitDetail getDetail(IngridHit hit, IngridQuery query, String[] requestedFields) throws Exception {
-        return new IngridHitDetail();
+        return index.getDetail( hit, requestedFields );
     }
 
     /**
@@ -133,7 +133,13 @@ public class SEIPlug extends HeartBeatPlug {
      *      de.ingrid.utils.query.IngridQuery, java.lang.String[])
      */
     public IngridHitDetail[] getDetails(IngridHit[] hits, IngridQuery query, String[] requestedFields) throws Exception {
-        return new IngridHitDetail[0];
+        IngridHitDetail[] detailHits = new IngridHitDetail[ hits.length ];
+        
+        for (int i = 0; i < hits.length; i++) {
+            detailHits[i] = getDetail( hits[i], query, requestedFields );
+            
+        }
+        return detailHits;
     }
     
     public static void main(String[] args) throws Exception {

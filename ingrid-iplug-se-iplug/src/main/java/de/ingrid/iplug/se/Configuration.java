@@ -2,8 +2,15 @@ package de.ingrid.iplug.se;
 
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+import org.elasticsearch.action.search.SearchType;
+
 import com.tngtech.configbuilder.annotation.propertyloaderconfiguration.PropertiesFiles;
 import com.tngtech.configbuilder.annotation.propertyloaderconfiguration.PropertyLocations;
+import com.tngtech.configbuilder.annotation.typetransformer.TypeTransformer;
+import com.tngtech.configbuilder.annotation.typetransformer.TypeTransformers;
+import com.tngtech.configbuilder.annotation.valueextractor.DefaultValue;
+import com.tngtech.configbuilder.annotation.valueextractor.PropertyValue;
 
 import de.ingrid.admin.IConfig;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
@@ -12,7 +19,43 @@ import de.ingrid.admin.command.PlugdescriptionCommandObject;
 @PropertyLocations(directories = {"conf"}, fromClassLoader = true)
 public class Configuration implements IConfig {
     
-    //private static Log log = LogFactory.getLog(Configuration.class);
+    private static Logger log = Logger.getLogger(Configuration.class);
+    
+    public class StringToSearchType extends TypeTransformer<String, SearchType>{
+        
+        @Override
+        public SearchType transform( String input ) {
+            SearchType type;
+            switch (input) {
+            case "COUNT":
+                type = SearchType.COUNT;
+                break;
+            case "DEFAULT":
+                type = SearchType.DEFAULT;
+                break;
+            case "DFS_QUERY_AND_FETCH":
+                type = SearchType.DFS_QUERY_AND_FETCH;
+                break;
+            case "DFS_QUERY_THEN_FETCH":
+                type = SearchType.DFS_QUERY_THEN_FETCH;
+                break;
+            case "QUERY_AND_FETCH":
+                type = SearchType.QUERY_AND_FETCH;
+                break;
+            case "QUERY_THEN_FETCH":
+                type = SearchType.QUERY_THEN_FETCH;
+                break;
+            case "SCAN":
+                type = SearchType.SCAN;
+                break;
+            default:
+                log.error( "Unknown SearchType (" + input + "), using default one: DFS_QUERY_THEN_FETCH" );
+                type = SearchType.DFS_QUERY_THEN_FETCH;
+            }
+            return type;
+        }
+        
+    }
 
 	@Override
 	public void initialize() {
@@ -26,39 +69,13 @@ public class Configuration implements IConfig {
 		// TODO Auto-generated method stub
 		
 	}
-    
-//    @PropertyValue("iplug.database.driver")
-//    @DefaultValue("com.mysql.jdbc.Driver")
-//    public String databaseDriver;
-//    
-//    @PropertyValue("iplug.database.url")
-//    @DefaultValue("jdbc:mysql://localhost:3306/igc")
-//    public String databaseUrl;
-//    
-//    @PropertyValue("iplug.database.username")
-//    public String databaseUsername;
-//    
-//    @PropertyValue("iplug.database.password")
-//    public String databasePassword;
-//    
-//    @PropertyValue("iplug.database.schema")
-//    public String databaseSchema;
-//    
-//    
-//    @PropertyValue("spring.profile")
-//    public String springProfile;
-//
-//    @Override
-//    public void initialize() {
-//        if ( springProfile != null ) {
-//            System.setProperty( "spring.profiles.active", springProfile );
-//        } else {
-//            log.error( "Spring profile not set! In configuration set 'spring.profile' to one of 'object_internet', 'object_intranet', 'address_internet' or 'address_intranet'" );
-//            System.exit( 1 );
-//        }
-//    }
-//
-    @Override
+	
+	@TypeTransformers(Configuration.StringToSearchType.class)
+    @PropertyValue("search.type")
+    @DefaultValue("DEFAULT")
+    public SearchType searchType;	
+
+	@Override
     public void addPlugdescriptionValues( PlugdescriptionCommandObject pdObject ) {
         pdObject.put( "iPlugClass", "de.ingrid.iplug.se.SEIPlug" );
         

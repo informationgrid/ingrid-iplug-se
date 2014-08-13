@@ -20,9 +20,10 @@ public interface Index {
 	/**
 	 * 
 	 * @param hit
+	 * @param requestedFields 
 	 * @return
 	 */
-	public IngridHitDetail getDetail(IngridHit hit);
+	public IngridHitDetail getDetail(IngridHit hit, String[] requestedFields);
 	
 	
 	/**

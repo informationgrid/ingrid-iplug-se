@@ -5,18 +5,17 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import de.ingrid.utils.query.ClauseQuery;
 import de.ingrid.utils.query.IngridQuery;
 
-@Service
 public class QueryConverter {
     
     private static Logger log = Logger.getLogger( QueryConverter.class );
     
+    @Autowired
     private List<IQueryConverter> _queryConverter;
 
     public QueryConverter() {

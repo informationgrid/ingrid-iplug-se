@@ -3,10 +3,12 @@ package de.ingrid.iplug.se.elasticsearch.converter;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.springframework.stereotype.Service;
 
 import de.ingrid.utils.query.IngridQuery;
 import de.ingrid.utils.query.TermQuery;
 
+@Service
 public class DefaultFieldsQueryConverter implements IQueryConverter {
     
     private static final String[] content = {"title", "abstract"};
@@ -24,7 +26,11 @@ public class DefaultFieldsQueryConverter implements IQueryConverter {
                 
                 if (term.isRequred()) {
                     if (bq == null) bq = QueryBuilders.boolQuery();
-                    bq.must( subQuery );
+                    if (term.isProhibited()) {
+                        bq.mustNot( subQuery );
+                    } else {                        
+                        bq.must( subQuery );
+                    }
                     
                 } else {
                     // if it's an OR-connection then the currently built query must become a sub-query
@@ -47,5 +53,10 @@ public class DefaultFieldsQueryConverter implements IQueryConverter {
             queryBuilder.must( bq );
         }
     }
+    
+//    @Bean
+//    public DefaultFieldsQueryConverter defaultFieldsQueryConverter() {
+//        return this;
+//    }
 
 }

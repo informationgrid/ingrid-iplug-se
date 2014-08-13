@@ -40,26 +40,16 @@
         XMLconfiguredIndexWrapper into IngridIndexSearcher constructor, so it
         can be updated in the configure phase.
     -->
-    <bean id="indexWrapper" class="de.ingrid.search.utils.LuceneIndexReaderWrapper">
-        <qualifier value="XMLconfiguredIndexWrapper" />
-    </bean>
-    
-    <!-- Single parsers are injected explicitly (but created via annotation mechanism) -->
-    <!-- Adapt number, type and order of parsers dependent from iPlug -->
-    <!-- <bean class="de.ingrid.admin.search.QueryParsers">
+
+    <bean class="de.ingrid.iplug.se.elasticsearch.converter.QueryConverter">
         <qualifier value="XMLconfigured"/>
         <property name="queryParsers">
             <list>
-                <ref bean="contentQueryParser" />
-                NO datatype in lucene query !
-                ref bean="dataTypeQueryParser" /
-                <ref bean="fieldQueryParser" />
-                <ref bean="titleQueryParser" />
-                <ref bean="allResultsOnEmptyQueryParser" />
+                <ref bean="defaultFieldsQueryConverter" />
+                <ref bean="matchAllQueryConverter" />
             </list>
         </property>
-    </bean> -->
-
+    </bean>
     
     <!--
         Wraps a plugdescription object. The wrapper implements IConfigurable
