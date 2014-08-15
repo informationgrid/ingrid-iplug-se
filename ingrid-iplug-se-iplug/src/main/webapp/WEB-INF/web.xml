@@ -48,6 +48,24 @@ http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
         <url-pattern>*.html</url-pattern>
     </filter-mapping>
     
+    <!-- Encode all Parameters UTF-8 ! so Umlaute are transferred correctly, e.g. in query parameter on test search page -->
+    <filter>
+        <filter-name>CharacterEncodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+        <param-name>encoding</param-name>
+        <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+        <param-name>forceEncoding</param-name>
+        <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+       <filter-name>CharacterEncodingFilter</filter-name>
+       <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>Any User</web-resource-name>

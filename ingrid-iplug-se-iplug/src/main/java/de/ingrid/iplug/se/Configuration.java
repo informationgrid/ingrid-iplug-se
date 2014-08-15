@@ -73,7 +73,11 @@ public class Configuration implements IConfig {
 	@TypeTransformers(Configuration.StringToSearchType.class)
     @PropertyValue("search.type")
     @DefaultValue("DEFAULT")
-    public SearchType searchType;	
+    public SearchType searchType;
+	
+	@PropertyValue("dir.instances")
+	@DefaultValue("instances")
+    private String dirInstances;	
 
 	@Override
     public void addPlugdescriptionValues( PlugdescriptionCommandObject pdObject ) {
@@ -102,6 +106,10 @@ public class Configuration implements IConfig {
 //        props.setProperty( "iplug.database.password", databasePassword);
 //        props.setProperty( "iplug.database.schema", databaseSchema);
 //    }
+
+    public String getInstancesDir() {
+        return dirInstances;
+    }
 
 
 }
