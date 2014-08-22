@@ -3,6 +3,10 @@
  */
 package de.ingrid.iplug.se;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +16,8 @@ import com.tngtech.configbuilder.ConfigBuilder;
 import de.ingrid.admin.JettyStarter;
 import de.ingrid.iplug.HeartBeatPlug;
 import de.ingrid.iplug.PlugDescriptionFieldFilters;
+import de.ingrid.iplug.se.db.DBManager;
+import de.ingrid.iplug.se.db.model.Url;
 import de.ingrid.utils.IngridHit;
 import de.ingrid.utils.IngridHitDetail;
 import de.ingrid.utils.IngridHits;
@@ -145,6 +151,30 @@ public class SEIPlug extends HeartBeatPlug {
     public static void main(String[] args) throws Exception {
         conf = new ConfigBuilder<Configuration>(Configuration.class).withCommandLineArgs(args).build();
         new JettyStarter( conf );
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory(conf.databaseID);//, properties);
+        DBManager.INSTANCE.intialize(emf);
+        EntityManager em = DBManager.INSTANCE.getEntityManager();
+        
+        // do database migrations
+//        Flyway flyway = new Flyway();
+//        flyway.setDataSource(dbUrl, "", "");
+//        flyway.migrate();
+        
+        // get an entity manager instance (initializes properties in the DBManager)
+        em.getTransaction().begin();
+        Url url = new Url();
+        url.setStatus( 200 );
+        url.setUrl( "http://www.wemove.com" );
+        em.persist(url);
+        em.getTransaction().commit();
+        
+        //CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+
+        // select patients for the current page
+//        CriteriaQuery<Url> urlQuery = criteriaBuilder.createQuery(Url.class);
+//        Root<Url> urlTpl = urlQuery.from(Url.class);
+//        TypedQuery<Url> urlPagingQuery = em.createQuery(urlQuery);
+//        urlPagingQuery.getSingleResult();
     }
     
 }

@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
@@ -27,7 +28,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -62,9 +62,7 @@ public class IndexImplTest {
     @BeforeClass
     public static void setUp() throws Exception {
         elastic = new ElasticsearchNodeFactoryBean();
-        elastic.setConfigLocation( new ClassPathResource( "elasticsearch_memory.yml" ) );
         elastic.afterPropertiesSet();
-        
         
         // set necessary configurations for startup
         Configuration configuration = new Configuration();

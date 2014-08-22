@@ -1,9 +1,18 @@
 package de.ingrid.iplug.se;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.search.SearchType;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 
 import com.tngtech.configbuilder.annotation.propertyloaderconfiguration.PropertiesFiles;
 import com.tngtech.configbuilder.annotation.propertyloaderconfiguration.PropertyLocations;
@@ -15,7 +24,7 @@ import com.tngtech.configbuilder.annotation.valueextractor.PropertyValue;
 import de.ingrid.admin.IConfig;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
 
-@PropertiesFiles( {"config"} )
+@PropertiesFiles( {"config", "elasticsearch"} )
 @PropertyLocations(directories = {"conf"}, fromClassLoader = true)
 public class Configuration implements IConfig {
     
@@ -63,13 +72,6 @@ public class Configuration implements IConfig {
 		
 	}
 
-	@Override
-	public void setPropertiesFromPlugdescription(Properties arg0,
-			PlugdescriptionCommandObject arg1) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	@TypeTransformers(Configuration.StringToSearchType.class)
     @PropertyValue("search.type")
     @DefaultValue("DEFAULT")
@@ -77,7 +79,15 @@ public class Configuration implements IConfig {
 	
 	@PropertyValue("dir.instances")
 	@DefaultValue("instances")
-    private String dirInstances;	
+    private String dirInstances;
+
+	@PropertyValue("db.id")
+    @DefaultValue("iplug-se")
+    public String databaseID;
+	
+	@PropertyValue("http.port")
+    @DefaultValue("9299")
+    public String esHttpPort;
 
 	@Override
     public void addPlugdescriptionValues( PlugdescriptionCommandObject pdObject ) {
@@ -91,24 +101,44 @@ public class Configuration implements IConfig {
 //        pdObject.setConnection( dbc );
     }
 //
-//    @Override
-//    public void setPropertiesFromPlugdescription( Properties props, PlugdescriptionCommandObject pd ) {
-//        DatabaseConnection connection = (DatabaseConnection) pd.getConnection();
-//        databaseDriver = connection.getDataBaseDriver();
-//        databaseUrl = connection.getConnectionURL();
-//        databaseUsername = connection.getUser();
-//        databasePassword = connection.getPassword();
-//        databaseSchema = connection.getSchema();
-//        
-//        props.setProperty( "iplug.database.driver", databaseDriver);
-//        props.setProperty( "iplug.database.url", databaseUrl);
-//        props.setProperty( "iplug.database.username", databaseUsername);
-//        props.setProperty( "iplug.database.password", databasePassword);
-//        props.setProperty( "iplug.database.schema", databaseSchema);
-//    }
+    @Override
+    public void setPropertiesFromPlugdescription( Properties props, PlugdescriptionCommandObject pd ) {
+        props.setProperty( "dir.instances", this.dirInstances);
+        
+        // write elastic search properties to separate configuration
+        // TODO: refactor this code to make an easy function, by putting it into the base-webapp!
+        Properties p = new Properties();
+        try {
+            // check for elastic search settings in classpath, which works during development
+            // and production
+            Resource resource = new ClassPathResource( "/elasticsearch.properties" );
+            if (resource.exists()) {
+                p.load( resource.getInputStream() );
+            } else {
+                // create file if it does not exist yet
+                // use the location of the production environment!
+                resource = new FileSystemResource( "conf/elasticsearch.properties" );
+            }
+            p.put( "http.port", esHttpPort );
+            OutputStream os = new FileOutputStream( resource.getFile() ); 
+            p.store( os, "Override configuration written by the application" );
+            os.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public String getInstancesDir() {
         return dirInstances;
+    }
+    
+    public void setInstancesDir(String dir) {
+        this.dirInstances = dir;
+    }
+    public Map<String, String> getElasticSearchSettings() {
+        Map<String,String> map = new HashMap<String, String>();
+        //map.put( "", "" )
+        return map;
     }
 
 

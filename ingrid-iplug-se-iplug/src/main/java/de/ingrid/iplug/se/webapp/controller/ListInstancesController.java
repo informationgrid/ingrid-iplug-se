@@ -3,9 +3,12 @@ package de.ingrid.iplug.se.webapp.controller;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +25,6 @@ import de.ingrid.admin.controller.AbstractController;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.webapp.container.Instance;
 
-
 /**
  * Control the database parameter page.
  * 
@@ -33,12 +35,12 @@ import de.ingrid.iplug.se.webapp.container.Instance;
 @SessionAttributes("plugDescription")
 public class ListInstancesController extends AbstractController {
 
-    //@ModelAttribute("instances")
+    // @ModelAttribute("instances")
     public List<Instance> getInstances() throws Exception {
         ArrayList<Instance> list = new ArrayList<Instance>();
-        
+
         String dir = SEIPlug.conf.getInstancesDir();
-        if ( Files.isDirectory( Paths.get( dir ) ) ) {
+        if (Files.isDirectory( Paths.get( dir ) )) {
             FileFilter directoryFilter = new FileFilter() {
                 public boolean accept(File file) {
                     return file.isDirectory();
@@ -52,10 +54,10 @@ public class ListInstancesController extends AbstractController {
                 list.add( instance );
             }
         }
-        
+
         return list;
     }
-    
+
     @RequestMapping(value = { "/iplug-pages/listInstances.html" }, method = RequestMethod.GET)
     public String getParameters(final ModelMap modelMap) throws Exception {
 
@@ -64,23 +66,50 @@ public class ListInstancesController extends AbstractController {
     }
 
     @RequestMapping(value = "/iplug-pages/listInstances.html", method = RequestMethod.POST)
-    public String post( @ModelAttribute("plugDescription") final PlugdescriptionCommandObject pdCommandObject,
-            @RequestParam(value = "action", required = false) final String action ) {
+    public String post(@ModelAttribute("plugDescription") final PlugdescriptionCommandObject pdCommandObject,
+            @RequestParam(value = "action", required = false) final String action) {
 
         return AdminViews.SAVE;
     }
-    
+
     @RequestMapping(value = "/iplug-pages/listInstances.html", method = RequestMethod.POST, params = "add")
-    public String addInstance(final ModelMap modelMap, @RequestParam("name") String name) {
+    public String addInstance(final ModelMap modelMap, @RequestParam("instance") String name) {
         String dir = SEIPlug.conf.getInstancesDir();
-        
+
+        // convert spaces to "_"
+        name = name.replaceAll( " ", "_" );
+
         try {
-            Path newDir = Files.createDirectories( Paths.get( dir + "/" + name ) );
-            if (newDir == null) {
-                throw new RuntimeException("Directory could not be created: " + dir + "/" + name );
+            final Path newInstanceDir = Files.createDirectories( Paths.get( dir + "/" + name ) );
+            if (newInstanceDir == null) {
+                throw new RuntimeException( "Directory could not be created: " + dir + "/" + name );
             }
-            modelMap.put( "instances", getInstances() );
             
+            final Path destDir = Paths.get( newInstanceDir.toString(), "conf" );
+
+            // copy default configuration
+            try {
+                final Path sourceDir = Paths.get( "conf/default/conf" );
+                Files.walkFileTree( sourceDir, new SimpleFileVisitor<Path>() {
+                    public FileVisitResult visitFile( Path file, BasicFileAttributes attrs ) throws IOException {
+                        return copy(file);
+                    }
+                    public FileVisitResult preVisitDirectory( Path dir, BasicFileAttributes attrs ) throws IOException {
+                        return copy(dir);
+                    }
+                    private FileVisitResult copy( Path fileOrDir ) throws IOException {
+                        Files.copy( fileOrDir, destDir.resolve( sourceDir.relativize( fileOrDir ) ) );
+                        return FileVisitResult.CONTINUE;
+                    }
+
+                } );
+            } catch (IOException e) {
+                e.printStackTrace();
+                modelMap.put( "error", "Default configuration could not be copied to: " + destDir );
+            }
+
+            modelMap.put( "instances", getInstances() );
+
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -92,13 +121,32 @@ public class ListInstancesController extends AbstractController {
     }
 
     @RequestMapping(value = "/iplug-pages/listInstances.html", method = RequestMethod.GET, params = "delete")
-    public String deleteInstance(final ModelMap modelMap, @RequestParam("id") String name) throws Exception {
+    public String deleteInstance(final ModelMap modelMap, @RequestParam("instance") String name) throws Exception {
         String dir = SEIPlug.conf.getInstancesDir();
-        Files.delete( Paths.get( dir + "/" + name ) );
-        
+        Path directoryToDelete = Paths.get( dir, name );
+        try {
+            Files.walkFileTree( directoryToDelete, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    Files.delete( file );
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    Files.delete( dir );
+                    return FileVisitResult.CONTINUE;
+                }
+
+            } );
+        } catch (IOException e) {
+            e.printStackTrace();
+            modelMap.put( "error", "Directory '" + directoryToDelete.toString() + "' could not be deleted!" );
+        }
+
         modelMap.put( "instances", getInstances() );
-        
+
         return AdminViews.SE_LIST_INSTANCES;
     }
-    
+
 }

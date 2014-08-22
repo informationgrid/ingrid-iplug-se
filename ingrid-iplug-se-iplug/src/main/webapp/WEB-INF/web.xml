@@ -35,6 +35,16 @@ http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
         <servlet-name>forwarding</servlet-name>
         <url-pattern>*.js</url-pattern>
     </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>H2Servlet</servlet-name>
+        <servlet-class>org.h2.server.web.WebServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>H2Servlet</servlet-name>
+        <url-pattern>/h2/*</url-pattern>
+    </servlet-mapping>
+    
   	<listener>
       <listener-class>de.ingrid.admin.ContextListener</listener-class>
     </listener>

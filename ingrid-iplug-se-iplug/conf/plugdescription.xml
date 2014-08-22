@@ -1,25 +1,11 @@
 <de.ingrid.utils.PlugDescription>
-  <int>17</int>
-  <string>proxyServiceUrl</string>
-  <string>/ingrid-group:iplug-se-test</string>
+  <int>19</int>
+  <string>personTitle</string>
+  <string></string>
+  <string>workingDirectory</string>
+  <string>C:\Users\Public\Development\ingrid\ingrid-iplug-dsc-scripted\trunk\.</string>
   <string>IPLUG_ADMIN_GUI_PORT</string>
   <int>8082</int>
-  <string>provider</string>
-  <list>
-    <string>be_snb</string>
-    <string>he_umwelt</string>
-    <string>hh_argeelbe</string>
-  </list>
-  <string>dataSourceName</string>
-  <string>iplug se</string>
-  <string>dataSourceDescription</string>
-  <string></string>
-  <string>md5Hash</string>
-  <string>/ingrid-group:iplug-se-test</string>
-  <string>personName</string>
-  <string>Max</string>
-  <string>personMail</string>
-  <string>meier@max.de</string>
   <string>dataType</string>
   <list>
     <string>default</string>
@@ -28,24 +14,44 @@
     <string>topics</string>
     <string>IDF_1.0</string>
   </list>
-  <string>personSureName</string>
-  <string>Meier</string>
+  <string>IPLUG_ADMIN_PASSWORD</string>
+  <string>admin</string>
+  <string>dataSourceName</string>
+  <string>iplug se</string>
+  <string>personName</string>
+  <string>Max</string>
   <string>personPhone</string>
   <string>98767</string>
-  <string>personTitle</string>
-  <string></string>
-  <string>iPlugClass</string>
-  <string>de.ingrid.iplug.se.SEIPlug</string>
+  <string>IPLUG_ADMIN_GUI_URL</string>
+  <string>http://localhost:8085</string>
+  <string>md5Hash</string>
+  <string>/ingrid-group:iplug-se-test</string>
   <string>partner</string>
   <list>
     <string>be</string>
     <string>hh</string>
     <string>he</string>
   </list>
-  <string>IPLUG_ADMIN_PASSWORD</string>
-  <string>admin</string>
-  <string>workingDirectory</string>
-  <string>C:\Users\Public\Development\ingrid\ingrid-iplug-dsc-scripted\trunk\.</string>
-  <string>IPLUG_ADMIN_GUI_URL</string>
-  <string>http://localhost:8085</string>
+  <string>provider</string>
+  <list>
+    <string>be_snb</string>
+    <string>he_umwelt</string>
+    <string>hh_argeelbe</string>
+  </list>
+  <string>isRecordLoader</string>
+  <boolean>false</boolean>
+  <string>proxyServiceUrl</string>
+  <string>/ingrid-group:iplug-se-test</string>
+  <string>personMail</string>
+  <string>meier@max.de</string>
+  <string>dataSourceDescription</string>
+  <string></string>
+  <string>fields</string>
+  <list>
+    <string>incl_meta</string>
+  </list>
+  <string>personSureName</string>
+  <string>Meier</string>
+  <string>iPlugClass</string>
+  <string>de.ingrid.iplug.se.SEIPlug</string>
 </de.ingrid.utils.PlugDescription>

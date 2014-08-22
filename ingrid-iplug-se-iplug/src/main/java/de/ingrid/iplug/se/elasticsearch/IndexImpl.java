@@ -53,6 +53,7 @@ public class IndexImpl implements Index {
             client = elasticSearch.getObject().client();
 
             log.info( "Elastic Search Settings: " + elasticSearch.getObject().settings().toDelimitedString( ',' ) );
+            //log.info( "Elastic Port: " + elasticSearch.getObject().settings() );
 
         } catch (Exception e) {
             log.error( "Error during initialization of ElasticSearch-Client!" );

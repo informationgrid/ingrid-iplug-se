@@ -1,3 +1,59 @@
+fieldset {
+	border: 1px solid #CCC;
+	margin: 8px 0px 30px 0px;
+	padding: 16px 45px;
+	position: relative;
+}
+
+row {
+	float: left;
+	clear: left;
+	min-height: 30px;
+	margin-bottom: 15px;
+	width: 100%;	
+}
+
+label {
+	float: left;
+	width: 130px;
+}
+
+/* Time Picker  */
+.ui-widget-header {
+    border-bottom: 1px solid #AAA;
+}
+
+#ptTimeSelectSetButton a {
+    border: 1px solid;	
+}
+
+.ui-widget-content.ptTimeSelectLeftPane {
+	border-right: 1px solid #AAA !important;
+}
+
+.ptTimeSelectHrAmPmCntr {
+	border: 1px solid #AAA;
+	background-color: #EEE;
+}
+
+/* TABS */
+#weekDays, #monthDays {
+	float: left;
+	position: relative;
+	left: 130px;
+	padding-right: 130px;
+	top: -17px;
+}
+
+/* input, select {
+	width: 100% !important;
+}
+  */
+input[name='time'] {
+	width: 100px;
+} 
+
+
 #tab-container {
 	padding: 10px;
 }
@@ -14,6 +70,7 @@
 	background: #F5F8EB;
 	border: solid 1px #DDE9BD;
 	border-bottom: none;
+	padding-bottom: 0 !important;
 	-moz-border-radius: 4px 4px 0 0;
 	-webkit-border-radius: 4px 4px 0 0;
 }
@@ -57,7 +114,6 @@
 	font-size: 1em;
 	border-collapse: collapse;
 } */
-
 #instances {
 	margin: 20px;
 }
@@ -65,4 +121,51 @@
 #instances table {
 	width: 100%;
 	margin-bottom: 5px;
+}
+
+/* tables */
+table.tablesorter {
+	font-family: arial;
+	background-color: #CDCDCD;
+	margin: 10px 0pt 15px;
+	font-size: 8pt;
+	width: 100%;
+	text-align: left;
+	border-spacing: 1px;
+}
+
+table.tablesorter thead tr th, table.tablesorter tfoot tr th {
+	font-size: 8pt;
+	padding: 4px;
+}
+
+table.tablesorter thead tr .header {
+	background-image: url(../img/bg.gif);
+	background-repeat: no-repeat;
+	background-position: center right;
+	cursor: pointer;
+}
+
+table.tablesorter tbody td {
+	color: #3D3D3D;
+	padding: 4px;
+	background-color: #FFF;
+	vertical-align: top;
+	word-break: break-word;
+}
+
+table.tablesorter tbody tr.odd td {
+	background-color: #F0F0F6;
+}
+
+table.tablesorter thead tr .headerSortUp {
+	background-image: url(../img/asc.gif);
+}
+
+table.tablesorter thead tr .headerSortDown {
+	background-image: url(../img/desc.gif);
+}
+
+table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
+	background-color: #8dbdd8;
 }

@@ -1,9 +1,14 @@
 package de.ingrid.iplug.se.webapp.container;
 
+import java.util.List;
+
+import de.ingrid.iplug.se.db.model.Url;
+
 public class Instance {
 
     private String name;
     private String status;
+    private List<Url> urls;
 
     public Instance() {}
 
@@ -21,5 +26,13 @@ public class Instance {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public List<Url> getUrls() {
+        return this.urls;    
+    }
+    
+    public void setUrls(List<Url> urls) {
+        this.urls = urls;        
     }
 }

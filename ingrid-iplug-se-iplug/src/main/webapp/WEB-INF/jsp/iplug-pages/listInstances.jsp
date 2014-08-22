@@ -11,12 +11,11 @@
 <meta name="keywords" content="" />
 <meta name="author" content="wemove digital solutions" />
 <meta name="copyright" content="wemove digital solutions GmbH" />
-<link rel="StyleSheet" href="../css/base/portal_u.css" type="text/css"
-	media="all" />
-<link rel="StyleSheet" href="../css/se_styles.css" type="text/css"
-	media="all" />
+<link rel="StyleSheet" href="../css/base/portal_u.css" type="text/css" media="all" />
+<link rel="StyleSheet" href="../css/se_styles.css" type="text/css" media="all" />
 	
 <script type="text/javascript" src="../js/base/jquery-1.8.0.min.js"></script>
+<script type="text/javascript" src="../js/jquery.tablesorter.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
         $("button[action]").click(function() {
@@ -35,6 +34,22 @@
             }
             // submit form
             form.submit();
+        });
+        
+        $("#listInstances").tablesorter({ 
+            // pass the headers argument and assing a object 
+            headers: { 
+                // assign the secound column (we start counting zero) 
+                1: { 
+                    // disable it by setting the property sorter to false 
+                    sorter: false 
+                }, 
+                // assign the third column (we start counting zero) 
+                2: { 
+                    // disable it by setting the property sorter to false 
+                    sorter: false 
+                } 
+            }
         });
     });
 </script>
@@ -68,12 +83,23 @@
 
 	<div id="contentBox" class="contentMiddle">
 		<h1 id="head">SE - Instanzen</h1>
+        
+        <div class="controls">
+            <a href="../base/extras.html">Zur&uuml;ck</a>
+            <a href="../base/welcome.html">Abbrechen</a>
+            <a href="#" onclick="document.getElementById('formInstances').submit();">Weiter</a>
+        </div>
+        <div class="controls cBottom">
+            <a href="../base/extras.html">Zur&uuml;ck</a>
+            <a href="../base/welcome.html">Abbrechen</a>
+            <a href="#" onclick="document.getElementById('formInstances').submit();">Weiter</a>
+        </div>
 
         <form:form id="formInstances" method="post" action="../iplug-pages/listInstances.html">
             <input type="hidden" name="action" value="submit" />
             <input type="hidden" name="id" value="" />
 			<div id="instances">
-				<table class="data">
+				<table id="listInstances" class="data tablesorter">
 					<thead>
 						<tr>
 							<th data-sort="string">Name</th>
@@ -84,16 +110,19 @@
 					<tbody>
 						<c:forEach items="${instances}" var="instance" varStatus="loop">
 							<tr>
-								<td><a href="instance.html?id=${loop.index}">${instance.name}</a></td>
+								<td><a href="instanceConfig.html?instance=${instance.name}">${instance.name}</a></td>
 								<td>${instance.status}</td>
 								<%-- <td><button type="button" action="delete" name="delete" data-id="${instance.name}">Löschen</button></td> --%>
-								<td><a href="listInstances.html?id=${instance.name}&delete">Löschen</a></td>
+								<td><a href="listInstances.html?instance=${instance.name}&delete">Löschen</a></td>
 							</tr>
 						</c:forEach>
 					</tbody>
 				</table>
-				<input type="text" name="name" size="30"></input>
+				<input type="text" name="instance" style="width: 200px;"></input>
 		        <button type="submit" name="add">Neue Instanz</button>
+                <c:if test="${not empty error}">
+                    <p class="error">${error}</p>
+                </c:if>
 			</div>
 		</form:form>
 

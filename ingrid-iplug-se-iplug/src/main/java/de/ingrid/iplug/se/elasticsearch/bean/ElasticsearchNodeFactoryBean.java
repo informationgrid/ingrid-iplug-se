@@ -1,7 +1,9 @@
 package de.ingrid.iplug.se.elasticsearch.bean;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -11,6 +13,7 @@ import org.elasticsearch.node.NodeBuilder;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
@@ -51,6 +54,8 @@ public class ElasticsearchNodeFactoryBean implements FactoryBean<Node>,
 
 	private Node node;
 
+    private Properties properties;
+
 	public void setConfigLocation(final Resource configLocation) {
 		this.configLocation = configLocation;
 	}
@@ -62,6 +67,11 @@ public class ElasticsearchNodeFactoryBean implements FactoryBean<Node>,
 	public void setSettings(final Map<String, String> settings) {
 		this.settings = settings;
 	}
+	
+	public void setProperties(Properties props) {
+        this.properties = props;
+        
+    }
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -70,7 +80,21 @@ public class ElasticsearchNodeFactoryBean implements FactoryBean<Node>,
 
 	private void internalCreateNode() {
 		final NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder();
+		
+		// set inital configurations coming from the property file
+		Properties p = new Properties();
+		try {
+		    ClassPathResource resource = new ClassPathResource( "/elasticsearch.properties" );
+		    if (resource.exists()) {
+		        p.load( resource.getInputStream() );
+		        nodeBuilder.getSettings().put( p );		        
+		    }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
+		// other possibilities for configuration
+		// TODO: remove those not needed!
 		if (null != configLocation) {
 			internalLoadSettings( nodeBuilder, configLocation );
 		}
@@ -83,6 +107,9 @@ public class ElasticsearchNodeFactoryBean implements FactoryBean<Node>,
 
 		if (null != settings) {
 			nodeBuilder.getSettings().put( settings );
+		}
+		if (null != properties) {
+		    nodeBuilder.getSettings().put( properties );
 		}
 
 		node = nodeBuilder.node();
