@@ -22,7 +22,40 @@ public class DefaultFieldsQueryConverter implements IQueryConverter {
         if (terms.length > 0) {
             
             for (TermQuery term : terms) {
-                QueryBuilder subQuery = QueryBuilders.multiMatchQuery( term.getTerm(), content );
+                String t = term.getTerm();
+                QueryBuilder subQuery = null;
+
+                // if it's a phrase
+                if (t.contains( " " )) {
+                    subQuery = QueryBuilders.boolQuery();
+                    for (String field : content) {
+                        ((BoolQueryBuilder)subQuery).should( QueryBuilders.matchPhraseQuery( field, t ) );
+                    }
+                // in case a term was not identified as a wildcard-term, e.g. "Deutsch*"
+                } else if (t.contains( "*" )) {
+                    subQuery = QueryBuilders.boolQuery();
+                    //for (String field : content) {
+                        //((BoolQueryBuilder)subQuery).should( QueryBuilders.wildcardQuery( field, t ) );
+                        ((BoolQueryBuilder)subQuery).should( QueryBuilders.queryString( t ) );
+//                        try {
+//                            TokenStream tokenStream = (new GermanAnalyzer(Version.LUCENE_CURRENT)).tokenStream( null, "Fa?en");//t );
+//                            CharTermAttribute termAttr = tokenStream.addAttribute(CharTermAttribute.class);
+//                            tokenStream.reset();
+//                            while (tokenStream.incrementToken()) {
+//                                System.out.println( termAttr.toString() );
+//                            }
+//                            tokenStream.end();
+//                            tokenStream.close();
+//                        } catch (IOException e) {
+//                            // TODO Auto-generated catch block
+//                            e.printStackTrace();
+//                        }
+                    //}
+                    
+                } else {
+                
+                    subQuery = QueryBuilders.multiMatchQuery( t, content );
+                }
                 
                 if (term.isRequred()) {
                     if (bq == null) bq = QueryBuilders.boolQuery();

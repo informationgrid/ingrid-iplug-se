@@ -33,11 +33,14 @@ public class QueryConverter {
         ClauseQuery[] clauses = ingridQuery.getClauses();
         for (ClauseQuery clauseQuery : clauses) {
             final BoolQueryBuilder res = convert(clauseQuery);
-            qb.must( res );
-//            if (!sc.equals(new BooleanQuery())) {
-//                Occur occur = transform(clauseQuery.isRequred(), clauseQuery.isProhibited());
-//                booleanQuery.add(sc, occur);
-//            }
+            if (clauseQuery.isRequred()) {
+                if (clauseQuery.isProhibited())
+                    qb.mustNot( res );
+                else
+                    qb.must( res );
+            } else {
+                qb.should( res );
+            }
         }
         parse(ingridQuery, qb);
         

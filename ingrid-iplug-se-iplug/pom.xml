@@ -47,6 +47,14 @@
 				<artifactId>xercesImpl</artifactId>
 				<version>2.6.2</version>
 			</dependency>
+			<!-- PowerMock needs the latest libs from javassit, which is depended on reflections-lib,
+			     otherwise the tests don't run with Java8  -->
+			<dependency>
+			    <groupId>org.reflections</groupId>
+			    <artifactId>reflections</artifactId>
+			    <version>0.9.9-RC2</version>
+			</dependency>
+						
 		</dependencies>
 	</dependencyManagement>
 
