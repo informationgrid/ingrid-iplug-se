@@ -18,7 +18,6 @@ package de.ingrid.iplug.se.webapp.controller.scheduler;
 
 import it.sauronsoftware.cron4j.Scheduler;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;

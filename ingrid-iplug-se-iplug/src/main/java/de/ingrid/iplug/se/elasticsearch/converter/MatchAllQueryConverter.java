@@ -15,7 +15,8 @@ public class MatchAllQueryConverter implements IQueryConverter {
         // all other ones are subclasses !
         //
         boolean isTopQuery = (ingridQuery.getClass().equals(IngridQuery.class));
-        if (isTopQuery && !queryBuilder.hasClauses()) {
+        boolean hasTerms = ingridQuery.getTerms().length > 0;
+        if (!hasTerms && isTopQuery && !queryBuilder.hasClauses()) {
             BoolQueryBuilder bq = QueryBuilders.boolQuery();
             bq.must( QueryBuilders.matchAllQuery() );
             queryBuilder.must( bq );

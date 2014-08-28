@@ -7,6 +7,7 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -70,6 +71,8 @@ public class IndexImpl implements Index {
         // convert InGrid-query to QueryBuilder
         QueryBuilder query = queryConverter.convert( ingridQuery );
 
+        boolean isLocationSearch = ingridQuery.containsField( "x1" );
+        
         // search prepare
         SearchRequestBuilder srb = client.prepareSearch( instances )
                 // .setTypes("type1", "type2")
@@ -77,9 +80,13 @@ public class IndexImpl implements Index {
                 .setQuery( query ) // Query
                 // .addAggregation( aggregation ) // Facets
                 // .setPostFilter(FilterBuilders.rangeFilter("age").from(12).to(18))
-                // Filter
                 .setFrom( startHit ).setSize( num )
                 .setExplain( true );
+        
+        // Filter for results only with location information
+        if (isLocationSearch) {
+            srb.setPostFilter( FilterBuilders.existsFilter( "x1" ) );
+        }
 
         // TODO: add facets/aggregations
 

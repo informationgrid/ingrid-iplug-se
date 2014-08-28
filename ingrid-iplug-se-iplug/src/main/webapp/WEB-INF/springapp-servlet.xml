@@ -41,6 +41,8 @@
 			<list>
 				<ref bean="defaultFieldsQueryConverter" />
 				<ref bean="wildcardQueryConverter" />
+				<ref bean="fuzzyQueryConverter" />
+				<ref bean="fieldQueryIGCConverter" />
 				<ref bean="matchAllQueryConverter" />
 			</list>
 		</property>

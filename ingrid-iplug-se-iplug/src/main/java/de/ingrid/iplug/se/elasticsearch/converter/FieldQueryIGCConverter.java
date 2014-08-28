@@ -11,6 +11,8 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.index.query.TermQueryBuilder;
+import org.springframework.stereotype.Service;
 
 import de.ingrid.utils.query.FieldQuery;
 import de.ingrid.utils.query.IngridQuery;
@@ -22,6 +24,7 @@ import de.ingrid.utils.query.IngridQuery;
  * @author André
  *
  */
+@Service
 public class FieldQueryIGCConverter implements IQueryConverter {
     
     private final static Logger log = Logger.getLogger( FieldQueryIGCConverter.class );
@@ -30,7 +33,6 @@ public class FieldQueryIGCConverter implements IQueryConverter {
     public void parse(IngridQuery ingridQuery, BoolQueryBuilder queryBuilder) {
         FieldQuery[] fields = ingridQuery.getFields();
 
-        BoolQueryBuilder bq = null;
         
         Map<String,Object> geoMap = new HashMap<String,Object>(fields.length);
         Map<String,Object> timeMap = new HashMap<String,Object>(fields.length);
@@ -72,6 +74,7 @@ public class FieldQueryIGCConverter implements IQueryConverter {
                 // TODO: booleanQuery.add(new TermQuery(new Term(query.getFieldName(), query.getFieldValue().toLowerCase())), Occur.SHOULD);
             } else {
             
+                BoolQueryBuilder bq = null;
                 subQuery = QueryBuilders.matchQuery( fieldQuery.getFieldName(), fieldQuery.getFieldValue() );
                 queryBuilder.must( applyAndOrRules( fieldQuery, bq, subQuery ) );
             }
@@ -82,179 +85,160 @@ public class FieldQueryIGCConverter implements IQueryConverter {
             list.add("exact");
             geoMap.put("coord", list);
         }
-        //prepareGeo(bq, geoMap);
+        prepareGeo(queryBuilder, geoMap);
         prepareTime(queryBuilder, timeMap);
     }
     
     
-//    private void prepareGeo(BoolQueryBuilder booleanQuery, Map<String,Object> geoMap) {
-//        List<String> list = (List<String>) geoMap.get("coord");
-//        if (list != null) {
+    private void prepareGeo(BoolQueryBuilder booleanQuery, Map<String,Object> geoMap) {
+        List<String> list = (List<String>) geoMap.get("coord");
+        if (list != null) {
 //            BooleanQuery.setMaxClauseCount(10240);
-//            Iterator<String> iterator = list.iterator();
-//            while (iterator.hasNext()) {
-//                String value = iterator.next();
-//                if ("inside".equals(value)) {
-//                    // innerhalb
-//                    prepareInsideGeoQuery(booleanQuery, geoMap);
-//                } else if ("intersect".equals(value)) {
-//                    // schneiden
-//                    prepareIntersectGeoQuery(booleanQuery, geoMap);
-//                } else if ("include".equals(value)) {
-//                    // enthalten
-//                    prepareIncludeGeoQuery(booleanQuery, geoMap);
-//                } else {
-//                    prepareExactGeoQuery(booleanQuery, geoMap);
-//                }
-//            }
-//        }
-//        if (log.isDebugEnabled()) {
-//            log.debug("resulting query:" + booleanQuery.toString());
-//        }
-//    }
-//
-//    /** Hits BBox INCLUDE the passed BBox */
-//    private static void prepareIncludeGeoQuery(BoolQueryBuilder booleanQuery, Map<String,Object> geoMap) {
-//        String x1 = (String) geoMap.get("x1");
-//        String x2 = (String) geoMap.get("x2");
-//        String y1 = (String) geoMap.get("y1");
-//        String y2 = (String) geoMap.get("y2");
-//
-//        if (x1 != null && x2 != null && y1 != null && y2 != null) {
-//            // At least one x1 AND one y1 AND one x2 AND one y2 OUTSIDE passed BBox, borders are ok
-//            Query x1Below = NumericRangeQuery.newDoubleRange("x1",
-//                    new Double(-360.0), new Double(x1), true, true);
-//            Query x2Above = NumericRangeQuery.newDoubleRange("x2",
-//                    new Double(x2), new Double(360.0), true, true);
-//            Query y1Below = NumericRangeQuery.newDoubleRange("y1",
-//                    new Double(-360.0), new Double(y1), true, true);
-//            Query y2Above = NumericRangeQuery.newDoubleRange("y2",
-//                    new Double(y2), new Double(360.0), true, true);
-//
-//            booleanQuery.must( x1Below )
-//                        .must( x2Above )
-//                        .must( y1Below )
-//                        .must( y2Above );
-//        }
-//    }
-//
-//    private static void prepareExactGeoQuery(BoolQueryBuilder booleanQuery, Map<String,Object> geoMap) {
-//        String x1 = (String) geoMap.get("x1");
-//        String x2 = (String) geoMap.get("x2");
-//        String y1 = (String) geoMap.get("y1");
-//        String y2 = (String) geoMap.get("y2");
-//
-//        if (x1 != null && x2 != null && y1 != null && y2 != null) {
-//            Query x1EqualsX1 = NumericRangeQuery.newDoubleRange("x1",
-//                    new Double(x1), new Double(x1), true, true);
-//            Query x2EqualsX2 = NumericRangeQuery.newDoubleRange("x2",
-//                    new Double(x2), new Double(x2), true, true);
-//            Query y1EqualsY1 = NumericRangeQuery.newDoubleRange("y1",
-//                    new Double(y1), new Double(y1), true, true);
-//            Query y2EqualsY2 = NumericRangeQuery.newDoubleRange("y2",
-//                    new Double(y2), new Double(y2), true, true);
-//
-//            booleanQuery.must( x1EqualsX1 )
-//                        .must( x2EqualsX2 )
-//                        .must( y1EqualsY1 )
-//                        .must( y2EqualsY2 );
-//        }
-//    }
-//
-//    /** Hits BBox INTERSECT the passed BBox */
-//    private static void prepareIntersectGeoQuery(BoolQueryBuilder booleanQuery, Map<String,Object> geoMap) {
-//        String x1 = (String) geoMap.get("x1");
-//        String x2 = (String) geoMap.get("x2");
-//        String y1 = (String) geoMap.get("y1");
-//        String y2 = (String) geoMap.get("y2");
-//
-//        if (x1 != null && x2 != null && y1 != null && y2 != null) {
-//
-//            // NOT ALL OUTSIDE (this would be coord:include)
-//            // at least one x1 OR one y1 OR one x2 OR one y2 INSIDE passed BBox, borders are ok
-//            Query x1Inside = NumericRangeQuery.newDoubleRange("x1",
-//                    new Double(x1), new Double(x2), true, true);
-//            Query x2Inside = NumericRangeQuery.newDoubleRange("x2",
-//                    new Double(x1), new Double(x2), true, true);
-//            Query y1Inside = NumericRangeQuery.newDoubleRange("y1",
-//                    new Double(y1), new Double(y2), true, true);
-//            Query y2Inside = NumericRangeQuery.newDoubleRange("y2",
-//                    new Double(y1), new Double(y2), true, true);
-//            BooleanQuery isInside = new BooleanQuery();
-//            isInside.add(x1Inside, Occur.SHOULD);
-//            isInside.add(x2Inside, Occur.SHOULD);
-//            isInside.add(y1Inside, Occur.SHOULD);
-//            isInside.add(y2Inside, Occur.SHOULD);
-//            booleanQuery.must( isInside );
-//
-//            // NOT ALL INSIDE (this would be coord:inside)
-//            // at least one x1 OR one y1 OR one x2 OR one y2 OUTSIDE passed BBox, borders are ok
-//            Query x1Below = NumericRangeQuery.newDoubleRange("x1",
-//                    new Double(-360.0), new Double(x1), true, true);
-//            Query x2Above = NumericRangeQuery.newDoubleRange("x2",
-//                    new Double(x2), new Double(360.0), true, true);
-//            Query y1Below = NumericRangeQuery.newDoubleRange("y1",
-//                    new Double(-360.0), new Double(y1), true, true);
-//            Query y2Above = NumericRangeQuery.newDoubleRange("y2",
-//                    new Double(y2), new Double(360.0), true, true);
-//            BooleanQuery isOutside = new BooleanQuery();
-//            isOutside.add(x1Below, Occur.SHOULD);
-//            isOutside.add(x2Above, Occur.SHOULD);
-//            isOutside.add(y1Below, Occur.SHOULD);
-//            isOutside.add(y2Above, Occur.SHOULD);
-//            booleanQuery.must( isOutside );
-//
-//            // guarantee that not all x are in area left or all x are in area right
-//
-//            // at least one x1 is left of right border, border itself is ok
-//            Query x1LeftX2 = NumericRangeQuery.newDoubleRange("x1",
-//                    new Double(-360.0), new Double(x2), true, true);
-//            booleanQuery.must( x1LeftX2 );
-//            // at least one x2 is right of left border, border itself is ok
-//            Query x2RightX1 = NumericRangeQuery.newDoubleRange("x2",
-//                    new Double(x1), new Double(360.0), true, true);
-//            booleanQuery.must( x2RightX1 );
-//
-//            // guarantee that not all y are in area below or all y are in area above
-//
-//            // at least one y1 is below upper border, border itself is ok
-//            Query y1BelowY2 = NumericRangeQuery.newDoubleRange("y1",
-//                    new Double(-360.0), new Double(y2), true, true);
-//            booleanQuery.must( y1BelowY2 );
-//            // at least one y2 is above lower border, border itself is ok
-//            Query y2AboveY1 = NumericRangeQuery.newDoubleRange("y2",
-//                    new Double(y1), new Double(360.0), true, true);
-//            booleanQuery.must( y2AboveY1 );
-//        }
-//    }
-//
-//    private static void prepareInsideGeoQuery(BoolQueryBuilder booleanQuery, Map<String,Object> geoMap) {
-//        String x1 = (String) geoMap.get("x1");
-//        String x2 = (String) geoMap.get("x2");
-//        String y1 = (String) geoMap.get("y1");
-//        String y2 = (String) geoMap.get("y2");
-//
-//        if (x1 != null && x2 != null && y1 != null && y2 != null) {
-//            // NO x1 or y1 or x2 or y2 OUTSIDE passed BBox, borders are ok
-//            Query x1Below = NumericRangeQuery.newDoubleRange("x1",
-//                    new Double(-360.0), new Double(x1), true, false);
-//            Query x2Above = NumericRangeQuery.newDoubleRange("x2",
-//                    new Double(x2), new Double(360.0), false, true);
-//            Query y1Below = NumericRangeQuery.newDoubleRange("y1",
-//                    new Double(-360.0), new Double(y1), true, false);
-//            Query y2Above = NumericRangeQuery.newDoubleRange("y2",
-//                    new Double(y2), new Double(360.0), false, true);
-//            booleanQuery.mustNot( x1Below )
-//                        .mustNot( x2Above )
-//                        .mustNot( y1Below )
-//                        .mustNot( y2Above );
-//
-//            // NOTICE: WE NEED A MUST (or SHOULD) ! MUST_NOT ALONE IS NOT SUFFICIENT FOR Lucene Query !
-//            // http://lucene.apache.org/java/2_9_0/api/all/org/apache/lucene/search/BooleanClause.Occur.html#MUST_NOT
-//            // "Note that it is not possible to search for queries that only consist of a MUST_NOT clause."
-//            booleanQuery.must( new MatchAllDocsQuery() );
-//        }
-//    }
+            Iterator<String> iterator = list.iterator();
+            while (iterator.hasNext()) {
+                String value = iterator.next();
+                if ("inside".equals(value)) {
+                    // innerhalb
+                    prepareInsideGeoQuery(booleanQuery, geoMap);
+                } else if ("intersect".equals(value)) {
+                    // schneiden
+                    prepareIntersectGeoQuery(booleanQuery, geoMap);
+                } else if ("include".equals(value)) {
+                    // enthalten
+                    prepareIncludeGeoQuery(booleanQuery, geoMap);
+                } else {
+                    prepareExactGeoQuery(booleanQuery, geoMap);
+                }
+            }
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("resulting query:" + booleanQuery.toString());
+        }
+    }
+
+    /** Hits BBox INCLUDE the passed BBox */
+    private static void prepareIncludeGeoQuery(BoolQueryBuilder booleanQuery, Map<String,Object> geoMap) {
+        String x1 = (String) geoMap.get("x1");
+        String x2 = (String) geoMap.get("x2");
+        String y1 = (String) geoMap.get("y1");
+        String y2 = (String) geoMap.get("y2");
+
+        if (x1 != null && x2 != null && y1 != null && y2 != null) {
+            // At least one x1 AND one y1 AND one x2 AND one y2 OUTSIDE passed BBox, borders are ok
+            RangeQueryBuilder x1Below = QueryBuilders.rangeQuery( "x1" ).from( -180.0 ).to( new Double(x1) ).includeLower( true ).includeUpper( true );
+            RangeQueryBuilder y1Below = QueryBuilders.rangeQuery( "y1" ).from( -180.0 ).to( new Double(y1) ).includeLower( true ).includeUpper( true );
+            RangeQueryBuilder x2Above = QueryBuilders.rangeQuery( "x2" ).from( new Double(x2) ).to( 180.0 ).includeLower( true ).includeUpper( true );
+            RangeQueryBuilder y2Above = QueryBuilders.rangeQuery( "y2" ).from( new Double(y2) ).to( 180.0 ).includeLower( true ).includeUpper( true );
+
+            booleanQuery.must( x1Below )
+                        .must( x2Above )
+                        .must( y1Below )
+                        .must( y2Above );
+        }
+    }
+
+    private static void prepareExactGeoQuery(BoolQueryBuilder booleanQuery, Map<String,Object> geoMap) {
+        String x1 = (String) geoMap.get("x1");
+        String x2 = (String) geoMap.get("x2");
+        String y1 = (String) geoMap.get("y1");
+        String y2 = (String) geoMap.get("y2");
+
+        if (x1 != null && x2 != null && y1 != null && y2 != null) {
+            
+            TermQueryBuilder x1EqualsX1 = QueryBuilders.termQuery( "x1", new Double(x1) );
+            TermQueryBuilder y1EqualsY1 = QueryBuilders.termQuery( "y1", new Double(y1) );
+            TermQueryBuilder x2EqualsX2 = QueryBuilders.termQuery( "x2", new Double(x2) );
+            TermQueryBuilder y2EqualsY2 = QueryBuilders.termQuery( "y2", new Double(y2) );
+
+            booleanQuery.must( x1EqualsX1 )
+                        .must( x2EqualsX2 )
+                        .must( y1EqualsY1 )
+                        .must( y2EqualsY2 );
+        }
+    }
+
+    /** Hits BBox INTERSECT the passed BBox */
+    private static void prepareIntersectGeoQuery(BoolQueryBuilder booleanQuery, Map<String,Object> geoMap) {
+        String x1 = (String) geoMap.get("x1");
+        String x2 = (String) geoMap.get("x2");
+        String y1 = (String) geoMap.get("y1");
+        String y2 = (String) geoMap.get("y2");
+
+        if (x1 != null && x2 != null && y1 != null && y2 != null) {
+
+            // NOT ALL OUTSIDE (this would be coord:include)
+            // at least one x1 OR one y1 OR one x2 OR one y2 INSIDE passed BBox, borders are ok
+            RangeQueryBuilder x1Inside = QueryBuilders.rangeQuery( "x1" ).from( new Double(x1) ).to( new Double(x2) ).includeLower( true ).includeUpper( true );
+            RangeQueryBuilder y1Inside = QueryBuilders.rangeQuery( "y1" ).from( new Double(y1) ).to( new Double(y2) ).includeLower( true ).includeUpper( true );
+            RangeQueryBuilder x2Inside = QueryBuilders.rangeQuery( "x2" ).from( new Double(x1) ).to( new Double(x2) ).includeLower( true ).includeUpper( true );
+            RangeQueryBuilder y2Inside = QueryBuilders.rangeQuery( "y2" ).from( new Double(y1) ).to( new Double(y2) ).includeLower( true ).includeUpper( true );
+
+            BoolQueryBuilder isInside = QueryBuilders.boolQuery();
+            isInside.should( x1Inside )
+                    .should( x2Inside )
+                    .should( y1Inside )
+                    .should( y2Inside );
+            booleanQuery.must( isInside );
+
+            // NOT ALL INSIDE (this would be coord:inside)
+            // at least one x1 OR one y1 OR one x2 OR one y2 OUTSIDE passed BBox, borders are ok
+            RangeQueryBuilder x1Below = QueryBuilders.rangeQuery( "x1" ).from( -180.0 ).to( new Double(x1) ).includeLower( true ).includeUpper( true );
+            RangeQueryBuilder y1Below = QueryBuilders.rangeQuery( "y1" ).from( -180.0 ).to( new Double(y1) ).includeLower( true ).includeUpper( true );
+            RangeQueryBuilder x2Above = QueryBuilders.rangeQuery( "x2" ).from( new Double(x2) ).to( 180.0 ).includeLower( true ).includeUpper( true );
+            RangeQueryBuilder y2Above = QueryBuilders.rangeQuery( "y2" ).from( new Double(y2) ).to( 180.0 ).includeLower( true ).includeUpper( true );
+
+            BoolQueryBuilder isOutside = QueryBuilders.boolQuery();
+            isOutside.should( x1Below )
+                     .should( x2Above )
+                     .should( y1Below )
+                     .should( y2Above );
+            booleanQuery.must( isOutside );
+
+            // guarantee that not all x are in area left or all x are in area right
+
+            // at least one x1 is left of right border, border itself is ok
+            RangeQueryBuilder x1LeftX2  = QueryBuilders.rangeQuery( "x1" ).from( -180.0 ).to( new Double(x2) ).includeLower( true ).includeUpper( true );
+            booleanQuery.must( x1LeftX2 );
+            // at least one x2 is right of left border, border itself is ok
+            RangeQueryBuilder x2RightX1 = QueryBuilders.rangeQuery( "x2" ).from( new Double(x1) ).to( 180.0 ).includeLower( true ).includeUpper( true );
+            booleanQuery.must( x2RightX1 );
+
+            // guarantee that not all y are in area below or all y are in area above
+
+            // at least one y1 is below upper border, border itself is ok
+            RangeQueryBuilder y1BelowY2 = QueryBuilders.rangeQuery( "y1" ).from( -180.0 ).to( new Double(y2) ).includeLower( true ).includeUpper( true );
+            booleanQuery.must( y1BelowY2 );
+            // at least one y2 is above lower border, border itself is ok
+            RangeQueryBuilder y2AboveY1 = QueryBuilders.rangeQuery( "y2" ).from( new Double(y1) ).to( 180.0 ).includeLower( true ).includeUpper( true );
+            booleanQuery.must( y2AboveY1 );
+            
+        }
+    }
+
+    private static void prepareInsideGeoQuery(BoolQueryBuilder booleanQuery, Map<String,Object> geoMap) {
+        String x1 = (String) geoMap.get("x1");
+        String x2 = (String) geoMap.get("x2");
+        String y1 = (String) geoMap.get("y1");
+        String y2 = (String) geoMap.get("y2");
+
+        if (x1 != null && x2 != null && y1 != null && y2 != null) {
+            // NO x1 or y1 or x2 or y2 OUTSIDE passed BBox, borders are ok
+            RangeQueryBuilder x1Below = QueryBuilders.rangeQuery( "x1" ).from( -180.0 ).to( new Double(x1) ).includeLower( true ).includeUpper( false );
+            RangeQueryBuilder y1Below = QueryBuilders.rangeQuery( "y1" ).from( -180.0 ).to( new Double(y1) ).includeLower( true ).includeUpper( false );
+            RangeQueryBuilder x2Above = QueryBuilders.rangeQuery( "x2" ).from( new Double(x2) ).to( 180.0 ).includeLower( false ).includeUpper( true );
+            RangeQueryBuilder y2Above = QueryBuilders.rangeQuery( "y2" ).from( new Double(y2) ).to( 180.0 ).includeLower( false ).includeUpper( true );
+
+            booleanQuery.mustNot( x1Below )
+                        .mustNot( x2Above )
+                        .mustNot( y1Below )
+                        .mustNot( y2Above );
+
+            // NOTICE: WE NEED A MUST (or SHOULD) ! MUST_NOT ALONE IS NOT SUFFICIENT FOR Lucene Query !
+            // http://lucene.apache.org/java/2_9_0/api/all/org/apache/lucene/search/BooleanClause.Occur.html#MUST_NOT
+            // "Note that it is not possible to search for queries that only consist of a MUST_NOT clause."
+            // TODO: still needed? booleanQuery.must( new MatchAllDocsQuery() );
+        }
+    }
 
     private static void prepareTime(BoolQueryBuilder query, Map<String,Object> timeMap) {
         if (log.isDebugEnabled()) {
@@ -466,7 +450,7 @@ public class FieldQueryIGCConverter implements IQueryConverter {
                 bq = parentBq;
             }
         }
-        
+
         return bq;
     }
 

@@ -15,6 +15,11 @@
             },
             "url": {
                 "type": "string"
+            },
+            "bbox": {
+                "type": "geo_shape",
+                "tree": "quadtree",
+                "precision": "1m"
             }
         }
     }

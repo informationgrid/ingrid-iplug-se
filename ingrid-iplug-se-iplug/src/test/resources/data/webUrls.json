@@ -1,7 +1,7 @@
 { "index" : { "_index" : "test", "_type" : "web", "_id" : "1" } }
-{ "url" : "http://www.wemove.com", "title": "wemove", "abstract": "Die beste IT-Firma auf der Welt!", "fetched": "2014-06-03", "t0": "2014-06-03" }
+{ "url" : "http://www.wemove.com", "title": "wemove", "abstract": "Die beste IT-Firma auf der Welt!", "fetched": "2014-06-03", "t0": "2014-06-03", "bbox": { "type": "envelope", "coordinates": [ [ 11.15, 52.70 ], [ 9.89, 51.89 ] ] } }
 { "index" : { "_index" : "test", "_type" : "web", "_id" : "2" } }
-{ "url" : "http://www.heise.de", "title": "Heise", "abstract": "Informationen über IT stets aktuell. Like fox news", "fetched": "2014-04-13", "t1": "2014-04-01", "t2": "2014-04-15" }
+{ "url" : "http://www.heise.de", "title": "Heise", "abstract": "Informationen über IT stets aktuell. Like fox news", "fetched": "2014-04-13", "t1": "2014-04-01", "t2": "2014-04-15", "x1": 9.89, "y1": 51.89, "x2": 11.15, "y2": 52.70  }
 { "index" : { "_index" : "test", "_type" : "web", "_id" : "3" } }
 { "url" : "http://www.spiegel.de", "title": "Spiegel", "abstract": "Nachrichten von heute mit genialen Beiträgen", "fetched": "2014-05-22", "t0": "2014-08-11" }
 { "index" : { "_index" : "test", "_type" : "web", "_id" : "4" } }

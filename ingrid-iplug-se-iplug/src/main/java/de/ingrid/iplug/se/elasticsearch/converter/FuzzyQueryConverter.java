@@ -3,10 +3,12 @@ package de.ingrid.iplug.se.elasticsearch.converter;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.springframework.stereotype.Service;
 
 import de.ingrid.utils.query.FuzzyTermQuery;
 import de.ingrid.utils.query.IngridQuery;
 
+@Service
 public class FuzzyQueryConverter implements IQueryConverter {
     
     @Override

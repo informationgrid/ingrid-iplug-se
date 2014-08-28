@@ -452,9 +452,129 @@ public class IndexImplTest {
         
     }
 
-    @Test @Ignore
-    public void searchForLocation() {
-        fail( "Not yet implemented" );
+    /**
+     * Check for bounding boxes that are truly inside a given one.
+     */
+    @Test
+    public void searchForLocationInside() {
+        // surrounds
+        IngridQuery q = ExampleQuery.byTerm( "x1:9.49 y1:51.39 x2:11.45 y2:53.10 coord:inside" );
+        IngridHits search = index.search( q, 0, 10 );
+        assertThat( search, not( is( nullValue() ) ) );
+        assertThat( search.getHits().length, is( 1 ) );
+        checkHitsForIDs( search.getHits(), 2 );
+        
+        // exact
+        q = ExampleQuery.byTerm( "x1:9.89 y1:51.89 x2:11.15 y2:52.70 coord:inside" );
+        search = index.search( q, 0, 10 );
+        assertThat( search, not( is( nullValue() ) ) );
+        assertThat( search.getHits().length, is( 1 ) );
+        checkHitsForIDs( search.getHits(), 2 );
+        
+        // completely inside mostly on the edge
+        q = ExampleQuery.byTerm( "x1:9.9 y1:51.89 x2:11.15 y2:52.70 coord:inside" );
+        search = index.search( q, 0, 10 );
+        assertThat( search, not( is( nullValue() ) ) );
+        assertThat( search.getHits().length, is( 0 ) );
+        
+        // intersecting
+        q = ExampleQuery.byTerm( "x1:8 y1:48 x2:10.5 y2:52.10 coord:inside" );
+        search = index.search( q, 0, 10 );
+        assertThat( search, not( is( nullValue() ) ) );
+        assertThat( search.getHits().length, is( 0 ) );
+        
+        // completely inside
+        q = ExampleQuery.byTerm( "x1:10 y1:52 x2:11 y2:52.4 coord:inside" );
+        search = index.search( q, 0, 10 );
+        assertThat( search, not( is( nullValue() ) ) );
+        assertThat( search.getHits().length, is( 0 ) );
+        
+        // completely outside
+        q = ExampleQuery.byTerm( "x1:3 y1:51 x2:6 y2:52.4 coord:intersect" );
+        search = index.search( q, 0, 10 );
+        assertThat( search.getHits().length, is( 0 ) );
+    }
+    
+    /**
+     * Check for bounding boxes that are truly intersecting!
+     */
+    @Test
+    public void searchForLocationIntersect() {
+        // surrounds
+        IngridQuery q = ExampleQuery.byTerm( "x1:9.49 y1:51.39 x2:11.45 y2:53.10 coord:intersect" );
+        IngridHits search = index.search( q, 0, 10 );
+        assertThat( search, not( is( nullValue() ) ) );
+        assertThat( search.getHits().length, is( 0 ) );
+        
+        // exact
+        q = ExampleQuery.byTerm( "x1:9.89 y1:51.89 x2:11.15 y2:52.70 coord:intersect" );
+        search = index.search( q, 0, 10 );
+        assertThat( search, not( is( nullValue() ) ) );
+        assertThat( search.getHits().length, is( 1 ) );
+        checkHitsForIDs( search.getHits(), 2 );
+        
+        // completely inside mostly on the edge
+        q = ExampleQuery.byTerm( "x1:9.9 y1:51.89 x2:11.15 y2:52.70 coord:intersect" );
+        search = index.search( q, 0, 10 );
+        assertThat( search.getHits().length, is( 1 ) );
+        checkHitsForIDs( search.getHits(), 2 );
+        
+        // intersecting
+        q = ExampleQuery.byTerm( "x1:8 y1:48 x2:10.5 y2:52.10 coord:intersect" );
+        search = index.search( q, 0, 10 );
+        assertThat( search.getHits().length, is( 1 ) );
+        checkHitsForIDs( search.getHits(), 2 );
+        
+        // completely inside
+        q = ExampleQuery.byTerm( "x1:10 y1:52 x2:11 y2:52.4 coord:intersect" );
+        search = index.search( q, 0, 10 );
+        assertThat( search.getHits().length, is( 0 ) );
+        
+        // completely outside
+        q = ExampleQuery.byTerm( "x1:3 y1:51 x2:6 y2:52.4 coord:intersect" );
+        search = index.search( q, 0, 10 );
+        assertThat( search.getHits().length, is( 0 ) );
+    }
+
+    /**
+     * Check for bounding boxes that truly includes the given one!
+     */
+    @Test
+    public void searchForLocationInclude() {
+        // surrounds
+        IngridQuery q = ExampleQuery.byTerm( "x1:9.49 y1:51.39 x2:11.45 y2:53.10 coord:include" );
+        IngridHits search = index.search( q, 0, 10 );
+        assertThat( search, not( is( nullValue() ) ) );
+        assertThat( search.getHits().length, is( 0 ) );
+        
+        // exact
+        q = ExampleQuery.byTerm( "x1:9.89 y1:51.89 x2:11.15 y2:52.70 coord:include" );
+        search = index.search( q, 0, 10 );
+        assertThat( search, not( is( nullValue() ) ) );
+        assertThat( search.getHits().length, is( 1 ) );
+        checkHitsForIDs( search.getHits(), 2 );
+        
+        // completely inside mostly on the edge
+        q = ExampleQuery.byTerm( "x1:9.9 y1:51.89 x2:11.15 y2:52.70 coord:include" );
+        search = index.search( q, 0, 10 );
+        assertThat( search.getHits().length, is( 1 ) );
+        checkHitsForIDs( search.getHits(), 2 );
+        
+        // intersecting
+        q = ExampleQuery.byTerm( "x1:8 y1:48 x2:10.5 y2:52.10 coord:include" );
+        search = index.search( q, 0, 10 );
+        assertThat( search.getHits().length, is( 0 ) );
+        
+        // completely inside
+        q = ExampleQuery.byTerm( "x1:10 y1:52 x2:11 y2:52.4 coord:include" );
+        search = index.search( q, 0, 10 );
+        assertThat( search.getHits().length, is( 1 ) );
+        checkHitsForIDs( search.getHits(), 2 );
+        
+        // completely outside
+        q = ExampleQuery.byTerm( "x1:3 y1:51 x2:6 y2:52.4 coord:include" );
+        search = index.search( q, 0, 10 );
+        assertThat( search.getHits().length, is( 0 ) );
     }
 
     @Test @Ignore
