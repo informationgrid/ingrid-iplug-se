@@ -25,6 +25,7 @@ import de.ingrid.admin.JettyStarter;
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.elasticsearch.bean.ElasticsearchNodeFactoryBean;
+import de.ingrid.iplug.se.elasticsearch.converter.DatatypePartnerProviderQueryConverter;
 import de.ingrid.iplug.se.elasticsearch.converter.DefaultFieldsQueryConverter;
 import de.ingrid.iplug.se.elasticsearch.converter.FieldQueryIGCConverter;
 import de.ingrid.iplug.se.elasticsearch.converter.FuzzyQueryConverter;
@@ -38,8 +39,15 @@ import de.ingrid.utils.queryparser.ParseException;
 import de.ingrid.utils.queryparser.QueryStringParser;
 
 public class Utils {
-    public static ElasticsearchNodeFactoryBean setupES() throws Exception {
-        ElasticsearchNodeFactoryBean elastic = new ElasticsearchNodeFactoryBean();
+    public static final long MAX_RESULTS = 11;
+    
+    public static IndexImpl index = null;
+
+    private static ElasticsearchNodeFactoryBean elastic;
+
+    public static void setupES() throws Exception {
+        elastic = new ElasticsearchNodeFactoryBean();
+        elastic.setLocal( true );
         elastic.afterPropertiesSet();
         
         // set necessary configurations for startup
@@ -50,8 +58,6 @@ public class Utils {
         
         setMapping( elastic );
         prepareIndex( elastic );
-        
-        return elastic;
     }
     
     
@@ -104,7 +110,7 @@ public class Utils {
     }
 
 
-    public static QueryConverter getQueryConverter(JettyStarter jettyStarter) {
+    public static void initIndex(JettyStarter jettyStarter) {
         PowerMockito.mockStatic( JettyStarter.class );
         Mockito.when(JettyStarter.getInstance()).thenReturn( jettyStarter );
         
@@ -118,11 +124,11 @@ public class Utils {
         parsers.add( new WildcardQueryConverter() );
         parsers.add( new FuzzyQueryConverter() );
         parsers.add( new FieldQueryIGCConverter() );
+        parsers.add( new DatatypePartnerProviderQueryConverter() );
         parsers.add( new MatchAllQueryConverter() );
         qc.setQueryParsers( parsers );
         
-        return qc;
-        
+        index = new IndexImpl( elastic, qc, new FacetConverter() );
     }
     
     public static IngridQuery getIngridQuery( String term ) {
@@ -162,8 +168,8 @@ public class Utils {
         Map<String, Object> f3 = new HashMap<String, Object>();
         f3.put("id", "datatype");
         Map<String, String> classes2 = new HashMap<String, String>();
-        classes2.put("id", "myBundWaldbrand");
-        classes2.put("query", "partner:bund AND (Waldbrand OR Auto)");
+        classes2.put("id", "bundPDFs");
+        classes2.put("query", "partner:bund datatype:pdf");
         f3.put("classes", Arrays.asList(new Object[] { classes2 }));
 
         ingridQuery.put("FACETS", Arrays.asList(new Object[] { f1, f2, f3 }));

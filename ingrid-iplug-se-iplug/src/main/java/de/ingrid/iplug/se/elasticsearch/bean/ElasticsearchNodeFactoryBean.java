@@ -56,6 +56,8 @@ public class ElasticsearchNodeFactoryBean implements FactoryBean<Node>,
 
     private Properties properties;
 
+    private boolean isLocal = false;
+
 	public void setConfigLocation(final Resource configLocation) {
 		this.configLocation = configLocation;
 	}
@@ -112,7 +114,7 @@ public class ElasticsearchNodeFactoryBean implements FactoryBean<Node>,
 		    nodeBuilder.getSettings().put( properties );
 		}
 
-		node = nodeBuilder.node();
+		node = nodeBuilder.local( isLocal ).node();
 	}
 
 	private void internalLoadSettings(final NodeBuilder nodeBuilder,
@@ -155,5 +157,10 @@ public class ElasticsearchNodeFactoryBean implements FactoryBean<Node>,
 	public boolean isSingleton() {
 		return true;
 	}
+
+    public void setLocal(boolean value) {
+        this.isLocal = value;
+        
+    }
 
 }

@@ -81,20 +81,9 @@ public class FacetConverter {
         return aggregations;
     }
 
-    public IngridDocument convertFacetResultsToDoc(SearchResponse response, IngridQuery ingridQuery) {
+    public IngridDocument convertFacetResultsToDoc(SearchResponse response) {
         IngridDocument facets = new IngridDocument();
 
-//        List<FacetClass> facetClasses = new ArrayList<FacetClass>();
-//        List<FacetDefinition> facetDefs = FacetUtils.getFacetDefinitions(ingridQuery);
-//        
-//        for (FacetDefinition def : facetDefs) {
-//            facetClasses.addAll( _facetClassRegistry.getFacetClasses( def ) );
-//        }
-//        
-//        for (FacetClass fc : facetClasses) {
-//            facets.put(fc.getFacetClassName(), response.getAggregations().get( fc.getFacetClassName() ) );
-//        }
-        
         List<Aggregation> aggregations = response.getAggregations().asList();
         for (Aggregation aggregation : aggregations) {
             //facets.put( aggregation.getName(), -1l );
@@ -111,7 +100,7 @@ public class FacetConverter {
                 facets.put(aggregation.getName(), agg.getDocCount() );
                 
             } else {
-                throw new RuntimeException( "Aggregation Class not supported: " + aggregation.getClass() + " (query: " + ingridQuery + ")" );
+                throw new RuntimeException( "Aggregation Class not supported: " + aggregation.getClass() );
             }
         }
         

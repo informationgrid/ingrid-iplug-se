@@ -77,6 +77,10 @@ public class IndexImpl implements Index {
 
         // convert InGrid-query to QueryBuilder
         QueryBuilder query = queryConverter.convert( ingridQuery );
+        
+        if (log.isDebugEnabled()) {
+            log.debug( "Elastic Search Query: \n" + query );
+        }
 
         boolean isLocationSearch = ingridQuery.containsField( "x1" );
         boolean hasFacets = ingridQuery.containsKey( "FACETS" );
@@ -86,8 +90,6 @@ public class IndexImpl implements Index {
                 // .setTypes("type1", "type2")
                 .setSearchType( searchType  )
                 .setQuery( query ) // Query
-                // .addAggregation( aggregation ) // Facets
-                // .setPostFilter(FilterBuilders.rangeFilter("age").from(12).to(18))
                 .setFrom( startHit ).setSize( num )
                 .setExplain( false );
         
@@ -96,7 +98,7 @@ public class IndexImpl implements Index {
             srb.setPostFilter( FilterBuilders.existsFilter( "x1" ) );
         }
 
-        // add facets/aggregations
+        // pre-processing: add facets/aggregations to the query
         if (hasFacets) {
             List<AbstractAggregationBuilder> aggregations = facetConverter.getAggregations( ingridQuery, queryConverter );
             for (AbstractAggregationBuilder aggregation : aggregations) {
@@ -109,6 +111,13 @@ public class IndexImpl implements Index {
 
         // convert to IngridHits
         IngridHits hits = getHitsFromResponse( searchResponse, ingridQuery );
+        
+        // post-processing: extract and convert facets to InGrid-Document
+        if (hasFacets) {
+            // add facets from response
+            IngridDocument facets = facetConverter.convertFacetResultsToDoc( searchResponse );
+            hits.put( "FACETS", facets );
+        }
         
         return hits;
     }
@@ -131,10 +140,6 @@ public class IndexImpl implements Index {
 
         IngridHits ingridHits = new IngridHits( totalHits, hitArray );
         
-        // add facets from response
-        IngridDocument facets = facetConverter.convertFacetResultsToDoc( searchResponse, ingridQuery );
-        ingridHits.put( "FACETS", facets );
-
         return ingridHits;
     }
 

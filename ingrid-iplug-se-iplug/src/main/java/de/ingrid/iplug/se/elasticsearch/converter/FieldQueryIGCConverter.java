@@ -37,6 +37,7 @@ public class FieldQueryIGCConverter implements IQueryConverter {
         Map<String,Object> geoMap = new HashMap<String,Object>(fields.length);
         Map<String,Object> timeMap = new HashMap<String,Object>(fields.length);
         
+        BoolQueryBuilder bq = null;
         for (FieldQuery fieldQuery : fields) {
             QueryBuilder subQuery = null;
             
@@ -44,12 +45,16 @@ public class FieldQueryIGCConverter implements IQueryConverter {
             String value = fieldQuery.getFieldValue().toLowerCase();
             if (indexField.equals("x1")) {
                 geoMap.put(indexField, value);
+                
             } else if (indexField.equals("x2")) {
                 geoMap.put(indexField, value);
+                
             } else if (indexField.equals("y1")) {
                 geoMap.put(indexField, value);
+                
             } else if (indexField.equals("y2")) {
                 geoMap.put(indexField, value);
+                
             } else if (indexField.equals("coord")) {
                 List<String> list = (List<String>) geoMap.get(indexField);
                 if (list == null) {
@@ -57,12 +62,16 @@ public class FieldQueryIGCConverter implements IQueryConverter {
                 }
                 list.add(value);
                 geoMap.put(indexField, list);
+                
             } else if ("t0".equals(indexField)) {
                 timeMap.put(indexField, value);
+                
             } else if ("t1".equals(indexField)) {
                 timeMap.put(indexField, value);
+                
             } else if ("t2".equals(indexField)) {
                 timeMap.put(indexField, value);
+                
             } else if ("time".equals(indexField)) {
                 List<String> list = (List<String>) timeMap.get(indexField);
                 if (list == null) {
@@ -70,14 +79,18 @@ public class FieldQueryIGCConverter implements IQueryConverter {
                 }
                 list.add(value);
                 timeMap.put(indexField, list);
+                
             } else if ("incl_meta".equals(indexField) && "on".equals(value)) {
                 // TODO: booleanQuery.add(new TermQuery(new Term(query.getFieldName(), query.getFieldValue().toLowerCase())), Occur.SHOULD);
+                
             } else {
-            
-                BoolQueryBuilder bq = null;
                 subQuery = QueryBuilders.matchQuery( fieldQuery.getFieldName(), fieldQuery.getFieldValue() );
-                queryBuilder.must( applyAndOrRules( fieldQuery, bq, subQuery ) );
+//                applyAndOrRules( fieldQuery, bq, subQuery )
+                bq = ConverterUtils.applyAndOrRules( fieldQuery, bq, subQuery );
             }
+        }
+        if (bq != null) {
+            queryBuilder.must( bq );
         }
         
         if (null == geoMap.get("coord")) {
@@ -412,9 +425,6 @@ public class FieldQueryIGCConverter implements IQueryConverter {
                             .should(second);
             query.must( booleanQueryTime );
         } else if (null != t0) {
-//            Term termT0 = new Term("t0", t0);
-//            Term termT1 = new Term("t1", t0);
-//            Term termT2 = new Term("t2", t0);
 
             BoolQueryBuilder booleanQueryTime = QueryBuilders.boolQuery();
             booleanQueryTime.should( QueryBuilders.termQuery( "t0", t0 ) )
@@ -423,35 +433,4 @@ public class FieldQueryIGCConverter implements IQueryConverter {
             query.must( booleanQueryTime );
         }
     }
-    
-    
-    
-    private QueryBuilder applyAndOrRules(IngridQuery fieldQuery, BoolQueryBuilder bq, QueryBuilder subQuery) {
-        if (fieldQuery.isRequred()) {
-            if (bq == null) bq = QueryBuilders.boolQuery();
-            if (fieldQuery.isProhibited()) {
-                bq.mustNot( subQuery );
-            } else {                        
-                bq.must( subQuery );
-            }
-            
-        } else {
-            // if it's an OR-connection then the currently built query must become a sub-query
-            // so that the AND/OR connection is correctly transformed. In case there was an
-            // AND-connection before, the transformation would become:
-            // OR( (term1 AND term2), term3)
-            if (bq == null) {
-                bq = QueryBuilders.boolQuery();
-                bq.should( subQuery );
-                
-            } else {
-                BoolQueryBuilder parentBq = QueryBuilders.boolQuery();
-                parentBq.should( bq ).should( subQuery );
-                bq = parentBq;
-            }
-        }
-
-        return bq;
-    }
-
 }
