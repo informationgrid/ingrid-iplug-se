@@ -246,10 +246,6 @@ public class FieldQueryIGCConverter implements IQueryConverter {
                         .mustNot( y1Below )
                         .mustNot( y2Above );
 
-            // NOTICE: WE NEED A MUST (or SHOULD) ! MUST_NOT ALONE IS NOT SUFFICIENT FOR Lucene Query !
-            // http://lucene.apache.org/java/2_9_0/api/all/org/apache/lucene/search/BooleanClause.Occur.html#MUST_NOT
-            // "Note that it is not possible to search for queries that only consist of a MUST_NOT clause."
-            // TODO: still needed? booleanQuery.must( new MatchAllDocsQuery() );
         }
     }
 

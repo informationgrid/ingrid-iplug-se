@@ -77,7 +77,7 @@ public class LocationSearchTest  {
         assertThat( search.getHits().length, is( 0 ) );
         
         // completely outside
-        q = Utils.getIngridQuery( "x1:3 y1:51 x2:6 y2:52.4 coord:intersect" );
+        q = Utils.getIngridQuery( "x1:3 y1:51 x2:6 y2:52.4 coord:inside" );
         search = Utils.index.search( q, 0, 10 );
         assertThat( search.getHits().length, is( 0 ) );
     }

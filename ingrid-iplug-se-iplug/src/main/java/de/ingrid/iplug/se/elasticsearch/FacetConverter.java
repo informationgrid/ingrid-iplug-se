@@ -1,7 +1,6 @@
 package de.ingrid.iplug.se.elasticsearch;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.elasticsearch.action.search.SearchResponse;
@@ -51,8 +50,6 @@ public class FacetConverter {
             AbstractAggregationBuilder aggr = null;
             if (classes != null) {
                 for (FacetClassDefinition fClass : classes) {
-                    //aggr = AggregationBuilders.filter( fClass.getName() ).filter( FilterBuilders.queryFilter( QueryBuilders.queryString( fClass.getFragment() ) ) );
-                    // TODO: try to convert query string into an InGrid-Query and transform it to a QueryBuilder as being done with the main query
                     IngridQuery facetQuery;
                     try {
                         facetQuery = QueryStringParser.parse( fClass.getFragment() );
@@ -69,15 +66,6 @@ public class FacetConverter {
             aggregations.add( aggr );
         }
         
-//        List<Map<String,Object>> facets = ingridQuery.getArrayList( "FACETS" );
-        
-//        for (Map<String,Object> facet : facets) {
-//            String name = (String) facet.get( "id" );
-//            
-//        }
-        
-        
-        
         return aggregations;
     }
 
@@ -86,10 +74,8 @@ public class FacetConverter {
 
         List<Aggregation> aggregations = response.getAggregations().asList();
         for (Aggregation aggregation : aggregations) {
-            //facets.put( aggregation.getName(), -1l );
-            Collection<Bucket> buckets = null;
             if ( aggregation.getClass() == UnmappedTerms.class ) {
-                
+                // TODO: handle it
             } else if ( aggregation.getClass() == StringTerms.class ) {
                 StringTerms partnerAgg = (StringTerms) aggregation;
                 for (Bucket bucket : partnerAgg.getBuckets()) {
