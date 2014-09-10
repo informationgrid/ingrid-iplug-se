@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.ingrid.iplug.se.webapp.controller.scheduler;
+package de.ingrid.iplug.se.webapp.controller.instance.scheduler;
 
 public class ClockCommand extends CrawlCommand {
 

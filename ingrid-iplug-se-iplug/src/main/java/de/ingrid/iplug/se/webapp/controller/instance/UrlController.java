@@ -17,8 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
-import de.ingrid.admin.controller.AbstractController;
 import de.ingrid.iplug.se.SEIPlug;
+import de.ingrid.iplug.se.conf.UrlMaintenanceSettings.IngridPartner;
+import de.ingrid.iplug.se.conf.UrlMaintenanceSettings.UrlTypes;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Url;
 import de.ingrid.iplug.se.webapp.controller.AdminViews;
@@ -31,7 +32,7 @@ import de.ingrid.iplug.se.webapp.controller.AdminViews;
  */
 @Controller
 @SessionAttributes("plugDescription")
-public class UrlController extends AbstractController {
+public class UrlController extends InstanceController {
 
     @RequestMapping(value = { "/iplug-pages/instanceUrls.html" }, method = RequestMethod.GET)
     public String getParameters(final ModelMap modelMap,
@@ -43,10 +44,7 @@ public class UrlController extends AbstractController {
         if (!instanceFolder.exists())
             return "redirect:" + AdminViews.SE_LIST_INSTANCES + ".html";
 
-//        Instance instance = getInstanceData( name );
-        //instance.setUrls( getUrlsFromDB() );
-
-//        modelMap.put( "instance", instance );
+        modelMap.put( "instance", getInstanceData(name) );
 
         return AdminViews.SE_INSTANCE_URLS;
     }
@@ -59,6 +57,16 @@ public class UrlController extends AbstractController {
         createQuery.select( from );
         Query query = em.createQuery( createQuery );
         return query.getResultList();
+    }
+    
+    @ModelAttribute("partners")
+    public List<IngridPartner> getPartner() {
+        return SEIPlug.conf.getUrlMaintenanceSettings().getPartner();
+    }
+    
+    @ModelAttribute("types")
+    public List<UrlTypes> getTypes() {
+        return SEIPlug.conf.getUrlMaintenanceSettings().getTypes();
     }
     
     @RequestMapping(value = { "/iplug-pages/instanceUrls.html" }, method = RequestMethod.POST, params = "editUrl")

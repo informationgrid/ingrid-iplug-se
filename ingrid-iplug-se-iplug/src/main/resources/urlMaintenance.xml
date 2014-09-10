@@ -1,0 +1,16 @@
+<?xml version="1.0" standalone="yes"?>
+<!DOCTYPE partner [
+    <!ELEMENT partner (name,provider*)>
+    <!ELEMENT name (#PCDATA)>
+    <!ELEMENT provider (name)>
+]>
+
+<partner>
+    <name>Bayern</name>
+    <provider>
+        <name>p1</name>
+    </provider>
+    <provider>
+        <name>p2</name>
+    </provider>
+</partner>

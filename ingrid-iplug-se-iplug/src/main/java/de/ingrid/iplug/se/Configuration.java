@@ -2,8 +2,12 @@ package de.ingrid.iplug.se;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -13,6 +17,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.tngtech.configbuilder.annotation.propertyloaderconfiguration.PropertiesFiles;
 import com.tngtech.configbuilder.annotation.propertyloaderconfiguration.PropertyLocations;
 import com.tngtech.configbuilder.annotation.typetransformer.TypeTransformer;
@@ -22,6 +28,7 @@ import com.tngtech.configbuilder.annotation.valueextractor.PropertyValue;
 
 import de.ingrid.admin.IConfig;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
+import de.ingrid.iplug.se.conf.UrlMaintenanceSettings;
 
 @PropertiesFiles( {"config", "elasticsearch"} )
 @PropertyLocations(directories = {"conf"}, fromClassLoader = true)
@@ -64,11 +71,61 @@ public class Configuration implements IConfig {
         }
         
     }
+    
+    private UrlMaintenanceSettings urlMaintenanceSettings;
 
 	@Override
 	public void initialize() {
-		// TODO Auto-generated method stub
-		
+	    try(Reader reader = new InputStreamReader(Configuration.class.getResourceAsStream("/urlMaintenance.json"), "UTF-8")) {
+//            Gson gson = new GsonBuilder().create();
+//            UrlMaintenanceSettings settings = new UrlMaintenanceSettings();
+//            
+//            List<IngridPartner> partner = new ArrayList<IngridPartner>();
+//            IngridPartner p = settings.new IngridPartner("by", "Bayern");
+//            List<Provider> provider = new ArrayList<Provider>();
+//            Provider prov1 = new Provider( "prov1", "Anbieter 1" );
+//            provider.add( prov1 );
+//            Provider prov2 = new Provider( "prov1", "Anbieter 1" );
+//            provider.add( prov2 );
+//            p.provider = provider;
+//            partner.add( p  );
+//            settings.setPartner( partner );
+//            List<UrlTypes> types = new ArrayList<UrlMaintenanceSettings.UrlTypes>();
+//            UrlTypes urlType = settings.new UrlTypes();
+//            urlType.name = "Webseiten";
+//            List<Options> options = new ArrayList<UrlMaintenanceSettings.Options>();
+//            
+//            Options o = settings.new Options();
+//            o.id = "o1";
+//            o.value = "Umwelt";
+//            options.add( o );
+//            o = settings.new Options();
+//            o.id = "o2";
+//            o.value = "Recht";
+//            options.add( o );
+//            o = settings.new Options();
+//            o.id = "o3";
+//            o.value = "Forschung";
+//            options.add( o );
+//            urlType.options = options ;
+//            types.add( urlType  );
+//            settings.setTypes( types  );
+//            String json = gson.toJson( settings );
+//            //Person p = gson.fromJson(reader, Person.class);
+//            System.out.println(json);
+	        
+	        // see: http://www.javacreed.com/simple-gson-example/
+	        Gson gson = new GsonBuilder().create();
+            UrlMaintenanceSettings settings = gson.fromJson(reader, UrlMaintenanceSettings.class);
+            setUrlMaintenanceSettings( settings );
+	    
+        } catch (UnsupportedEncodingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 	}
 
 	@TypeTransformers(Configuration.StringToSearchType.class)
@@ -87,6 +144,13 @@ public class Configuration implements IConfig {
 	@PropertyValue("http.port")
     @DefaultValue("9299")
     public String esHttpPort;
+	
+	@PropertyValue("partner.name")
+	public String partnerName;
+	
+	@PropertyValue("partner.provider.name")
+	public List<String> providerNames;
+	
 
 	@Override
     public void addPlugdescriptionValues( PlugdescriptionCommandObject pdObject ) {
@@ -134,10 +198,19 @@ public class Configuration implements IConfig {
     public void setInstancesDir(String dir) {
         this.dirInstances = dir;
     }
+    
     public Map<String, String> getElasticSearchSettings() {
         Map<String,String> map = new HashMap<String, String>();
         //map.put( "", "" )
         return map;
+    }
+    
+    public UrlMaintenanceSettings getUrlMaintenanceSettings() {
+        return urlMaintenanceSettings;
+    }
+    
+    public void setUrlMaintenanceSettings(UrlMaintenanceSettings urlMaintenanceSettings) {
+        this.urlMaintenanceSettings = urlMaintenanceSettings;
     }
 
 

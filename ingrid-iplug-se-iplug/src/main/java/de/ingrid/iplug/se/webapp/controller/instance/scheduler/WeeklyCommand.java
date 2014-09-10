@@ -14,28 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.ingrid.iplug.se.webapp.controller.scheduler;
+package de.ingrid.iplug.se.webapp.controller.instance.scheduler;
 
-public class CrawlCommand {
+import java.util.ArrayList;
+import java.util.List;
 
-  private Integer _depth;
+public class WeeklyCommand extends ClockCommand {
 
-  private Integer _topn;
-  
-  public Integer getDepth() {
-    return _depth;
-  }
+    public static enum Day {
+        SUN, MON, TUE, WED, THU, FRI, SAT
+    }
 
-  public void setDepth(Integer depth) {
-    _depth = depth;
-  }
+    private List<Day> _days = new ArrayList<Day>();
 
-  public Integer getTopn() {
-    return _topn;
-  }
+    public List<Day> getDays() {
+        return _days;
+    }
 
-  public void setTopn(Integer topn) {
-    _topn = topn;
-  }
+    public void setDays(List<Day> days) {
+        _days = days;
+    }
 
 }

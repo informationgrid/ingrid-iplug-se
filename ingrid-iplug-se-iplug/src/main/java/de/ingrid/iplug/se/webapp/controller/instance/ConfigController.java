@@ -34,9 +34,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
-import de.ingrid.admin.controller.AbstractController;
 import de.ingrid.iplug.se.SEIPlug;
-import de.ingrid.iplug.se.webapp.container.Instance;
 import de.ingrid.iplug.se.webapp.controller.AdminViews;
 import de.ingrid.iplug.se.webapp.controller.ConfigurationCommand;
 
@@ -48,7 +46,7 @@ import de.ingrid.iplug.se.webapp.controller.ConfigurationCommand;
  */
 @Controller
 @SessionAttributes("plugDescription")
-public class ConfigController extends AbstractController {
+public class ConfigController extends InstanceController {
 
     @RequestMapping(value = { "/iplug-pages/instanceConfig.html" }, method = RequestMethod.GET)
     public String getParameters(final ModelMap modelMap,
@@ -65,13 +63,6 @@ public class ConfigController extends AbstractController {
         return AdminViews.SE_INSTANCE_CONFIG;
     }
     
-    private Instance getInstanceData(String name) {
-        Instance instance = new Instance();
-        instance.setName( name );
-    
-        return instance;
-    }
-
 //    @RequestMapping(value = "/iplug-pages/instance.html", method = RequestMethod.POST)
 //    public String post(final BindingResult errors,
 //            @ModelAttribute("plugDescription") final PlugdescriptionCommandObject pdCommandObject) {

@@ -1,4 +1,4 @@
-package de.ingrid.iplug.se.webapp.controller.scheduler;
+package de.ingrid.iplug.se.webapp.controller.instance;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,12 +15,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
-import de.ingrid.admin.controller.AbstractController;
 import de.ingrid.iplug.se.SEIPlug;
-import de.ingrid.iplug.se.webapp.container.Instance;
 import de.ingrid.iplug.se.webapp.controller.AdminViews;
-import de.ingrid.iplug.se.webapp.controller.scheduler.ClockCommand.Period;
-import de.ingrid.iplug.se.webapp.controller.scheduler.WeeklyCommand.Day;
+import de.ingrid.iplug.se.webapp.controller.instance.scheduler.AdvancedCommand;
+import de.ingrid.iplug.se.webapp.controller.instance.scheduler.ClockCommand;
+import de.ingrid.iplug.se.webapp.controller.instance.scheduler.ClockCommand.Period;
+import de.ingrid.iplug.se.webapp.controller.instance.scheduler.CrawlCommand;
+import de.ingrid.iplug.se.webapp.controller.instance.scheduler.CrawlDataPersistence;
+import de.ingrid.iplug.se.webapp.controller.instance.scheduler.MonthlyCommand;
+import de.ingrid.iplug.se.webapp.controller.instance.scheduler.PatternPersistence;
+import de.ingrid.iplug.se.webapp.controller.instance.scheduler.WeeklyCommand;
+import de.ingrid.iplug.se.webapp.controller.instance.scheduler.WeeklyCommand.Day;
 
 /**
  * Control the database parameter page.
@@ -30,7 +35,7 @@ import de.ingrid.iplug.se.webapp.controller.scheduler.WeeklyCommand.Day;
  */
 @Controller
 @SessionAttributes("plugDescription")
-public class SchedulingController extends AbstractController {
+public class SchedulingController extends InstanceController {
     
     private final PatternPersistence _patternPersistence;
     private final CrawlDataPersistence _crawlDataPersistence;
@@ -55,13 +60,6 @@ public class SchedulingController extends AbstractController {
         modelMap.put( "instance", getInstanceData( name ) );
 
         return AdminViews.SE_INSTANCE_SCHEDULER;
-    }
-
-    private Instance getInstanceData(String name) {
-        Instance instance = new Instance();
-        instance.setName( name );
-
-        return instance;
     }
 
     @ModelAttribute("clockCommand")
@@ -136,10 +134,10 @@ public class SchedulingController extends AbstractController {
     public String postDaily(@ModelAttribute("clockCommand") ClockCommand clockCommand, Errors errors, @RequestParam("instance") String name, final ModelMap map)
             throws IOException {
 
-        map.put( "instance", getInstanceData( name ) );
         // validate and return to page on error
         validate( errors, clockCommand );
         if (errors.hasErrors()) {
+            map.put( "instance", getInstanceData( name ) );
             return AdminViews.SE_INSTANCE_SCHEDULER;
         }
 
@@ -163,11 +161,11 @@ public class SchedulingController extends AbstractController {
             throws IOException {
 
         String tabId = "#tab2";
-        map.put( "instance", getInstanceData( name ) );
         map.put( "selectedTab", tabId );
         // validate and return to page on error
         validate( errors, weeklyCommand );
         if (errors.hasErrors()) {
+            map.put( "instance", getInstanceData( name ) );
             return AdminViews.SE_INSTANCE_SCHEDULER;
         }
 
@@ -194,7 +192,7 @@ public class SchedulingController extends AbstractController {
         Integer depth = weeklyCommand.getDepth();
         Integer topn = weeklyCommand.getTopn();
         _crawlDataPersistence.saveCrawlData(depth, topn, name);
-        return "redirect:" + AdminViews.SE_INSTANCE_SCHEDULER + ".html" + tabId + "?instance=" + name;
+        return "redirect:" + AdminViews.SE_INSTANCE_SCHEDULER + ".html" + "?instance=" + name + tabId;
     }
 
     @RequestMapping(value = "/iplug-pages/monthly.html", method = RequestMethod.POST)
@@ -255,14 +253,14 @@ public class SchedulingController extends AbstractController {
         Integer depth = advancedCommand.getDepth();
         Integer topn = advancedCommand.getTopn();
         _crawlDataPersistence.saveCrawlData(depth, topn, name);
-        return "redirect:" + AdminViews.SE_INSTANCE_SCHEDULER + ".html" + tabId + "?instance=" + name;
+        return "redirect:" + AdminViews.SE_INSTANCE_SCHEDULER + ".html" + "?instance=" + name + tabId;
     }
 
     @RequestMapping(value = "/iplug-pages/delete.html", method = RequestMethod.POST)
     public String delete(@RequestParam("instance") String name) throws IOException {
         _patternPersistence.deletePattern(name);
         _crawlDataPersistence.deleteCrawlData(name);
-        return "redirect:" + AdminViews.SE_INSTANCE_SCHEDULER + ".html?instance=" + name + "&tab=";
+        return "redirect:" + AdminViews.SE_INSTANCE_SCHEDULER + ".html?instance=" + name;
     }
 
     private void validate(Errors errors, CrawlCommand clockCommand) {

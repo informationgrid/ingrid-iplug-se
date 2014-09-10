@@ -150,6 +150,7 @@ public class SEIPlug extends HeartBeatPlug {
     
     public static void main(String[] args) throws Exception {
         conf = new ConfigBuilder<Configuration>(Configuration.class).withCommandLineArgs(args).build();
+        log.debug( "DEBUG test" );
         new JettyStarter( conf );
         EntityManagerFactory emf = Persistence.createEntityManagerFactory(conf.databaseID);//, properties);
         DBManager.INSTANCE.intialize(emf);

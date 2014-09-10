@@ -14,49 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.ingrid.iplug.se.webapp.controller.scheduler;
+package de.ingrid.iplug.se.webapp.controller.instance.scheduler;
 
-import java.io.File;
 import java.io.Serializable;
 
-public class CrawlData implements Serializable {
+public class Pattern implements Serializable {
 
-  private static final long serialVersionUID = 2982502019868199903L;
+  private static final long serialVersionUID = -2162700143961677028L;
 
-  private Integer _depth;
+  private String _pattern;
 
-  private Integer _topn;
-
-  private File _workingDirectory;
-
-  public Integer getDepth() {
-    return _depth;
+  public String getPattern() {
+    return _pattern;
   }
 
-  public void setDepth(Integer depth) {
-    _depth = depth;
-  }
-
-  public Integer getTopn() {
-    return _topn;
-  }
-
-  public void setTopn(Integer topn) {
-    _topn = topn;
-  }
-
-  public File getWorkingDirectory() {
-    return _workingDirectory;
-  }
-
-  public void setWorkingDirectory(File workingDirectory) {
-    _workingDirectory = workingDirectory;
-  }
-
-  @Override
-  public String toString() {
-    return "depth: " + _depth + " topN: " + _topn + " directory:"
-        + _workingDirectory.getAbsolutePath();
+  public void setPattern(String pattern) {
+    _pattern = pattern;
   }
 
 }

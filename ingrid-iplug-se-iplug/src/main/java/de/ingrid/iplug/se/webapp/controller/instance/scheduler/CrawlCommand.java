@@ -14,18 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.ingrid.iplug.se.webapp.controller.scheduler;
+package de.ingrid.iplug.se.webapp.controller.instance.scheduler;
 
-public class AdvancedCommand extends CrawlCommand {
+public class CrawlCommand {
 
-  private String _pattern = "* * * * *";
+  private Integer _depth;
 
-  public String getPattern() {
-    return _pattern;
+  private Integer _topn;
+  
+  public Integer getDepth() {
+    return _depth;
   }
 
-  public void setPattern(String pattern) {
-    _pattern = pattern;
+  public void setDepth(Integer depth) {
+    _depth = depth;
+  }
+
+  public Integer getTopn() {
+    return _topn;
+  }
+
+  public void setTopn(Integer topn) {
+    _topn = topn;
   }
 
 }

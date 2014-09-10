@@ -14,22 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.ingrid.iplug.se.webapp.controller.scheduler;
+package de.ingrid.iplug.se.webapp.controller.instance.scheduler;
 
-import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Pattern implements Serializable {
+public class MonthlyCommand extends ClockCommand {
 
-  private static final long serialVersionUID = -2162700143961677028L;
+  private List<Integer> _daysOfMonth = new ArrayList<Integer>();
 
-  private String _pattern;
-
-  public String getPattern() {
-    return _pattern;
+  public List<Integer> getDaysOfMonth() {
+    return _daysOfMonth;
   }
 
-  public void setPattern(String pattern) {
-    _pattern = pattern;
+  public void setDaysOfMonth(List<Integer> daysOfMonth) {
+    _daysOfMonth = daysOfMonth;
   }
 
 }
