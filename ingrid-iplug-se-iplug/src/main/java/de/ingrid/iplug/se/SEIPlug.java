@@ -3,6 +3,9 @@
  */
 package de.ingrid.iplug.se;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -17,6 +20,7 @@ import de.ingrid.admin.JettyStarter;
 import de.ingrid.iplug.HeartBeatPlug;
 import de.ingrid.iplug.PlugDescriptionFieldFilters;
 import de.ingrid.iplug.se.db.DBManager;
+import de.ingrid.iplug.se.db.model.Metadata;
 import de.ingrid.iplug.se.db.model.Url;
 import de.ingrid.utils.IngridHit;
 import de.ingrid.utils.IngridHitDetail;
@@ -166,6 +170,21 @@ public class SEIPlug extends HeartBeatPlug {
         Url url = new Url();
         url.setStatus( 200 );
         url.setUrl( "http://www.wemove.com" );
+        List<Metadata> metadata = new ArrayList<Metadata>();
+        Metadata m1 = new Metadata();
+        m1.setMetaKey( "lang" );
+        m1.setMetaValue( "de" );
+        Metadata m2 = new Metadata();
+        m2.setMetaKey( "datatype" );
+        m2.setMetaValue( "www" );
+        metadata.add( m1 );
+        metadata.add( m2 );
+        url.setMetadata( metadata );
+        List<String> limitUrls = new ArrayList<String>();
+        limitUrls.add( "http://www.wemove.com/about" );
+        limitUrls.add( "http://www.wemove.com/jobs" );
+        url.setLimitUrls( limitUrls );
+        
         em.persist(url);
         em.getTransaction().commit();
         

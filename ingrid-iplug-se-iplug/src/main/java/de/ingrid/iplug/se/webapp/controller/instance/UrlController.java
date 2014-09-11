@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.conf.UrlMaintenanceSettings.IngridPartner;
+import de.ingrid.iplug.se.conf.UrlMaintenanceSettings.MetaElement;
 import de.ingrid.iplug.se.conf.UrlMaintenanceSettings.UrlTypes;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Url;
@@ -67,6 +68,58 @@ public class UrlController extends InstanceController {
     @ModelAttribute("types")
     public List<UrlTypes> getTypes() {
         return SEIPlug.conf.getUrlMaintenanceSettings().getTypes();
+    }
+    
+    @ModelAttribute("metadata")
+    public List<MetaElement> getMetadata() {
+        List<MetaElement> metadata = SEIPlug.conf.getUrlMaintenanceSettings().getMetadata();
+//        List<Metadata> metadata = new ArrayList<Metadata>();
+//        
+//        UrlMaintenanceSettings settings = SEIPlug.conf.getUrlMaintenanceSettings();
+//        
+//        Metadata m = settings.new Metadata();
+//        m.setId( "partnerMD" );
+//        m.setLabel( "Partner :D" );
+//        List<Metadata> children = new ArrayList<Metadata>();
+//        
+//        Metadata c1 = settings.new Metadata();
+//        c1.setId( "by" );
+//        c1.setLabel( "Bayern :D" );
+//        List<Metadata> c1List  = new ArrayList<Metadata>();
+//        Metadata c11 = settings.new Metadata();
+//        c11.setId( "p1" );
+//        c11.setLabel( "Provider Nummer 1" );
+//        c1List.add( c11 );
+//        Metadata c12 = settings.new Metadata();
+//        c12.setId( "p2" );
+//        c12.setLabel( "Provider Nummer 2" );
+//        c1List.add( c12 );
+//        c1.setChildren( c1List );
+//        
+//        Metadata c2 = settings.new Metadata();
+//        c2.setId( "by" );
+//        c2.setLabel( "Sachsen :D" );
+//        
+//        c1List  = new ArrayList<Metadata>();
+//        c11 = settings.new Metadata();
+//        c11.setId( "p3" );
+//        c11.setLabel( "Provider Nummer 3" );
+//        c1List.add( c11 );
+//        c12 = settings.new Metadata();
+//        c12.setId( "p4" );
+//        c12.setLabel( "Provider Nummer 4" );
+//        c1List.add( c12 );
+//        c2.setChildren( c1List );
+//        
+//        children.add( c1  );
+//        m.setChildren( children );
+//        metadata.add( m  );
+//        
+//        
+//        
+//        metadata.add( m2  );
+        
+        return metadata;
     }
     
     @RequestMapping(value = { "/iplug-pages/instanceUrls.html" }, method = RequestMethod.POST, params = "editUrl")

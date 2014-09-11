@@ -17,12 +17,12 @@
                 <td>
                     <div>
                         <div>
-                            <button class="btnUrl">Bearbeiten</button>
+                            <button class="btnUrl" data-id="${ url.id }">Bearbeiten</button>
                             <button class="select">Weitere Optionen</button>
                         </div>
                         <ul style="position:absolute; padding-left: 0; min-width: 100px;">
-                            <li>Löschen</li>
-                            <li>Testen</li>
+                            <li action="delete">Löschen</li>
+                            <li action="test">Testen</li>
                         </ul>
                         <%-- <a href="instanceUrls.html?instance=${instance.name}&id=${url.id}&editUrl">Bearbeiten</a> 
                         <a href="instanceUrls.html?instance=${instance.name}&id=${url.id}&deleteUrl">Löschen</a>
@@ -41,36 +41,7 @@
         <fieldset>
             <div>
                 <h3>Start-URL</h3>
-                <input type="text" name="startUrl" id="startUrl" value="http://"
-                    class="text ui-widget-content ui-corner-all">
-            </div>
-            
-            <div>
-                <h3>Sprache</h3>
-                <select name="lang" id="langLimit">
-                    <option>Deutsch</option>
-                    <option>Englisch</option>
-                </select>
-            </div>
-            
-            <div style="width: 47%; float: left;">
-                <h3>Partner</h3>
-                <select id="partner">
-                <c:forEach items="${partners}" var="partner">
-                    <option value="${ partner.shortName }">${ partner.displayName }</option>
-                </c:forEach>
-                </select>
-            </div>
-            
-            <div style="width: 50%;float: left;padding-left: 3%;">
-                <h3>Anbieter</h3>
-                <select id="provider" multiple>
-                <c:forEach items="${partners}" var="partner">
-                    <c:forEach items="${partner.provider}" var="provider">
-                        <option class="${partner.shortName}" value="${ provider.shortName }">${ provider.displayName }</option>
-                    </c:forEach>
-                </c:forEach>
-                </select>
+                <input type="text" name="startUrl" id="startUrl" value="http://" class="text ui-widget-content ui-corner-all">
             </div>
             
             <div>
@@ -79,6 +50,7 @@
                     <thead>
                         <tr>
                             <th data-sort="string">URL</th>
+                            <th width="150px"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -93,6 +65,7 @@
                     <thead>
                         <tr>
                             <th data-sort="string">URL</th>
+                            <th width="150px"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -102,25 +75,73 @@
             </div>
             
             
-            <div>
-                <h3>Metadaten</h3>
-                <!-- <select id="type"> -->
-                <c:forEach items="${types}" var="type">
-                    <%-- <option value="${ type.id}">${ type.name }</option> --%>
-                    <label><input type="radio" name="type" value="${ type.id }"> ${ type.name }</label>
-                </c:forEach>
-                <div style="clear:both;"></div>
-                <!-- </select> -->
-                <fieldset id="metadata">
-                    <c:forEach items="${types}" var="type">
-                        <c:forEach items="${type.options}" var="option">
-                            <span class="${type.id}">
-                                <label><input type="checkbox" value="${option.id}">${ option.value }</label>
-                            </span>
+            <!-- <h3>Metadaten</h3> -->
+            
+            <c:forEach items="${ metadata }" var="meta">
+                <div class="meta_${ meta.id }">
+                <h3>${ meta.label }</h3>
+                
+                <c:if test="${ meta.type == 'grouped' }" >
+                    <select multiple>
+                    <c:forEach items="${ meta.children }" var="group">
+                        <optgroup label="${ group.label }">
+                        <c:forEach items="${ group.children }" var="value">
+                            <option value="${ value.id }">${ value.label } (${ value.id })</option>
                         </c:forEach>
+                        </optgroup>
                     </c:forEach>
-                </fieldset>
-            </div>
+                    </select>
+                </c:if>
+                
+                <c:if test="${meta.type == 'select' || meta.type == null}" >
+                    <select <c:if test="${ meta.multiple == true }">multiple</c:if>>
+                    <c:forEach items="${ meta.children }" var="group">
+                        <option value="${ group.id }">${ group.label }</option>
+                    </c:forEach>
+                    </select>
+                </c:if>
+                
+                <c:if test="${meta.type == 'checkbox'}" >
+                    <fieldset>
+                    <legend>${ meta.label }</legend>
+                    <c:forEach items="${ meta.children }" var="group">
+                        <label><input type="checkbox" value="${ group.id }"> ${ group.label }</label>
+                    </c:forEach>
+                    </fieldset>
+                </c:if>
+                
+                <c:if test="${meta.type == 'radio'}" >
+                    <c:forEach items="${ meta.children }" var="group">
+                        <label><input type="radio" name="meta.id" value="${ group.id }"> ${ group.label }</label>
+                    </c:forEach>
+                    <div style="clear:both;"></div>
+                    <c:forEach items="${ meta.children }" var="group">
+                        <c:if test="${ group.children != null }">
+                        <fieldset class="meta_${ group.id }" style="display: none;">
+                        <c:forEach items="${ group.children }" var="check">
+                            <label title="${ check.id }"><input type="checkbox" value="${ check.id }"> ${ check.label }</label>
+                        </c:forEach>
+                        </fieldset>
+                        </c:if>
+                    </c:forEach>
+                </c:if>
+                
+                </div>
+            </c:forEach>
+            
+            <!-- User defined metadata -->
+            <table id="userMetadataTable" class="data tablesorter">
+                <thead>
+                    <tr>
+                        <th data-sort="string">Metadata</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <input type="text" class="text ui-widget-content ui-corner-all">
+            <button id="btnAddUserMetadata" type="button" class="right" >Benutzerdefinierte Metadatum hinzufügen</button>
+                
             <!-- Allow form submission with keyboard without duplicating the dialog button -->
             <!-- <input type="submit" tabindex="-1" style="position: absolute; top: -1000px"> -->
         </fieldset>

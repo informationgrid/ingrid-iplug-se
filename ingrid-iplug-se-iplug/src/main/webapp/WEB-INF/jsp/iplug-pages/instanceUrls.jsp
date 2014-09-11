@@ -32,14 +32,34 @@
 		function addUrlValidator() {
 			var valid = true;
 			
-			// $("input[name=type]:checked").val()
+			var data = dialog.data("urlDataObject");
+			
+			// add all values from the dialog to the data object wich will be sent to the server
+			// the limit/exclude urls already have been added
+			data.url = $("#startUrl").val();
+			
+			data.metadata = [];
+			
+			// get metadata from all selects
+			// get metadata from all visible checkboxes
+			var allInputs = $("#dialog-form select, #dialog-form input[type=checkbox]:checked:visible");
+
+			allInputs.each(function(index, element) {
+				var value = $(element).val();
+				if (value) data.metadata.push({ metaKey: value, metaValue: value });
+			});
 			
 			if ( valid ) {
-        		$("#urlTable tbody").append("<tr>" +
-       				"<td>" + url + "</td>" +
-       				"<td>" + data + "</td>" +
-       			"</tr>");
-		        dialog.dialog( "close" );
+				$.ajax({
+					type: "POST",
+					url: "/rest/addUrl.json?instance=${instance.name}",
+					contentType: 'application/json',
+					data: JSON.stringify( data )
+				})
+			    .done(function( result ) {
+			        alert( "Data posted: " + result );
+			    });
+		        //dialog.dialog( "close" );
 		    }
 			return valid;
 		}
@@ -49,19 +69,20 @@
 			var url = $("#limitUrl").val();
 			var data = "";
 			
+			var button = "<div><button class='btnUrl'>Bearbeiten</button><button class='select'>Weitere Optionen</button></div><ul style='position:absolute; padding-left: 0; min-width: 100px;''><li action='jsDelete'>Löschen</li><li>Testen</li></ul>";
+			
 			if ( valid ) {
-        		$("#limitUrlTable tbody")
+        		var actionButton = $("#limitUrlTable tbody")
         		  .append("<tr>" +
        				 "<td>" + url + "</td>" +
-       				 "<td>" + data + "</td>" +
+       				 "<td>" + button + "</td>" +
        			  "</tr>")
-       			  .find("tr")
-                  .contextMenu(menu, {
-                	    triggerOn: 'contextmenu',
-                	    afterOpen: function(data, trigger) {
-                	        clickedTarget = trigger.target;
-                	    } 
-       		      });
+       			  .find("tr .btnUrl");
+        		
+        		createActionButton( actionButton );
+        		
+        		dialog.data("urlDataObject").limitUrls.push( url );
+        		
         		dialogLimit.dialog( "close" );
 		    }
 			return valid;
@@ -70,7 +91,7 @@
 		dialog = $("#dialog-form").dialog({
 			autoOpen : false,
 			height : 750,
-			width : 750,
+			width : 770,
 			modal : true,
 			buttons : {
 				"Abbrechen" : function() {
@@ -84,7 +105,7 @@
 
 		dialogLimit = $("#dialog-form-limit").dialog({
 			autoOpen : false,
-			height : 400,
+			height : 250,
 			width : 550,
 			modal : true,
 			buttons : {
@@ -101,6 +122,11 @@
 
 		$("#btnAddUrl").on("click", function() {
 			dialog.dialog("open");
+			dialog.data("urlDataObject", {
+					limitUrls: [],
+					excludeUrls: [],
+					metadata: []
+			});
 		});
 
 		$("#btnAddLimitUrl").on("click", function() {
@@ -108,17 +134,18 @@
 		});
 		
 		// hide all metadata types initially
-		$("#metadata span").hide();
-		$('input[type=radio][name=type]').change(function() {
+		//$("#metadata span").hide();
+		$('#dialog-form input[type=radio]').change(function() {
+			var parent = this.parentNode.parentNode;
 			// hide all
-    		$("#metadata span").hide();
+    		$("fieldset", parent).hide();
 			// only show corresponding values
-    		$("#metadata span." + this.value).show();
+    		$("fieldset.meta_" + this.value).show();
 		});
 
 		//settings = "${partners}";
 		// only show providers that belong to their partner! 
-		$("#provider option").hide();
+		/* $("#provider option").hide();
 		$("#provider ." + $("#partner").val()).show();
 		$("#partner").on("change", function(event) {
 			var partnerShort = $("#partner").val();
@@ -126,28 +153,47 @@
 			$("#provider ." + partnerShort).show();
 			// select first one
 			$("#provider").val( $("#provider ." + partnerShort)[0].value );
-		});
+		}); */
 		
-		$(".btnUrl").button().click(function() {
-				alert("Running the last action");
-			}).next().button({
-				text : false,
-				icons : {
-					primary : "ui-icon-triangle-1-s"
-				}
-			}).click(function() {
-				var menu = $(this).parent().next().show().position({
-					my : "left top",
-					at : "left bottom",
-					of : this
-				});
-				$(document).one("click", function() {
-					menu.hide();
-				});
-				return false;
-			}).parent().buttonset().next().hide().menu();
+		function createActionButton( btn ) {
+    		btn.button().click(function() {
+    				alert("Running the last action");
+    			}).next().button({
+    				text : false,
+    				icons : {
+    					primary : "ui-icon-triangle-1-s"
+    				}
+    			}).click(function() {
+    				var menu = $(this).parent().next().show().position({
+    					my : "left top",
+    					at : "left bottom",
+    					of : this
+    				});
+    				$(document).one("click", function(evt) {
+    					var action = evt.target.getAttribute("action");
+    					if (action) {
+    						switch (action) {
+    						case "jsDelete":
+    							var row = $(evt.target).parents("tr");
+    							var url = row.children()[0].innerHTML;
+    							
+    							var limitUrls = dialog.data("urlDataObject").limitUrls;
+    							// remove url from data object
+    							limitUrls.splice(limitUrls.indexOf( url ));
+    							// remove row from table
+    							row.remove();
+    						}
+    					}
+    					menu.hide();
+    				});
+    				return false;
+    			}).parent().buttonset().next().hide().menu();			
+		}
+		
+		createActionButton( $(".btnUrl") );
+		
 
-		//$("#provider").chosen({width: "100%"});
+		$("#dialog-form select").chosen({width: "100%", disable_search_threshold: 5});
 		
 	});
 </script>

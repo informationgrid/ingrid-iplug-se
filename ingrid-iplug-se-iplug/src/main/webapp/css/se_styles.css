@@ -12,8 +12,8 @@
 	position: relative;
 }
 
-.ui-dialog #metadata label {
-	width: 160px;
+.ui-dialog fieldset label {
+	width: 165px;
 }
 
 label input {

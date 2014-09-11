@@ -4,12 +4,16 @@
 package de.ingrid.iplug.se.db.model;
 
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Past;
@@ -60,7 +64,15 @@ public class Url {
     @Column
     private int status;
 
-
+    @OneToMany(cascade=CascadeType.ALL)
+    private List<Metadata> metadata;
+    
+    @ElementCollection
+    private List<String> limitUrls;
+    
+    @ElementCollection
+    private List<String> excludeUrls;
+    
     public Long getId() {
         return id;
     }
@@ -123,6 +135,30 @@ public class Url {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public List<Metadata> getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(List<Metadata> metadata) {
+        this.metadata = metadata;
+    }
+
+    public List<String> getLimitUrls() {
+        return limitUrls;
+    }
+
+    public void setLimitUrls(List<String> limitUrls) {
+        this.limitUrls = limitUrls;
+    }
+
+    public List<String> getExcludeUrls() {
+        return excludeUrls;
+    }
+
+    public void setExcludeUrls(List<String> excludeUrls) {
+        this.excludeUrls = excludeUrls;
     }
 
     
