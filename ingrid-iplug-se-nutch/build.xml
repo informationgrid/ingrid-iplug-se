@@ -1,6 +1,6 @@
-<project default="dist">
+<project default="dist" xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:ac="antlib:net.sf.antcontrib">
 
-	<property name="nutch-version" value="apache-nutch-1.8" />
+	<property name="nutch-version" value="apache-nutch-1.9" />
 	<property name="ingrid.ext.libs" value="${basedir}/ingrid-nutch-libs" />
 
 	<target name="init">
@@ -12,7 +12,7 @@
 	</target>
 
 	<target name="copy-nutch">
-        <unzip src="${nutch-version}-src.zip" dest="build/" />
+		<unzip src="${nutch-version}-src.zip" dest="build/" />
 	</target>
 
 	<target name="copy-ingrid-se-plugins">
@@ -35,12 +35,12 @@
 
 	<!-- To build the installer, use maven: mvn assembly:assembly -Dmaven.test.skip -->
 	<target name="dist" depends="clean, copy-nutch, copy-ingrid-se-plugins, copy-ingrid-se-part,create-manifest">
-		
-        <echo>override nutch build files to extend build custom source code</echo>
-        <copy todir="build/${nutch-version}">
-            <fileset dir="ingrid-nutch-override" />
-        </copy>
-		
+
+		<echo>override nutch build files to extend build custom source code</echo>
+		<copy todir="build/${nutch-version}">
+			<fileset dir="ingrid-nutch-override" />
+		</copy>
+
 		<!-- echo classpath for debug purpose -->
 		<echo>echo classpath for debug purpose</echo>
 		<replace file="build/${nutch-version}/build.xml">
@@ -65,4 +65,37 @@
 			<attribute name="iPlug-Type" value="${maven.iplugType}" />
 		</manifest>
 	</target>
+
+	<target name="make-pom">
+		<ant dir="./build/${nutch-version}" target="create-pom" antfile="../../build.xml" />
+	</target>
+	
+	
+	<target name="create-pom">
+		<typedef uri="antlib:org.apache.ivy.ant" onerror="fail" loaderRef="ivyLoader">
+			<classpath>
+				<pathelement location="./ivy/ivy-2.2.0.jar" />
+			</classpath>
+		</typedef>
+		<fail>
+			<condition>
+				<not>
+					<typefound uri="antlib:org.apache.ivy.ant" name="cleancache" />
+				</not>
+			</condition>
+		              You need Apache Ivy 2.0 or later from http://ant.apache.org/
+		              It could not be loaded from ${ivy.repo.url}
+		 </fail>
+		<condition property="ivy.found">
+			<typefound uri="antlib:org.apache.ivy.ant" name="cleancache" />
+		</condition>
+
+		<ivy:settings file="./ivy/ivysettings.xml" />
+
+		<ivy:makepom ivyfile="./ivy/ivy.xml" pomfile="./pom_nutch.xml" templatefile="./ivy/mvn.template">
+			<mapping conf="default" scope="compile" />
+			<mapping conf="runtime" scope="runtime" />
+		</ivy:makepom>
+	</target>
+
 </project>

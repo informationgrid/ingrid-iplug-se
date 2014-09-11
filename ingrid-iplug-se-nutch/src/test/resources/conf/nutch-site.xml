@@ -5,4 +5,9 @@
 
 <configuration>
 
+<property>
+ <name>http.agent.name</name>
+ <value>My Nutch Spider</value>
+</property>
+
 </configuration>

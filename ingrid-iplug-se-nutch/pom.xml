@@ -39,15 +39,18 @@
 		<dependency>
 			<groupId>org.apache.nutch</groupId>
 			<artifactId>nutch</artifactId>
-			<version>1.8</version>
+			<version>1.9</version>
 		</dependency>
-
+		
+		<!-- nutch plugin dependencies -->
 		<dependency>
 			<groupId>org.elasticsearch</groupId>
 			<artifactId>elasticsearch</artifactId>
-			<version>0.90.1</version>
+			<version>1.1.0</version>
 			<optional>true</optional>
 		</dependency>
+
+		<!-- nutch dependencies -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
@@ -60,6 +63,9 @@
 			<version>1.6.1</version>
 			<optional>true</optional>
 		</dependency>
+		<!-- PROVIDED BY INGRID, see below <dependency> <groupId>log4j</groupId> 
+			<artifactId>log4j</artifactId> <version>1.2.15</version> <optional>true</optional> 
+			</dependency> -->
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
@@ -87,7 +93,7 @@
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-core</artifactId>
-			<version>1.2.1</version>
+			<version>1.2.0</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
@@ -101,32 +107,6 @@
 			<artifactId>icu4j</artifactId>
 			<version>4.0.1</version>
 			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mortbay.jetty</groupId>
-			<artifactId>jetty-client</artifactId>
-			<version>6.1.22</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.15</version>
-			<optional>true</optional>
-			<exclusions>
-				<exclusion>
-					<groupId>com.sun.jdmk</groupId>
-					<artifactId>jmxtools</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.sun.jmx</groupId>
-					<artifactId>jmxri</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>javax.jms</groupId>
-					<artifactId>jms</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>xerces</groupId>
@@ -155,19 +135,25 @@
 		<dependency>
 			<groupId>com.google.code.crawler-commons</groupId>
 			<artifactId>crawler-commons</artifactId>
-			<version>0.3</version>
+			<version>0.4</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
+			<version>4.11</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-test</artifactId>
 			<version>1.2.0</version>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.mortbay.jetty</groupId>
+			<artifactId>jetty-client</artifactId>
+			<version>6.1.22</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
@@ -181,6 +167,30 @@
 			<artifactId>jetty-util</artifactId>
 			<version>6.1.22</version>
 			<optional>true</optional>
+		</dependency>
+
+
+
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.15</version>
+			<optional>true</optional>
+			<exclusions>
+				<!-- exclude since not in maven repo by default -->
+				<exclusion>
+					<groupId>com.sun.jdmk</groupId>
+					<artifactId>jmxtools</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.jmx</groupId>
+					<artifactId>jmxri</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>javax.jms</groupId>
+					<artifactId>jms</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 	</dependencies>
@@ -208,8 +218,8 @@
 							<sources>
 								<source>ingrid-nutch-plugins/analysis-de/src/java</source>
 								<source>ingrid-nutch-plugins/analysis-de/src/test</source>
-                                <source>ingrid-nutch-plugins/analysis-fr/src/java</source>
-                                <source>ingrid-nutch-plugins/analysis-fr/src/test</source>
+								<source>ingrid-nutch-plugins/analysis-fr/src/java</source>
+								<source>ingrid-nutch-plugins/analysis-fr/src/test</source>
 								<source>ingrid-nutch-plugins/indexer-ingrid/src/java</source>
 								<source>ingrid-nutch-plugins/indexer-ingrid/src/test</source>
 								<source>ingrid-nutch-plugins/index-sns/src/java</source>
