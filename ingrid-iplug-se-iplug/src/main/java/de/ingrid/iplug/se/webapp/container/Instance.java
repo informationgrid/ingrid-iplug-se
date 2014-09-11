@@ -7,6 +7,7 @@ import de.ingrid.iplug.se.db.model.Url;
 public class Instance {
 
     private String name;
+    private String workingDirectory;
     private String status;
     private List<Url> urls;
 
@@ -35,4 +36,14 @@ public class Instance {
     public void setUrls(List<Url> urls) {
         this.urls = urls;        
     }
+
+    public String getWorkingDirectory() {
+        return workingDirectory;
+    }
+
+    public void setWorkingDirectory(String workingDirectory) {
+        this.workingDirectory = workingDirectory;
+    }
+    
+    
 }
