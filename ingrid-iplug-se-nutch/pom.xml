@@ -40,8 +40,14 @@
 			<groupId>org.apache.nutch</groupId>
 			<artifactId>nutch</artifactId>
 			<version>1.9</version>
+			<exclusions>
+				<exclusion>
+					<groupId>xerces</groupId>
+					<artifactId>xercesImpl</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
-		
+
 		<!-- nutch plugin dependencies -->
 		<dependency>
 			<groupId>org.elasticsearch</groupId>
@@ -108,18 +114,10 @@
 			<version>4.0.1</version>
 			<scope>compile</scope>
 		</dependency>
-		<dependency>
-			<groupId>xerces</groupId>
-			<artifactId>xercesImpl</artifactId>
-			<version>2.9.1</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>xerces</groupId>
-			<artifactId>xmlParserAPIs</artifactId>
-			<version>2.6.2</version>
-			<scope>compile</scope>
-		</dependency>
+		<!-- <dependency> <groupId>xerces</groupId> <artifactId>xercesImpl</artifactId> 
+			<version>2.9.1</version> <scope>compile</scope> </dependency> <dependency> 
+			<groupId>xerces</groupId> <artifactId>xmlParserAPIs</artifactId> <version>2.6.2</version> 
+			<scope>compile</scope> </dependency> -->
 		<dependency>
 			<groupId>oro</groupId>
 			<artifactId>oro</artifactId>
@@ -279,10 +277,19 @@
 						<configuration>
 							<outputDirectory>ingrid-nutch-libs</outputDirectory>
 							<excludeTransitive>false</excludeTransitive>
-							<excludeArtifactIds>ingrid-installer</excludeArtifactIds>
+							<excludeArtifactIds>ingrid-installer,xercesImpl,xerces,xalan</excludeArtifactIds>
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>true</downloadJavadocs>
+				</configuration>
 			</plugin>
 
 		</plugins>

@@ -33,10 +33,10 @@ import org.apache.nutch.metadata.Metadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.ingrid.nutch.analysis.AnalyzerFactory;
-import de.ingrid.nutch.analysis.NutchAnalyzer;
-import de.ingrid.nutch.indexer.IndexerConstants;
-import de.ingrid.nutch.indexer.lucene.LuceneConstants;
+import de.ingrid.iplug.se.nutch.analysis.AnalyzerFactory;
+import de.ingrid.iplug.se.nutch.analysis.NutchAnalyzer;
+import de.ingrid.iplug.se.nutch.indexer.IndexerConstants;
+import de.ingrid.iplug.se.nutch.indexer.lucene.LuceneConstants;
 
 /**
  * Writes the Ingrid specific local index.

@@ -33,13 +33,15 @@
 		</copy>
 	</target>
 
-	<!-- To build the installer, use maven: mvn assembly:assembly -Dmaven.test.skip -->
-	<target name="dist" depends="clean, copy-nutch, copy-ingrid-se-plugins, copy-ingrid-se-part,create-manifest">
-
-		<echo>override nutch build files to extend build custom source code</echo>
-		<copy todir="build/${nutch-version}">
-			<fileset dir="ingrid-nutch-override" />
+	<target name="copy-ingrid-nutch-override">
+        <echo>override nutch build files to extend build custom source code</echo>
+		<copy todir="build/${nutch-version}" overwrite="true">
+			<fileset dir="ingrid-nutch-override" includes="**"/>
 		</copy>
+	</target>
+
+	<!-- To build the installer, use maven: mvn assembly:assembly -Dmaven.test.skip -->
+	<target name="dist" depends="clean, copy-nutch, copy-ingrid-se-plugins, copy-ingrid-se-part, copy-ingrid-nutch-override, create-manifest">
 
 		<!-- echo classpath for debug purpose -->
 		<echo>echo classpath for debug purpose</echo>
@@ -69,8 +71,8 @@
 	<target name="make-pom">
 		<ant dir="./build/${nutch-version}" target="create-pom" antfile="../../build.xml" />
 	</target>
-	
-	
+
+
 	<target name="create-pom">
 		<typedef uri="antlib:org.apache.ivy.ant" onerror="fail" loaderRef="ivyLoader">
 			<classpath>

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.ingrid.nutch.analysis;
+package de.ingrid.iplug.se.nutch.analysis;
 
 // JDK imports
 import org.apache.hadoop.conf.Configurable;

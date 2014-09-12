@@ -1,4 +1,4 @@
-package de.ingrid.nutch.indexer;
+package de.ingrid.iplug.se.nutch.indexer;
 
 public class IndexerConstants {
 

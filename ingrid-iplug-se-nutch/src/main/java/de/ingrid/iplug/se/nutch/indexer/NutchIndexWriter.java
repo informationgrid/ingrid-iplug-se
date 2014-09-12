@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.ingrid.nutch.indexer;
+package de.ingrid.iplug.se.nutch.indexer;
 
 import java.io.IOException;
 
