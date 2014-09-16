@@ -582,8 +582,8 @@ public class BWLinkDbFilter extends Configured {
             System.err.println("Usage: BWLinkDbFilter <linkdb> <bwdb> <normalize> <filter> <replace current linkdb>");
             return;
         }
-        bwDb.update(new Path(args[1]), new Path(args[2]), Boolean.valueOf(args[3]), Boolean.valueOf(args[4]), Boolean
-                .valueOf(args[5]));
+        bwDb.update(new Path(args[0]), new Path(args[1]), Boolean.valueOf(args[2]), Boolean.valueOf(args[3]), Boolean
+                .valueOf(args[4]));
 
     }
 

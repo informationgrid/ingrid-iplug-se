@@ -10,4 +10,62 @@
  <value>My Nutch Spider</value>
 </property>
 
+<property>
+  <name>plugin.includes</name>
+  <value>protocol-http|urlfilter-regex|parse-(html|tika)|index-(basic|anchor|metadata)|indexer-elastic|scoring-opic|urlnormalizer-(pass|regex|basic)</value>
+  <description>Regular expression naming plugin directory names to
+  include.  Any plugin not matching this expression is excluded.
+  In any case you need at least include the nutch-extensionpoints plugin. By
+  default Nutch includes crawling just HTML and plain text via HTTP,
+  and basic indexing and search plugins. In order to use HTTPS please enable 
+  protocol-httpclient, but be aware of possible intermittent problems with the 
+  underlying commons-httpclient library.
+  </description>
+</property>
+
+<property>
+ <name>elastic.host</name>
+ <value>localhost</value>
+</property>
+
+<property>
+ <name>index.parse.md</name>
+ <value>partner,provider</value>
+</property>
+
+<property>
+ <name>fetcher.parse</name>
+ <value>true</value>
+</property>
+
+<property>
+  <name>fetcher.threads.fetch</name>
+  <value>50</value>
+  <description>The number of FetcherThreads the fetcher should use.
+  This is also determines the maximum number of requests that are
+  made at once (each FetcherThread handles one connection). The total
+  number of threads running in distributed mode will be the number of
+  fetcher threads * number of nodes as fetcher has one map task per node.
+  </description>
+</property>
+
+<property>
+  <name>fetcher.throughput.threshold.pages</name>
+  <value>1</value>
+  <description>The threshold of minimum pages per second. If the fetcher downloads less
+  pages per second than the configured threshold, the fetcher stops, preventing slow queue's
+  from stalling the throughput. This threshold must be an integer. This can be useful when
+  fetcher.timelimit.mins is hard to determine. The default value of -1 disables this check.
+  </description>
+</property>
+
+<property>
+  <name>fetcher.throughput.threshold.check.after</name>
+  <value>1</value>
+  <description>The number of minutes after which the throughput check is enabled.</description>
+</property>
+
+
+
+
 </configuration>

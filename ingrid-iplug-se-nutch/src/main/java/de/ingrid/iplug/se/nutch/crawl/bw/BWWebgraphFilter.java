@@ -545,13 +545,13 @@ public class BWWebgraphFilter extends Configured {
     public static void main(String[] args) throws Exception {
         Configuration conf = NutchConfiguration.create();
         BWWebgraphFilter bwDb = new BWWebgraphFilter(conf, new Path(args[1]));
-        if (args.length != 6) {
+        if (args.length != 5) {
             System.err
-                    .println("Usage: BWWebgraphFilter <crawldir> <webgraphdb> <bwdb> <normalize> <filter> <replace current webgraph>");
+                    .println("Usage: BWWebgraphFilter <webgraphdb> <bwdb> <normalize> <filter> <replace current webgraph>");
             return;
         }
-        bwDb.update(new Path(args[2]), new Path(args[3]), Boolean.valueOf(args[4]), Boolean.valueOf(args[5]), Boolean
-                .valueOf(args[6]));
+        bwDb.update(new Path(args[0]), new Path(args[1]), Boolean.valueOf(args[2]), Boolean.valueOf(args[3]), Boolean
+                .valueOf(args[4]));
 
     }
 
