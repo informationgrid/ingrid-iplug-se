@@ -1,11 +1,14 @@
 package de.ingrid.iplug.se.webapp.controller.instance;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.springframework.stereotype.Controller;
@@ -18,10 +21,9 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
 import de.ingrid.iplug.se.SEIPlug;
-import de.ingrid.iplug.se.conf.UrlMaintenanceSettings.IngridPartner;
 import de.ingrid.iplug.se.conf.UrlMaintenanceSettings.MetaElement;
-import de.ingrid.iplug.se.conf.UrlMaintenanceSettings.UrlTypes;
 import de.ingrid.iplug.se.db.DBManager;
+import de.ingrid.iplug.se.db.model.Metadata;
 import de.ingrid.iplug.se.db.model.Url;
 import de.ingrid.iplug.se.webapp.controller.AdminViews;
 
@@ -50,24 +52,41 @@ public class UrlController extends InstanceController {
         return AdminViews.SE_INSTANCE_URLS;
     }
     
+    @SuppressWarnings("unchecked")
     @ModelAttribute("dbUrls")
-    public List<Url> getUrlsFromDB(@RequestParam("instance") String name) {
+    public List<Url> getUrlsFromDB(@RequestParam("instance") String name, @RequestParam("filter") String filter) {
         EntityManager em = DBManager.INSTANCE.getEntityManager();
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<Url> createQuery = em.getCriteriaBuilder().createQuery( Url.class );
-        Root<Url> from = createQuery.from( Url.class );
-        createQuery.select( from );
+        Root<Url> urlTable = createQuery.from( Url.class );
+        Root<Metadata> metadataTable = createQuery.from( Metadata.class );
+
+        List<Predicate> criteria = new ArrayList<Predicate>();
+        criteria.add( criteriaBuilder.equal( urlTable.<String> get ("instance"), name ) );
+        
+        String[] metaOptions = filter.split( "," );
+        for (String meta : metaOptions) {
+            String[] metaSplit = meta.split( ":" );
+            if (metaSplit.length == 2) {
+                criteria.add( criteriaBuilder.equal( metadataTable.<String> get ("metaKey"), metaSplit[0] ) );
+                criteria.add( criteriaBuilder.equal( metadataTable.<String> get ("metaValue"), metaSplit[1] ) );
+            }
+        }
+        
+        createQuery.select( urlTable ).where( criteriaBuilder.and(criteria.toArray(new Predicate[0])) );
         Query query = em.createQuery( createQuery );
         return query.getResultList();
     }
     
-    @ModelAttribute("partners")
-    public List<IngridPartner> getPartner() {
-        return SEIPlug.conf.getUrlMaintenanceSettings().getPartner();
-    }
-    
-    @ModelAttribute("types")
-    public List<UrlTypes> getTypes() {
-        return SEIPlug.conf.getUrlMaintenanceSettings().getTypes();
+    @ModelAttribute("filterOptions")
+    public String[] getFilterOption(@RequestParam("filter") String filter) {
+        return filter.split( "," );
+//        return Arrays.asList( split );
+//        for (String item : split) {
+//            if (item.equals( option ))
+//                return true;
+//        }
+//        return false;
     }
     
     @ModelAttribute("metadata")

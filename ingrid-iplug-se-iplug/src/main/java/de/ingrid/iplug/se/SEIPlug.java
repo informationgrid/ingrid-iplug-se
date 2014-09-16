@@ -167,18 +167,30 @@ public class SEIPlug extends HeartBeatPlug {
         
         // get an entity manager instance (initializes properties in the DBManager)
         em.getTransaction().begin();
-        Url url = new Url();
+        Url url = new Url( "catalog" );
         url.setStatus( 200 );
         url.setUrl( "http://www.wemove.com" );
         List<Metadata> metadata = new ArrayList<Metadata>();
         Metadata m1 = new Metadata();
         m1.setMetaKey( "lang" );
-        m1.setMetaValue( "de" );
+        m1.setMetaValue( "en" );
         Metadata m2 = new Metadata();
-        m2.setMetaKey( "datatype" );
-        m2.setMetaValue( "www" );
+        m2.setMetaKey( "topic" );
+        m2.setMetaValue( "t2" );
+        Metadata m3 = new Metadata();
+        m3.setMetaKey( "topic" );
+        m3.setMetaValue( "t3" );
+        Metadata m4 = new Metadata();
+        m4.setMetaKey( "unknown" );
+        m4.setMetaValue( "xxx" );
+        Metadata m5 = new Metadata();
+        m5.setMetaKey( "topic" );
+        m5.setMetaValue( "angularjs" );
         metadata.add( m1 );
         metadata.add( m2 );
+        metadata.add( m3 );
+        metadata.add( m4 );
+        metadata.add( m5 );
         url.setMetadata( metadata );
         List<String> limitUrls = new ArrayList<String>();
         limitUrls.add( "http://www.wemove.com/about" );
@@ -188,13 +200,6 @@ public class SEIPlug extends HeartBeatPlug {
         em.persist(url);
         em.getTransaction().commit();
         
-        //CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-
-        // select patients for the current page
-//        CriteriaQuery<Url> urlQuery = criteriaBuilder.createQuery(Url.class);
-//        Root<Url> urlTpl = urlQuery.from(Url.class);
-//        TypedQuery<Url> urlPagingQuery = em.createQuery(urlQuery);
-//        urlPagingQuery.getSingleResult();
     }
     
 }

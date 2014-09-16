@@ -15,5 +15,6 @@ public class AdminViews extends IViews {
     public static final String SE_INSTANCE_CONFIG = "/iplug-pages/instanceConfig";
     public static final String SE_INSTANCE_SCHEDULER = "/iplug-pages/instanceScheduling";
     public static final String SE_INSTANCE_URLS = "/iplug-pages/instanceUrls";
+    public static final String SE_INSTANCE_MANAGEMENT = "/iplug-pages/instanceManagement";
 
 }

@@ -12,12 +12,9 @@ http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
     </servlet>
     <servlet-mapping>
         <servlet-name>springapp</servlet-name>
-        <url-pattern>*.html</url-pattern>
+        <url-pattern>/</url-pattern>
     </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>springapp</servlet-name>
-        <url-pattern>*.json</url-pattern>
-    </servlet-mapping>
+
     <servlet>
         <servlet-name>forwarding</servlet-name>
         <servlet-class>de.ingrid.admin.SimpleForwardServlet</servlet-class>

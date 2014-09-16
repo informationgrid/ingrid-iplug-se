@@ -2,6 +2,7 @@
     "metadata": [
         {
             "label": "Sprache",
+            "id": "lang",
             "type": "select",
             "children": [
                 {
@@ -16,7 +17,9 @@
         },
         {
             "label": "Partner",
+            "id": "partner",
             "type": "select",
+            "multiple": true,
             "children": [
                 {
                     "label": "Brandenburg",
@@ -30,6 +33,7 @@
         },
         {
             "label": "Anbieter",
+            "id": "provider",
             "type": "grouped",
             "children": [
                 {
@@ -59,176 +63,6 @@
                             "id": "stp2"
                         }
                     ]
-                }
-            ]
-        },
-        {
-            "label": "Typ",
-            "id": "type",
-            "type": "radio",
-            "children": [
-                {
-                    "id": "web",
-                    "label": "Webseiten",
-                    "children": [
-                        {
-                            "id": "o1",
-                            "label": "Umwelt"
-                        },
-                        {
-                            "id": "o2",
-                            "label": "Recht"
-                        },
-                        {
-                            "id": "o3",
-                            "label": "Forschung"
-                        }
-                    ]
-                },
-                {
-                    "id": "topic",
-                    "label": "Themen",
-                    "children": [
-                        {
-                            "id": "t1",
-                            "label": "Abfall"
-                        },
-                        {
-                            "id": "t2",
-                            "label": "Altlasten"
-                        },
-                        {
-                            "id": "t3",
-                            "label": "Bauen"
-                        },
-                        {
-                            "id": "t4",
-                            "label": "Boden"
-                        },
-                        {
-                            "id": "t5",
-                            "label": "Chemikalien"
-                        },
-                        {
-                            "id": "t6",
-                            "label": "Energie"
-                        },
-                        {
-                            "id": "t7",
-                            "label": "Forstwirtschaft"
-                        },
-                        {
-                            "id": "t8",
-                            "label": "Gentechnik"
-                        },
-                        {
-                            "id": "t9",
-                            "label": "Geologie"
-                        },
-                        {
-                            "id": "t10",
-                            "label": "Gesundheit"
-                        },
-                        {
-                            "id": "t11",
-                            "label": "Lärm und Erschütterung"
-                        },
-                        {
-                            "id": "t12",
-                            "label": "Landwirtschaft"
-                        },
-                        {
-                            "id": "t13",
-                            "label": "Luft und Klima"
-                        },
-                        {
-                            "id": "t14",
-                            "label": "Nachhaltige Entwicklung"
-                        },
-                        {
-                            "id": "t15",
-                            "label": "Strahlung"
-                        },
-                        {
-                            "id": "t16",
-                            "label": "Tierschutz"
-                        },
-                        {
-                            "id": "t17",
-                            "label": "Umweltinformationen"
-                        },
-                        {
-                            "id": "t18",
-                            "label": "Umweltwirtschaft"
-                        },
-                        {
-                            "id": "t19",
-                            "label": "Verkehr"
-                        },
-                        {
-                            "id": "t20",
-                            "label": "Wasser"
-                        }
-                    ]
-                },
-                {
-                    "id": "service",
-                    "label": "Service",
-                    "children": [
-                        {
-                            "id": "s1",
-                            "label": "Pressemitteilungen"
-                        },
-                        {
-                            "id": "s2",
-                            "label": "Publikationen"
-                        },
-                        {
-                            "id": "s3",
-                            "label": "Veranstaltungen"
-                        }
-                    ]
-                },
-                {
-                    "id": "measure",
-                    "label": "Messwerte",
-                    "children": [
-                        {
-                            "id": "m1",
-                            "label": "Strahlung"
-                        },
-                        {
-                            "id": "m2",
-                            "label": "Luft"
-                        },
-                        {
-                            "id": "m3",
-                            "label": "Wasser"
-                        },
-                        {
-                            "id": "m4",
-                            "label": "Weitere"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "label": "Webseiten",
-            "id": "web",
-            "type": "checkbox",
-            "children": [
-                {
-                    "id": "o1",
-                    "label": "Umwelt"
-                },
-                {
-                    "id": "o2",
-                    "label": "Recht"
-                },
-                {
-                    "id": "o3",
-                    "label": "Forschung"
                 }
             ]
         },
@@ -322,6 +156,7 @@
         {
             "label": "Service",
             "id": "service",
+            "multiple": true,
             "children": [
                 {
                     "id": "s1",
@@ -340,6 +175,7 @@
         {
             "label": "Messwerte",
             "id": "measure",
+            "multiple": true,
             "children": [
                 {
                     "id": "m1",
@@ -356,40 +192,6 @@
                 {
                     "id": "m4",
                     "label": "Weitere"
-                }
-            ]
-        }
-    ],
-    "partner": [
-        {
-            "_displayName": "Bayern",
-            "_shortName": "by",
-            "provider": [
-                {
-                    "_displayName": "",
-                    "_shortName": ""
-                },
-                {
-                    "_displayName": "Anbieter 1",
-                    "_shortName": "prov1"
-                },
-                {
-                    "_displayName": "Anbieter 2",
-                    "_shortName": "prov2"
-                }
-            ]
-        },
-        {
-            "_displayName": "Sachsen",
-            "_shortName": "sn",
-            "provider": [
-                {
-                    "_displayName": "Anbieter 3",
-                    "_shortName": "prov3"
-                },
-                {
-                    "_displayName": "Anbieter 4",
-                    "_shortName": "prov4"
                 }
             ]
         }

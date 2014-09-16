@@ -18,11 +18,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Past;
 
-/**
- * Implementation of a patient.
- * 
- * @author ingo
- */
 @Entity
 public class Url {
 
@@ -37,6 +32,9 @@ public class Url {
     
     @Column(length=20)
     private String type;
+    
+    @Column
+    private String instance;
 
     @Past
     @Temporal(TemporalType.DATE)
@@ -72,6 +70,12 @@ public class Url {
     
     @ElementCollection
     private List<String> excludeUrls;
+    
+    public Url() {}
+    
+    public Url( String instance ) {
+        setInstance( instance );
+    }
     
     public Long getId() {
         return id;
@@ -159,6 +163,14 @@ public class Url {
 
     public void setExcludeUrls(List<String> excludeUrls) {
         this.excludeUrls = excludeUrls;
+    }
+
+    public String getInstance() {
+        return instance;
+    }
+
+    public void setInstance(String instance) {
+        this.instance = instance;
     }
 
     

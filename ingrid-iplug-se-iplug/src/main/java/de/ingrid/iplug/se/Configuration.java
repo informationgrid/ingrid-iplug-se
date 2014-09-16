@@ -16,7 +16,6 @@ import org.elasticsearch.action.search.SearchType;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.tngtech.configbuilder.annotation.propertyloaderconfiguration.PropertiesFiles;
