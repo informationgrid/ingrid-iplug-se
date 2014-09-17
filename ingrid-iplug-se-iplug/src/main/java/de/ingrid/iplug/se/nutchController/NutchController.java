@@ -14,14 +14,15 @@ public class NutchController {
     Map<String, NutchProcess> instances = new HashMap<String, NutchProcess>();
 
     /**
-     * Start a crawl of an instance.
-     * The instance must contain at least the name and the working directory, so 
-     * that the crawl can be started.
-     * @param instance
+     * Start a crawl.
+     * 
+     * @param crawl
      * @throws Exception
      */
-    public synchronized void crawl(Instance instance) throws Exception {
+    public synchronized void crawl(Crawl crawl) throws Exception {
 
+        Instance instance = crawl.getInstance();
+        
         if (instances.containsKey(instance.getName())) {
             NutchProcess command = instances.get(instance.getName());
             if (command.getStatus() == NutchProcess.STATUS.RUNNING) {
@@ -29,9 +30,9 @@ public class NutchController {
             }
         }
 
-        NutchProcess command = new NutchProcess();
+        GenericNutchProcess command = new GenericNutchProcess();
         command.addClassPath(instance.getWorkingDirectory() + File.separator + "conf");
-        command.addClassPathLibraryDirectory("build/apache-nutch-1.8/runtime/local");
+        command.addClassPathLibraryDirectory("build/apache-nutch-1.9/runtime/local");
         command.addJavaOptions(new String[] { "-Xmx512m", "-Dhadoop.log.dir=logs", "-Dhadoop.log.file=hadoop.log" });
         command.setWorkingDirectory(instance.getWorkingDirectory());
         command.addCommand("org.apache.nutch.crawl.Injector", "test/crawldb", "src/test/resources/urls");

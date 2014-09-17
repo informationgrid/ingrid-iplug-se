@@ -2,18 +2,11 @@ package de.ingrid.iplug.se.nutchController;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
-import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
-import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
-import org.apache.commons.exec.Executor;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 /**
@@ -21,7 +14,7 @@ import org.apache.log4j.Logger;
  * nutch executable commands.
  * 
  */
-public class NutchProcess extends Thread {
+public abstract class NutchProcess extends Thread {
 
     private static Logger log = Logger.getLogger(NutchProcess.class);
 
@@ -29,53 +22,19 @@ public class NutchProcess extends Thread {
         CREATED, RUNNING, INTERRUPTED, FINISHED
     };
 
-    private String[] classPath = new String[] {};
-    private String[] javaOptions = new String[] {};
+    String[] classPath = new String[] {};
+    String[] javaOptions = new String[] {};
 
-    private long timeout = ExecuteWatchdog.INFINITE_TIMEOUT;
+    long timeout = ExecuteWatchdog.INFINITE_TIMEOUT;
 
-    private String executable = "java";
+    String executable = "java";
 
-    private File workingDirectory = null;
+    File workingDirectory = null;
 
-    private List<String[]> commands = new ArrayList<String[]>();
+    CommandResultHandler resultHandler = null;
 
-    private CommandResultHandler resultHandler = null;
+    STATUS status = STATUS.CREATED;
 
-    private STATUS status = STATUS.CREATED;
-
-    @Override
-    public void run() {
-        status = STATUS.RUNNING;
-        for (String[] command : commands) {
-            if (status != STATUS.RUNNING)
-                break;
-            try {
-                resultHandler = execute(command);
-                resultHandler.waitFor();
-                if (resultHandler.getExitValue() != 0) {
-                    status = STATUS.INTERRUPTED;
-                }
-            } catch (InterruptedException e) {
-                status = STATUS.INTERRUPTED;
-                if (resultHandler.getWatchdog().killedProcess()) {
-                    log.info("Process was killed by watchdog.");
-                } else {
-                    log.error("Process was unexpectably killed.", e);
-                }
-            } catch (IOException e) {
-                status = STATUS.INTERRUPTED;
-                if (resultHandler.getWatchdog().killedProcess()) {
-                    log.info("Process was killed by watchdog.");
-                } else {
-                    log.error("Process was unexpectably killed.", e);
-                }
-            }
-        }
-        if (status == STATUS.RUNNING) {
-            status = STATUS.FINISHED;
-        }
-    }
 
     /**
      * Stops the execution of the commands and kills the process
@@ -154,15 +113,6 @@ public class NutchProcess extends Thread {
     }
 
     /**
-     * Add commands to be executed.
-     * 
-     * @param command
-     */
-    public void addCommand(String... command) {
-        this.commands.add(command);
-    }
-
-    /**
      * Returns the status of this command chain.
      * 
      * @return
@@ -171,40 +121,13 @@ public class NutchProcess extends Thread {
         return this.status;
     }
 
-    private CommandResultHandler execute(String[] commandAndOptions) throws IOException {
-        String cp = StringUtils.join(classPath, File.pathSeparator);
-
-        String[] nutchCall = new String[] { "-cp", cp };
-        nutchCall = arrayConcat(nutchCall, javaOptions);
-        nutchCall = arrayConcat(nutchCall, commandAndOptions);
-
-        CommandLine cmdLine = new CommandLine(executable);
-        cmdLine.addArguments(nutchCall);
-
-        CommandResultHandler resultHandler;
-        Executor executor = new DefaultExecutor();
-        if (workingDirectory != null) {
-            executor.setWorkingDirectory(workingDirectory);
-        } else {
-            executor.setWorkingDirectory(new File("."));
-        }
-        ExecuteWatchdog watchdog = new ExecuteWatchdog(timeout);
-        executor.setWatchdog(watchdog);
-        resultHandler = new CommandResultHandler(watchdog);
-        if (log.isDebugEnabled()) {
-            log.debug("Call: " + StringUtils.join(cmdLine.toStrings(), " "));
-        }
-        executor.execute(cmdLine, resultHandler);
-        return resultHandler;
-    }
-
-    private <T> T[] arrayConcat(T[] first, T[] second) {
+    <T> T[] arrayConcat(T[] first, T[] second) {
         T[] result = Arrays.copyOf(first, first.length + second.length);
         System.arraycopy(second, 0, result, first.length, second.length);
         return result;
     }
 
-    private String[] getJarFiles(String dir) {
+    String[] getJarFiles(String dir) {
         File file = new File(dir);
         String[] files = file.list(new FilenameFilter() {
             @Override
@@ -221,7 +144,7 @@ public class NutchProcess extends Thread {
         return files;
     }
 
-    private class CommandResultHandler extends DefaultExecuteResultHandler {
+    class CommandResultHandler extends DefaultExecuteResultHandler {
 
         private ExecuteWatchdog watchdog;
 
@@ -248,6 +171,10 @@ public class NutchProcess extends Thread {
         public ExecuteWatchdog getWatchdog() {
             return this.watchdog;
         }
+    }
+    
+    class NutchProcessStatus {
+        
     }
 
 }
