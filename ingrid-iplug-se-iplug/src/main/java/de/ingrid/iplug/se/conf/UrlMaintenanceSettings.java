@@ -9,7 +9,9 @@ public class UrlMaintenanceSettings {
         
         private String label;
         
-        private List<MetaElement> children;
+        private Boolean isDefault;
+        
+        private List<Metadata> children;
 
         public String getId() {
             return id;
@@ -27,13 +29,22 @@ public class UrlMaintenanceSettings {
             this.label = label;
         }
 
-        public List<MetaElement> getChildren() {
+        public List<Metadata> getChildren() {
             return children;
         }
 
-        public void setChildren(List<MetaElement> children) {
+        public void setChildren(List<Metadata> children) {
             this.children = children;
         }
+
+        public Boolean getIsDefault() {
+            return isDefault;
+        }
+
+        public void setIsDefault(Boolean isDefault) {
+            this.isDefault = isDefault;
+        }
+
     }
     
     public class MetaElement {
@@ -43,7 +54,9 @@ public class UrlMaintenanceSettings {
         
         private String type;
         
-        private boolean multiple;
+        private Boolean isMultiple;
+        
+        private Boolean isDisabled;
         
         private List<Metadata> children;
 
@@ -79,14 +92,21 @@ public class UrlMaintenanceSettings {
             this.children = children;
         }
 
-        public boolean isMultiple() {
-            return multiple;
+        public Boolean getIsMultiple() {
+            return isMultiple;
         }
 
-        public void setMultiple(boolean multiple) {
-            this.multiple = multiple;
+        public void setIsMultiple(Boolean multiple) {
+            this.isMultiple = multiple;
         }
         
+        public Boolean getIsDisabled() {
+            return isDisabled;
+        }
+
+        public void setIsDisabled(Boolean disabled) {
+            this.isDisabled = disabled;
+        }
     }
     
     private List<MetaElement> metadata;

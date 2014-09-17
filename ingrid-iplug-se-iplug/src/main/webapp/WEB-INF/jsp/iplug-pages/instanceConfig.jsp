@@ -21,13 +21,26 @@
 <script type="text/javascript">
 	$(document).ready(
 		function() {
-			/* $('#tab-container').easytabs({
+			$('#configTabs').easytabs({
 				animate : false
 			});
-
-			$('#schedulingTabs').easytabs({
-				animate : false
-			}); */
+			
+			$("#btnUpdateMetadata").on( "click", function() {
+    			$.ajax({
+                    type: "POST",
+                    url: "/rest/updateMetadata?instance=${instance.name}",
+                    contentType: 'application/json',
+                    data: $("#metadata").val(),
+                    success: function() {
+                        // let JSP do the magic to refresh the page correctly
+                        location.reload();
+                    },
+                    error: function(jqXHR, text, error) {
+                        console.error(text, error);
+                        alert(error);
+                    }
+                });
+			});
 
 			$("#configurationTable").tablesorter({
 				headers : {

@@ -4,7 +4,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 
 @Entity
 public class Metadata {
@@ -16,10 +15,6 @@ public class Metadata {
     private String metaKey;
 
     private String metaValue;
-    
-    @ManyToOne
-    private Url url;
-
     
     public Long getId() {
         return id;
@@ -45,11 +40,4 @@ public class Metadata {
         this.metaValue = metaValue;
     }
 
-    public Url getUrls() {
-        return url;
-    }
-
-    public void setUrls(Url urls) {
-        this.url = urls;
-    }
 }

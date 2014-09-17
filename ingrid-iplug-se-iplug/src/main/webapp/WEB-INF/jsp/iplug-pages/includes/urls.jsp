@@ -2,20 +2,52 @@
 
 <fieldset>
     <legend>Filter</legend>
+    <label>URL</label>
+    <div style="width: 100%;">
+        <input id="filterUrl" type="text">
+    </div>
     <label>Metadata</label>
     <select id="filterMetadata" multiple>
     <c:forEach items="${ metadata }" var="meta">
-        <optgroup label="${ meta.label }">
+        <c:if test="${ meta.type != 'grouped' }">
+            <optgroup label="${ meta.label }">
+        </c:if>
         <c:forEach items="${ meta.children }" var="group">
-            <option value="${ meta.id }:${ group.id }" <c:forEach items="${ filterOptions }" var="filter"><c:set var="temp" value="${ meta.id }:${ group.id }" /><c:if test="${ filter == temp }">selected</c:if></c:forEach>>${ group.label }</option>
+            <c:if test="${ meta.type == 'grouped' }">
+                <optgroup label="${ meta.label } (${ group.label })">
+                <c:forEach items="${ group.children }" var="subgroup">
+                    <option value="${ meta.id }:${ subgroup.id }" <c:forEach items="${ filterOptions }" var="filter"><c:set var="temp" value="${ meta.id }:${ subgroup.id }" /><c:if test="${ filter == temp }">selected</c:if></c:forEach>>${ subgroup.label }</option>
+                </c:forEach>
+            </c:if>
+            <c:if test="${ meta.type != 'grouped' }">
+                <option value="${ meta.id }:${ group.id }" <c:forEach items="${ filterOptions }" var="filter"><c:set var="temp" value="${ meta.id }:${ group.id }" /><c:if test="${ filter == temp }">selected</c:if></c:forEach>>${ group.label }</option>
+            </c:if>
         </c:forEach>
     </c:forEach>
     </select>
 </fieldset>
 
+<!-- pager -->
+<div id="pager" class="pager">
+    <form>
+        <img src="../img/first.png" class="first" />
+        <img src="../img/prev.png" class="prev" />
+        <span class="pagedisplay"></span>
+        <!-- this can be any element, including an input -->
+        <img src="../img/next.png" class="next" />
+        <img src="../img/last.png" class="last" />
+        <!-- <select class="pagesize">
+            <option value="2">2</option>
+            <option value="20">20</option>
+            <option value="30">30</option>
+            <option value="40">40</option>
+        </select> -->
+    </form>
+</div>
 <table id="urlTable" class="data tablesorter">
     <thead>
         <tr>
+            <th data-sort="string" width="20px"></th>
             <th data-sort="string">URL</th>
             <th data-sort="string">Status</th>
             <th data-sort="string" width="150px"></th>
@@ -24,7 +56,15 @@
     <tbody>
         <c:forEach items="${dbUrls}" var="url" varStatus="loop">
             <tr>
-                <td>${url.url}</a></td>
+                <td><input type="checkbox" data-id="${ url.id }"></td>
+                <td>
+                    ${url.url}
+                    <div class="url-info">
+                        <div class="limit">Limit-URLs: <c:forEach items="${ url.limitUrls }" var="limitUrl">${ limitUrl },</c:forEach></div>
+                        <c:if test="${ not empty url.excludeUrls }"><div class="exclude">Exclude-URLs: <c:forEach items="${ url.excludeUrls }" var="excludeUrl">${ excludeUrl },</c:forEach></div></c:if>
+                        <div class="metadata">Metadaten: <c:forEach items="${ url.metadata }" var="meta">${ meta.metaKey }:${ meta.metaValue },</c:forEach></div>
+                    </div>
+                </td>
                 <td>${url.status}</td>
                 <%-- <td><button type="button" action="delete" name="delete" data-id="${instance.name}">Löschen</button></td> --%>
                 <td>
@@ -47,7 +87,10 @@
         </c:forEach>
     </tbody>
 </table>
-<button id="btnAddUrl" type="submit" name="add">Neue URL</button>
+
+<button id="btnDeleteUrls" type="button" name="delete" class="">URLs löschen</button>
+<button id="btnAddUrl" type="button" name="add" class="right">Neue URL</button>
+<div style="clear:both;"></div>
 
 
 <div id="dialog-form" title="Neue URL anlegen">
@@ -68,9 +111,12 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <tr class="newRow">
+                            <td><input type="text" id="newLimitUrl"></td>
+                            <td><button id="btnAddLimitUrl" type="button" class="right">Neue Limit-URL</button></td>
+                        </tr>
                     </tbody>
                 </table>
-                <button id="btnAddLimitUrl" type="button" class="right">Neue Limit-URL</button>
             </div>
             
             <div>
@@ -83,9 +129,12 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <tr class="newRow">
+                            <td><input type="text" id="newExcludeUrl"></td>
+                            <td><button id="btnAddExcludeUrl" type="button" class="right">Neue Exclude-URL</button></td>
+                        </tr>
                     </tbody>
                 </table>
-                <button id="btnAddExcludeUrl" type="button" class="right">Neue Exclude-URL</button>
             </div>
             
             
@@ -96,9 +145,12 @@
                 <h3>${ meta.label }</h3>
                 
                 <c:if test="${meta.type == 'select' || meta.type == null}" >
-                    <select id="${ meta.id }" <c:if test="${ meta.multiple == true }">multiple</c:if>>
+                    <select id="${ meta.id }" 
+                        <c:if test="${ meta.isMultiple == true }">multiple</c:if>
+                        <c:if test="${ meta.isDisabled == true }">disabled</c:if>
+                    >
                     <c:forEach items="${ meta.children }" var="group">
-                        <option value="${ meta.id }:${ group.id }">${ group.label }</option>
+                        <option value="${ meta.id }:${ group.id }" <c:if test="${ group.isDefault == true }">selected</c:if>>${ group.label }</option>
                     </c:forEach>
                     </select>
                 </c:if>
@@ -164,7 +216,7 @@
     </form>
 </div>
 
-<div id="dialog-form-limit" title="Add new Limit-URL">
+<!-- <div id="dialog-form-limit" title="Add new Limit-URL">
     <form>
         <fieldset>
             <h3>Limit-URL</h3>
@@ -179,4 +231,5 @@
             <input type="text" name="excludeUrl" id="excludeUrl" value="http://" class="text ui-widget-content ui-corner-all">
         </fieldset>
     </form>
-</div>
+</div> -->
+

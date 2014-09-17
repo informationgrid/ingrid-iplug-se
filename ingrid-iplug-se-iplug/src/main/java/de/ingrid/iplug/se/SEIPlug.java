@@ -166,6 +166,11 @@ public class SEIPlug extends HeartBeatPlug {
 //        flyway.migrate();
         
         // get an entity manager instance (initializes properties in the DBManager)
+        setupTestData( em );
+        
+    }
+    
+    private static void setupTestData(EntityManager em) {
         em.getTransaction().begin();
         Url url = new Url( "catalog" );
         url.setStatus( 200 );
@@ -196,10 +201,27 @@ public class SEIPlug extends HeartBeatPlug {
         limitUrls.add( "http://www.wemove.com/about" );
         limitUrls.add( "http://www.wemove.com/jobs" );
         url.setLimitUrls( limitUrls );
+        List<String> excludeUrls = new ArrayList<String>();
+        excludeUrls.add( "http://www.wemove.com/about" );
+        url.setExcludeUrls( excludeUrls );
         
         em.persist(url);
-        em.getTransaction().commit();
         
+        String[] urls = new String[] { "http://www.xyz.com", "http://www.spiegel.de", "http://www.heise.de", "http://www.apple.com", 
+                "http://www.engadget.com", "http://www.tagesschau.de", "http://www.home.com", "http://www.ultra.com",
+                "http://www.libri.com", "http://www.audible.de", "http://www.amazon.com", "http://www.power.com" };
+        
+        for (String uri : urls) {
+            url = new Url( "catalog" );
+            url.setStatus( 400 );
+            url.setUrl( uri );
+            List<String> limit = new ArrayList<String>();
+            limit.add( uri );
+            url.setLimitUrls( limit );
+            em.persist(url);
+        }
+        
+        em.getTransaction().commit();
     }
     
 }

@@ -19,7 +19,7 @@
             "label": "Partner",
             "id": "partner",
             "type": "select",
-            "multiple": true,
+            "isMultiple": true,
             "children": [
                 {
                     "label": "Brandenburg",
@@ -69,7 +69,7 @@
         {
             "label": "Themen",
             "id": "topic",
-            "multiple": true,
+            "isMultiple": true,
             "children": [
                 {
                     "id": "t1",
@@ -156,7 +156,7 @@
         {
             "label": "Service",
             "id": "service",
-            "multiple": true,
+            "isMultiple": true,
             "children": [
                 {
                     "id": "s1",
@@ -175,7 +175,7 @@
         {
             "label": "Messwerte",
             "id": "measure",
-            "multiple": true,
+            "isMultiple": true,
             "children": [
                 {
                     "id": "m1",

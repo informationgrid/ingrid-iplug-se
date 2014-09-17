@@ -1,5 +1,8 @@
 package de.ingrid.iplug.se.webapp.controller.instance;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.http.HttpStatus;
@@ -53,6 +56,20 @@ public class RestDataController {
         }
         em.getTransaction().commit();
         return new ResponseEntity<Url>( url, HttpStatus.OK );
+    }
+    
+    @RequestMapping(value = { "deleteUrls.json" }, method = RequestMethod.POST)
+    public ResponseEntity<Map<String, String>> deleteUrls(@RequestBody Long[] ids) {
+        EntityManager em = DBManager.INSTANCE.getEntityManager();
+        em.getTransaction().begin();
+        for (Long id : ids) {
+            Url url = em.find( Url.class, id );
+            em.remove( url );
+        }
+        em.getTransaction().commit();
+        Map<String, String> result = new HashMap<String, String>();
+        result.put( "result", "OK" );
+        return new ResponseEntity<Map<String, String>>( result, HttpStatus.OK );
     }
 
 }

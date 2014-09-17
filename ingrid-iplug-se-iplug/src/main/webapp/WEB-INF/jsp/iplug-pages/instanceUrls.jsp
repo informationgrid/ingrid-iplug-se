@@ -13,23 +13,34 @@
 <link rel="StyleSheet" href="../css/base/portal_u.css" type="text/css" media="all" />
 <link rel="StyleSheet" href="../css/jquery-ui.min.css" type="text/css" media="all" />
 <link rel="StyleSheet" href="../css/chosen.min.css" type="text/css" media="all" />
+<link rel="StyleSheet" href="../css/jquery.tablesorter.pager.css" type="text/css" media="all" />
 
 <script type="text/javascript" src="../js/base/jquery-1.8.0.min.js"></script>
 <script type="text/javascript" src="../js/jquery-ui.min.js"></script>
-<script type="text/javascript" src="../js/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="../js/jquery.tablesorter.js"></script>
+<script type="text/javascript" src="../js/jquery.tablesorter.widgets.js"></script>
+<script type="text/javascript" src="../js/jquery.tablesorter.pager.js"></script>
 <script type="text/javascript" src="../js/chosen.jquery.min.js"></script>
 
 <script type="text/javascript">
     var urlMaintenance = null;
 	$(document).ready(function() {
-		$("#urlTable").tablesorter({
-			headers : {
-				2 : {
-					sorter : false
-				}
-			}
+		
+		// remember initial default values which will be set for each new URL!
+		var defaultValues = [];
+		$("#dialog-form option:selected").each(function(index, item) {
+			var metaSplitted = item.getAttribute("value").split(":");
+			var meta = { metaKey: metaSplitted[0], metaValue: metaSplitted[1] };
+			defaultValues.push( meta ); 
 		});
-
+		
+		var pagerOptions = {
+			container: $(".pager"),
+			output: '{startRow} bis {endRow} von {filteredRows} URLs',
+			//size: 2,
+			savePages : false
+		};
+		
 		function addUrlValidator() {
 			var valid = true;
 			
@@ -89,7 +100,7 @@
 						location.reload();
 					},
 					error: function(jqXHR, text, error) {
-						log.error(text, error);
+						console.error(text, error);
 					}
 				});
 		        
@@ -100,7 +111,7 @@
 		
 		function getButtonTemplate(type) {
 			var button = null;
-		    switch(type) {
+		    /* switch(type) {
 		    case "limitUrlTable":
 		        button = "<div><button class='btnUrl'>Bearbeiten</button><button class='select'>Weitere Optionen</button></div><ul style='position:absolute; padding-left: 0; min-width: 100px;''><li action='jsDeleteLimit'>Löschen</li><li>Testen</li></ul>";
 		    	break;
@@ -110,22 +121,26 @@
 		    case "userMetadataTable":
 		        button = "<div><button type='button' onclick='urlMaintenance.deleteMetadata(event)'>Löschen</button>";
 		    	break;
-		    }
+		    } */
+	        button = "<div><button type='button' onclick='urlMaintenance.deleteMetadata(event)'>Löschen</button>";
 		    return button;
 		}
 		
 		function addUrlRowTo(id, url) {
 			var button = getButtonTemplate( id );
 			
-			var actionButton = $("#" + id + " tbody")
-            .append("<tr>" +
-               "<td>" + url + "</td>" +
-               "<td>" + button + "</td>" +
-            "</tr>")
-            .find("tr .btnUrl");
+			var actionButton = $("#" + id + " tbody .newRow");
+			var newRow = $(
+				"<tr>" +
+	               "<td>" + url + "</td>" +
+	               "<td>" + button + "</td>" +
+	            "</tr>"
+	        );
+			newRow.insertBefore( $("#" + id + " tbody .newRow") );
+            //.find("tr .btnUrl");
           
 			if (id !== "userMetadataTable") {
-			    createActionButton( actionButton );
+			    //createActionButton( actionButton );
 			}
 		}
 		
@@ -159,7 +174,7 @@
 			});
 			
 			// empty tables
-			$("#dialog-form tbody tr").remove();
+			$("#dialog-form tbody tr:not(.newRow)").remove();
 			
 		}
 
@@ -230,7 +245,7 @@
 			close : function() {}
 		});
 
-		dialogLimit = $("#dialog-form-limit").dialog({
+/* 		dialogLimit = $("#dialog-form-limit").dialog({
 			autoOpen : false,
 			height : 250,
 			width : 550,
@@ -257,7 +272,7 @@
                 	addLimitUrlValidator("exclude")
                 }
             },
-		});
+		}); */
 		/* form = dialog.find("form").on("submit", function(event) {
 			event.preventDefault();
 			addUser();
@@ -346,21 +361,31 @@
 
 		$("#btnAddUrl").on("click", function() {
             dialog.data("urlDataObject", {
+            	    instance: '${ instance.name }',
                     limitUrls: [],
                     excludeUrls: [],
-                    metadata: [],
+                    metadata: $.extend({}, defaultValues), // add a copy of default values
                     userMetadata: []
             });
             dialog.dialog("open");
         });
 
         $( "#btnAddLimitUrl" ).on( "click", function() {
-            dialogLimit.dialog("open");
+            //dialogLimit.dialog("open");
+            var url = $("#newLimitUrl").val();
+        	addUrlRowTo( "limitUrlTable", url );
+        	dialog.data("urlDataObject").limitUrls.push( url );
+        	$("#newLimitUrl").val("");
         });
         $( "#btnAddExcludeUrl" ).on( "click", function() {
-            dialogExclude.dialog("open");
+            //dialogExclude.dialog("open");
+            var url = $("#newExcludeUrl").val();
+            addUrlRowTo( "excludeUrlTable", url );
+            dialog.data("urlDataObject").excludeUrls.push( url );
+            $("#newExcludeUrl").val("");
         });
         
+        // action for button to add user metadata
         $("#userMetaError").hide();
         $("#btnAddUserMetadata").on( "click", function() {
             var newMeta = $( "#userMeta" ).val();
@@ -373,9 +398,38 @@
                 $("#userMetaError").show();
             }
         });
+        
+        // action for button to delete urls
+        $("#btnDeleteUrls").on( "click", function() {
+            var checkedRows = $( "#urlTable input:checked" );
+        	var dataIDs = []; 
+            checkedRows.each( function(index, row) {
+            	dataIDs.push( row.getAttribute( "data-id" ) );
+            });
+            $.ajax({
+                type: "POST",
+                url: "/rest/deleteUrls.json?instance=${instance.name}",
+                contentType: 'application/json',
+                data: JSON.stringify( dataIDs ),
+                success: function() {
+                    // let JSP do the magic to refresh the page correctly
+                    location.reload();
+                },
+                error: function(jqXHR, text, error) {
+                    console.error(text, error);
+                }
+            });
+        });
 
-		$("#dialog-form select").chosen({width: "100%", disable_search_threshold: 5});
-		$("#filterMetadata").chosen({width: "100%", disable_search_threshold: 5})
+        // convert select boxes to better ones
+        var chosenOptions = {
+            width: "100%",
+            disable_search_threshold: 5,
+            placeholder_text_multiple: "Bitte auswählen",
+            no_results_text: "Keinen Eintrag gefunden"
+        };
+		$("#dialog-form select").chosen( chosenOptions );
+		$("#filterMetadata").chosen( chosenOptions )
 		    .change(function(event, options) {
 		    	var filter = [];
 		    	$.each(this.selectedOptions, function(index, option) {
@@ -384,6 +438,28 @@
 		        
 		        location.search = "?instance=${instance.name}&filter=" + filter.join(",");
 		    });
+		
+		// filter by Url
+		$("#filterUrl").on( "keyup", function() {
+			var columns = [];
+			columns[1] =  this.value;
+			$('#urlTable').trigger('search', [ columns ]);			
+		});
+		
+		// initialize the table and its paging option
+        $("#urlTable").tablesorter({
+            headers : {
+                2 : {
+                    sorter : false
+                }
+            },
+            widgets: ['zebra', 'filter'],
+            widgetOptions: {
+            	filter_columnFilters: false,
+            	filter_hideFilters: false
+            }
+        })
+        .tablesorterPager(pagerOptions);
 		
     	/* PUBLIC FUNCTIONS */
     	urlMaintenance = {

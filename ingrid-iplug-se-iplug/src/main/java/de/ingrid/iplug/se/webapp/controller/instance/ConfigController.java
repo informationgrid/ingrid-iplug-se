@@ -1,10 +1,17 @@
 package de.ingrid.iplug.se.webapp.controller.instance;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 import javax.xml.parsers.DocumentBuilder;
@@ -23,6 +30,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,8 +41,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
 import de.ingrid.iplug.se.SEIPlug;
+import de.ingrid.iplug.se.conf.UrlMaintenanceSettings;
 import de.ingrid.iplug.se.webapp.controller.AdminViews;
 import de.ingrid.iplug.se.webapp.controller.ConfigurationCommand;
 
@@ -62,17 +74,9 @@ public class ConfigController extends InstanceController {
         modelMap.put( "instance", getInstanceData(name) );
         return AdminViews.SE_INSTANCE_CONFIG;
     }
-    
-//    @RequestMapping(value = "/iplug-pages/instance.html", method = RequestMethod.POST)
-//    public String post(final BindingResult errors,
-//            @ModelAttribute("plugDescription") final PlugdescriptionCommandObject pdCommandObject) {
-//
-//        return AdminViews.SE_LIST_INSTANCES;
-//    }
 
     @ModelAttribute("configurationCommands")
-    public List<ConfigurationCommand> referenceDataConfiguration(@RequestParam("instance") String name,
-            HttpSession session) throws Exception {
+    public List<ConfigurationCommand> referenceDataConfiguration(@RequestParam("instance") String name) throws Exception {
         String dir = SEIPlug.conf.getInstancesDir();
         File instanceFolder = new File( dir );
         File defaultXml = new File( instanceFolder, name + "/conf/nutch-default.xml" );
@@ -103,6 +107,21 @@ public class ConfigController extends InstanceController {
         }
 
         return defaultList;
+    }
+    
+    @ModelAttribute("metaConfigJson")
+    public String getMetadataConfigAsJson(@RequestParam("instance") String name) throws UnsupportedEncodingException {
+        String json = null;
+        try(FileInputStream reader = new FileInputStream(SEIPlug.conf.getInstancesDir() + "/" + name + "/conf/urlMaintenance.json")) {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            UrlMaintenanceSettings settings = gson.fromJson( new InputStreamReader( reader, "UTF-8" ), UrlMaintenanceSettings.class );
+            json = gson.toJson( settings );
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+        return json;
     }
 
     private List<ConfigurationCommand> loadConfigurationCommands(File file) throws ParserConfigurationException {
@@ -213,6 +232,31 @@ public class ConfigController extends InstanceController {
 
         // return "redirect:/index.hmtl";
         return new ResponseEntity<String>( "Config Updated", HttpStatus.OK );
+    }
+    
+    @RequestMapping(value = "/rest/updateMetadata", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, String>> updateMetadataConfig(@RequestParam("instance") String name, @RequestBody String json) throws IOException {
+        String confFile = SEIPlug.conf.getInstancesDir() + "/" + name + "/conf/urlMaintenance.json";
+        
+        // check if json can be converted correctly
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        UrlMaintenanceSettings settings = gson.fromJson( json, UrlMaintenanceSettings.class );
+        
+        Map<String, String> result = new HashMap<String, String>();
+        // only write then json content to file
+        if (settings != null) {
+            //            File fos = new File( SEIPlug.conf.getInstancesDir() + "/" + name + "/conf/urlMaintenance.json" );
+//            BufferedWriter writer = new BufferedWriter( new FileWriter( fos ) );
+//            writer.write( json );
+//            writer.close();
+            Writer out = new FileWriter( confFile );
+            gson.toJson( settings, out);
+            out.close();
+            result.put( "result", "OK" );
+            return new ResponseEntity<Map<String, String>>( result, HttpStatus.OK );
+        }
+        result.put( "result", "Error" );
+        return new ResponseEntity<Map<String, String>>( result, HttpStatus.INTERNAL_SERVER_ERROR );
     }
 
 }
