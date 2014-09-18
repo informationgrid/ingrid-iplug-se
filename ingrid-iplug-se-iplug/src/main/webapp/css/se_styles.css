@@ -5,7 +5,7 @@
 	position: relative;
 }
 
-.ui-dialog fieldset {
+.ui-dialog fieldset, #tab-container fieldset {
 	border: 1px solid #CCC;
 	margin: 10px 0px;
 	padding: 15px 15px;
@@ -16,27 +16,55 @@
 	width: 165px;
 }
 
+.ui-dialog fieldset > div {
+	padding-bottom: 10px;
+}
+
 label input {
 	vertical-align: bottom;
+}
+
+/* nice style for input boxes */
+.full {
+	width: 100%;
+    overflow: hidden;
+}
+
+.inline {
+    display: inline-block;
+}
+
+.input {
+    border: 1px solid #1B78B1;
+    clear: both;
+}
+.space {
+    margin-bottom: 10px;
+}
+
+.input input {
+	padding: 5px;
+	border: 0;
+    width: 100%;
 }
 
 .right {
 	float: right;
 }
 
-#dialog-form fieldset>div {
+/* #dialog-form fieldset>div {
 	padding-bottom: 10px;
-}
+} */
 
 .ui-buttonset {
 	padding-bottom: 4px;
 	text-align: center;
 }
 
-#dialog-form input[type=text], #dialog-form select, #dialog-form .chosen-container
+/* #dialog-form input[type=text], #dialog-form select, #dialog-form .chosen-container
 	{
 	width: 100%;
-}
+} */
 
 row {
 	float: left;
@@ -175,7 +203,7 @@ input[name='time'] {
 table.tablesorter {
 	font-family: arial;
 	background-color: #CDCDCD;
-	margin: 0px 0pt 15px;
+	/* margin: 0px 0pt 15px; */
 	font-size: 8pt;
 	width: 100%;
 	text-align: left;
@@ -187,7 +215,7 @@ table.tablesorter thead tr th, table.tablesorter tfoot tr th {
 	padding: 4px;
 }
 
-table.tablesorter thead tr .header {
+table.tablesorter thead tr .header, .tablesorter-header {
 	background-image: url(../img/bg.gif);
 	background-repeat: no-repeat;
 	background-position: center right;
@@ -198,7 +226,7 @@ table.tablesorter tbody td {
 	color: #3D3D3D;
 	padding: 4px;
 	background-color: #FFF;
-	vertical-align: top;
+	/* vertical-align: top; */
 	word-break: break-word;
 }
 
@@ -206,17 +234,23 @@ table.tablesorter tbody tr.odd td {
 	background-color: #F0F0F6;
 }
 
-table.tablesorter thead tr .headerSortUp {
+table.tablesorter thead tr .headerSortUp, table.tablesorter thead tr .tablesorter-headerAsc {
 	background-image: url(../img/asc.gif);
 }
 
-table.tablesorter thead tr .headerSortDown {
+table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .tablesorter-headerDesc {
 	background-image: url(../img/desc.gif);
 }
 
 table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp
 	{
 	background-color: #8dbdd8;
+}
+
+thead .sorter-false {
+    background-image: none;
+    cursor: default;
+    padding: 4px;
 }
 
 /* Table Sorter */

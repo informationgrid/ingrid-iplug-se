@@ -9,18 +9,20 @@
 <meta name="keywords" content="" />
 <meta name="author" content="wemove digital solutions" />
 <meta name="copyright" content="wemove digital solutions GmbH" />
-<link rel="StyleSheet" href="../css/se_styles.css" type="text/css" media="all" />
 <link rel="StyleSheet" href="../css/base/portal_u.css" type="text/css" media="all" />
 <link rel="StyleSheet" href="../css/jquery-ui.min.css" type="text/css" media="all" />
 <link rel="StyleSheet" href="../css/chosen.min.css" type="text/css" media="all" />
 <link rel="StyleSheet" href="../css/jquery.tablesorter.pager.css" type="text/css" media="all" />
+<link rel="StyleSheet" href="../css/se_styles.css" type="text/css" media="all" />
 
 <script type="text/javascript" src="../js/base/jquery-1.8.0.min.js"></script>
 <script type="text/javascript" src="../js/jquery-ui.min.js"></script>
-<script type="text/javascript" src="../js/jquery.tablesorter.js"></script>
-<script type="text/javascript" src="../js/jquery.tablesorter.widgets.js"></script>
-<script type="text/javascript" src="../js/jquery.tablesorter.pager.js"></script>
+<!-- <script type="text/javascript" src="../js/jquery.tablesorter.min.js"></script> -->
+<script type="text/javascript" src="../js/jquery.tablesorter.full.min.js"></script>
+<script type="text/javascript" src="../js/jquery.tablesorter.widgets.min.js"></script>
+<script type="text/javascript" src="../js/jquery.tablesorter.pager.min.js"></script>
 <script type="text/javascript" src="../js/chosen.jquery.min.js"></script>
+<script type="text/javascript" src="../js/mindmup-editabletable.js"></script>
 
 <script type="text/javascript">
     var urlMaintenance = null;
@@ -126,25 +128,42 @@
 		    return button;
 		}
 		
-		function addUrlRowTo(id, url) {
+		function addUrlRowTo(id, url, pos) {
 			var button = getButtonTemplate( id );
 			
 			var actionButton = $("#" + id + " tbody .newRow");
 			var newRow = $(
-				"<tr>" +
+				"<tr data-row='" + pos + "'>" +
 	               "<td>" + url + "</td>" +
-	               "<td>" + button + "</td>" +
+	               "<td data-editable='false'>" + button + "</td>" +
 	            "</tr>"
 	        );
 			newRow.insertBefore( $("#" + id + " tbody .newRow") );
             //.find("tr .btnUrl");
           
+            // make tables limit/exclude editable
+            $("#" + id).editableTableWidget();
+
+            $('td', newRow).on(
+                'change',
+                function(evt, newValue) {
+                    var row = evt.target.parentNode;
+                    var rowPos = row.getAttribute( "data-row" ); 
+                    if ( id === "limitUrlTable" ) {
+                        dialog.data("urlDataObject").limitUrls[ rowPos ] = newValue;
+                    	
+                    } else {
+                        dialog.data("urlDataObject").excludeUrls[ rowPos ] = newValue;
+                    }
+                }
+            );
+            
 			if (id !== "userMetadataTable") {
 			    //createActionButton( actionButton );
 			}
 		}
 		
-		function addLimitUrlValidator(type) {
+		/* function addLimitUrlValidator(type) {
 			var valid = true;
 			var url = $("#limitUrl").val();
 			if (type === "exclude") {
@@ -153,18 +172,18 @@
 			
 			if ( valid ) {
 				if (type === "limit") {
-					addUrlRowTo("limitUrlTable", url);
+					addUrlRowTo("limitUrlTable", url, dialog.data("urlDataObject").limitUrls.length);
 					dialog.data("urlDataObject").limitUrls.push( url );
                 	dialogLimit.dialog( "close" );
 				} else {
-					addUrlRowTo("excludeUrlTable", url);
+					addUrlRowTo("excludeUrlTable", url, dialog.data("urlDataObject").excludeUrls.length);
                     dialog.data("urlDataObject").excludeUrls.push( url );
                 	dialogExclude.dialog( "close" );
 				}
         		
 		    }
 			return valid;
-		}
+		} */
 		
 		function resetFields() {
 			// reset all select boxes
@@ -198,11 +217,26 @@
     			if (data) {
     				$("#startUrl").val( data.url ? data.url : "http://" );
     				$.each( data.limitUrls, function(index, url) {
-    					addUrlRowTo("limitUrlTable", url);
+    					addUrlRowTo("limitUrlTable", url, index);
     				});
     				$.each( data.excludeUrls, function(index, url) {
-    					addUrlRowTo("excludeUrlTable", url);
+    					addUrlRowTo("excludeUrlTable", url, index);
     				});
+    				
+    				// make tables limit/exclude editable
+    		        /* $('#limitUrlTable, #excludeUrlTable').editableTableWidget({
+    		            //editor : $('<textarea>')
+    		        });
+
+    		        $('#limitUrlTable tr:not(.newRow) td').on(
+    		            'change',
+    		            function(evt, newValue) {
+    		                var row = evt.target.parentNode;
+    		                var rowPos = row.getAttribute( "data-row" ); 
+    		                dialog.data("urlDataObject").limitUrls[ rowPos ] = newValue;
+    		            }
+    		        ); */
+    				
     				// a metadata consists of a key and a value which is represented as
     				// a key:value option inside an element with the id of the key
     				// collect all metadata with the same key to do multiselection
@@ -238,7 +272,7 @@
     				});
     				
                     $.each( data.userMetadata, function(index, value) {
-                    	addUrlRowTo( "userMetadataTable", value );
+                    	addUrlRowTo( "userMetadataTable", value, index );
                     });
     			}
 			},
@@ -273,10 +307,6 @@
                 }
             },
 		}); */
-		/* form = dialog.find("form").on("submit", function(event) {
-			event.preventDefault();
-			addUser();
-		}); */
 
 		// hide all metadata types initially
 		//$("#metadata span").hide();
@@ -287,18 +317,6 @@
 			// only show corresponding values
     		$("fieldset.meta_" + this.value).show();
 		});
-
-		//settings = "${partners}";
-		// only show providers that belong to their partner! 
-		/* $("#provider option").hide();
-		$("#provider ." + $("#partner").val()).show();
-		$("#partner").on("change", function(event) {
-			var partnerShort = $("#partner").val();
-			$("#provider option").hide();
-			$("#provider ." + partnerShort).show();
-			// select first one
-			$("#provider").val( $("#provider ." + partnerShort)[0].value );
-		}); */
 		
 		function deleteMetadata(evt) {
 			actionHandler( "jsDeleteUserMetadata", $(evt.target) );
@@ -330,6 +348,8 @@
     		btn.button().click(function() {
     			var id = this.getAttribute("data-id");
     			$.get("/rest/url/" + id, function(data) {
+    				// reload page if data was not received, which calls login page
+    				if (typeof data === "string") location.reload();
     				console.log("Data: ", data);
     				data.userMetadata = [];
     				dialog.data("urlDataObject", data);
@@ -373,14 +393,14 @@
         $( "#btnAddLimitUrl" ).on( "click", function() {
             //dialogLimit.dialog("open");
             var url = $("#newLimitUrl").val();
-        	addUrlRowTo( "limitUrlTable", url );
+        	addUrlRowTo( "limitUrlTable", url, dialog.data("urlDataObject").limitUrls.length );
         	dialog.data("urlDataObject").limitUrls.push( url );
         	$("#newLimitUrl").val("");
         });
         $( "#btnAddExcludeUrl" ).on( "click", function() {
             //dialogExclude.dialog("open");
             var url = $("#newExcludeUrl").val();
-            addUrlRowTo( "excludeUrlTable", url );
+            addUrlRowTo( "excludeUrlTable", url, dialog.data("urlDataObject").excludeUrls.length );
             dialog.data("urlDataObject").excludeUrls.push( url );
             $("#newExcludeUrl").val("");
         });
@@ -449,10 +469,14 @@
 		// initialize the table and its paging option
         $("#urlTable").tablesorter({
             headers : {
-                2 : {
+                0 : {
+                    sorter : false
+                },
+                3 : {
                     sorter : false
                 }
             },
+            sortList: [[0,0]], // sort first column ascending
             widgets: ['zebra', 'filter'],
             widgetOptions: {
             	filter_columnFilters: false,

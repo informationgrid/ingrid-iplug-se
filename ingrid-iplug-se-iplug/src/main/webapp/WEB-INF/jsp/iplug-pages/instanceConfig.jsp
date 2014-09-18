@@ -66,7 +66,6 @@
 					var row = evt.target.parentNode;
 					var columnKey = $("td", row)[1];
 					var key = $(columnKey).text();
-					//YAHOO.util.Connect.asyncRequest('POST', 'index.html?name=' + record.getData('name')+'&value='+oNewData);
 					$.post("instanceConfig.html?instance=${instance.name}&name=" + key + "&value=" + newValue,
 						function(data) {
 							console.log("OK: ", data);

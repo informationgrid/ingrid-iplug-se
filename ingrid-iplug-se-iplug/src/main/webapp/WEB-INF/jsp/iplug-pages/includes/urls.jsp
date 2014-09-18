@@ -3,7 +3,7 @@
 <fieldset>
     <legend>Filter</legend>
     <label>URL</label>
-    <div style="width: 100%;">
+    <div class="input full space">
         <input id="filterUrl" type="text">
     </div>
     <label>Metadata</label>
@@ -36,20 +36,15 @@
         <!-- this can be any element, including an input -->
         <img src="../img/next.png" class="next" />
         <img src="../img/last.png" class="last" />
-        <!-- <select class="pagesize">
-            <option value="2">2</option>
-            <option value="20">20</option>
-            <option value="30">30</option>
-            <option value="40">40</option>
-        </select> -->
     </form>
 </div>
+
 <table id="urlTable" class="data tablesorter">
     <thead>
         <tr>
             <th data-sort="string" width="20px"></th>
             <th data-sort="string">URL</th>
-            <th data-sort="string">Status</th>
+            <th data-sort="string" width="60px">Status</th>
             <th data-sort="string" width="150px"></th>
         </tr>
     </thead>
@@ -66,7 +61,6 @@
                     </div>
                 </td>
                 <td>${url.status}</td>
-                <%-- <td><button type="button" action="delete" name="delete" data-id="${instance.name}">Löschen</button></td> --%>
                 <td>
                     <div>
                         <div>
@@ -78,9 +72,6 @@
                             <li action="test">Testen</li>
                             <li action="template">Als Template verwenden ...</li>
                         </ul>
-                        <%-- <a href="instanceUrls.html?instance=${instance.name}&id=${url.id}&editUrl">Bearbeiten</a> 
-                        <a href="instanceUrls.html?instance=${instance.name}&id=${url.id}&deleteUrl">Löschen</a>
-                        <a href="instanceUrls.html?instance=${instance.name}&id=${url.id}&testUrl">Test</a> --%>
                     </div>
                 </td>
             </tr>
@@ -98,7 +89,9 @@
         <fieldset>
             <div>
                 <h3>Start-URL</h3>
-                <input type="text" name="startUrl" id="startUrl" value="http://" class="text ui-widget-content ui-corner-all">
+                <div class="input full space">                
+                    <input type="text" name="startUrl" id="startUrl" value="http://" class="text ui-widget-content ui-corner-all">
+                </div>
             </div>
             
             <div>
@@ -112,8 +105,8 @@
                     </thead>
                     <tbody>
                         <tr class="newRow">
-                            <td><input type="text" id="newLimitUrl"></td>
-                            <td><button id="btnAddLimitUrl" type="button" class="right">Neue Limit-URL</button></td>
+                            <td data-editable='false'><div class="input full"><input type="text" id="newLimitUrl"></div></td>
+                            <td data-editable='false'><button id="btnAddLimitUrl" type="button">Neue Limit-URL</button></td>
                         </tr>
                     </tbody>
                 </table>
@@ -130,8 +123,8 @@
                     </thead>
                     <tbody>
                         <tr class="newRow">
-                            <td><input type="text" id="newExcludeUrl"></td>
-                            <td><button id="btnAddExcludeUrl" type="button" class="right">Neue Exclude-URL</button></td>
+                            <td data-editable='false'><div class="input full"><input type="text" id="newExcludeUrl"></div></td>
+                            <td data-editable='false'><button id="btnAddExcludeUrl" type="button">Neue Exclude-URL</button></td>
                         </tr>
                     </tbody>
                 </table>
@@ -196,19 +189,23 @@
             </c:forEach>
             
             <!-- User defined metadata -->
-            <table id="userMetadataTable" class="data tablesorter">
-                <thead>
-                    <tr>
-                        <th data-sort="string">Metadata</th>
-                        <th data-sort="string" width="80px"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-            <input id="userMeta" type="text" class="text ui-widget-content ui-corner-all">
-            <p id="userMetaError" class="error">Ein Metadatum muss aus einem Schlüssel und einem Wert bestehen, welche durch einen Doppelpunkt getrennt sind. Bsp.: lang:de</p>
-            <button id="btnAddUserMetadata" type="button" class="right" >Benutzerdefinierte Metadatum hinzufügen</button>
+            <div>
+                <table id="userMetadataTable" class="data tablesorter">
+                    <thead>
+                        <tr>
+                            <th data-sort="string">Metadata</th>
+                            <th data-sort="string" width="80px"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <div class="input full">
+                    <input id="userMeta" type="text" class="text ui-widget-content ui-corner-all">
+                </div>
+                <p id="userMetaError" class="error">Ein Metadatum muss aus einem Schlüssel und einem Wert bestehen, welche durch einen Doppelpunkt getrennt sind. Bsp.: lang:de</p>
+                <button id="btnAddUserMetadata" type="button" class="right" >Benutzerdefinierte Metadatum hinzufügen</button>
+            </div>
                 
             <!-- Allow form submission with keyboard without duplicating the dialog button -->
             <!-- <input type="submit" tabindex="-1" style="position: absolute; top: -1000px"> -->

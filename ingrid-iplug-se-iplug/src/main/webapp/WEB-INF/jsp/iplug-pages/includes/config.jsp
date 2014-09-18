@@ -1,6 +1,5 @@
 <%@ include file="/WEB-INF/jsp/base/include.jsp"%>
 
-
 <div id="configTabs" class="tab-container">
     <ul class="etabs">
         <li class="tab"><a href="#tab1"><em><fmt:message key="configuration.metadata.title" /></em></a></li>

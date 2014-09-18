@@ -11,6 +11,7 @@
 <meta name="author" content="wemove digital solutions" />
 <meta name="copyright" content="wemove digital solutions GmbH" />
 <link rel="StyleSheet" href="../css/base/portal_u.css" type="text/css" media="all" />
+<link rel="StyleSheet" href="../css/se_styles.css" type="text/css" media="all" />
 
 </head>
 <body>
@@ -53,7 +54,9 @@
                     <tr>
                         <td class="leftCol">Datenbankpfad</td>
                         <td>
-                            <input type="text" name="dataBasePath" value="${dataBasePath}" />
+                            <div class="input full">
+                                <input type="text" name="dataBasePath" value="${dataBasePath}" />
+                            </div>
                             <form:errors path="dataBasePath" cssClass="error" element="div" />
                             <br />
                             Dies ist der Pfad, wo die dateibasierte Datenbank abgelegt werden soll, in der sich die gepflegten URLs befinden.
@@ -63,7 +66,9 @@
                     <tr>
                         <td class="leftCol">Instanzenpfad</td>
                         <td>
-                            <input type="text" name="instancePath" value="${instancePath}" />
+                            <div class="input full">
+                                <input type="text" name="instancePath" value="${instancePath}" />
+                            </div>
                             <form:errors path="instancePath" cssClass="error" element="div" />
                             <br />
                             Dieser Pfad gibt an, wo die Einstellungen und Indexe der gesammelten Webseiten abgelegt werden sollen.
@@ -73,7 +78,9 @@
                     <tr>
                         <td class="leftCol">ElasticSearch Port</td>
                         <td>
-                            <input type="text" name="elasticSearchPort" value="${elasticSearchPort}" />
+                            <div class="input full">
+                                <input type="text" name="elasticSearchPort" value="${elasticSearchPort}" />
+                            </div>
                             <form:errors path="elasticSearchPort" cssClass="error" element="div" />
                             <br />
                             Dieser Port wird für die Kommunikation mit dem Index verwendet.

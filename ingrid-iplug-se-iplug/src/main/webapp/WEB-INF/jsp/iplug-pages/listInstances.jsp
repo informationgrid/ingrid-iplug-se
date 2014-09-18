@@ -118,7 +118,9 @@
 						</c:forEach>
 					</tbody>
 				</table>
-				<input type="text" name="instance" style="width: 200px;"></input>
+                <div class="input inline">
+				    <input type="text" name="instance" style="width: 200px;"></input>
+                </div>
 		        <button type="submit" name="add">Neue Instanz</button>
                 <c:if test="${not empty error}">
                     <p class="error">${error}</p>
