@@ -1,6 +1,6 @@
 <project default="dist" xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:ac="antlib:net.sf.antcontrib">
 
-	<property name="nutch-version" value="apache-nutch-1.9" />
+	<property name="nutch-version" value="${apache-nutch-version}" />
 	<property name="ingrid.ext.libs" value="${basedir}/ingrid-nutch-libs" />
 
 	<target name="init">

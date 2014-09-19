@@ -9,12 +9,15 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ingrid</groupId>
 	<artifactId>ingrid-iplug-se-nutch</artifactId>
-	<packaging>jar</packaging>
+	<packaging>pom</packaging>
 	<name>ingrid-iplug-se-nutch</name>
 	<scm>
 		<connection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid/ingrid-iplug-se/branches/3.5.x_new_architecture/ingrid-iplug-se-nutch</connection>
 		<developerConnection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid-mdek/trunk/ingrid-iplug-se/branches/3.5.x_new_architecture/ingrid-iplug-se-nutch</developerConnection>
 	</scm>
+	<properties>
+		<apache-nutch-version>apache-nutch-1.9</apache-nutch-version>
+	</properties>
 	<repositories>
 		<!-- Repo of parent pom needed, parent pom may not be installed locally 
 			yet -->
@@ -46,14 +49,8 @@
 			<groupId>org.apache.nutch</groupId>
 			<artifactId>nutch</artifactId>
 			<version>1.9</version>
-<!-- 
-			<exclusions>
-				<exclusion>
-					<groupId>xerces</groupId>
-					<artifactId>xercesImpl</artifactId>
-				</exclusion>
-			</exclusions>
- -->			
+			<!-- O <exclusions> <exclusion> <groupId>xerces</groupId> <artifactId>xercesImpl</artifactId> 
+				</exclusion> </exclusions> -->
 		</dependency>
 
 		<!-- nutch plugin dependencies -->
@@ -249,17 +246,13 @@
 						<phase>compile</phase>
 						<configuration>
 							<tasks>
-								<echo>${java.home}</echo>
 								<echo
 									message="Executing original ant build script '${basedir}/build.xml' target=dist." />
-								<ant antfile="${basedir}/build.xml" inheritRefs="true">
-									<property name="maven.version" value="${version}" />
-									<property name="maven.buildNumber" value="${buildNumber}" />
-									<property name="maven.timestamp" value="${timestamp}" />
-									<property name="maven.iplugType" value="IPLUG_SE" />
-									<property name="ingrid-base-webapp.version" value="${ingrid-base-webapp.version}" />
-									<target name="dist" />
-								</ant>
+								<!-- <ant antfile="${basedir}/build.xml" inheritRefs="true"> <property 
+									name="maven.version" value="${version}" /> <property name="maven.buildNumber" 
+									value="${buildNumber}" /> <property name="maven.timestamp" value="${timestamp}" 
+									/> <property name="maven.iplugType" value="IPLUG_SE" /> <property name="ingrid-base-webapp.version" 
+									value="${ingrid-base-webapp.version}" /> <target name="dist" /> </ant> -->
 							</tasks>
 						</configuration>
 						<goals>
@@ -268,6 +261,7 @@
 					</execution>
 				</executions>
 				<dependencies>
+
 					<!-- following is needed since this plugin mixes up the JAVA_HOME directory 
 						a bit -->
 					<dependency>
@@ -278,6 +272,25 @@
 						<systemPath>${java.home}/../lib/tools.jar</systemPath>
 					</dependency>
 				</dependencies>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>src/main/assembly/bin.xml</descriptor>
+							</descriptors>
+							<finalName>${project.artifactId}-${project.version}</finalName>
+							<appendAssemblyId>false</appendAssemblyId>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<assembly>
+  <id>apache-nutch</id>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <fileSets>
+    <fileSet>
+      <directory>build/${apache-nutch-version}</directory>
+      <outputDirectory>/apache-nutch-runtime/</outputDirectory>
+      <includes>
+        <include>runtime/**</include>
+        <include>LICENSE.txt</include>
+        <include>CHANGES.txt</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+</assembly>
