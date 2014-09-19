@@ -1,5 +1,6 @@
 package de.ingrid.iplug.se.nutchController;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +29,6 @@ public class NutchController {
             }
         }
 
-        process.setWorkingDirectory(instance.getWorkingDirectory());
         instances.put(instance.getName(), process);
         process.start();
     }

@@ -1,8 +1,5 @@
 package de.ingrid.iplug.se.webapp.controller.instance;
 
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -14,6 +11,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.nutchController.IngridCrawlNutchProcess;
 import de.ingrid.iplug.se.nutchController.NutchController;
+import de.ingrid.iplug.se.nutchController.NutchProcessFactory;
 import de.ingrid.iplug.se.webapp.container.Instance;
 import de.ingrid.iplug.se.webapp.controller.AdminViews;
 
@@ -27,8 +25,12 @@ import de.ingrid.iplug.se.webapp.controller.AdminViews;
 @SessionAttributes("plugDescription")
 public class ManagementController extends InstanceController {
 
-    @Autowired
     private NutchController nutchController;
+
+    @Autowired
+    public ManagementController(NutchController nutchController) {
+        this.nutchController = nutchController;
+    }
 
     @RequestMapping(value = { "/iplug-pages/instanceManagement.html" }, method = RequestMethod.GET)
     public String showManagement(final ModelMap modelMap, @RequestParam("instance") String name) {
@@ -43,16 +45,8 @@ public class ManagementController extends InstanceController {
         Instance instance = new Instance();
         instance.setName(name);
         instance.setWorkingDirectory(SEIPlug.conf.getInstancesDir() + "/" + name);
-        IngridCrawlNutchProcess process = new IngridCrawlNutchProcess();
-        process.setDepth(1);
-        process.setNoUrls(100);
-        
-        FileSystem fs = FileSystems.getDefault();
-        process.addClassPath(fs.getPath(instance.getWorkingDirectory(), "conf").toAbsolutePath().toString());
-        process.addJavaOptions(new String[] { "-Xmx512m", "-Dhadoop.log.dir=" + fs.getPath(instance.getWorkingDirectory(), "logs").toAbsolutePath(), "-Dhadoop.log.file=hadoop.log" });
-        process.addClassPath("../../ingrid-iplug-se-nutch/build/apache-nutch-1.9/runtime/local");
-        process.addClassPathLibraryDirectory("../ingrid-iplug-se-nutch/build/apache-nutch-1.9/runtime/local/lib");
-        
+
+        IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, 1, 100);
 
         nutchController.start(instance, process);
         return redirect(AdminViews.SE_INSTANCE_MANAGEMENT + ".html?instance=" + name);

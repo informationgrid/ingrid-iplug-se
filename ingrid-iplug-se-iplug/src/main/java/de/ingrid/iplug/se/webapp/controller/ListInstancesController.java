@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
 import de.ingrid.admin.controller.AbstractController;
 import de.ingrid.iplug.se.SEIPlug;
+import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
 
 /**
@@ -76,8 +77,8 @@ public class ListInstancesController extends AbstractController {
     public String addInstance(final ModelMap modelMap, @RequestParam("instance") String name) {
         String dir = SEIPlug.conf.getInstancesDir();
 
-        // convert spaces to "_"
-        name = name.replaceAll( " ", "_" );
+        // convert illegal chars to "_"
+        name = name.replaceAll( "[:\\\\/*?|<>\\W]", "_" );
 
         try {
             final Path newInstanceDir = Files.createDirectories( Paths.get( dir + "/" + name ) );
@@ -85,29 +86,28 @@ public class ListInstancesController extends AbstractController {
                 throw new RuntimeException( "Directory could not be created: " + dir + "/" + name );
             }
             
-            final Path destDir = Paths.get( newInstanceDir.toString(), "conf" );
 
             // copy default configuration
+            Path destDir = Paths.get( newInstanceDir.toString(), "conf" );
+            Path sourceDir = Paths.get( "conf", "default", "conf" );
             try {
-                final Path sourceDir = Paths.get( "conf/default/conf" );
-                Files.walkFileTree( sourceDir, new SimpleFileVisitor<Path>() {
-                    public FileVisitResult visitFile( Path file, BasicFileAttributes attrs ) throws IOException {
-                        return copy(file);
-                    }
-                    public FileVisitResult preVisitDirectory( Path dir, BasicFileAttributes attrs ) throws IOException {
-                        return copy(dir);
-                    }
-                    private FileVisitResult copy( Path fileOrDir ) throws IOException {
-                        Files.copy( fileOrDir, destDir.resolve( sourceDir.relativize( fileOrDir ) ) );
-                        return FileVisitResult.CONTINUE;
-                    }
-
-                } );
+                FileUtils.copyDirectories(sourceDir, destDir);
             } catch (IOException e) {
                 e.printStackTrace();
                 modelMap.put( "error", "Default configuration could not be copied to: " + destDir );
             }
 
+            // copy nutch configurations
+            destDir = Paths.get( newInstanceDir.toString(), "conf", "nutch" );
+            sourceDir = Paths.get( "apache-nutch-runtime", "runtime", "local", "conf" );
+            try {
+                FileUtils.copyDirectories(sourceDir, destDir);
+            } catch (IOException e) {
+                e.printStackTrace();
+                modelMap.put( "error", "Default configuration could not be copied to: " + destDir );
+            }
+            
+            
             modelMap.put( "instances", getInstances() );
 
         } catch (IOException e) {
