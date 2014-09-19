@@ -15,19 +15,11 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.settings.Settings.Builder;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import de.ingrid.admin.JettyStarter;
-import de.ingrid.iplug.se.elasticsearch.Utils;
-
-import static org.elasticsearch.node.NodeBuilder.*;
 
 @RunWith(PowerMockRunner.class)
 //@PrepareForTest(JettyStarter.class)
