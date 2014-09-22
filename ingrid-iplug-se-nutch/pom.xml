@@ -248,11 +248,12 @@
 							<tasks>
 								<echo
 									message="Executing original ant build script '${basedir}/build.xml' target=dist." />
-								<ant antfile="${basedir}/build.xml" inheritRefs="true">
+								    <ant antfile="${basedir}/build.xml" inheritRefs="true">
 									<property name="maven.version" value="${version}" />
 									<property name="maven.buildNumber" value="${buildNumber}" />
 									<property name="maven.timestamp" value="${timestamp}" />
 									<property name="maven.iplugType" value="IPLUG_SE" />
+									<property name="apache-nutch-version" value="${apache-nutch-version}" />
 									<property name="ingrid-base-webapp.version" value="${ingrid-base-webapp.version}" />
 									<target name="dist" />
 								</ant>
