@@ -301,6 +301,8 @@
 							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
+						    <includeScope>compile</includeScope>
+                            <includeScope>runtime</includeScope>
 							<outputDirectory>ingrid-nutch-libs</outputDirectory>
 							<excludeTransitive>false</excludeTransitive>
 							<excludeArtifactIds>ingrid-installer,xercesImpl,xerces,xalan</excludeArtifactIds>
@@ -315,6 +317,20 @@
 				<configuration>
 					<downloadSources>true</downloadSources>
 					<downloadJavadocs>true</downloadJavadocs>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>ingrid-nutch-libs</directory>
+							<includes>
+								<include>**/*</include>
+							</includes>
+							<followSymlinks>false</followSymlinks>
+						</fileset>
+					</filesets>
 				</configuration>
 			</plugin>
 
