@@ -1,5 +1,7 @@
 package de.ingrid.iplug.se;
 
+import java.util.List;
+
 import de.ingrid.utils.IngridHit;
 import de.ingrid.utils.IngridHitDetail;
 import de.ingrid.utils.IngridHits;
@@ -39,5 +41,8 @@ public interface Index {
 	 * 
 	 */
 	public void close();
+
+
+    public void setActiveInstances(List<String> value);
 	
 }

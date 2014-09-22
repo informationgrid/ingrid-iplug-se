@@ -88,12 +88,8 @@ public class SEIPlug extends HeartBeatPlug {
 
         this.fPlugDesc = plugDescription;
         this.fPlugId = fPlugDesc.getPlugId();
-//        try {
-//            this.fWorkingDir = fPlugDesc.getWorkinDirectory().getCanonicalPath();
-//        } catch (IOException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
+        
+        index.setActiveInstances( conf.activeInstances );
         
         // TODO: add plug id as index information
         // ...

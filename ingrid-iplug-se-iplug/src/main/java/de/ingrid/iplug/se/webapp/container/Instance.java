@@ -9,7 +9,9 @@ public class Instance {
     private String name;
     private String workingDirectory;
     private String status;
+    private boolean isActive;
     private List<Url> urls;
+    private boolean indexTypeExists;
 
     public Instance() {}
 
@@ -43,6 +45,22 @@ public class Instance {
 
     public void setWorkingDirectory(String workingDirectory) {
         this.workingDirectory = workingDirectory;
+    }
+
+    public boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public boolean getIndexTypeExists() {
+        return this.indexTypeExists;        
+    }
+    
+    public void setIndexTypeExists(boolean typeExists) {
+        this.indexTypeExists = typeExists;        
     }
     
     

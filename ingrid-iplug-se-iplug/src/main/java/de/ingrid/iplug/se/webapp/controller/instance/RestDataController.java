@@ -1,6 +1,7 @@
 package de.ingrid.iplug.se.webapp.controller.instance;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Url;
 
@@ -72,4 +74,22 @@ public class RestDataController {
         return new ResponseEntity<Map<String, String>>( result, HttpStatus.OK );
     }
 
+    @RequestMapping(value = { "instance/{name}/{value}" }, method = RequestMethod.POST)
+    public ResponseEntity<Map<String, String>> toggleInstanceActive(@PathVariable("name") String name, @PathVariable("value") String value) {
+        
+        List<String> activeInstances = SEIPlug.conf.activeInstances;
+        if ("on".equals( value )) {
+            activeInstances.add( name );
+        } else {
+            activeInstances.remove( name );            
+        }
+        
+        return generateOkResponse();
+    }
+    
+    private ResponseEntity<Map<String, String>> generateOkResponse() {
+        Map<String, String> result = new HashMap<String, String>();
+        result.put( "result", "OK" );
+        return new ResponseEntity<Map<String, String>>( result, HttpStatus.OK );
+    }
 }

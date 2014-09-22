@@ -32,15 +32,15 @@
     </div>
     <div id="tab-container" class="tab-container">
         <ul class='etabs'>
-            <li class='tab<c:if test="${activeTab == '1'}"> active</c:if>'><a<c:if test="${activeTab != '1'}"> href="instanceConfig.html?instance=${instance.name}"</c:if>>Konfiguration</a></li>
             <li class='tab<c:if test="${activeTab == '2'}"> active</c:if>'><a<c:if test="${activeTab != '2'}"> href="instanceUrls.html?instance=${instance.name}"</c:if>>URL-Pflege</a></li>
+            <li class='tab<c:if test="${activeTab == '1'}"> active</c:if>'><a<c:if test="${activeTab != '1'}"> href="instanceConfig.html?instance=${instance.name}"</c:if>>Konfiguration</a></li>
             <li class='tab<c:if test="${activeTab == '3'}"> active</c:if>'><a<c:if test="${activeTab != '3'}"> href="instanceScheduling.html?instance=${instance.name}"</c:if>>Scheduling</a></li>
             <li class='tab<c:if test="${activeTab == '4'}"> active</c:if>'><a<c:if test="${activeTab != '4'}"> href="instanceManagement.html?instance=${instance.name}"</c:if>>Status</a></li>
         </ul>
         <div class="panel-container">
             <div id="tab-config">
-                <c:if test="${activeTab == '1'}"><c:import url="includes/config.jsp"></c:import></c:if>
                 <c:if test="${activeTab == '2'}"><c:import url="includes/urls.jsp"></c:import></c:if>
+                <c:if test="${activeTab == '1'}"><c:import url="includes/config.jsp"></c:import></c:if>
                 <c:if test="${activeTab == '3'}"><c:import url="includes/scheduling.jsp"></c:import></c:if>
                 <c:if test="${activeTab == '4'}"><c:import url="includes/management.jsp"></c:import></c:if>
             </div>

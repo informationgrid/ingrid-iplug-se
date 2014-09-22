@@ -50,29 +50,32 @@
     </thead>
     <tbody>
         <c:forEach items="${dbUrls}" var="url" varStatus="loop">
-            <tr>
+            <tr data-id="${ url.id }">
                 <td><input type="checkbox" data-id="${ url.id }"></td>
                 <td>
                     ${url.url}
-                    <div class="url-info">
-                        <div class="limit">Limit-URLs: <c:forEach items="${ url.limitUrls }" var="limitUrl">${ limitUrl },</c:forEach></div>
-                        <c:if test="${ not empty url.excludeUrls }"><div class="exclude">Exclude-URLs: <c:forEach items="${ url.excludeUrls }" var="excludeUrl">${ excludeUrl },</c:forEach></div></c:if>
-                        <div class="metadata">Metadaten: <c:forEach items="${ url.metadata }" var="meta">${ meta.metaKey }:${ meta.metaValue },</c:forEach></div>
-                    </div>
                 </td>
                 <td>${url.status}</td>
                 <td>
                     <div>
                         <div>
-                            <button class="btnUrl" data-id="${ url.id }">Bearbeiten</button>
+                            <button class="btnUrl">Bearbeiten</button>
                             <button class="select">Weitere Optionen</button>
                         </div>
-                        <ul style="position:absolute; padding-left: 0; min-width: 100px;">
+                        <ul style="position:absolute; padding-left: 0; min-width: 100px; z-index: 100;">
                             <li action="delete">Löschen</li>
                             <li action="test">Testen</li>
-                            <li action="template">Als Template verwenden ...</li>
+                            <li action="createNewFromTemplate">Als Template verwenden ...</li>
                         </ul>
                     </div>
+                </td>
+            </tr>
+            <tr class="tablesorter-childRow">
+                <td></td>
+                <td colspan="3" class="url-info">
+                    <div class="limit">Limit-URLs: <c:forEach items="${ url.limitUrls }" var="limitUrl">${ limitUrl },</c:forEach></div>
+                    <c:if test="${ not empty url.excludeUrls }"><div class="exclude">Exclude-URLs: <c:forEach items="${ url.excludeUrls }" var="excludeUrl">${ excludeUrl },</c:forEach></div></c:if>
+                    <div class="metadata">Metadaten: <c:forEach items="${ url.metadata }" var="meta">${ meta.metaKey }:${ meta.metaValue },</c:forEach></div>
                 </td>
             </tr>
         </c:forEach>
@@ -89,7 +92,7 @@
         <fieldset>
             <div>
                 <h3>Start-URL</h3>
-                <div class="input full space">                
+                <div class="input full">                
                     <input type="text" name="startUrl" id="startUrl" value="http://" class="text ui-widget-content ui-corner-all">
                 </div>
             </div>
@@ -100,7 +103,7 @@
                     <thead>
                         <tr>
                             <th data-sort="string">URL</th>
-                            <th width="150px"></th>
+                            <th width="140px"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -118,7 +121,7 @@
                     <thead>
                         <tr>
                             <th data-sort="string">URL</th>
-                            <th width="150px"></th>
+                            <th width="140px"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -190,21 +193,22 @@
             
             <!-- User defined metadata -->
             <div>
+                <h3>Weitere Metadaten</h3>
                 <table id="userMetadataTable" class="data tablesorter">
                     <thead>
                         <tr>
                             <th data-sort="string">Metadata</th>
-                            <th data-sort="string" width="80px"></th>
+                            <th data-sort="string" width="150px"></th>
                         </tr>
                     </thead>
                     <tbody>
+                        <tr class="newRow">
+                            <td data-editable='false'><div class="input full"><input id="userMeta" type="text"></div></td>
+                            <td data-editable='false'><button id="btnAddUserMetadata" type="button">Benutzerdefiniertes Metadatum hinzufügen</button></td>
+                        </tr>
                     </tbody>
                 </table>
-                <div class="input full">
-                    <input id="userMeta" type="text" class="text ui-widget-content ui-corner-all">
-                </div>
                 <p id="userMetaError" class="error">Ein Metadatum muss aus einem Schlüssel und einem Wert bestehen, welche durch einen Doppelpunkt getrennt sind. Bsp.: lang:de</p>
-                <button id="btnAddUserMetadata" type="button" class="right" >Benutzerdefinierte Metadatum hinzufügen</button>
             </div>
                 
             <!-- Allow form submission with keyboard without duplicating the dialog button -->

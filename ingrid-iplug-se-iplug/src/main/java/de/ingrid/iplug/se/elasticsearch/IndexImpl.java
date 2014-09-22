@@ -43,17 +43,30 @@ public class IndexImpl implements Index {
     private FacetConverter facetConverter;
     
     private final static String[] detailFields =  { "url", "title", "abstract" };
+
+    private static final String ELASTIC_SEARCH_ID = "es_id";
+
+    private static final String ELASTIC_SEARCH_INDEX = "es_index";
+
+    private static final String ELASTIC_SEARCH_INDEX_TYPE = "es_type";
     
-    // TODO: get all active indices to search for
-    private String instances = "test";
+    // comma-separated list of instances used for search
+    // -> set through configuration
+    private String[] instances = null;
 
     private String plugId = null;
 
     // SearchType see: http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-request-search-type.html
     private SearchType searchType = null;
 
+    private String indexName;
+
     @Autowired
     public IndexImpl(ElasticsearchNodeFactoryBean elasticSearch, QueryConverter qc, FacetConverter fc) {
+        this.indexName = SEIPlug.conf.index;
+        this.searchType = SEIPlug.conf.searchType;
+        this.plugId = JettyStarter.getInstance().config.communicationProxyUrl;
+        
         try {
             this.elasticSearch = elasticSearch;
             this.queryConverter = qc;
@@ -61,17 +74,20 @@ public class IndexImpl implements Index {
             client = elasticSearch.getObject().client();
 
             log.info( "Elastic Search Settings: " + elasticSearch.getObject().settings().toDelimitedString( ',' ) );
-            //log.info( "Elastic Port: " + elasticSearch.getObject().settings() );
+            boolean indexExists = client.admin().indices().prepareExists( indexName ).execute().actionGet().isExists();
+            if (!indexExists) {
+                client.admin().indices().prepareCreate( indexName ).execute().actionGet();
+            }
+            
+            setActiveInstances( SEIPlug.conf.activeInstances );
 
         } catch (Exception e) {
             log.error( "Error during initialization of ElasticSearch-Client!" );
             e.printStackTrace();
         }
         
-        this.searchType = SEIPlug.conf.searchType;
-        this.plugId = JettyStarter.getInstance().config.communicationProxyUrl;
     }
-
+    
     @Override
     public IngridHits search(IngridQuery ingridQuery, int startHit, int num) {
 
@@ -86,8 +102,8 @@ public class IndexImpl implements Index {
         boolean hasFacets = ingridQuery.containsKey( "FACETS" );
         
         // search prepare
-        SearchRequestBuilder srb = client.prepareSearch( instances )
-                // .setTypes("type1", "type2")
+        SearchRequestBuilder srb = client.prepareSearch( indexName )
+                .setTypes( instances )
                 .setSearchType( searchType  )
                 .setQuery( query ) // Query
                 .setFrom( startHit ).setSize( num )
@@ -132,9 +148,13 @@ public class IndexImpl implements Index {
         int totalHits = (int) hits.getTotalHits();
         IngridHit[] hitArray = new IngridHit[length];
         int pos = 0;
+        int docId = 0;
         for (SearchHit hit : hits.hits()) {
-            int docId = Integer.valueOf( hit.getId() );
-            hitArray[pos] = new IngridHit(this.plugId, docId, -1, hit.getScore() );
+            IngridHit ingridHit = new IngridHit(this.plugId, docId++, -1, hit.getScore() );
+            ingridHit.put( ELASTIC_SEARCH_ID, hit.getId() );
+            ingridHit.put( ELASTIC_SEARCH_INDEX, hit.getIndex() );
+            ingridHit.put( ELASTIC_SEARCH_INDEX_TYPE, hit.getType() );
+            hitArray[pos] = ingridHit; 
             pos++;
         }
 
@@ -145,10 +165,12 @@ public class IndexImpl implements Index {
 
     @Override
     public IngridHitDetail getDetail(IngridHit hit, String[] requestedFields) {
-        String documentId = String.valueOf( hit.getDocumentId() );
+        String documentId = hit.getString( ELASTIC_SEARCH_ID );
+        String fromIndex = hit.getString( ELASTIC_SEARCH_INDEX );
+        String fromType = hit.getString( ELASTIC_SEARCH_INDEX_TYPE );
         String[] allFields = (String[]) ArrayUtils.addAll( detailFields, requestedFields );
         
-        GetResponse response = client.prepareGet( instances, "_all", documentId )
+        GetResponse response = client.prepareGet( fromIndex, fromType, documentId )
                 .setFields( allFields )
                 .execute()
                 .actionGet();
@@ -179,6 +201,11 @@ public class IndexImpl implements Index {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void setActiveInstances(List<String> values) {
+        this.instances = values.toArray(new String[0]);
     }
 
 }

@@ -12,13 +12,15 @@
 <meta name="author" content="wemove digital solutions" />
 <meta name="copyright" content="wemove digital solutions GmbH" />
 <link rel="StyleSheet" href="../css/base/portal_u.css" type="text/css" media="all" />
+<link rel="StyleSheet" href="../css/jquery-ui.min.css" type="text/css" media="all" />
 <link rel="StyleSheet" href="../css/se_styles.css" type="text/css" media="all" />
 	
 <script type="text/javascript" src="../js/base/jquery-1.8.0.min.js"></script>
+<script type="text/javascript" src="../js/jquery-ui.min.js"></script>
 <script type="text/javascript" src="../js/jquery.tablesorter.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
-        $("button[action]").click(function() {
+        /* $("button[action]").click(function() {
             // get form
             var form = $("#formInstances");
             var action = $(this).attr("action");
@@ -34,23 +36,64 @@
             }
             // submit form
             form.submit();
+        }); */
+        
+        $("#listInstances").tablesorter();
+        
+        // initialize radio buttons for status of instances
+        $( ".radio" ).buttonset();
+        
+        $( ".radio" ).on("change", function(event) {
+        	var instance = $(this).attr( "data-id" );
+        	var value = $(event.target).val();
+        	
+        	$.ajax({
+                type: "POST",
+                url: "/rest/instance/" + instance + "/" + value,
+                contentType: 'application/json',
+                success: function() {
+                    console.debug( "Switched instance '" + instance + "' to: " + value );
+                },
+                error: function(jqXHR, text, error) {
+                    console.error(text, error);
+                }
+            });
         });
         
-        $("#listInstances").tablesorter({ 
-            // pass the headers argument and assing a object 
-            headers: { 
-                // assign the secound column (we start counting zero) 
-                1: { 
-                    // disable it by setting the property sorter to false 
-                    sorter: false 
-                }, 
-                // assign the third column (we start counting zero) 
-                2: { 
-                    // disable it by setting the property sorter to false 
-                    sorter: false 
-                } 
+        $(".btnInstance").button().click(function() {
+            var id = this.getAttribute("data-id");
+            $.ajax({
+                url: "listInstances",
+                type: 'DELETE',
+                success: function() {
+                    location.reload();
+                },
+                data: id,
+                contentType: 'application/json'
+            });
+        }).next().button({
+            text : false,
+            icons : {
+                primary : "ui-icon-triangle-1-s"
             }
-        });
+        }).click(function() {
+            var menu = $(this).parent().next().show().position({
+                my : "left top",
+                at : "left bottom",
+                of : this
+            });
+            $(document).one("click", function(evt) {
+                var action = evt.target.getAttribute("action");
+                if (action == "recreateIndex") {
+                    var id = $(evt.target).parents("tr").children().find("a")[0].innerHTML;
+                    $.post("listInstances.html?instance=" + id + "&" + action, null, function() {
+                    	location.reload();
+                    });
+                }
+                menu.hide();
+            });
+            return false;
+        }).parent().buttonset().next().hide().menu();
     });
 </script>
 
@@ -103,17 +146,37 @@
 					<thead>
 						<tr>
 							<th data-sort="string">Name</th>
-							<th data-sort="string">Status</th>
-							<th data-sort="string">Aktionen</th>
+							<th data-sorter="false" class="sorter-false" width="100px">Status</th>
+							<th data-sorter="false" width="150px">Aktionen</th>
 						</tr>
 					</thead>
 					<tbody>
 						<c:forEach items="${instances}" var="instance" varStatus="loop">
 							<tr>
-								<td><a href="instanceConfig.html?instance=${instance.name}">${instance.name}</a></td>
-								<td>${instance.status}</td>
+								<td><a href="instanceUrls.html?instance=${instance.name}">${instance.name}</a><c:if test="${ instance.indexTypeExists == false }"> <span class="error">(Index/Typ fehlt)</span></c:if></td>
+								<td>${instance.status}
+                                    <div class="radio" data-id="${instance.name}">
+                                        <input type="radio" id="statusOn_${instance.name}" name="status_${instance.name}" value="on"
+                                            <c:if test="${instance.isActive == true}">checked="checked"</c:if>
+                                        ><label for="statusOn_${instance.name}">An</label>
+                                        <input type="radio" id="statusOff_${instance.name}" name="status_${instance.name}" value="off" 
+                                            <c:if test="${instance.isActive == false}">checked="checked"</c:if>
+                                        ><label for="statusOff_${instance.name}">Aus</label>
+                                    </div>
+                                </td>
 								<%-- <td><button type="button" action="delete" name="delete" data-id="${instance.name}">Löschen</button></td> --%>
-								<td><a href="listInstances.html?instance=${instance.name}&delete">Löschen</a></td>
+								<td>
+                                    <%-- <a href="listInstances.html?instance=${instance.name}&delete">Löschen</a> --%>
+                                    <div>
+                                        <div>
+                                            <button type="button" class="btnInstance" data-id="${ instance.name }">Löschen</button>
+                                            <button class="select">Weitere Optionen</button>
+                                        </div>
+                                        <ul style="position:absolute; padding-left: 0; min-width: 100px; z-index: 100;">
+                                            <li action="recreateIndex" <c:if test="${ instance.indexTypeExists == true }">disabled</c:if>>Index/Typ erstellen</li>
+                                        </ul>
+                                    </div>
+                                </td>
 							</tr>
 						</c:forEach>
 					</tbody>

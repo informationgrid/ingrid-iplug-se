@@ -2,7 +2,6 @@ package de.ingrid.iplug.se.webapp.controller;
 
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -16,7 +15,7 @@ import de.ingrid.iplug.se.utils.FileUtils;
 public class ListInstancesControllerTest {
 
     @Test
-    public void testAddInstance() throws IOException {
+    public void testAddInstance() throws Exception {
         
         FileUtils.removeRecursive(Paths.get("test-instances"));
         

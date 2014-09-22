@@ -74,10 +74,10 @@ row {
 	width: 100%;
 }
 
-label {
+/* label {
 	float: left;
 	width: 130px;
-}
+} */
 
 .url-info {
 	padding-left: 20px;
@@ -210,6 +210,10 @@ table.tablesorter {
 	border-spacing: 1px;
 }
 
+.tablesorter .filtered {
+    display: none;
+}
+
 table.tablesorter thead tr th, table.tablesorter tfoot tr th {
 	font-size: 8pt;
 	padding: 4px;
@@ -247,7 +251,7 @@ table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSo
 	background-color: #8dbdd8;
 }
 
-thead .sorter-false {
+table.tablesorter thead .header.sorter-false {
     background-image: none;
     cursor: default;
     padding: 4px;

@@ -186,6 +186,15 @@
 		} */
 		
 		function resetFields() {
+			if (dialog.data("isNew") === true) {
+				$(".ui-dialog-title", dialog.parent()).text( "Neue URL anlegen" );
+				$(".ui-dialog-buttonset button:last .ui-button-text").text( "Erstellen" )
+				
+			} else {
+				$(".ui-dialog-title", dialog.parent()).text( "URL bearbeiten" );
+				$(".ui-dialog-buttonset button:last .ui-button-text").text( "Ändern" )				
+			}
+			
 			// reset all select boxes
 			$("#dialog-form select").each(function(index, item) {
 				$(item).val("");
@@ -325,6 +334,21 @@
 		function actionHandler( action, target ) {
 			var type = null;
 			switch (action) {
+			case "createNewFromTemplate":
+				var id = $( target ).parents("tr").attr("data-id");
+                $.get("/rest/url/" + id, function(data) {
+                    // reload page if data was not received, which calls login page
+                    if (typeof data === "string") location.reload();
+                    // empty start/limit/exclude URL(s)
+                    data.userMetadata = [];
+                    data.url = "http://";
+                    data.limitUrls = [];
+                    data.excludeUrls = [];
+                    dialog.data("urlDataObject", data);
+                    dialog.data("isNew", true);
+                    dialog.dialog("open");
+                });
+				break;
             case "jsDeleteUserMetadata":
             	type = type ? type : "userMetadata";
                 // FALL THROUGH!!!
@@ -338,7 +362,7 @@
                 
                 var dataArray = dialog.data("urlDataObject")[ type ];
                 // remove url from data object
-                dataArray.splice(dataArray.indexOf( url ));
+                dataArray.splice(dataArray.indexOf( url ), 1);
                 // remove row from table
                 row.remove();
             }
@@ -346,7 +370,7 @@
 		
 		function createActionButton( btn ) {
     		btn.button().click(function() {
-    			var id = this.getAttribute("data-id");
+    			var id = $( this ).parents("tr").attr("data-id");
     			$.get("/rest/url/" + id, function(data) {
     				// reload page if data was not received, which calls login page
     				if (typeof data === "string") location.reload();
@@ -387,6 +411,7 @@
                     metadata: $.extend({}, defaultValues), // add a copy of default values
                     userMetadata: []
             });
+            dialog.data("isNew", true);
             dialog.dialog("open");
         });
 
@@ -424,7 +449,7 @@
             var checkedRows = $( "#urlTable input:checked" );
         	var dataIDs = []; 
             checkedRows.each( function(index, row) {
-            	dataIDs.push( row.getAttribute( "data-id" ) );
+            	dataIDs.push( $( row ).parents("tr").attr("data-id") );
             });
             $.ajax({
                 type: "POST",
@@ -480,7 +505,12 @@
             widgets: ['zebra', 'filter'],
             widgetOptions: {
             	filter_columnFilters: false,
-            	filter_hideFilters: false
+            	filter_hideFilters: false,
+            	// include child row content while filtering, if true
+                filter_childRows  : false,
+            	// class name applied to filter row and each input
+                filter_cssFilter  : 'filtered',
+                pager_removeRows: false
             }
         })
         .tablesorterPager(pagerOptions);
