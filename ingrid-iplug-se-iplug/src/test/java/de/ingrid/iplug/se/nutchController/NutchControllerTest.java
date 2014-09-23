@@ -54,19 +54,19 @@ public class NutchControllerTest {
 
         long start = System.currentTimeMillis();
         Thread.sleep(500);
-        assertEquals("Status is RUNNING", NutchProcess.STATUS.RUNNING, nutchController.getStatus(instance));
+        assertEquals("Status is RUNNING", NutchProcess.STATUS.RUNNING, nutchController.getNutchProcess(instance).getStatus());
         while ((System.currentTimeMillis() - start) < 300000) {
             Thread.sleep(1000);
-            if (nutchController.getStatus(instance) != NutchProcess.STATUS.RUNNING) {
+            if (nutchController.getNutchProcess(instance).getStatus() != NutchProcess.STATUS.RUNNING) {
                 break;
             }
         }
-        if (nutchController.getStatus(instance) == NutchProcess.STATUS.RUNNING) {
+        if (nutchController.getNutchProcess(instance).getStatus() == NutchProcess.STATUS.RUNNING) {
             node.close();
             nutchController.stop(instance);
             fail("Crawl took more than 5 min.");
         }
-        assertEquals("Status is FINISHED", NutchProcess.STATUS.FINISHED, nutchController.getStatus(instance));
+        assertEquals("Status is FINISHED", NutchProcess.STATUS.FINISHED, nutchController.getNutchProcess(instance).getStatus());
         node.close();        
 
         FileUtils.removeRecursive(Paths.get("test-instances"));

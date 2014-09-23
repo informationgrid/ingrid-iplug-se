@@ -33,18 +33,19 @@ public class NutchController {
     }
 
     /**
-     * Returns the status of the nutch process for this instance.
+     * Returns the nutch process for this instance if any.
      * 
-     * @param instance
+     * @param instance The instance or null if not found.
      * @return
      */
-    public synchronized NutchProcess.STATUS getStatus(Instance instance) {
+    public synchronized NutchProcess getNutchProcess(Instance instance) {
         if (instances.containsKey(instance.getName())) {
-            NutchProcess command = instances.get(instance.getName());
-            return command.getStatus();
+            NutchProcess process = instances.get(instance.getName());
+            return process;
         }
         return null;
     }
+    
 
     /**
      * Stops a process for the specified instance.
