@@ -14,11 +14,11 @@ import java.io.OutputStreamWriter;
 import java.util.Date;
 import java.util.LinkedHashMap;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 
+import com.google.common.io.Files;
 import com.thoughtworks.xstream.XStream;
 
 /**
@@ -117,7 +117,7 @@ public class StatusProvider {
             }
         }
     }
-    
+
     /**
      * Returns the current message for the given state key.
      * 
@@ -131,7 +131,7 @@ public class StatusProvider {
             return null;
         }
     }
-    
+
     /**
      * Appends a String to a state. Does nothing if the state does not exist.
      * 
@@ -143,7 +143,6 @@ public class StatusProvider {
             states.get(key).value = states.get(key).value.concat(value);
         }
     }
-    
 
     /**
      * Add a message to the message list. If the key already exists, the message
@@ -207,7 +206,7 @@ public class StatusProvider {
 
         // move the temporary file to the configuration file
         this.lastStatusFile.delete();
-        FileUtils.moveFile(tmpFile, this.lastStatusFile);
+        Files.move(tmpFile, this.lastStatusFile);
     }
 
     /**
