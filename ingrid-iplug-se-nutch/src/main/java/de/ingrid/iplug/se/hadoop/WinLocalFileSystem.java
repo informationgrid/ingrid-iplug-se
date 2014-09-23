@@ -2,6 +2,8 @@ package de.ingrid.iplug.se.hadoop;
 
 import java.io.IOException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
@@ -19,13 +21,14 @@ import org.apache.hadoop.fs.permission.FsPermission;
  */
 public class WinLocalFileSystem extends LocalFileSystem {
 
+    
+    public final static Log log = LogFactory.getLog(WinLocalFileSystem.class);
     /**
          *
          *
          */
     public WinLocalFileSystem() {
         super();
-        System.err.println("Patch for HADOOP-7682: " + "Instantiating workaround file system");
     }
 
     /**
@@ -49,7 +52,9 @@ public class WinLocalFileSystem extends LocalFileSystem {
         try {
             super.setPermission(path, permission);
         } catch (IOException e) {
-            System.err.println("Patch for HADOOP-7682: " + "Ignoring IOException setting permission for path \"" + path + "\": " + e.getMessage());
+            if (log.isDebugEnabled()) {
+                log.debug("Patch for HADOOP-7682: " + "Ignoring IOException setting permission for path \"" + path + "\": " + e.getMessage());
+            }
         }
     }
 
