@@ -67,7 +67,9 @@ public class NutchControllerTest {
             fail("Crawl took more than 5 min.");
         }
         assertEquals("Status is FINISHED", NutchProcess.STATUS.FINISHED, nutchController.getNutchProcess(instance).getStatus());
-        node.close();        
+        node.close();
+        
+        System.out.println(nutchController.getNutchProcess(instance).getStatusProvider().toString());
 
         FileUtils.removeRecursive(Paths.get("test-instances"));
     }
