@@ -8,11 +8,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.junit.Test;
+import org.xml.sax.SAXException;
+
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
 
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
@@ -22,7 +29,7 @@ import de.ingrid.iplug.se.webapp.container.Instance;
 public class NutchControllerTest {
 
     @Test
-    public void test() throws InterruptedException, IOException {
+    public void test() throws InterruptedException, IOException, JsonSyntaxException, JsonIOException, SAXException, ParserConfigurationException, TransformerException {
         
         FileUtils.removeRecursive(Paths.get("test-instances"));
         
@@ -39,8 +46,9 @@ public class NutchControllerTest {
         Path logs = Paths.get(SEIPlug.conf.getInstancesDir(), "test", "logs").toAbsolutePath();
         Files.createDirectories(logs);
 
-        FileUtils.copyDirectories(Paths.get("../ingrid-iplug-se-nutch/src/test/resources/conf").toAbsolutePath(), conf);
+        FileUtils.copyDirectories(Paths.get("apache-nutch-runtime/runtime/local/conf").toAbsolutePath(), conf);
         FileUtils.copyDirectories(Paths.get("../ingrid-iplug-se-nutch/src/test/resources/urls").toAbsolutePath(), urls);
+        FileUtils.copyDirectories(Paths.get("conf/default/conf").toAbsolutePath(), conf);
         
         IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, 1, 100);
 

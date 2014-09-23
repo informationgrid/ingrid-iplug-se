@@ -45,7 +45,12 @@
 			<dependency>
 				<groupId>xerces</groupId>
 				<artifactId>xercesImpl</artifactId>
-				<version>2.6.2</version>
+				<version>2.9.1</version>
+			</dependency>
+			<dependency>
+				<groupId>xalan</groupId>
+				<artifactId>xalan</artifactId>
+				<version>2.7.1</version>
 			</dependency>
 			<!--<dependency> <groupId>com.tngtech.java</groupId> <artifactId>config-builder</artifactId> 
 				<version>1.4-SNAPSHOT</version> </dependency> -->
@@ -54,6 +59,11 @@
 				<artifactId>ingrid-iplug</artifactId>
 				<version>3.5.0-SNAPSHOT</version>
 			</dependency>
+            <dependency>
+                <groupId>de.ingrid</groupId>
+                <artifactId>ingrid-utils</artifactId>
+                <version>3.5.0-SNAPSHOT</version>
+            </dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -87,30 +97,30 @@
 			<artifactId>elasticsearch</artifactId>
 			<version>1.3.2</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
 			<version>2.4.2</version>
 		</dependency>
-		
+
 		<dependency>
-		    <groupId>com.fasterxml.jackson.core</groupId>
-		    <artifactId>jackson-databind</artifactId>
-		    <version>2.4.2</version>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.4.2</version>
 		</dependency>
-		
-		
+
+
 		<dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-exec</artifactId>
-            <version>1.2</version>
-        </dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-exec</artifactId>
+			<version>1.2</version>
+		</dependency>
 
 		<!-- The following two libs are needed for geo_shape based search! see: 
 			http://www.elasticsearch.org/guide/en/elasticsearch/client/java-api/current/query-dsl-filters.html -->
@@ -119,7 +129,7 @@
 			<artifactId>jts</artifactId> <version>1.13</version> <exclusions> <exclusion> 
 			<groupId>xerces</groupId> <artifactId>xercesImpl</artifactId> </exclusion> 
 			</exclusions> </dependency> -->
-		
+
 		<!-- needed for Java8 compatibility with PowerMock -->
 		<!-- <dependency> <groupId>org.javassist</groupId> <artifactId>javassist</artifactId> 
 			<version>3.18.2-GA</version> </dependency> -->
@@ -161,6 +171,7 @@
 			<version>1.5.6</version>
 			<!-- <scope>test</scope> -->
 		</dependency>
+
 	</dependencies>
 	<build>
 		<plugins>
@@ -206,6 +217,7 @@
 								<artifactItem>
 									<groupId>de.ingrid</groupId>
 									<artifactId>ingrid-iplug-se-nutch</artifactId>
+                                    <version>${project.version}</version>
 									<type>zip</type>
 									<outputDirectory>./</outputDirectory>
 								</artifactItem>
