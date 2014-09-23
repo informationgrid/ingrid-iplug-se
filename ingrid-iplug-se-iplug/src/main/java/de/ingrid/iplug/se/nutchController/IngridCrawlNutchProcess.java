@@ -84,7 +84,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
 
                 String currentSegment = fs.getPath(segments, getCurrentSegment(segments)).toString();
 
-                this.statusProvider.addState("FETCH" + i, "Generate up to " + noUrls.toString() + " urls for fetching...");
+                this.statusProvider.addState("FETCH" + i, "Fetching...");
                 execute("org.apache.nutch.fetcher.Fetcher", currentSegment);
                 this.statusProvider.appendToState("FETCH" + i, " done.");
 

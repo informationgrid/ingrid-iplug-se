@@ -8,32 +8,26 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.conf.Configuration;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.google.gson.Gson;
@@ -71,11 +65,11 @@ public class NutchProcessFactory {
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
-        Document document = builder.parse( nutchConfPath.toFile() );
+        Document document = builder.parse(nutchConfPath.toFile());
         document.getDocumentElement().normalize();
-        
+
         XPathUtils xpath = new XPathUtils();
-        
+
         // add metadata to the nutch configuration
         List<String> metadataList = new ArrayList<String>();
         String indexParseMdValue = xpath.getString(document, "//value[text()='index.parse.md']/following-sibling::value");
@@ -94,12 +88,12 @@ public class NutchProcessFactory {
                 metadataList.add(mde.getId());
             }
         }
-        
+
         indexParseMdValue = StringUtils.join(metadataList, ",");
-        
+
         addOrUpdateProperty(document.getDocumentElement(), "index.parse.md", indexParseMdValue, "Generated metadata from the ingrid instance configuration.");
-        addOrUpdateProperty(document.getDocumentElement(), "hadoop.tmp.dir", Paths.get(instance.getWorkingDirectory(), "hadoop-tmp").toString(), "Set hadoop temp directory to the instance.");
-        
+        addOrUpdateProperty(document.getDocumentElement(), "hadoop.tmp.dir", Paths.get(instance.getWorkingDirectory(), "hadoop-tmp").toAbsolutePath().toString(), "Set hadoop temp directory to the instance.");
+
         document.getDocumentElement().normalize();
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         Transformer transformer = transformerFactory.newTransformer();
@@ -111,11 +105,11 @@ public class NutchProcessFactory {
         return process;
 
     }
-    
-    private static  void addOrUpdateProperty(Element el, String name, String value, String description) {
+
+    private static void addOrUpdateProperty(Element el, String name, String value, String description) {
         XPathUtils xpath = new XPathUtils();
-        
-        if (!xpath.nodeExists(el, "//name[text()='"+name+"']/following-sibling::value")) {
+
+        if (!xpath.nodeExists(el, "//name[text()='" + name + "']/following-sibling::value")) {
             Node n = xpath.createElementFromXPathAsSibling(el, "/configuration/property");
             Node nameNode = xpath.createElementFromXPath(n, "name");
             XMLUtils.createOrReplaceTextNode(nameNode, name);
@@ -124,11 +118,11 @@ public class NutchProcessFactory {
             Node descriptionNode = xpath.createElementFromXPath(n, "description");
             XMLUtils.createOrReplaceTextNode(descriptionNode, description);
         } else {
-            
-            Node valueNode = xpath.getNode(el, "//name[text()='"+name+"']/following-sibling::value");
+
+            Node valueNode = xpath.getNode(el, "//name[text()='" + name + "']/following-sibling::value");
             XMLUtils.createOrReplaceTextNode(valueNode, value);
-            
-            Node descriptionNode = xpath.getNode(el, "//name[text()='"+name+"']/following-sibling::description");
+
+            Node descriptionNode = xpath.getNode(el, "//name[text()='" + name + "']/following-sibling::description");
             if (descriptionNode != null) {
                 XMLUtils.createOrReplaceTextNode(descriptionNode, description);
             }
