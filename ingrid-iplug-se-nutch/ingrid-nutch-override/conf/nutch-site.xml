@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<!-- Put site-specific property overrides in this file. -->
+
+<configuration>
+
+	<property>
+		<name>fs.file.impl</name>
+		<value>de.ingrid.iplug.se.hadoop.WinLocalFileSystem</value>
+		<description>Enables patch for issue HADOOP-7682 on Windows
+		</description>
+	</property>
+
+</configuration>
