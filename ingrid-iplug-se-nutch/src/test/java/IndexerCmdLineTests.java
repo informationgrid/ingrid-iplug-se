@@ -60,8 +60,6 @@ public class IndexerCmdLineTests {
     @Test
     public void test03InjectMetadata() throws Exception {
 
-        MetadataInjector.main(new String[] { "test/metadatadb", "src/test/resources/urls/metadata" });
-
         // inject start urls
         List<String> call = new ArrayList<String>();
         call.addAll(setUpBaseCall());
@@ -69,7 +67,7 @@ public class IndexerCmdLineTests {
         call.add("test/metadatadb");
         call.add("src/test/resources/urls/metadata");
 
-        // executeCall(call);
+        executeCall(call);
     }
 
     @Test
@@ -117,27 +115,6 @@ public class IndexerCmdLineTests {
         List<String> call = new ArrayList<String>();
         call.addAll(setUpBaseCall());
         call.add("org.apache.nutch.fetcher.Fetcher");
-        call.add("test/segments/" + directories[directories.length - 1]);
-
-        executeCall(call);
-    }
-
-    @Test
-    public void test07Parse() throws IOException, InterruptedException {
-
-        // get all segments
-        File file = new File("test/segments");
-        String[] directories = file.list(new FilenameFilter() {
-            @Override
-            public boolean accept(File current, String name) {
-                return new File(current, name).isDirectory();
-            }
-        });
-
-        // inject start urls
-        List<String> call = new ArrayList<String>();
-        call.addAll(setUpBaseCall());
-        call.add("org.apache.nutch.parse.ParseSegment");
         call.add("test/segments/" + directories[directories.length - 1]);
 
         executeCall(call);
@@ -433,10 +410,7 @@ public class IndexerCmdLineTests {
 
     private List<String> setUpBaseCall() {
 
-        String[] classPath = new String[] { "src/test/resources/conf", "build/apache-nutch-1.9/runtime/local" };
-
-        String[] libs = getJarFiles("build/apache-nutch-1.9/runtime/local/lib");
-        classPath = concat(classPath, libs);
+        String[] classPath = new String[] { "src/test/resources/conf", "build/apache-nutch-1.9/runtime/local", "build/apache-nutch-1.9/runtime/local/lib/*" };
 
         String cp = StringUtils.join(classPath, File.pathSeparator);
 

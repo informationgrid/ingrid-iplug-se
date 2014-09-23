@@ -17,27 +17,6 @@
 
 package de.ingrid.iplug.se.nutch.net;
 
-import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.Vector;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.nutch.net.URLNormalizer;
-import org.apache.nutch.net.URLNormalizers;
-import org.apache.nutch.plugin.Extension;
-import org.apache.nutch.plugin.ExtensionPoint;
-import org.apache.nutch.plugin.PluginRepository;
-import org.apache.nutch.plugin.PluginRuntimeException;
-import org.apache.nutch.util.ObjectCache;
 
 /**
  * This class uses a "chained filter" pattern to run defined normalizers.
