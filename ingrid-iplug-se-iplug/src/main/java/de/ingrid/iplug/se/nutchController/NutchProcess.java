@@ -34,6 +34,8 @@ public abstract class NutchProcess extends Thread {
     CommandResultHandler resultHandler = null;
 
     STATUS status = STATUS.CREATED;
+    
+    StatusProvider statusProvider = null;
 
 
     /**
@@ -172,9 +174,17 @@ public abstract class NutchProcess extends Thread {
             return this.watchdog;
         }
     }
-    
-    class NutchProcessStatus {
-        
-    }
 
+    public void setStatusProvider(StatusProvider statusProvider) {
+        this.statusProvider = statusProvider;
+    }
+    
+    
+    public StatusProvider getStatusProvider() {
+        return this.statusProvider;
+    }
+    
+
+    
+    
 }
