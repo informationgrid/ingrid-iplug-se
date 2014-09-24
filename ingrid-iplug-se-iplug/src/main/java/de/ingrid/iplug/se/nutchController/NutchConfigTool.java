@@ -41,7 +41,7 @@ public class NutchConfigTool {
     private XPathUtils xpath = new XPathUtils();
 
     public NutchConfigTool(Path nutchConfig) {
-        this.nutchConfig = nutchConfig;
+        this.nutchConfig = nutchConfig.toAbsolutePath();
     }
 
     /**
@@ -120,8 +120,8 @@ public class NutchConfigTool {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = builder.parse(nutchConfig.toFile());
-            document.getDocumentElement().normalize();
+            doc = builder.parse(nutchConfig.toFile());
+            doc.getDocumentElement().normalize();
         } catch (ParserConfigurationException | SAXException | IOException e) {
             log.error("Error opening nutch configuration: " + nutchConfig, e);
             throw new RuntimeException("Error opening nutch configuration: " + nutchConfig, e);
