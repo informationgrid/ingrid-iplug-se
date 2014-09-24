@@ -47,13 +47,15 @@ import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
-import org.apache.hadoop.mapred.TextInputFormat;
+import org.apache.hadoop.util.StringUtils;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 import org.apache.nutch.metadata.Metadata;
 import org.apache.nutch.net.URLNormalizers;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
 
-public class MetadataInjector extends Configured {
+public class MetadataInjector extends Configured implements Tool {
 
     private static final Log LOG = LogFactory.getLog(MetadataInjector.class);
 
@@ -122,6 +124,9 @@ public class MetadataInjector extends Configured {
 
     public MetadataInjector(Configuration conf) {
         super(conf);
+    }
+
+    public MetadataInjector() {
     }
 
     /**
@@ -263,18 +268,30 @@ public class MetadataInjector extends Configured {
     }
 
     public static void main(String[] args) throws Exception {
-        MetadataInjector injector = new MetadataInjector(NutchConfiguration.create());
+        int res = ToolRunner.run(NutchConfiguration.create(), new MetadataInjector(), args);
+        System.exit(res);
+    }
+
+    @Override
+    public int run(String[] args) throws Exception {
         if (args.length < 2) {
             System.err.println("Usage: MetadataInjector <metadataDb> <urls>");
-            return;
+            return -1;
         }
+        try {
 
-        Path metadatadb = new Path(args[0]);
-        LocalFileSystem localFS = FileSystem.getLocal(new Configuration());
-        if (localFS.exists(metadatadb)) {
-            localFS.delete(metadatadb, true);
+            Path metadatadb = new Path(args[0]);
+            LocalFileSystem localFS = FileSystem.getLocal(getConf());
+            if (localFS.exists(metadatadb)) {
+                localFS.delete(metadatadb, true);
+            }
+
+            inject(new Path(args[0]), new Path(args[1]));
+
+            return 0;
+        } catch (Exception e) {
+            LOG.error("MetadataInjector: " + StringUtils.stringifyException(e));
+            return -1;
         }
-
-        injector.inject(new Path(args[0]), new Path(args[1]));
     }
 }

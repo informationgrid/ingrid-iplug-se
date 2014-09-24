@@ -29,6 +29,9 @@ public class WinLocalFileSystem extends LocalFileSystem {
          */
     public WinLocalFileSystem() {
         super();
+        if (log.isDebugEnabled()) {
+            log.debug("Patch for HADOOP-7682: Instantiating workaround file system");
+        }
     }
 
     /**

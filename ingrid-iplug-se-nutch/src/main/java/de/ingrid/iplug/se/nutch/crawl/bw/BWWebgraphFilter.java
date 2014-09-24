@@ -43,6 +43,9 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
+import org.apache.hadoop.util.StringUtils;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 import org.apache.nutch.net.URLFilters;
 import org.apache.nutch.net.URLNormalizers;
 import org.apache.nutch.scoring.webgraph.LinkDatum;
@@ -54,26 +57,22 @@ import org.apache.nutch.util.NutchJob;
 import de.ingrid.iplug.se.nutch.net.InGridURLNormalizers;
 
 /**
- * Webgraph filter tool that filters urls in outlinks that do
- * not pass a white-black list. Only outlinks are filtered because the 
- * new computation of the webgraph will always generate inlinks and nodes
- * out of the outlinks.
+ * Webgraph filter tool that filters urls in outlinks that do not pass a
+ * white-black list. Only outlinks are filtered because the new computation of
+ * the webgraph will always generate inlinks and nodes out of the outlinks.
  * 
  * @see BWInjector
  */
-public class BWWebgraphFilter extends Configured {
+public class BWWebgraphFilter extends Configured implements Tool {
 
     public static final Log LOG = LogFactory.getLog(BWWebgraphFilter.class);
 
     public static final String CURRENT_NAME = "current";
 
-    private Path crawlDirPath = null;
-
     public static class ObjectWritableMapper implements Mapper<HostTypeKey, Writable, HostTypeKey, ObjectWritable> {
 
         @Override
-        public void map(HostTypeKey key, Writable value, OutputCollector<HostTypeKey, ObjectWritable> collector,
-                Reporter reporter) throws IOException {
+        public void map(HostTypeKey key, Writable value, OutputCollector<HostTypeKey, ObjectWritable> collector, Reporter reporter) throws IOException {
             ObjectWritable objectWritable = new ObjectWritable(value);
             collector.collect(key, objectWritable);
         }
@@ -190,8 +189,7 @@ public class BWWebgraphFilter extends Configured {
         private String scope;
 
         @Override
-        public void map(Text key, LinkDatum value, OutputCollector<HostTypeKey, LinkDatumEntry> out, Reporter rep)
-                throws IOException {
+        public void map(Text key, LinkDatum value, OutputCollector<HostTypeKey, LinkDatumEntry> out, Reporter rep) throws IOException {
 
             String url = key.toString();
             if (urlNormalizers) {
@@ -269,8 +267,7 @@ public class BWWebgraphFilter extends Configured {
 
         private BWPatterns _patterns;
 
-        public void reduce(HostTypeKey key, Iterator<ObjectWritable> values,
-                OutputCollector<HostTypeKey, ObjectWritable> out, Reporter report) throws IOException {
+        public void reduce(HostTypeKey key, Iterator<ObjectWritable> values, OutputCollector<HostTypeKey, ObjectWritable> out, Reporter report) throws IOException {
 
             while (values.hasNext()) {
                 ObjectWritable objectWritable = (ObjectWritable) values.next();
@@ -285,8 +282,7 @@ public class BWWebgraphFilter extends Configured {
                 if (_patterns == null) {
                     // return, because no bw pattern has been set for this url
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("Key url or linked url does not have a valid BW patterns, remove it: " + value
-                                + " for HostTypeKey: " + key.toString());
+                        LOG.debug("Key url or linked url does not have a valid BW patterns, remove it: " + value + " for HostTypeKey: " + key.toString());
                     }
                     return;
                 }
@@ -299,17 +295,14 @@ public class BWWebgraphFilter extends Configured {
                         // url is outside the black list and matches the white
                         // list
                         if (LOG.isDebugEnabled()) {
-                            LOG.debug("Key url passed BW patterns: " + linkDatumEntry + " for HostTypeKey: "
-                                    + key.toString());
+                            LOG.debug("Key url passed BW patterns: " + linkDatumEntry + " for HostTypeKey: " + key.toString());
                         }
                         out.collect(key, objectWritable);
-                    } else if (key.getType() == HostTypeKey.LINKED_URL_TYPE
-                            && _patterns.willPassBWLists(linkDatumEntry._linkDatum.getUrl())) {
+                    } else if (key.getType() == HostTypeKey.LINKED_URL_TYPE && _patterns.willPassBWLists(linkDatumEntry._linkDatum.getUrl())) {
                         // linked url is outside the black list and matches the
                         // white
                         if (LOG.isDebugEnabled()) {
-                            LOG.debug("Linked url passed BW patterns: " + linkDatumEntry + " for HostTypeKey: "
-                                    + key.toString());
+                            LOG.debug("Linked url passed BW patterns: " + linkDatumEntry + " for HostTypeKey: " + key.toString());
                         }
                         out.collect(key, objectWritable);
                     } else {
@@ -317,11 +310,9 @@ public class BWWebgraphFilter extends Configured {
                         if (LOG.isDebugEnabled()) {
 
                             if (key.getType() == HostTypeKey.GENERIC_DATUM_TYPE) {
-                                LOG.debug("Key url does not match BW patterns, remove it: " + linkDatumEntry
-                                        + " for HostTypeKey: " + key.toString());
+                                LOG.debug("Key url does not match BW patterns, remove it: " + linkDatumEntry + " for HostTypeKey: " + key.toString());
                             } else {
-                                LOG.debug("Linked url does not match BW patterns, remove it: " + linkDatumEntry
-                                        + " for HostTypeKey: " + key.toString());
+                                LOG.debug("Linked url does not match BW patterns, remove it: " + linkDatumEntry + " for HostTypeKey: " + key.toString());
                             }
                         }
                     }
@@ -343,12 +334,10 @@ public class BWWebgraphFilter extends Configured {
      * This means that both key url as well as linked url have passed the BW
      * patterns (see {@link BwLinkDatumReducer}).
      */
-    public static class FilterLinkDatumReducer implements Mapper<HostTypeKey, ObjectWritable, Text, ObjectWritable>,
-            Reducer<Text, ObjectWritable, Text, LinkDatum> {
+    public static class FilterLinkDatumReducer implements Mapper<HostTypeKey, ObjectWritable, Text, ObjectWritable>, Reducer<Text, ObjectWritable, Text, LinkDatum> {
 
         @Override
-        public void map(HostTypeKey key, ObjectWritable value, OutputCollector<Text, ObjectWritable> out, Reporter rep)
-                throws IOException {
+        public void map(HostTypeKey key, ObjectWritable value, OutputCollector<Text, ObjectWritable> out, Reporter rep) throws IOException {
 
             if (value.get() instanceof LinkDatumEntry) {
                 out.collect(new Text(((LinkDatumEntry) value.get()).toString()), value);
@@ -356,8 +345,7 @@ public class BWWebgraphFilter extends Configured {
         }
 
         @Override
-        public void reduce(Text key, Iterator<ObjectWritable> values, OutputCollector<Text, LinkDatum> out,
-                Reporter report) throws IOException {
+        public void reduce(Text key, Iterator<ObjectWritable> values, OutputCollector<Text, LinkDatum> out, Reporter report) throws IOException {
 
             int cnt = 0;
             ObjectWritable value = null;
@@ -384,8 +372,7 @@ public class BWWebgraphFilter extends Configured {
     public static class UnwrapLinkDatumReducer implements Mapper<LinkDatumEntry, LinkDatumEntry, Text, LinkDatum> {
 
         @Override
-        public void map(LinkDatumEntry key, LinkDatumEntry value, OutputCollector<Text, LinkDatum> out, Reporter rep)
-                throws IOException {
+        public void map(LinkDatumEntry key, LinkDatumEntry value, OutputCollector<Text, LinkDatum> out, Reporter rep) throws IOException {
             out.collect(key._url, key._linkDatum);
         }
 
@@ -399,15 +386,16 @@ public class BWWebgraphFilter extends Configured {
 
     public BWWebgraphFilter(Configuration conf, Path crawlDir) {
         super(conf);
-        this.crawlDirPath = crawlDir;
 
     }
 
-    public void update(Path webgraphPath, Path bwdb, boolean normalize, boolean filter, boolean replaceWebgraph)
-            throws IOException {
+    public BWWebgraphFilter() {
+    }
+
+    public void update(Path webgraphPath, Path bwdb, boolean normalize, boolean filter, boolean replaceWebgraph) throws IOException {
 
         String name = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
-        Path outputWebgraph = new Path(this.crawlDirPath, "webGraphDB_" + name);
+        Path outputWebgraph = new Path(getConf().get("hadoop.tmp.dir", "."), "webgraph_" + name);
 
         LOG.info("filter webgraph against bwdb: starting");
         LOG.info("filter webgraph against bwdb: output webgraph " + outputWebgraph);
@@ -448,8 +436,7 @@ public class BWWebgraphFilter extends Configured {
         Path filteredOutlinkDb = new Path(outputWebgraph, name);
         LOG.info("filter webgraph against bwdb: filter OUTLINK objects against bwdb.");
         job = new NutchJob(getConf());
-        job.setJobName("filter webgraph against bwdb: filter OUTLINK objects against bwdb." + wrappedOutlinkOutput
-                + bwdb);
+        job.setJobName("filter webgraph against bwdb: filter OUTLINK objects against bwdb." + wrappedOutlinkOutput + bwdb);
         job.setInputFormat(SequenceFileInputFormat.class);
         FileInputFormat.addInputPath(job, wrappedOutlinkOutput);
         FileInputFormat.addInputPath(job, new Path(bwdb, "current"));
@@ -469,8 +456,7 @@ public class BWWebgraphFilter extends Configured {
         Path outputOutlinkDb = new Path(outputWebgraph, WebGraph.OUTLINK_DIR);
         LOG.info("filter webgraph against bwdb: filter OUTLINK objects for valid entries.");
         job = new NutchJob(getConf());
-        job.setJobName("filter webgraph against bwdb: filter OUTLINK objects for valid entries." + filteredOutlinkDb
-                + bwdb);
+        job.setJobName("filter webgraph against bwdb: filter OUTLINK objects for valid entries." + filteredOutlinkDb + bwdb);
         job.setInputFormat(SequenceFileInputFormat.class);
         FileInputFormat.addInputPath(job, filteredOutlinkDb);
         FileOutputFormat.setOutputPath(job, outputOutlinkDb);
@@ -484,43 +470,41 @@ public class BWWebgraphFilter extends Configured {
         JobClient.runJob(job);
         FileSystem.get(job).delete(filteredOutlinkDb, true);
 
-
-/*        
-        LOG.info("filter webgraph against bwdb: rebuild INLINK db.");
-        Path outputInlinkDb = new Path(outputWebgraph, WebGraph.INLINK_DIR);
-
-        JobConf inlinkJob = new NutchJob(conf);
-        inlinkJob.setJobName("Inlinkdb " + outputInlinkDb);
-        FileInputFormat.addInputPath(inlinkJob, outputOutlinkDb);
-        inlinkJob.setInputFormat(SequenceFileInputFormat.class);
-        inlinkJob.setMapperClass(InlinkDb.class);
-        inlinkJob.setMapOutputKeyClass(Text.class);
-        inlinkJob.setMapOutputValueClass(LinkDatum.class);
-        inlinkJob.setOutputKeyClass(Text.class);
-        inlinkJob.setOutputValueClass(LinkDatum.class);
-        FileOutputFormat.setOutputPath(inlinkJob, outputInlinkDb);
-        inlinkJob.setOutputFormat(MapFileOutputFormat.class);
-        SyncUtil.syncJobRun(inlinkJob);// JobClient.runJob(filterJob);
-
-        // rebuild node db
-        LOG.info("filter webgraph against bwdb: rebuild NODE db.");
-        Path outputNodeDb = new Path(outputWebgraph, WebGraph.NODE_DIR);
-        JobConf nodeJob = new NutchJob(conf);
-        nodeJob.setJobName("NodeDb " + outputNodeDb);
-        LOG.info("NodeDb: adding input: " + outputOutlinkDb);
-        LOG.info("NodeDb: adding input: " + outputInlinkDb);
-        FileInputFormat.addInputPath(nodeJob, outputOutlinkDb);
-        FileInputFormat.addInputPath(nodeJob, outputInlinkDb);
-        nodeJob.setInputFormat(SequenceFileInputFormat.class);
-        nodeJob.setReducerClass(WebGraph.NodeDb.class);
-        nodeJob.setMapOutputKeyClass(Text.class);
-        nodeJob.setMapOutputValueClass(LinkDatum.class);
-        nodeJob.setOutputKeyClass(Text.class);
-        nodeJob.setOutputValueClass(Node.class);
-        FileOutputFormat.setOutputPath(nodeJob, outputNodeDb);
-        nodeJob.setOutputFormat(MapFileOutputFormat.class);
-        SyncUtil.syncJobRun(nodeJob);// JobClient.runJob(filterJob);
-*/        
+        /*
+         * LOG.info("filter webgraph against bwdb: rebuild INLINK db."); Path
+         * outputInlinkDb = new Path(outputWebgraph, WebGraph.INLINK_DIR);
+         * 
+         * JobConf inlinkJob = new NutchJob(conf);
+         * inlinkJob.setJobName("Inlinkdb " + outputInlinkDb);
+         * FileInputFormat.addInputPath(inlinkJob, outputOutlinkDb);
+         * inlinkJob.setInputFormat(SequenceFileInputFormat.class);
+         * inlinkJob.setMapperClass(InlinkDb.class);
+         * inlinkJob.setMapOutputKeyClass(Text.class);
+         * inlinkJob.setMapOutputValueClass(LinkDatum.class);
+         * inlinkJob.setOutputKeyClass(Text.class);
+         * inlinkJob.setOutputValueClass(LinkDatum.class);
+         * FileOutputFormat.setOutputPath(inlinkJob, outputInlinkDb);
+         * inlinkJob.setOutputFormat(MapFileOutputFormat.class);
+         * SyncUtil.syncJobRun(inlinkJob);// JobClient.runJob(filterJob);
+         * 
+         * // rebuild node db
+         * LOG.info("filter webgraph against bwdb: rebuild NODE db."); Path
+         * outputNodeDb = new Path(outputWebgraph, WebGraph.NODE_DIR); JobConf
+         * nodeJob = new NutchJob(conf); nodeJob.setJobName("NodeDb " +
+         * outputNodeDb); LOG.info("NodeDb: adding input: " + outputOutlinkDb);
+         * LOG.info("NodeDb: adding input: " + outputInlinkDb);
+         * FileInputFormat.addInputPath(nodeJob, outputOutlinkDb);
+         * FileInputFormat.addInputPath(nodeJob, outputInlinkDb);
+         * nodeJob.setInputFormat(SequenceFileInputFormat.class);
+         * nodeJob.setReducerClass(WebGraph.NodeDb.class);
+         * nodeJob.setMapOutputKeyClass(Text.class);
+         * nodeJob.setMapOutputValueClass(LinkDatum.class);
+         * nodeJob.setOutputKeyClass(Text.class);
+         * nodeJob.setOutputValueClass(Node.class);
+         * FileOutputFormat.setOutputPath(nodeJob, outputNodeDb);
+         * nodeJob.setOutputFormat(MapFileOutputFormat.class);
+         * SyncUtil.syncJobRun(nodeJob);// JobClient.runJob(filterJob);
+         */
 
         if (replaceWebgraph) {
             LOG.info("filter webgraph against bwdb: replace current webgraph");
@@ -531,9 +515,11 @@ public class BWWebgraphFilter extends Configured {
                 fs.rename(webgraphPath, old);
             }
             fs.mkdirs(webgraphPath);
-//            fs.rename(outputNodeDb, new Path(webgraphPath, WebGraph.NODE_DIR));
+            // fs.rename(outputNodeDb, new Path(webgraphPath,
+            // WebGraph.NODE_DIR));
             fs.rename(outputOutlinkDb, new Path(webgraphPath, WebGraph.OUTLINK_DIR));
-//            fs.rename(outputInlinkDb, new Path(webgraphPath, WebGraph.INLINK_DIR));
+            // fs.rename(outputInlinkDb, new Path(webgraphPath,
+            // WebGraph.INLINK_DIR));
             if (fs.exists(old))
                 fs.delete(old, true);
             fs.delete(outputWebgraph, true);
@@ -543,16 +529,25 @@ public class BWWebgraphFilter extends Configured {
     }
 
     public static void main(String[] args) throws Exception {
-        Configuration conf = NutchConfiguration.create();
-        BWWebgraphFilter bwDb = new BWWebgraphFilter(conf, new Path(args[1]));
-        if (args.length != 5) {
-            System.err
-                    .println("Usage: BWWebgraphFilter <webgraphdb> <bwdb> <normalize> <filter> <replace current webgraph>");
-            return;
-        }
-        bwDb.update(new Path(args[0]), new Path(args[1]), Boolean.valueOf(args[2]), Boolean.valueOf(args[3]), Boolean
-                .valueOf(args[4]));
+        int res = ToolRunner.run(NutchConfiguration.create(), new BWWebgraphFilter(), args);
+        System.exit(res);
+    }
 
+    @Override
+    public int run(String[] args) throws Exception {
+        if (args.length < 5) {
+            System.err.println("Usage: BWWebgraphFilter <webgraphdb> <bwdb> <normalize> <filter> <replace current webgraph>");
+            return -1;
+        }
+        try {
+
+            update(new Path(args[0]), new Path(args[1]), Boolean.valueOf(args[2]), Boolean.valueOf(args[3]), Boolean.valueOf(args[4]));
+
+            return 0;
+        } catch (Exception e) {
+            LOG.error("BWWebgraphFilter: " + StringUtils.stringifyException(e));
+            return -1;
+        }
     }
 
 }

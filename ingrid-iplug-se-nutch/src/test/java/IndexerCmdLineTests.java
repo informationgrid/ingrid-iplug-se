@@ -2,20 +2,23 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.nutch.indexer.IndexingJob;
+import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.node.Node;
+import org.elasticsearch.node.NodeBuilder;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-
-import de.ingrid.iplug.se.nutch.crawl.metadata.MetadataInjector;
-import de.ingrid.iplug.se.nutch.crawl.metadata.ParseDataUpdater;
 
 /**
  * 
@@ -179,8 +182,6 @@ public class IndexerCmdLineTests {
             }
         });
 
-        ParseDataUpdater.main(new String[] { "test/metadatadb", "test/segments/" + directories[directories.length - 1] });
-
         // inject start urls
         List<String> call = new ArrayList<String>();
         call.addAll(setUpBaseCall());
@@ -192,23 +193,7 @@ public class IndexerCmdLineTests {
     }
 
     @Test
-    public void test10WebgraphFilter() throws IOException, InterruptedException {
-
-        // inject start urls
-        List<String> call = new ArrayList<String>();
-        call.addAll(setUpBaseCall());
-        call.add("de.ingrid.iplug.se.nutch.crawl.bw.BWWebgraphFilter");
-        call.add("test/webgraph");
-        call.add("test/bwdb");
-        call.add("false");
-        call.add("false");
-        call.add("true");
-
-        executeCall(call);
-    }
-
-    @Test
-    public void test11WebgraphCreate() throws Exception {
+    public void test10WebgraphCreate() throws Exception {
 
         // get all segments
         File file = new File("test/segments");
@@ -232,7 +217,7 @@ public class IndexerCmdLineTests {
     }
 
     @Test
-    public void test12LinkRank() throws Exception {
+    public void test11LinkRank() throws Exception {
 
         // inject start urls
         List<String> call = new ArrayList<String>();
@@ -245,7 +230,7 @@ public class IndexerCmdLineTests {
     }
 
     @Test
-    public void test13ScoreUpdater() throws Exception {
+    public void test12ScoreUpdater() throws Exception {
 
         // inject start urls
         List<String> call = new ArrayList<String>();
@@ -258,6 +243,23 @@ public class IndexerCmdLineTests {
 
         executeCall(call);
     }
+    
+    @Test
+    public void test13WebgraphFilter() throws IOException, InterruptedException {
+
+        // inject start urls
+        List<String> call = new ArrayList<String>();
+        call.addAll(setUpBaseCall());
+        call.add("de.ingrid.iplug.se.nutch.crawl.bw.BWWebgraphFilter");
+        call.add("test/webgraph");
+        call.add("test/bwdb");
+        call.add("false");
+        call.add("false");
+        call.add("true");
+
+        executeCall(call);
+    }
+
 
     @Test
     public void test14MergeSegments() throws Exception {
@@ -279,8 +281,13 @@ public class IndexerCmdLineTests {
             call.add("test/merged_segment");
             call.add("-dir");
             call.add("test/segments");
-
             executeCall(call);
+            FileSystem fs = FileSystems.getDefault();
+            if (fs.getPath("test/merged_segment").toFile().exists()) {
+                delete(fs.getPath("test/segments").toFile());
+                Files.move(fs.getPath("test/merged_segment"), fs.getPath("test/segments"), StandardCopyOption.REPLACE_EXISTING);
+            }
+            
         }
     }
 
@@ -294,9 +301,16 @@ public class IndexerCmdLineTests {
         call.add("test/filtered_segment");
         call.add("test/crawldb");
         call.add("-dir");
-        call.add("test/merged_segment");
+        call.add("test/segments");
 
         executeCall(call);
+        FileSystem fs = FileSystems.getDefault();
+        if (fs.getPath("test/filtered_segment").toFile().exists()) {
+            delete(fs.getPath("test/segments").toFile());
+            Files.move(fs.getPath("test/filtered_segment"), fs.getPath("test/segments"), StandardCopyOption.REPLACE_EXISTING);
+        }
+
+    
     }
 
     @Test
@@ -308,7 +322,7 @@ public class IndexerCmdLineTests {
         call.add("org.apache.nutch.crawl.LinkDb");
         call.add("test/linkdb");
         call.add("-dir");
-        call.add("test/filtered_segment");
+        call.add("test/segments");
         call.add("-noNormalize");
         call.add("-noFilter");
 
@@ -334,8 +348,6 @@ public class IndexerCmdLineTests {
     @Test
     public void test18Index() throws Exception {
 
-        IndexingJob.main(new String[] { "test/crawldb", "-linkdb", "test/linkdb", "-dir", "test/filtered_segment", "-deleteGone" });
-
         // inject start urls
         List<String> call = new ArrayList<String>();
         call.addAll(setUpBaseCall());
@@ -344,10 +356,18 @@ public class IndexerCmdLineTests {
         call.add("-linkdb");
         call.add("test/linkdb");
         call.add("-dir");
-        call.add("test/filtered_segment");
+        call.add("test/segments");
         call.add("-deleteGone");
 
+        Settings settings = ImmutableSettings.settingsBuilder().put("path.data", "test").build();
+        NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().clusterName("elasticsearch").data(true).settings(settings);
+        nodeBuilder = nodeBuilder.local(false);
+        Node node = nodeBuilder.node();
+        
         executeCall(call);
+        
+        node.close();
+
     }
 
     /*
@@ -424,29 +444,6 @@ public class IndexerCmdLineTests {
 
         return baseCall;
 
-    }
-
-    private String[] getJarFiles(String dir) {
-        File file = new File(dir);
-        String[] files = file.list(new FilenameFilter() {
-            @Override
-            public boolean accept(File current, String name) {
-                File f = new File(current, name);
-                return !f.isDirectory() && name.endsWith(".jar");
-            }
-        });
-
-        for (int i = 0; i < files.length; i++) {
-            files[i] = (new File(dir, files[i])).getAbsolutePath();
-        }
-
-        return files;
-    }
-
-    public static <T> T[] concat(T[] first, T[] second) {
-        T[] result = Arrays.copyOf(first, first.length + second.length);
-        System.arraycopy(second, 0, result, first.length, second.length);
-        return result;
     }
 
     void delete(File f) throws IOException {

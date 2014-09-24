@@ -48,6 +48,9 @@ import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.util.Progressable;
+import org.apache.hadoop.util.StringUtils;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.crawl.CrawlDb;
 import org.apache.nutch.net.URLFilters;
@@ -62,15 +65,14 @@ import de.ingrid.iplug.se.nutch.net.InGridURLNormalizers;
  * 
  * @see BWInjector
  */
-public class BWUpdateDb extends Configured {
+public class BWUpdateDb extends Configured implements Tool {
 
     public static final Log LOG = LogFactory.getLog(BWUpdateDb.class);
 
     public static class ObjectWritableMapper implements Mapper<HostTypeKey, Writable, HostTypeKey, ObjectWritable> {
 
         @Override
-        public void map(HostTypeKey key, Writable value, OutputCollector<HostTypeKey, ObjectWritable> collector,
-                Reporter reporter) throws IOException {
+        public void map(HostTypeKey key, Writable value, OutputCollector<HostTypeKey, ObjectWritable> collector, Reporter reporter) throws IOException {
             ObjectWritable objectWritable = new ObjectWritable(value);
             collector.collect(key, objectWritable);
         }
@@ -134,42 +136,42 @@ public class BWUpdateDb extends Configured {
         public static final String URL_NORMALIZING = "bwupdatedb.url.normalizers";
 
         public static final String URL_NORMALIZING_SCOPE = "bwupdatedb.url.normalizers.scope";
-        
+
         private boolean urlFiltering;
-        
+
         private boolean urlNormalizers;
-  
+
         private URLFilters filters;
-  
+
         private URLNormalizers normalizers;
-        
+
         private String scope;
-        
+
         @Override
-        public void map(Text key, CrawlDatum value, OutputCollector<HostTypeKey, Entry> out, Reporter rep)
-                throws IOException {
+        public void map(Text key, CrawlDatum value, OutputCollector<HostTypeKey, Entry> out, Reporter rep) throws IOException {
 
             String url = key.toString();
             if (urlNormalizers) {
                 try {
-                  url = normalizers.normalize(url, scope); // normalize the url
+                    url = normalizers.normalize(url, scope); // normalize the
+                                                             // url
                 } catch (Exception e) {
-                  LOG.warn("Skipping " + url + ":" + e);
-                  url = null;
+                    LOG.warn("Skipping " + url + ":" + e);
+                    url = null;
                 }
-              }
+            }
             if (url != null && urlFiltering) {
                 try {
-                  url = filters.filter(url); // filter the url
+                    url = filters.filter(url); // filter the url
                 } catch (Exception e) {
-                  LOG.warn("Skipping " + url + ":" + e);
-                  url = null;
+                    LOG.warn("Skipping " + url + ":" + e);
+                    url = null;
                 }
-              }
+            }
             if (url != null) { // if it passes
-              String host = new URL(url).getHost();
-              Entry entry = new Entry(key, value);
-              out.collect(new HostTypeKey(host, HostTypeKey.CRAWL_DATUM_TYPE), entry);
+                String host = new URL(url).getHost();
+                Entry entry = new Entry(key, value);
+                out.collect(new HostTypeKey(host, HostTypeKey.CRAWL_DATUM_TYPE), entry);
             }
         }
 
@@ -177,11 +179,11 @@ public class BWUpdateDb extends Configured {
             urlFiltering = job.getBoolean(URL_FILTERING, false);
             urlNormalizers = job.getBoolean(URL_NORMALIZING, false);
             if (urlFiltering) {
-              filters = new URLFilters(job);
+                filters = new URLFilters(job);
             }
             if (urlNormalizers) {
-              scope = job.get(URL_NORMALIZING_SCOPE, InGridURLNormalizers.SCOPE_BWDB);
-              normalizers = new URLNormalizers(job, scope);
+                scope = job.get(URL_NORMALIZING_SCOPE, InGridURLNormalizers.SCOPE_BWDB);
+                normalizers = new URLNormalizers(job, scope);
             }
         }
 
@@ -198,8 +200,7 @@ public class BWUpdateDb extends Configured {
 
         private BWPatterns _patterns;
 
-        public void reduce(HostTypeKey key, Iterator<ObjectWritable> values,
-                OutputCollector<HostTypeKey, ObjectWritable> out, Reporter report) throws IOException {
+        public void reduce(HostTypeKey key, Iterator<ObjectWritable> values, OutputCollector<HostTypeKey, ObjectWritable> out, Reporter report) throws IOException {
 
             while (values.hasNext()) {
                 ObjectWritable objectWritable = (ObjectWritable) values.next();
@@ -215,8 +216,7 @@ public class BWUpdateDb extends Configured {
                     // return, because no bw pattern has been set for this url
                     // this results in NOT crawling this url
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("No BW pattern for url: " + (((Entry) value)._url).toString()
-                                + " for HostTypeKey: " + key.toString());
+                        LOG.debug("No BW pattern for url: " + (((Entry) value)._url).toString() + " for HostTypeKey: " + key.toString());
                     }
                     return;
                 }
@@ -225,14 +225,12 @@ public class BWUpdateDb extends Configured {
                 if (_patterns.willPassBWLists(url)) {
                     // url is outside the black list and matches the white list
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("BW patterns passed for url: " + (((Entry) value)._url).toString()
-                                + " for HostTypeKey: " + key.toString());
+                        LOG.debug("BW patterns passed for url: " + (((Entry) value)._url).toString() + " for HostTypeKey: " + key.toString());
                     }
                     out.collect(key, objectWritable);
                 } else {
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("BW patterns NOT passed for url: " + (((Entry) value)._url).toString()
-                                + " for HostTypeKey: " + key.toString());
+                        LOG.debug("BW patterns NOT passed for url: " + (((Entry) value)._url).toString() + " for HostTypeKey: " + key.toString());
                     }
 
                 }
@@ -253,9 +251,8 @@ public class BWUpdateDb extends Configured {
      * same job
      */
     public static class FormatConverter implements Mapper<HostTypeKey, ObjectWritable, Text, CrawlDatum> {
-        
-        public void map(HostTypeKey key, ObjectWritable value, OutputCollector<Text, CrawlDatum> out, Reporter rep)
-                throws IOException {
+
+        public void map(HostTypeKey key, ObjectWritable value, OutputCollector<Text, CrawlDatum> out, Reporter rep) throws IOException {
             Entry entry = (Entry) value.get();
             out.collect(entry._url, entry._crawlDatum);
         }
@@ -304,8 +301,7 @@ public class BWUpdateDb extends Configured {
             }
         }
 
-        public RecordWriter<HostTypeKey, BWPatterns> getRecordWriter(FileSystem fs, JobConf job, String name,
-                Progressable progress) throws IOException {
+        public RecordWriter<HostTypeKey, BWPatterns> getRecordWriter(FileSystem fs, JobConf job, String name, Progressable progress) throws IOException {
             Path dir = FileOutputFormat.getOutputPath(job);
             DataOutputStream fileOut = fs.create(new Path(dir, name), progress);
             return new LineRecordWriter(fileOut);
@@ -314,6 +310,9 @@ public class BWUpdateDb extends Configured {
 
     public BWUpdateDb(Configuration conf) {
         super(conf);
+    }
+
+    public BWUpdateDb() {
     }
 
     // TODO use normalize and filter inside the bw-job? and not only in the
@@ -385,13 +384,13 @@ public class BWUpdateDb extends Configured {
         convertJob.setOutputValueClass(CrawlDatum.class);
         JobClient.runJob(convertJob);
 
-        // 
+        //
         FileSystem.get(job).delete(tmpMergedDb, true);
 
         JobConf updateJob = CrawlDb.createJob(getConf(), crawlDb);
         boolean additionsAllowed = getConf().getBoolean(CrawlDb.CRAWLDB_ADDITIONS_ALLOWED, true);
         updateJob.setBoolean(CrawlDb.CRAWLDB_ADDITIONS_ALLOWED, additionsAllowed);
-        // do not filter/normalize URLs from crawl db again. Presume all 
+        // do not filter/normalize URLs from crawl db again. Presume all
         // urls in crawldb are filtered/normalized
         // joachim@wemove.com at 27.05.2010
         // updateJob.setBoolean(CrawlDbFilter.URL_FILTERING, filter);
@@ -435,20 +434,30 @@ public class BWUpdateDb extends Configured {
     }
 
     public static void main(String[] args) throws Exception {
-        Configuration conf = NutchConfiguration.create();
-        BWUpdateDb bwDb = new BWUpdateDb(conf);
-        if (args.length != 5 && args.length != 3) {
-            System.err.println("Usage: <crawldb> <bwdb> <segment> <normalize> <filter>");
-            System.err.println("or: <bwdb> -dump <out_dir>");
-            return;
-        }
-        if (args[1].equals("-dump")) {
-            bwDb.processDumpJob(args[0], args[2], conf);
-        } else {
-            bwDb.update(new Path(args[0]), new Path(args[1]), new Path[] { new Path(args[2]) }, Boolean
-                    .valueOf(args[3]), Boolean.valueOf(args[4]));
-        }
+        int res = ToolRunner.run(NutchConfiguration.create(), new BWUpdateDb(), args);
+        System.exit(res);
+    }
 
+    @Override
+    public int run(String[] args) throws Exception {
+        if (args.length != 5 && args.length != 3) {
+            System.err.println("Usage: BWUpdateDb <crawldb> <bwdb> <segment> <normalize> <filter>");
+            System.err.println("or: BWUpdateDb <bwdb> -dump <out_dir>");
+            return -1;
+        }
+        try {
+
+            if (args[1].equals("-dump")) {
+                processDumpJob(args[0], args[2], getConf());
+            } else {
+                update(new Path(args[0]), new Path(args[1]), new Path[] { new Path(args[2]) }, Boolean.valueOf(args[3]), Boolean.valueOf(args[4]));
+            }
+
+            return 0;
+        } catch (Exception e) {
+            LOG.error("BWUpdateDb: " + StringUtils.stringifyException(e));
+            return -1;
+        }
     }
 
 }

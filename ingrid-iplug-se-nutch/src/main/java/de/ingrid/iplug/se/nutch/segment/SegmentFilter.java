@@ -50,6 +50,9 @@ import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.hadoop.mapred.SequenceFileRecordReader;
 import org.apache.hadoop.util.Progressable;
+import org.apache.hadoop.util.StringUtils;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.crawl.CrawlDb;
 import org.apache.nutch.crawl.Generator;
@@ -71,7 +74,7 @@ import org.apache.nutch.util.NutchJob;
  * 
  * @author Joachim Müller
  */
-public class SegmentFilter extends Configured implements Mapper<Text, MetaWrapper, Text, MetaWrapper>, Reducer<Text, MetaWrapper, Text, MetaWrapper> {
+public class SegmentFilter extends Configured implements Tool, Mapper<Text, MetaWrapper, Text, MetaWrapper>, Reducer<Text, MetaWrapper, Text, MetaWrapper> {
     private static final Log LOG = LogFactory.getLog(SegmentFilter.class);
 
     private URLFilters filters = null;
@@ -248,7 +251,6 @@ public class SegmentFilter extends Configured implements Mapper<Text, MetaWrappe
     }
 
     public SegmentFilter() {
-        super(null);
     }
 
     public SegmentFilter(Configuration conf) {
@@ -496,10 +498,13 @@ public class SegmentFilter extends Configured implements Mapper<Text, MetaWrappe
 
     }
 
-    /**
-     * @param args
-     */
     public static void main(String[] args) throws Exception {
+        int res = ToolRunner.run(NutchConfiguration.create(), new SegmentFilter(), args);
+        System.exit(res);
+    }
+
+    @Override
+    public int run(String[] args) throws Exception {
         if (args.length < 2) {
             System.err.println("SegmentFilter output_dir crawldb_dir (-dir segments | seg1 seg2 ...) [-filter] [-normalize]");
             System.err.println("\toutput_dir\tname of the parent dir for output segment");
@@ -507,35 +512,39 @@ public class SegmentFilter extends Configured implements Mapper<Text, MetaWrappe
             System.err.println("\t-dir segments\tparent dir containing several segments");
             System.err.println("\tseg1 seg2 ...\tlist of segment dirs");
             System.err.println("\t-filter\t\tfilter out URL-s prohibited by current URLFilters");
-            return;
+            return -1;
         }
-        Configuration conf = NutchConfiguration.create();
-        final FileSystem fs = FileSystem.get(conf);
-        Path out = new Path(args[0]);
-        Path crawlDbPath = new Path(args[1]);
-        ArrayList<Path> segs = new ArrayList<Path>();
-        boolean filter = false;
-        boolean normalize = false;
-        for (int i = 2; i < args.length; i++) {
-            if (args[i].equals("-dir")) {
-                FileStatus[] fstats = fs.listStatus(new Path(args[++i]), HadoopFSUtil.getPassDirectoriesFilter(fs));
-                Path[] files = HadoopFSUtil.getPaths(fstats);
-                for (int j = 0; j < files.length; j++)
-                    segs.add(files[j]);
-            } else if (args[i].equals("-filter")) {
-                filter = true;
-            } else if (args[i].equals("-normalize")) {
-                normalize = true;
-            } else {
-                segs.add(new Path(args[i]));
+        try {
+            final FileSystem fs = FileSystem.get(getConf());
+            Path out = new Path(args[0]);
+            Path crawlDbPath = new Path(args[1]);
+            ArrayList<Path> segs = new ArrayList<Path>();
+            boolean filter = false;
+            boolean normalize = false;
+            for (int i = 2; i < args.length; i++) {
+                if (args[i].equals("-dir")) {
+                    FileStatus[] fstats = fs.listStatus(new Path(args[++i]), HadoopFSUtil.getPassDirectoriesFilter(fs));
+                    Path[] files = HadoopFSUtil.getPaths(fstats);
+                    for (int j = 0; j < files.length; j++)
+                        segs.add(files[j]);
+                } else if (args[i].equals("-filter")) {
+                    filter = true;
+                } else if (args[i].equals("-normalize")) {
+                    normalize = true;
+                } else {
+                    segs.add(new Path(args[i]));
+                }
             }
+            if (segs.size() == 0) {
+                System.err.println("ERROR: No input segments.");
+                return -1;
+            }
+            filter(out, crawlDbPath, segs.toArray(new Path[segs.size()]), filter, normalize);
+            return 0;
+        } catch (Exception e) {
+            LOG.error("ParseDataUpdater: " + StringUtils.stringifyException(e));
+            return -1;
         }
-        if (segs.size() == 0) {
-            System.err.println("ERROR: No input segments.");
-            return;
-        }
-        SegmentFilter segmentFilter = new SegmentFilter(conf);
-        segmentFilter.filter(out, crawlDbPath, segs.toArray(new Path[segs.size()]), filter, normalize);
     }
 
 }

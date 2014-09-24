@@ -45,6 +45,9 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
+import org.apache.hadoop.util.StringUtils;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 import org.apache.nutch.crawl.Inlink;
 import org.apache.nutch.crawl.Inlinks;
 import org.apache.nutch.crawl.LinkDb;
@@ -61,7 +64,7 @@ import de.ingrid.iplug.se.nutch.net.InGridURLNormalizers;
  * 
  * @see BWInjector
  */
-public class BWLinkDbFilter extends Configured {
+public class BWLinkDbFilter extends Configured implements Tool {
 
     public static final Log LOG = LogFactory.getLog(BWLinkDbFilter.class);
 
@@ -70,8 +73,7 @@ public class BWLinkDbFilter extends Configured {
     public static class ObjectWritableMapper implements Mapper<HostTypeKey, Writable, HostTypeKey, ObjectWritable> {
 
         @Override
-        public void map(HostTypeKey key, Writable value, OutputCollector<HostTypeKey, ObjectWritable> collector,
-                Reporter reporter) throws IOException {
+        public void map(HostTypeKey key, Writable value, OutputCollector<HostTypeKey, ObjectWritable> collector, Reporter reporter) throws IOException {
             ObjectWritable objectWritable = new ObjectWritable(value);
             collector.collect(key, objectWritable);
         }
@@ -187,8 +189,7 @@ public class BWLinkDbFilter extends Configured {
         private String scope;
 
         @Override
-        public void map(Text key, Inlinks value, OutputCollector<HostTypeKey, InlinkEntry> out, Reporter rep)
-                throws IOException {
+        public void map(Text key, Inlinks value, OutputCollector<HostTypeKey, InlinkEntry> out, Reporter rep) throws IOException {
 
             String url = key.toString();
             if (urlNormalizers) {
@@ -262,8 +263,7 @@ public class BWLinkDbFilter extends Configured {
         private String scope;
 
         @Override
-        public void map(Text key, Inlinks value, OutputCollector<HostTypeKey, InlinksEntry> out, Reporter rep)
-                throws IOException {
+        public void map(Text key, Inlinks value, OutputCollector<HostTypeKey, InlinksEntry> out, Reporter rep) throws IOException {
 
             String url = key.toString();
             if (urlNormalizers) {
@@ -317,8 +317,7 @@ public class BWLinkDbFilter extends Configured {
 
         private BWPatterns _patterns;
 
-        public void reduce(HostTypeKey key, Iterator<ObjectWritable> values,
-                OutputCollector<HostTypeKey, ObjectWritable> out, Reporter report) throws IOException {
+        public void reduce(HostTypeKey key, Iterator<ObjectWritable> values, OutputCollector<HostTypeKey, ObjectWritable> out, Reporter report) throws IOException {
 
             while (values.hasNext()) {
                 ObjectWritable objectWritable = (ObjectWritable) values.next();
@@ -332,8 +331,7 @@ public class BWLinkDbFilter extends Configured {
 
                 if (_patterns == null) {
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("Key url or linked url does not have a valid BW patterns, remove it: " + value
-                                + " for HostTypeKey: " + key.toString());
+                        LOG.debug("Key url or linked url does not have a valid BW patterns, remove it: " + value + " for HostTypeKey: " + key.toString());
                     }
                     // return, because no bw pattern has been set for this url
                     return;
@@ -345,14 +343,12 @@ public class BWLinkDbFilter extends Configured {
                         // url is outside the black list and matches the white
                         // list
                         if (LOG.isDebugEnabled()) {
-                            LOG.debug("BW patterns passed for url: " + (((InlinksEntry) value)._url).toString()
-                                    + " for HostTypeKey: " + key.toString());
+                            LOG.debug("BW patterns passed for url: " + (((InlinksEntry) value)._url).toString() + " for HostTypeKey: " + key.toString());
                         }
                         out.collect(key, objectWritable);
                     } else {
                         if (LOG.isDebugEnabled()) {
-                            LOG.debug("InlinksEntry does not pass BW patterns, remove it: "
-                                    + (((InlinksEntry) value)._url).toString() + " for HostTypeKey: " + key.toString());
+                            LOG.debug("InlinksEntry does not pass BW patterns, remove it: " + (((InlinksEntry) value)._url).toString() + " for HostTypeKey: " + key.toString());
                         }
                     }
                 } else if (value instanceof InlinkEntry) {
@@ -361,14 +357,12 @@ public class BWLinkDbFilter extends Configured {
                         // url is outside the black list and matches the white
                         // list
                         if (LOG.isDebugEnabled()) {
-                            LOG.debug("BW patterns passed for url: " + (((InlinkEntry) value)._url).toString()
-                                    + " for HostTypeKey: " + key.toString());
+                            LOG.debug("BW patterns passed for url: " + (((InlinkEntry) value)._url).toString() + " for HostTypeKey: " + key.toString());
                         }
                         out.collect(key, objectWritable);
                     } else {
                         if (LOG.isDebugEnabled()) {
-                            LOG.debug("InlinkEntry does not pass BW patterns, remove it: "
-                                    + (((InlinkEntry) value)._url).toString() + " for HostTypeKey: " + key.toString());
+                            LOG.debug("InlinkEntry does not pass BW patterns, remove it: " + (((InlinkEntry) value)._url).toString() + " for HostTypeKey: " + key.toString());
                         }
                     }
                 }
@@ -392,8 +386,7 @@ public class BWLinkDbFilter extends Configured {
      * This process transforms the {@link HostTypeKey} based data back into a
      * link db structure.
      */
-    public static class LinkDbFormatConverter implements Reducer<Text, ObjectWritable, Text, Inlinks>,
-            Mapper<HostTypeKey, ObjectWritable, Text, ObjectWritable> {
+    public static class LinkDbFormatConverter implements Reducer<Text, ObjectWritable, Text, Inlinks>, Mapper<HostTypeKey, ObjectWritable, Text, ObjectWritable> {
 
         public void configure(JobConf job) {
         }
@@ -402,8 +395,7 @@ public class BWLinkDbFilter extends Configured {
         }
 
         @Override
-        public void map(HostTypeKey key, ObjectWritable value, OutputCollector<Text, ObjectWritable> out, Reporter rep)
-                throws IOException {
+        public void map(HostTypeKey key, ObjectWritable value, OutputCollector<Text, ObjectWritable> out, Reporter rep) throws IOException {
 
             Object entry = value.get();
 
@@ -419,8 +411,7 @@ public class BWLinkDbFilter extends Configured {
         }
 
         @Override
-        public void reduce(Text key, Iterator<ObjectWritable> values, OutputCollector<Text, Inlinks> out, Reporter rep)
-                throws IOException {
+        public void reduce(Text key, Iterator<ObjectWritable> values, OutputCollector<Text, Inlinks> out, Reporter rep) throws IOException {
             Inlinks _inlinks = null;
             List<Inlink> inLinkEntries = new ArrayList<Inlink>();
             Object entry = null;
@@ -452,8 +443,10 @@ public class BWLinkDbFilter extends Configured {
         super(conf);
     }
 
-    public void update(Path linkDb, Path bwdb, boolean normalize, boolean filter, boolean replaceLinkDb)
-            throws IOException {
+    public BWLinkDbFilter() {
+    }
+
+    public void update(Path linkDb, Path bwdb, boolean normalize, boolean filter, boolean replaceLinkDb) throws IOException {
 
         String name = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
         Path outputLinkDb = new Path(linkDb, name);
@@ -564,7 +557,7 @@ public class BWLinkDbFilter extends Configured {
         convertJob.setOutputValueClass(Inlinks.class);
         JobClient.runJob(convertJob);
 
-        // 
+        //
         FileSystem.get(job).delete(tmpMergedDb, true);
 
         if (replaceLinkDb) {
@@ -576,15 +569,25 @@ public class BWLinkDbFilter extends Configured {
     }
 
     public static void main(String[] args) throws Exception {
-        Configuration conf = NutchConfiguration.create();
-        BWLinkDbFilter bwDb = new BWLinkDbFilter(conf);
-        if (args.length != 5) {
-            System.err.println("Usage: BWLinkDbFilter <linkdb> <bwdb> <normalize> <filter> <replace current linkdb>");
-            return;
-        }
-        bwDb.update(new Path(args[0]), new Path(args[1]), Boolean.valueOf(args[2]), Boolean.valueOf(args[3]), Boolean
-                .valueOf(args[4]));
+        int res = ToolRunner.run(NutchConfiguration.create(), new BWLinkDbFilter(), args);
+        System.exit(res);
+    }
 
+    @Override
+    public int run(String[] args) throws Exception {
+        if (args.length < 5) {
+            System.err.println("Usage: BWLinkDbFilter <linkdb> <bwdb> <normalize> <filter> <replace current linkdb>");
+            return -1;
+        }
+        try {
+
+            update(new Path(args[0]), new Path(args[1]), Boolean.valueOf(args[2]), Boolean.valueOf(args[3]), Boolean.valueOf(args[4]));
+
+            return 0;
+        } catch (Exception e) {
+            LOG.error("BWLinkDbFilter: " + StringUtils.stringifyException(e));
+            return -1;
+        }
     }
 
 }

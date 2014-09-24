@@ -43,6 +43,9 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
+import org.apache.hadoop.util.StringUtils;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.crawl.CrawlDb;
 import org.apache.nutch.net.URLFilters;
@@ -52,13 +55,12 @@ import org.apache.nutch.util.NutchJob;
 
 import de.ingrid.iplug.se.nutch.net.InGridURLNormalizers;
 
-
 /**
  * CrawlDb filter tool that filters urls that pass a white-black list
  * 
  * @see BWInjector
  */
-public class BWCrawlDbFilter extends Configured {
+public class BWCrawlDbFilter extends Configured implements Tool {
 
     public static final Log LOG = LogFactory.getLog(BWCrawlDbFilter.class);
 
@@ -67,8 +69,7 @@ public class BWCrawlDbFilter extends Configured {
     public static class ObjectWritableMapper implements Mapper<HostTypeKey, Writable, HostTypeKey, ObjectWritable> {
 
         @Override
-        public void map(HostTypeKey key, Writable value, OutputCollector<HostTypeKey, ObjectWritable> collector,
-                Reporter reporter) throws IOException {
+        public void map(HostTypeKey key, Writable value, OutputCollector<HostTypeKey, ObjectWritable> collector, Reporter reporter) throws IOException {
             ObjectWritable objectWritable = new ObjectWritable(value);
             collector.collect(key, objectWritable);
         }
@@ -144,8 +145,7 @@ public class BWCrawlDbFilter extends Configured {
         private String scope;
 
         @Override
-        public void map(Text key, CrawlDatum value, OutputCollector<HostTypeKey, Entry> out, Reporter rep)
-                throws IOException {
+        public void map(Text key, CrawlDatum value, OutputCollector<HostTypeKey, Entry> out, Reporter rep) throws IOException {
 
             String url = key.toString();
             if (urlNormalizers) {
@@ -197,8 +197,7 @@ public class BWCrawlDbFilter extends Configured {
 
         private BWPatterns _patterns;
 
-        public void reduce(HostTypeKey key, Iterator<ObjectWritable> values,
-                OutputCollector<HostTypeKey, ObjectWritable> out, Reporter report) throws IOException {
+        public void reduce(HostTypeKey key, Iterator<ObjectWritable> values, OutputCollector<HostTypeKey, ObjectWritable> out, Reporter report) throws IOException {
 
             while (values.hasNext()) {
                 ObjectWritable objectWritable = (ObjectWritable) values.next();
@@ -213,13 +212,13 @@ public class BWCrawlDbFilter extends Configured {
 
                 if (_patterns == null) {
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("Key url or linked url does not have a valid BW patterns, remove it: " + value
-                                + " for HostTypeKey: " + key.toString());
+                        LOG.debug("Key url or linked url does not have a valid BW patterns, remove it: " + value + " for HostTypeKey: " + key.toString());
                     }
                     // return, because no bw pattern has been set for this url
                     // this results in NOT crawling this url
-                    
-                    // TODO add to be deleted by elastic search, check for indexed state, flush immediately
+
+                    // TODO add to be deleted by elastic search, check for
+                    // indexed state, flush immediately
                     return;
                 }
 
@@ -227,17 +226,16 @@ public class BWCrawlDbFilter extends Configured {
                 if (_patterns.willPassBWLists(url)) {
                     // url is outside the black list and matches the white list
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("BW patterns passed for url: " + (((Entry) value)._url).toString()
-                                + " for HostTypeKey: " + key.toString());
+                        LOG.debug("BW patterns passed for url: " + (((Entry) value)._url).toString() + " for HostTypeKey: " + key.toString());
                     }
                     out.collect(key, objectWritable);
                 } else {
                     if (LOG.isInfoEnabled()) {
-                        LOG.info("Crawldatum does not pass BW patterns, remove it: " + (((Entry) value)._url).toString()
-                                + " for HostTypeKey: " + key.toString());
+                        LOG.info("Crawldatum does not pass BW patterns, remove it: " + (((Entry) value)._url).toString() + " for HostTypeKey: " + key.toString());
                     }
 
-                    // TODO add to be deleted by elastic search, check for indexed state, bulk possible per pattern
+                    // TODO add to be deleted by elastic search, check for
+                    // indexed state, bulk possible per pattern
                 }
             }
         }
@@ -257,8 +255,7 @@ public class BWCrawlDbFilter extends Configured {
      */
     public static class FormatConverter implements Mapper<HostTypeKey, ObjectWritable, Text, CrawlDatum> {
 
-        public void map(HostTypeKey key, ObjectWritable value, OutputCollector<Text, CrawlDatum> out, Reporter rep)
-                throws IOException {
+        public void map(HostTypeKey key, ObjectWritable value, OutputCollector<Text, CrawlDatum> out, Reporter rep) throws IOException {
             Entry entry = (Entry) value.get();
             out.collect(entry._url, entry._crawlDatum);
         }
@@ -274,14 +271,16 @@ public class BWCrawlDbFilter extends Configured {
         super(conf);
     }
 
+    public BWCrawlDbFilter() {
+    }
+
     // TODO use normalize and filter inside the bw-job? and not only in the
     // crawldb-job.
-    public void update(Path crawlDb, Path bwdb, boolean normalize, boolean filter,
-            boolean replaceCrawlDb) throws IOException {
-        
+    public void update(Path crawlDb, Path bwdb, boolean normalize, boolean filter, boolean replaceCrawlDb) throws IOException {
+
         String name = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
         Path outputCrawlDb = new Path(crawlDb, name);
-        
+
         LOG.info("filter crawldb against bwdb: starting");
         LOG.info("filter crawldb against bwdb: output crawldb " + outputCrawlDb);
         LOG.info("filter crawldb against bwdb: input crawldb " + crawlDb);
@@ -292,13 +291,13 @@ public class BWCrawlDbFilter extends Configured {
 
         Configuration conf = getConf();
         FileSystem fs = FileSystem.get(conf);
-        
+
         // return if crawldb does not exist
         if (!fs.exists(crawlDb)) {
             LOG.info("filter crawldb against bwdb: crawldb does not exist, nothing todo.");
             return;
         }
-        
+
         // wrapping
         LOG.info("filter crawldb against bwdb: wrapping started.");
         name = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
@@ -358,7 +357,7 @@ public class BWCrawlDbFilter extends Configured {
         convertJob.setOutputValueClass(CrawlDatum.class);
         JobClient.runJob(convertJob);
 
-        // 
+        //
         FileSystem.get(job).delete(tmpMergedDb, true);
 
         if (replaceCrawlDb) {
@@ -370,16 +369,25 @@ public class BWCrawlDbFilter extends Configured {
     }
 
     public static void main(String[] args) throws Exception {
-        Configuration conf = NutchConfiguration.create();
-        BWCrawlDbFilter bwDb = new BWCrawlDbFilter(conf);
-        if (args.length != 5) {
-            System.err
-                    .println("Usage: BWCrawlDbFilter <crawldb> <bwdb> <normalize> <filter> <replace current crawldb>");
-            return;
-        }
-        bwDb.update(new Path(args[0]), new Path(args[1]), Boolean.valueOf(args[2]), Boolean
-                .valueOf(args[3]), Boolean.valueOf(args[4]));
+        int res = ToolRunner.run(NutchConfiguration.create(), new BWCrawlDbFilter(), args);
+        System.exit(res);
+    }
 
+    @Override
+    public int run(String[] args) throws Exception {
+        if (args.length < 5) {
+            System.err.println("Usage: BWCrawlDbFilter <crawldb> <bwdb> <normalize> <filter> <replace current crawldb>");
+            return -1;
+        }
+        try {
+
+            update(new Path(args[0]), new Path(args[1]), Boolean.valueOf(args[2]), Boolean.valueOf(args[3]), Boolean.valueOf(args[4]));
+
+            return 0;
+        } catch (Exception e) {
+            LOG.error("BWCrawlDbFilter: " + StringUtils.stringifyException(e));
+            return -1;
+        }
     }
 
 }
