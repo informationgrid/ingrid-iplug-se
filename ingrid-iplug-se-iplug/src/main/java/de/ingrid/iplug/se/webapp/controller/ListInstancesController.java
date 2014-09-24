@@ -166,9 +166,9 @@ public class ListInstancesController extends InstanceController {
             }
             
 
-            // copy default configuration
+            // copy nutch configurations
             Path destDir = Paths.get( newInstanceDir.toString(), "conf" );
-            Path sourceDir = Paths.get( "conf", "default", "conf" );
+            Path sourceDir = Paths.get( "apache-nutch-runtime", "runtime", "local", "conf" );
             try {
                 FileUtils.copyDirectories(sourceDir, destDir);
             } catch (IOException e) {
@@ -176,9 +176,9 @@ public class ListInstancesController extends InstanceController {
                 //modelMap.put( "error", "Default configuration could not be copied to: " + destDir );
             }
 
-            // copy nutch configurations
-            destDir = Paths.get( newInstanceDir.toString(), "conf", "nutch" );
-            sourceDir = Paths.get( "apache-nutch-runtime", "runtime", "local", "conf" );
+            // copy default configuration
+            destDir = Paths.get( newInstanceDir.toString(), "conf" );
+            sourceDir = Paths.get( "conf", "default", "conf" );
             try {
                 FileUtils.copyDirectories(sourceDir, destDir);
             } catch (IOException e) {
