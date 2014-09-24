@@ -38,7 +38,7 @@
             <li class='tab<c:if test="${activeTab == '4'}"> active</c:if>'><a<c:if test="${activeTab != '4'}"> href="instanceManagement.html?instance=${instance.name}"</c:if>>Management</a></li>
         </ul>
         <div class="panel-container">
-            <div id="tab-config">
+            <div>
                 <c:if test="${activeTab == '2'}"><c:import url="includes/urls.jsp"></c:import></c:if>
                 <c:if test="${activeTab == '1'}"><c:import url="includes/config.jsp"></c:import></c:if>
                 <c:if test="${activeTab == '3'}"><c:import url="includes/scheduling.jsp"></c:import></c:if>

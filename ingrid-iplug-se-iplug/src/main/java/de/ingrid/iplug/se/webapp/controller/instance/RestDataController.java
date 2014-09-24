@@ -1,11 +1,13 @@
 package de.ingrid.iplug.se.webapp.controller.instance;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,10 +19,17 @@ import org.springframework.web.bind.annotation.RestController;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Url;
+import de.ingrid.iplug.se.nutchController.NutchController;
+import de.ingrid.iplug.se.nutchController.NutchProcess;
+import de.ingrid.iplug.se.nutchController.StatusProvider.State;
+import de.ingrid.iplug.se.webapp.container.Instance;
 
 @RestController
 @RequestMapping("/rest")
-public class RestDataController {
+public class RestDataController extends InstanceController {
+    
+    @Autowired
+    private NutchController nutchController;
     
     @RequestMapping(value = { "/test" }, method = RequestMethod.GET)
     public String test() {
@@ -86,6 +95,20 @@ public class RestDataController {
         
         return generateOkResponse();
     }
+    
+    @RequestMapping(value = { "status/{instance}" }, method = RequestMethod.GET)
+    public ResponseEntity<Collection<State>> getStatus(@PathVariable("instance") String name) {
+        Instance instance = getInstanceData( name );
+        NutchProcess nutchProcess = nutchController.getNutchProcess( instance  );
+        
+        if ( nutchProcess == null ||
+            (nutchProcess != null && nutchProcess.getState() == Thread.State.TERMINATED)) {
+            return new ResponseEntity<Collection<State>>( HttpStatus.OK );
+        }
+        
+        return new ResponseEntity<Collection<State>>( nutchProcess.getStatusProvider().getStates(), HttpStatus.OK );
+    }
+    
     
     private ResponseEntity<Map<String, String>> generateOkResponse() {
         Map<String, String> result = new HashMap<String, String>();

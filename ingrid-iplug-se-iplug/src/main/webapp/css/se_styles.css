@@ -5,6 +5,10 @@
 	position: relative;
 }
 
+#statusContainer {
+	background-color: #F5F8EB;
+}
+
 .ui-dialog fieldset, #tab-container fieldset {
 	border: 1px solid #CCC;
 	margin: 10px 0px;

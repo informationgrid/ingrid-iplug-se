@@ -11,12 +11,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.stereotype.Service;
 
 import com.google.common.io.Files;
 import com.thoughtworks.xstream.XStream;
@@ -27,7 +27,6 @@ import com.thoughtworks.xstream.XStream;
  * @author joachim@wemove.com
  * 
  */
-@Service
 public class StatusProvider {
 
     final protected static Log log = LogFactory.getLog(StatusProvider.class);
@@ -90,6 +89,30 @@ public class StatusProvider {
         State(String value, Date time, Classification classification) {
             this.value = value;
             this.time = time;
+            this.classification = classification;
+        }
+
+        public String getValue() {
+            return value;
+        }
+        
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public Date getTime() {
+            return time;
+        }
+
+        public void setTime(Date time) {
+            this.time = time;
+        }
+
+        public Classification getClassification() {
+            return classification;
+        }
+
+        public void setClassification(Classification classification) {
             this.classification = classification;
         }
 
@@ -284,6 +307,10 @@ public class StatusProvider {
             }
         }
         return sb.toString();
+    }
+    
+    public Collection<State> getStates() {
+        return this.states.values();
     }
 
     public String getMsgFormat() {

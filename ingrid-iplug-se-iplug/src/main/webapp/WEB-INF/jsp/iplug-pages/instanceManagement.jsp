@@ -12,12 +12,52 @@
 <link rel="StyleSheet" href="../css/base/portal_u.css" type="text/css" media="all" />
 <link rel="StyleSheet" href="../css/se_styles.css" type="text/css" media="all" />
 
+<script type="text/javascript" src="../js/base/jquery-1.8.0.min.js"></script>
 
 <script type="text/javascript">
-	/* $(document).ready(function() {
-		
-	}); */
+
+    $("#status").html( "Hole Status ..." );
+	checkState();
 	
+	$(document).ready(function() {
+	});
+	
+	function checkState() {
+    	$.ajax( "../rest/status/${ instance.name }", {
+    		type: "GET",
+            contentType: 'application/json',
+            success: function(data) {
+                if (!data) {
+                	data = "Es läuft zur Zeit kein Crawl.";
+                    $("#status").html( data );
+                    return;
+                }
+                
+                var formatTime = function(ts) {
+                	var date = new Date(ts);
+                	var d = date.getDate();
+                    var m = date.getMonth() + 1;
+                    var y = date.getFullYear();
+                    var time = date.toTimeString().substring(0, 8);
+                    return '' + y + '-' + (m<=9 ? '0' + m : m) + '-' + (d <= 9 ? '0' + d : d) + ' ' + time;
+                };
+                
+                // fill div with data from content
+                var content = "";
+                for (var i=0; i < data.length; i++) {
+                	var row = data[i];
+                    content += "<div class=''>" + formatTime(row.time) + " - [" + row.classification + "] " + row.value + "</div>";                	
+                }
+                $("#status").html( content );
+                
+                // repeat execution every 5s until finished
+                setTimeout( checkState, 5000 );
+            },
+            error: function(jqXHR, text, error) {
+                console.error(text, error);
+            }
+    	});
+	}
 	
 </script>
 

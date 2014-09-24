@@ -53,7 +53,7 @@ public class ManagementController extends InstanceController {
 
     @SuppressWarnings("unchecked")
     @RequestMapping(value = { "/iplug-pages/instanceManagement.html" }, method = RequestMethod.POST, params = "start")
-    public String startCrawl(@RequestParam("instance") String name) throws Exception {
+    public String startCrawl(@RequestParam("instance") String name, @RequestParam("depth") int depth, @RequestParam("num") int numUrls) throws Exception {
         String workDir = SEIPlug.conf.getInstancesDir() + "/" + name;
 
         // get all urls belonging to the given instance
@@ -103,11 +103,9 @@ public class ManagementController extends InstanceController {
         FileUtils.writeToFile( Paths.get( workDir, "urls", "exclude" ).toAbsolutePath(), "seed.txt", excludeUrls );
         
         // configure crawl process        
-        Instance instance = new Instance();
-        instance.setName(name);
-        instance.setWorkingDirectory( workDir );
+        Instance instance = getInstanceData( name );
 
-        IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, 1, 100);
+        IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, depth, numUrls);
 
         // run crawl process
         nutchController.start(instance, process);
