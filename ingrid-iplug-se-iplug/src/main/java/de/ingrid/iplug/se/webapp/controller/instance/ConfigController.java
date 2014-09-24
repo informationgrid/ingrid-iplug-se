@@ -1,13 +1,12 @@
 package de.ingrid.iplug.se.webapp.controller.instance;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +46,7 @@ import com.google.gson.GsonBuilder;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.conf.UrlMaintenanceSettings;
+import de.ingrid.iplug.se.utils.InstanceConfigurationTool;
 import de.ingrid.iplug.se.webapp.controller.AdminViews;
 import de.ingrid.iplug.se.webapp.controller.ConfigurationCommand;
 
@@ -61,28 +61,25 @@ import de.ingrid.iplug.se.webapp.controller.ConfigurationCommand;
 public class ConfigController extends InstanceController {
 
     @RequestMapping(value = { "/iplug-pages/instanceConfig.html" }, method = RequestMethod.GET)
-    public String getParameters(final ModelMap modelMap,
-            @ModelAttribute("plugDescription") final PlugdescriptionCommandObject commandObject,
-            @RequestParam("instance") String name) {
+    public String getParameters(final ModelMap modelMap, @ModelAttribute("plugDescription") final PlugdescriptionCommandObject commandObject, @RequestParam("instance") String name) {
 
         String dir = SEIPlug.conf.getInstancesDir();
-        File instanceFolder = new File( dir, name );
+        File instanceFolder = new File(dir, name);
         if (!instanceFolder.exists())
             return "redirect:" + AdminViews.SE_LIST_INSTANCES + ".html";
 
-        
-        modelMap.put( "instance", getInstanceData(name) );
+        modelMap.put("instance", getInstanceData(name));
         return AdminViews.SE_INSTANCE_CONFIG;
     }
 
     @ModelAttribute("configurationCommands")
     public List<ConfigurationCommand> referenceDataConfiguration(@RequestParam("instance") String name) throws Exception {
         String dir = SEIPlug.conf.getInstancesDir();
-        File instanceFolder = new File( dir );
-        File defaultXml = new File( instanceFolder, name + "/conf/nutch-default.xml" );
-        File siteXml = new File( instanceFolder, name + "/conf/nutch-site.xml" );
-        List<ConfigurationCommand> defaultList = loadConfigurationCommands( defaultXml );
-        List<ConfigurationCommand> siteList = loadConfigurationCommands( siteXml );
+        File instanceFolder = new File(dir);
+        File defaultXml = new File(instanceFolder, name + "/conf/nutch-default.xml");
+        File siteXml = new File(instanceFolder, name + "/conf/nutch-site.xml");
+        List<ConfigurationCommand> defaultList = loadConfigurationCommands(defaultXml);
+        List<ConfigurationCommand> siteList = loadConfigurationCommands(siteXml);
 
         if (defaultList == null || siteList == null)
             return null;
@@ -90,37 +87,34 @@ public class ConfigController extends InstanceController {
         // overwrite default values
         for (ConfigurationCommand defaultCommand : defaultList) {
             for (ConfigurationCommand siteCommand : siteList) {
-                if (defaultCommand.getName().equals( siteCommand.getName() )) {
-                    defaultCommand.setFinalValue( siteCommand.getValue() );
+                if (defaultCommand.getName().equals(siteCommand.getName())) {
+                    defaultCommand.setFinalValue(siteCommand.getValue());
                 }
             }
         }
 
         // add properties from site.xml which is not in default.xml
         for (ConfigurationCommand configurationCommand : siteList) {
-            if (!defaultList.contains( configurationCommand )) {
-                ConfigurationCommand last = defaultList.get( defaultList.size() - 1 );
-                configurationCommand.setPosition( last.getPosition() + 1 );
-                configurationCommand.setFinalValue( configurationCommand.getValue() );
-                defaultList.add( configurationCommand );
+            if (!defaultList.contains(configurationCommand)) {
+                ConfigurationCommand last = defaultList.get(defaultList.size() - 1);
+                configurationCommand.setPosition(last.getPosition() + 1);
+                configurationCommand.setFinalValue(configurationCommand.getValue());
+                defaultList.add(configurationCommand);
             }
         }
 
         return defaultList;
     }
-    
+
     @ModelAttribute("metaConfigJson")
     public String getMetadataConfigAsJson(@RequestParam("instance") String name) throws UnsupportedEncodingException {
         String json = null;
-        try(FileInputStream reader = new FileInputStream(SEIPlug.conf.getInstancesDir() + "/" + name + "/conf/urlMaintenance.json")) {
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            UrlMaintenanceSettings settings = gson.fromJson( new InputStreamReader( reader, "UTF-8" ), UrlMaintenanceSettings.class );
-            json = gson.toJson( settings );
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        
+        InstanceConfigurationTool instanceConfig = new InstanceConfigurationTool(Paths.get(SEIPlug.conf.getInstancesDir(), name, "conf", "urlMaintenance.json"));
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        UrlMaintenanceSettings settings = instanceConfig.getSettings();
+        json = gson.toJson(settings);
+
         return json;
     }
 
@@ -129,36 +123,35 @@ public class ConfigController extends InstanceController {
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
         try {
-            Document document = documentBuilder.parse( file );
+            Document document = documentBuilder.parse(file);
             Element documentElement = document.getDocumentElement();
-            NodeList nodeList = documentElement.getElementsByTagName( "property" );
+            NodeList nodeList = documentElement.getElementsByTagName("property");
 
             list = new ArrayList<ConfigurationCommand>();
             for (int i = 0; i < nodeList.getLength(); i++) {
                 ConfigurationCommand configurationCommand = new ConfigurationCommand();
-                configurationCommand.setPosition( i );
-                Node property = nodeList.item( i );
+                configurationCommand.setPosition(i);
+                Node property = nodeList.item(i);
 
-                NodeList nameList = ((Element) property).getElementsByTagName( "name" );
-                configurationCommand.setName( nameList.item( 0 ).getFirstChild().getNodeValue() );
+                NodeList nameList = ((Element) property).getElementsByTagName("name");
+                configurationCommand.setName(nameList.item(0).getFirstChild().getNodeValue());
 
-                NodeList valueList = ((Element) property).getElementsByTagName( "value" );
-                if (valueList.item( 0 ).getFirstChild() != null) {
-                    configurationCommand.setValue( valueList.item( 0 ).getFirstChild().getNodeValue() );
+                NodeList valueList = ((Element) property).getElementsByTagName("value");
+                if (valueList.item(0).getFirstChild() != null) {
+                    configurationCommand.setValue(valueList.item(0).getFirstChild().getNodeValue());
                 }
 
-                NodeList descriptionList = ((Element) property).getElementsByTagName( "description" );
+                NodeList descriptionList = ((Element) property).getElementsByTagName("description");
                 if (descriptionList != null) {
                     if (descriptionList.getLength() > 0) {
-                        if (descriptionList.item( 0 ).getFirstChild() != null) {
-                            configurationCommand.setDescription( descriptionList.item( 0 ).getFirstChild()
-                                    .getNodeValue() );
+                        if (descriptionList.item(0).getFirstChild() != null) {
+                            configurationCommand.setDescription(descriptionList.item(0).getFirstChild().getNodeValue());
                         }
 
                     }
                 }
 
-                list.add( configurationCommand );
+                list.add(configurationCommand);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -171,16 +164,15 @@ public class ConfigController extends InstanceController {
     }
 
     @RequestMapping(value = "/iplug-pages/instanceConfig.html", method = RequestMethod.POST)
-    public ResponseEntity<String> postConfiguration(@RequestParam("name") String name,
-            @RequestParam("value") String value, @RequestParam("instance") String instance, HttpSession session)
-            throws ParserConfigurationException, SAXException, IOException, TransformerException {
+    public ResponseEntity<String> postConfiguration(@RequestParam("name") String name, @RequestParam("value") String value, @RequestParam("instance") String instance, HttpSession session) throws ParserConfigurationException, SAXException,
+            IOException, TransformerException {
 
         String dir = SEIPlug.conf.getInstancesDir();
-        File instanceFolder = new File( dir );
-        File file = new File( instanceFolder, instance + "/conf/nutch-site.xml" );
+        File instanceFolder = new File(dir);
+        File file = new File(instanceFolder, instance + "/conf/nutch-site.xml");
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-        Document document = documentBuilder.parse( file );
+        Document document = documentBuilder.parse(file);
         Element documentElement = document.getDocumentElement();
 
         // update site.xml
@@ -188,19 +180,19 @@ public class ConfigController extends InstanceController {
         // value
         // which is done here!
         boolean update = false;
-        NodeList nodeList = documentElement.getElementsByTagName( "name" );
+        NodeList nodeList = documentElement.getElementsByTagName("name");
         for (int i = 0; i < nodeList.getLength(); i++) {
-            Node firstChild = nodeList.item( i ).getFirstChild();
+            Node firstChild = nodeList.item(i).getFirstChild();
             String textContent = firstChild.getTextContent();
-            if (textContent.equals( name )) {
+            if (textContent.equals(name)) {
                 update = true;
-                NodeList valueList = documentElement.getElementsByTagName( "value" );
-                Node valueNode = valueList.item( i );
+                NodeList valueList = documentElement.getElementsByTagName("value");
+                Node valueNode = valueList.item(i);
                 Node valueText = valueNode.getFirstChild();
                 if (valueText == null) {
-                    valueNode.appendChild( document.createTextNode( value ) );
+                    valueNode.appendChild(document.createTextNode(value));
                 } else {
-                    valueText.setTextContent( value );
+                    valueText.setTextContent(value);
                 }
                 break;
             }
@@ -208,55 +200,57 @@ public class ConfigController extends InstanceController {
 
         // create new property in site.xml
         if (!update) {
-            Element propertyElement = document.createElement( "property" );
-            Element nameElement = document.createElement( "name" );
-            Element valueElement = document.createElement( "value" );
-            nameElement.appendChild( document.createTextNode( name ) );
-            valueElement.appendChild( document.createTextNode( value ) );
-            propertyElement.appendChild( nameElement );
-            propertyElement.appendChild( valueElement );
-            documentElement.appendChild( propertyElement );
+            Element propertyElement = document.createElement("property");
+            Element nameElement = document.createElement("name");
+            Element valueElement = document.createElement("value");
+            nameElement.appendChild(document.createTextNode(name));
+            valueElement.appendChild(document.createTextNode(value));
+            propertyElement.appendChild(nameElement);
+            propertyElement.appendChild(valueElement);
+            documentElement.appendChild(propertyElement);
         }
 
         // write site.xml
-        Source xmlSource = new DOMSource( document );
-        Result result = new StreamResult( new FileOutputStream( file ) );
+        Source xmlSource = new DOMSource(document);
+        Result result = new StreamResult(new FileOutputStream(file));
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         Transformer transformer = transformerFactory.newTransformer();
-        transformer.setOutputProperty( "indent", "yes" );
-        transformer.transform( xmlSource, result );
+        transformer.setOutputProperty("indent", "yes");
+        transformer.transform(xmlSource, result);
 
         // update configuration
         // Configuration configuration = nutchInstance.getConfiguration();
         // configuration.set( name, value );
 
         // return "redirect:/index.hmtl";
-        return new ResponseEntity<String>( "Config Updated", HttpStatus.OK );
+        return new ResponseEntity<String>("Config Updated", HttpStatus.OK);
     }
-    
+
     @RequestMapping(value = "/rest/updateMetadata", method = RequestMethod.POST)
     public ResponseEntity<Map<String, String>> updateMetadataConfig(@RequestParam("instance") String name, @RequestBody String json) throws IOException {
         String confFile = SEIPlug.conf.getInstancesDir() + "/" + name + "/conf/urlMaintenance.json";
-        
+
         // check if json can be converted correctly
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        UrlMaintenanceSettings settings = gson.fromJson( json, UrlMaintenanceSettings.class );
-        
+        UrlMaintenanceSettings settings = gson.fromJson(json, UrlMaintenanceSettings.class);
+
         Map<String, String> result = new HashMap<String, String>();
         // only write then json content to file
         if (settings != null) {
-            //            File fos = new File( SEIPlug.conf.getInstancesDir() + "/" + name + "/conf/urlMaintenance.json" );
-//            BufferedWriter writer = new BufferedWriter( new FileWriter( fos ) );
-//            writer.write( json );
-//            writer.close();
-            Writer out = new FileWriter( confFile );
-            gson.toJson( settings, out);
+            // File fos = new File( SEIPlug.conf.getInstancesDir() + "/" + name
+            // + "/conf/urlMaintenance.json" );
+            // BufferedWriter writer = new BufferedWriter( new FileWriter( fos )
+            // );
+            // writer.write( json );
+            // writer.close();
+            Writer out = new FileWriter(confFile);
+            gson.toJson(settings, out);
             out.close();
-            result.put( "result", "OK" );
-            return new ResponseEntity<Map<String, String>>( result, HttpStatus.OK );
+            result.put("result", "OK");
+            return new ResponseEntity<Map<String, String>>(result, HttpStatus.OK);
         }
-        result.put( "result", "Error" );
-        return new ResponseEntity<Map<String, String>>( result, HttpStatus.INTERNAL_SERVER_ERROR );
+        result.put("result", "Error");
+        return new ResponseEntity<Map<String, String>>(result, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }
