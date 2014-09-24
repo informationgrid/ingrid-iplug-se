@@ -16,7 +16,6 @@
  */
 package org.apache.nutch.analysis.lang;
 
-
 // Nutch imports
 import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.crawl.Inlinks;
@@ -31,62 +30,66 @@ import org.apache.nutch.net.protocols.Response;
 // Hadoop imports
 import org.apache.hadoop.conf.Configuration;
 
-
 /**
- * An {@link org.apache.nutch.indexer.IndexingFilter} that 
- * add a <code>lang</code> (language) field to the document.
- *
+ * An {@link org.apache.nutch.indexer.IndexingFilter} that add a
+ * <code>lang</code> (language) field to the document.
+ * 
  * It tries to find the language of the document by:
  * <ul>
- *   <li>First, checking if {@link HTMLLanguageParser} add some language
- *       information</li>
- *   <li>Then, checking if a <code>Content-Language</code> HTTP header can be
- *       found</li>
- *   <li>Finaly by analyzing the document content</li>
+ * <li>First, checking if {@link HTMLLanguageParser} add some language
+ * information</li>
+ * <li>Then, checking if a <code>Content-Language</code> HTTP header can be
+ * found</li>
+ * <li>Finaly by analyzing the document content</li>
  * </ul>
- *   
+ * 
  * @author Sami Siren
  * @author Jerome Charron
  */
 public class LanguageIndexingFilter implements IndexingFilter {
-  
 
-  private Configuration conf;
+    private Configuration conf;
 
-/**
-   * Constructs a new Language Indexing Filter.
-   */
-  public LanguageIndexingFilter() {
+    /**
+     * Constructs a new Language Indexing Filter.
+     */
+    public LanguageIndexingFilter() {
 
-  }
-
-  // Inherited JavaDoc
-  public NutchDocument filter(NutchDocument doc, Parse parse, Text url, CrawlDatum datum, Inlinks inlinks)
-    throws IndexingException {
-
-    // check if LANGUAGE found, possibly put there by HTMLLanguageParser
-    String lang = parse.getData().getParseMeta().get(Metadata.LANGUAGE);
-
-    // check if HTTP-header tels us the language
-    if (lang == null) {
-        lang = parse.getData().getContentMeta().get(Response.CONTENT_LANGUAGE);
     }
 
-    if (lang == null || lang.length() == 0) {
-      lang = "unknown";
+    // Inherited JavaDoc
+    public NutchDocument filter(NutchDocument doc, Parse parse, Text url, CrawlDatum datum, Inlinks inlinks) throws IndexingException {
+
+        // check if LANGUAGE found, possibly put there by HTMLLanguageParser
+        String lang = parse.getData().getParseMeta().get(Metadata.LANGUAGE);
+
+        // check if HTTP-header tels us the language
+        if (lang == null) {
+            lang = parse.getData().getContentMeta().get(Response.CONTENT_LANGUAGE);
+        }
+
+        // use language configured in url-maintenance
+        // languages will be put according to the host of the administered URLs
+        // (see MetadataMerger)
+        if (lang == null || conf.getBoolean("ingrid.lang.analyze.override.with.metadata", false)) {
+            lang = parse.getData().getParseMeta().get("lang");
+        }
+
+        if (lang == null || lang.length() == 0) {
+            lang = "unknown";
+        }
+
+        doc.add("lang", lang);
+
+        return doc;
     }
 
-    doc.add("lang", lang);
+    public void setConf(Configuration conf) {
+        this.conf = conf;
+    }
 
-    return doc;
-  }
-
-  public void setConf(Configuration conf) {
-    this.conf = conf;
-  }
-
-  public Configuration getConf() {
-    return this.conf;
-  }
+    public Configuration getConf() {
+        return this.conf;
+    }
 
 }

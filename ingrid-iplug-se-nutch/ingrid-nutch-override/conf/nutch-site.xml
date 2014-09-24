@@ -27,7 +27,7 @@
 
     <property>
         <name>plugin.includes</name>
-        <value>protocol-httpclient|urlfilter-regex|parse-(html|tika)|index-(basic|anchor|metadata|more)|indexer-elastic|scoring-link|language-identifier|urlnormalizer-(pass|regex|basic)|analysis-de</value>
+        <value>protocol-httpclient|urlfilter-regex|parse-(html|tika)|index-(basic|anchor|metadata|more)|indexer-elastic|scoring-link|ingrid-language-identifier|urlnormalizer-(pass|regex|basic)|analysis-de</value>
         <description>Regular expression naming plugin directory names to
             include. Any plugin not matching this expression is excluded.
             In any case you need at least include the nutch-extensionpoints plugin.
@@ -310,5 +310,12 @@
         <value>1</value>
         <description>The number of minutes after which the throughput check is enabled.</description>
     </property>
+    
+    <property>
+        <name>ingrid.lang.analyze.override.with.metadata</name>
+        <value>true</value>
+        <description>Override the language extraction result with the value from the metadata. This setting is ingrid specific and presumes that a metadata 'lang' exists for each entry.</description>
+    </property>
+    
     
 </configuration>

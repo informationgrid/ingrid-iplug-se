@@ -9,7 +9,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ingrid</groupId>
 	<artifactId>ingrid-iplug-se-nutch</artifactId>
-	<packaging>pom</packaging>
+	<packaging>jar</packaging>
 	<name>ingrid-iplug-se-nutch</name>
 	<scm>
 		<connection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid/ingrid-iplug-se/branches/3.5.x_new_architecture/ingrid-iplug-se-nutch</connection>
@@ -34,11 +34,11 @@
 				<artifactId>hadoop-core</artifactId>
 				<version>1.2.1</version>
 			</dependency>
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-test</artifactId>
-                <version>1.2.1</version>
-            </dependency>
+			<dependency>
+				<groupId>org.apache.hadoop</groupId>
+				<artifactId>hadoop-test</artifactId>
+				<version>1.2.1</version>
+			</dependency>
 			<dependency>
 				<groupId>xerces</groupId>
 				<artifactId>xercesImpl</artifactId>
@@ -214,6 +214,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.9.1</version>
 				<executions>
 					<execution>
 						<phase>generate-sources</phase>
@@ -223,13 +224,9 @@
 						<configuration>
 							<sources>
 								<source>ingrid-nutch-plugins/analysis-de/src/java</source>
-								<source>ingrid-nutch-plugins/analysis-de/src/test</source>
 								<source>ingrid-nutch-plugins/analysis-fr/src/java</source>
-								<source>ingrid-nutch-plugins/analysis-fr/src/test</source>
 								<source>ingrid-nutch-plugins/indexer-ingrid/src/java</source>
-								<source>ingrid-nutch-plugins/indexer-ingrid/src/test</source>
-								<source>ingrid-nutch-plugins/index-sns/src/java</source>
-								<source>ingrid-nutch-plugins/index-sns/src/test</source>
+								<source>ingrid-nutch-plugins/ingrid-language-identifier/src/java</source>
 							</sources>
 						</configuration>
 					</execution>
@@ -244,8 +241,8 @@
 							<tasks>
 								<echo
 									message="Executing original ant build script '${basedir}/build.xml' target=dist." />
-								    <ant antfile="${basedir}/build.xml" inheritRefs="true">
-									<property name="maven.version" value="${version}" />
+								<ant antfile="${basedir}/build.xml" inheritRefs="true">
+									<property name="maven.version" value="${project.version}" />
 									<property name="maven.buildNumber" value="${buildNumber}" />
 									<property name="maven.timestamp" value="${timestamp}" />
 									<property name="maven.iplugType" value="IPLUG_SE" />
@@ -303,8 +300,8 @@
 							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
-						    <includeScope>compile</includeScope>
-                            <includeScope>runtime</includeScope>
+							<includeScope>compile</includeScope>
+							<includeScope>runtime</includeScope>
 							<outputDirectory>ingrid-nutch-libs</outputDirectory>
 							<excludeTransitive>false</excludeTransitive>
 							<excludeArtifactIds>ingrid-installer,xercesImpl,xerces,xalan</excludeArtifactIds>
@@ -323,6 +320,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.5</version>
 				<configuration>
 					<filesets>
 						<fileset>
