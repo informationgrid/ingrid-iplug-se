@@ -163,6 +163,11 @@ public class IngridCrawlNutchProcess extends NutchProcess {
 
         String[] nutchCall = new String[] { "-cp", cp };
         nutchCall = arrayConcat(nutchCall, javaOptions);
+        // Debug specific call
+        String debugOption = System.getProperty( "debugNutchCall" );
+        if (debugOption != null && commandAndOptions[0].endsWith( debugOption )) {
+            nutchCall = arrayConcat( nutchCall, new String[] { "-agentlib:jdwp=transport=dt_socket,address=7000,server=y,suspend=y" } );
+        }
         nutchCall = arrayConcat(nutchCall, commandAndOptions);
 
         CommandLine cmdLine = new CommandLine(executable);

@@ -58,15 +58,20 @@ public class ManagementController extends InstanceController {
 
         // get all urls belonging to the given instance
         List<Url> urls = UrlHandler.getUrlsByInstance( name );
-        Map<String, List<String>> startUrls = new HashMap<String, List<String>>();
+        Map<String, Map<String, List<String>>> startUrls = new HashMap<String, Map<String, List<String>>>();
         List<String> limitUrls = new ArrayList<String>(); 
         List<String> excludeUrls = new ArrayList<String>();
         
         for (Url url : urls) {
             
-            List<String> metadata = new ArrayList<String>();
+            Map<String, List<String>> metadata = new HashMap<String, List<String>>();
             for (Metadata meta : url.getMetadata()) {
-                metadata.add( meta.getMetaKey() + ":" + meta.getMetaValue() ) ;
+                List<String> metaValues = metadata.get( meta.getMetaKey() );
+                if (metaValues == null) {
+                    metaValues = new ArrayList<String>();
+                    metadata.put( meta.getMetaKey(), metaValues );
+                }
+                metaValues.add( meta.getMetaValue() ) ;
             }
             
             startUrls.put( url.getUrl(), metadata );
@@ -84,8 +89,13 @@ public class ManagementController extends InstanceController {
         
         List<String> metadataValues = new ArrayList<String>();
         for (String start : startUrlsValue) {
-            List<String> metas = startUrls.get( start );
-            metadataValues.add( start + "\t" + StringUtils.join( metas, "\t" ) );
+            Map<String, List<String>> metas = startUrls.get( start );
+            
+            String metasConcat = start;
+            for (String key : metas.keySet()) {
+                metasConcat += "\t" + key + ":\t" + StringUtils.join( metas.get( key ), "\t" );
+            }
+            metadataValues.add( metasConcat );
         }
         
         FileUtils.writeToFile( Paths.get( workDir, "urls", "metadata" ).toAbsolutePath(), "seed.txt", metadataValues );
