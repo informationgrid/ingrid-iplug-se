@@ -181,6 +181,27 @@ public class IngridCrawlNutchProcess extends NutchProcess {
         if (log.isDebugEnabled()) {
             log.debug("Call: " + StringUtils.join(cmdLine.toStrings(), " "));
         }
+        
+        /**
+         * FOR WINDOWS DEVELOPMENT TO RUN IN CYGWIN
+         */
+        if (System.getProperty( "runInCygwin" ) != null) {
+            cmdLine = new CommandLine("C:\\cygwin\\bin\\bash.exe");
+            cmdLine.addArgument( "-c" );
+            
+            String options = StringUtils.join(javaOptions, " ");
+            String command = StringUtils.join(commandAndOptions, " ");
+            // FOR DEBUGGING NUTCH
+            // options += " -agentlib:jdwp=transport=dt_socket,address=7000,server=y,suspend=y";
+            String call = "java -cp '" + cp + "' " + options + " " + command;
+            // adding debug option
+            call = call.replaceAll( "\\\\", "/" );
+            cmdLine.addArgument( call );
+        }
+        /**
+         * END
+         */
+        
         executor.execute(cmdLine, resultHandler);
         executor.getStreamHandler();
         resultHandler.waitFor();

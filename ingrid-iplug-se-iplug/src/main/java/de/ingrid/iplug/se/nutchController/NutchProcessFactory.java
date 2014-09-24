@@ -66,7 +66,7 @@ public class NutchProcessFactory {
 
         process.setWorkingDirectory(instance.getWorkingDirectory());
         process.addClassPath(Paths.get(instance.getWorkingDirectory(), "conf").toAbsolutePath().toString());
-        process.addJavaOptions(new String[] { "-Xmx512m", "-Dhadoop.log.dir=" + Paths.get(instance.getWorkingDirectory(), "logs").toAbsolutePath(), "-Dhadoop.log.file=hadoop.log" });
+        process.addJavaOptions(new String[] { "-Xmx512m", "-Dhadoop.log.dir=" + Paths.get(instance.getWorkingDirectory(), "logs").toAbsolutePath(), "-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8" });
         process.addClassPath(Paths.get("apache-nutch-runtime/runtime/local").toAbsolutePath().toString());
         process.addClassPath(Paths.get(Paths.get(instance.getWorkingDirectory()).toAbsolutePath().getParent().getParent().toAbsolutePath().toString(), "apache-nutch-runtime/runtime/local/lib").toAbsolutePath().toString()
                 .concat(File.separator).concat("*"));

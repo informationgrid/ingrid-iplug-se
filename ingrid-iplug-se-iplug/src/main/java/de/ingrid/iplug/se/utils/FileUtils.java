@@ -1,14 +1,23 @@
 package de.ingrid.iplug.se.utils;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+
 
 public class FileUtils {
+    
+    private static Logger log = Logger.getLogger( FileUtils.class );
     
     public static void removeRecursive(Path path) throws IOException {
         if (!Files.exists(path)) return;
@@ -46,6 +55,24 @@ public class FileUtils {
         Files.walkFileTree(source, new CopyVisitor(source, destination));
 
     }
+    
+    public static void writeToFile( Path path, String name, List<String> listContent ) throws IOException {
+        if(path != null){
+            Files.createDirectories( path );
+            if (listContent != null) {
+                Writer writer = new FileWriter( path.resolve( name ).toString() );
+                BufferedWriter bWriter = new BufferedWriter( writer );
+                for (String content : listContent) {
+                    bWriter.write(content);
+                    bWriter.newLine();
+                }
+                bWriter.close();
+            } else {
+                log.error("Content is null!");
+            }
+        }
+    }
+    
     
     private static class CopyVisitor extends SimpleFileVisitor<Path> {
         private Path fromPath;

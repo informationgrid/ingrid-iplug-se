@@ -1,5 +1,12 @@
 package de.ingrid.iplug.se.webapp.controller.instance;
 
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -9,11 +16,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import de.ingrid.iplug.se.SEIPlug;
+import de.ingrid.iplug.se.db.UrlHandler;
+import de.ingrid.iplug.se.db.model.Metadata;
+import de.ingrid.iplug.se.db.model.Url;
 import de.ingrid.iplug.se.nutchController.IngridCrawlNutchProcess;
 import de.ingrid.iplug.se.nutchController.NutchController;
 import de.ingrid.iplug.se.nutchController.NutchProcessFactory;
+import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
 import de.ingrid.iplug.se.webapp.controller.AdminViews;
+import edu.emory.mathcs.backport.java.util.Arrays;
 
 /**
  * Control the database parameter page.
@@ -39,15 +51,55 @@ public class ManagementController extends InstanceController {
         return AdminViews.SE_INSTANCE_MANAGEMENT;
     }
 
+    @SuppressWarnings("unchecked")
     @RequestMapping(value = { "/iplug-pages/instanceManagement.html" }, method = RequestMethod.POST, params = "start")
     public String startCrawl(@RequestParam("instance") String name) throws Exception {
+        String workDir = SEIPlug.conf.getInstancesDir() + "/" + name;
 
+        // get all urls belonging to the given instance
+        List<Url> urls = UrlHandler.getUrlsByInstance( name );
+        Map<String, List<String>> startUrls = new HashMap<String, List<String>>();
+        List<String> limitUrls = new ArrayList<String>(); 
+        List<String> excludeUrls = new ArrayList<String>();
+        
+        for (Url url : urls) {
+            
+            List<String> metadata = new ArrayList<String>();
+            for (Metadata meta : url.getMetadata()) {
+                metadata.add( meta.getMetaKey() + ":" + meta.getMetaValue() ) ;
+            }
+            
+            startUrls.put( url.getUrl(), metadata );
+            for (String limit : url.getLimitUrls()) {
+                limitUrls.add( limit );
+            }
+            for (String exclude : url.getExcludeUrls()) {
+                excludeUrls.add( exclude );
+            }
+        }
+        
+        // output urls and metadata
+        String[] startUrlsValue = startUrls.keySet().toArray( new String[0] );
+        FileUtils.writeToFile( Paths.get( workDir, "urls", "start" ).toAbsolutePath(), "seed.txt", Arrays.asList( startUrlsValue ));
+        
+        List<String> metadataValues = new ArrayList<String>();
+        for (String start : startUrlsValue) {
+            List<String> metas = startUrls.get( start );
+            metadataValues.add( start + "\t" + StringUtils.join( metas, "\t" ) );
+        }
+        
+        FileUtils.writeToFile( Paths.get( workDir, "urls", "metadata" ).toAbsolutePath(), "seed.txt", metadataValues );
+        FileUtils.writeToFile( Paths.get( workDir, "urls", "limit" ).toAbsolutePath(), "seed.txt", limitUrls );
+        FileUtils.writeToFile( Paths.get( workDir, "urls", "exclude" ).toAbsolutePath(), "seed.txt", excludeUrls );
+        
+        // configure crawl process        
         Instance instance = new Instance();
         instance.setName(name);
-        instance.setWorkingDirectory(SEIPlug.conf.getInstancesDir() + "/" + name);
+        instance.setWorkingDirectory( workDir );
 
         IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, 1, 100);
 
+        // run crawl process
         nutchController.start(instance, process);
         return redirect(AdminViews.SE_INSTANCE_MANAGEMENT + ".html?instance=" + name);
     }
