@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -16,6 +17,7 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -27,8 +29,13 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
+import de.ingrid.admin.Utils;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
+import de.ingrid.admin.object.Partner;
+import de.ingrid.admin.object.Provider;
+import de.ingrid.admin.service.CommunicationService;
 import de.ingrid.iplug.se.SEIPlug;
+import de.ingrid.iplug.se.conf.UrlMaintenanceSettings;
 import de.ingrid.iplug.se.conf.UrlMaintenanceSettings.MetaElement;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Metadata;
@@ -46,6 +53,13 @@ import de.ingrid.iplug.se.webapp.controller.AdminViews;
 @SessionAttributes("plugDescription")
 public class UrlController extends InstanceController {
 
+    private CommunicationService _communicationInterface;
+    
+    @Autowired
+    public UrlController(final CommunicationService communicationInterface) throws Exception {
+        _communicationInterface = communicationInterface;
+    }
+
     @RequestMapping(value = { "/iplug-pages/instanceUrls.html" }, method = RequestMethod.GET)
     public String getParameters(final ModelMap modelMap, @ModelAttribute("plugDescription") final PlugdescriptionCommandObject commandObject, @RequestParam("instance") String name) {
 
@@ -58,7 +72,7 @@ public class UrlController extends InstanceController {
 
         return AdminViews.SE_INSTANCE_URLS;
     }
-
+    
     @ModelAttribute("dbUrls")
     public List<Url> getUrlsFromDB(@RequestParam("instance") String name, @RequestParam(value = "filter", required = false, defaultValue = "") String filter) {
         EntityManager em = DBManager.INSTANCE.getEntityManager();
@@ -101,8 +115,68 @@ public class UrlController extends InstanceController {
     public List<MetaElement> getMetadata(@RequestParam("instance") String name) throws FileNotFoundException, JsonSyntaxException, JsonIOException, UnsupportedEncodingException {
 
         InstanceConfigurationTool instanceConfig = new InstanceConfigurationTool(Paths.get(SEIPlug.conf.getInstancesDir(), name, "conf", "urlMaintenance.json"));
-        return instanceConfig.getMetadata();
+        List<MetaElement> metadata = instanceConfig.getMetadata();
+        
+        // try to get latest partner and provider from the iBus (Management-iPlug / Portal)
+        if (_communicationInterface.isConnected(0)) {
+            try {
+                List<Partner> partners = Utils.getPartners(_communicationInterface.getIBus());
+                List<Provider> providers = Utils.getProviders(_communicationInterface.getIBus());
+                UrlMaintenanceSettings settings = instanceConfig.getSettings();
+                
+                // find partner in metadata
+                for (MetaElement metaElement : metadata) {
+                    if ("partner".equals( metaElement.getId() )) {
+                        List<UrlMaintenanceSettings.Metadata> partnerMeta = metaElement.getChildren();
+                        // remove all entries
+                        partnerMeta.clear();
+
+                        // fill with entries from iBus
+                        for (Partner partner : partners) {
+                            UrlMaintenanceSettings.Metadata m = settings.new Metadata();
+                            m.setId( partner.getShortName() );
+                            m.setLabel( partner.getDisplayName() );
+                            partnerMeta.add( m );
+                        }
+                        
+                    } else if ("provider".equals( metaElement.getId() )) {
+                        List<UrlMaintenanceSettings.Metadata> providerMeta = metaElement.getChildren();
+                        // remove all entries
+                        providerMeta.clear();
+                        
+                        // fill with entries from iBus
+                        for (Partner partner : partners) {
+                            UrlMaintenanceSettings.Metadata m = settings.new Metadata();
+                            m.setId( partner.getShortName() );
+                            m.setLabel( partner.getDisplayName() );
+                            
+                            String providerId = partner.getShortName().substring(0, 2);
+                            final Iterator<Provider> it = providers.iterator();
+                            List<UrlMaintenanceSettings.Metadata> provider = new ArrayList<UrlMaintenanceSettings.Metadata>();
+                            while (it.hasNext()) {
+                                final Provider pr = it.next();
+                                if (pr.getShortName().startsWith(providerId)) {
+                                    UrlMaintenanceSettings.Metadata p = settings.new Metadata();
+                                    p.setId( pr.getShortName() );
+                                    p.setLabel( pr.getDisplayName() );
+                                    provider.add( p );
+                                    it.remove();
+                                }
+                            }
+                            m.setChildren( provider );
+                            providerMeta.add( m );
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        
+        return metadata;
     }
+    
 
     @RequestMapping(value = { "/iplug-pages/instanceUrls.html" }, method = RequestMethod.POST, params = "editUrl")
     public String editUrl(@RequestParam("instance") String name, @RequestParam("id") Long id) {

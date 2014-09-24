@@ -24,7 +24,6 @@ import com.tngtech.configbuilder.annotation.valueextractor.PropertyValue;
 
 import de.ingrid.admin.IConfig;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
-import de.ingrid.iplug.se.conf.UrlMaintenanceSettings;
 
 @PropertiesFiles( {"config", "elasticsearch"} )
 @PropertyLocations(directories = {"conf"}, fromClassLoader = true)
@@ -68,8 +67,6 @@ public class Configuration implements IConfig {
         
     }
     
-    private UrlMaintenanceSettings urlMaintenanceSettings;
-
 	@Override
 	public void initialize() {
 	}
@@ -153,13 +150,6 @@ public class Configuration implements IConfig {
         return map;
     }
     
-    public UrlMaintenanceSettings getUrlMaintenanceSettings() {
-        return urlMaintenanceSettings;
-    }
-    
-    public void setUrlMaintenanceSettings(UrlMaintenanceSettings urlMaintenanceSettings) {
-        this.urlMaintenanceSettings = urlMaintenanceSettings;
-    }
     public String getActiveInstancesAsString() {
         return StringUtils.join( this.activeInstances, ',' );
     }
