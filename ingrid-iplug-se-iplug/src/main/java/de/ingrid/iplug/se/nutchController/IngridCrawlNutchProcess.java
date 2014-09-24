@@ -92,8 +92,8 @@ public class IngridCrawlNutchProcess extends NutchProcess {
                 // Usage: <crawldb> <bwdb> <segment> <normalize> <filter>
                 execute("de.ingrid.iplug.se.nutch.crawl.bw.BWUpdateDb", crawlDb, bwDb, currentSegment, "true", "true");
                 this.statusProvider.appendToState("UPDATE_CRAWLDB" + i, " done.");
-
-                execute("de.ingrid.iplug.se.nutch.tools.HostStatistic", crawlDb, currentSegment);
+// TODO: create new statistic
+//                execute("de.ingrid.iplug.se.nutch.tools.HostStatistic", crawlDb, currentSegment);
 
                 this.statusProvider.addState("UPDATE_MD" + i, "Update metadata for new urls...");
                 execute("de.ingrid.iplug.se.nutch.crawl.metadata.ParseDataUpdater", mddb, currentSegment);
@@ -102,14 +102,18 @@ public class IngridCrawlNutchProcess extends NutchProcess {
 
             this.statusProvider.addState("MERGE_SEGMENT", "Merge segments...");
             execute("org.apache.nutch.segment.SegmentMerger", mergedSegments, "-dir", segments);
-            removeRecursive(fs.getPath(segments));
-            Files.move(fs.getPath(mergedSegments), fs.getPath(segments), StandardCopyOption.REPLACE_EXISTING);
+            if (fs.getPath(mergedSegments).toFile().exists()) {
+                removeRecursive(fs.getPath(segments));
+                Files.move(fs.getPath(mergedSegments), fs.getPath(segments), StandardCopyOption.REPLACE_EXISTING);
+            }
             this.statusProvider.appendToState("MERGE_SEGMENT", " done.");
 
             this.statusProvider.addState("FILTER_SEGMENT", "Filter segment width limit/exclude urls...");
             execute("de.ingrid.iplug.se.nutch.segment.SegmentFilter", filteredSegments, crawlDb, "-dir", segments);
-            removeRecursive(fs.getPath(segments));
-            Files.move(fs.getPath(filteredSegments), fs.getPath(segments), StandardCopyOption.REPLACE_EXISTING);
+            if (fs.getPath(filteredSegments).toFile().exists()) {
+                removeRecursive(fs.getPath(segments));
+                Files.move(fs.getPath(filteredSegments), fs.getPath(segments), StandardCopyOption.REPLACE_EXISTING);
+            }
             this.statusProvider.appendToState("FILTER_SEGMENT", " done.");
 
 
