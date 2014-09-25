@@ -1,10 +1,12 @@
-package de.ingrid.iplug.se.nutch.tools;
+package de.ingrid.iplug.se.nutch.statistics;
 
+import java.io.BufferedWriter;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Random;
 
@@ -19,6 +21,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BooleanWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.SequenceFile;
+import org.apache.hadoop.io.SequenceFile.Reader;
 import org.apache.hadoop.io.SequenceFile.Sorter;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
@@ -35,20 +38,16 @@ import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.hadoop.mapred.lib.InverseMapper;
+import org.apache.hadoop.util.StringUtils;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.crawl.CrawlDb;
+import org.apache.nutch.util.NutchConfiguration;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
-public class HostStatistic extends Configured {
-
-    public static final String INPUT_OPTION = "INPUT_OPTION";
-
-    public static final String INPUT_OPTION_CRAWLDB_DIR = "-crawldb";
-
-    public static final String INPUT_OPTION_FETCH_DIR = "-fetch";
-
-    public static final String COUNT_OPTION = "COUNT_OPTION";
-
-    public static final String COUNT_OPTION_HOST = "-host";
+public class HostStatistic extends Configured implements Tool {
 
     private static final Log LOG = LogFactory.getLog(HostStatistic.class.getName());
 
@@ -152,51 +151,75 @@ public class HostStatistic extends Configured {
         super(configuration);
     }
 
-    public void statistic(Path crawldb, Path segment) throws IOException {
+    public HostStatistic() {
+    }
 
-        Path out = new Path(segment, "statistic/host");
+    public void statistic(Path crawldb, Path outputDir) throws IOException {
 
-        FileSystem fileSystem = FileSystem.get(getConf());
-        fileSystem.delete(out, true);
+        Path out = new Path(outputDir, "statistic/host");
+
+        FileSystem fs = FileSystem.get(getConf());
+        fs.delete(out, true);
 
         LOG.info("START CRAWLDB STATISTIC");
         String id = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
 
         String name = "crawldb-statistic-temp-" + id;
-        Path tempCrawldb = new Path(getConf().get("mapred.temp.dir", "."), name);
-        JobConf countJob = createCountJob(INPUT_OPTION_CRAWLDB_DIR, crawldb, tempCrawldb);
-        JobClient.runJob(countJob);
-
-        LOG.info("START FETCH STATISTIC");
-        name = "shard-statistic-temp-" + id;
-        Path tempFetch = new Path(getConf().get("mapred.temp.dir", "."), name);
-        countJob = createCountJob(INPUT_OPTION_FETCH_DIR, segment, tempFetch);
+        Path tempCrawldb = new Path(getConf().get("hadoop.temp.dir", "."), name);
+        JobConf countJob = createCountJob(crawldb, tempCrawldb);
         JobClient.runJob(countJob);
 
         name = "crawldb-sequence-temp-" + id;
-        Path tempSequenceCrawldb = new Path(getConf().get("mapred.temp.dir", "."), name);
+        Path tempSequenceCrawldb = new Path(getConf().get("hadoop.temp.dir", "."), name);
         JobConf sequenceCrawldbJob = createSequenceFileJob(tempCrawldb, tempSequenceCrawldb);
         JobClient.runJob(sequenceCrawldbJob);
 
-        name = "shard-sequence-temp-" + id;
-        Path tempSequenceShard = new Path(getConf().get("mapred.temp.dir", "."), name);
-        JobConf sequenceShardJob = createSequenceFileJob(tempFetch, tempSequenceShard);
-        JobClient.runJob(sequenceShardJob);
+        fs.delete(tempCrawldb, true);
 
         // sort the output files into one file
-        Sorter sorter = new SequenceFile.Sorter(fileSystem, StatisticWritable.class, Text.class, getConf());
+        name = "crawldb-sorted-temp-" + id;
+        Path tempSortedCrawldb = new Path(getConf().get("hadoop.temp.dir", "."), name);
+        Sorter sorter = new SequenceFile.Sorter(fs, StatisticWritable.class, Text.class, getConf());
+        Path[] paths = getPaths(fs, tempSequenceCrawldb);
+        sorter.sort(paths, tempSortedCrawldb, false);
 
-        Path[] paths = getPaths(fileSystem, tempSequenceCrawldb);
-        LOG.info("sort path's: " + Arrays.asList(paths));
-        sorter.sort(paths, new Path(out, "crawldb"), false);
+        fs.delete(tempSequenceCrawldb, true);
 
-        paths = getPaths(fileSystem, tempSequenceShard);
-        LOG.info("sort path's: " + Arrays.asList(paths));
-        sorter.sort(paths, new Path(out, "shard"), false);
+        Reader reader = null;
+        BufferedWriter br = null;
+        try {
 
-        fileSystem.delete(tempCrawldb, true);
-        fileSystem.delete(tempFetch, true);
-        // fileSystem.delete(tempMerge, true);
+            reader = new SequenceFile.Reader(fs, tempSortedCrawldb, getConf());
+            StatisticWritable key = new StatisticWritable();
+            Text value = new Text();
+
+            Path file = new Path(out, "crawldb");
+            if (fs.exists(file)) {
+                fs.delete(file, true);
+            }
+            OutputStream os = fs.create(file);
+            br = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            while (reader.next(key, value)) {
+
+                JSONObject jsn = new JSONObject();
+                jsn.put("host", value);
+                jsn.put("fetched", key.getFetchSuccessCount());
+                jsn.put("known", key.getOverallCount());
+                br.write(jsn.toString() + "\n");
+            }
+        } catch (JSONException e) {
+            LOG.error("Error creating JSON from statistics", e);
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                reader.close();
+            }
+            if (br != null) {
+                br.close();
+            }
+        }
+
+        fs.delete(tempSortedCrawldb, true);
     }
 
     private Path[] getPaths(FileSystem fileSystem, Path tempSequenceCrawldb) throws IOException {
@@ -213,13 +236,9 @@ public class HostStatistic extends Configured {
         return paths;
     }
 
-    private static JobConf createCountJob(String inputOption, Path in, Path out) {
-        Path inputDir = null;
-        if (inputOption.equals(INPUT_OPTION_CRAWLDB_DIR)) {
-            inputDir = new Path(in, CrawlDb.CURRENT_NAME);
-        } else if (inputOption.equals(INPUT_OPTION_FETCH_DIR)) {
-            inputDir = new Path(in, CrawlDatum.FETCH_DIR_NAME);
-        }
+    private static JobConf createCountJob(Path in, Path out) {
+        Path inputDir = new Path(in, CrawlDb.CURRENT_NAME);
+
         JobConf job = new JobConf();
         job.setJobName("host_count " + inputDir);
 
@@ -253,11 +272,25 @@ public class HostStatistic extends Configured {
     }
 
     public static void main(String[] args) throws Exception {
-        Path crawldb = new Path(args[0]);
-        Path segment = new Path(args[1]);
-        HostStatistic hostStatistic = new HostStatistic(new Configuration());
-        hostStatistic.statistic(crawldb, segment);
+        int res = ToolRunner.run(NutchConfiguration.create(), new HostStatistic(), args);
+        System.exit(res);
+    }
 
+    @Override
+    public int run(String[] args) throws Exception {
+        if (args.length < 2) {
+            System.err.println("Usage: HostStatistic <bwdb> <output_dir>");
+            System.err.println("       The statistic will be writte to <output_dir>/statistic/host.");
+
+            return -1;
+        }
+        try {
+            statistic(new Path(args[0]), new Path(args[1]));
+            return 0;
+        } catch (Exception e) {
+            LOG.error("HostStatistic: " + StringUtils.stringifyException(e));
+            return -1;
+        }
     }
 
 }

@@ -22,7 +22,7 @@
    provider-name="nutch.org">
 
     <runtime>
-      <library name="language-identifier.jar">
+      <library name="ingrid-language-identifier.jar">
          <export name="*"/>
       </library>
    </runtime>

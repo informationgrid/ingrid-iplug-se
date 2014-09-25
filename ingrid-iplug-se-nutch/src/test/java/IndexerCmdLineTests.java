@@ -149,29 +149,7 @@ public class IndexerCmdLineTests {
     }
 
     @Test
-    public void test09HostStatistics() throws IOException, InterruptedException {
-
-        // get all segments
-        File file = new File("test/segments");
-        String[] directories = file.list(new FilenameFilter() {
-            @Override
-            public boolean accept(File current, String name) {
-                return new File(current, name).isDirectory();
-            }
-        });
-
-        // inject start urls
-        List<String> call = new ArrayList<String>();
-        call.addAll(setUpBaseCall());
-        call.add("de.ingrid.iplug.se.nutch.tools.HostStatistic");
-        call.add("test/crawldb");
-        call.add("test/segments/" + directories[directories.length - 1]);
-
-        executeCall(call);
-    }
-
-    @Test
-    public void test09_1ParseDataUpdater() throws IOException, InterruptedException {
+    public void test09ParseDataUpdater() throws IOException, InterruptedException {
 
         // get all segments
         File file = new File("test/segments");
@@ -188,6 +166,19 @@ public class IndexerCmdLineTests {
         call.add("de.ingrid.iplug.se.nutch.crawl.metadata.ParseDataUpdater");
         call.add("test/metadatadb");
         call.add("test/segments/" + directories[directories.length - 1]);
+
+        executeCall(call);
+    }
+
+    @Test
+    public void test09_1HostStatistics() throws IOException, InterruptedException {
+
+        // create statistics
+        List<String> call = new ArrayList<String>();
+        call.addAll(setUpBaseCall());
+        call.add("de.ingrid.iplug.se.nutch.statistics.HostStatistic");
+        call.add("test/crawldb");
+        call.add("test");
 
         executeCall(call);
     }
@@ -243,7 +234,7 @@ public class IndexerCmdLineTests {
 
         executeCall(call);
     }
-    
+
     @Test
     public void test13WebgraphFilter() throws IOException, InterruptedException {
 
@@ -259,7 +250,6 @@ public class IndexerCmdLineTests {
 
         executeCall(call);
     }
-
 
     @Test
     public void test14MergeSegments() throws Exception {
@@ -287,7 +277,7 @@ public class IndexerCmdLineTests {
                 delete(fs.getPath("test/segments").toFile());
                 Files.move(fs.getPath("test/merged_segment"), fs.getPath("test/segments"), StandardCopyOption.REPLACE_EXISTING);
             }
-            
+
         }
     }
 
@@ -310,7 +300,6 @@ public class IndexerCmdLineTests {
             Files.move(fs.getPath("test/filtered_segment"), fs.getPath("test/segments"), StandardCopyOption.REPLACE_EXISTING);
         }
 
-    
     }
 
     @Test
@@ -363,9 +352,9 @@ public class IndexerCmdLineTests {
         NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().clusterName("elasticsearch").data(true).settings(settings);
         nodeBuilder = nodeBuilder.local(false);
         Node node = nodeBuilder.node();
-        
+
         executeCall(call);
-        
+
         node.close();
 
     }

@@ -39,6 +39,7 @@ import de.ingrid.iplug.se.nutch.crawl.bw.BWWebgraphFilter;
 import de.ingrid.iplug.se.nutch.crawl.metadata.MetadataInjector;
 import de.ingrid.iplug.se.nutch.crawl.metadata.ParseDataUpdater;
 import de.ingrid.iplug.se.nutch.segment.SegmentFilter;
+import de.ingrid.iplug.se.nutch.statistics.HostStatistic;
 
 /**
  * 
@@ -55,7 +56,7 @@ public class IndexerTests {
     public void test00DetelteTestData() throws Exception {
         delete(new File("test"));
     }
-    
+
     @Test
     public void test01InjectStartURLs() throws Exception {
         ToolRunner.run(NutchConfiguration.create(), new Injector(), new String[] { "test/crawldb", "src/test/resources/urls/start" });
@@ -114,29 +115,7 @@ public class IndexerTests {
     }
 
     @Test
-    public void test09HostStatistics() throws IOException, InterruptedException {
-
-        // get all segments
-        File file = new File("test/segments");
-        String[] directories = file.list(new FilenameFilter() {
-            @Override
-            public boolean accept(File current, String name) {
-                return new File(current, name).isDirectory();
-            }
-        });
-
-        // inject start urls
-        List<String> call = new ArrayList<String>();
-        call.addAll(setUpBaseCall());
-        call.add("de.ingrid.iplug.se.nutch.tools.HostStatistic");
-        call.add("test/crawldb");
-        call.add("test/segments/" + directories[directories.length - 1]);
-
-        executeCall(call);
-    }
-
-    @Test
-    public void test09_1ParseDataUpdater() throws Exception {
+    public void test09ParseDataUpdater() throws Exception {
 
         // get all segments
         File file = new File("test/segments");
@@ -148,6 +127,12 @@ public class IndexerTests {
         });
 
         ToolRunner.run(NutchConfiguration.create(), new ParseDataUpdater(), new String[] { "test/metadatadb", "test/segments/" + directories[directories.length - 1] });
+    }
+
+    @Test
+    public void test09_1HostStatistics() throws Exception {
+
+        ToolRunner.run(NutchConfiguration.create(), new HostStatistic(), new String[] { "test/crawldb", "test" });
     }
 
     @Test
@@ -173,7 +158,7 @@ public class IndexerTests {
 
         ToolRunner.run(NutchConfiguration.create(), new BWWebgraphFilter(), new String[] { "test/webgraph", "test/bwdb", "false", "false", "true" });
     }
-    
+
     @Test
     public void test14MergeSegments() throws Exception {
 
@@ -314,7 +299,5 @@ public class IndexerTests {
         if (!f.delete())
             throw new FileNotFoundException("Failed to delete file: " + f);
     }
-
-
 
 }
