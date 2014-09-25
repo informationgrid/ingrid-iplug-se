@@ -295,7 +295,7 @@ public class GeneralSearchTest {
     public void getDetail() {
         IngridQuery q = Utils.getIngridQuery( "Welt wemove" );
         IngridHits search = Utils.index.search( q, 0, 10 );
-        IngridHitDetail detail = Utils.index.getDetail( search.getHits()[0], null );
+        IngridHitDetail detail = Utils.index.getDetail( search.getHits()[0], q, null );
         assertThat( detail, not( is( nullValue() ) ) );
         // assertThat( detail.getHitId(), is( "1" ) );
         assertThat( detail.getDocumentId(), is( 1 ) );
@@ -310,7 +310,7 @@ public class GeneralSearchTest {
         IngridQuery q = Utils.getIngridQuery( "Welt wemove" );
         IngridHits search = Utils.index.search( q, 0, 10 );
         String[] extraFields = new String[] { "fetched" };
-        IngridHitDetail detail = Utils.index.getDetail( search.getHits()[0], extraFields );
+        IngridHitDetail detail = Utils.index.getDetail( search.getHits()[0], q, extraFields );
         assertThat( detail, not( is( nullValue() ) ) );
         // assertThat( detail.getHitId(), is( "1" ) );
         assertThat( detail.getDocumentId(), is( 1 ) );
