@@ -9,6 +9,8 @@ import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.log4j.Logger;
 
+import de.ingrid.iplug.se.nutchController.StatusProvider.Classification;
+
 /**
  * Wrapper for a nutch process execution. A NutchProcess can contain multiple
  * nutch executable commands.
@@ -48,6 +50,7 @@ public abstract class NutchProcess extends Thread {
         if (status == STATUS.RUNNING) {
             status = STATUS.INTERRUPTED;
             if (resultHandler != null && !resultHandler.hasResult()) {
+                this.statusProvider.addState( "ABORT", "The process has been aborted by a user", Classification.WARN );
                 resultHandler.getWatchdog().destroyProcess();
                 try {
                     resultHandler.waitFor(60 * 1000);

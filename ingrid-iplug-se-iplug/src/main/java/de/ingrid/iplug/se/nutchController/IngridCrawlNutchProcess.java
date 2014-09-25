@@ -38,11 +38,13 @@ public class IngridCrawlNutchProcess extends NutchProcess {
         status = STATUS.RUNNING;
 
         try {
-
+            // clear previously set states
+            this.statusProvider.clear();
+            
             this.statusProvider.addState("START", "Start crawl.");
 
             FileSystem fs = FileSystems.getDefault();
-            
+
             String workingPath = fs.getPath(workingDirectory.getAbsolutePath()).toString();
 
             // commonly used crawl parameter
@@ -94,6 +96,8 @@ public class IngridCrawlNutchProcess extends NutchProcess {
                 // Usage: <crawldb> <bwdb> <segment> <normalize> <filter>
                 execute("de.ingrid.iplug.se.nutch.crawl.bw.BWUpdateDb", crawlDb, bwDb, currentSegment, "true", "true");
                 this.statusProvider.appendToState("UPDATE_CRAWLDB" + i, " done.");
+                // TODO: create new statistic
+                execute("de.ingrid.iplug.se.nutch.statistics.HostStatistic", crawlDb, currentSegment);
 
                 this.statusProvider.addState("UPDATE_MD" + i, "Update metadata for new urls...");
                 execute("de.ingrid.iplug.se.nutch.crawl.metadata.ParseDataUpdater", mddb, currentSegment);
@@ -162,6 +166,12 @@ public class IngridCrawlNutchProcess extends NutchProcess {
         } catch (IOException e) {
             status = STATUS.INTERRUPTED;
             log.error("Process exited with errors.", e);
+        } finally {
+            try {
+                this.statusProvider.write();
+            } catch (IOException e) {
+                log.warn( "Crawl log could not be written" );
+            }
         }
 
     }

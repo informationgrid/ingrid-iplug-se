@@ -21,6 +21,7 @@ import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Url;
 import de.ingrid.iplug.se.nutchController.NutchController;
 import de.ingrid.iplug.se.nutchController.NutchProcess;
+import de.ingrid.iplug.se.nutchController.StatusProvider;
 import de.ingrid.iplug.se.nutchController.StatusProvider.State;
 import de.ingrid.iplug.se.webapp.container.Instance;
 
@@ -101,9 +102,11 @@ public class RestDataController extends InstanceController {
         Instance instance = getInstanceData( name );
         NutchProcess nutchProcess = nutchController.getNutchProcess( instance  );
         
+        
         if ( nutchProcess == null ||
             (nutchProcess != null && nutchProcess.getState() == Thread.State.TERMINATED)) {
-            return new ResponseEntity<Collection<State>>( HttpStatus.OK );
+            StatusProvider statusProvider = new StatusProvider( instance.getWorkingDirectory() );
+            return new ResponseEntity<Collection<State>>( statusProvider.getStates(), HttpStatus.FOUND );
         }
         
         return new ResponseEntity<Collection<State>>( nutchProcess.getStatusProvider().getStates(), HttpStatus.OK );

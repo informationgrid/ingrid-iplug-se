@@ -16,11 +16,31 @@
 
 <script type="text/javascript">
 
-    $("#status").html( "Hole Status ..." );
-	checkState();
 	
 	$(document).ready(function() {
+        $("#crawlInfo").html( "Hole Status ..." );
+    	checkState();
+        $("#crawlStop").hide();
 	});
+	
+	function setLog(data) {
+		var formatTime = function(ts) {
+            var date = new Date(ts);
+            var d = date.getDate();
+            var m = date.getMonth() + 1;
+            var y = date.getFullYear();
+            var time = date.toTimeString().substring(0, 8);
+            return '' + y + '-' + (m<=9 ? '0' + m : m) + '-' + (d <= 9 ? '0' + d : d) + ' ' + time;
+        };
+        
+        // fill div with data from content
+        var content = "";
+        for (var i=0; i < data.length; i++) {
+            var row = data[i];
+            content += "<div class='" + row.classification.toLowerCase() + "'>" + formatTime(row.time) + " - [" + row.classification + "] " + row.value + "</div>";                 
+        }
+        $("#status").html( content );
+	}
 	
 	function checkState() {
     	$.ajax( "../rest/status/${ instance.name }", {
@@ -28,33 +48,33 @@
             contentType: 'application/json',
             success: function(data) {
                 if (!data) {
-                	data = "Es läuft zur Zeit kein Crawl.";
-                    $("#status").html( data );
+                	$("#crawlInfo").html( "Es läuft zur Zeit kein Crawl." );
+                    $("#crawlStart").show();
+                    $("#crawlStop").hide();
                     return;
                 }
+                $("#crawlInfo").hide();
+                $("#crawlStart").hide();
+                $("#crawlStop").show();
                 
-                var formatTime = function(ts) {
-                	var date = new Date(ts);
-                	var d = date.getDate();
-                    var m = date.getMonth() + 1;
-                    var y = date.getFullYear();
-                    var time = date.toTimeString().substring(0, 8);
-                    return '' + y + '-' + (m<=9 ? '0' + m : m) + '-' + (d <= 9 ? '0' + d : d) + ' ' + time;
-                };
-                
-                // fill div with data from content
-                var content = "";
-                for (var i=0; i < data.length; i++) {
-                	var row = data[i];
-                    content += "<div class=''>" + formatTime(row.time) + " - [" + row.classification + "] " + row.value + "</div>";                	
-                }
-                $("#status").html( content );
+                setLog( data );
+                $("#status").show();
                 
                 // repeat execution every 5s until finished
                 setTimeout( checkState, 5000 );
             },
             error: function(jqXHR, text, error) {
-                console.error(text, error);
+            	if (error === "Found") {
+            		$("#crawlInfo").html( "Es läuft zur Zeit kein Crawl. (<a href='#' onclick='$(\"#status\").toggle()'>Information zum letzten Crawl) " );
+            		$("#status").hide();
+            		$("#crawlStart").show();
+                    $("#crawlStop").hide();
+            		var data = JSON.parse( jqXHR.responseText );
+                    setLog( data );
+            	} else {
+            		$("#crawlInfo").html( "Es trat ein Fehler beim Laden des Logs auf. " );
+                    console.error( error, jqXHR );            		
+            	}
             }
     	});
 	}

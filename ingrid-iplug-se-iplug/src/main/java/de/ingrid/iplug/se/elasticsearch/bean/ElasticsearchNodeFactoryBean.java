@@ -89,7 +89,7 @@ public class ElasticsearchNodeFactoryBean implements FactoryBean<Node>,
 		    ClassPathResource resource = new ClassPathResource( "/elasticsearch.properties" );
 		    if (resource.exists()) {
 		        p.load( resource.getInputStream() );
-		        nodeBuilder.getSettings().put( p );		        
+		        nodeBuilder.getSettings().put( p );
 		    }
         } catch (IOException e) {
             e.printStackTrace();

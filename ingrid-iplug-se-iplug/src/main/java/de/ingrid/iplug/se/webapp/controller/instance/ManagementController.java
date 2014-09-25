@@ -111,5 +111,13 @@ public class ManagementController extends InstanceController {
         nutchController.start(instance, process);
         return redirect(AdminViews.SE_INSTANCE_MANAGEMENT + ".html?instance=" + name);
     }
+    
+    @RequestMapping(value = { "/iplug-pages/instanceManagement.html" }, method = RequestMethod.POST, params = "stop")
+    public String stopCrawl(@RequestParam("instance") String name) throws Exception {
+        
+        Instance instance = getInstanceData( name );
+        nutchController.stop( instance );
+        return redirect(AdminViews.SE_INSTANCE_MANAGEMENT + ".html?instance=" + name);
+    }
 
 }

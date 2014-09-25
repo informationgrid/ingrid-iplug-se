@@ -70,7 +70,7 @@ public class NutchProcessFactory {
         process.addClassPath(Paths.get("apache-nutch-runtime/runtime/local").toAbsolutePath().toString());
         process.addClassPath(Paths.get(Paths.get(instance.getWorkingDirectory()).toAbsolutePath().getParent().getParent().toAbsolutePath().toString(), "apache-nutch-runtime/runtime/local/lib").toAbsolutePath().toString()
                 .concat(File.separator).concat("*"));
-        process.setStatusProvider(new StatusProvider());
+        process.setStatusProvider(new StatusProvider( instance.getWorkingDirectory() ));
 
         NutchConfigTool nutchConfigTool = new NutchConfigTool(Paths.get(instance.getWorkingDirectory(), "conf", "nutch-site.xml"));
 

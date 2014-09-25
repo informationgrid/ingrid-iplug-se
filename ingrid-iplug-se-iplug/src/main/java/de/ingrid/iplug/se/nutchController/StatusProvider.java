@@ -31,16 +31,6 @@ public class StatusProvider {
 
     final protected static Log log = LogFactory.getLog(StatusProvider.class);
 
-    /**
-     * The name of the system property that defines the last status file
-     */
-    private static final String LAST_STATUS_FILE_NAME_PROPERTY = "lastStatus";
-
-    /**
-     * The name of the system property that defines the ingrid home directory
-     */
-    private static final String INGRID_HOME = "ingrid_home";
-
     public static enum Classification {
         INFO(1), WARN(2), ERROR(3);
 
@@ -53,23 +43,11 @@ public class StatusProvider {
 
     private File lastStatusFile = null;
 
-    public StatusProvider() {
+    public StatusProvider(String logDir) {
 
-        // check if the config property is set and load the appropriate
-        // file if yes
-        String lastStatusFilename = System.getProperty(LAST_STATUS_FILE_NAME_PROPERTY);
-
-        if (lastStatusFilename == null) {
-            // check if the ingrid home path is set and derive config file
-            String ingridHome = System.getProperty(INGRID_HOME);
-            if (ingridHome != null) {
-                File f = new File(ingridHome, "last_status.xml");
-                lastStatusFilename = f.getAbsolutePath();
-            }
-        }
-
-        if (lastStatusFilename != null) {
-            this.lastStatusFile = new File(lastStatusFilename);
+        if (this.lastStatusFile == null) {
+            
+            this.lastStatusFile = new File( logDir, "last_status.xml" );
             try {
                 this.load();
             } catch (IOException e) {
@@ -209,6 +187,10 @@ public class StatusProvider {
      * @throws IOException
      */
     public synchronized void write() throws IOException {
+        if (this.lastStatusFile == null) {
+            log.warn( "Log file could not be written, because it was not defined!" );
+            return;
+        }
 
         // serialize the Configuration instance to xml
         XStream xstream = new XStream();
@@ -238,7 +220,11 @@ public class StatusProvider {
      */
     @SuppressWarnings("unchecked")
     public synchronized void load() throws IOException {
-
+        if (this.lastStatusFile == null) {
+            log.warn( "Log file could not be read, because it was not defined!" );
+            return;
+        }
+        
         // create empty configuration, if not existing yet
         if (!this.lastStatusFile.exists()) {
             log.warn("Status file " + this.lastStatusFile + " does not exist.");

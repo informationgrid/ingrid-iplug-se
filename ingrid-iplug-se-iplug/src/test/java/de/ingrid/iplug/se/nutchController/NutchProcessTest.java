@@ -45,12 +45,12 @@ public class NutchProcessTest {
         FileUtils.copyDirectories(fs.getPath("../ingrid-iplug-se-nutch/src/test/resources/urls").toAbsolutePath(), urls);
 
         GenericNutchProcess p = new GenericNutchProcess();
-        p.setStatusProvider(new StatusProvider());
+        p.setStatusProvider(new StatusProvider( workingDir.toString() ));
         p.setWorkingDirectory(workingDir.toString());
         p.addClassPath(conf.toString());
         p.addClassPath("../../ingrid-iplug-se-nutch/build/apache-nutch-1.9/runtime/local");
         p.addClassPath("../../ingrid-iplug-se-nutch/build/apache-nutch-1.9/runtime/local/lib/*");
-        p.addJavaOptions(new String[] { "-Xmx512m", "-Dhadoop.log.dir=" + logs, "-Dhadoop.log.file=hadoop.log" });
+        p.addJavaOptions(new String[] { "-Xmx512m", "-Dhadoop.log.dir=" + logs, "-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8" });
         p.addCommand("org.apache.nutch.crawl.Injector", "crawldb", "../../ingrid-iplug-se-nutch/src/test/resources/urls/start");
         NutchController controller = new NutchController();
         Instance instance = new Instance();
@@ -87,10 +87,10 @@ public class NutchProcessTest {
         p.addClassPath(conf.toString());
         p.addClassPath("../../ingrid-iplug-se-nutch/build/apache-nutch-1.9/runtime/local");
         p.addClassPath("../../ingrid-iplug-se-nutch/build/apache-nutch-1.9/runtime/local/lib/*");
-        p.addJavaOptions(new String[] { "-Xmx512m", "-Dhadoop.log.dir=" + logs, "-Dhadoop.log.file=hadoop.log" });
+        p.addJavaOptions(new String[] { "-Xmx512m", "-Dhadoop.log.dir=" + logs, "-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8" });
         p.setDepth(1);
         p.setNoUrls(10);
-        p.setStatusProvider(new StatusProvider());
+        p.setStatusProvider(new StatusProvider( workingDir.toString() ));
         p.start();
 
         Settings settings = ImmutableSettings.settingsBuilder().put("path.data", "./").build();
