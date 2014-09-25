@@ -42,6 +42,8 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             this.statusProvider.addState("START", "Start crawl.");
 
             FileSystem fs = FileSystems.getDefault();
+            
+            String workingPath = fs.getPath(workingDirectory.getAbsolutePath()).toString();
 
             // commonly used crawl parameter
             String crawlDb = fs.getPath(workingDirectory.getAbsolutePath(), "crawldb").toString();
@@ -92,13 +94,15 @@ public class IngridCrawlNutchProcess extends NutchProcess {
                 // Usage: <crawldb> <bwdb> <segment> <normalize> <filter>
                 execute("de.ingrid.iplug.se.nutch.crawl.bw.BWUpdateDb", crawlDb, bwDb, currentSegment, "true", "true");
                 this.statusProvider.appendToState("UPDATE_CRAWLDB" + i, " done.");
-// TODO: create new statistic
-//                execute("de.ingrid.iplug.se.nutch.tools.HostStatistic", crawlDb, currentSegment);
 
                 this.statusProvider.addState("UPDATE_MD" + i, "Update metadata for new urls...");
                 execute("de.ingrid.iplug.se.nutch.crawl.metadata.ParseDataUpdater", mddb, currentSegment);
                 this.statusProvider.appendToState("UPDATE_MD" + i, " done.");
             }
+
+            this.statusProvider.addState("CREATE_HOST_STATISTICS", "Create hosts statistic...");
+            execute("de.ingrid.iplug.se.nutch.statistics.HostStatistic", crawlDb, workingPath);
+            this.statusProvider.appendToState("CREATE_HOST_STATISTICS", " done.");
 
             this.statusProvider.addState("MERGE_SEGMENT", "Merge segments...");
             execute("org.apache.nutch.segment.SegmentMerger", mergedSegments, "-dir", segments);
@@ -177,7 +181,6 @@ public class IngridCrawlNutchProcess extends NutchProcess {
         CommandLine cmdLine = new CommandLine(executable);
         cmdLine.addArguments(nutchCall);
 
-        CommandResultHandler resultHandler;
         Executor executor = new DefaultExecutor();
         if (workingDirectory != null) {
             executor.setWorkingDirectory(workingDirectory);
