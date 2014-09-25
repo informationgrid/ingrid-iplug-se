@@ -8,6 +8,7 @@ public class Instance {
 
     private String name;
     private String workingDirectory;
+    private String indexName;
     private String status;
     private boolean isActive;
     private List<Url> urls;
@@ -61,6 +62,14 @@ public class Instance {
     
     public void setIndexTypeExists(boolean typeExists) {
         this.indexTypeExists = typeExists;        
+    }
+
+    public String getIndexName() {
+        return indexName;
+    }
+
+    public void setIndexName(String indexName) {
+        this.indexName = indexName;
     }
     
     

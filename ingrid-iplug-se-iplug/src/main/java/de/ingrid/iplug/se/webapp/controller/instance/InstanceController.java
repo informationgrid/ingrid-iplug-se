@@ -12,6 +12,7 @@ public abstract class InstanceController extends AbstractController {
         Instance instance = new Instance();
         instance.setName( name );
         instance.setWorkingDirectory( Paths.get( SEIPlug.conf.getInstancesDir(), name ).toString() );
+        instance.setIndexName( SEIPlug.conf.index );
         
         if (SEIPlug.conf.activeInstances.contains( name )) {
             instance.setIsActive( true );
