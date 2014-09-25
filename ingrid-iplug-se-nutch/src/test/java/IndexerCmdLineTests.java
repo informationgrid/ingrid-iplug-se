@@ -399,6 +399,12 @@ public class IndexerCmdLineTests {
 
     private void executeCall(List<String> injectCall) throws IOException, InterruptedException {
         System.out.println(StringUtils.join(injectCall, " "));
+
+        // Debug specific call
+        String debugOption = System.getProperty( "debugNutchCall" );
+        if (debugOption != null && injectCall.contains(debugOption)) {
+            injectCall.add(1, "-agentlib:jdwp=transport=dt_socket,address=7000,server=y,suspend=y");
+        }
         ProcessBuilder pb = new ProcessBuilder(injectCall);
         Map<String, String> localEnvMap = System.getenv();
         Map<String, String> env = pb.environment();

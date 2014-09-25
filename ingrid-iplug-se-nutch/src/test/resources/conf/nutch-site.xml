@@ -27,7 +27,7 @@
 
     <property>
         <name>plugin.includes</name>
-        <value>protocol-httpclient|urlfilter-regex|parse-(html|tika)|index-(basic|anchor|metadata|more)|indexer-elastic|scoring-link|ingrid-language-identifier|urlnormalizer-(pass|regex|basic)|analysis-de</value>
+        <value>protocol-httpclient|urlfilter-regex|parse-(html|tika)|index-(basic|anchor|metadata|more)|ingrid-indexer-elastic|scoring-link|ingrid-language-identifier|urlnormalizer-(pass|regex|basic)|analysis-de</value>
         <description>Regular expression naming plugin directory names to
             include. Any plugin not matching this expression is excluded.
             In any case you need at least include the nutch-extensionpoints plugin.
@@ -317,6 +317,11 @@
         <description>Override the language extraction result with the value from the metadata. This setting is ingrid specific and presumes that a metadata 'lang' exists for each entry.</description>
     </property>
 
+    <property>
+        <name>ingrid.indexer.elastic.type</name>
+        <value>test</value>
+        <description>Defines the index type of the indexed documents. The instance name will be used to be able to quickly manipulate all urls of an instance. This property only applies for the ingrid.indexer.elastic plugin..</description>
+    </property>
 
 
 </configuration>
