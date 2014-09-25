@@ -106,7 +106,8 @@ public class RestDataController extends InstanceController {
         if ( nutchProcess == null ||
             (nutchProcess != null && nutchProcess.getState() == Thread.State.TERMINATED)) {
             StatusProvider statusProvider = new StatusProvider( instance.getWorkingDirectory() );
-            return new ResponseEntity<Collection<State>>( statusProvider.getStates(), HttpStatus.FOUND );
+            Collection<State> states = statusProvider.getStates();
+            return new ResponseEntity<Collection<State>>( states.isEmpty() ? null : states, HttpStatus.FOUND );
         }
         
         return new ResponseEntity<Collection<State>>( nutchProcess.getStatusProvider().getStates(), HttpStatus.OK );

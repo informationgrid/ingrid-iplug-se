@@ -11,13 +11,15 @@
         <input type="hidden" name="instance" value="${instance.name}" />
         <h3>Tiefe</h3>
         <div class="input full space"> 
-            <input type="text" name="depth" value="1">
+            <input type="text" name="depth" value="1" required min="1" max="10" digits="true">
         </div>
         <h3>Anzahl der URLs</h3>
         <div class="input full space"> 
-            <input type="text" name="num" value="">
+            <input type="text" name="num" value="" required min="1" max="1000000" digits="true">
         </div>
-        <button name="start">Start Crawl</button>
+        <div>
+            <button name="start">Start Crawl</button>
+        </div>
     </div>
     <div id="crawlStop">
         <button name="stop">Crawl beenden</button>

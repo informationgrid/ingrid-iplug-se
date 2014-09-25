@@ -20,6 +20,8 @@ import org.apache.commons.exec.Executor;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import de.ingrid.iplug.se.nutchController.StatusProvider.Classification;
+
 /**
  * Wrapper for a ingrid specific nutch process execution. This is too complex to
  * execute this with a {@link GenericNutchProcess}.
@@ -228,6 +230,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
         executor.getStreamHandler();
         resultHandler.waitFor();
         if (resultHandler.getExitValue() != 0) {
+            this.statusProvider.addState( "ERROR", "Error during Execution of: " + commandAndOptions[0], Classification.ERROR );
             throw new IOException("Process exited with error code: " + resultHandler.getExitValue());
         }
     }

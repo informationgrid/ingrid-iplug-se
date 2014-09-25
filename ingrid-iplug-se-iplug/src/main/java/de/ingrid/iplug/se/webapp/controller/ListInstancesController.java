@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.elasticsearch.action.admin.indices.exists.types.TypesExistsRequest;
@@ -76,13 +77,33 @@ public class ListInstancesController extends InstanceController {
     @RequestMapping(value = { "/iplug-pages/listInstances.html" }, method = RequestMethod.GET)
     public String getParameters(final ModelMap modelMap) throws Exception {
 
-        modelMap.put( "instances", getInstances() );
+        List<Instance> instances = getInstances();
+        
+        // check for invalid instances and remove them from the active ones
+        Iterator<String> activeInstancesIt = SEIPlug.conf.activeInstances.iterator();
+        while (activeInstancesIt.hasNext()) {
+            String active = activeInstancesIt.next();
+            
+            boolean found = false;
+            for (Instance instance : instances) {
+                if (instance.getName().equals( active )) {
+                    found  = true;
+                    break;
+                }
+            }
+            
+            if (!found) {
+                activeInstancesIt.remove();
+            }
+        }
+        
+        modelMap.put( "instances", instances );
         return AdminViews.SE_LIST_INSTANCES;
     }
 
     @RequestMapping(value = "/iplug-pages/listInstances.html", method = RequestMethod.POST)
     public String post(@ModelAttribute("plugDescription") final PlugdescriptionCommandObject pdCommandObject,
-            @RequestParam(value = "action", required = false) final String action) {
+            @RequestParam(value = "action", required = false) final String action) throws Exception {
 
         return AdminViews.SAVE;
     }

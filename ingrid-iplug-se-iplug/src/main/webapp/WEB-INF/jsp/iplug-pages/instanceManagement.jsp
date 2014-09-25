@@ -13,6 +13,8 @@
 <link rel="StyleSheet" href="../css/se_styles.css" type="text/css" media="all" />
 
 <script type="text/javascript" src="../js/base/jquery-1.8.0.min.js"></script>
+<script src="../js/jquery.validate.min.js"></script>
+<script src="../js/localization/messages_de.min.js"></script>
 
 <script type="text/javascript">
 
@@ -21,6 +23,19 @@
         $("#crawlInfo").html( "Hole Status ..." );
     	checkState();
         $("#crawlStop").hide();
+        
+        $("#formManagement").validate({
+            //errorLabelContainer: $("#formManagement div.error"),
+            highlight: function(element, errorClass, validClass) {
+                $(element).parent().addClass(errorClass);
+            },
+            unhighlight: function(element, errorClass, validClass) {
+                $(element).parent().removeClass(errorClass);
+            },
+            errorPlacement: function(error, element) {
+                error.insertAfter( element.parent() );
+            }
+        });
 	});
 	
 	function setLog(data) {
@@ -47,12 +62,6 @@
     		type: "GET",
             contentType: 'application/json',
             success: function(data) {
-                if (!data) {
-                	$("#crawlInfo").html( "Es läuft zur Zeit kein Crawl." );
-                    $("#crawlStart").show();
-                    $("#crawlStop").hide();
-                    return;
-                }
                 $("#crawlInfo").hide();
                 $("#crawlStart").hide();
                 $("#crawlStop").show();
@@ -65,12 +74,19 @@
             },
             error: function(jqXHR, text, error) {
             	if (error === "Found") {
-            		$("#crawlInfo").html( "Es läuft zur Zeit kein Crawl. (<a href='#' onclick='$(\"#status\").toggle()'>Information zum letzten Crawl) " );
-            		$("#status").hide();
+            		$("#crawlInfo").show();
             		$("#crawlStart").show();
                     $("#crawlStop").hide();
-            		var data = JSON.parse( jqXHR.responseText );
-                    setLog( data );
+            		$("#status").hide();
+            		var data = "";
+            		if (jqXHR.responseText == "") {
+                		$("#crawlInfo").html( "Es läuft zur Zeit kein Crawl." );
+            			
+            		} else {
+                		$("#crawlInfo").html( "Es läuft zur Zeit kein Crawl. (<a href='#' onclick='$(\"#status\").toggle()'>Information zum letzten Crawl) " );
+            			data = JSON.parse( jqXHR.responseText );
+                        setLog( data );            			
+            		}
             	} else {
             		$("#crawlInfo").html( "Es trat ein Fehler beim Laden des Logs auf. " );
                     console.error( error, jqXHR );            		
