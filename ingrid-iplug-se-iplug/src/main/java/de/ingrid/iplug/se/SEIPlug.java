@@ -131,7 +131,7 @@ public class SEIPlug extends HeartBeatPlug {
      *      de.ingrid.utils.query.IngridQuery, java.lang.String[])
      */
     public IngridHitDetail getDetail(IngridHit hit, IngridQuery query, String[] requestedFields) throws Exception {
-        return index.getDetail( hit, requestedFields );
+        return index.getDetail(hit, query, requestedFields );
     }
 
     /**

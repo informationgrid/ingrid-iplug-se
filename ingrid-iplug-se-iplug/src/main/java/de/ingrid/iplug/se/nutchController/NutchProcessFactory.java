@@ -4,12 +4,7 @@
 package de.ingrid.iplug.se.nutchController;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -23,12 +18,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
-import de.ingrid.iplug.se.conf.UrlMaintenanceSettings;
 import de.ingrid.iplug.se.conf.UrlMaintenanceSettings.MetaElement;
 import de.ingrid.iplug.se.utils.InstanceConfigurationTool;
 import de.ingrid.iplug.se.webapp.container.Instance;
@@ -92,6 +84,11 @@ public class NutchProcessFactory {
 
         nutchConfigTool.addOrUpdateProperty("index.parse.md", indexParseMdValue, "Generated metadata from the ingrid instance configuration.");
         nutchConfigTool.addOrUpdateProperty("hadoop.tmp.dir", Paths.get(instance.getWorkingDirectory(), "hadoop-tmp").toAbsolutePath().toString(), "Set hadoop temp directory to the instance.");
+        nutchConfigTool.addOrUpdateProperty("ingrid.indexer.elastic.type", instance.getName(), "Defines the index type of the indexed documents. The instance name will be used to be able to quickly manipulate all urls of an instance. This property only applies for the ingrid.indexer.elastic plugin.");
+        nutchConfigTool.addOrUpdateProperty("elastic.index", instance.getIndexName(), "Default index to send documents to.");
+        nutchConfigTool.addOrUpdateProperty("elastic.port", instance.getEsTransportTcpPort(), "The port to connect to using TransportClient.");
+        nutchConfigTool.addOrUpdateProperty("elastic.host", instance.getEsHttpHost(), "The hostname to send documents to using TransportClient. Either host\n" + 
+        		"  and port must be defined or cluster.");
 
         nutchConfigTool.write();
 

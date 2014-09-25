@@ -42,8 +42,8 @@ public class IngridCrawlNutchProcess extends NutchProcess {
         try {
             // clear previously set states
             this.statusProvider.clear();
-            
-            this.statusProvider.addState("START", "Start crawl.");
+
+            this.statusProvider.addState("START", "Start crawl. [depth:" + depth + ";urls:" + noUrls + "]");
 
             FileSystem fs = FileSystems.getDefault();
 
@@ -84,24 +84,22 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             this.statusProvider.appendToState("FILTER_CRAWLDB", " done.");
 
             for (int i = 0; i < depth; i++) {
-                this.statusProvider.addState("GENERATE" + i, "Generate up to " + noUrls.toString() + " urls for fetching...");
+                this.statusProvider.addState("GENERATE" + i, "Generate up to " + noUrls.toString() + " urls for fetching " + "["+(i+1) + "/"+ depth + "] ...");
                 execute("org.apache.nutch.crawl.Generator", crawlDb, segments, "-topN", noUrls.toString());
                 this.statusProvider.appendToState("GENERATE" + i, " done.");
 
                 String currentSegment = fs.getPath(segments, getCurrentSegment(segments)).toString();
 
-                this.statusProvider.addState("FETCH" + i, "Fetching...");
+                this.statusProvider.addState("FETCH" + i, "Fetching " + "["+ (i+1) + "/"+ depth + "] ...");
                 execute("org.apache.nutch.fetcher.Fetcher", currentSegment);
                 this.statusProvider.appendToState("FETCH" + i, " done.");
 
-                this.statusProvider.addState("UPDATE_CRAWLDB" + i, "Update database with new urls and links...");
+                this.statusProvider.addState("UPDATE_CRAWLDB" + i, "Update database with new urls and links " + "["+(i+1) + "/"+ depth + "] ...");
                 // Usage: <crawldb> <bwdb> <segment> <normalize> <filter>
                 execute("de.ingrid.iplug.se.nutch.crawl.bw.BWUpdateDb", crawlDb, bwDb, currentSegment, "true", "true");
                 this.statusProvider.appendToState("UPDATE_CRAWLDB" + i, " done.");
-                // TODO: create new statistic
-                execute("de.ingrid.iplug.se.nutch.statistics.HostStatistic", crawlDb, currentSegment);
 
-                this.statusProvider.addState("UPDATE_MD" + i, "Update metadata for new urls...");
+                this.statusProvider.addState("UPDATE_MD" + i, "Update metadata for new urls " + "["+(i+1) + "/"+ depth + "] ...");
                 execute("de.ingrid.iplug.se.nutch.crawl.metadata.ParseDataUpdater", mddb, currentSegment);
                 this.statusProvider.appendToState("UPDATE_MD" + i, " done.");
             }
@@ -125,7 +123,6 @@ public class IngridCrawlNutchProcess extends NutchProcess {
                 Files.move(fs.getPath(filteredSegments), fs.getPath(segments), StandardCopyOption.REPLACE_EXISTING);
             }
             this.statusProvider.appendToState("FILTER_SEGMENT", " done.");
-
 
             this.statusProvider.addState("UPDATE_WEBGRAPH", "Update web graph with new urls...");
             execute("org.apache.nutch.scoring.webgraph.WebGraph", "-webgraphdb", webgraph, "-segmentDir", segments);
@@ -172,7 +169,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             try {
                 this.statusProvider.write();
             } catch (IOException e) {
-                log.warn( "Crawl log could not be written" );
+                log.warn("Crawl log could not be written");
             }
         }
 
@@ -184,9 +181,9 @@ public class IngridCrawlNutchProcess extends NutchProcess {
         String[] nutchCall = new String[] { "-cp", cp };
         nutchCall = arrayConcat(nutchCall, javaOptions);
         // Debug specific call
-        String debugOption = System.getProperty( "debugNutchCall" );
-        if (debugOption != null && commandAndOptions[0].endsWith( debugOption )) {
-            nutchCall = arrayConcat( nutchCall, new String[] { "-agentlib:jdwp=transport=dt_socket,address=7000,server=y,suspend=y" } );
+        String debugOption = System.getProperty("debugNutchCall");
+        if (debugOption != null && commandAndOptions[0].endsWith(debugOption)) {
+            nutchCall = arrayConcat(nutchCall, new String[] { "-agentlib:jdwp=transport=dt_socket,address=7000,server=y,suspend=y" });
         }
         nutchCall = arrayConcat(nutchCall, commandAndOptions);
 
@@ -205,27 +202,28 @@ public class IngridCrawlNutchProcess extends NutchProcess {
         if (log.isDebugEnabled()) {
             log.debug("Call: " + StringUtils.join(cmdLine.toStrings(), " "));
         }
-        
+
         /**
          * FOR WINDOWS DEVELOPMENT TO RUN IN CYGWIN
          */
-        if (System.getProperty( "runInCygwin" ) != null) {
+        if (System.getProperty("runInCygwin") != null) {
             cmdLine = new CommandLine("C:\\cygwin\\bin\\bash.exe");
-            cmdLine.addArgument( "-c" );
-            
+            cmdLine.addArgument("-c");
+
             String options = StringUtils.join(javaOptions, " ");
             String command = StringUtils.join(commandAndOptions, " ");
             // FOR DEBUGGING NUTCH
-            // options += " -agentlib:jdwp=transport=dt_socket,address=7000,server=y,suspend=y";
+            // options +=
+            // " -agentlib:jdwp=transport=dt_socket,address=7000,server=y,suspend=y";
             String call = "java -cp '" + cp + "' " + options + " " + command;
             // adding debug option
-            call = call.replaceAll( "\\\\", "/" );
-            cmdLine.addArgument( call );
+            call = call.replaceAll("\\\\", "/");
+            cmdLine.addArgument(call);
         }
         /**
          * END
          */
-        
+
         executor.execute(cmdLine, resultHandler);
         executor.getStreamHandler();
         resultHandler.waitFor();

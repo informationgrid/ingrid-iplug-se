@@ -22,10 +22,11 @@ public interface Index {
 	/**
 	 * 
 	 * @param hit
+     * @param query
 	 * @param requestedFields 
 	 * @return
 	 */
-	public IngridHitDetail getDetail(IngridHit hit, String[] requestedFields);
+	public IngridHitDetail getDetail(IngridHit hit, IngridQuery query, String[] requestedFields);
 	
 	
 	/**

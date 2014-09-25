@@ -1,16 +1,19 @@
 package de.ingrid.iplug.se.elasticsearch;
 
+import static org.elasticsearch.index.query.QueryBuilders.multiMatchQuery;
+
 import java.util.List;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
@@ -42,7 +45,7 @@ public class IndexImpl implements Index {
     
     private FacetConverter facetConverter;
     
-    private final static String[] detailFields =  { "url", "title", "abstract" };
+    private final static String[] detailFields =  { "url", "title" };
 
     private static final String ELASTIC_SEARCH_ID = "es_id";
 
@@ -107,7 +110,8 @@ public class IndexImpl implements Index {
                 .setSearchType( searchType  )
                 .setQuery( query ) // Query
                 .setFrom( startHit ).setSize( num )
-                .setExplain( false );
+                .setExplain( false )
+                .setNoFields();
         
         // Filter for results only with location information
         if (isLocationSearch) {
@@ -125,6 +129,7 @@ public class IndexImpl implements Index {
         // search!
         SearchResponse searchResponse = srb.execute().actionGet();
 
+        
         // convert to IngridHits
         IngridHits hits = getHitsFromResponse( searchResponse, ingridQuery );
         
@@ -164,23 +169,48 @@ public class IndexImpl implements Index {
     }
 
     @Override
-    public IngridHitDetail getDetail(IngridHit hit, String[] requestedFields) {
+    public IngridHitDetail getDetail(IngridHit hit, IngridQuery ingridQuery, String[] requestedFields) {
         String documentId = hit.getString( ELASTIC_SEARCH_ID );
         String fromIndex = hit.getString( ELASTIC_SEARCH_INDEX );
         String fromType = hit.getString( ELASTIC_SEARCH_INDEX_TYPE );
         String[] allFields = (String[]) ArrayUtils.addAll( detailFields, requestedFields );
         
-        GetResponse response = client.prepareGet( fromIndex, fromType, documentId )
+     // convert InGrid-query to QueryBuilder
+//        QueryBuilder query = QueryBuilders.boolQuery().must(QueryBuilders.idsQuery(documentId)).should(queryConverter.convert( ingridQuery ));
+        QueryBuilder query = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("_id", documentId)).must(queryConverter.convert( ingridQuery ));
+        
+        
+        // search prepare
+        SearchRequestBuilder srb = client.prepareSearch( fromIndex )
+                .setTypes( fromType )
+                .setSearchType( searchType  )
+                .setQuery( query ) // Query
+                .setFrom( 0 ).setSize( 1 )
+                .setExplain( false )
+                .addHighlightedField("content")
+                .addFields(allFields)
+                .setSource("");
+
+        SearchResponse searchResponse = srb.execute().actionGet();
+        
+        SearchHits dHits = searchResponse.getHits();
+        SearchHit dHit = dHits.getAt(0);
+        
+/*        GetResponse response = client.prepareGet( fromIndex, fromType, documentId )
                 .setFields( allFields )
                 .execute()
                 .actionGet();
-
-        String title = (String) response.getField( IndexFields.TITLE ).getValue();
-        String summary = (String) response.getField( IndexFields.ABSTRACT ).getValue();
+*/
+        String title = (String) dHit.field( IndexFields.TITLE ).getValue();
+        String summary = "";
+        if (dHit.getHighlightFields().containsKey("content")) {
+            summary = StringUtils.join(dHit.getHighlightFields().get( "content" ).fragments(), " ... ");
+        }
+                //(String) response.getField( IndexFields.ABSTRACT ).getValue();
         IngridHitDetail detail = new IngridHitDetail( hit.getPlugId(), hit.getDocumentId(), hit.getDataSourceId(), hit.getScore(), title, summary );
         if (requestedFields != null) {
             for (String field : requestedFields) {
-                detail.put( field, response.getField( field ).getValue());
+                detail.put( field, dHit.field( field ).getValue());
             }
         }
         return detail;

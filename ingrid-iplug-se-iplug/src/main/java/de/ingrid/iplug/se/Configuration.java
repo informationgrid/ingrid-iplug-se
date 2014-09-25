@@ -85,8 +85,16 @@ public class Configuration implements IConfig {
     public String databaseID;
 	
 	@PropertyValue("http.port")
-    @DefaultValue("9299")
+    @DefaultValue("9200")
     public String esHttpPort;
+    
+	@PropertyValue("transport.tcp.port")
+    @DefaultValue("9300")
+    public String esTransportTcpPort;
+
+    @PropertyValue("http.host")
+    @DefaultValue("localhost")
+    public String esHttpHost;
 	
 	@PropertyValue("index.name")
 	@DefaultValue("iplugse")

@@ -11,7 +11,7 @@ import de.ingrid.utils.query.TermQuery;
 @Service
 public class DefaultFieldsQueryConverter implements IQueryConverter {
     
-    private static final String[] content = {"title", "abstract"};
+    private static final String[] content = {"title", "content"};
 
     @Override
     public void parse(IngridQuery ingridQuery, BoolQueryBuilder queryBuilder) {

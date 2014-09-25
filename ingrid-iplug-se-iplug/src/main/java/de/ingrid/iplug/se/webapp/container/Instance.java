@@ -13,6 +13,8 @@ public class Instance {
     private boolean isActive;
     private List<Url> urls;
     private boolean indexTypeExists;
+    private String esTransportTcpPort;
+    private String esHttpHost;
 
     public Instance() {}
 
@@ -71,6 +73,24 @@ public class Instance {
     public void setIndexName(String indexName) {
         this.indexName = indexName;
     }
+
+    public String getEsTransportTcpPort() {
+        return esTransportTcpPort;
+    }
+
+    public void setEsTransportTcpPort(String esTransportTcpPort) {
+        this.esTransportTcpPort = esTransportTcpPort;
+    }
+
+    public String getEsHttpHost() {
+        return esHttpHost;
+    }
+
+    public void setEsHttpHost(String esHttpHost) {
+        this.esHttpHost = esHttpHost;
+    }
+    
+    
     
     
 }

@@ -52,7 +52,7 @@ public class NutchConfigTool {
      * 
      * @param name
      * @param value
-     * @param description
+     * @param description The description for the property. Unchanged or not created for value <code>null</code>;
      */
     public void addOrUpdateProperty(String name, String value, String description) {
 
@@ -69,14 +69,14 @@ public class NutchConfigTool {
             Node valueNode = xpath.createElementFromXPath(n, "value");
             XMLUtils.createOrReplaceTextNode(valueNode, value);
             Node descriptionNode = xpath.createElementFromXPath(n, "description");
-            XMLUtils.createOrReplaceTextNode(descriptionNode, description);
+            XMLUtils.createOrReplaceTextNode(descriptionNode, description == null ? "" : description);
         } else {
 
             Node valueNode = xpath.getNode(el, "//name[text()='" + name + "']/following-sibling::value");
             XMLUtils.createOrReplaceTextNode(valueNode, value);
 
             Node descriptionNode = xpath.getNode(el, "//name[text()='" + name + "']/following-sibling::description");
-            if (descriptionNode != null) {
+            if (descriptionNode != null && description != null) {
                 XMLUtils.createOrReplaceTextNode(descriptionNode, description);
             }
         }
