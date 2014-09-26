@@ -66,50 +66,90 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             String filteredSegments = fs.getPath(workingDirectory.getAbsolutePath(), "segments_filtered").toString();
 
             this.statusProvider.addState("INJECT_START", "Inject start urls...");
-            execute("org.apache.nutch.crawl.Injector", crawlDb, startUrls);
+            int ret = execute("org.apache.nutch.crawl.Injector", crawlDb, startUrls);
+            if (ret != 0) {
+                throwCrawlError("Error during Execution of: org.apache.nutch.crawl.Injector");
+            }
             this.statusProvider.appendToState("INJECT_START", " done.");
 
             this.statusProvider.addState("INJECT_BW", "Inject limit and exclude urls...");
-            execute("de.ingrid.iplug.se.nutch.crawl.bw.BWInjector", bwDb, limitPatterns, excludePatterns);
+            ret = execute("de.ingrid.iplug.se.nutch.crawl.bw.BWInjector", bwDb, limitPatterns, excludePatterns);
+            if (ret != 0) {
+                throwCrawlError("Error during Execution of: de.ingrid.iplug.se.nutch.crawl.bw.BWInjector");
+            }
             this.statusProvider.appendToState("INJECT_BW", " done.");
 
             this.statusProvider.addState("INJECT_META", "Inject metadata...");
-            execute("de.ingrid.iplug.se.nutch.crawl.metadata.MetadataInjector", mddb, metadata);
+            ret = execute("de.ingrid.iplug.se.nutch.crawl.metadata.MetadataInjector", mddb, metadata);
+            if (ret != 0) {
+                throwCrawlError("Error during Execution of: de.ingrid.iplug.se.nutch.crawl.metadata.MetadataInjector");
+            }
             this.statusProvider.appendToState("INJECT_META", " done.");
 
             this.statusProvider.addState("FILTER_CRAWLDB", "Filter crawldb width limit/exclude urls...");
             // Usage: <crawldb> <bwdb> <normalize> <filter> <replace current
             // crawldb>
-            execute("de.ingrid.iplug.se.nutch.crawl.bw.BWCrawlDbFilter", crawlDb, bwDb, "false", "false", "true");
+            ret = execute("de.ingrid.iplug.se.nutch.crawl.bw.BWCrawlDbFilter", crawlDb, bwDb, "false", "false", "true");
+            if (ret != 0) {
+                throwCrawlError("Error during Execution of: de.ingrid.iplug.se.nutch.crawl.bw.BWCrawlDbFilter");
+            }
             this.statusProvider.appendToState("FILTER_CRAWLDB", " done.");
 
             for (int i = 0; i < depth; i++) {
-                this.statusProvider.addState("GENERATE" + i, "Generate up to " + noUrls.toString() + " urls for fetching " + "["+(i+1) + "/"+ depth + "] ...");
-                execute("org.apache.nutch.crawl.Generator", crawlDb, segments, "-topN", noUrls.toString());
+                this.statusProvider.addState("GENERATE" + i, "Generate up to " + noUrls.toString() + " urls for fetching " + "[" + (i + 1) + "/" + depth + "] ...");
+                ret = execute("org.apache.nutch.crawl.Generator", crawlDb, segments, "-topN", noUrls.toString());
+                if (ret != 0) {
+                    log.warn("No URLs generated for fetch process. All urls fetched?");
+                    this.statusProvider.addState("GENERATE_ZERO_URLS", "No URLs generated for fetch process. All urls fetched?", Classification.WARN);
+                    if (i == 0) {
+                        // skip whole crawl process if this is the first generation.
+                        // this should not be a problem, because no new segment should be generated
+                        // TODO: check this (maybe check for multiple segments), because we cannot distinguish between zero URLs and error. :-(
+                        return;
+                    } else {
+                        // skip fetch, update crawldb, update metadata and continue.
+                        break;
+                    }
+                }
                 this.statusProvider.appendToState("GENERATE" + i, " done.");
 
                 String currentSegment = fs.getPath(segments, getCurrentSegment(segments)).toString();
 
-                this.statusProvider.addState("FETCH" + i, "Fetching " + "["+ (i+1) + "/"+ depth + "] ...");
-                execute("org.apache.nutch.fetcher.Fetcher", currentSegment);
+                this.statusProvider.addState("FETCH" + i, "Fetching " + "[" + (i + 1) + "/" + depth + "] ...");
+                ret = execute("org.apache.nutch.fetcher.Fetcher", currentSegment);
+                if (ret != 0) {
+                    throwCrawlError("Error during Execution of: org.apache.nutch.fetcher.Fetcher");
+                }
                 this.statusProvider.appendToState("FETCH" + i, " done.");
 
-                this.statusProvider.addState("UPDATE_CRAWLDB" + i, "Update database with new urls and links " + "["+(i+1) + "/"+ depth + "] ...");
+                this.statusProvider.addState("UPDATE_CRAWLDB" + i, "Update database with new urls and links " + "[" + (i + 1) + "/" + depth + "] ...");
                 // Usage: <crawldb> <bwdb> <segment> <normalize> <filter>
-                execute("de.ingrid.iplug.se.nutch.crawl.bw.BWUpdateDb", crawlDb, bwDb, currentSegment, "true", "true");
+                ret = execute("de.ingrid.iplug.se.nutch.crawl.bw.BWUpdateDb", crawlDb, bwDb, currentSegment, "true", "true");
+                if (ret != 0) {
+                    throwCrawlError("Error during Execution of: de.ingrid.iplug.se.nutch.crawl.bw.BWUpdateDb");
+                }
                 this.statusProvider.appendToState("UPDATE_CRAWLDB" + i, " done.");
 
-                this.statusProvider.addState("UPDATE_MD" + i, "Update metadata for new urls " + "["+(i+1) + "/"+ depth + "] ...");
-                execute("de.ingrid.iplug.se.nutch.crawl.metadata.ParseDataUpdater", mddb, currentSegment);
+                this.statusProvider.addState("UPDATE_MD" + i, "Update metadata for new urls " + "[" + (i + 1) + "/" + depth + "] ...");
+                ret = execute("de.ingrid.iplug.se.nutch.crawl.metadata.ParseDataUpdater", mddb, currentSegment);
+                if (ret != 0) {
+                    throwCrawlError("Error during Execution of: de.ingrid.iplug.se.nutch.crawl.metadata.ParseDataUpdater");
+                }
                 this.statusProvider.appendToState("UPDATE_MD" + i, " done.");
             }
 
             this.statusProvider.addState("CREATE_HOST_STATISTICS", "Create hosts statistic...");
-            execute("de.ingrid.iplug.se.nutch.statistics.HostStatistic", crawlDb, workingPath);
+            ret = execute("de.ingrid.iplug.se.nutch.statistics.HostStatistic", crawlDb, workingPath);
+            if (ret != 0) {
+                throwCrawlError("Error during Execution of: de.ingrid.iplug.se.nutch.statistics.HostStatistic");
+            }
             this.statusProvider.appendToState("CREATE_HOST_STATISTICS", " done.");
 
             this.statusProvider.addState("MERGE_SEGMENT", "Merge segments...");
-            execute("org.apache.nutch.segment.SegmentMerger", mergedSegments, "-dir", segments);
+            ret = execute("org.apache.nutch.segment.SegmentMerger", mergedSegments, "-dir", segments);
+            if (ret != 0) {
+                throwCrawlError("Error during Execution of: org.apache.nutch.segment.SegmentMerger");
+            }
             if (fs.getPath(mergedSegments).toFile().exists()) {
                 removeRecursive(fs.getPath(segments));
                 Files.move(fs.getPath(mergedSegments), fs.getPath(segments), StandardCopyOption.REPLACE_EXISTING);
@@ -125,29 +165,50 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             this.statusProvider.appendToState("FILTER_SEGMENT", " done.");
 
             this.statusProvider.addState("UPDATE_WEBGRAPH", "Update web graph with new urls...");
-            execute("org.apache.nutch.scoring.webgraph.WebGraph", "-webgraphdb", webgraph, "-segmentDir", segments);
-            execute("org.apache.nutch.scoring.webgraph.LinkRank", "-webgraphdb", webgraph);
-            execute("org.apache.nutch.scoring.webgraph.ScoreUpdater", "-webgraphdb", webgraph, "-crawldb", crawlDb);
+            ret = execute("org.apache.nutch.scoring.webgraph.WebGraph", "-webgraphdb", webgraph, "-segmentDir", segments);
+            if (ret != 0) {
+                throwCrawlError("Error during Execution of: org.apache.nutch.scoring.webgraph.WebGraph");
+            }
+            ret = execute("org.apache.nutch.scoring.webgraph.LinkRank", "-webgraphdb", webgraph);
+            if (ret != 0) {
+                throwCrawlError("Error during Execution of: org.apache.nutch.scoring.webgraph.LinkRank");
+            }
+            ret = execute("org.apache.nutch.scoring.webgraph.ScoreUpdater", "-webgraphdb", webgraph, "-crawldb", crawlDb);
+            if (ret != 0) {
+                throwCrawlError("Error during Execution of: org.apache.nutch.scoring.webgraph.ScoreUpdater");
+            }
             this.statusProvider.appendToState("UPDATE_WEBGRAPH", " done.");
 
             this.statusProvider.addState("FILTER_WEBGRAPH", "Filter web graph with limit/exclude urls...");
             // Usage: BWWebgraphFilter <webgraphdb> <bwdb> <normalize> <filter>
             // <replace current webgraph>
-            execute("de.ingrid.iplug.se.nutch.crawl.bw.BWWebgraphFilter", webgraph, bwDb, "false", "false", "true");
+            ret = execute("de.ingrid.iplug.se.nutch.crawl.bw.BWWebgraphFilter", webgraph, bwDb, "false", "false", "true");
+            if (ret != 0) {
+                throwCrawlError("Error during Execution of: org.apache.nutch.scoring.webgraph.ScoreUpdater");
+            }
             this.statusProvider.appendToState("FILTER_WEBGRAPH", " done.");
 
             this.statusProvider.addState("UPDATE_LINKDB", "Update link database...");
-            execute("org.apache.nutch.crawl.LinkDb", linkDb, "-dir", segments, "-noNormalize", "-noFilter");
+            ret = execute("org.apache.nutch.crawl.LinkDb", linkDb, "-dir", segments, "-noNormalize", "-noFilter");
+            if (ret != 0) {
+                throwCrawlError("Error during Execution of: org.apache.nutch.crawl.LinkDb");
+            }
             this.statusProvider.appendToState("UPDATE_LINKDB", " done.");
 
             this.statusProvider.addState("FILTER_LINKDB", "Filter link database with limit/exclude urls...");
             // Usage: BWLinkDbFilter <linkdb> <bwdb> <normalize> <filter>
             // <replace current linkdb>
-            execute("de.ingrid.iplug.se.nutch.crawl.bw.BWLinkDbFilter", linkDb, bwDb, "false", "false", "true");
+            ret = execute("de.ingrid.iplug.se.nutch.crawl.bw.BWLinkDbFilter", linkDb, bwDb, "false", "false", "true");
+            if (ret != 0) {
+                throwCrawlError("Error during Execution of: de.ingrid.iplug.se.nutch.crawl.bw.BWLinkDbFilter");
+            }
             this.statusProvider.appendToState("FILTER_LINKDB", " done.");
 
             this.statusProvider.addState("INDEX", "Create index...");
-            execute("org.apache.nutch.indexer.IndexingJob", crawlDb, "-linkdb", linkDb, "-dir", segments, "-deleteGone");
+            ret = execute("org.apache.nutch.indexer.IndexingJob", crawlDb, "-linkdb", linkDb, "-dir", segments, "-deleteGone");
+            if (ret != 0) {
+                throwCrawlError("Error during Execution of: org.apache.nutch.indexer.IndexingJob");
+            }
             this.statusProvider.appendToState("INDEX", " done.");
 
             if (status == STATUS.RUNNING) {
@@ -175,7 +236,12 @@ public class IngridCrawlNutchProcess extends NutchProcess {
 
     }
 
-    private void execute(String... commandAndOptions) throws IOException, InterruptedException {
+    private void throwCrawlError(String string) throws IOException {
+        this.statusProvider.addState("ERROR", string, Classification.ERROR);
+        throw new IOException(string + ". Process exited with error code: " + resultHandler.getExitValue());
+    }
+
+    private int execute(String... commandAndOptions) throws IOException, InterruptedException {
         String cp = StringUtils.join(classPath, File.pathSeparator);
 
         String[] nutchCall = new String[] { "-cp", cp };
@@ -227,10 +293,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
         executor.execute(cmdLine, resultHandler);
         executor.getStreamHandler();
         resultHandler.waitFor();
-        if (resultHandler.getExitValue() != 0) {
-            this.statusProvider.addState( "ERROR", "Error during Execution of: " + commandAndOptions[0], Classification.ERROR );
-            throw new IOException("Process exited with error code: " + resultHandler.getExitValue());
-        }
+        return resultHandler.getExitValue();
     }
 
     private String getCurrentSegment(String path) {
