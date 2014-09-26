@@ -27,7 +27,7 @@
 
     <property>
         <name>plugin.includes</name>
-        <value>protocol-httpclient|urlfilter-regex|parse-(html|tika)|index-(basic|anchor|metadata|more)|ingrid-indexer-elastic|scoring-link|ingrid-language-identifier|urlnormalizer-(pass|regex|basic)|analysis-de</value>
+        <value>protocol-httpclient|urlfilter-regex|parse-(html|tika)|index-(basic|anchor|metadata|more)|ingrid-indexer-elastic|scoring-ingrid|ingrid-language-identifier|urlnormalizer-(pass|regex|basic)|analysis-de</value>
         <description>Regular expression naming plugin directory names to
             include. Any plugin not matching this expression is excluded.
             In any case you need at least include the nutch-extensionpoints plugin.
@@ -285,17 +285,6 @@
 </property>
 
 <property>
-  <name>fetcher.threads.fetch</name>
-  <value>50</value>
-  <description>The number of FetcherThreads the fetcher should use.
-  This is also determines the maximum number of requests that are
-  made at once (each FetcherThread handles one connection). The total
-  number of threads running in distributed mode will be the number of
-  fetcher threads * number of nodes as fetcher has one map task per node.
-  </description>
-</property>
-
-<property>
   <name>fetcher.throughput.threshold.pages</name>
   <value>1</value>
   <description>The threshold of minimum pages per second. If the fetcher downloads less
@@ -323,5 +312,16 @@
         <description>Defines the index type of the indexed documents. The instance name will be used to be able to quickly manipulate all urls of an instance. This property only applies for the ingrid.indexer.elastic plugin..</description>
     </property>
 
+    <property>
+      <name>scoring.depth.max</name>
+      <value>10</value>
+      <description>Max depth value from seed allowed by default.
+      Can be overriden on a per-seed basis by specifying "_maxdepth_=VALUE"
+      as a seed metadata. This plugin adds a "_depth_" metadatum to the pages
+      to track the distance from the seed it was found from. 
+      The depth is used to prioritise URLs in the generation step so that
+      shallower pages are fetched first.
+      </description>
+    </property>
 
 </configuration>

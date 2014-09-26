@@ -228,7 +228,7 @@
 								<source>ingrid-nutch-plugins/indexer-ingrid/src/java</source>
 								<source>ingrid-nutch-plugins/ingrid-language-identifier/src/java</source>
                                 <source>ingrid-nutch-plugins/ingrid-indexer-elastic/src/java</source>
-								
+                                <source>ingrid-nutch-plugins/scoring-ingrid/src/java</source>
 							</sources>
 						</configuration>
 					</execution>

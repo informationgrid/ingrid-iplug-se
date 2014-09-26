@@ -31,6 +31,7 @@
         <ant dir="analysis-fr" target="deploy" />
         <ant dir="ingrid-language-identifier" target="deploy" />
         <ant dir="ingrid-indexer-elastic" target="deploy" />
+        <ant dir="scoring-ingrid" target="deploy" />
 
 		<!-- default nutch plugins -->
 		<ant dir="creativecommons" target="deploy" />
