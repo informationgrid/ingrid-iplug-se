@@ -25,5 +25,17 @@
         <button name="stop">Crawl beenden</button>
     </div>
     
-    <canvas id="myChart" width="400" height="400"></canvas>
+    <table id="statisticTable">
+        <thead>
+            <tr>
+                <th data-sort="string" width="100px"></th>
+                <th data-sort="string">Host</th>
+                <th data-sort="string" width="70px">Bekannt</th>
+                <th data-sort="string" width="70px">Analysiert</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <canvas id="myChart" width="700" height="400"></canvas>
 </form:form>

@@ -15,7 +15,8 @@
 <script type="text/javascript" src="../js/base/jquery-1.8.0.min.js"></script>
 <script src="../js/jquery.validate.min.js"></script>
 <script src="../js/localization/messages_de.min.js"></script>
-<script src="../js/chart.min.js"></script>
+<!--<script src="../js/chart.min.js"></script>-->
+<script type="text/javascript" src="../js/jquery.tablesorter.full.min.js"></script>
 
 <script type="text/javascript">
 
@@ -102,21 +103,42 @@
 	}
 	
 	function getStatistic() {
+		// fill table
+        var addTableRow = function(item, biggest) {
+            $("#statisticTable tbody").append(
+                    "<tr>" +
+                        "<td title='rot=bekannt; grün=analysiert'><div style='background-color: red; height: 3px; margin-bottom: 5px; width: " + (item.known / biggest.known)*100 + "px'></div><div style='background-color: green; height: 3px; width: " + (item.fetched / biggest.fetched)*100 + "px'></div></td>" +
+                        "<td>" + item.host + "</td>" +
+                        "<td>" + item.known + "</td>" +
+                        "<td>" + item.fetched + "</td>" +
+                    "</tr>"
+            );
+        };
+        
 		$.ajax( "../rest/status/${ instance.name }/statistic", {
 			type: "GET",
             contentType: 'application/json',
             success: function(data) {
                 var json = JSON.parse( data );
                 console.log( json );
-                
+                var overall = json.splice(0, 1);
                 var labels = [], dataKnown = [], dataFetched = [];
+                
+                // determine highest known and fetched values
+                var biggest = { known: -1, fetched: -1 };
                 $.each( json, function(index, item) {
-                	labels.push( item.host );
-                	dataKnown.push( item.known );
-                	dataFetched.push( item.fetched );
+                	if (item.known > biggest.known) biggest.known = item.known;
+                	if (item.fetched > biggest.fetched) biggest.fetched = item.fetched;
                 });
                 
-                var ctx = document.getElementById("myChart").getContext("2d");
+                $.each( json, function(index, item) {
+                	// labels.push( item.host );
+                	// dataKnown.push( item.known );
+                	// dataFetched.push( item.fetched );
+                	addTableRow( item, biggest );
+                });
+                
+                /*var ctx = document.getElementById("myChart").getContext("2d");
                 var data = {
                     labels: labels,
                     datasets: [
@@ -138,10 +160,25 @@
                         }
                     ]
                 };
-                var myBarChart = new Chart(ctx).Bar(data);
+                var myBarChart = new Chart(ctx).Bar(data);*/
+                
+                $("#statisticTable").tablesorter({
+                    sortList: [[0,0]], // sort first column ascending
+                    widgets: ['zebra', 'filter'],
+                    widgetOptions: {
+                        filter_columnFilters: true,
+                        filter_hideFilters: false,
+                        // class name applied to filter row and each input
+                        filter_cssFilter  : 'filtered',
+                        pager_removeRows: false
+                    }
+                });
             }
+		
 		});
+		
 	}
+	
 	
 </script>
 

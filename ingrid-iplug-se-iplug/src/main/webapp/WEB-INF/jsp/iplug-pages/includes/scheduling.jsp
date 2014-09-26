@@ -47,16 +47,22 @@
                                     </legend>
 
                                     <row> <label> <fmt:message key="scheduling.crawlDepth" /> :
-                                    </label> <field> <form:select path="depth">
-                                        <form:options items="${depths}" />
-                                    </form:select>
+                                    </label> <field> 
+                                    <div class="input full">
+                                        <form:select path="depth">
+                                            <form:options items="${depths}" />
+                                        </form:select>
+                                    </div>
                                     <div class="error">
                                         <form:errors path="depth" />
                                     </div>
                                     </field> <desc></desc> </row>
 
                                     <row> <label> <fmt:message key="scheduling.pagesPerSegment" /> :
-                                    </label> <field> <form:input path="topn" />
+                                    </label> <field> 
+                                    <div class="input full">
+                                        <form:input path="topn" />
+                                    </div>
                                     <div class="error">
                                         <form:errors path="topn" />
                                     </div>
@@ -96,16 +102,22 @@
                                     </legend>
 
                                     <row> <label> <fmt:message key="scheduling.crawlDepth" /> :
-                                    </label> <field> <form:select path="depth">
-                                        <form:options items="${depths}" />
-                                    </form:select>
+                                    </label> <field> 
+                                    <div class="input full">
+                                        <form:select path="depth">
+                                            <form:options items="${depths}" />
+                                        </form:select>
+                                    </div>
                                     <div class="error">
                                         <form:errors path="depth" />
                                     </div>
                                     </field> <desc></desc> </row>
 
                                     <row> <label> <fmt:message key="scheduling.pagesPerSegment" /> :
-                                    </label> <field> <form:input path="topn" />
+                                    </label> <field> 
+                                    <div class="input full">
+                                        <form:input path="topn" />
+                                    </div>
                                     <div class="error">
                                         <form:errors path="topn" />
                                     </div>
@@ -146,16 +158,22 @@
                                     </legend>
 
                                     <row> <label> <fmt:message key="scheduling.crawlDepth" /> :
-                                    </label> <field> <form:select path="depth">
-                                        <form:options items="${depths}" />
-                                    </form:select>
+                                    </label> <field> 
+                                    <div class="input full">
+                                        <form:select path="depth">
+                                            <form:options items="${depths}" />
+                                        </form:select>
+                                    </div>
                                     <div class="error">
                                         <form:errors path="depth" />
                                     </div>
                                     </field> <desc></desc> </row>
 
                                     <row> <label> <fmt:message key="scheduling.pagesPerSegment" /> :
-                                    </label> <field> <form:input path="topn" />
+                                    </label> <field> 
+                                    <div class="input full">
+                                        <form:input path="topn" />
+                                    </div>
                                     <div class="error">
                                         <form:errors path="topn" />
                                     </div>
@@ -177,7 +195,10 @@
                                     </legend>
 
                                     <row> <label> <fmt:message key="scheduling.cronPattern" /> :
-                                    </label> <field> <form:input path="pattern" />
+                                    </label> <field>
+                                    <div class="input full">
+                                        <form:input path="pattern" />
+                                    </div>
                                     <div class="error">
                                         <form:errors path="pattern" />
                                     </div>
@@ -194,16 +215,22 @@
                                     </legend>
 
                                     <row> <label> <fmt:message key="scheduling.crawlDepth" /> :
-                                    </label> <field> <form:select path="depth">
-                                        <form:options items="${depths}" />
-                                    </form:select>
+                                    </label> <field>
+                                    <div class="input full">
+                                        <form:select path="depth">
+                                            <form:options items="${depths}" />
+                                        </form:select>
+                                    </div>
                                     <div class="error">
                                         <form:errors path="depth" />
                                     </div>
                                     </field> <desc></desc> </row>
 
                                     <row> <label> <fmt:message key="scheduling.pagesPerSegment" /> :
-                                    </label> <field> <form:input path="topn" />
+                                    </label> <field>
+                                    <div class="input full">
+                                        <form:input path="topn" />
+                                    </div>
                                     <div class="error">
                                         <form:errors path="topn" />
                                     </div>
@@ -215,22 +242,6 @@
                     </div>
                 </div>
             </div>
-            <script type="text/javascript">
-													/* (function() {
-													    //var tabView = new YAHOO.widget.TabView('schedulingTabs');
-													    var activeTab = 0;
-													    if (location.href.indexOf("weekly.html") != -1) {
-													        activeTab = 1;
-													    } else if (location.href.indexOf("monthly.html") != -1) {
-													        activeTab = 2;
-													    } else if (location.href.indexOf("advanced.html") != -1) {
-													        activeTab = 3;
-													    }
-													    //tabView.set('activeIndex', activeTab);
-													})(); */
-												</script>
-
         </div>
-        <div class="yui-b"></div>
     </div>
 </div>

@@ -62,7 +62,7 @@ label input {
     margin-bottom: 10px;
 }
 
-.input input {
+.input input, .input select {
 	padding: 5px;
 	border: 0;
     width: 100%;
