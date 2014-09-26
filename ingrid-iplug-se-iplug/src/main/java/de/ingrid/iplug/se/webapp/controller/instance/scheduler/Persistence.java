@@ -67,7 +67,7 @@ public class Persistence<T> {
         String dir = SEIPlug.conf.getInstancesDir();
         File instanceDir = new File(dir, instanceName);
         if (instanceDir == null || !instanceDir.exists()) {
-            throw new RuntimeException( "working directory does ot exists" );
+            throw new RuntimeException( "working directory does not exists" );
         }
         return instanceDir.getAbsolutePath();
     }

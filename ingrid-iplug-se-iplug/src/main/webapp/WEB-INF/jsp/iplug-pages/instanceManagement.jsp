@@ -15,6 +15,7 @@
 <script type="text/javascript" src="../js/base/jquery-1.8.0.min.js"></script>
 <script src="../js/jquery.validate.min.js"></script>
 <script src="../js/localization/messages_de.min.js"></script>
+<script src="../js/chart.min.js"></script>
 
 <script type="text/javascript">
 
@@ -36,6 +37,8 @@
                 error.insertAfter( element.parent() );
             }
         });
+        
+        getStatistic();
 	});
 	
 	function setLog(data) {
@@ -77,7 +80,7 @@
             		$("#crawlInfo").show();
             		$("#crawlStart").show();
                     $("#crawlStop").hide();
-            		$("#status").hide();
+            		//$("#status").hide();
             		var data = "";
             		if (jqXHR.responseText == "") {
                 		$("#crawlInfo").html( "Es läuft zur Zeit kein Crawl." );
@@ -87,12 +90,57 @@
             			data = JSON.parse( jqXHR.responseText );
                         setLog( data );            			
             		}
+            		
+            		// repeat execution every 60s until finished
+                    setTimeout( checkState, 60000 );
             	} else {
             		$("#crawlInfo").html( "Es trat ein Fehler beim Laden des Logs auf. " );
                     console.error( error, jqXHR );            		
             	}
             }
     	});
+	}
+	
+	function getStatistic() {
+		$.ajax( "../rest/status/${ instance.name }/statistic", {
+			type: "GET",
+            contentType: 'application/json',
+            success: function(data) {
+                var json = JSON.parse( data );
+                console.log( json );
+                
+                var labels = [], dataKnown = [], dataFetched = [];
+                $.each( json, function(index, item) {
+                	labels.push( item.host );
+                	dataKnown.push( item.known );
+                	dataFetched.push( item.fetched );
+                });
+                
+                var ctx = document.getElementById("myChart").getContext("2d");
+                var data = {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: "Insgesamt",
+                            fillColor: "rgba(220,220,220,0.5)",
+                            strokeColor: "rgba(220,220,220,0.8)",
+                            highlightFill: "rgba(220,220,220,0.75)",
+                            highlightStroke: "rgba(220,220,220,1)",
+                            data: dataKnown
+                        },
+                        {
+                            label: "Erfasst",
+                            fillColor: "rgba(151,187,205,0.5)",
+                            strokeColor: "rgba(151,187,205,0.8)",
+                            highlightFill: "rgba(151,187,205,0.75)",
+                            highlightStroke: "rgba(151,187,205,1)",
+                            data: dataFetched
+                        }
+                    ]
+                };
+                var myBarChart = new Chart(ctx).Bar(data);
+            }
+		});
 	}
 	
 </script>

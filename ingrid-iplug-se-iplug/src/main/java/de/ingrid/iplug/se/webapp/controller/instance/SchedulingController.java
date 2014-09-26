@@ -24,6 +24,7 @@ import de.ingrid.iplug.se.webapp.controller.instance.scheduler.CrawlCommand;
 import de.ingrid.iplug.se.webapp.controller.instance.scheduler.CrawlDataPersistence;
 import de.ingrid.iplug.se.webapp.controller.instance.scheduler.MonthlyCommand;
 import de.ingrid.iplug.se.webapp.controller.instance.scheduler.PatternPersistence;
+import de.ingrid.iplug.se.webapp.controller.instance.scheduler.SchedulerManager;
 import de.ingrid.iplug.se.webapp.controller.instance.scheduler.WeeklyCommand;
 import de.ingrid.iplug.se.webapp.controller.instance.scheduler.WeeklyCommand.Day;
 
@@ -39,6 +40,9 @@ public class SchedulingController extends InstanceController {
     
     private final PatternPersistence _patternPersistence;
     private final CrawlDataPersistence _crawlDataPersistence;
+    
+    @Autowired
+    private SchedulerManager _schedulerManager;
 
     @Autowired
     public SchedulingController(PatternPersistence patternPersistence,
@@ -129,6 +133,16 @@ public class SchedulingController extends InstanceController {
         }
         return month;
     }
+    
+    private void saveAndSchedule(String name, String pattern, Integer depth, Integer topn) throws IOException {
+        // persist scheduling
+        _patternPersistence.savePattern(pattern, name);
+
+        // persist crawldata
+        _crawlDataPersistence.saveCrawlData(depth, topn, name);
+        
+        _schedulerManager.schedule( name );
+    }
 
     @RequestMapping(value = "/iplug-pages/daily.html", method = RequestMethod.POST)
     public String postDaily(@ModelAttribute("clockCommand") ClockCommand clockCommand, Errors errors, @RequestParam("instance") String name, final ModelMap map)
@@ -147,12 +161,8 @@ public class SchedulingController extends InstanceController {
         Period period = clockCommand.getPeriod();
         hour = period == Period.PM ? hour + 12 : hour;
         String pattern = minute + " " + hour + " " + "* * 0-6";
-        _patternPersistence.savePattern(pattern, name);
-
-        // persist crawldata
-        Integer depth = clockCommand.getDepth();
-        Integer topn = clockCommand.getTopn();
-        _crawlDataPersistence.saveCrawlData(depth, topn, name);
+        
+        saveAndSchedule( name, pattern, clockCommand.getDepth(), clockCommand.getTopn() );
         return "redirect:" + AdminViews.SE_INSTANCE_SCHEDULER + ".html?instance=" + name;
     }
 
@@ -186,12 +196,8 @@ public class SchedulingController extends InstanceController {
             counter++;
         }
         String pattern = minute + " " + hour + " " + "* * " + dayPattern;
-        _patternPersistence.savePattern(pattern, name);
 
-        // persist crawldata
-        Integer depth = weeklyCommand.getDepth();
-        Integer topn = weeklyCommand.getTopn();
-        _crawlDataPersistence.saveCrawlData(depth, topn, name);
+        saveAndSchedule( name, pattern, weeklyCommand.getDepth(), weeklyCommand.getTopn() );
         return "redirect:" + AdminViews.SE_INSTANCE_SCHEDULER + ".html" + "?instance=" + name + tabId;
     }
 
@@ -225,12 +231,8 @@ public class SchedulingController extends InstanceController {
             counter++;
         }
         String pattern = minute + " " + hour + " " + dayPattern + " * *";
-        _patternPersistence.savePattern(pattern, name);
-
-        // persist crawldata
-        Integer depth = monthlyCommand.getDepth();
-        Integer topn = monthlyCommand.getTopn();
-        _crawlDataPersistence.saveCrawlData(depth, topn, name);
+        
+        saveAndSchedule( name, pattern, monthlyCommand.getDepth(), monthlyCommand.getTopn() );
         return "redirect:" + AdminViews.SE_INSTANCE_SCHEDULER + ".html?instance=" + name + tabId;
     }
 
@@ -247,12 +249,8 @@ public class SchedulingController extends InstanceController {
             return AdminViews.SE_INSTANCE_SCHEDULER;
         }
         String pattern = advancedCommand.getPattern();
-        _patternPersistence.savePattern(pattern, name);
 
-        // persist crawldata
-        Integer depth = advancedCommand.getDepth();
-        Integer topn = advancedCommand.getTopn();
-        _crawlDataPersistence.saveCrawlData(depth, topn, name);
+        saveAndSchedule( name, pattern, advancedCommand.getDepth(), advancedCommand.getTopn() );
         return "redirect:" + AdminViews.SE_INSTANCE_SCHEDULER + ".html" + "?instance=" + name + tabId;
     }
 
@@ -260,6 +258,7 @@ public class SchedulingController extends InstanceController {
     public String delete(@RequestParam("instance") String name) throws IOException {
         _patternPersistence.deletePattern(name);
         _crawlDataPersistence.deleteCrawlData(name);
+        _schedulerManager.deschedule( name );
         return "redirect:" + AdminViews.SE_INSTANCE_SCHEDULER + ".html?instance=" + name;
     }
 

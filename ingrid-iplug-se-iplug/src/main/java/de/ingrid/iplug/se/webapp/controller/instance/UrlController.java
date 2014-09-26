@@ -31,6 +31,7 @@ import com.google.gson.JsonSyntaxException;
 
 import de.ingrid.admin.Utils;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
+import de.ingrid.admin.controller.AbstractController;
 import de.ingrid.admin.object.Partner;
 import de.ingrid.admin.object.Provider;
 import de.ingrid.admin.service.CommunicationService;
@@ -51,7 +52,7 @@ import de.ingrid.iplug.se.webapp.controller.AdminViews;
  */
 @Controller
 @SessionAttributes("plugDescription")
-public class UrlController extends InstanceController {
+public class UrlController extends AbstractController {
 
     private CommunicationService _communicationInterface;
     
@@ -68,7 +69,7 @@ public class UrlController extends InstanceController {
         if (!instanceFolder.exists())
             return "redirect:" + AdminViews.SE_LIST_INSTANCES + ".html";
 
-        modelMap.put("instance", getInstanceData(name));
+        modelMap.put("instance", InstanceController.getInstanceData(name));
 
         return AdminViews.SE_INSTANCE_URLS;
     }

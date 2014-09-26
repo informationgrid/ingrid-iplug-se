@@ -30,11 +30,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
+import de.ingrid.admin.controller.AbstractController;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.elasticsearch.bean.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
 import de.ingrid.iplug.se.webapp.controller.instance.InstanceController;
+import de.ingrid.iplug.se.webapp.controller.instance.scheduler.SchedulerManager;
 
 /**
  * Control the database parameter page.
@@ -44,10 +46,13 @@ import de.ingrid.iplug.se.webapp.controller.instance.InstanceController;
  */
 @Controller
 @SessionAttributes("plugDescription")
-public class ListInstancesController extends InstanceController {
+public class ListInstancesController extends AbstractController {
     
     @Autowired
     private ElasticsearchNodeFactoryBean elasticSearch;
+    
+    @Autowired
+    private SchedulerManager schedulerManager;
 
     // @ModelAttribute("instances")
     public List<Instance> getInstances() throws Exception {
@@ -63,7 +68,7 @@ public class ListInstancesController extends InstanceController {
             File instancesDirObject = new File( dir );
             File[] subDirs = instancesDirObject.listFiles( directoryFilter );
             for (File subDir : subDirs) {
-                Instance instance = getInstanceData( subDir.getName() );
+                Instance instance = InstanceController.getInstanceData( subDir.getName() );
                 Client client = elasticSearch.getObject().client();
                 boolean typeExists = typeExists( SEIPlug.conf.index, subDir.getName(), client );
                 instance.setIndexTypeExists( typeExists );
@@ -137,6 +142,8 @@ public class ListInstancesController extends InstanceController {
         // create directory and copy necessary configuration files
         boolean success = initializeInstanceDir( dir + "/" + name );
         if (success) {
+            
+            schedulerManager.addInstance( name );
             
             Client client = elasticSearch.getObject().client();
             // if a type within an index already exists, then return error and ask user what to do

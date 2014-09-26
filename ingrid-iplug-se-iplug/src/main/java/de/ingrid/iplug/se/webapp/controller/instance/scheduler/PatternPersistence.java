@@ -16,58 +16,47 @@
  */
 package de.ingrid.iplug.se.webapp.controller.instance.scheduler;
 
-import it.sauronsoftware.cron4j.Scheduler;
-
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PatternPersistence extends Persistence<Pattern> {
 
-  private Scheduler _scheduler;
-  private final SchedulingRunnable _runnable;
-  private Object _scheduleId;
+    public PatternPersistence() {}
 
-  @Autowired
-  public PatternPersistence(SchedulingRunnable runnable) {
-    _runnable = runnable;
-    _scheduler = new Scheduler();
-    _scheduler.start();
-  }
+    public void savePattern(String pattern, String instanceName) throws IOException {
+        Pattern patternObject = new Pattern();
+        patternObject.setPattern( pattern );
+        makePersistent( patternObject, instanceName );
+//        Scheduler scheduler = _scheduler.getScheduler( instanceName );
+//        if (!scheduler.isStarted()) {
+//            _scheduler.schedule( pattern );
+//        } else {
+//            _scheduler.reschedule( instanceName, pattern );
+//        }
 
-  public void savePattern(String pattern, String instanceName) throws IOException {
-    Pattern patternObject = new Pattern();
-    patternObject.setPattern(pattern);
-    makePersistent(patternObject, instanceName);
-    if (_scheduleId == null) {
-      _scheduleId = _scheduler.schedule(pattern, _runnable);
-    } else {
-      _scheduler.reschedule(_scheduleId, pattern);
     }
 
-  }
+    public Pattern loadPattern(String instanceName) throws Exception {
+        return load( Pattern.class, instanceName );
+    }
 
-  public Pattern loadPattern(String instanceName) throws Exception {
-    return load(Pattern.class, instanceName);
-  }
+    public boolean existsPattern(String instanceName) {
+        return exists( Pattern.class, instanceName );
+    }
 
-  public boolean existsPattern(String instanceName) {
-    return exists(Pattern.class, instanceName);
-  }
+    public void deletePattern(String instanceName) throws IOException {
+        makeTransient( Pattern.class, instanceName );
+//        _scheduler.deschedule( _scheduleId );
+//        _scheduleId = null;
+    }
 
-  public void deletePattern(String instanceName) throws IOException {
-    makeTransient(Pattern.class, instanceName);
-    _scheduler.deschedule(_scheduleId);
-    _scheduleId = null;
-  }
-
-//  public void setWorkingDirectory(File workingDirectory) throws Exception {
-//    super.setWorkingDirectory(workingDirectory);
-//    if (existsPattern()) {
-//      Pattern pattern = loadPattern();
-//      _scheduleId = _scheduler.schedule(pattern.getPattern(), _runnable);
-//    }
-//  }
+    // public void setWorkingDirectory(File workingDirectory) throws Exception {
+    // super.setWorkingDirectory(workingDirectory);
+    // if (existsPattern()) {
+    // Pattern pattern = loadPattern();
+    // _scheduleId = _scheduler.schedule(pattern.getPattern(), _runnable);
+    // }
+    // }
 }

@@ -2,13 +2,12 @@ package de.ingrid.iplug.se.webapp.controller.instance;
 
 import java.nio.file.Paths;
 
-import de.ingrid.admin.controller.AbstractController;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.webapp.container.Instance;
 
-public abstract class InstanceController extends AbstractController {
+public class InstanceController {
 
-    protected Instance getInstanceData(String name) {
+    public static Instance getInstanceData(String name) {
         Instance instance = new Instance();
         instance.setName( name );
         instance.setWorkingDirectory( Paths.get( SEIPlug.conf.getInstancesDir(), name ).toString() );

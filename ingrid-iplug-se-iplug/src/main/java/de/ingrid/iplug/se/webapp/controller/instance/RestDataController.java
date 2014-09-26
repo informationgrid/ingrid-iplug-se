@@ -1,5 +1,8 @@
 package de.ingrid.iplug.se.webapp.controller.instance;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +26,7 @@ import de.ingrid.iplug.se.nutchController.NutchController;
 import de.ingrid.iplug.se.nutchController.NutchProcess;
 import de.ingrid.iplug.se.nutchController.StatusProvider;
 import de.ingrid.iplug.se.nutchController.StatusProvider.State;
+import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
 
 @RestController
@@ -39,20 +43,9 @@ public class RestDataController extends InstanceController {
 
     @RequestMapping(value = { "url/{id}" }, method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<Url> getUrl(@PathVariable("id") Long id) {
-//    @RequestMapping(value = { "url.json" }, method = RequestMethod.GET, produces = "application/json")
-//    public Url getUrl(@RequestParam("id") String id) {
         EntityManager em = DBManager.INSTANCE.getEntityManager();
-        
         Url url = em.find( Url.class, id );
-        
-//        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-//
-//        // select patients for the current page
-//        CriteriaQuery<Url> urlQuery = criteriaBuilder.createQuery(Url.class);
-//        Root<Url> urlTpl = urlQuery.from(Url.class);
-//        TypedQuery<Url> urlPagingQuery = em.createQuery(urlQuery);
-//        Url url = urlPagingQuery.getSingleResult();
-        //return url;
+
         return new ResponseEntity<Url>( url, url != null ? HttpStatus.OK : HttpStatus.NOT_FOUND );
     }
 
@@ -102,7 +95,6 @@ public class RestDataController extends InstanceController {
         Instance instance = getInstanceData( name );
         NutchProcess nutchProcess = nutchController.getNutchProcess( instance  );
         
-        
         if ( nutchProcess == null ||
             (nutchProcess != null && nutchProcess.getState() == Thread.State.TERMINATED)) {
             StatusProvider statusProvider = new StatusProvider( instance.getWorkingDirectory() );
@@ -111,6 +103,15 @@ public class RestDataController extends InstanceController {
         }
         
         return new ResponseEntity<Collection<State>>( nutchProcess.getStatusProvider().getStates(), HttpStatus.OK );
+    }
+    
+    @RequestMapping(value = { "status/{instance}/statistic" }, method = RequestMethod.GET)
+    public ResponseEntity<String> getStatistic(@PathVariable("instance") String name) throws IOException {
+        
+        Path path = Paths.get( SEIPlug.conf.getInstancesDir(), name, "statistic", "host", "crawldb" );
+        String content = FileUtils.readFile( path );
+        
+        return new ResponseEntity<String>( content, HttpStatus.OK );
     }
     
     

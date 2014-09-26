@@ -204,7 +204,7 @@ public class HostStatistic extends Configured implements Tool {
             while (reader.next(key, value)) {
 
                 JSONObject jsn = new JSONObject();
-                jsn.put("host", value);
+                jsn.put("host", new String( value.toString() ));
                 jsn.put("fetched", key.getFetchSuccessCount());
                 jsn.put("known", key.getOverallCount());
                 array.put( jsn );

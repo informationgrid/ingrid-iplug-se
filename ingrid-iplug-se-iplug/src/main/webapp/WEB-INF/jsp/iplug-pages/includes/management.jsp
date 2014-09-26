@@ -24,4 +24,6 @@
     <div id="crawlStop">
         <button name="stop">Crawl beenden</button>
     </div>
+    
+    <canvas id="myChart" width="400" height="400"></canvas>
 </form:form>
