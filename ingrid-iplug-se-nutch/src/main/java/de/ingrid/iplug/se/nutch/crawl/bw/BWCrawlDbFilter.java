@@ -54,6 +54,7 @@ import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
 
 import de.ingrid.iplug.se.nutch.net.InGridURLNormalizers;
+import de.ingrid.iplug.se.nutch.tools.IngridElasticSearchClient;
 
 /**
  * CrawlDb filter tool that filters urls that pass a white-black list
@@ -65,6 +66,8 @@ public class BWCrawlDbFilter extends Configured implements Tool {
     public static final Log LOG = LogFactory.getLog(BWCrawlDbFilter.class);
 
     public static final String CURRENT_NAME = "current";
+
+    public IngridElasticSearchClient esClient = null;
 
     public static class ObjectWritableMapper implements Mapper<HostTypeKey, Writable, HostTypeKey, ObjectWritable> {
 
@@ -197,6 +200,8 @@ public class BWCrawlDbFilter extends Configured implements Tool {
 
         private BWPatterns _patterns;
 
+        private IngridElasticSearchClient esClient = null;
+
         public void reduce(HostTypeKey key, Iterator<ObjectWritable> values, OutputCollector<HostTypeKey, ObjectWritable> out, Reporter report) throws IOException {
 
             while (values.hasNext()) {
@@ -219,6 +224,17 @@ public class BWCrawlDbFilter extends Configured implements Tool {
 
                     // TODO add to be deleted by elastic search, check for
                     // indexed state, flush immediately
+                    if (esClient != null) {
+                        CrawlDatum datum = ((Entry) value)._crawlDatum;
+                        if (datum.getStatus() != CrawlDatum.STATUS_DB_UNFETCHED) {
+                            String url = (((Entry) value)._url).toString();
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("Create delete request for elastic search: " + url);
+                            }
+                            esClient.addRequest(esClient.prepareDeleteRequest(url), url.length());
+                        }
+                    }
+
                     return;
                 }
 
@@ -234,16 +250,34 @@ public class BWCrawlDbFilter extends Configured implements Tool {
                         LOG.info("Crawldatum does not pass BW patterns, remove it: " + (((Entry) value)._url).toString() + " for HostTypeKey: " + key.toString());
                     }
 
-                    // TODO add to be deleted by elastic search, check for
-                    // indexed state, bulk possible per pattern
+                    // deleted by elastic search
+                    if (esClient != null) {
+                        CrawlDatum datum = ((Entry) value)._crawlDatum;
+                        if (datum.getStatus() != CrawlDatum.STATUS_DB_UNFETCHED) {
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("Create delete request for elastic search: " + url);
+                            }
+                            esClient.addRequest(esClient.prepareDeleteRequest(url), url.length());
+                        }
+                    }
                 }
             }
         }
 
-        public void configure(JobConf arg0) {
+        public void configure(JobConf job) {
+            if (esClient == null) {
+                try {
+                    esClient = new IngridElasticSearchClient(job);
+                } catch (IOException e) {
+                    LOG.error("Unable to create elasticsearch client.");
+                }
+            }
         }
 
         public void close() throws IOException {
+            if (esClient != null) {
+                esClient.close();
+            }
         }
 
     }
@@ -331,15 +365,15 @@ public class BWCrawlDbFilter extends Configured implements Tool {
         filterJob.setJobName("filtering: " + wrappedSegOutput + bwdb);
         filterJob.setInputFormat(SequenceFileInputFormat.class);
 
-        FileInputFormat.addInputPath(filterJob, wrappedSegOutput);
-        FileInputFormat.addInputPath(filterJob, new Path(bwdb, "current"));
-        FileOutputFormat.setOutputPath(filterJob, tmpMergedDb);
-        filterJob.setMapperClass(ObjectWritableMapper.class);
-        filterJob.setReducerClass(BwReducer.class);
-        filterJob.setOutputFormat(MapFileOutputFormat.class);
-        filterJob.setOutputKeyClass(HostTypeKey.class);
-        filterJob.setOutputValueClass(ObjectWritable.class);
-        JobClient.runJob(filterJob);
+            FileInputFormat.addInputPath(filterJob, wrappedSegOutput);
+            FileInputFormat.addInputPath(filterJob, new Path(bwdb, "current"));
+            FileOutputFormat.setOutputPath(filterJob, tmpMergedDb);
+            filterJob.setMapperClass(ObjectWritableMapper.class);
+            filterJob.setReducerClass(BwReducer.class);
+            filterJob.setOutputFormat(MapFileOutputFormat.class);
+            filterJob.setOutputKeyClass(HostTypeKey.class);
+            filterJob.setOutputValueClass(ObjectWritable.class);
+            JobClient.runJob(filterJob);
 
         // remove wrappedSegOutput
         FileSystem.get(job).delete(wrappedSegOutput, true);
