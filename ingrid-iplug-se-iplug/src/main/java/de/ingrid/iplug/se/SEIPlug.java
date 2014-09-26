@@ -170,7 +170,7 @@ public class SEIPlug extends HeartBeatPlug {
         em.getTransaction().begin();
         Url url = new Url( "catalog" );
         url.setStatus( 200 );
-        url.setUrl( "http://www.wemove.com" );
+        url.setUrl( "http://www.wemove.com/" );
         List<Metadata> metadata = new ArrayList<Metadata>();
         Metadata m1 = new Metadata();
         m1.setMetaKey( "lang" );
@@ -194,8 +194,7 @@ public class SEIPlug extends HeartBeatPlug {
         metadata.add( m5 );
         url.setMetadata( metadata );
         List<String> limitUrls = new ArrayList<String>();
-        limitUrls.add( "http://www.wemove.com/about" );
-        limitUrls.add( "http://www.wemove.com/jobs" );
+        limitUrls.add( "http://www.wemove.com/" );
         url.setLimitUrls( limitUrls );
         List<String> excludeUrls = new ArrayList<String>();
         excludeUrls.add( "http://www.wemove.com/about" );
@@ -203,9 +202,13 @@ public class SEIPlug extends HeartBeatPlug {
         
         em.persist(url);
         
-        String[] urls = new String[] { "http://www.xyz.com", "http://www.spiegel.de", "http://www.heise.de", "http://www.apple.com", 
-                "http://www.engadget.com", "http://www.tagesschau.de", "http://www.home.com", "http://www.ultra.com",
-                "http://www.libri.com", "http://www.audible.de", "http://www.amazon.com", "http://www.power.com" };
+        String[] urls = new String[] { "http://www.spiegel.de", "http://www.heise.de", "http://www.apple.com", 
+                "http://www.engadget.com", "http://www.tagesschau.de", "http://www.home-mag.com/", "http://www.ultramusicfestival.com/",
+                "http://www.ebook.de/de/", "http://www.audible.de", "http://www.amazon.com", "http://www.powerint.com/", "http://www.tanzkongress.de/",
+                "http://www.thesourcecode.de/", "http://werk-x.at/", "http://keinundapel.com/", "http://www.ta-trung.com/", "http://www.attac.de/", 
+                "http://www.altana-kulturstiftung.de/", "http://www.lemagazinedouble.com/", "http://www.montessori-muehlheim.de/", 
+                "http://missy-magazine.de/", "http://www.eh-darmstadt.de/", "http://herbert.de/", "http://www.mousonturm.de/", "http://www.zeit.de/",
+                "https://read2burn.com/"};
         
         for (String uri : urls) {
             url = new Url( "catalog" );
