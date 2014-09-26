@@ -201,7 +201,10 @@ public class IndexImpl implements Index {
                 .execute()
                 .actionGet();
 */
-        String title = (String) dHit.field( IndexFields.TITLE ).getValue();
+        String title = "untitled";
+        if (dHit.field( IndexFields.TITLE ) != null) {
+            title = (String) dHit.field( IndexFields.TITLE ).getValue();
+        }
         String summary = "";
         if (dHit.getHighlightFields().containsKey("content")) {
             summary = StringUtils.join(dHit.getHighlightFields().get( "content" ).fragments(), " ... ");
