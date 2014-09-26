@@ -436,12 +436,15 @@ public class IndexerCmdLineTests {
         baseCall.add("-Xmx512m");
         baseCall.add("-Dhadoop.log.dir=logs");
         baseCall.add("-Dhadoop.log.file=hadoop.log");
+        baseCall.add("-Dfile.encoding=UTF-8");
 
         return baseCall;
 
     }
 
     void delete(File f) throws IOException {
+        if (!f.exists()) return;
+        
         if (f.isDirectory()) {
             for (File c : f.listFiles())
                 delete(c);

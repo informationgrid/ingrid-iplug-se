@@ -44,6 +44,7 @@ import org.apache.hadoop.util.ToolRunner;
 import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.crawl.CrawlDb;
 import org.apache.nutch.util.NutchConfiguration;
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -199,14 +200,16 @@ public class HostStatistic extends Configured implements Tool {
             }
             OutputStream os = fs.create(file);
             br = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            JSONArray array = new JSONArray();
             while (reader.next(key, value)) {
 
                 JSONObject jsn = new JSONObject();
                 jsn.put("host", value);
                 jsn.put("fetched", key.getFetchSuccessCount());
                 jsn.put("known", key.getOverallCount());
-                br.write(jsn.toString() + "\n");
+                array.put( jsn );
             }
+            br.write(array.toString());
         } catch (JSONException e) {
             LOG.error("Error creating JSON from statistics", e);
             e.printStackTrace();
