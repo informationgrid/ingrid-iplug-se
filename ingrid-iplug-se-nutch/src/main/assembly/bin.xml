@@ -10,7 +10,7 @@
       <directory>build/${apache-nutch-version}</directory>
       <outputDirectory>/apache-nutch-runtime/</outputDirectory>
       <includes>
-        <include>runtime/**</include>
+        <include>runtime/local/**</include>
         <include>LICENSE.txt</include>
         <include>CHANGES.txt</include>
       </includes>
