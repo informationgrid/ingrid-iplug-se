@@ -1254,13 +1254,25 @@ public class Fetcher extends Configured implements Tool,
 
       pagesLastSec = pages.get() - pagesLastSec;
       bytesLastSec = (int)bytes.get() - bytesLastSec;
-
+      
       reporter.incrCounter("FetcherStatus", "bytes_downloaded", bytesLastSec);
 
       reportStatus(pagesLastSec, bytesLastSec);
+      
+      StringBuilder status = new StringBuilder();
+      Long elapsed = new Long((System.currentTimeMillis() - start)/1000);
+      float avgPagesSec =  (float) pages.get() / elapsed.floatValue();
+      long avgBytesSec =  (bytes.get() /125l) / elapsed.longValue();
+      status.append(activeThreads).append(" threads (").append(spinWaiting.get()).append(" waiting), ");
+      status.append(fetchQueues.getQueueCount()).append(" queues, ");
+      status.append(fetchQueues.getTotalSize()).append(" URLs queued, ");
+      status.append(pages).append(" pages, ").append(errors).append(" errors, ");
+      status.append(String.format("%.2f", avgPagesSec)).append(" pages/s (");
+      status.append(pagesLastSec).append(" last sec), ");
+      status.append(avgBytesSec).append(" kbits/s (").append((bytesLastSec / 125)).append(" last sec)");
 
-      LOG.info("-activeThreads=" + activeThreads + ", spinWaiting=" + spinWaiting.get()
-          + ", fetchQueues.totalSize=" + fetchQueues.getTotalSize()+ ", fetchQueues.getQueueCount="+fetchQueues.getQueueCount());
+
+      LOG.info(status.toString());
 
       if (!feeder.isAlive() && fetchQueues.getTotalSize() < 5) {
         fetchQueues.dump();
@@ -1269,7 +1281,7 @@ public class Fetcher extends Configured implements Tool,
       // if throughput threshold is enabled
       if (throughputThresholdTimeLimit < System.currentTimeMillis() && throughputThresholdPages != -1) {
         // Check if we're dropping below the threshold, only if the FetchQueue still filled
-        if (pagesLastSec < throughputThresholdPages && fetchQueues.getTotalSize() > 0) {
+        if (avgPagesSec < throughputThresholdPages && fetchQueues.getTotalSize() > 0) {
           throughputThresholdNumRetries++;
           LOG.warn(Integer.toString(throughputThresholdNumRetries) + ": dropping below configured threshold of " + Integer.toString(throughputThresholdPages) + " pages per second");
 
