@@ -7,6 +7,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -21,7 +22,6 @@ import org.apache.nutch.indexer.IndexingJob;
 import org.apache.nutch.scoring.webgraph.LinkRank;
 import org.apache.nutch.scoring.webgraph.ScoreUpdater;
 import org.apache.nutch.scoring.webgraph.WebGraph;
-import org.apache.nutch.segment.SegmentMerger;
 import org.apache.nutch.util.NutchConfiguration;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
@@ -39,6 +39,7 @@ import de.ingrid.iplug.se.nutch.crawl.bw.BWWebgraphFilter;
 import de.ingrid.iplug.se.nutch.crawl.metadata.MetadataInjector;
 import de.ingrid.iplug.se.nutch.crawl.metadata.ParseDataUpdater;
 import de.ingrid.iplug.se.nutch.segment.SegmentFilter;
+import de.ingrid.iplug.se.nutch.segment.SegmentMerger;
 import de.ingrid.iplug.se.nutch.statistics.HostStatistic;
 
 /**
@@ -86,13 +87,13 @@ public class IndexerTests {
     }
 
     @Test
-    public void test05Generate() throws Exception {
+    public void test05_1Generate() throws Exception {
 
         ToolRunner.run(NutchConfiguration.create(), new Generator(), new String[] { "test/crawldb", "test/segments" });
     }
 
     @Test
-    public void test06Fetch() throws Exception {
+    public void test05_2Fetch() throws Exception {
 
         // get all segments
         File file = new File("test/segments");
@@ -102,12 +103,71 @@ public class IndexerTests {
                 return new File(current, name).isDirectory();
             }
         });
+        
+        Arrays.sort(directories);
 
         ToolRunner.run(NutchConfiguration.create(), new Fetcher(), new String[] { "test/segments/" + directories[directories.length - 1] });
     }
 
     @Test
-    public void test08UpdateCrawlDb() throws Exception {
+    public void test05_3UpdateCrawlDb() throws Exception {
+
+        // get all segments
+        File file = new File("test/segments");
+        String[] directories = file.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File current, String name) {
+                return new File(current, name).isDirectory();
+            }
+        });
+        
+        Arrays.sort(directories);
+
+        ToolRunner.run(NutchConfiguration.create(), new BWUpdateDb(), new String[] { "test/crawldb", "test/bwdb", "test/segments/" + directories[directories.length - 1], "true", "true" });
+    }
+
+    @Test
+    public void test05_4ParseDataUpdater() throws Exception {
+
+        // get all segments
+        File file = new File("test/segments");
+        String[] directories = file.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File current, String name) {
+                return new File(current, name).isDirectory();
+            }
+        });
+        
+        Arrays.sort(directories);
+
+        ToolRunner.run(NutchConfiguration.create(), new ParseDataUpdater(), new String[] { "test/metadatadb", "test/segments/" + directories[directories.length - 1] });
+    }
+
+    @Test
+    public void test06_01Generate() throws Exception {
+
+        ToolRunner.run(NutchConfiguration.create(), new Generator(), new String[] { "test/crawldb", "test/segments" });
+    }
+
+    @Test
+    public void test06_02Fetch() throws Exception {
+
+        // get all segments
+        File file = new File("test/segments");
+        String[] directories = file.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File current, String name) {
+                return new File(current, name).isDirectory();
+            }
+        });
+        
+        Arrays.sort(directories);
+
+        ToolRunner.run(NutchConfiguration.create(), new Fetcher(), new String[] { "test/segments/" + directories[directories.length - 1] });
+    }
+
+    @Test
+    public void test06_03UpdateCrawlDb() throws Exception {
 
         // get all segments
         File file = new File("test/segments");
@@ -122,7 +182,7 @@ public class IndexerTests {
     }
 
     @Test
-    public void test09ParseDataUpdater() throws Exception {
+    public void test06_04ParseDataUpdater() throws Exception {
 
         // get all segments
         File file = new File("test/segments");
@@ -134,8 +194,9 @@ public class IndexerTests {
         });
 
         ToolRunner.run(NutchConfiguration.create(), new ParseDataUpdater(), new String[] { "test/metadatadb", "test/segments/" + directories[directories.length - 1] });
-    }
-
+    }    
+    
+    
     @Test
     public void test09_1HostStatistics() throws Exception {
 
@@ -189,7 +250,7 @@ public class IndexerTests {
     @Test
     public void test15SegmentFilter() throws Exception {
 
-        ToolRunner.run(NutchConfiguration.create(), new SegmentFilter(), new String[] { "test/filtered_segment", "test/crawldb", "-dir", "test/segment" });
+        ToolRunner.run(NutchConfiguration.create(), new SegmentFilter(), new String[] { "test/filtered_segment", "test/crawldb", "-dir", "test/segments" });
         FileSystem fs = FileSystems.getDefault();
         if (fs.getPath("test/filtered_segment").toFile().exists()) {
             delete(fs.getPath("test/segments").toFile());

@@ -5,317 +5,325 @@
 
 <configuration>
 
-    <property>
-        <name>file.content.limit</name>
-        <value>3145728</value>
-        <description>The length limit for downloaded content, in bytes.
-            If this value is nonnegative (>=0), content longer than it will be
-            truncated;
-            otherwise, no truncation at all.
-        </description>
-    </property>
+	<property>
+		<name>file.content.limit</name>
+		<value>3145728</value>
+		<description>The length limit for downloaded content, in bytes.
+			If this value is nonnegative (>=0), content longer than it will be
+			truncated;
+			otherwise, no truncation at all.
+		</description>
+	</property>
 
-    <property>
-        <name>http.content.limit</name>
-        <value>3145728</value>
-        <description>The length limit for downloaded content, in bytes.
-            If this value is nonnegative (>=0), content longer than it will be
-            truncated;
-            otherwise, no truncation at all.
-        </description>
-    </property>
+	<property>
+		<name>http.content.limit</name>
+		<value>3145728</value>
+		<description>The length limit for downloaded content, in bytes.
+			If this value is nonnegative (>=0), content longer than it will be
+			truncated;
+			otherwise, no truncation at all.
+		</description>
+	</property>
 
-    <property>
-        <name>plugin.includes</name>
-        <value>protocol-httpclient|urlfilter-regex|parse-(html|tika)|index-(basic|anchor|metadata|more)|ingrid-indexer-elastic|scoring-ingrid|ingrid-language-identifier|urlnormalizer-(pass|regex|basic)|analysis-de</value>
-        <description>Regular expression naming plugin directory names to
-            include. Any plugin not matching this expression is excluded.
-            In any case you need at least include the nutch-extensionpoints plugin.
-            By
-            default Nutch includes crawling just HTML and plain text via HTTP,
-            and basic indexing and search plugins. In order to use HTTPS please
-            enable
-            protocol-httpclient, but be aware of possible intermittent problems with the
-            underlying commons-httpclient library.
-        </description>
-    </property>
-    
- <!--   
-    <property>
-  <name>plugin.includes</name>
-  <value>protocol-http|urlfilter-regex|parse-(html|tika)|index-(basic|anchor|metadata)|indexer-elastic|scoring-opic|urlnormalizer-(pass|regex|basic)</value>
-  <description>Regular expression naming plugin directory names to
-  include.  Any plugin not matching this expression is excluded.
-  In any case you need at least include the nutch-extensionpoints plugin. By
-  default Nutch includes crawling just HTML and plain text via HTTP,
-  and basic indexing and search plugins. In order to use HTTPS please enable 
-  protocol-httpclient, but be aware of possible intermittent problems with the 
-  underlying commons-httpclient library.
-  </description>
-</property>
+	<property>
+		<name>plugin.includes</name>
+		<value>protocol-httpclient|urlfilter-regex|parse-(html|tika)|index-(basic|anchor|metadata|more)|ingrid-indexer-elastic|scoring-ingrid|ingrid-language-identifier|urlnormalizer-(pass|regex|basic)|analysis-de
+		</value>
+		<description>Regular expression naming plugin directory names to
+			include. Any plugin not matching this expression is excluded.
+			In any case you need at least include the nutch-extensionpoints plugin.
+			By
+			default Nutch includes crawling just HTML and plain text via HTTP,
+			and basic indexing and search plugins. In order to use HTTPS please
+			enable
+			protocol-httpclient, but be aware of possible intermittent problems with the
+			underlying commons-httpclient library.
+		</description>
+	</property>
 
-     -->
+	<!-- <property> <name>plugin.includes</name> <value>protocol-http|urlfilter-regex|parse-(html|tika)|index-(basic|anchor|metadata)|indexer-elastic|scoring-opic|urlnormalizer-(pass|regex|basic)</value> 
+		<description>Regular expression naming plugin directory names to include. 
+		Any plugin not matching this expression is excluded. In any case you need 
+		at least include the nutch-extensionpoints plugin. By default Nutch includes 
+		crawling just HTML and plain text via HTTP, and basic indexing and search 
+		plugins. In order to use HTTPS please enable protocol-httpclient, but be 
+		aware of possible intermittent problems with the underlying commons-httpclient 
+		library. </description> </property> -->
 
-    <property>
-        <name>http.agent.name</name>
-        <value>Mozilla</value>
-        <description>HTTP 'User-Agent' request header. MUST NOT be empty -
-            please set this to a single word uniquely related to your
-            organization.
+	<property>
+		<name>http.agent.name</name>
+		<value>Mozilla</value>
+		<description>HTTP 'User-Agent' request header. MUST NOT be empty -
+			please set this to a single word uniquely related to your
+			organization.
 
-            NOTE: You should also check other related properties:
+			NOTE: You should also check other related properties:
 
-            http.robots.agents
-            http.agent.description
-            http.agent.url
-            http.agent.email
-            http.agent.version
+			http.robots.agents
+			http.agent.description
+			http.agent.url
+			http.agent.email
+			http.agent.version
 
-            and set their values appropriately.
+			and set their values appropriately.
 
-        </description>
-    </property>
+		</description>
+	</property>
 
-    <property>
-        <name>http.robots.agents</name>
-        <value>ingrid,*</value>
-        <description>The agent strings we'll look for in robots.txt files,
-            comma-separated, in decreasing order of precedence. You should
-            put the value of http.agent.name as the first agent name, and keep the
-            default * at the end of the list. E.g.: BlurflDev,Blurfl,*
-        </description>
-    </property>
+	<property>
+		<name>http.robots.agents</name>
+		<value>ingrid,*</value>
+		<description>The agent strings we'll look for in robots.txt files,
+			comma-separated, in decreasing order of precedence. You should
+			put the value of http.agent.name as the first agent name, and keep the
+			default * at the end of the list. E.g.: BlurflDev,Blurfl,*
+		</description>
+	</property>
 
-    <property>
-        <name>http.agent.description</name>
-        <value>compatible; ingrid</value>
-        <description>Further description of our bot- this text is used in
-            the User-Agent header. It appears in parenthesis after the agent name.
-        </description>
-    </property>
+	<property>
+		<name>http.agent.description</name>
+		<value>compatible; ingrid</value>
+		<description>Further description of our bot- this text is used in
+			the User-Agent header. It appears in parenthesis after the agent name.
+		</description>
+	</property>
 
-    <property>
-        <name>http.agent.url</name>
-        <value>+http://www.portalu.de</value>
-        <description>A URL to advertise in the User-Agent header. This will
-            appear in parenthesis after the agent name. Custom dictates that this
-            should be a URL of a page explaining the purpose and behavior of this
-            crawler.
-        </description>
-    </property>
+	<property>
+		<name>http.agent.url</name>
+		<value>+http://www.portalu.de</value>
+		<description>A URL to advertise in the User-Agent header. This will
+			appear in parenthesis after the agent name. Custom dictates that this
+			should be a URL of a page explaining the purpose and behavior of this
+			crawler.
+		</description>
+	</property>
 
-    <property>
-        <name>http.agent.email</name>
-        <value>crawler@portalu.de</value>
-        <description>An email address to advertise in the HTTP 'From' request
-            header and User-Agent header. A good practice is to mangle this
-            address (e.g. 'info at example dot com') to avoid spamming.
-        </description>
-    </property>
+	<property>
+		<name>http.agent.email</name>
+		<value>crawler@portalu.de</value>
+		<description>An email address to advertise in the HTTP 'From' request
+			header and User-Agent header. A good practice is to mangle this
+			address (e.g. 'info at example dot com') to avoid spamming.
+		</description>
+	</property>
 
-    <property>
-        <name>http.agent.version</name>
-        <value>5.0</value>
-        <description>A version string to advertise in the User-Agent
-            header.
-        </description>
-    </property>
+	<property>
+		<name>http.agent.version</name>
+		<value>5.0</value>
+		<description>A version string to advertise in the User-Agent
+			header.
+		</description>
+	</property>
 
-    <property>
-        <name>db.fetch.schedule.class</name>
-        <value>org.apache.nutch.crawl.AdaptiveFetchSchedule</value>
-        <description>The implementation of fetch schedule.
-            org.apache.nutch.crawl.DefaultFetchSchedule simply
-            adds the original fetchInterval to the last fetch time, regardless of
-            page changes. org.apache.nutch.crawl.AdaptiveFetchSchedule calculates
-            the fetchInterval depending on the signature of a page.
-        </description>
-    </property>
-    <property>
-        <name>db.max.outlinks.per.page</name>
-        <value>200</value>
-        <description>The maximum number of outlinks that we'll process for a
-            page.
-            If this value is nonnegative (>=0), at most db.max.outlinks.per.page
-            outlinks
-            will be processed for a page; otherwise, all outlinks will be processed.
-        </description>
-    </property>
+	<property>
+		<name>db.fetch.schedule.class</name>
+		<value>org.apache.nutch.crawl.AdaptiveFetchSchedule</value>
+		<description>The implementation of fetch schedule.
+			org.apache.nutch.crawl.DefaultFetchSchedule simply
+			adds the original fetchInterval to the last fetch time, regardless of
+			page changes. org.apache.nutch.crawl.AdaptiveFetchSchedule calculates
+			the fetchInterval depending on the signature of a page.
+		</description>
+	</property>
+	<property>
+		<name>db.max.outlinks.per.page</name>
+		<value>200</value>
+		<description>The maximum number of outlinks that we'll process for a
+			page.
+			If this value is nonnegative (>=0), at most db.max.outlinks.per.page
+			outlinks
+			will be processed for a page; otherwise, all outlinks will be processed.
+		</description>
+	</property>
 
-    <property>
-        <name>generate.max.per.host</name>
-        <value>20000</value>
-        <description>The maximum number of urls per host in a single
-            fetchlist. -1 if unlimited.
-        </description>
-    </property>
+	<property>
+		<name>generate.max.per.host</name>
+		<value>20000</value>
+		<description>The maximum number of urls per host in a single
+			fetchlist. -1 if unlimited.
+		</description>
+	</property>
 
-    <property>
-        <name>fetcher.threads.per.host.by.ip</name>
-        <value>false</value>
-        <description>If true, then fetcher will count threads by IP address,
-            to which the URL's host name resolves. If false, only host name will
-            be
-            used. NOTE: this should be set to the same value as
-            "generate.max.per.host.by.ip" - default settings are different only
-            for
-            reasons of backward-compatibility.
-        </description>
-    </property>
+	<property>
+		<name>fetcher.threads.per.host.by.ip</name>
+		<value>false</value>
+		<description>If true, then fetcher will count threads by IP address,
+			to which the URL's host name resolves. If false, only host name will
+			be
+			used. NOTE: this should be set to the same value as
+			"generate.max.per.host.by.ip" - default settings are different only
+			for
+			reasons of backward-compatibility.
+		</description>
+	</property>
 
 
-    <property>
-        <name>fetcher.server.min.delay</name>
-        <value>3.0</value>
-        <description>The minimum number of seconds the fetcher will delay
-            between
-            successive requests to the same server. This value is applicable ONLY
-            if fetcher.threads.per.host is greater than 1 (i.e. the host blocking
-            is turned off).
-        </description>
-    </property>
+	<property>
+		<name>fetcher.server.min.delay</name>
+		<value>3.0</value>
+		<description>The minimum number of seconds the fetcher will delay
+			between
+			successive requests to the same server. This value is applicable ONLY
+			if fetcher.threads.per.host is greater than 1 (i.e. the host blocking
+			is turned off).
+		</description>
+	</property>
 
-    <property>
-        <name>fetcher.threads.per.host</name>
-        <value>3</value>
-        <description>This number is the maximum number of threads that
-            should be allowed to access a host at one time.
-        </description>
-    </property>
+	<property>
+		<name>fetcher.threads.per.host</name>
+		<value>3</value>
+		<description>This number is the maximum number of threads that
+			should be allowed to access a host at one time.
+		</description>
+	</property>
 
-    <property>
-        <name>crawl.generate.filter</name>
-        <value>false</value>
-        <description>If set true (default) all URLs generated into a fetch
-            list of a segment will be filtered by the filters defined in
-            'urlfilter.regex.file'.</description>
-    </property>
+	<property>
+		<name>crawl.generate.filter</name>
+		<value>false</value>
+		<description>If set true (default) all URLs generated into a fetch
+			list of a segment will be filtered by the filters defined in
+			'urlfilter.regex.file'.
+		</description>
+	</property>
 
-    <property>
-        <name>db.max.inlinks</name>
-        <value>5000</value>
-        <description>Describes how many inlinks to an URL are used. The higher
-            the value you have to be aware of a higher memory usage.
-        </description>
-    </property>
+	<property>
+		<name>db.max.inlinks</name>
+		<value>5000</value>
+		<description>Describes how many inlinks to an URL are used. The higher
+			the value you have to be aware of a higher memory usage.
+		</description>
+	</property>
 
-    <property>
-        <name>db.fetch.interval.default</name>
-        <value>86400</value>
-        <description>The default number of seconds between re-fetches of a
-            page (432000 is 5 days). (ingrid specific: Set the to 86400 (1 day)
-            to
-            work best in conjunction with the adaptive fetch schedule. Thus we can
-            detect fast changing websites earlier as if we set
-            the fetch schedule to a larger value.
-        </description>
-    </property>
+	<property>
+		<name>db.fetch.interval.default</name>
+		<value>86400</value>
+		<description>The default number of seconds between re-fetches of a
+			page (432000 is 5 days). (ingrid specific: Set the to 86400 (1 day)
+			to
+			work best in conjunction with the adaptive fetch schedule. Thus we can
+			detect fast changing websites earlier as if we set
+			the fetch schedule to a larger value.
+		</description>
+	</property>
 
-    <property>
-        <name>db.fetch.schedule.adaptive.sync_delta</name>
-        <value>false</value>
-        <description>If true, try to synchronize with the time of page change.
-            by shifting the next fetchTime by a fraction (sync_rate) of the
-            difference
-            between the last modification time, and the last fetch time.
-        </description>
-    </property>
+	<property>
+		<name>db.fetch.schedule.adaptive.sync_delta</name>
+		<value>false</value>
+		<description>If true, try to synchronize with the time of page change.
+			by shifting the next fetchTime by a fraction (sync_rate) of the
+			difference
+			between the last modification time, and the last fetch time.
+		</description>
+	</property>
 
-    <property>
-        <name>webGraphDb</name>
-        <value>./webGraphDb</value>
-        <description>The location where the webgraph will be created, when
-            calling from command line.
-            During the normal crawl process, the webgaph will be stored inside the
-            instance folder.
-        </description>
-    </property>
+	<property>
+		<name>webGraphDb</name>
+		<value>./webGraphDb</value>
+		<description>The location where the webgraph will be created, when
+			calling from command line.
+			During the normal crawl process, the webgaph will be stored inside the
+			instance folder.
+		</description>
+	</property>
 
-    <!-- linkrank scoring properties -->
-    <property>
-        <name>link.ignore.internal.host</name>
-        <value>true</value>
-        <description>Ignore outlinks to the same hostname.</description>
-    </property>
+	<!-- linkrank scoring properties -->
+	<property>
+		<name>link.ignore.internal.host</name>
+		<value>true</value>
+		<description>Ignore outlinks to the same hostname.</description>
+	</property>
 
-    <property>
-        <name>link.ignore.internal.domain</name>
-        <value>true</value>
-        <description>Ignore outlinks to the same domain.</description>
-    </property>
+	<property>
+		<name>link.ignore.internal.domain</name>
+		<value>true</value>
+		<description>Ignore outlinks to the same domain.</description>
+	</property>
 
-    <property>
-        <name>link.ignore.limit.page</name>
-        <value>true</value>
-        <description>Limit to only a single outlink to the same page.
-        </description>
-    </property>
+	<property>
+		<name>link.ignore.limit.page</name>
+		<value>true</value>
+		<description>Limit to only a single outlink to the same page.
+		</description>
+	</property>
 
-    <property>
-        <name>link.ignore.limit.domain</name>
-        <value>true</value>
-        <description>Limit to only a single outlink to the same domain.
-        </description>
-    </property>
+	<property>
+		<name>link.ignore.limit.domain</name>
+		<value>true</value>
+		<description>Limit to only a single outlink to the same domain.
+		</description>
+	</property>
 
-    <property>
-        <name>http.accept.language</name>
-        <value>de-de,de;q=0.8,en-us;q=0.5,en-gb;q=0.5,en;q=0.3,*;q=0.1</value>
-        <description>HTTP 'Accept-Language' request header.
-            List of acceptable languages for response.
-        </description>
-    </property>
+	<property>
+		<name>http.accept.language</name>
+		<value>de-de,de;q=0.8,en-us;q=0.5,en-gb;q=0.5,en;q=0.3,*;q=0.1</value>
+		<description>HTTP 'Accept-Language' request header.
+			List of acceptable languages for response.
+		</description>
+	</property>
 
-    <property>
-        <name>fs.file.impl</name>
-        <value>de.ingrid.iplug.se.hadoop.WinLocalFileSystem</value>
-        <description>Enables patch for issue HADOOP-7682 on Windows
-        </description>
-    </property>
+	<property>
+		<name>fs.file.impl</name>
+		<value>de.ingrid.iplug.se.hadoop.WinLocalFileSystem</value>
+		<description>Enables patch for issue HADOOP-7682 on Windows
+		</description>
+	</property>
 
 
-    <property>
-        <name>elastic.host</name>
-        <value>localhost</value>
-    </property>
+	<property>
+		<name>elastic.host</name>
+		<value>localhost</value>
+	</property>
 
-    <property>
-        <name>fetcher.parse</name>
-        <value>true</value>
-    </property>
+	<property>
+		<name>fetcher.parse</name>
+		<value>true</value>
+	</property>
 
-    <property>
-        <name>fetcher.throughput.threshold.pages</name>
-        <value>1</value>
-        <description>The threshold of minimum pages per second. If the fetcher downloads less
-          pages per second than the configured threshold, the fetcher stops, preventing slow queue's
-          from stalling the throughput. This threshold must be an integer. This can be useful when
-          fetcher.timelimit.mins is hard to determine. The default value of -1 disables this check.
-        </description>
-    </property>
+	<property>
+		<name>fetcher.throughput.threshold.pages</name>
+		<value>1</value>
+		<description>The threshold of minimum pages per second. If the fetcher
+			downloads less
+			pages per second than the configured threshold, the fetcher stops,
+			preventing slow queue's
+			from stalling the throughput. This threshold must be an integer. This can
+			be useful when
+			fetcher.timelimit.mins is hard to determine. The default value of -1 disables this check.
+		</description>
+	</property>
 
-    <property>
-        <name>fetcher.throughput.threshold.check.after</name>
-        <value>1</value>
-        <description>The number of minutes after which the throughput check is enabled.</description>
-    </property>
-    
-    <property>
-        <name>ingrid.lang.analyze.override.with.metadata</name>
-        <value>true</value>
-        <description>Override the language extraction result with the value from the metadata. This setting is ingrid specific and presumes that a metadata 'lang' exists for each entry.</description>
-    </property>
-    
-    <property>
-      <name>scoring.depth.max</name>
-      <value>10</value>
-      <description>Max depth value from seed allowed by default.
-      Can be overriden on a per-seed basis by specifying "_maxdepth_=VALUE"
-      as a seed metadata. This plugin adds a "_depth_" metadatum to the pages
-      to track the distance from the seed it was found from. 
-      The depth is used to prioritise URLs in the generation step so that
-      shallower pages are fetched first.
-      </description>
-    </property>
-    
+	<property>
+		<name>fetcher.throughput.threshold.check.after</name>
+		<value>1</value>
+		<description>The number of minutes after which the throughput check is
+			enabled.</description>
+	</property>
+
+	<property>
+		<name>ingrid.lang.analyze.override.with.metadata</name>
+		<value>true</value>
+		<description>Override the language extraction result with the value
+			from the metadata. This setting is ingrid specific and presumes that
+			a metadata 'lang' exists for each entry.</description>
+	</property>
+
+	<property>
+		<name>scoring.depth.max</name>
+		<value>10</value>
+		<description>Max depth value from seed allowed by default.
+			Can be overriden on a per-seed basis by specifying "_maxdepth_=VALUE"
+			as a seed metadata. This plugin adds a "_depth_" metadatum to the pages
+			to track the distance from the seed it was found from.
+			The depth is used to prioritise URLs in the generation step so that
+			shallower pages are fetched first.
+		</description>
+	</property>
+
+	<property>
+		<name>fetcher.store.content</name>
+		<value>false</value>
+		<description>If true, fetcher will store content.</description>
+	</property>
+
+
 </configuration>
