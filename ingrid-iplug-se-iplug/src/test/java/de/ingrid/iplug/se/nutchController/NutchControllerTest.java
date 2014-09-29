@@ -50,7 +50,7 @@ public class NutchControllerTest {
         FileUtils.copyDirectories(Paths.get("../ingrid-iplug-se-nutch/src/test/resources/urls").toAbsolutePath(), urls);
         FileUtils.copyDirectories(Paths.get("conf/default/conf").toAbsolutePath(), conf);
         
-        IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, 1, 100);
+        IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, 2, 100);
 
         NutchController nutchController = new NutchController();
         nutchController.start(instance, process);

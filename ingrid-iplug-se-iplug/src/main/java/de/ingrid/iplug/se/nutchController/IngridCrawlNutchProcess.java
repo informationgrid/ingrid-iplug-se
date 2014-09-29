@@ -8,6 +8,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -116,7 +117,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
                 String currentSegment = fs.getPath(segments, getCurrentSegment(segments)).toString();
 
                 this.statusProvider.addState("FETCH" + i, "Fetching " + "[" + (i + 1) + "/" + depth + "] ...");
-                ret = execute("org.apache.nutch.fetcher.Fetcher", currentSegment);
+                ret = execute("de.ingrid.iplug.se.nutch.fetcher.Fetcher", currentSegment);
                 if (ret != 0) {
                     throwCrawlError("Error during Execution of: org.apache.nutch.fetcher.Fetcher");
                 }
@@ -146,7 +147,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             this.statusProvider.appendToState("CREATE_HOST_STATISTICS", " done.");
 
             this.statusProvider.addState("MERGE_SEGMENT", "Merge segments...");
-            ret = execute("org.apache.nutch.segment.SegmentMerger", mergedSegments, "-dir", segments);
+            ret = execute("de.ingrid.iplug.se.nutch.segment.SegmentMerger", mergedSegments, "-dir", segments);
             if (ret != 0) {
                 throwCrawlError("Error during Execution of: org.apache.nutch.segment.SegmentMerger");
             }
@@ -210,6 +211,10 @@ public class IngridCrawlNutchProcess extends NutchProcess {
                 throwCrawlError("Error during Execution of: org.apache.nutch.indexer.IndexingJob");
             }
             this.statusProvider.appendToState("INDEX", " done.");
+            
+            this.statusProvider.addState("CLEANUP_HADOOP", "Clean up ...");
+            removeRecursive(Paths.get(workingDirectory.getAbsolutePath(), "hadoop-tmp"));
+            this.statusProvider.appendToState("(\"CLEANUP_HADOOP", " done.");
 
             if (status == STATUS.RUNNING) {
                 status = STATUS.FINISHED;

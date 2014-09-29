@@ -239,22 +239,9 @@
     </property>
 
     <property>
-        <name>link.ignore.internal.domain</name>
-        <value>true</value>
-        <description>Ignore outlinks to the same domain.</description>
-    </property>
-
-    <property>
         <name>link.ignore.limit.page</name>
         <value>true</value>
         <description>Limit to only a single outlink to the same page.
-        </description>
-    </property>
-
-    <property>
-        <name>link.ignore.limit.domain</name>
-        <value>true</value>
-        <description>Limit to only a single outlink to the same domain.
         </description>
     </property>
 
@@ -311,5 +298,12 @@
 	  shallower pages are fetched first.
 	  </description>
     </property>
+    
+    <property>
+        <name>fetcher.store.content</name>
+        <value>false</value>
+        <description>If true, fetcher will store content.</description>
+    </property>
+    
     
 </configuration>
