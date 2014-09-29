@@ -477,8 +477,6 @@ public class SegmentFilter extends Configured implements Tool, Mapper<Text, Meta
         job.setOutputValueClass(MetaWrapper.class);
         job.setOutputFormat(SegmentOutputFormat.class);
 
-        setConf(job);
-
         JobClient.runJob(job);
 
         // ensure empty segment parts are copied

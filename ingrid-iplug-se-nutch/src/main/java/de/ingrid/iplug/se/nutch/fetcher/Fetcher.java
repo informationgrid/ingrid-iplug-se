@@ -55,6 +55,12 @@ import org.apache.nutch.util.*;
 import crawlercommons.robots.BaseRobotRules;
 
 /**
+ * Replaces the original {@link org.apache.nutch.fetcher.Fetcher} and changes the following behavior:
+ * 
+ * <li>Do not stop threshold checking after threshold reached once</li>
+ * 
+ * <p>The original documentation:</p>
+ * 
  * A queue-based fetcher.
  *
  * <p>This fetcher uses a well-known model of one producer (a QueueFeeder)
@@ -1262,17 +1268,18 @@ public class Fetcher extends Configured implements Tool,
 
       // if throughput threshold is enabled
       if (throughputThresholdTimeLimit < System.currentTimeMillis() && throughputThresholdPages != -1) {
-        // Check if we're dropping below the threshold
-        if (pagesLastSec < throughputThresholdPages) {
+        // Check if we're dropping below the threshold, only if the FetchQueue still filled
+        if (pagesLastSec < throughputThresholdPages && fetchQueues.getTotalSize() > 0) {
           throughputThresholdNumRetries++;
           LOG.warn(Integer.toString(throughputThresholdNumRetries) + ": dropping below configured threshold of " + Integer.toString(throughputThresholdPages) + " pages per second");
 
           // Quit if we dropped below threshold too many times
-          if (throughputThresholdNumRetries == throughputThresholdMaxRetries) {
+          if (throughputThresholdNumRetries >= throughputThresholdMaxRetries) {
             LOG.warn("Dropped below threshold too many times, killing!");
 
             // Disable the threshold checker
-            throughputThresholdPages = -1;
+            // do not disable the checker, otherwise the queue is filled up again by the input
+            // throughputThresholdPages = -1;
 
             // Empty the queues cleanly and get number of items that were dropped
             int hitByThrougputThreshold = fetchQueues.emptyQueues();

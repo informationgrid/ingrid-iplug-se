@@ -234,22 +234,9 @@
 	</property>
 
 	<property>
-		<name>link.ignore.internal.domain</name>
-		<value>true</value>
-		<description>Ignore outlinks to the same domain.</description>
-	</property>
-
-	<property>
 		<name>link.ignore.limit.page</name>
 		<value>true</value>
 		<description>Limit to only a single outlink to the same page.
-		</description>
-	</property>
-
-	<property>
-		<name>link.ignore.limit.domain</name>
-		<value>true</value>
-		<description>Limit to only a single outlink to the same domain.
 		</description>
 	</property>
 

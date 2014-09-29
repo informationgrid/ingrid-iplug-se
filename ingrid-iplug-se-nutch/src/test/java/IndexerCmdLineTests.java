@@ -117,7 +117,7 @@ public class IndexerCmdLineTests {
         // inject start urls
         List<String> call = new ArrayList<String>();
         call.addAll(setUpBaseCall());
-        call.add("org.apache.nutch.fetcher.Fetcher");
+        call.add("de.ingrid.iplug.se.nutch.fetcher.Fetcher");
         call.add("test/segments/" + directories[directories.length - 1]);
 
         executeCall(call);
@@ -267,7 +267,7 @@ public class IndexerCmdLineTests {
             // inject start urls
             List<String> call = new ArrayList<String>();
             call.addAll(setUpBaseCall());
-            call.add("org.apache.nutch.segment.SegmentMerger");
+            call.add("de.ingrid.iplug.se.nutch.segment.SegmentMerger");
             call.add("test/merged_segment");
             call.add("-dir");
             call.add("test/segments");

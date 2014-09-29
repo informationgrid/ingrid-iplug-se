@@ -5,7 +5,6 @@ http://www.sfk-taa.de/
 http://www.umweltprobenbank.de/de
 http://www.home.eper.de
 http://www.eper.de/
-http://www.kopf-an.de/
 http://www.bmu-kids.de/
 http://www.boklim.de/boklimPublic/index.html
 http://www.umweltbundesamt.de/
@@ -28,7 +27,6 @@ http://www.naturdetektive.de
 http://fuer-mensch-und-umwelt.de/
 http://www.clearingstelle-eeg.de
 http://www.ofd-hannover.de/bgws/
-http://www.genres.de/
 http://www.kst.portalu.de/
 http://www.ssk.de/
 http://elise.bafg.de/
@@ -48,3 +46,8 @@ http://www.berge2002.de/
 http://www.transfer-21.de/
 http://www.co2online.de/
 http://www.energie-verstehen.de/
+http://www.heise.de/
+http://www.spiegel.de/
+http://www.engadget.de/
+http://www.cnet.de/
+
