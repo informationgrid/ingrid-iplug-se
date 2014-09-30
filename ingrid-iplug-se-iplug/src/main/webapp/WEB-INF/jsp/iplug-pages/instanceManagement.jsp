@@ -28,6 +28,7 @@
         $("#crawlInfo").html( "Hole Status ..." );
         checkState();
         $("#crawlStop").hide();
+        $("#allInfo").hide();
         
         $("#formManagement").validate({
             //errorLabelContainer: $("#formManagement div.error"),
@@ -88,7 +89,7 @@
                 $("#crawlStop").show();
                 
                 setLog( data );
-                $("#status").show();
+                $("#allInfo").show();
                 
                 // repeat execution every 5s until finished
                 setTimeout( checkState, 5000 );
@@ -99,7 +100,7 @@
                     $("#crawlInfo").show();
                     $("#crawlStart").show();
                     $("#crawlStop").hide();
-                    //$("#status").hide();
+                    //$("#allInfo").hide();
                     var data = "";
                     if (jqXHR.responseText == "") {
                         $("#crawlInfo").html( "Es läuft zur Zeit kein Crawl." );
@@ -156,7 +157,6 @@
                 if (!data) $("#statisticTable").hide();
                 
                 var json = JSON.parse( data );
-                console.log( json );
                 var overall = json.splice(0, 1);
                 var labels = [], dataKnown = [], dataFetched = [];
                 

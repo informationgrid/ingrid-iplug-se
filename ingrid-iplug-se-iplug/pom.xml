@@ -268,6 +268,32 @@
 				</configuration>
 			</plugin>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>2.5.2</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+				<executions>
+	                <execution>
+	                    <id>installer-install</id>
+	                    <goals>
+	                        <goal>install-file</goal>
+	                    </goals>
+	                    <phase>install</phase>
+						<configuration>
+							<skip>false</skip>
+							<packaging>jar</packaging>
+							<artifactId>${project.parent.artifactId}</artifactId>
+							<classifier>installer</classifier>
+							<groupId>${project.groupId}</groupId>
+							<version>${project.version}</version>
+							<file>${project.build.directory}/${project.build.finalName}-installer.jar</file>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>wagon-maven-plugin</artifactId>
 				<configuration>

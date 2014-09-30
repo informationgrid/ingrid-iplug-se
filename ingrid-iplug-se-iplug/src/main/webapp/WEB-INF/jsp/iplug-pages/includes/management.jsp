@@ -3,13 +3,19 @@
 <form:form id="formManagement" method="post" action="../iplug-pages/instanceManagement.html">
     <div id="crawlStart">
         <input type="hidden" name="instance" value="${instance.name}" />
-        <h3>Tiefe</h3>
-        <div class="input full space"> 
-            <input type="text" name="depth" value="1" required min="1" max="10" digits="true">
+        <div style="width: 50%; float:left;">
+            <div style="padding-right:20px;">
+                <h3>Tiefe</h3>
+                <div class="input full space" style="margin-right: 20px;"> 
+                    <input type="text" name="depth" value="1" required min="1" max="10" digits="true">
+                </div>
+            </div>
         </div>
-        <h3>Anzahl der URLs</h3>
-        <div class="input full space"> 
-            <input type="text" name="num" value="" required min="1" max="1000000" digits="true">
+        <div style="width: 50%; float:left;">
+            <h3>Anzahl der URLs</h3>
+            <div class="input full space"> 
+                <input type="text" name="num" value="" required min="1" max="1000000" digits="true">
+            </div>
         </div>
         <div class="space">
             <button name="start">Start Crawl</button>
