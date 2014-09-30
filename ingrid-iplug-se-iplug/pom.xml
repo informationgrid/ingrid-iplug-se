@@ -174,16 +174,8 @@
 
 	</dependencies>
 	<build>
+		<finalName>${project.name}-${project.version}</finalName>
 		<plugins>
-			<!-- "DISABLE" WAGON PLUGIN TO AVOID EMPTY UPLOAD DIRECTORIES FROM SUBMODULES -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>wagon-maven-plugin</artifactId>
-				<configuration>
-					<fromDir>NOT_EXISITING_DIRECTORY</fromDir>
-					<url>/dev/null</url>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -229,6 +221,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-eclipse-plugin</artifactId>
+                <version>2.9</version>
 				<inherited>true</inherited>
 				<configuration>
 					<useProjectReferences>false</useProjectReferences>
@@ -251,6 +244,7 @@
 				<artifactId>maven-assembly-plugin</artifactId>
 				<!-- Add Type of Component to Manifest of Installer for Upgrade Server -->
 				<configuration>
+					<skipAssembly>false</skipAssembly>
 					<archive>
 						<manifestEntries>
 							<ingridComponentType>IPLUG_SE</ingridComponentType>
@@ -260,6 +254,7 @@
 			</plugin>
 			<plugin>
                 <artifactId>maven-clean-plugin</artifactId>
+                <version>2.6</version>
                 <configuration>
                     <filesets>
                         <fileset>

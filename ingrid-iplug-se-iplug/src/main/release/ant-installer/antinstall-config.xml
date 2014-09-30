@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE installer PUBLIC "-//tp23 //DTD Ant Installer Config//EN" "http://antinstaller.sf.net/dtd/antinstall-config-0.8.dtd">
+<installer
+    ui                    ="swing,text,swing-auto,text-auto"
+    loadDefaults          ="prompt"
+    verbose               ="true"
+    debug                 ="false"
+    lookAndFeel           ="greymetal"
+    name                  ="InGrid iPlug-SE Installation"
+    windowIcon            ="/resources/icons/logoIcon.gif"
+    defaultImageResource  ="/resources/makewavesdawn.png"
+    minJavaVersion        ="1.6"
+    version               ="1.0">
+
+    <!--  The target "extract" must be called first, so it is defined on the first page -->
+    <page
+        type        ="input"
+        name        ="intro"
+        overflow    = "true"
+        displayText ="Willkommen zur InGrid-iPlug-SE Installation">
+        <comment displayText="" bold="true" explanatoryText="Nehmen Sie Einstellungen vor, um das Portal zu konfigurieren."/>
+
+        <comment displayText="Hinweis: " bold="true"/>
+        <comment displayText="" explanatoryText="Wenn dies ein Update ist, dann können die Einstellungen der vorherigen Installation verwendet werden. Dazu muss sich die Datei 'ant.install.properties' im gleichen Verzeichnis wie der Installer befinden."/>
+        <target-select
+            property      ="updateOrNew"
+            displayText   ="Neu oder Update"
+            defaultValue  ="true">
+            <option value="setUpdateProperty" text="Update (Einstellungen bleiben erhalten)"/>
+            <option value="setInstallProperty" text="Neuinstallation"/>
+        </target-select>
+    </page>
+
+    <page
+        ifTarget    ="setInstallProperty"
+        type        ="input"
+        name        ="componentOptions"
+        displayText ="Einstellungen fuer das iPlug"
+        target      ="writeSettings">
+
+        <comment displayText="" explanatoryText="Lokaler Port, unter dem die Administrationsoberfläche des iPlugs erreichbar sein soll."/>           
+        <text property="localServerPort" displayText="Port für Adminoberfläche:" defaultValue="9667"/>
+    </page>
+    
+    <page
+        ifTarget    ="setInstallProperty"
+        type        ="input"
+        overflow    = "true"
+        name        ="properties"
+        displayText ="Benötigte Installationsoptionen">
+        <directory
+            property        ="installDir"
+            defaultValue    ="/opt/ingrid/ingrid-iplug-se"
+            defaultValueWin ="C:\tmp\ingrid-iplug-se-iplug-3.5.0-SNAPSHOT"
+            displayText     ="Installationsverzeichnis"
+            create          ="true"/>
+    </page>
+
+    <page
+        ifTarget          ="setUpdateProperty"
+        type              ="input"
+        overflow          = "true"
+        name              ="properties"
+        displayText       ="Benötigte Installationsoptionen"
+        target            ="patchFiles"
+        postDisplayTarget ="antinstaller-determineVersion">
+        <directory
+            property            ="installDir"
+            defaultValue        ="/opt/ingrid/ingrid-iplug-se"
+            defaultValueWin     ="C:\tmp\ingrid-iplug-se-iplug-3.5.0-SNAPSHOT"
+            displayText         ="Altes Installationsverzeichnis"
+            create              ="false"
+            checkExists         ="true" />
+    </page>
+
+    <page
+        type        ="progress"
+        name        ="progress"
+        displayText ="Installationsfortschritt"
+        showTargets ="true"
+        target      ="startIPlug">
+    </page>
+</installer>
+
+

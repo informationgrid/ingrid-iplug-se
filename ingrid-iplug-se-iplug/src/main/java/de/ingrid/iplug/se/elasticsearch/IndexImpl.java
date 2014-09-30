@@ -1,7 +1,5 @@
 package de.ingrid.iplug.se.elasticsearch;
 
-import static org.elasticsearch.index.query.QueryBuilders.multiMatchQuery;
-
 import java.util.List;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -238,7 +236,11 @@ public class IndexImpl implements Index {
 
     @Override
     public void setActiveInstances(List<String> values) {
-        this.instances = values.toArray(new String[0]);
+        if (values == null) {
+            this.instances = new String[0];
+        } else {
+            this.instances = values.toArray(new String[0]);
+        }
     }
 
 }

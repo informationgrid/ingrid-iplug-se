@@ -1,0 +1,199 @@
+{
+    "metadata": [
+        {
+            "label": "Sprache",
+            "id": "lang",
+            "type": "select",
+            "children": [
+                {
+                    "label": "Deutsch",
+                    "id": "de"
+                },
+                {
+                    "label": "Englisch",
+                    "id": "en"
+                }
+            ]
+        },
+        {
+            "label": "Partner",
+            "id": "partner",
+            "type": "select",
+            "multiple": true,
+            "children": [
+                {
+                    "label": "Brandenburg",
+                    "id": "bb"
+                },
+                {
+                    "label": "Sachsen-Anhalt",
+                    "id": "st"
+                }
+            ]
+        },
+        {
+            "label": "Anbieter",
+            "id": "provider",
+            "type": "grouped",
+            "children": [
+                {
+                    "label": "Brandenburg",
+                    "id": "bb",
+                    "children": [
+                        {
+                            "label": "bb provider 1",
+                            "id": "bbp1"
+                        },
+                        {
+                            "label": "bb provider 2",
+                            "id": "bbp2"
+                        }
+                    ]
+                },
+                {
+                    "label": "Sachsen-Anhalt",
+                    "id": "st",
+                    "children": [
+                        {
+                            "label": "st provider 1",
+                            "id": "stp1"
+                        },
+                        {
+                            "label": "st provider 2",
+                            "id": "stp2"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "label": "Themen",
+            "id": "topic",
+            "multiple": true,
+            "children": [
+                {
+                    "id": "t1",
+                    "label": "Abfall"
+                },
+                {
+                    "id": "t2",
+                    "label": "Altlasten"
+                },
+                {
+                    "id": "t3",
+                    "label": "Bauen"
+                },
+                {
+                    "id": "t4",
+                    "label": "Boden"
+                },
+                {
+                    "id": "t5",
+                    "label": "Chemikalien"
+                },
+                {
+                    "id": "t6",
+                    "label": "Energie"
+                },
+                {
+                    "id": "t7",
+                    "label": "Forstwirtschaft"
+                },
+                {
+                    "id": "t8",
+                    "label": "Gentechnik"
+                },
+                {
+                    "id": "t9",
+                    "label": "Geologie"
+                },
+                {
+                    "id": "t10",
+                    "label": "Gesundheit"
+                },
+                {
+                    "id": "t11",
+                    "label": "Lärm und Erschütterung"
+                },
+                {
+                    "id": "t12",
+                    "label": "Landwirtschaft"
+                },
+                {
+                    "id": "t13",
+                    "label": "Luft und Klima"
+                },
+                {
+                    "id": "t14",
+                    "label": "Nachhaltige Entwicklung"
+                },
+                {
+                    "id": "t15",
+                    "label": "Strahlung"
+                },
+                {
+                    "id": "t16",
+                    "label": "Tierschutz"
+                },
+                {
+                    "id": "t17",
+                    "label": "Umweltinformationen"
+                },
+                {
+                    "id": "t18",
+                    "label": "Umweltwirtschaft"
+                },
+                {
+                    "id": "t19",
+                    "label": "Verkehr"
+                },
+                {
+                    "id": "t20",
+                    "label": "Wasser"
+                }
+            ]
+        },
+        {
+            "label": "Service",
+            "id": "service",
+            "multiple": true,
+            "children": [
+                {
+                    "id": "s1",
+                    "label": "Pressemitteilungen"
+                },
+                {
+                    "id": "s2",
+                    "label": "Publikationen"
+                },
+                {
+                    "id": "s3",
+                    "label": "Veranstaltungen"
+                }
+            ]
+        },
+        {
+            "label": "Messwerte",
+            "id": "measure",
+            "multiple": true,
+            "children": [
+                {
+                    "id": "m1",
+                    "label": "Strahlung"
+                },
+                {
+                    "id": "m2",
+                    "label": "Luft"
+                },
+                {
+                    "id": "m3",
+                    "label": "Wasser"
+                },
+                {
+                    "id": "m4",
+                    "label": "Weitere"
+                }
+            ]
+        }
+    ]
+}

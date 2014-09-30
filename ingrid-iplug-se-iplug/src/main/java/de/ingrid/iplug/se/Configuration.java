@@ -71,7 +71,7 @@ public class Configuration implements IConfig {
 	public void initialize() {
 	}
 
-	@TypeTransformers(Configuration.StringToSearchType.class)
+    @TypeTransformers(Configuration.StringToSearchType.class)
     @PropertyValue("search.type")
     @DefaultValue("DEFAULT")
     public SearchType searchType;
@@ -101,6 +101,7 @@ public class Configuration implements IConfig {
 	public String index;
 	
 	@PropertyValue("instance.active")
+	@DefaultValue("")
 	public List<String> activeInstances;
 	
 

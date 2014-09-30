@@ -175,7 +175,7 @@ public class ListInstancesController extends AbstractController {
     }
     
     private String getMappingSource() throws IOException {
-        ClassPathResource resource = new ClassPathResource( "data/mappingProperties.json" );
+        ClassPathResource resource = new ClassPathResource( "mappingProperties.json" );
         List<String> urlsData = Files.readAllLines( Paths.get( resource.getURI() ), Charset.defaultCharset() );
         String mappingSource = "";
         for (String line : urlsData) {

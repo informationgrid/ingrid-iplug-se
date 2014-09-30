@@ -70,6 +70,8 @@ public class SchedulerManager {
             instanceDirs = instancesDirObject.listFiles( directoryFilter );
         }
 
+        if (instanceDirs == null) return new File[0];
+        
         return instanceDirs;
     }
     

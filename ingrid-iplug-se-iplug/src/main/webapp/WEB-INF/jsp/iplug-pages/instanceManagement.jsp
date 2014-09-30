@@ -119,6 +119,8 @@
 			type: "GET",
             contentType: 'application/json',
             success: function(data) {
+                if (!data) $("#statisticTable").hide();
+                
                 var json = JSON.parse( data );
                 console.log( json );
                 var overall = json.splice(0, 1);

@@ -163,7 +163,15 @@ public class FileUtils {
         FileUtils.writeToFile( Paths.get( workDir, "urls", "exclude" ).toAbsolutePath(), "seed.txt", excludeUrls );
     }
 
+    /**
+     * Read the content of a file from a path. If the file does not exist, then null is returned. 
+     * @param path is the location of the file to read the content from
+     * @return the content of the file if it exists otherwise null
+     * @throws IOException
+     */
     public static String readFile(Path path) throws IOException {
+        if (!path.toFile().exists()) return null;
+        
         byte[] encoded = Files.readAllBytes( path );
         return new String(encoded, "UTF-8");
     }

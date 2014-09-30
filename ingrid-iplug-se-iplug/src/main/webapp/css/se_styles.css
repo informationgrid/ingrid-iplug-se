@@ -44,30 +44,6 @@ label input {
 	vertical-align: bottom;
 }
 
-/* nice style for input boxes */
-.full {
-	width: 100%;
-    overflow: hidden;
-}
-
-.inline {
-    display: inline-block;
-}
-
-.input {
-    border: 1px solid #1B78B1;
-    clear: both;
-}
-.space {
-    margin-bottom: 10px;
-}
-
-.input input, .input select {
-	padding: 5px;
-	border: 0;
-    width: 100%;
-}
-
 .right {
 	float: right;
 }

@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.googlecode.flyway.core.Flyway;
 import com.tngtech.configbuilder.ConfigBuilder;
 
 import de.ingrid.admin.JettyStarter;
@@ -150,19 +151,21 @@ public class SEIPlug extends HeartBeatPlug {
     
     public static void main(String[] args) throws Exception {
         conf = new ConfigBuilder<Configuration>(Configuration.class).withCommandLineArgs(args).build();
-        log.debug( "DEBUG test" );
         new JettyStarter( conf );
         EntityManagerFactory emf = Persistence.createEntityManagerFactory(conf.databaseID);//, properties);
         DBManager.INSTANCE.intialize(emf);
         EntityManager em = DBManager.INSTANCE.getEntityManager();
         
         // do database migrations
-//        Flyway flyway = new Flyway();
-//        flyway.setDataSource(dbUrl, "", "");
-//        flyway.migrate();
+        Flyway flyway = new Flyway();
+        String dbUrl = DBManager.INSTANCE.getProperty("javax.persistence.jdbc.url").toString();
+        flyway.setDataSource(dbUrl, "", "");
+        flyway.migrate();
         
         // get an entity manager instance (initializes properties in the DBManager)
-        setupTestData( em );
+        if ( "iplug-se-dev".equals( conf.databaseID ) ) {
+            setupTestData( em );
+        }
         
     }
     
@@ -219,6 +222,15 @@ public class SEIPlug extends HeartBeatPlug {
             url.setLimitUrls( limit );
             em.persist(url);
         }
+        
+        url = new Url( "other" );
+        url.setStatus( 200 );
+        url.setUrl( "http://de.wikipedia.org/" );
+        List<String> limit = new ArrayList<String>();
+        limit.add( "http://de.wikipedia.org" );
+        url.setLimitUrls( limit );
+        em.persist(url);
+        
         
         em.getTransaction().commit();
     }
