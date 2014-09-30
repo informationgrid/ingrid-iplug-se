@@ -251,6 +251,15 @@
 						</manifestEntries>
 					</archive>
 				</configuration>
+				<executions>
+	                <execution>
+	                    <id>installer-builder</id>
+	                    <goals>
+	                        <goal>single</goal>
+	                    </goals>
+	                    <phase>package</phase>
+	                </execution>
+	            </executions>
 			</plugin>
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
