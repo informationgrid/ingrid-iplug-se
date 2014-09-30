@@ -114,6 +114,15 @@ public class RestDataController extends InstanceController {
         return new ResponseEntity<String>( content, HttpStatus.OK );
     }
     
+    @RequestMapping(value = { "status/{instance}/hadoop" }, method = RequestMethod.GET)
+    public ResponseEntity<String> getHadoopLog(@PathVariable("instance") String name) throws IOException {
+        
+        Path path = Paths.get( SEIPlug.conf.getInstancesDir(), name, "logs", "hadoop.log" );
+        String content = FileUtils.readFile( path );
+        
+        return new ResponseEntity<String>( content, HttpStatus.OK );
+    }
+    
     
     private ResponseEntity<Map<String, String>> generateOkResponse() {
         Map<String, String> result = new HashMap<String, String>();

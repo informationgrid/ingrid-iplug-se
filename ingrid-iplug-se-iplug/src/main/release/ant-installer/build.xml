@@ -3,10 +3,8 @@
         iPlug-SE Installation Script
     </description>
 
-    <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
-
     <!-- set global properties for this build -->
-    <property name="iPlugName"          value="${project.artifactId}-${project.version}"/>
+    <property name="iPlugName"          value="${project.build.finalName}"/>
     
     <!-- THIS PORPERTIES ARE NECESSARY FOR UPDATES -->
     <property name="libraryDir"         value="lib" />

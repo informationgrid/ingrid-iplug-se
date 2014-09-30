@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>de.ingrid</groupId>
 		<artifactId>ingrid-releases-pom</artifactId>
-		<version>3.4.0</version>
+		<version>3.5.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ingrid</groupId>
@@ -29,7 +29,7 @@
 
 	<modules>
 		<module>ingrid-iplug-se-nutch</module>
-		<module>ingrid-iplug-se-iplug</module>
+        <module>ingrid-iplug-se-iplug</module>
 	</modules>
 	<dependencyManagement>
 	</dependencyManagement>
@@ -80,14 +80,9 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<inherited>false</inherited>
 				<!-- Add Type of Component to Manifest of Installer for Upgrade Server -->
 				<configuration>
-					<archive>
-						<manifestEntries>
-							<ingridComponentType>IPLUG_SE</ingridComponentType>
-						</manifestEntries>
-					</archive>
+                    <skipAssembly>true</skipAssembly>
 				</configuration>
 			</plugin>
 			<!-- DISABLE RELEASE / ASSEMBLY STUFF FOR SUBMODULES ! RELEASE/BUNDLE 
@@ -109,6 +104,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
+				<!-- the inherited plugin extracts the installer which must not be done by sub-modules -->
 				<inherited>false</inherited>
 				<dependencies>
 					<!-- following is needed since this plugin mixes up the JAVA_HOME directory 
@@ -123,35 +119,8 @@
 					</dependency>
 				</dependencies>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-changes-plugin</artifactId>
-				<inherited>false</inherited>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>wagon-maven-plugin</artifactId>
-				<inherited>false</inherited>
-				<configuration>
-					<!-- NOTICE: REDEFINE directory on distribution server -->
-					<url>file:///opt/ingrid/distributions/${project.name}/${project.version}</url>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-release-plugin</artifactId>
-				<inherited>false</inherited>
-			</plugin>
+			
 		</plugins>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<excludes>
-					<exclude>*.xml</exclude>
-					<exclude>*.properties</exclude>
-					<exclude>*.bak</exclude>
-				</excludes>
-			</resource>
-		</resources>
 	</build>
 	<reporting>
 		<plugins>

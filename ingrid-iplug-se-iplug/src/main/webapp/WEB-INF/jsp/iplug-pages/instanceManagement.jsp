@@ -9,10 +9,12 @@
 <meta name="keywords" content="" />
 <meta name="author" content="wemove digital solutions" />
 <meta name="copyright" content="wemove digital solutions GmbH" />
+<link rel="StyleSheet" href="../css/jquery-ui.min.css" type="text/css" media="all" />
 <link rel="StyleSheet" href="../css/base/portal_u.css" type="text/css" media="all" />
 <link rel="StyleSheet" href="../css/se_styles.css" type="text/css" media="all" />
 
 <script type="text/javascript" src="../js/base/jquery-1.8.0.min.js"></script>
+<script type="text/javascript" src="../js/jquery-ui.min.js"></script>
 <script src="../js/jquery.validate.min.js"></script>
 <script src="../js/localization/messages_de.min.js"></script>
 <!--<script src="../js/chart.min.js"></script>-->
@@ -20,10 +22,11 @@
 
 <script type="text/javascript">
 
-	
-	$(document).ready(function() {
+    var dialog;
+
+    $(document).ready(function() {
         $("#crawlInfo").html( "Hole Status ..." );
-    	checkState();
+        checkState();
         $("#crawlStop").hide();
         
         $("#formManagement").validate({
@@ -40,10 +43,22 @@
         });
         
         getStatistic();
-	});
-	
-	function setLog(data) {
-		var formatTime = function(ts) {
+
+        dialog = $("#dialog-hadoop").dialog({
+            autoOpen : false,
+            height : 750,
+            width : 770,
+            modal : true,
+            buttons : {
+                "Schliessen" : function() {
+                    dialog.dialog("close");
+                }
+            }
+        });
+    });
+    
+    function setLog(data) {
+        var formatTime = function(ts) {
             var date = new Date(ts);
             var d = date.getDate();
             var m = date.getMonth() + 1;
@@ -56,18 +71,20 @@
         var content = "";
         for (var i=0; i < data.length; i++) {
             var row = data[i];
-            content += "<div class='" + row.classification.toLowerCase() + "'>" + formatTime(row.time) + " - [" + row.classification + "] " + row.value + "</div>";                 
+            content += "<div class='" + row.classification.toLowerCase() + "'>" + formatTime(row.time) + " - [" + row.classification + "] " + row.value + "</div>";
         }
+
         $("#status").html( content );
-	}
-	
-	function checkState() {
-    	$.ajax( "../rest/status/${ instance.name }", {
-    		type: "GET",
+    }
+    
+    function checkState() {
+        $.ajax( "../rest/status/${ instance.name }", {
+            type: "GET",
             contentType: 'application/json',
             success: function(data) {
                 $("#crawlInfo").hide();
                 $("#crawlStart").hide();
+                $("#moreInfo").hide();
                 $("#crawlStop").show();
                 
                 setLog( data );
@@ -77,33 +94,50 @@
                 setTimeout( checkState, 5000 );
             },
             error: function(jqXHR, text, error) {
-            	if (error === "Found") {
-            		$("#crawlInfo").show();
-            		$("#crawlStart").show();
+                // if it's not a real error, but just saying, that no process is running
+                if (error === "Found") {
+                    $("#crawlInfo").show();
+                    $("#crawlStart").show();
                     $("#crawlStop").hide();
-            		//$("#status").hide();
-            		var data = "";
-            		if (jqXHR.responseText == "") {
-                		$("#crawlInfo").html( "Es läuft zur Zeit kein Crawl." );
-            			
-            		} else {
-                		$("#crawlInfo").html( "Es läuft zur Zeit kein Crawl. (<a href='#' onclick='$(\"#status\").toggle()'>Information zum letzten Crawl) " );
-            			data = JSON.parse( jqXHR.responseText );
-                        setLog( data );            			
-            		}
-            		
-            		// repeat execution every 60s until finished
+                    //$("#status").hide();
+                    var data = "";
+                    if (jqXHR.responseText == "") {
+                        $("#crawlInfo").html( "Es läuft zur Zeit kein Crawl." );
+                        
+                    } else {
+                        $("#crawlInfo").html( "Es läuft zur Zeit kein Crawl. (<a href='#' onclick='$(\"#allInfo\").toggle()'>Information zum letzten Crawl) " );
+                        data = JSON.parse( jqXHR.responseText );
+                        setLog( data );
+                        // show link to request hadoop.log content
+                        $("#moreInfo").show();
+                    }
+                    
+                    // repeat execution every 60s until finished
                     setTimeout( checkState, 60000 );
-            	} else {
-            		$("#crawlInfo").html( "Es trat ein Fehler beim Laden des Logs auf. " );
-                    console.error( error, jqXHR );            		
-            	}
+
+                // when a real error occurs
+                } else {
+                    $("#crawlInfo").html( "Es trat ein Fehler beim Laden des Logs auf. " );
+                    console.error( error, jqXHR );                  
+                }
             }
-    	});
-	}
-	
-	function getStatistic() {
-		// fill table
+        });
+    }
+
+    function showHadoopLog() {
+        dialog.dialog("open");
+        $("#dialog-hadoop .content").html( "wird geladen ..." );
+        $.ajax( "../rest/status/${ instance.name }/hadoop", {
+            type: "GET",
+            contentType: 'application/json',
+            success: function(data) {
+                $("#dialog-hadoop .content").html( data.replace(/\n/g, "<br>") );
+            }
+        });
+    }
+    
+    function getStatistic() {
+        // fill table
         var addTableRow = function(item, biggest) {
             $("#statisticTable tbody").append(
                     "<tr>" +
@@ -115,8 +149,8 @@
             );
         };
         
-		$.ajax( "../rest/status/${ instance.name }/statistic", {
-			type: "GET",
+        $.ajax( "../rest/status/${ instance.name }/statistic", {
+            type: "GET",
             contentType: 'application/json',
             success: function(data) {
                 if (!data) $("#statisticTable").hide();
@@ -129,15 +163,15 @@
                 // determine highest known and fetched values
                 var biggest = { known: -1, fetched: -1 };
                 $.each( json, function(index, item) {
-                	if (item.known > biggest.known) biggest.known = item.known;
-                	if (item.fetched > biggest.fetched) biggest.fetched = item.fetched;
+                    if (item.known > biggest.known) biggest.known = item.known;
+                    if (item.fetched > biggest.fetched) biggest.fetched = item.fetched;
                 });
                 
                 $.each( json, function(index, item) {
-                	// labels.push( item.host );
-                	// dataKnown.push( item.known );
-                	// dataFetched.push( item.fetched );
-                	addTableRow( item, biggest );
+                    // labels.push( item.host );
+                    // dataKnown.push( item.known );
+                    // dataFetched.push( item.fetched );
+                    addTableRow( item, biggest );
                 });
                 
                 /*var ctx = document.getElementById("myChart").getContext("2d");
@@ -165,6 +199,7 @@
                 var myBarChart = new Chart(ctx).Bar(data);*/
                 
                 $("#statisticTable").tablesorter({
+                    headers : { 0 : { sorter : false } },
                     sortList: [[0,0]], // sort first column ascending
                     widgets: ['zebra', 'filter'],
                     widgetOptions: {
@@ -176,12 +211,12 @@
                     }
                 });
             }
-		
-		});
-		
-	}
-	
-	
+        
+        });
+        
+    }
+    
+    
 </script>
 
 </head>

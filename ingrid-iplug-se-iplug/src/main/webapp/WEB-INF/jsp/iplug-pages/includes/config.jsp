@@ -18,9 +18,9 @@
             		<tr>
             			<th data-sort="string" style="width: 35px;">Pos</th>
             			<th data-sort="string" style="width: 150px;">Name</th>
-            			<th data-sort="string">Beschreibung</th>
-            			<th data-sort="string">Standard Wert</th>
-            			<th data-sort="string">Eigener Wert</th>
+            			<th>Beschreibung</th>
+            			<th>Standard Wert</th>
+            			<th>Eigener Wert</th>
             		</tr>
             	</thead>
             	<tbody>

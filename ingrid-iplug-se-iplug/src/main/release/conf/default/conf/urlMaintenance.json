@@ -19,15 +19,71 @@
             "label": "Partner",
             "id": "partner",
             "type": "select",
-            "multiple": true,
+            "isMultiple": true,
             "children": [
+                {
+                    "label": "Bund",
+                    "id": "bund"
+                },
+                {
+                    "label": "Baden-Württemberg",
+                    "id": "bw"
+                },
+                {
+                    "label": "Bayern",
+                    "id": "by"
+                },
+                {
+                    "label": "Berlin",
+                    "id": "be"
+                },
                 {
                     "label": "Brandenburg",
                     "id": "bb"
                 },
                 {
+                    "label": "Bremen",
+                    "id": "hb"
+                },
+                {
+                    "label": "Hamburg",
+                    "id": "hh"
+                },
+                {
+                    "label": "Hessen",
+                    "id": "he"
+                },
+                {
+                    "label": "Mecklenburg-Vorpommern",
+                    "id": "mv"
+                },
+                {
+                    "label": "Niedersachsen",
+                    "id": "ni"
+                },
+                {
+                    "label": "Nordrhein-Westfalen",
+                    "id": "nw"
+                },
+                {
+                    "label": "Rheinland-Pfalz",
+                    "id": "rp"
+                },
+                {
+                    "label": "Saarland",
+                    "id": "sl"
+                },
+                {
                     "label": "Sachsen-Anhalt",
                     "id": "st"
+                },
+                {
+                    "label": "Schleswig-Holstein",
+                    "id": "sh"
+                },
+                {
+                    "label": "Thüringen",
+                    "id": "th"
                 }
             ]
         },
@@ -35,7 +91,61 @@
             "label": "Anbieter",
             "id": "provider",
             "type": "grouped",
+            "isMultiple": true,
             "children": [
+                {
+                    "label": "Bund",
+                    "children": [
+                        {
+                            "label": "",
+                            "id": "bu_bmu"
+                        },
+                        {
+                            "label": "",
+                            "id": "bu_uba"
+                        },
+                        {
+                            "label": "",
+                            "id": "bu_bfn"
+                        },
+                        {
+                            "label": "",
+                            "id": "bu_bfs"
+                        },
+                        {
+                            "label": "",
+                            "id": "bu_bmf"
+                        },
+                        {
+                            "label": "",
+                            "id": "bu_bmbf"
+                        },
+                        {
+                            "label": "",
+                            "id": "bu_bmelv"
+                        },
+                        {
+                            "label": "",
+                            "id": "bu_bmz"
+                        },
+                        {
+                            "label": "",
+                            "id": "bu_aa"
+                        },
+                        {
+                            "label": "",
+                            "id": "bu_bsh"
+                        },
+                        {
+                            "label": "",
+                            "id": "bu_bvl"
+                        },
+                        {
+                            "label": "",
+                            "id": "bu_bgr"
+                        }
+                    ]
+                },
                 {
                     "label": "Brandenburg",
                     "id": "bb",
@@ -69,86 +179,90 @@
         {
             "label": "Themen",
             "id": "topic",
-            "multiple": true,
+            "isMultiple": true,
             "children": [
                 {
-                    "id": "t1",
+                    "id": "abfall",
                     "label": "Abfall"
                 },
                 {
-                    "id": "t2",
+                    "id": "altlasten",
                     "label": "Altlasten"
                 },
                 {
-                    "id": "t3",
+                    "id": "bauen",
                     "label": "Bauen"
                 },
                 {
-                    "id": "t4",
+                    "id": "boden",
                     "label": "Boden"
                 },
                 {
-                    "id": "t5",
+                    "id": "chemikalien",
                     "label": "Chemikalien"
                 },
                 {
-                    "id": "t6",
+                    "id": "energie",
                     "label": "Energie"
                 },
                 {
-                    "id": "t7",
+                    "id": "forstwirtschaft",
                     "label": "Forstwirtschaft"
                 },
                 {
-                    "id": "t8",
+                    "id": "gentechnik",
                     "label": "Gentechnik"
                 },
                 {
-                    "id": "t9",
+                    "id": "geologie",
                     "label": "Geologie"
                 },
                 {
-                    "id": "t10",
+                    "id": "gesundheit",
                     "label": "Gesundheit"
                 },
                 {
-                    "id": "t11",
+                    "id": "laermerschuetterung",
                     "label": "Lärm und Erschütterung"
                 },
                 {
-                    "id": "t12",
+                    "id": "landwirtschaft",
                     "label": "Landwirtschaft"
                 },
                 {
-                    "id": "t13",
+                    "id": "luftklima",
                     "label": "Luft und Klima"
                 },
                 {
-                    "id": "t14",
+                    "id": "nachhaltigeentwicklung",
                     "label": "Nachhaltige Entwicklung"
                 },
                 {
-                    "id": "t15",
+                    "id": "naturlandschaft",
+                    "label": "Natur und Landschaft"
+                },
+                {
+                    "id": "strahlung",
                     "label": "Strahlung"
                 },
                 {
-                    "id": "t16",
+                    "id": "tierschutz",
                     "label": "Tierschutz"
                 },
                 {
-                    "id": "t17",
+                    "id": "umweltinformation",
                     "label": "Umweltinformationen"
                 },
                 {
-                    "id": "t18",
+                    "id": "umweltwirtschaft",
                     "label": "Umweltwirtschaft"
                 },
                 {
-                    "id": "t19",
+                    "id": "verkehr",
                     "label": "Verkehr"
                 },
                 {
-                    "id": "t20",
+                    "id": "wasser",
                     "label": "Wasser"
                 }
             ]
@@ -156,18 +270,18 @@
         {
             "label": "Service",
             "id": "service",
-            "multiple": true,
+            "isMultiple": true,
             "children": [
                 {
-                    "id": "s1",
+                    "id": "press",
                     "label": "Pressemitteilungen"
                 },
                 {
-                    "id": "s2",
+                    "id": "publication",
                     "label": "Publikationen"
                 },
                 {
-                    "id": "s3",
+                    "id": "event",
                     "label": "Veranstaltungen"
                 }
             ]
@@ -175,22 +289,22 @@
         {
             "label": "Messwerte",
             "id": "measure",
-            "multiple": true,
+            "isMultiple": true,
             "children": [
                 {
-                    "id": "m1",
+                    "id": "radiation",
                     "label": "Strahlung"
                 },
                 {
-                    "id": "m2",
+                    "id": "air",
                     "label": "Luft"
                 },
                 {
-                    "id": "m3",
+                    "id": "water",
                     "label": "Wasser"
                 },
                 {
-                    "id": "m4",
+                    "id": "misc",
                     "label": "Weitere"
                 }
             ]

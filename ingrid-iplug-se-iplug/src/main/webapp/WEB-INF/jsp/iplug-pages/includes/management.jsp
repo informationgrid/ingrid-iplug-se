@@ -1,11 +1,5 @@
 <%@ include file="/WEB-INF/jsp/base/include.jsp"%>
 
-<fieldset id="statusContainer">
-    <legend>Status</legend>
-    <div id="crawlInfo"></div>
-    <div id="status"></div>
-</fieldset>
-
 <form:form id="formManagement" method="post" action="../iplug-pages/instanceManagement.html">
     <div id="crawlStart">
         <input type="hidden" name="instance" value="${instance.name}" />
@@ -17,25 +11,38 @@
         <div class="input full space"> 
             <input type="text" name="num" value="" required min="1" max="1000000" digits="true">
         </div>
-        <div>
+        <div class="space">
             <button name="start">Start Crawl</button>
         </div>
     </div>
-    <div id="crawlStop">
+    <div id="crawlStop" class="space">
         <button name="stop">Crawl beenden</button>
     </div>
-    
-    <table id="statisticTable">
-        <thead>
-            <tr>
-                <th data-sort="string" width="100px"></th>
-                <th data-sort="string">Host</th>
-                <th data-sort="string" width="70px">Bekannt</th>
-                <th data-sort="string" width="70px">Analysiert</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-    <canvas id="myChart" width="700" height="400"></canvas>
 </form:form>
+
+<fieldset id="statusContainer">
+    <legend>Status</legend>
+    <div id="crawlInfo" class="space"></div>
+    <div id="allInfo">
+        <div id="status"></div>
+        <div id="moreInfo" style="padding-top: 10px;">weitere Informationen: <a href='#' onclick='showHadoopLog()'>hadoop.log</a></div>
+    </div>
+</fieldset>
+    
+<table id="statisticTable" class="data tablesorter">
+    <thead>
+        <tr>
+            <th width="100px"></th>
+            <th data-sort="string">Host</th>
+            <th data-sort="int" width="70px">Bekannt</th>
+            <th data-sort="int" width="70px">Analysiert</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<canvas id="myChart" width="700" height="400"></canvas>
+
+<div id="dialog-hadoop" title="Hadoop-Log">
+    <div class="content"></div>
+</div>

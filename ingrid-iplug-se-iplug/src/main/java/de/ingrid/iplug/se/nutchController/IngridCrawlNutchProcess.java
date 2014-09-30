@@ -106,6 +106,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
                         // skip whole crawl process if this is the first generation.
                         // this should not be a problem, because no new segment should be generated
                         // TODO: check this (maybe check for multiple segments), because we cannot distinguish between zero URLs and error. :-(
+                        this.status = STATUS.INTERRUPTED;
                         return;
                     } else {
                         // skip fetch, update crawldb, update metadata and continue.

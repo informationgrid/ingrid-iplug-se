@@ -8,11 +8,11 @@
 	<fileSets>
 		<fileSet>
       <directory>src/main/release/scripts</directory>
-      <outputDirectory>${project.artifactId}-${project.version}</outputDirectory>
+      <outputDirectory>${project.build.finalName}</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>src/main/release/conf</directory>
-      <outputDirectory>${project.artifactId}-${project.version}/conf</outputDirectory>
+      <outputDirectory>${project.build.finalName}/conf</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>src/main/release/ant-installer</directory>
@@ -21,18 +21,18 @@
     </fileSet>
     <fileSet>
 			<directory>apache-nutch-runtime</directory>
-			<outputDirectory>${project.artifactId}-${project.version}/apache-nutch-runtime</outputDirectory>
+			<outputDirectory>${project.build.finalName}/apache-nutch-runtime</outputDirectory>
 		</fileSet>
     <fileSet>
       <directory>src/main/webapp</directory>
-      <outputDirectory>${project.artifactId}-${project.version}/webapp</outputDirectory>
+      <outputDirectory>${project.build.finalName}/webapp</outputDirectory>
       <excludes>
         <exclude>**/WEB-INF/jetty-web.xml</exclude>
       </excludes>
     </fileSet>
     <fileSet>
       <directory>target/base-webapp</directory>
-      <outputDirectory>${project.artifactId}-${project.version}/webapp</outputDirectory>
+      <outputDirectory>${project.build.finalName}/webapp</outputDirectory>
     </fileSet>
 		<fileSet>
 			<directory>../target/installer</directory>
@@ -42,13 +42,13 @@
   <files>
     <file>
       <source>src/main/release/jetty/jetty-web.xml</source>
-      <outputDirectory>${project.artifactId}-${project.version}/webapp/WEB-INF</outputDirectory>
+      <outputDirectory>${project.build.finalName}/webapp/WEB-INF</outputDirectory>
       <filtered>true</filtered>
     </file>
   </files>
   <dependencySets>
     <dependencySet>
-      <outputDirectory>${project.artifactId}-${project.version}/lib</outputDirectory>
+      <outputDirectory>${project.build.finalName}/lib</outputDirectory>
       <unpack>false</unpack>
       <scope>runtime</scope>
       <excludes>
