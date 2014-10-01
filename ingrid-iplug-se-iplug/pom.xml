@@ -303,6 +303,33 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.8.2</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+				<executions>
+	                <execution>
+	                    <id>installer-deploy</id>
+	                    <goals>
+	                        <goal>deploy-file</goal>
+	                    </goals>
+	                    <phase>deploy</phase>
+						<configuration>
+							<skip>false</skip>
+							<packaging>jar</packaging>
+							<artifactId>${project.parent.artifactId}</artifactId>
+							<classifier>installer</classifier>
+							<groupId>${project.groupId}</groupId>
+							<version>${project.version}</version>
+							<file>${project.build.directory}/${project.build.finalName}-installer.jar</file>
+							<url>${project.distributionManagement.repository.url}</url>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>wagon-maven-plugin</artifactId>
 				<configuration>
