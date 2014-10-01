@@ -5,11 +5,11 @@ import org.springframework.stereotype.Service;
 import de.ingrid.admin.object.AbstractDataType;
 
 @Service
-public class SEDataType extends AbstractDataType {
+public class ServiceDataType extends AbstractDataType {
 
-    public SEDataType() {
-        super("se");
-        setForceActive(true);
+    public ServiceDataType() {
+        super("service");
+        //setForceActive(true);
     }
 
 }

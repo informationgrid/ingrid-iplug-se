@@ -29,7 +29,7 @@ public class DatabaseParameterController extends AbstractController {
             @ModelAttribute("plugDescription") final PlugdescriptionCommandObject commandObject) {
 
         // write object into session
-        modelMap.put("dataBasePath", "");
+        modelMap.put("dataBasePath", SEIPlug.conf.databaseDir);
         modelMap.put("instancePath", SEIPlug.conf.getInstancesDir());
         modelMap.put("elasticSearchPort", SEIPlug.conf.esHttpPort);
         return AdminViews.DB_PARAMS;
@@ -39,6 +39,7 @@ public class DatabaseParameterController extends AbstractController {
     public String post(@RequestParam("dataBasePath") String dbPath, @RequestParam("instancePath") String instancePath,
             @RequestParam("elasticSearchPort") String elasticSearchPort) {
 
+        SEIPlug.conf.databaseDir = dbPath;
         SEIPlug.conf.setInstancesDir( instancePath );
         SEIPlug.conf.esHttpPort = elasticSearchPort;
         return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );

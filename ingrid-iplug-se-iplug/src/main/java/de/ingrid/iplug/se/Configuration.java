@@ -84,6 +84,10 @@ public class Configuration implements IConfig {
     @DefaultValue("iplug-se")
     public String databaseID;
 	
+	@PropertyValue("db.dir")
+	@DefaultValue("database")
+	public String databaseDir;
+	
 	@PropertyValue("http.port")
     @DefaultValue("9200")
     public String esHttpPort;
@@ -119,7 +123,8 @@ public class Configuration implements IConfig {
 //
     @Override
     public void setPropertiesFromPlugdescription( Properties props, PlugdescriptionCommandObject pd ) {
-        props.setProperty( "dir.instances", this.dirInstances);
+        props.setProperty( "db.dir", this.databaseDir );
+        props.setProperty( "dir.instances", this.dirInstances );
         props.setProperty( "instance.active", getActiveInstancesAsString() );        
         
         // write elastic search properties to separate configuration

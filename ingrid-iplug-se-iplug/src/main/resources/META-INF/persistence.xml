@@ -8,7 +8,7 @@
         <properties>
             <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform" />
             <property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
-            <property name="javax.persistence.jdbc.url" value="jdbc:h2:./database/urls;MVCC=true" />
+            <!-- <property name="javax.persistence.jdbc.url" value="jdbc:h2:./database/urls;MVCC=true" /> --> <!-- the path is set via the configuration!  -->
 
             <!-- EclipseLink should create the database schema automatically -->
             <!-- <property name="eclipselink.ddl-generation" value="create-tables" /> -->

@@ -3,8 +3,12 @@
  */
 package de.ingrid.iplug.se;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -153,8 +157,19 @@ public class SEIPlug extends HeartBeatPlug {
         conf = new ConfigBuilder<Configuration>(Configuration.class).withCommandLineArgs(args).build();
         new JettyStarter( conf );
         
+        // set the directory of the database to the configured one
+        Map<String, String> properties = new HashMap<String, String>();
+        Path dbDir = Paths.get( conf.databaseDir );
+        properties.put("javax.persistence.jdbc.url", "jdbc:h2:" + dbDir.toFile().getAbsolutePath() + "/urls;MVCC=true");
+        
         // get an entity manager instance (initializes properties in the DBManager)
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory(conf.databaseID);//, properties);
+        EntityManagerFactory emf = null;
+        // for development use the settings from the persistence.xml
+        if ( "iplug-se-dev".equals( conf.databaseID ) ) {
+            emf = Persistence.createEntityManagerFactory(conf.databaseID);
+        } else {
+            emf = Persistence.createEntityManagerFactory(conf.databaseID, properties);
+        }
         DBManager.INSTANCE.intialize(emf);
         EntityManager em = DBManager.INSTANCE.getEntityManager();
         
