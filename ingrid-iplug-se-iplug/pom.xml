@@ -323,8 +323,8 @@
 							<uniqueVersion>false</uniqueVersion>
 							<artifactId>${project.parent.artifactId}</artifactId>
 							<classifier>installer</classifier>
-							<!-- <groupId>${project.groupId}</groupId>
-							<version>${project.version}</version> -->
+							<groupId>${project.groupId}</groupId>
+							<version>${project.version}</version>
 							<file>${project.build.directory}/${project.build.finalName}-installer.jar</file>
 							<url>${project.distributionManagement.repository.url}</url>
 						</configuration>
