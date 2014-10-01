@@ -61,7 +61,7 @@
 
     <target name="writeSettings">
         <propertyfile file="${installDir}/conf/config.override.properties">
-            <entry  key="jetty.port" type="int" value="${localServerPort}" />
+            <entry  key="jetty.port" type="string" value="${localServerPort}" />
         </propertyfile>
     </target>
     
