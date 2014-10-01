@@ -47,7 +47,7 @@
     <tbody>
     </tbody>
 </table>
-<canvas id="myChart" width="700" height="400"></canvas>
+<!-- <canvas id="myChart" width="700" height="400"></canvas> -->
 
 <div id="dialog-hadoop" title="Hadoop-Log">
     <div class="content"></div>

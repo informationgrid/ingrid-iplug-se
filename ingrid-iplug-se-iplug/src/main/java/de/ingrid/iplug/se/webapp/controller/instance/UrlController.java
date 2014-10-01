@@ -115,7 +115,12 @@ public class UrlController extends AbstractController {
     @ModelAttribute("metadata")
     public List<MetaElement> getMetadata(@RequestParam("instance") String name) throws FileNotFoundException, JsonSyntaxException, JsonIOException, UnsupportedEncodingException {
 
-        InstanceConfigurationTool instanceConfig = new InstanceConfigurationTool(Paths.get(SEIPlug.conf.getInstancesDir(), name, "conf", "urlMaintenance.json"));
+        InstanceConfigurationTool instanceConfig = null;
+        try {
+            instanceConfig = new InstanceConfigurationTool(Paths.get(SEIPlug.conf.getInstancesDir(), name, "conf", "urlMaintenance.json"));
+        } catch (RuntimeException e) {
+            return null;
+        }
         List<MetaElement> metadata = instanceConfig.getMetadata();
         
         // try to get latest partner and provider from the iBus (Management-iPlug / Portal)

@@ -22,7 +22,8 @@
 
 <script type="text/javascript">
 
-    var dialog;
+    var dialog,
+        statisticIsUpdated = true;
 
     $(document).ready(function() {
         $("#crawlInfo").html( "Hole Status ..." );
@@ -90,6 +91,7 @@
                 
                 setLog( data );
                 $("#allInfo").show();
+                statisticIsUpdated = true;
                 
                 // repeat execution every 5s until finished
                 setTimeout( checkState, 5000 );
@@ -111,6 +113,7 @@
                         setLog( data );
                         // show link to request hadoop.log content
                         $("#moreInfo").show();
+                        if (statisticIsUpdated) getStatistic();
                     }
                     
                     // repeat execution every 60s until finished
@@ -138,6 +141,7 @@
     }
     
     function getStatistic() {
+        statisticIsUpdated = false;
         // fill table
         var addTableRow = function(item, biggest) {
             $("#statisticTable tbody").append(
@@ -154,7 +158,12 @@
             type: "GET",
             contentType: 'application/json',
             success: function(data) {
-                if (!data) $("#statisticTable").hide();
+                if (!data) {
+                    $("#statisticTable").hide();
+                    return;
+                } else {
+                    $("#statisticTable").show();
+                }
                 
                 var json = JSON.parse( data );
                 var overall = json.splice(0, 1);
@@ -167,6 +176,8 @@
                     if (item.fetched > biggest.fetched) biggest.fetched = item.fetched;
                 });
                 
+                // remove all rows first
+                $("#statisticTable tbody tr").remove();
                 $.each( json, function(index, item) {
                     // labels.push( item.host );
                     // dataKnown.push( item.known );

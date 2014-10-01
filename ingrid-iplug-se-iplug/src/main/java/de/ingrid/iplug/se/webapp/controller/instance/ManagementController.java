@@ -35,9 +35,14 @@ public class ManagementController extends AbstractController {
 
     @RequestMapping(value = { "/iplug-pages/instanceManagement.html" }, method = RequestMethod.GET)
     public String showManagement(final ModelMap modelMap, @RequestParam("instance") String name) {
-        modelMap.put("instance", InstanceController.getInstanceData(name));
-
-        return AdminViews.SE_INSTANCE_MANAGEMENT;
+        Instance instance = InstanceController.getInstanceData(name);
+        
+        if (instance == null) {
+            return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );
+        } else {
+            modelMap.put("instance", instance );
+            return AdminViews.SE_INSTANCE_MANAGEMENT;
+        }
     }
 
     @RequestMapping(value = { "/iplug-pages/instanceManagement.html" }, method = RequestMethod.POST, params = "start")

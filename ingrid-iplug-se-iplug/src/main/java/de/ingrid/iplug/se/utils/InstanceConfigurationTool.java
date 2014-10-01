@@ -46,7 +46,7 @@ public class InstanceConfigurationTool {
             settings = gson.fromJson(new InputStreamReader(reader, "UTF-8"), UrlMaintenanceSettings.class);
         } catch (FileNotFoundException | JsonSyntaxException | JsonIOException | UnsupportedEncodingException e) {
             log.error("Error opening instance configuration: " + confPath, e);
-            throw new RuntimeException("Error writing nutch configuration: " + confPath, e);
+            throw new RuntimeException("Error opening nutch configuration: " + confPath, e);
         } finally {
             if (reader != null) {
                 try {

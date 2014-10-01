@@ -206,7 +206,9 @@ public class ListInstancesController extends AbstractController {
 
             // copy default configuration
             destDir = Paths.get( newInstanceDir.toString(), "conf" );
-            sourceDir = Paths.get( "conf", "default", "conf" );
+            ClassPathResource instanceResourcesDir = new ClassPathResource( "instance-data" );
+            sourceDir = Paths.get( instanceResourcesDir.getFile().getPath() );
+            
             try {
                 FileUtils.copyDirectories(sourceDir, destDir);
             } catch (IOException e) {
@@ -215,9 +217,7 @@ public class ListInstancesController extends AbstractController {
             }
 
             
-            //modelMap.put( "instances", getInstances() );
-                
-                result = true;
+            result = true;
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -253,8 +253,6 @@ public class ListInstancesController extends AbstractController {
             //modelMap.put( "error", "Directory '" + directoryToDelete.toString() + "' could not be deleted!" );
             return new ResponseEntity<String>( HttpStatus.INTERNAL_SERVER_ERROR );
         }
-
-        //modelMap.put( "instances", getInstances() );
 
         return new ResponseEntity<String>( HttpStatus.OK );
     }

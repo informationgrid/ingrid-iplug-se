@@ -87,7 +87,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             }
             this.statusProvider.appendToState("INJECT_META", " done.");
 
-            this.statusProvider.addState("FILTER_CRAWLDB", "Filter crawldb width limit/exclude urls...");
+            this.statusProvider.addState("FILTER_CRAWLDB", "Filter crawldb by limit/exclude urls...");
             // Usage: <crawldb> <bwdb> <normalize> <filter> <replace current
             // crawldb>
             ret = execute("de.ingrid.iplug.se.nutch.crawl.bw.BWCrawlDbFilter", crawlDb, bwDb, "false", "false", "true");
@@ -158,7 +158,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             }
             this.statusProvider.appendToState("MERGE_SEGMENT", " done.");
 
-            this.statusProvider.addState("FILTER_SEGMENT", "Filter segment width limit/exclude urls...");
+            this.statusProvider.addState("FILTER_SEGMENT", "Filter segment by limit/exclude urls...");
             execute("de.ingrid.iplug.se.nutch.segment.SegmentFilter", filteredSegments, crawlDb, "-dir", segments);
             if (fs.getPath(filteredSegments).toFile().exists()) {
                 removeRecursive(fs.getPath(segments));

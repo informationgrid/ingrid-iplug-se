@@ -1,0 +1,313 @@
+{
+    "metadata": [
+        {
+            "label": "Sprache",
+            "id": "lang",
+            "type": "select",
+            "children": [
+                {
+                    "label": "Deutsch",
+                    "id": "de"
+                },
+                {
+                    "label": "Englisch",
+                    "id": "en"
+                }
+            ]
+        },
+        {
+            "label": "Partner",
+            "id": "partner",
+            "type": "select",
+            "isMultiple": true,
+            "children": [
+                {
+                    "label": "Bund",
+                    "id": "bund"
+                },
+                {
+                    "label": "Baden-Württemberg",
+                    "id": "bw"
+                },
+                {
+                    "label": "Bayern",
+                    "id": "by"
+                },
+                {
+                    "label": "Berlin",
+                    "id": "be"
+                },
+                {
+                    "label": "Brandenburg",
+                    "id": "bb"
+                },
+                {
+                    "label": "Bremen",
+                    "id": "hb"
+                },
+                {
+                    "label": "Hamburg",
+                    "id": "hh"
+                },
+                {
+                    "label": "Hessen",
+                    "id": "he"
+                },
+                {
+                    "label": "Mecklenburg-Vorpommern",
+                    "id": "mv"
+                },
+                {
+                    "label": "Niedersachsen",
+                    "id": "ni"
+                },
+                {
+                    "label": "Nordrhein-Westfalen",
+                    "id": "nw"
+                },
+                {
+                    "label": "Rheinland-Pfalz",
+                    "id": "rp"
+                },
+                {
+                    "label": "Saarland",
+                    "id": "sl"
+                },
+                {
+                    "label": "Sachsen-Anhalt",
+                    "id": "st"
+                },
+                {
+                    "label": "Schleswig-Holstein",
+                    "id": "sh"
+                },
+                {
+                    "label": "Thüringen",
+                    "id": "th"
+                }
+            ]
+        },
+        {
+            "label": "Anbieter",
+            "id": "provider",
+            "type": "grouped",
+            "isMultiple": true,
+            "children": [
+                {
+                    "label": "Bund",
+                    "children": [
+                        {
+                            "label": "",
+                            "id": "bu_bmu"
+                        },
+                        {
+                            "label": "",
+                            "id": "bu_uba"
+                        },
+                        {
+                            "label": "",
+                            "id": "bu_bfn"
+                        },
+                        {
+                            "label": "",
+                            "id": "bu_bfs"
+                        },
+                        {
+                            "label": "",
+                            "id": "bu_bmf"
+                        },
+                        {
+                            "label": "",
+                            "id": "bu_bmbf"
+                        },
+                        {
+                            "label": "",
+                            "id": "bu_bmelv"
+                        },
+                        {
+                            "label": "",
+                            "id": "bu_bmz"
+                        },
+                        {
+                            "label": "",
+                            "id": "bu_aa"
+                        },
+                        {
+                            "label": "",
+                            "id": "bu_bsh"
+                        },
+                        {
+                            "label": "",
+                            "id": "bu_bvl"
+                        },
+                        {
+                            "label": "",
+                            "id": "bu_bgr"
+                        }
+                    ]
+                },
+                {
+                    "label": "Brandenburg",
+                    "id": "bb",
+                    "children": [
+                        {
+                            "label": "bb provider 1",
+                            "id": "bbp1"
+                        },
+                        {
+                            "label": "bb provider 2",
+                            "id": "bbp2"
+                        }
+                    ]
+                },
+                {
+                    "label": "Sachsen-Anhalt",
+                    "id": "st",
+                    "children": [
+                        {
+                            "label": "st provider 1",
+                            "id": "stp1"
+                        },
+                        {
+                            "label": "st provider 2",
+                            "id": "stp2"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "label": "Themen",
+            "id": "topic",
+            "isMultiple": true,
+            "children": [
+                {
+                    "id": "abfall",
+                    "label": "Abfall"
+                },
+                {
+                    "id": "altlasten",
+                    "label": "Altlasten"
+                },
+                {
+                    "id": "bauen",
+                    "label": "Bauen"
+                },
+                {
+                    "id": "boden",
+                    "label": "Boden"
+                },
+                {
+                    "id": "chemikalien",
+                    "label": "Chemikalien"
+                },
+                {
+                    "id": "energie",
+                    "label": "Energie"
+                },
+                {
+                    "id": "forstwirtschaft",
+                    "label": "Forstwirtschaft"
+                },
+                {
+                    "id": "gentechnik",
+                    "label": "Gentechnik"
+                },
+                {
+                    "id": "geologie",
+                    "label": "Geologie"
+                },
+                {
+                    "id": "gesundheit",
+                    "label": "Gesundheit"
+                },
+                {
+                    "id": "laermerschuetterung",
+                    "label": "Lärm und Erschütterung"
+                },
+                {
+                    "id": "landwirtschaft",
+                    "label": "Landwirtschaft"
+                },
+                {
+                    "id": "luftklima",
+                    "label": "Luft und Klima"
+                },
+                {
+                    "id": "nachhaltigeentwicklung",
+                    "label": "Nachhaltige Entwicklung"
+                },
+                {
+                    "id": "naturlandschaft",
+                    "label": "Natur und Landschaft"
+                },
+                {
+                    "id": "strahlung",
+                    "label": "Strahlung"
+                },
+                {
+                    "id": "tierschutz",
+                    "label": "Tierschutz"
+                },
+                {
+                    "id": "umweltinformation",
+                    "label": "Umweltinformationen"
+                },
+                {
+                    "id": "umweltwirtschaft",
+                    "label": "Umweltwirtschaft"
+                },
+                {
+                    "id": "verkehr",
+                    "label": "Verkehr"
+                },
+                {
+                    "id": "wasser",
+                    "label": "Wasser"
+                }
+            ]
+        },
+        {
+            "label": "Service",
+            "id": "service",
+            "isMultiple": true,
+            "children": [
+                {
+                    "id": "press",
+                    "label": "Pressemitteilungen"
+                },
+                {
+                    "id": "publication",
+                    "label": "Publikationen"
+                },
+                {
+                    "id": "event",
+                    "label": "Veranstaltungen"
+                }
+            ]
+        },
+        {
+            "label": "Messwerte",
+            "id": "measure",
+            "isMultiple": true,
+            "children": [
+                {
+                    "id": "radiation",
+                    "label": "Strahlung"
+                },
+                {
+                    "id": "air",
+                    "label": "Luft"
+                },
+                {
+                    "id": "water",
+                    "label": "Wasser"
+                },
+                {
+                    "id": "misc",
+                    "label": "Weitere"
+                }
+            ]
+        }
+    ]
+}

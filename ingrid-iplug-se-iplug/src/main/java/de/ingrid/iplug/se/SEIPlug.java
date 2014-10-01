@@ -152,19 +152,22 @@ public class SEIPlug extends HeartBeatPlug {
     public static void main(String[] args) throws Exception {
         conf = new ConfigBuilder<Configuration>(Configuration.class).withCommandLineArgs(args).build();
         new JettyStarter( conf );
+        
+        // get an entity manager instance (initializes properties in the DBManager)
         EntityManagerFactory emf = Persistence.createEntityManagerFactory(conf.databaseID);//, properties);
         DBManager.INSTANCE.intialize(emf);
         EntityManager em = DBManager.INSTANCE.getEntityManager();
         
-        // do database migrations
-        Flyway flyway = new Flyway();
-        String dbUrl = DBManager.INSTANCE.getProperty("javax.persistence.jdbc.url").toString();
-        flyway.setDataSource(dbUrl, "", "");
-        flyway.migrate();
-        
-        // get an entity manager instance (initializes properties in the DBManager)
+        // apply test-data during development
         if ( "iplug-se-dev".equals( conf.databaseID ) ) {
             setupTestData( em );
+            
+        } else {
+            // do database migrations
+            Flyway flyway = new Flyway();
+            String dbUrl = DBManager.INSTANCE.getProperty("javax.persistence.jdbc.url").toString();
+            flyway.setDataSource(dbUrl, "", "");
+            flyway.migrate();
         }
         
     }
