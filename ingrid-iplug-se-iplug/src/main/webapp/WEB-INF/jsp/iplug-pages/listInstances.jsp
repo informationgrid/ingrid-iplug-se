@@ -49,7 +49,7 @@
         	
         	$.ajax({
                 type: "POST",
-                url: "/rest/instance/" + instance + "/" + value,
+                url: "../rest/instance/" + instance + "/" + value,
                 contentType: 'application/json',
                 success: function() {
                     console.debug( "Switched instance '" + instance + "' to: " + value );

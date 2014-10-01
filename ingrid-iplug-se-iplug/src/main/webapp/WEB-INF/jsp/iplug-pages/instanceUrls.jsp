@@ -94,7 +94,7 @@
 			if ( valid ) {
 				$.ajax({
 					type: "POST",
-					url: "/rest/addUrl.json?instance=${instance.name}",
+					url: "../rest/addUrl.json?instance=${instance.name}",
 					contentType: 'application/json',
 					data: JSON.stringify( data ),
 					success: function() {
@@ -336,7 +336,7 @@
 			switch (action) {
 			case "createNewFromTemplate":
 				var id = $( target ).parents("tr").attr("data-id");
-                $.get("/rest/url/" + id, function(data) {
+                $.get("../rest/url/" + id, function(data) {
                     // reload page if data was not received, which calls login page
                     if (typeof data === "string") location.reload();
                     // empty start/limit/exclude URL(s)
@@ -371,7 +371,7 @@
 		function createActionButton( btn ) {
     		btn.button().click(function() {
     			var id = $( this ).parents("tr").attr("data-id");
-    			$.get("/rest/url/" + id, function(data) {
+    			$.get("../rest/url/" + id, function(data) {
     				// reload page if data was not received, which calls login page
     				if (typeof data === "string") location.reload();
     				console.log("Data: ", data);
@@ -453,7 +453,7 @@
             });
             $.ajax({
                 type: "POST",
-                url: "/rest/deleteUrls.json?instance=${instance.name}",
+                url: "../rest/deleteUrls.json?instance=${instance.name}",
                 contentType: 'application/json',
                 data: JSON.stringify( dataIDs ),
                 success: function() {

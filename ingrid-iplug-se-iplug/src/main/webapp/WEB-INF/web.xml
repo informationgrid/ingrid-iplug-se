@@ -46,7 +46,7 @@ http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
         <url-pattern>/h2/*</url-pattern>
     </servlet-mapping>
     
-  	<listener>
+    <listener>
       <listener-class>de.ingrid.admin.ContextListener</listener-class>
     </listener>
     
@@ -116,7 +116,7 @@ http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
     
     <error-page>
         <error-code>404</error-code>
-        <location>/base/welcome.html</location>
+        <location>/index.jsp</location>
     </error-page>
     
     <error-page>

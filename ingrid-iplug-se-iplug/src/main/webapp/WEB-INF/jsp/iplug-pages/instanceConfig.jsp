@@ -28,7 +28,7 @@
 			$("#btnUpdateMetadata").on( "click", function() {
     			$.ajax({
                     type: "POST",
-                    url: "/rest/updateMetadata?instance=${instance.name}",
+                    url: "../rest/updateMetadata?instance=${instance.name}",
                     contentType: 'application/json',
                     data: $("#metadata").val(),
                     success: function() {
