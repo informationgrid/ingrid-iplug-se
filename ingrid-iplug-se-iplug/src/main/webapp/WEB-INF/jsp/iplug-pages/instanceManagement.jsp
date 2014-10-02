@@ -73,7 +73,9 @@
         var content = "";
         for (var i=0; i < data.length; i++) {
             var row = data[i];
-            content += "<div class='" + row.classification.toLowerCase() + "'>" + formatTime(row.time) + " - [" + row.classification + "] " + row.value + "</div>";
+            if (row.value) {
+                content += "<div class='" + row.classification.toLowerCase() + "'>" + formatTime(row.time) + " - [" + row.classification + "] " + row.value + "</div>";
+            }
         }
 
         $("#status").html( content );

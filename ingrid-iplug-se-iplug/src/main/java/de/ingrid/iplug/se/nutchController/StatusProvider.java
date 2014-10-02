@@ -11,9 +11,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,7 +32,7 @@ import com.thoughtworks.xstream.XStream;
  */
 public class StatusProvider {
 
-    final protected static Log log = LogFactory.getLog(StatusProvider.class);
+    final protected static Log LOG = LogFactory.getLog(StatusProvider.class);
 
     public static enum Classification {
         INFO(1), WARN(2), ERROR(3);
@@ -46,17 +49,19 @@ public class StatusProvider {
     public StatusProvider(String logDir) {
 
         if (this.lastStatusFile == null) {
-            
-            this.lastStatusFile = new File( logDir, "last_status.xml" );
+
+            this.lastStatusFile = new File(logDir, "last_status.xml");
             try {
                 this.load();
             } catch (IOException e) {
-                log.error("Error loading last status file.", e);
+                LOG.error("Error loading last status file.", e);
             }
         }
     }
 
     public static class State {
+
+        protected String key;
 
         protected String value;
 
@@ -64,7 +69,10 @@ public class StatusProvider {
 
         protected Classification classification;
 
-        State(String value, Date time, Classification classification) {
+        protected Map<String, String> properties;
+
+        State(String key, String value, Date time, Classification classification) {
+            this.key = key;
             this.value = value;
             this.time = time;
             this.classification = classification;
@@ -73,7 +81,7 @@ public class StatusProvider {
         public String getValue() {
             return value;
         }
-        
+
         public void setValue(String value) {
             this.value = value;
         }
@@ -92,6 +100,28 @@ public class StatusProvider {
 
         public void setClassification(Classification classification) {
             this.classification = classification;
+        }
+
+        public void setProperty(String key, String value) {
+            if (properties == null) {
+                properties = new HashMap<String, String>();
+            }
+            properties.put(key, value);
+        }
+
+        public String getProperty(String key) {
+            if (properties != null) {
+                return properties.get(key);
+            }
+            return null;
+        }
+
+        public String getKey() {
+            return key;
+        }
+
+        public void setKey(String key) {
+            this.key = key;
         }
 
     }
@@ -114,8 +144,13 @@ public class StatusProvider {
             states.get(key).classification = classification;
         } else {
             synchronized (this) {
-                states.put(key, new State(value, new Date(), classification));
+                states.put(key, new State(key, value, new Date(), classification));
             }
+        }
+        try {
+            write();
+        } catch (IOException e) {
+            LOG.error("Error writing last status.", e);
         }
     }
 
@@ -142,6 +177,11 @@ public class StatusProvider {
     public void appendToState(String key, String value) {
         if (states.containsKey(key)) {
             states.get(key).value = states.get(key).value.concat(value);
+            try {
+                write();
+            } catch (IOException e) {
+                LOG.error("Error writing last status.", e);
+            }
         }
     }
 
@@ -154,6 +194,36 @@ public class StatusProvider {
      */
     public void addState(String key, String value) {
         this.addState(key, value, Classification.INFO);
+    }
+
+    /**
+     * Adds a property to a state. Creates a NULL state if necessary.
+     * 
+     * @param state
+     * @param key
+     * @param value
+     */
+    public void setStateProperty(String state, String key, String value) {
+        if (!states.containsKey(state)) {
+            synchronized (this) {
+                states.put(state, new State(state, null, new Date(), Classification.INFO));
+            }
+        }
+        states.get(state).setProperty(key, value);
+    }
+
+    /**
+     * Returns a property of a state. Returns NULL if it does not exist.
+     * 
+     * @param state
+     * @param key
+     * @return
+     */
+    public String getStateProperty(String state, String key) {
+        if (states.containsKey(state)) {
+            return states.get(state).getProperty(key);
+        }
+        return null;
     }
 
     /**
@@ -188,7 +258,7 @@ public class StatusProvider {
      */
     public synchronized void write() throws IOException {
         if (this.lastStatusFile == null) {
-            log.warn( "Log file could not be written, because it was not defined!" );
+            LOG.warn("Log file could not be written, because it was not defined!");
             return;
         }
 
@@ -221,24 +291,24 @@ public class StatusProvider {
     @SuppressWarnings("unchecked")
     public synchronized void load() throws IOException {
         if (this.lastStatusFile == null) {
-            log.warn( "Log file could not be read, because it was not defined!" );
+            LOG.warn("Log file could not be read, because it was not defined!");
             return;
         }
-        
+
         // create empty configuration, if not existing yet
         if (!this.lastStatusFile.exists()) {
-            log.warn("Status file " + this.lastStatusFile + " does not exist.");
+            LOG.warn("Status file " + this.lastStatusFile + " does not exist.");
             if (this.lastStatusFile.getParentFile() != null && !this.lastStatusFile.getParentFile().exists() && !this.lastStatusFile.getParentFile().mkdirs()) {
-                log.error("Unable to create directories for '" + this.lastStatusFile.getParentFile() + "'");
+                LOG.error("Unable to create directories for '" + this.lastStatusFile.getParentFile() + "'");
             }
-            log.info("Creating configuration file " + this.lastStatusFile);
+            LOG.info("Creating configuration file " + this.lastStatusFile);
             this.lastStatusFile.createNewFile();
         }
 
         BufferedReader input = null;
         try {
-            if (log.isDebugEnabled()) {
-                log.debug("Read status file: " + this.lastStatusFile);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Read status file: " + this.lastStatusFile);
             }
             // read the configuration file content
             StringBuilder content = new StringBuilder();
@@ -252,7 +322,7 @@ public class StatusProvider {
             input = null;
 
             if (content.length() == 0) {
-                log.warn("Last status file " + this.lastStatusFile + " is empty.");
+                LOG.warn("Last status file " + this.lastStatusFile + " is empty.");
             }
 
             // deserialize a temporary Configuration instance from xml
@@ -283,20 +353,23 @@ public class StatusProvider {
         StringBuilder sb = new StringBuilder();
         synchronized (this) {
             for (State state : states.values()) {
-                if (state.classification.equals(Classification.ERROR)) {
-                    sb.append("<span class=\"error\">" + String.format(msgFormat, state.time, state.classification.name(), state.value) + "</span>");
-                } else if (state.classification.equals(Classification.WARN)) {
-                    sb.append("<span class=\"warn\">" + String.format(msgFormat, state.time, state.classification.name(), state.value) + "</span>");
-                } else {
-                    sb.append("<span class=\"info\">" + String.format(msgFormat, state.time, state.classification.name(), state.value) + "</span>");
+                // do not display null states
+                if (state.getValue() != null) {
+                    if (state.classification.equals(Classification.ERROR)) {
+                        sb.append("<span class=\"error\">" + String.format(msgFormat, state.time, state.classification.name(), state.value) + "</span>");
+                    } else if (state.classification.equals(Classification.WARN)) {
+                        sb.append("<span class=\"warn\">" + String.format(msgFormat, state.time, state.classification.name(), state.value) + "</span>");
+                    } else {
+                        sb.append("<span class=\"info\">" + String.format(msgFormat, state.time, state.classification.name(), state.value) + "</span>");
+                    }
                 }
             }
         }
         return sb.toString();
     }
-    
-    public Collection<State> getStates() {
-        return this.states.values();
+
+    public List<State> getStates() {
+        return new ArrayList<State>(this.states.values());
     }
 
     public String getMsgFormat() {

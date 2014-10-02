@@ -18,6 +18,10 @@ import de.ingrid.iplug.se.nutchController.StatusProvider.Classification;
  */
 public abstract class NutchProcess extends Thread {
 
+    public static enum STATES {
+        ABORT, ERROR;
+    };
+
     private static Logger log = Logger.getLogger(NutchProcess.class);
 
     public enum STATUS {
@@ -50,7 +54,7 @@ public abstract class NutchProcess extends Thread {
         if (status == STATUS.RUNNING) {
             status = STATUS.INTERRUPTED;
             if (resultHandler != null && !resultHandler.hasResult()) {
-                this.statusProvider.addState( "ABORT", "The process has been aborted by a user", Classification.WARN );
+                this.statusProvider.addState( STATES.ABORT.name(), "The process has been aborted by a user", Classification.WARN );
                 resultHandler.getWatchdog().destroyProcess();
                 try {
                     resultHandler.waitFor(60 * 1000);
