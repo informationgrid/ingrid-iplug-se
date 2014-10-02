@@ -281,7 +281,7 @@
 
 	<property>
 		<name>fetcher.throughput.threshold.check.after</name>
-		<value>1</value>
+		<value>60</value>
 		<description>The number of minutes after which the throughput check is
 			enabled.</description>
 	</property>
