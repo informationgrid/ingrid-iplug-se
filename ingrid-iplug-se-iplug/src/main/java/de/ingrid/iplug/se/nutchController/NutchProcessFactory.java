@@ -14,8 +14,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
 
 import com.google.gson.JsonIOException;
@@ -34,7 +32,7 @@ import edu.emory.mathcs.backport.java.util.Arrays;
  */
 public class NutchProcessFactory {
 
-    private final static Log log = LogFactory.getLog(NutchProcessFactory.class);
+    //private final static Log log = LogFactory.getLog(NutchProcessFactory.class);
     
     /**
      * 

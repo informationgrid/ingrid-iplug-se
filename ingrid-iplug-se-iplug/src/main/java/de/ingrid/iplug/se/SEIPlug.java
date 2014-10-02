@@ -89,7 +89,7 @@ public class SEIPlug extends HeartBeatPlug {
     @Override
     public void configure(PlugDescription plugDescription) {
         super.configure(plugDescription);
-        log.info("Configuring iPlug-SE ...");
+        log.info("(Re-)Configuring iPlug-SE ...");
 
         this.fPlugDesc = plugDescription;
         this.fPlugId = fPlugDesc.getPlugId();
@@ -98,6 +98,8 @@ public class SEIPlug extends HeartBeatPlug {
         
         // TODO: add plug id as index information
         // ...
+        
+        log.info("Done.");
     }
 
     /**

@@ -30,6 +30,7 @@ public class FieldQueryIGCConverter implements IQueryConverter {
     private final static Logger log = Logger.getLogger( FieldQueryIGCConverter.class );
     
     @Override
+    @SuppressWarnings("unchecked")
     public void parse(IngridQuery ingridQuery, BoolQueryBuilder queryBuilder) {
         FieldQuery[] fields = ingridQuery.getFields();
 
@@ -103,6 +104,7 @@ public class FieldQueryIGCConverter implements IQueryConverter {
     }
     
     
+    @SuppressWarnings("unchecked")
     private void prepareGeo(BoolQueryBuilder booleanQuery, Map<String,Object> geoMap) {
         List<String> list = (List<String>) geoMap.get("coord");
         if (list != null) {
@@ -249,6 +251,7 @@ public class FieldQueryIGCConverter implements IQueryConverter {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static void prepareTime(BoolQueryBuilder query, Map<String,Object> timeMap) {
         if (log.isDebugEnabled()) {
             log.debug("start prepareTime with t0=" + timeMap.get("t0") + ", t1:" + timeMap.get("t1") + ", t2:"
