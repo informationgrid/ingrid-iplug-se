@@ -51,10 +51,6 @@ public class IndexImpl implements Index {
 
     private static final String ELASTIC_SEARCH_INDEX_TYPE = "es_type";
     
-    // comma-separated list of instances used for search
-    // -> set through configuration
-    private String[] instances = null;
-
     private String plugId = null;
 
     // SearchType see: http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-request-search-type.html
@@ -80,8 +76,6 @@ public class IndexImpl implements Index {
                 client.admin().indices().prepareCreate( indexName ).execute().actionGet();
             }
             
-            setActiveInstances( SEIPlug.conf.activeInstances );
-
         } catch (Exception e) {
             log.error( "Error during initialization of ElasticSearch-Client!" );
             e.printStackTrace();
@@ -101,6 +95,7 @@ public class IndexImpl implements Index {
 
         boolean isLocationSearch = ingridQuery.containsField( "x1" );
         boolean hasFacets = ingridQuery.containsKey( "FACETS" );
+        String[] instances = SEIPlug.conf.activeInstances.toArray( new String[0] );
         
         // search prepare
         SearchRequestBuilder srb = client.prepareSearch( indexName )
@@ -231,15 +226,6 @@ public class IndexImpl implements Index {
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void setActiveInstances(List<String> values) {
-        if (values == null) {
-            this.instances = new String[0];
-        } else {
-            this.instances = values.toArray(new String[0]);
         }
     }
 

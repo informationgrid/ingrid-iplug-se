@@ -43,7 +43,4 @@ public interface Index {
 	 */
 	public void close();
 
-
-    public void setActiveInstances(List<String> value);
-	
 }

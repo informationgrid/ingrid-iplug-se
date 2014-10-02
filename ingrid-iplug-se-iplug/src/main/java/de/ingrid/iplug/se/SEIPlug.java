@@ -94,8 +94,6 @@ public class SEIPlug extends HeartBeatPlug {
         this.fPlugDesc = plugDescription;
         this.fPlugId = fPlugDesc.getPlugId();
         
-        index.setActiveInstances( conf.activeInstances );
-        
         // TODO: add plug id as index information
         // ...
         
