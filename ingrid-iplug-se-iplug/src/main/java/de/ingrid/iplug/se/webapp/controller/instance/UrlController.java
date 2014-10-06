@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -43,6 +44,7 @@ import de.ingrid.iplug.se.db.model.Metadata;
 import de.ingrid.iplug.se.db.model.Url;
 import de.ingrid.iplug.se.utils.InstanceConfigurationTool;
 import de.ingrid.iplug.se.webapp.controller.AdminViews;
+import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * Control the database parameter page.
@@ -169,6 +171,7 @@ public class UrlController extends AbstractController {
                                     it.remove();
                                 }
                             }
+                            Collections.sort( provider, new ProviderComparer() );
                             m.setChildren( provider );
                             providerMeta.add( m );
                         }
@@ -193,6 +196,15 @@ public class UrlController extends AbstractController {
     public String testUrl(@RequestParam("instance") String name, @RequestParam("id") Long id) {
 
         return redirect(AdminViews.SE_INSTANCE_URLS + ".html?instance=" + name);
+    }
+    
+    private class ProviderComparer implements Comparator<UrlMaintenanceSettings.Metadata> {
+
+        @Override
+        public int compare(UrlMaintenanceSettings.Metadata o1, UrlMaintenanceSettings.Metadata o2) {
+            return o1.getLabel().toLowerCase().compareTo( o2.getLabel().toLowerCase() );
+        }
+
     }
 
 }
