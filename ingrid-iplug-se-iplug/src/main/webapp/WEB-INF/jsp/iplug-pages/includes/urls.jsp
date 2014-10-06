@@ -217,6 +217,13 @@
     </form>
 </div>
 
+<div id="dialog-confirm" title="Wirklich löschen?">
+    <p>
+        <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+        Möchten Sie die Url(s) wirklich löschen?
+    </p>
+</div>
+
 <!-- <div id="dialog-form-limit" title="Add new Limit-URL">
     <form>
         <fieldset>

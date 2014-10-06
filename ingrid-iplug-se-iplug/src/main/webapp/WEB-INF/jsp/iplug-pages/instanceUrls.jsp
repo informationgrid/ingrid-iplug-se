@@ -303,6 +303,52 @@
 			close : function() {}
 		});
 
+        dialogConfirm = $( "#dialog-confirm" ).dialog({
+            resizable: false,
+            autoOpen: false,
+            height:140,
+            modal: true,
+            buttons: {
+                "Abbrechen": function() {
+                    $( this ).dialog( "close" );
+                },
+                "Löschen": function() {
+                    var action = dialogConfirm.data("action");
+                    if (action.type === "deleteSingleUrl") {
+                        $.ajax({
+                            url: "../rest/url/" + action.id,
+                            type: 'DELETE',
+                            success: function() {
+                                location.reload();
+                            },
+                            data: action.id,
+                            contentType: 'application/json'
+                        });
+                    } else if (action.type === "deleteMultipleUrls") {
+                        var checkedRows = $( "#urlTable input:checked" );
+                        var dataIDs = []; 
+                        checkedRows.each( function(index, row) {
+                            dataIDs.push( $( row ).parents("tr").attr("data-id") );
+                        });
+                        $.ajax({
+                            type: "DELETE",
+                            url: "../rest/urls",
+                            contentType: 'application/json',
+                            data: JSON.stringify( dataIDs ),
+                            success: function() {
+                                // let JSP do the magic to refresh the page correctly
+                                location.reload();
+                            },
+                            error: function(jqXHR, text, error) {
+                                console.error(text, error);
+                            }
+                        });
+                    }
+                    $( this ).dialog( "close" );
+                }
+            }
+        });
+
 /* 		dialogLimit = $("#dialog-form-limit").dialog({
 			autoOpen : false,
 			height : 250,
@@ -385,15 +431,11 @@
                 break;
             case "delete":
                 var id = $( target ).parents("tr").attr("data-id");
-                $.ajax({
-                    url: "../rest/url/" + id,
-                    type: 'DELETE',
-                    success: function() {
-                        location.reload();
-                    },
-                    data: id,
-                    contentType: 'application/json'
+                dialogConfirm.data("action", {
+                    type: "deleteSingleUrl",
+                    id: id
                 });
+                dialogConfirm.dialog("open")
                 break;
             default:
                 alert( "Unbekannte Aktion: ", action );
@@ -479,24 +521,10 @@
         
         // action for button to delete urls
         $("#btnDeleteUrls").on( "click", function() {
-            var checkedRows = $( "#urlTable input:checked" );
-        	var dataIDs = []; 
-            checkedRows.each( function(index, row) {
-            	dataIDs.push( $( row ).parents("tr").attr("data-id") );
+            dialogConfirm.data( "action", {
+                type: "deleteMultipleUrls"
             });
-            $.ajax({
-                type: "DELETE",
-                url: "../rest/urls",
-                contentType: 'application/json',
-                data: JSON.stringify( dataIDs ),
-                success: function() {
-                    // let JSP do the magic to refresh the page correctly
-                    location.reload();
-                },
-                error: function(jqXHR, text, error) {
-                    console.error(text, error);
-                }
-            });
+            dialogConfirm.dialog( "open" );
         });
 
         // convert select boxes to better ones
