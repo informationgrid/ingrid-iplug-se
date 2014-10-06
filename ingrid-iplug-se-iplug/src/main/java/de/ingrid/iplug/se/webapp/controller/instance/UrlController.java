@@ -183,14 +183,7 @@ public class UrlController extends AbstractController {
         return metadata;
     }
     
-
-    @RequestMapping(value = { "/iplug-pages/instanceUrls.html" }, method = RequestMethod.POST, params = "editUrl")
-    public String editUrl(@RequestParam("instance") String name, @RequestParam("id") Long id) {
-
-        return redirect(AdminViews.SE_INSTANCE_URLS + ".html?instance=" + name);
-    }
-
-    @RequestMapping(value = { "/iplug-pages/instanceUrls.html" }, method = RequestMethod.POST, params = "deleteUrl")
+    @RequestMapping(value = { "/iplug-pages/instanceUrls.html" }, method = RequestMethod.DELETE, params = "deleteUrl")
     public String deleteUrl(@RequestParam("instance") String name, @RequestParam("id") Long id) {
 
         return redirect(AdminViews.SE_INSTANCE_URLS + ".html?instance=" + name);

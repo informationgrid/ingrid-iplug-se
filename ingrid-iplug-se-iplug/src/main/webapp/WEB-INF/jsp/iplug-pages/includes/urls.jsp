@@ -39,7 +39,7 @@
     </form>
 </div>
 
-<table id="urlTable" class="data tablesorter">
+<table id="urlTable" class="data tablesorter space">
     <thead>
         <tr>
             <th data-sort="string" width="20px"></th>

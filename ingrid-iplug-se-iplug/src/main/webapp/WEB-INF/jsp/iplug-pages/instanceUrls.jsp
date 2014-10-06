@@ -58,6 +58,9 @@
 			// get metadata from all visible checkboxes
 			var allInputs = $("#dialog-form select, #dialog-form input[type=checkbox]:checked:visible");
 
+            // ************************************
+            // Check if metadata is in valid format
+            // ************************************
 			var handleMetadataItem = function(item) {
 				var value = item.split(":");
 				if (value.length === 2) {
@@ -91,10 +94,22 @@
 			
 			delete data.userMetadata;
 			
+            // ************************************
+            // Check if limitUrls are valid and set
+            // ************************************
+            $.each( data.limitUrls, function(index, url) {
+
+            });
+
+            // if no limit url has been set, then take the start url
+            if (data.limitUrls.length === 0) {
+                data.limitUrls.push( data.url )
+            }
+
 			if ( valid ) {
 				$.ajax({
 					type: "POST",
-					url: "../rest/addUrl.json?instance=${instance.name}",
+					url: "../rest/url",
 					contentType: 'application/json',
 					data: JSON.stringify( data ),
 					success: function() {
@@ -339,7 +354,9 @@
                 $.get("../rest/url/" + id, function(data) {
                     // reload page if data was not received, which calls login page
                     if (typeof data === "string") location.reload();
-                    // empty start/limit/exclude URL(s)
+                    // empty start/limit/exclude URL(s) and remove the id
+                    delete data.id;
+                    delete data.status;
                     data.userMetadata = [];
                     data.url = "http://";
                     data.limitUrls = [];
@@ -365,6 +382,21 @@
                 dataArray.splice(dataArray.indexOf( url ), 1);
                 // remove row from table
                 row.remove();
+                break;
+            case "delete":
+                var id = $( target ).parents("tr").attr("data-id");
+                $.ajax({
+                    url: "../rest/url/" + id,
+                    type: 'DELETE',
+                    success: function() {
+                        location.reload();
+                    },
+                    data: id,
+                    contentType: 'application/json'
+                });
+                break;
+            default:
+                alert( "Unbekannte Aktion: ", action );
             }
 		}
 		
@@ -375,6 +407,7 @@
     				// reload page if data was not received, which calls login page
     				if (typeof data === "string") location.reload();
     				console.log("Data: ", data);
+                    dialog.data("isNew", false);
     				data.userMetadata = [];
     				dialog.data("urlDataObject", data);
     				dialog.dialog("open");
@@ -452,8 +485,8 @@
             	dataIDs.push( $( row ).parents("tr").attr("data-id") );
             });
             $.ajax({
-                type: "POST",
-                url: "../rest/deleteUrls.json?instance=${instance.name}",
+                type: "DELETE",
+                url: "../rest/urls",
                 contentType: 'application/json',
                 data: JSON.stringify( dataIDs ),
                 success: function() {

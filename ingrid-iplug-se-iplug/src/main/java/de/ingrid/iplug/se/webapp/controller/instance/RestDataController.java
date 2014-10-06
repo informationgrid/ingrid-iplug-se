@@ -49,12 +49,12 @@ public class RestDataController extends InstanceController {
         return new ResponseEntity<Url>( url, url != null ? HttpStatus.OK : HttpStatus.NOT_FOUND );
     }
 
-    @RequestMapping(value = { "addUrl.json" }, method = RequestMethod.POST)
+    @RequestMapping(value = { "url" }, method = RequestMethod.POST)
     public ResponseEntity<Url> addUrl(@RequestBody Url url) {
         EntityManager em = DBManager.INSTANCE.getEntityManager();
         em.getTransaction().begin();
         if (url.getId() == null) {
-            em.persist( url );            
+            em.persist( url );
             
         } else {
             em.merge( url );            
@@ -63,7 +63,12 @@ public class RestDataController extends InstanceController {
         return new ResponseEntity<Url>( url, HttpStatus.OK );
     }
     
-    @RequestMapping(value = { "deleteUrls.json" }, method = RequestMethod.POST)
+    @RequestMapping(value = { "url/{id}" }, method = RequestMethod.DELETE)
+    public ResponseEntity<Map<String, String>> deleteUrl(@PathVariable("id") Long id) {
+        return deleteUrls( new Long[] { id } );
+    }
+    
+    @RequestMapping(value = { "urls" }, method = RequestMethod.DELETE)
     public ResponseEntity<Map<String, String>> deleteUrls(@RequestBody Long[] ids) {
         EntityManager em = DBManager.INSTANCE.getEntityManager();
         em.getTransaction().begin();
