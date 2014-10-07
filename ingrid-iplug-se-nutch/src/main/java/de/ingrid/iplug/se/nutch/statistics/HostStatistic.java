@@ -44,6 +44,7 @@ import org.apache.hadoop.util.ToolRunner;
 import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.crawl.CrawlDb;
 import org.apache.nutch.util.NutchConfiguration;
+import org.apache.nutch.util.NutchJob;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -239,10 +240,10 @@ public class HostStatistic extends Configured implements Tool {
         return paths;
     }
 
-    private static JobConf createCountJob(Path in, Path out) {
+    private JobConf createCountJob(Path in, Path out) {
         Path inputDir = new Path(in, CrawlDb.CURRENT_NAME);
 
-        JobConf job = new JobConf();
+        JobConf job = new NutchJob(getConf());
         job.setJobName("host_count " + inputDir);
 
         FileInputFormat.addInputPath(job, inputDir);
@@ -258,8 +259,8 @@ public class HostStatistic extends Configured implements Tool {
         return job;
     }
 
-    private static JobConf createSequenceFileJob(Path in, Path out) {
-        JobConf sortJob = new JobConf();
+    private JobConf createSequenceFileJob(Path in, Path out) {
+        JobConf sortJob = new NutchJob(getConf());
         sortJob.setJobName("sort_host_count " + in);
         FileInputFormat.addInputPath(sortJob, in);
 

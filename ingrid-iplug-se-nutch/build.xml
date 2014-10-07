@@ -1,5 +1,10 @@
 <project default="dist" xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:ac="antlib:net.sf.antcontrib">
 
+    <condition property="apache-nutch-version" value="apache-nutch-1.9">
+       <not>
+          <isset property="apache-nutch-version"/>
+       </not>
+    </condition>
 	<property name="nutch-version" value="${apache-nutch-version}" />
 	<property name="ingrid.ext.libs" value="${basedir}/ingrid-nutch-libs" />
 

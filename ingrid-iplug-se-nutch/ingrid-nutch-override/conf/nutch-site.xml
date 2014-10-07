@@ -311,6 +311,14 @@
 		<value>false</value>
 		<description>If true, fetcher will store content.</description>
 	</property>
+	
+	<property>
+        <name>db.signature.class</name>
+        <value>org.apache.nutch.crawl.TextProfileSignature</value>
+        <description>The default implementation of a page signature. Signatures
+        created with this implementation will be used for duplicate detection
+        and removal.</description>
+    </property>
 
 
 </configuration>
