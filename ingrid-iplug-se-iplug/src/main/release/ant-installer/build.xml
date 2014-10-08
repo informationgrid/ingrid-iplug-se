@@ -8,7 +8,7 @@
     
     <!-- THIS PORPERTIES ARE NECESSARY FOR UPDATES -->
     <property name="libraryDir"         value="lib" />
-    <property name="libraryIdent"       value="ingrid-iplug-se-" />
+    <property name="libraryIdent"       value="ingrid-iplug-se-iplug-" />
     <!-- <property name="libraryIdent"       value="MANIFEST.MF" /> -->
     <property name="versionsWithConfigurations"  value="" />
     <property name="minSupportedVersion" value="3.5.0" />
