@@ -145,6 +145,8 @@ public class FileUtils {
         List<String> excludeUrls = new ArrayList<String>();
 
         for (Url url : urls) {
+            
+            if (url.getUrl() == null) continue;
 
             Map<String, List<String>> metadata = new HashMap<String, List<String>>();
             for (Metadata meta : url.getMetadata()) {
@@ -155,7 +157,7 @@ public class FileUtils {
                 }
                 metaValues.add(meta.getMetaValue());
             }
-
+            
             startUrls.put(url.getUrl(), metadata);
             for (String limit : url.getLimitUrls()) {
                 limitUrls.add(limit);
