@@ -41,7 +41,65 @@
 			container: $(".pager"),
 			output: '{startRow} bis {endRow} von {filteredRows} URLs',
 			//size: 2,
-			savePages : false
+			savePages : false,
+            ajaxUrl : '../rest/urls/${instance.name}?page={page}',
+            serverSideSorting: true,
+            ajaxObject: {
+                dataType: 'json'
+            },
+            ajaxProcessing: function(data){
+                if (data) {// && data.hasOwnProperty('rows')) {
+                    var r, row, c, d = data.data,
+                    // total number of rows (required)
+                    total = data.totalUrls,
+                    // array of header names (optional)
+                    //headers = data.headers,
+                    // all rows: array of arrays; each internal array has the table cell data for that row
+                    rows = "",
+                    // len should match pager set size (c.size)
+                    len = d.length;
+                    // this will depend on how the json is set up - see City0.json
+                    // rows
+                    for ( r=0; r < len; r++ ) {
+                        // row = ""; // new row array
+                        // cells
+                        rows += "<tr data-id='" + d[r].id + "'>" +
+                                "<td><input type='checkbox'></td>" +
+                                "<td>" + d[r].url + "</td>" +
+                                "<td>" + d[r].status + "</td>" +
+                                "<td>" + actionButtonTemplate + "</td>" +
+                                "</tr>";
+
+                        //rows.push(row); // add new row array to rows array
+
+                        // add another child row for metadata
+                        var excludeUrlsLine = d[r].excludeUrls.length > 0 ? "<div class='exclude'>Exclude-URLs: " + d[r].excludeUrls.join(',') + "</div>" : "";
+                        var metadata = [];
+                        d[r].metadata.forEach( function(m) { metadata.push( m.metaKey + ":" + m.metaValue ); })
+                        rows += "<tr class='tablesorter-childRow'><td></td><td colspan='3' class='url-info'>" +
+                                "<div class='limit'>Limit-URLs: " + d[r].limitUrls.join(',') + "</div>" +
+                                excludeUrlsLine +
+                                "<div class='metadata'>Metadaten: " + metadata.join(',') + "</div>" +
+                                "</td></tr>";
+                    }
+                    setTimeout( function() { createActionButton( $("tr .btnUrl") ); }, 0);
+
+                    // in version 2.10, you can optionally return $(rows) a set of table rows within a jQuery object
+                    return [ total, $(rows) ];
+                }
+            },
+            customAjaxUrl: function(table, url) {
+                // manipulate the url string as you desire
+                var metafilter = $("#urlTable").data().metafilter;
+                var urlfilter = $("#urlTable").data().urlfilter;
+                var sort = $('#urlTable').data().tablesorter.sortList[0];
+
+                if (metafilter) url += "&metafilter=" + metafilter;
+                if (urlfilter) url += "&urlfilter=" + urlfilter;
+                if (sort) url += "&sort=" + sort.join(',');
+
+                return url;
+            }
 		};
 		
 		function addUrlValidator() {
@@ -534,24 +592,31 @@
             no_results_text: "Keinen Eintrag gefunden"
         };
 
-        setTimeout(function() {
-    		$("#dialog-form select").chosen( chosenOptions );
-    		$("#filterMetadata").chosen( chosenOptions )
-    		    .change(function(event, options) {
-    		    	var filter = [];
-    		    	$.each(this.selectedOptions, function(index, option) {
-    		    		filter.push( option.getAttribute("value") ); 
-    		    	});
-    		        
-    		        location.search = "?instance=${instance.name}&filter=" + filter.join(",");
-    		    });
-        }, 0);
+        var setMetafilterValues = function() {
+            var filter = [];
+            var options = $("#filterMetadata option:selected");
+            $.each(options, function(index, option) {
+                filter.push( option.getAttribute("value") ); 
+            });
+            var filterParam = filter.join(",");
+            $("#urlTable").data().metafilter = filterParam;
+            // var columns = [];
+            // columns[1] =  filter.join(",");
+            $('#urlTable').trigger('search', [[filterParam]]);
+            window.history.pushState(null, null, location.pathname + "?instance=${instance.name}&filter=" + filterParam);
+        };
+
+		$("#dialog-form select").chosen( chosenOptions );
+		$("#filterMetadata").chosen( chosenOptions )
+		    .change(function(event, options) {
+		        setMetafilterValues();
+		    });
+        setMetafilterValues();
 		
 		// filter by Url
 		$("#filterUrl").on( "keyup", function() {
-			var columns = [];
-			columns[1] =  this.value;
-			$('#urlTable').trigger('search', [ columns ]);			
+            $("#urlTable").data().urlfilter = this.value;
+            $('#urlTable').trigger('search', [[this.value]]);
 		});
 		
 		// initialize the table and its paging option
@@ -565,39 +630,44 @@
                 }
             },
             sortList: [[0,0]], // sort first column ascending
+
             widgets: ['zebra', 'filter'],
             widgetOptions: {
+                // filter_external: '#filterUrl',
+                filter_serversideFiltering: true,
             	filter_columnFilters: false,
             	filter_hideFilters: false,
             	// include child row content while filtering, if true
-                filter_childRows  : false,
+                // filter_childRows  : false,
             	// class name applied to filter row and each input
                 filter_cssFilter  : 'filtered',
                 pager_removeRows: false
             }
         })
-        .tablesorterPager(pagerOptions)
-        .bind('pagerChange sortEnd', function(e, c){
-            $("#urlTable").addClass( "hideButtons" );
-            setTimeout(function() {
-                createActionButton( $("tr:visible.tablesorter-hasChildRow .btnUrl") );
-                $("#urlTable").removeClass( "hideButtons" );
-            }, 10);
-        });
+        .tablesorterPager(pagerOptions);
 
         $("#urlContent").css("visibility", "visible");
         $("#loading").hide();
 
-        // render first the buttons of the visible rows
-        createActionButton( $("tr:visible.tablesorter-hasChildRow .btnUrl") );
 
     	/* PUBLIC FUNCTIONS */
     	urlMaintenance = {
-    			deleteMetadata: deleteMetadata
+    		deleteMetadata: deleteMetadata
     	};
 	});
 	
-	
+	var actionButtonTemplate =
+        '<div class="actionButtons">' +
+            '<div>' +
+                '<button class="btnUrl">Bearbeiten</button>' +
+                '<button class="select">Weitere Optionen</button>' +
+            '</div>' +
+            '<ul style="position:absolute; padding-left: 0; min-width: 120px; z-index: 100; display: none;">' +
+                '<li action="delete">Löschen</li>' +
+                '<li action="test">Testen</li>' +
+                '<li action="createNewFromTemplate">Als Template verwenden ...</li>' +
+            '</ul>' +
+        '</div>';
 </script>
 
 </head>

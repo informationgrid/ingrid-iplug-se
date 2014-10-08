@@ -146,9 +146,12 @@
         statisticIsUpdated = false;
         // fill table
         var addTableRow = function(item, biggest) {
+            var knownWidth = (item.known / biggest.known) * 100;
+            var fetchedWidth = (item.fetched / item.known) * knownWidth;
+            var toFetchWidth = knownWidth - fetchedWidth;
             $("#statisticTable tbody").append(
                     "<tr>" +
-                        "<td title='rot=bekannt; grün=analysiert'><div style='background-color: red; height: 3px; margin-bottom: 5px; width: " + (item.known / biggest.known)*100 + "px'></div><div style='background-color: green; height: 3px; width: " + (item.fetched / biggest.fetched)*100 + "px'></div></td>" +
+                        "<td title='rot=noch nicht analysiert; grün=analysiert'><span style='display: inline-block; background-color: green; height: 3px; width: " + fetchedWidth + "px'></span><span style='display: inline-block; background-color: red; height: 3px; width: " + toFetchWidth + "px'></span></td>" +
                         "<td>" + item.host + "</td>" +
                         "<td>" + item.known + "</td>" +
                         "<td>" + item.fetched + "</td>" +

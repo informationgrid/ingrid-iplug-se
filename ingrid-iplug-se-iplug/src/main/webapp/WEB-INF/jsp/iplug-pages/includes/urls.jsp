@@ -54,36 +54,6 @@
             </tr>
         </thead>
         <tbody>
-            <c:forEach items="${dbUrls}" var="url" varStatus="loop">
-                <tr data-id="${ url.id }" row="${ loop.index }">
-                    <td><input type="checkbox" data-id="${ url.id }"></td>
-                    <td>
-                        ${url.url}
-                    </td>
-                    <td>${url.status}</td>
-                    <td>
-                        <div class="actionButtons">
-                            <div>
-                                <button class="btnUrl">Bearbeiten</button>
-                                <button class="select">Weitere Optionen</button>
-                            </div>
-                            <ul style="position:absolute; padding-left: 0; min-width: 100px; z-index: 100; display: none;">
-                                <li action="delete">Löschen</li>
-                                <li action="test">Testen</li>
-                                <li action="createNewFromTemplate">Als Template verwenden ...</li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-                <tr class="tablesorter-childRow">
-                    <td></td>
-                    <td colspan="3" class="url-info">
-                        <div class="limit">Limit-URLs: <c:forEach items="${ url.limitUrls }" var="limitUrl">${ limitUrl },</c:forEach></div>
-                        <c:if test="${ not empty url.excludeUrls }"><div class="exclude">Exclude-URLs: <c:forEach items="${ url.excludeUrls }" var="excludeUrl">${ excludeUrl },</c:forEach></div></c:if>
-                        <div class="metadata">Metadaten: <c:forEach items="${ url.metadata }" var="meta">${ meta.metaKey }:${ meta.metaValue },</c:forEach></div>
-                    </td>
-                </tr>
-            </c:forEach>
         </tbody>
     </table>
 
