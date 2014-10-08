@@ -3,7 +3,6 @@
  */
 package de.ingrid.iplug.se.db.model;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -14,9 +13,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.validation.constraints.Past;
 
 @Entity
 public class Url {
@@ -30,34 +26,31 @@ public class Url {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(length=20)
-    private String type;
-    
     @Column
     private String instance;
 
-    @Past
-    @Temporal(TemporalType.DATE)
-    //@XmlSchemaType(name="updated")
-    private Date updated;
-
-    @Past
-    @Temporal(TemporalType.DATE)
-    //@XmlSchemaType(name="created")
-    private Date created;
-    
-    @Past
-    @Temporal(TemporalType.DATE)
-    //@XmlSchemaType(name="statusUpdated")
-    private Date statusUpdated;
+//    @Past
+//    @Temporal(TemporalType.DATE)
+//    //@XmlSchemaType(name="updated")
+//    private Date updated;
+//
+//    @Past
+//    @Temporal(TemporalType.DATE)
+//    //@XmlSchemaType(name="created")
+//    private Date created;
+//    
+//    @Past
+//    @Temporal(TemporalType.DATE)
+//    //@XmlSchemaType(name="statusUpdated")
+//    private Date statusUpdated;
 
     @Column(length=1024)
     private String url;
     
-    @Past
-    @Temporal(TemporalType.DATE)
-    //@XmlSchemaType(name="deleted")
-    private Date deleted;
+//    @Past
+//    @Temporal(TemporalType.DATE)
+//    //@XmlSchemaType(name="deleted")
+//    private Date deleted;
 
     @Column
     private int status;
@@ -85,52 +78,12 @@ public class Url {
         this.id = id;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public Date getUpdated() {
-        return updated;
-    }
-
-    public void setUpdated(Date updated) {
-        this.updated = updated;
-    }
-
-    public Date getCreated() {
-        return created;
-    }
-
-    public void setCreated(Date created) {
-        this.created = created;
-    }
-
-    public Date getStatusUpdated() {
-        return statusUpdated;
-    }
-
-    public void setStatusUpdated(Date statusUpdated) {
-        this.statusUpdated = statusUpdated;
-    }
-
     public String getUrl() {
         return url;
     }
 
     public void setUrl(String url) {
         this.url = url;
-    }
-
-    public Date getDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(Date deleted) {
-        this.deleted = deleted;
     }
 
     public int getStatus() {

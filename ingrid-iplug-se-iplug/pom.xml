@@ -181,6 +181,14 @@
 			<version>1.5.6</version>
 			<!-- <scope>test</scope> -->
 		</dependency>
+		
+		<!-- Library used for the migration of old database to new one -->
+		<dependency>
+		    <groupId>mysql</groupId>
+		    <artifactId>mysql-connector-java</artifactId>
+		    <version>5.1.33</version>
+		</dependency>
+				
 
 	</dependencies>
 	<build>

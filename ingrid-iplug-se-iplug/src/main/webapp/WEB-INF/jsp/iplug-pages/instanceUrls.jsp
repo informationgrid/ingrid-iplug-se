@@ -26,7 +26,8 @@
 
 <script type="text/javascript">
     var urlMaintenance = null;
-	$(document).ready(function() {
+
+    $(document).ready(function() {
 		
 		// remember initial default values which will be set for each new URL!
 		var defaultValues = [];
@@ -203,11 +204,11 @@
 		function resetFields() {
 			if (dialog.data("isNew") === true) {
 				$(".ui-dialog-title", dialog.parent()).text( "Neue URL anlegen" );
-				$(".ui-dialog-buttonset button:last .ui-button-text").text( "Erstellen" )
+				$("#dialog-form").next().find("button:last .ui-button-text").text( "Erstellen" )
 				
 			} else {
 				$(".ui-dialog-title", dialog.parent()).text( "URL bearbeiten" );
-				$(".ui-dialog-buttonset button:last .ui-button-text").text( "Ändern" )				
+				$("#dialog-form").next().find("button:last .ui-button-text").text( "Ändern" )				
 			}
 			
 			// reset all select boxes
@@ -476,8 +477,6 @@
 			}).parent().buttonset().next().hide().menu();			
 		}
 		
-		createActionButton( $(".btnUrl") );
-
 		$("#btnAddUrl").on("click", function() {
             dialog.data("urlDataObject", {
             	    instance: '${ instance.name }',
@@ -534,16 +533,19 @@
             placeholder_text_multiple: "Bitte auswählen",
             no_results_text: "Keinen Eintrag gefunden"
         };
-		$("#dialog-form select").chosen( chosenOptions );
-		$("#filterMetadata").chosen( chosenOptions )
-		    .change(function(event, options) {
-		    	var filter = [];
-		    	$.each(this.selectedOptions, function(index, option) {
-		    		filter.push( option.getAttribute("value") ); 
-		    	});
-		        
-		        location.search = "?instance=${instance.name}&filter=" + filter.join(",");
-		    });
+
+        setTimeout(function() {
+    		$("#dialog-form select").chosen( chosenOptions );
+    		$("#filterMetadata").chosen( chosenOptions )
+    		    .change(function(event, options) {
+    		    	var filter = [];
+    		    	$.each(this.selectedOptions, function(index, option) {
+    		    		filter.push( option.getAttribute("value") ); 
+    		    	});
+    		        
+    		        location.search = "?instance=${instance.name}&filter=" + filter.join(",");
+    		    });
+        }, 0);
 		
 		// filter by Url
 		$("#filterUrl").on( "keyup", function() {
@@ -574,8 +576,21 @@
                 pager_removeRows: false
             }
         })
-        .tablesorterPager(pagerOptions);
-		
+        .tablesorterPager(pagerOptions)
+        .bind('pagerChange sortEnd', function(e, c){
+            $("#urlTable").addClass( "hideButtons" );
+            setTimeout(function() {
+                createActionButton( $("tr:visible.tablesorter-hasChildRow .btnUrl") );
+                $("#urlTable").removeClass( "hideButtons" );
+            }, 10);
+        });
+
+        $("#urlContent").css("visibility", "visible");
+        $("#loading").hide();
+
+        // render first the buttons of the visible rows
+        createActionButton( $("tr:visible.tablesorter-hasChildRow .btnUrl") );
+
     	/* PUBLIC FUNCTIONS */
     	urlMaintenance = {
     			deleteMetadata: deleteMetadata

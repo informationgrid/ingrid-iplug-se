@@ -4,17 +4,19 @@ import it.sauronsoftware.cron4j.Scheduler;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.elasticsearch.client.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.ingrid.iplug.se.SEIPlug;
+import de.ingrid.iplug.se.elasticsearch.bean.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.nutchController.NutchController;
+import de.ingrid.iplug.se.utils.ElasticSearchUtils;
 
 @Service
 public class SchedulerManager {
@@ -40,7 +42,8 @@ public class SchedulerManager {
     }
     
     @Autowired
-    public SchedulerManager(PatternPersistence patternPers, CrawlDataPersistence crawlDataPers, NutchController nutchController) throws ClassNotFoundException, IOException {
+    public SchedulerManager(PatternPersistence patternPers, CrawlDataPersistence crawlDataPers,
+            NutchController nutchController, ElasticsearchNodeFactoryBean elasticSearch) throws Exception {
         this.patternService = patternPers;
         this.crawlDataPers = crawlDataPers;
         this.nutchController = nutchController;
@@ -51,8 +54,19 @@ public class SchedulerManager {
             
             addInstance( name );
             
+            // check if elastic search index is present and create it otherwise
+            // this can be missing if old database has been migrated or an instance dir
+            // has been added manually
+            Client client = elasticSearch.getObject().client();
+            boolean typeExists = ElasticSearchUtils.typeExists( name, client );
+            if (!typeExists) {
+                ElasticSearchUtils.createIndexType( name, client );
+            }
+            
             // if schedule pattern exists then schedule the scheduler
             schedule( name );
+            
+            
         }
     }
     

@@ -16,6 +16,16 @@ div.input.error {
 
 button:hover { color:#ffffff; }
 
+.hideButtons .actionButtons {
+	display: none;
+}
+
+/* set height to match with the height of the action button
+   to prevent flicker during initialization */
+.tablesorter-hasChildRow {
+	height: 37px;
+}
+
 #schedulingTabs fieldset {
 	border: 1px solid #CCC;
 	margin: 8px 0px 30px 0px;
@@ -48,6 +58,10 @@ label input {
 
 .right {
 	float: right;
+}
+
+.left {
+	float: left;
 }
 
 /* #dialog-form fieldset>div {
