@@ -231,6 +231,34 @@ public class SEIPlug extends HeartBeatPlug {
                 "http://missy-magazine.de/", "http://www.eh-darmstadt.de/", "http://herbert.de/", "http://www.mousonturm.de/", "http://www.zeit.de/",
                 "https://read2burn.com/"};
         
+        
+        metadata = new ArrayList<Metadata>();
+        Metadata md = new Metadata();
+        md.setMetaKey( "lang" );
+        md.setMetaValue( "de" );
+        metadata.add(md);
+        
+        md = new Metadata();
+        md.setMetaKey( "partner" );
+        md.setMetaValue( "bund" );
+        metadata.add(md);
+
+        md = new Metadata();
+        md.setMetaKey( "provider" );
+        md.setMetaValue( "bu_bmu" );
+        metadata.add(md);
+        
+        md = new Metadata();
+        md.setMetaKey( "datatype" );
+        md.setMetaValue( "www" );
+        metadata.add(md);
+
+        md = new Metadata();
+        md.setMetaKey( "datatype" );
+        md.setMetaValue( "default" );
+        metadata.add(md);
+        
+        
         for (String uri : urls) {
             url = new Url( "catalog" );
             url.setStatus( 400 );
@@ -238,6 +266,7 @@ public class SEIPlug extends HeartBeatPlug {
             List<String> limit = new ArrayList<String>();
             limit.add( uri );
             url.setLimitUrls( limit );
+            url.setMetadata(metadata);
             em.persist(url);
         }
         
