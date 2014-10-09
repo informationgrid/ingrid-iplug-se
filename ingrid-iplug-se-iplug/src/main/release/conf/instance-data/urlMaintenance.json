@@ -196,12 +196,10 @@
                 {
                     "id": "research",
                     "label": "Forschungsprojekte"
-                }
                 },
                 {
                     "id": "service",
                     "label": "Service"
-                }
                 },
                 {
                     "id": "topics",
