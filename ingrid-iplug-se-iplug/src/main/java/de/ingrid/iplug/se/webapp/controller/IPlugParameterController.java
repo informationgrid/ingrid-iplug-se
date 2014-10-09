@@ -20,7 +20,7 @@ import de.ingrid.iplug.se.SEIPlug;
  */
 @Controller
 @SessionAttributes("plugDescription")
-public class DatabaseParameterController extends AbstractController {
+public class IPlugParameterController extends AbstractController {
 
     @RequestMapping(value = { "/iplug-pages/welcome.html",
             "/iplug-pages/dbParams.html" }, method = RequestMethod.GET)
@@ -37,11 +37,14 @@ public class DatabaseParameterController extends AbstractController {
 
     @RequestMapping(value = "/iplug-pages/dbParams.html", method = RequestMethod.POST)
     public String post(@RequestParam("dataBasePath") String dbPath, @RequestParam("instancePath") String instancePath,
-            @RequestParam("elasticSearchPort") String elasticSearchPort) {
+            @RequestParam("elasticSearchPort") String elasticSearchPort, @ModelAttribute("plugDescription") final PlugdescriptionCommandObject pdCommandObject) {
 
         SEIPlug.conf.databaseDir = dbPath;
         SEIPlug.conf.setInstancesDir( instancePath );
         SEIPlug.conf.esHttpPort = elasticSearchPort;
+        
+        pdCommandObject.setRankinTypes(true, false, false);
+        
         return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );
     }
 
