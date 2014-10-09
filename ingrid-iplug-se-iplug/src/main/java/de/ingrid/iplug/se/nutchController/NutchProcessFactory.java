@@ -19,6 +19,7 @@ import org.xml.sax.SAXException;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
+import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.conf.UrlMaintenanceSettings.MetaElement;
 import de.ingrid.iplug.se.utils.InstanceConfigurationTool;
 import de.ingrid.iplug.se.webapp.container.Instance;
@@ -56,7 +57,9 @@ public class NutchProcessFactory {
 
         process.setWorkingDirectory(instance.getWorkingDirectory());
         process.addClassPath(Paths.get(instance.getWorkingDirectory(), "conf").toAbsolutePath().toString());
-        process.addJavaOptions(new String[] { "-Dhadoop.log.dir=" + Paths.get(instance.getWorkingDirectory(), "logs").toAbsolutePath(), "-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8" });
+        // add default properties
+        process.addJavaOptions(SEIPlug.conf.nutchCallJavaOptions.toArray(new String[] {}));
+        process.addJavaOptions(new String[] { "-Dhadoop.log.dir=" + Paths.get(instance.getWorkingDirectory(), "logs").toAbsolutePath()});
         process.addClassPath(Paths.get("apache-nutch-runtime/runtime/local").toAbsolutePath().toString());
         process.addClassPath(Paths.get("apache-nutch-runtime","runtime","local","lib").toAbsolutePath().toString()
                 .concat(File.separator).concat("*"));

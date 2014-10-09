@@ -15,6 +15,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
+import com.tngtech.configbuilder.annotation.configuration.Separator;
 import com.tngtech.configbuilder.annotation.propertyloaderconfiguration.PropertiesFiles;
 import com.tngtech.configbuilder.annotation.propertyloaderconfiguration.PropertyLocations;
 import com.tngtech.configbuilder.annotation.typetransformer.TypeTransformer;
@@ -108,7 +109,12 @@ public class Configuration implements IConfig {
 	@DefaultValue("")
 	public List<String> activeInstances;
 	
-
+    @PropertyValue("nutch.call.java.options")
+    @DefaultValue("-Dhadoop.log.file=hadoop.log  -Dfile.encoding=UTF-8")
+    @Separator(" ")
+    public List<String> nutchCallJavaOptions;
+	
+	
 	@Override
     public void addPlugdescriptionValues( PlugdescriptionCommandObject pdObject ) {
         pdObject.put( "iPlugClass", "de.ingrid.iplug.se.SEIPlug" );
