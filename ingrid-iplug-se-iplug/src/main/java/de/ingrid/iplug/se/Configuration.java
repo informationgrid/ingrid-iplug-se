@@ -118,6 +118,8 @@ public class Configuration implements IConfig {
 	@Override
     public void addPlugdescriptionValues( PlugdescriptionCommandObject pdObject ) {
         pdObject.put( "iPlugClass", "de.ingrid.iplug.se.SEIPlug" );
+        pdObject.addPartner("all");
+        pdObject.addProvider("all");
         
 //        pdObject.addField("incl_meta");
 //        pdObject.addField("t01_object.obj_class");
