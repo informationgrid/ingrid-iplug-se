@@ -110,7 +110,7 @@ public class Configuration implements IConfig {
 	public List<String> activeInstances;
 	
     @PropertyValue("nutch.call.java.options")
-    @DefaultValue("-Dhadoop.log.file=hadoop.log  -Dfile.encoding=UTF-8")
+    @DefaultValue("-Dhadoop.log.file=hadoop.log -Dfile.encoding=UTF-8")
     @Separator(" ")
     public List<String> nutchCallJavaOptions;
 	
