@@ -203,12 +203,16 @@ public class IndexImpl implements Index {
             summary = StringUtils.join(dHit.getHighlightFields().get( "content" ).fragments(), " ... ");
         }
                 //(String) response.getField( IndexFields.ABSTRACT ).getValue();
-        IngridHitDetail detail = new IngridHitDetail( hit.getPlugId(), hit.getDocumentId(), hit.getDataSourceId(), hit.getScore(), title, summary );
+        IngridHitDetail detail = new IngridHitDetail(hit, title, summary);
         if (requestedFields != null) {
             for (String field : requestedFields) {
-                detail.put( field, dHit.field( field ).getValue());
+                if (dHit.field( field ) != null) {
+                    detail.put( field, dHit.field( field ).getValue());
+                }
             }
         }
+        detail.put("url", documentId);
+        
         return detail;
     }
 
