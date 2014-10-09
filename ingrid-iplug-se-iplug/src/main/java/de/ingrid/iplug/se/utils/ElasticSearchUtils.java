@@ -38,5 +38,13 @@ public class ElasticSearchUtils {
         }
         return mappingSource;
     }
+
+    public static void deleteType(String name, Client client) {
+        client.admin().indices().prepareDeleteMapping( SEIPlug.conf.index )
+            .setType( name )
+            .execute()
+            .actionGet();
+        
+    }
     
 }

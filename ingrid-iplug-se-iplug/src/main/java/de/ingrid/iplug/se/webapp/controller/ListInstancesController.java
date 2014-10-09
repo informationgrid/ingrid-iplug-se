@@ -237,6 +237,9 @@ public class ListInstancesController extends AbstractController {
             //modelMap.put( "error", "Directory '" + directoryToDelete.toString() + "' could not be deleted!" );
             return new ResponseEntity<String>( HttpStatus.INTERNAL_SERVER_ERROR );
         }
+        
+        // remove instance (type) from index
+        ElasticSearchUtils.deleteType( name, elasticSearch.getObject().client() );
 
         return new ResponseEntity<String>( HttpStatus.OK );
     }
