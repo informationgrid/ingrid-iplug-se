@@ -212,7 +212,11 @@ public class FileUtils {
                 return new File(current, name).isDirectory();
             }
         });
-        Arrays.sort(directories);
+        if (directories != null) {
+            Arrays.sort(directories);
+        } else {
+            directories = new String[] {};
+        }
 
         return directories;
 
