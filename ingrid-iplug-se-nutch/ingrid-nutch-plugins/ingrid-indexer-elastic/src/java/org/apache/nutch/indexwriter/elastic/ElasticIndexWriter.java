@@ -60,7 +60,7 @@ public class ElasticIndexWriter implements IndexWriter {
         // Loop through all fields of this doc
         for (String fieldName : doc.getFieldNames()) {
             if (doc.getField(fieldName).getValues().size() > 1) {
-                source.put(fieldName, doc.getFieldValue(fieldName));
+                source.put(fieldName, doc.getField(fieldName).getValues());
                 // Loop through the values to keep track of the size of this
                 // document
                 for (Object value : doc.getField(fieldName).getValues()) {
