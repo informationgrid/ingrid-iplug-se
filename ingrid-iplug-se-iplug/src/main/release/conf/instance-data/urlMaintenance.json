@@ -177,6 +177,43 @@
             ]
         },
         {
+            "label": "Datentypen",
+            "id": "datatype",
+            "isMultiple": true,
+            "children": [
+                {
+                    "id": "default",
+                    "label": "Allgemeine Umweltinformation"
+                },
+                {
+                    "id": "law",
+                    "label": "Rechtsvorschriften"
+                },
+                {
+                    "id": "measure",
+                    "label": "Messwerte"
+                },
+                {
+                    "id": "research",
+                    "label": "Forschungsprojekte"
+                }
+                },
+                {
+                    "id": "service",
+                    "label": "Service"
+                }
+                },
+                {
+                    "id": "topics",
+                    "label": "Themen"
+                },
+                {
+                    "id": "www",
+                    "label": "Webseiten"
+                }
+            ]
+        },
+        {
             "label": "Themen",
             "id": "topic",
             "isMultiple": true,

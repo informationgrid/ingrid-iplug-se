@@ -10,6 +10,16 @@ button {
 	cursor: pointer;
 }
 
+.radio .ui-state-default {
+	color: #888;
+	background: #EEE;
+}
+
+.radio .ui-state-active {
+	color: #FFF;
+	background: #68A5D2;
+}
+
 div.input.error {
 	border-color: #ff0000;
 }
