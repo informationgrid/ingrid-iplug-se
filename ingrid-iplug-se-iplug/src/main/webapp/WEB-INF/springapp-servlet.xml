@@ -41,10 +41,12 @@
 		<qualifier value="XMLconfigured" />
 		<property name="queryParsers">
 			<list>
+                <ref bean="datatypePartnerProviderQueryConverter" />
 				<ref bean="defaultFieldsQueryConverter" />
 				<ref bean="wildcardQueryConverter" />
 				<ref bean="fuzzyQueryConverter" />
 				<ref bean="fieldQueryIGCConverter" />
+				<!-- the match all converter must be the last converter in list -->
 				<ref bean="matchAllQueryConverter" />
 			</list>
 		</property>
@@ -71,6 +73,8 @@
 		<context:exclude-filter type="regex" expression="de.ingrid.admin.search.*" />
 		<context:exclude-filter type="regex" expression="de.ingrid.admin.controller.IndexController*" />
 		<context:exclude-filter type="regex" expression="de.ingrid.admin.controller.SchedulingController*" />
+        <!-- exclude this injector because it overridesthe index based partner/provider detection -->
+        <context:exclude-filter type="regex" expression="de.ingrid.admin.metadata.DefaultIPlugOperatorInjectorAdapter" />
 	</context:component-scan>
 
     <mvc:annotation-driven/>
@@ -81,5 +85,5 @@
 	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
 		<property name="maxUploadSize" value="1000000" />
 	</bean>
-
+	
 </beans>
