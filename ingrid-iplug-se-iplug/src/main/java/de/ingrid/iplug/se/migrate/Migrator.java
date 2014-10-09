@@ -111,6 +111,9 @@ public class Migrator {
             u.setLimitUrls( limitUrls );
             u.setExcludeUrls( excludeUrls );
             
+            if (u.getUrl().contains( "*" )) log.warn( "The URL seems to be a regular expression: " + u.getUrl() );
+            if (limitUrls.isEmpty()) log.warn( "The URL has no limit-URL: " + u.getUrl() );
+            
             webUrls.add( u );
         }
         return webUrls;
@@ -159,7 +162,7 @@ public class Migrator {
             
             // get all start Urls
             log.info( "Fetch all web urls ..." );
-            rs = st.executeQuery( "SELECT * FROM url WHERE startUrl_fk IS NULL AND type!='CATALOG'" );
+            rs = st.executeQuery( "SELECT * FROM url WHERE type='START'" );
             webUrls = convertToWebUrls( rs );
             rs.close();
             

@@ -9,7 +9,7 @@
         <legend>Filter</legend>
         <label>URL</label>
         <div class="input full space">
-            <input id="filterUrl" type="text">
+            <input id="filterUrl" type="text" value="<%= request.getParameter("urlfilter") %>">
         </div>
         <label>Metadata</label>
         <select id="filterMetadata" multiple>

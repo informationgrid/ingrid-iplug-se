@@ -28,20 +28,20 @@
     var urlMaintenance = null;
 
     $(document).ready(function() {
-		
-		// remember initial default values which will be set for each new URL!
-		var defaultValues = [];
-		$("#dialog-form option:selected").each(function(index, item) {
-			var metaSplitted = item.getAttribute("value").split(":");
-			var meta = { metaKey: metaSplitted[0], metaValue: metaSplitted[1] };
-			defaultValues.push( meta ); 
-		});
-		
-		var pagerOptions = {
-			container: $(".pager"),
-			output: '{startRow} bis {endRow} von {filteredRows} URLs',
-			//size: 2,
-			savePages : false,
+        
+        // remember initial default values which will be set for each new URL!
+        var defaultValues = [];
+        $("#dialog-form option:selected").each(function(index, item) {
+            var metaSplitted = item.getAttribute("value").split(":");
+            var meta = { metaKey: metaSplitted[0], metaValue: metaSplitted[1] };
+            defaultValues.push( meta ); 
+        });
+        
+        var pagerOptions = {
+            container: $(".pager"),
+            output: '{startRow} bis {endRow} von {filteredRows} URLs',
+            //size: 2,
+            savePages : false,
             ajaxUrl : '../rest/urls/${instance.name}?page={page}',
             serverSideSorting: true,
             ajaxObject: {
@@ -49,7 +49,7 @@
             },
             ajaxProcessing: function(data){
                 if (data) {// && data.hasOwnProperty('rows')) {
-                    var r, row, c, d = data.data,
+                    var r, d = data.data,
                     // total number of rows (required)
                     total = data.totalUrls,
                     // array of header names (optional)
@@ -75,7 +75,7 @@
                         // add another child row for metadata
                         var excludeUrlsLine = d[r].excludeUrls.length > 0 ? "<div class='exclude'>Exclude-URLs: " + d[r].excludeUrls.join(',') + "</div>" : "";
                         var metadata = [];
-                        d[r].metadata.forEach( function(m) { metadata.push( m.metaKey + ":" + m.metaValue ); })
+                        d[r].metadata.forEach( function(m) { metadata.push( m.metaKey + ":" + m.metaValue ); });
                         rows += "<tr class='tablesorter-childRow'><td></td><td colspan='3' class='url-info'>" +
                                 "<div class='limit'>Limit-URLs: " + d[r].limitUrls.join(',') + "</div>" +
                                 excludeUrlsLine +
@@ -100,119 +100,119 @@
 
                 return url;
             }
-		};
-		
-		function addUrlValidator() {
-			var valid = true;
-			
-			var data = dialog.data("urlDataObject");
-			
-			// add all values from the dialog to the data object wich will be sent to the server
-			// the limit/exclude urls already have been added
-			data.url = $("#startUrl").val();
-			
-			data.metadata = [];
-			
-			// get metadata from all selects
-			// get metadata from all visible checkboxes
-			var allInputs = $("#dialog-form select, #dialog-form input[type=checkbox]:checked:visible");
+        };
+        
+        function addUrlValidator() {
+            var valid = true;
+            
+            var data = dialog.data("urlDataObject");
+            
+            // add all values from the dialog to the data object wich will be sent to the server
+            // the limit/exclude urls already have been added
+            data.url = $("#startUrl").val();
+            
+            data.metadata = [];
+            
+            // get metadata from all selects
+            // get metadata from all visible checkboxes
+            var allInputs = $("#dialog-form select, #dialog-form input[type=checkbox]:checked:visible");
 
             // ************************************
             // Check if metadata is in valid format
             // ************************************
-			var handleMetadataItem = function(item) {
-				var value = item.split(":");
-				if (value.length === 2) {
-				    data.metadata.push({ metaKey: value[0], metaValue: value[1] });					
-				} else {
-					console.error( "Value has wrong format: " + item );
-				}
-			}
-			
-			allInputs.each(function(index, element) {
-				var val = $(element).val();
-				
-				
-				if (val instanceof Array) {
-					$.each(val, function(index, meta) {
-						handleMetadataItem( meta );
-					});
-					
-				} else if (val !== null) {
-						handleMetadataItem( val );
-						
-				} else {
-    				// value was not chosen
-    				// -> check if value is required					
-				}
-			});
-			
-			$.each( data.userMetadata, function(index, item) {
-				handleMetadataItem( item );
-			});
-			
-			delete data.userMetadata;
-			
+            var handleMetadataItem = function(item) {
+                var value = item.split(":");
+                if (value.length === 2) {
+                    data.metadata.push({ metaKey: value[0], metaValue: value[1] });                 
+                } else {
+                    console.error( "Value has wrong format: " + item );
+                }
+            };
+            
+            allInputs.each(function(index, element) {
+                var val = $(element).val();
+                
+                
+                if (val instanceof Array) {
+                    $.each(val, function(index, meta) {
+                        handleMetadataItem( meta );
+                    });
+                    
+                } else if (val !== null) {
+                        handleMetadataItem( val );
+                        
+                } else {
+                    // value was not chosen
+                    // -> check if value is required                    
+                }
+            });
+            
+            $.each( data.userMetadata, function(index, item) {
+                handleMetadataItem( item );
+            });
+            
+            delete data.userMetadata;
+            
             // ************************************
             // Check if limitUrls are valid and set
             // ************************************
-            $.each( data.limitUrls, function(index, url) {
+            // $.each( data.limitUrls, function(index, url) {
 
-            });
+            // });
 
             // if no limit url has been set, then take the start url
             if (data.limitUrls.length === 0) {
-                data.limitUrls.push( data.url )
+                data.limitUrls.push( data.url );
             }
 
-			if ( valid ) {
-				$.ajax({
-					type: "POST",
-					url: "../rest/url",
-					contentType: 'application/json',
-					data: JSON.stringify( data ),
-					success: function() {
-						// let JSP do the magic to refresh the page correctly
-						location.reload();
-					},
-					error: function(jqXHR, text, error) {
-						console.error(text, error);
-					}
-				});
-		        
-				dialog.dialog( "close" );
-		    }
-			return valid;
-		}
-		
-		function getButtonTemplate(type) {
-			var button = null;
-		    /* switch(type) {
-		    case "limitUrlTable":
-		        button = "<div><button class='btnUrl'>Bearbeiten</button><button class='select'>Weitere Optionen</button></div><ul style='position:absolute; padding-left: 0; min-width: 100px;''><li action='jsDeleteLimit'>Löschen</li><li>Testen</li></ul>";
-		    	break;
-		    case "excludeUrlTable":
-		        button = "<div><button class='btnUrl'>Bearbeiten</button><button class='select'>Weitere Optionen</button></div><ul style='position:absolute; padding-left: 0; min-width: 100px;''><li action='jsDeleteExclude'>Löschen</li><li>Testen</li></ul>";
-		    	break;
-		    case "userMetadataTable":
-		        button = "<div><button type='button' onclick='urlMaintenance.deleteMetadata(event)'>Löschen</button>";
-		    	break;
-		    } */
-	        button = "<div><button type='button' onclick='urlMaintenance.deleteMetadata(event)'>Löschen</button>";
-		    return button;
-		}
-		
-		function addUrlRowTo(id, url, pos) {
-			var button = getButtonTemplate( id );
-			
-			var actionButton = $("#" + id + " tbody .newRow");
-			var newRow = $(
-				"<tr data-row='" + pos + "'>" +
-	               "<td>" + url + "</td>" +
-	               "<td data-editable='false'>" + button + "</td>" +
-	            "</tr>"
-	        );
-			newRow.insertBefore( $("#" + id + " tbody .newRow") );
+            if ( valid ) {
+                $.ajax({
+                    type: "POST",
+                    url: "../rest/url",
+                    contentType: 'application/json',
+                    data: JSON.stringify( data ),
+                    success: function() {
+                        // let JSP do the magic to refresh the page correctly
+                        location.reload();
+                    },
+                    error: function(jqXHR, text, error) {
+                        console.error(text, error);
+                    }
+                });
+                
+                dialog.dialog( "close" );
+            }
+            return valid;
+        }
+        
+        function getButtonTemplate(type) {
+            var button = null;
+            /* switch(type) {
+            case "limitUrlTable":
+                button = "<div><button class='btnUrl'>Bearbeiten</button><button class='select'>Weitere Optionen</button></div><ul style='position:absolute; padding-left: 0; min-width: 100px;''><li action='jsDeleteLimit'>Löschen</li><li>Testen</li></ul>";
+                break;
+            case "excludeUrlTable":
+                button = "<div><button class='btnUrl'>Bearbeiten</button><button class='select'>Weitere Optionen</button></div><ul style='position:absolute; padding-left: 0; min-width: 100px;''><li action='jsDeleteExclude'>Löschen</li><li>Testen</li></ul>";
+                break;
+            case "userMetadataTable":
+                button = "<div><button type='button' onclick='urlMaintenance.deleteMetadata(event)'>Löschen</button>";
+                break;
+            } */
+            button = "<div><button type='button' onclick='urlMaintenance.deleteRow(\"" + type + "\", event)'>Löschen</button>";
+            return button;
+        }
+        
+        function addUrlRowTo(id, url, pos) {
+            var button = getButtonTemplate( id );
+            
+            // var actionButton = $("#" + id + " tbody .newRow");
+            var newRow = $(
+                "<tr data-row='" + pos + "'>" +
+                   "<td>" + url + "</td>" +
+                   "<td data-editable='false'>" + button + "</td>" +
+                "</tr>"
+            );
+            newRow.insertBefore( $("#" + id + " tbody .newRow") );
             //.find("tr .btnUrl");
           
             // make tables limit/exclude editable
@@ -225,142 +225,142 @@
                     var rowPos = row.getAttribute( "data-row" ); 
                     if ( id === "limitUrlTable" ) {
                         dialog.data("urlDataObject").limitUrls[ rowPos ] = newValue;
-                    	
+                        
                     } else {
                         dialog.data("urlDataObject").excludeUrls[ rowPos ] = newValue;
                     }
                 }
             );
             
-			if (id !== "userMetadataTable") {
-			    //createActionButton( actionButton );
-			}
-		}
-		
-		/* function addLimitUrlValidator(type) {
-			var valid = true;
-			var url = $("#limitUrl").val();
-			if (type === "exclude") {
-			    url = $("#excludeUrl").val();
-			}
-			
-			if ( valid ) {
-				if (type === "limit") {
-					addUrlRowTo("limitUrlTable", url, dialog.data("urlDataObject").limitUrls.length);
-					dialog.data("urlDataObject").limitUrls.push( url );
-                	dialogLimit.dialog( "close" );
-				} else {
-					addUrlRowTo("excludeUrlTable", url, dialog.data("urlDataObject").excludeUrls.length);
+            if (id !== "userMetadataTable") {
+                //createActionButton( actionButton );
+            }
+        }
+        
+        /* function addLimitUrlValidator(type) {
+            var valid = true;
+            var url = $("#limitUrl").val();
+            if (type === "exclude") {
+                url = $("#excludeUrl").val();
+            }
+            
+            if ( valid ) {
+                if (type === "limit") {
+                    addUrlRowTo("limitUrlTable", url, dialog.data("urlDataObject").limitUrls.length);
+                    dialog.data("urlDataObject").limitUrls.push( url );
+                    dialogLimit.dialog( "close" );
+                } else {
+                    addUrlRowTo("excludeUrlTable", url, dialog.data("urlDataObject").excludeUrls.length);
                     dialog.data("urlDataObject").excludeUrls.push( url );
-                	dialogExclude.dialog( "close" );
-				}
-        		
-		    }
-			return valid;
-		} */
-		
-		function resetFields() {
-			if (dialog.data("isNew") === true) {
-				$(".ui-dialog-title", dialog.parent()).text( "Neue URL anlegen" );
-				$("#dialog-form").next().find("button:last .ui-button-text").text( "Erstellen" )
-				
-			} else {
-				$(".ui-dialog-title", dialog.parent()).text( "URL bearbeiten" );
-				$("#dialog-form").next().find("button:last .ui-button-text").text( "Ändern" )				
-			}
-			
-			// reset all select boxes
-			$("#dialog-form select").each(function(index, item) {
-				$(item).val("");
-				$(item).trigger("chosen:updated");
-			});
-			
-			// empty tables
-			$("#dialog-form tbody tr:not(.newRow)").remove();
-			
-		}
+                    dialogExclude.dialog( "close" );
+                }
+                
+            }
+            return valid;
+        } */
+        
+        function resetFields() {
+            if (dialog.data("isNew") === true) {
+                $(".ui-dialog-title", dialog.parent()).text( "Neue URL anlegen" );
+                $("#dialog-form").next().find("button:last .ui-button-text").text( "Erstellen" );
+                
+            } else {
+                $(".ui-dialog-title", dialog.parent()).text( "URL bearbeiten" );
+                $("#dialog-form").next().find("button:last .ui-button-text").text( "Ändern" );           
+            }
+            
+            // reset all select boxes
+            $("#dialog-form select").each(function(index, item) {
+                $(item).val("");
+                $(item).trigger("chosen:updated");
+            });
+            
+            // empty tables
+            $("#dialog-form tbody tr:not(.newRow)").remove();
+            
+        }
 
-		dialog = $("#dialog-form").dialog({
-			autoOpen : false,
-			height : 750,
-			width : 770,
-			modal : true,
-			buttons : {
-				"Abbrechen" : function() {
-					dialog.dialog("close");
-				},
-				/* "Erstellen und weitere anlegen ..." : addUrlValidator, */
-				"Erstellen" : addUrlValidator
-			},
-			open: function() {
-    			// reset all fields first
-    			resetFields();
-    			
-    			var data = dialog.data("urlDataObject");
-    			if (data) {
-    				$("#startUrl").val( data.url ? data.url : "http://" );
-    				$.each( data.limitUrls, function(index, url) {
-    					addUrlRowTo("limitUrlTable", url, index);
-    				});
-    				$.each( data.excludeUrls, function(index, url) {
-    					addUrlRowTo("excludeUrlTable", url, index);
-    				});
-    				
-    				// make tables limit/exclude editable
-    		        /* $('#limitUrlTable, #excludeUrlTable').editableTableWidget({
-    		            //editor : $('<textarea>')
-    		        });
-
-    		        $('#limitUrlTable tr:not(.newRow) td').on(
-    		            'change',
-    		            function(evt, newValue) {
-    		                var row = evt.target.parentNode;
-    		                var rowPos = row.getAttribute( "data-row" ); 
-    		                dialog.data("urlDataObject").limitUrls[ rowPos ] = newValue;
-    		            }
-    		        ); */
-    				
-    				// a metadata consists of a key and a value which is represented as
-    				// a key:value option inside an element with the id of the key
-    				// collect all metadata with the same key to do multiselection
-    				var metaMap = {};
-    				$.each( data.metadata, function(index, meta) {
-    					if (!metaMap[ meta.metaKey ]) {
-    						metaMap[ meta.metaKey ] = [];
-    					}
-    					metaMap[ meta.metaKey ].push( meta.metaKey + ":" + meta.metaValue );
-    				});
-    				var additionalMetadata = [];
-    				$.each( metaMap, function(key, values) {
-    					var elem = $("#" + key);
-    					// if there's an element responsible for the metadata
-    					if (elem) {
-    						// update selected data
-        					elem.val(values);
-        					elem.trigger("chosen:updated");
-        					
-        					// find values not available as option, which will be added to user-defined list
-        					$.each(values, function(index, value) {
-        						if ($("option[value='"+value+"']").length === 0) {
-        							data.userMetadata.push( value );
-        						}
-        					});
-
-        				// otherwise add to user-defined metadata
-    					} else {
-        					$.each(values, function(index, value) {
-       							data.userMetadata.push( value );
-        					});
-    					}
-    				});
-    				
-                    $.each( data.userMetadata, function(index, value) {
-                    	addUrlRowTo( "userMetadataTable", value, index );
+        dialog = $("#dialog-form").dialog({
+            autoOpen : false,
+            height : 750,
+            width : 770,
+            modal : true,
+            buttons : {
+                "Abbrechen" : function() {
+                    dialog.dialog("close");
+                },
+                /* "Erstellen und weitere anlegen ..." : addUrlValidator, */
+                "Erstellen" : addUrlValidator
+            },
+            open: function() {
+                // reset all fields first
+                resetFields();
+                
+                var data = dialog.data("urlDataObject");
+                if (data) {
+                    $("#startUrl").val( data.url ? data.url : "http://" );
+                    $.each( data.limitUrls, function(index, url) {
+                        addUrlRowTo("limitUrlTable", url, index);
                     });
-    			}
-			},
-			close : function() {}
-		});
+                    $.each( data.excludeUrls, function(index, url) {
+                        addUrlRowTo("excludeUrlTable", url, index);
+                    });
+                    
+                    // make tables limit/exclude editable
+                    /* $('#limitUrlTable, #excludeUrlTable').editableTableWidget({
+                        //editor : $('<textarea>')
+                    });
+
+                    $('#limitUrlTable tr:not(.newRow) td').on(
+                        'change',
+                        function(evt, newValue) {
+                            var row = evt.target.parentNode;
+                            var rowPos = row.getAttribute( "data-row" ); 
+                            dialog.data("urlDataObject").limitUrls[ rowPos ] = newValue;
+                        }
+                    ); */
+                    
+                    // a metadata consists of a key and a value which is represented as
+                    // a key:value option inside an element with the id of the key
+                    // collect all metadata with the same key to do multiselection
+                    var metaMap = {};
+                    $.each( data.metadata, function(index, meta) {
+                        if (!metaMap[ meta.metaKey ]) {
+                            metaMap[ meta.metaKey ] = [];
+                        }
+                        metaMap[ meta.metaKey ].push( meta.metaKey + ":" + meta.metaValue );
+                    });
+                    
+                    $.each( metaMap, function(key, values) {
+                        var elem = $("#" + key);
+                        // if there's an element responsible for the metadata
+                        if (elem) {
+                            // update selected data
+                            elem.val(values);
+                            elem.trigger("chosen:updated");
+                            
+                            // find values not available as option, which will be added to user-defined list
+                            $.each(values, function(index, value) {
+                                if ($("option[value='"+value+"']").length === 0) {
+                                    data.userMetadata.push( value );
+                                }
+                            });
+
+                        // otherwise add to user-defined metadata
+                        } else {
+                            $.each(values, function(index, value) {
+                                data.userMetadata.push( value );
+                            });
+                        }
+                    });
+                    
+                    $.each( data.userMetadata, function(index, value) {
+                        addUrlRowTo( "userMetadataTable", value, index );
+                    });
+                }
+            },
+            close : function() {}
+        });
 
         dialogConfirm = $( "#dialog-confirm" ).dialog({
             resizable: false,
@@ -408,54 +408,55 @@
             }
         });
 
-/* 		dialogLimit = $("#dialog-form-limit").dialog({
-			autoOpen : false,
-			height : 250,
-			width : 550,
-			modal : true,
-			buttons : {
+/*      dialogLimit = $("#dialog-form-limit").dialog({
+            autoOpen : false,
+            height : 250,
+            width : 550,
+            modal : true,
+            buttons : {
                 "Abbrechen" : function() {
-                	dialogLimit.dialog("close");
+                    dialogLimit.dialog("close");
                 },
                 "Erstellen" : function() {
                     addLimitUrlValidator("limit")
                 }
             },
-		});
-		dialogExclude = $("#dialog-form-exclude").dialog({
-			autoOpen : false,
-			height : 250,
-			width : 550,
-			modal : true,
-			buttons : {
+        });
+        dialogExclude = $("#dialog-form-exclude").dialog({
+            autoOpen : false,
+            height : 250,
+            width : 550,
+            modal : true,
+            buttons : {
                 "Abbrechen" : function() {
-                	dialogExclude.dialog("close");
+                    dialogExclude.dialog("close");
                 },
                 "Erstellen" : function() {
-                	addLimitUrlValidator("exclude")
+                    addLimitUrlValidator("exclude")
                 }
             },
-		}); */
+        }); */
 
-		// hide all metadata types initially
-		//$("#metadata span").hide();
-		$( '#dialog-form input[type=radio]' ).change(function() {
-			var parent = this.parentNode.parentNode;
-			// hide all
-    		$("fieldset", parent).hide();
-			// only show corresponding values
-    		$("fieldset.meta_" + this.value).show();
-		});
-		
-		function deleteMetadata(evt) {
-			actionHandler( "jsDeleteUserMetadata", $(evt.target) );
-		}
-		
-		function actionHandler( action, target ) {
-			var type = null;
-			switch (action) {
-			case "createNewFromTemplate":
-				var id = $( target ).parents("tr").attr("data-id");
+        // hide all metadata types initially
+        //$("#metadata span").hide();
+        $( '#dialog-form input[type=radio]' ).change(function() {
+            var parent = this.parentNode.parentNode;
+            // hide all
+            $("fieldset", parent).hide();
+            // only show corresponding values
+            $("fieldset.meta_" + this.value).show();
+        });
+        
+        function deleteRow(type, evt) {
+            actionHandler( type, $(evt.target) );
+        }
+        
+        function actionHandler( action, target ) {
+            var type = null,
+                id = null;
+            switch (action) {
+            case "createNewFromTemplate":
+                id = $( target ).parents("tr").attr("data-id");
                 $.get("../rest/url/" + id, function(data) {
                     // reload page if data was not received, which calls login page
                     if (typeof data === "string") location.reload();
@@ -470,14 +471,14 @@
                     dialog.data("isNew", true);
                     dialog.dialog("open");
                 });
-				break;
-            case "jsDeleteUserMetadata":
-            	type = type ? type : "userMetadata";
+                break;
+            case "userMetadataTable":
+                type = type ? type : "userMetadata";
                 // FALL THROUGH!!!
-            case "jsDeleteExclude":
-            	type = type ? type : "excludeUrls";
+            case "excludeUrlTable":
+                type = type ? type : "excludeUrls";
                 // FALL THROUGH!!!
-            case "jsDeleteLimit":
+            case "limitUrlTable":
                 type = type ? type : "limitUrls";
                 var row = target.parents("tr");
                 var url = row.children()[0].innerHTML;
@@ -489,55 +490,55 @@
                 row.remove();
                 break;
             case "delete":
-                var id = $( target ).parents("tr").attr("data-id");
+                id = $( target ).parents("tr").attr("data-id");
                 dialogConfirm.data("action", {
                     type: "deleteSingleUrl",
                     id: id
                 });
-                dialogConfirm.dialog("open")
+                dialogConfirm.dialog("open");
                 break;
             default:
                 alert( "Unbekannte Aktion: ", action );
             }
-		}
-		
-		function createActionButton( btn ) {
-    		btn.button().click(function() {
-    			var id = $( this ).parents("tr").attr("data-id");
-    			$.get("../rest/url/" + id, function(data) {
-    				// reload page if data was not received, which calls login page
-    				if (typeof data === "string") location.reload();
-    				console.log("Data: ", data);
+        }
+        
+        function createActionButton( btn ) {
+            btn.button().click(function() {
+                var id = $( this ).parents("tr").attr("data-id");
+                $.get("../rest/url/" + id, function(data) {
+                    // reload page if data was not received, which calls login page
+                    if (typeof data === "string") location.reload();
+                    console.log("Data: ", data);
                     dialog.data("isNew", false);
-    				data.userMetadata = [];
-    				dialog.data("urlDataObject", data);
-    				dialog.dialog("open");
-    			});
-    		}).next().button({
-    			text : false,
-    			icons : {
-    				primary : "ui-icon-triangle-1-s"
-    			}
-			}).click(function() {
-				var menu = $(this).parent().next().show().position({
-					my : "left top",
-					at : "left bottom",
-					of : this
-				});
-				$(document).one("click", function(evt) {
-					var action = evt.target.getAttribute("action");
-					if (action) {
-						actionHandler( action, evt.target );
-					}
-					menu.hide();
-				});
-				return false;
-			}).parent().buttonset().next().hide().menu();			
-		}
-		
-		$("#btnAddUrl").on("click", function() {
+                    data.userMetadata = [];
+                    dialog.data("urlDataObject", data);
+                    dialog.dialog("open");
+                });
+            }).next().button({
+                text : false,
+                icons : {
+                    primary : "ui-icon-triangle-1-s"
+                }
+            }).click(function() {
+                var menu = $(this).parent().next().show().position({
+                    my : "left top",
+                    at : "left bottom",
+                    of : this
+                });
+                $(document).one("click", function(evt) {
+                    var action = evt.target.getAttribute("action");
+                    if (action) {
+                        actionHandler( action, evt.target );
+                    }
+                    menu.hide();
+                });
+                return false;
+            }).parent().buttonset().next().hide().menu();           
+        }
+        
+        $("#btnAddUrl").on("click", function() {
             dialog.data("urlDataObject", {
-            	    instance: '${ instance.name }',
+                    instance: '${ instance.name }',
                     limitUrls: [],
                     excludeUrls: [],
                     metadata: $.extend({}, defaultValues), // add a copy of default values
@@ -550,9 +551,9 @@
         $( "#btnAddLimitUrl" ).on( "click", function() {
             //dialogLimit.dialog("open");
             var url = $("#newLimitUrl").val();
-        	addUrlRowTo( "limitUrlTable", url, dialog.data("urlDataObject").limitUrls.length );
-        	dialog.data("urlDataObject").limitUrls.push( url );
-        	$("#newLimitUrl").val("");
+            addUrlRowTo( "limitUrlTable", url, dialog.data("urlDataObject").limitUrls.length );
+            dialog.data("urlDataObject").limitUrls.push( url );
+            $("#newLimitUrl").val("");
         });
         $( "#btnAddExcludeUrl" ).on( "click", function() {
             //dialogExclude.dialog("open");
@@ -592,6 +593,10 @@
             no_results_text: "Keinen Eintrag gefunden"
         };
 
+        var updateBrowserHistory = function() {
+            window.history.pushState(null, null, location.pathname + "?instance=${instance.name}&urlfilter=" + $("#urlTable").data().urlfilter + "&filter=" + $("#urlTable").data().metafilter);
+        };
+
         var setMetafilterValues = function() {
             var filter = [];
             var options = $("#filterMetadata option:selected");
@@ -603,23 +608,31 @@
             // var columns = [];
             // columns[1] =  filter.join(",");
             $('#urlTable').trigger('search', [[filterParam]]);
-            window.history.pushState(null, null, location.pathname + "?instance=${instance.name}&filter=" + filterParam);
+            updateBrowserHistory();
+        };
+        var setFilterUrlValue = function() {
+            var value = $("#filterUrl").val();
+            $("#urlTable").data().urlfilter = value;
+            $('#urlTable').trigger('search', [[ value ]]);
+            updateBrowserHistory();
         };
 
-		$("#dialog-form select").chosen( chosenOptions );
-		$("#filterMetadata").chosen( chosenOptions )
-		    .change(function(event, options) {
-		        setMetafilterValues();
-		    });
+
+        $("#dialog-form select").chosen( chosenOptions );
+        $("#filterMetadata").chosen( chosenOptions )
+            .change(function() {
+                setMetafilterValues();
+            });
+
+        // filter by Url
+        $("#filterUrl").on( "keyup", function() {
+            setFilterUrlValue();
+        });
+
         setMetafilterValues();
-		
-		// filter by Url
-		$("#filterUrl").on( "keyup", function() {
-            $("#urlTable").data().urlfilter = this.value;
-            $('#urlTable').trigger('search', [[this.value]]);
-		});
-		
-		// initialize the table and its paging option
+        setFilterUrlValue();
+        
+        // initialize the table and its paging option
         $("#urlTable").tablesorter({
             headers : {
                 0 : {
@@ -635,11 +648,11 @@
             widgetOptions: {
                 // filter_external: '#filterUrl',
                 filter_serversideFiltering: true,
-            	filter_columnFilters: false,
-            	filter_hideFilters: false,
-            	// include child row content while filtering, if true
+                filter_columnFilters: false,
+                filter_hideFilters: false,
+                // include child row content while filtering, if true
                 // filter_childRows  : false,
-            	// class name applied to filter row and each input
+                // class name applied to filter row and each input
                 filter_cssFilter  : 'filtered',
                 pager_removeRows: false
             }
@@ -650,19 +663,19 @@
         $("#loading").hide();
 
 
-    	/* PUBLIC FUNCTIONS */
-    	urlMaintenance = {
-    		deleteMetadata: deleteMetadata
-    	};
-	});
-	
-	var actionButtonTemplate =
+        /* PUBLIC FUNCTIONS */
+        urlMaintenance = {
+            deleteRow: deleteRow
+        };
+    });
+    
+    var actionButtonTemplate =
         '<div class="actionButtons">' +
             '<div>' +
                 '<button class="btnUrl">Bearbeiten</button>' +
                 '<button class="select">Weitere Optionen</button>' +
             '</div>' +
-            '<ul style="position:absolute; padding-left: 0; min-width: 120px; z-index: 100; display: none;">' +
+            '<ul style="position:absolute; padding-left: 0; min-width: 180px; z-index: 100; display: none;">' +
                 '<li action="delete">Löschen</li>' +
                 '<li action="test">Testen</li>' +
                 '<li action="createNewFromTemplate">Als Template verwenden ...</li>' +
