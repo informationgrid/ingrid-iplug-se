@@ -56,11 +56,13 @@ public class Migrator {
         // u.setUpdated( rs.getDate( UPDATED ) );
         u.setStatus( rs.getInt( STATUS ) );
         
-        // get metadata
-        PreparedStatement stmt = con.prepareStatement( "SELECT * FROM url_metadata um, metadata m WHERE um.metadatas__id=m.id AND um.url__id=?" );
-        stmt.setInt( 1, rs.getInt( ID ) );
-        ResultSet rs_meta = stmt.executeQuery();
-        //ResultSet rs_meta = st.executeQuery( "SELECT * FROM url u, url_metadata um, metadata m WHERE um.metadatas__id=m.id AND um.url__id=" + rs.getInt( ID ) );
+        // get provider/partner
+        // not needed ... these are defined per iPlug
+        
+        return u;
+    }
+    
+    private static List<Metadata> getMetadataFromResultSet(ResultSet rs_meta) throws SQLException {
         List<Metadata> metadataList = new ArrayList<Metadata>();
         while (rs_meta.next()) {
             Metadata metadata = new Metadata();
@@ -68,15 +70,9 @@ public class Migrator {
             metadata.setMetaValue( rs_meta.getString( METADATAVALUE ) );
             metadataList.add( metadata );
         }
-        u.setMetadata( metadataList );
-        rs_meta.close();
-        
-        // get provider/partner
-        // not needed ... these are defined per iPlug
-        
-        return u;
+        return metadataList;
     }
-    
+
     private static List<Url> convertToWebUrls(ResultSet rs) throws SQLException {
         List<Url> webUrls = new ArrayList<Url>();
         
@@ -93,9 +89,21 @@ public class Migrator {
             stmt.setInt( 1, rs.getInt( ID ) );
             ResultSet rs_limit = stmt.executeQuery();
             List<String> limitUrls = new ArrayList<String>();
+            List<Metadata> metadata = new ArrayList<Metadata>();
             while (rs_limit.next()) {
                 limitUrls.add( rs_limit.getString( URL ) );
+                
+                // get metadata connected to the limit urls
+                PreparedStatement stmtMeta = con.prepareStatement( "SELECT * FROM url u, url_metadata um, metadata m WHERE u.id=? AND um.url__id=u.id AND um.metadatas__id=m.id");
+                stmtMeta.setInt( 1, rs_limit.getInt( ID )  );
+                ResultSet rs_meta = stmtMeta.executeQuery();
+                
+                // metadata.addAll( getMetadataFromResultSet( rs_meta ) );
+                addNewMetadataToList( metadata, getMetadataFromResultSet( rs_meta ) );
+                
+                rs_meta.close();
             }
+            u.setMetadata( metadata );
             rs_limit.close();
             
             // EXCLUDE-Urls
@@ -120,6 +128,12 @@ public class Migrator {
     }
     
 
+    private static void addNewMetadataToList(List<Metadata> metadata, List<Metadata> metadataFromResultSet) {
+        for (Metadata meta : metadataFromResultSet) {
+            if (!metadata.contains( meta )) metadata.add( meta );
+        }
+    }
+
     private static List<Url> convertToCatalogUrls(ResultSet rs) throws SQLException {
         List<Url> catalogUrls = new ArrayList<Url>();
         // iterate over all Catalog Urls and convert them to the new format
@@ -128,6 +142,18 @@ public class Migrator {
             Url u = convertBasicUrl( rs );
             
             u.setInstance( conf.catalogInstance );
+            
+            // get metadata
+            PreparedStatement stmt = con.prepareStatement( "SELECT * FROM url_metadata um, metadata m WHERE um.metadatas__id=m.id AND um.url__id=?" );
+            stmt.setInt( 1, rs.getInt( ID ) );
+            ResultSet rs_meta = stmt.executeQuery();
+            //ResultSet rs_meta = st.executeQuery( "SELECT * FROM url u, url_metadata um, metadata m WHERE um.metadatas__id=m.id AND um.url__id=" + rs.getInt( ID ) );
+            
+            List<Metadata> metadataList = getMetadataFromResultSet( rs_meta );
+            
+            u.setMetadata( metadataList );
+            rs_meta.close();
+            
             
             // set the limit url with the value of the start url to only fetch this one page
             // in this case the start url must be a single page

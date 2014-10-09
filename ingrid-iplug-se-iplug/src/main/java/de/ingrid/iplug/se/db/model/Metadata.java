@@ -40,4 +40,15 @@ public class Metadata {
         this.metaValue = metaValue;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Metadata) {
+            Metadata other = (Metadata) obj;
+            if (this.metaKey.equals( other.metaKey ) && this.metaValue.equals( other.metaValue )) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
