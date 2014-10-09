@@ -54,6 +54,7 @@ public class FacetConverter {
                     try {
                         facetQuery = QueryStringParser.parse( fClass.getFragment() );
                         aggr = AggregationBuilders.filter( fClass.getName() ).filter( FilterBuilders.queryFilter( queryConverter.convert( facetQuery ) ) );
+                        aggregations.add( aggr );
                     } catch (ParseException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
@@ -62,8 +63,8 @@ public class FacetConverter {
                 
             } else {
                 aggr = AggregationBuilders.terms( name ).field( field );
+                aggregations.add( aggr );
             }
-            aggregations.add( aggr );
         }
         
         return aggregations;
