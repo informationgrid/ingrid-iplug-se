@@ -33,7 +33,7 @@
     </fieldset>
 
     <!-- pager -->
-    <div id="pager" class="pager">
+    <div id="pager" class="pager left">
         <form>
             <img src="../img/first.png" class="first" />
             <img src="../img/prev.png" class="prev" />
@@ -44,6 +44,8 @@
         </form>
     </div>
 
+    <button id="btnAddUrl" type="button" name="add" class="right" style="margin-top: 8px;">Neue URL</button>
+    
     <table id="urlTable" class="data tablesorter space">
         <thead>
             <tr>
@@ -58,7 +60,7 @@
     </table>
 
     <button id="btnDeleteUrls" type="button" name="delete" class="left">URLs löschen</button>
-    <button id="btnAddUrl" type="button" name="add" class="right">Neue URL</button>
+    <!-- <button id="btnAddUrl" type="button" name="add" class="right">Neue URL</button> -->
     <div style="clear:both;"></div>
 
 
@@ -70,6 +72,7 @@
                     <div class="input full">                
                         <input type="text" name="startUrl" id="startUrl" value="http://" class="text ui-widget-content ui-corner-all">
                     </div>
+                    <span id="errorStartUrl" class="error startUrl">Die URL ist nicht korrekt</span>
                 </div>
                 
                 <div>

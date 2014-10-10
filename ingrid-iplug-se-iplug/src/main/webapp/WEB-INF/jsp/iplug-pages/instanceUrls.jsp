@@ -102,14 +102,25 @@
             }
         };
         
+        function isUrl( url ) {
+            return (/^(http|https|ftp):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/i.test( url ));
+        }
+
         function addUrlValidator() {
             var valid = true;
+            $(".error").hide();
             
             var data = dialog.data("urlDataObject");
             
             // add all values from the dialog to the data object wich will be sent to the server
             // the limit/exclude urls already have been added
             data.url = $("#startUrl").val();
+
+            // check if url is valid
+            if ( !isUrl( data.url ) ) {
+                $(".error.startUrl").show();
+                valid = false;
+            }
             
             data.metadata = [];
             
@@ -147,11 +158,11 @@
                 }
             });
             
-            $.each( data.userMetadata, function(index, item) {
-                handleMetadataItem( item );
-            });
-            
-            delete data.userMetadata;
+            if (data.userMetadata) {
+                $.each( data.userMetadata, function(index, item) {
+                    handleMetadataItem( item );
+                });
+            }
             
             // ************************************
             // Check if limitUrls are valid and set
@@ -166,6 +177,8 @@
             }
 
             if ( valid ) {
+                delete data.userMetadata;
+
                 $.ajax({
                     type: "POST",
                     url: "../rest/url",
@@ -277,6 +290,8 @@
             
             // empty tables
             $("#dialog-form tbody tr:not(.newRow)").remove();
+
+            $(".error").hide();
             
         }
 
@@ -570,7 +585,7 @@
             if (newMeta.split(":").length === 2) {
                 $("#userMetaError").hide();
                 $( "#userMeta" ).val( "" );
-                addUrlRowTo( "userMetadataTable", newMeta );
+                addUrlRowTo( "userMetadataTable", newMeta, dialog.data( "urlDataObject" ).userMetadata.length );
                 dialog.data( "urlDataObject" ).userMetadata.push( newMeta );
             } else {
                 $("#userMetaError").show();
@@ -597,40 +612,41 @@
             window.history.pushState(null, null, location.pathname + "?instance=${instance.name}&urlfilter=" + $("#urlTable").data().urlfilter + "&filter=" + $("#urlTable").data().metafilter);
         };
 
-        var setMetafilterValues = function() {
+        var setFilterValues = function() {
             var filter = [];
             var options = $("#filterMetadata option:selected");
             $.each(options, function(index, option) {
                 filter.push( option.getAttribute("value") ); 
             });
             var filterParam = filter.join(",");
-            $("#urlTable").data().metafilter = filterParam;
-            // var columns = [];
-            // columns[1] =  filter.join(",");
-            $('#urlTable').trigger('search', [[filterParam]]);
-            updateBrowserHistory();
-        };
-        var setFilterUrlValue = function() {
             var value = $("#filterUrl").val();
+
+            $("#urlTable").data().metafilter = filterParam;
             $("#urlTable").data().urlfilter = value;
-            $('#urlTable').trigger('search', [[ value ]]);
+
+            var filterString = filterParam+value;
+            // workaround to trigger search filter correctly if resetting a filter
+            if (filterString === "") filterString = " ";
+
+            // use a combination of both filters to initiate a new search
+            // since we prepare the final url with request parameters ourselves
+            // it doesn't matter which value we trigger the search with
+            $('#urlTable').trigger('search', [[ filterString ]]);
             updateBrowserHistory();
         };
-
 
         $("#dialog-form select").chosen( chosenOptions );
         $("#filterMetadata").chosen( chosenOptions )
             .change(function() {
-                setMetafilterValues();
+                setFilterValues();
             });
 
         // filter by Url
         $("#filterUrl").on( "keyup", function() {
-            setFilterUrlValue();
+            setFilterValues();
         });
 
-        setMetafilterValues();
-        setFilterUrlValue();
+        setFilterValues();
         
         // initialize the table and its paging option
         $("#urlTable").tablesorter({
@@ -643,7 +659,7 @@
                 }
             },
             sortList: [[0,0]], // sort first column ascending
-
+            delayInit: true,
             widgets: ['zebra', 'filter'],
             widgetOptions: {
                 // filter_external: '#filterUrl',
