@@ -25,17 +25,18 @@ import com.tngtech.configbuilder.annotation.valueextractor.PropertyValue;
 
 import de.ingrid.admin.IConfig;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
+import de.ingrid.utils.PlugDescription;
 
-@PropertiesFiles( {"config", "elasticsearch"} )
-@PropertyLocations(directories = {"conf"}, fromClassLoader = true)
+@PropertiesFiles({ "config", "elasticsearch" })
+@PropertyLocations(directories = { "conf" }, fromClassLoader = true)
 public class Configuration implements IConfig {
-    
+
     private static Logger log = Logger.getLogger(Configuration.class);
-    
-    public class StringToSearchType extends TypeTransformer<String, SearchType>{
-        
+
+    public class StringToSearchType extends TypeTransformer<String, SearchType> {
+
         @Override
-        public SearchType transform( String input ) {
+        public SearchType transform(String input) {
             SearchType type;
             switch (input) {
             case "COUNT":
@@ -60,98 +61,99 @@ public class Configuration implements IConfig {
                 type = SearchType.SCAN;
                 break;
             default:
-                log.error( "Unknown SearchType (" + input + "), using default one: DFS_QUERY_THEN_FETCH" );
+                log.error("Unknown SearchType (" + input + "), using default one: DFS_QUERY_THEN_FETCH");
                 type = SearchType.DFS_QUERY_THEN_FETCH;
             }
             return type;
         }
-        
+
     }
-    
-	@Override
-	public void initialize() {
-	}
+
+    @Override
+    public void initialize() {
+    }
 
     @TypeTransformers(Configuration.StringToSearchType.class)
     @PropertyValue("search.type")
     @DefaultValue("DEFAULT")
     public SearchType searchType;
-	
-	@PropertyValue("dir.instances")
-	@DefaultValue("instances")
+
+    @PropertyValue("dir.instances")
+    @DefaultValue("instances")
     private String dirInstances;
 
-	@PropertyValue("db.id")
+    @PropertyValue("db.id")
     @DefaultValue("iplug-se")
     public String databaseID;
-	
-	@PropertyValue("db.dir")
-	@DefaultValue("database")
-	public String databaseDir;
-	
-	@PropertyValue("http.port")
+
+    @PropertyValue("db.dir")
+    @DefaultValue("database")
+    public String databaseDir;
+
+    @PropertyValue("http.port")
     @DefaultValue("9200")
     public String esHttpPort;
-    
-	@PropertyValue("transport.tcp.port")
+
+    @PropertyValue("transport.tcp.port")
     @DefaultValue("9300")
     public String esTransportTcpPort;
 
     @PropertyValue("http.host")
     @DefaultValue("localhost")
     public String esHttpHost;
-	
-	@PropertyValue("index.name")
-	@DefaultValue("iplugse")
-	public String index;
-	
-	@PropertyValue("instance.active")
-	@DefaultValue("")
-	public List<String> activeInstances;
-	
+
+    @PropertyValue("index.name")
+    @DefaultValue("iplugse")
+    public String index;
+
+    @PropertyValue("instance.active")
+    @DefaultValue("")
+    public List<String> activeInstances;
+
     @PropertyValue("nutch.call.java.options")
     @DefaultValue("-Dhadoop.log.file=hadoop.log -Dfile.encoding=UTF-8")
     @Separator(" ")
     public List<String> nutchCallJavaOptions;
-	
-	
-	@Override
-    public void addPlugdescriptionValues( PlugdescriptionCommandObject pdObject ) {
-        pdObject.put( "iPlugClass", "de.ingrid.iplug.se.SEIPlug" );
-        pdObject.addPartner("all");
-        pdObject.addProvider("all");
-        
-//        pdObject.addField("incl_meta");
-//        pdObject.addField("t01_object.obj_class");
-//        pdObject.addField("metaclass");
-//        
-//        DatabaseConnection dbc = new DatabaseConnection( databaseDriver, databaseUrl, databaseUsername, databasePassword, databaseSchema );
-//        pdObject.setConnection( dbc );
-    }
-//
+
     @Override
-    public void setPropertiesFromPlugdescription( Properties props, PlugdescriptionCommandObject pd ) {
-        props.setProperty( "db.dir", this.databaseDir );
-        props.setProperty( "dir.instances", this.dirInstances );
-        props.setProperty( "instance.active", getActiveInstancesAsString() );        
-        
+    public void addPlugdescriptionValues(PlugdescriptionCommandObject pdObject) {
+        pdObject.put("iPlugClass", "de.ingrid.iplug.se.SEIPlug");
+
+        // pdObject.addField("incl_meta");
+        // pdObject.addField("t01_object.obj_class");
+        // pdObject.addField("metaclass");
+        //
+        // DatabaseConnection dbc = new DatabaseConnection( databaseDriver,
+        // databaseUrl, databaseUsername, databasePassword, databaseSchema );
+        // pdObject.setConnection( dbc );
+    }
+
+    //
+    @Override
+    public void setPropertiesFromPlugdescription(Properties props, PlugdescriptionCommandObject pd) {
+        props.setProperty("db.dir", this.databaseDir);
+        props.setProperty("dir.instances", this.dirInstances);
+        props.setProperty("instance.active", getActiveInstancesAsString());
+
         // write elastic search properties to separate configuration
-        // TODO: refactor this code to make an easy function, by putting it into the base-webapp!
+        // TODO: refactor this code to make an easy function, by putting it into
+        // the base-webapp!
         Properties p = new Properties();
         try {
-            // check for elastic search settings in classpath, which works during development
+            // check for elastic search settings in classpath, which works
+            // during development
             // and production
-            Resource resource = new ClassPathResource( "/elasticsearch.properties" );
+            Resource resource = new ClassPathResource("/elasticsearch.properties");
             if (resource.exists()) {
-                p.load( resource.getInputStream() );
+                p.load(resource.getInputStream());
             } else {
                 // create file if it does not exist yet
                 // use the location of the production environment!
-                resource = new FileSystemResource( "conf/elasticsearch.properties" );
+                resource = new FileSystemResource("conf/elasticsearch.properties");
             }
-            p.put( "http.port", esHttpPort );
-            OutputStream os = new FileOutputStream( resource.getFile() ); 
-            p.store( os, "Override configuration written by the application" );
+            p.put("http.port", esHttpPort);
+            OutputStream os = new FileOutputStream(resource.getFile());
+            p.store(os, "Override configuration written by the application");
             os.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -161,20 +163,19 @@ public class Configuration implements IConfig {
     public String getInstancesDir() {
         return dirInstances;
     }
-    
+
     public void setInstancesDir(String dir) {
         this.dirInstances = dir;
     }
-    
+
     public Map<String, String> getElasticSearchSettings() {
-        Map<String,String> map = new HashMap<String, String>();
-        //map.put( "", "" )
+        Map<String, String> map = new HashMap<String, String>();
+        // map.put( "", "" )
         return map;
     }
-    
-    public String getActiveInstancesAsString() {
-        return StringUtils.join( this.activeInstances, ',' );
-    }
 
+    public String getActiveInstancesAsString() {
+        return StringUtils.join(this.activeInstances, ',');
+    }
 
 }

@@ -23,10 +23,10 @@ import com.tngtech.configbuilder.ConfigBuilder;
 
 import de.ingrid.admin.JettyStarter;
 import de.ingrid.iplug.HeartBeatPlug;
-import de.ingrid.iplug.PlugDescriptionFieldFilters;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Metadata;
 import de.ingrid.iplug.se.db.model.Url;
+import de.ingrid.utils.IPlugDescriptionFilter;
 import de.ingrid.utils.IngridHit;
 import de.ingrid.utils.IngridHitDetail;
 import de.ingrid.utils.IngridHits;
@@ -78,8 +78,8 @@ public class SEIPlug extends HeartBeatPlug {
     };
     
     @Autowired
-    public SEIPlug(IMetadataInjector[] injector, IPreProcessor[] preProcessors, IPostProcessor[] postProcessors) {
-        super(30000, new PlugDescriptionFieldFilters(), injector, preProcessors, postProcessors);
+    public SEIPlug(IPlugDescriptionFilter[] filters, IMetadataInjector[] injector, IPreProcessor[] preProcessors, IPostProcessor[] postProcessors) {
+        super(30000, filters, injector, preProcessors, postProcessors);
         
     }
     
