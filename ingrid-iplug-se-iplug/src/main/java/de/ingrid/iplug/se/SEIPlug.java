@@ -126,6 +126,8 @@ public class SEIPlug extends HeartBeatPlug {
         // remove "meta" field from query so search works !
         QueryUtil.removeFieldFromQuery(query, QueryUtil.FIELDNAME_METAINFO);
         QueryUtil.removeFieldFromQuery(query, QueryUtil.FIELDNAME_INCL_META);
+        
+        preProcess(query);
 
         return index.search(query, 0, 10);
 
@@ -136,6 +138,9 @@ public class SEIPlug extends HeartBeatPlug {
      *      de.ingrid.utils.query.IngridQuery, java.lang.String[])
      */
     public IngridHitDetail getDetail(IngridHit hit, IngridQuery query, String[] requestedFields) throws Exception {
+        
+        preProcess(query);
+        
         return index.getDetail(hit, query, requestedFields);
     }
 
@@ -144,6 +149,9 @@ public class SEIPlug extends HeartBeatPlug {
      *      de.ingrid.utils.query.IngridQuery, java.lang.String[])
      */
     public IngridHitDetail[] getDetails(IngridHit[] hits, IngridQuery query, String[] requestedFields) throws Exception {
+        
+        preProcess(query);
+        
         IngridHitDetail[] detailHits = new IngridHitDetail[hits.length];
 
         for (int i = 0; i < hits.length; i++) {

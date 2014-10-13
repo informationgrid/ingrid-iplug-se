@@ -26,6 +26,7 @@ import com.tngtech.configbuilder.annotation.valueextractor.PropertyValue;
 import de.ingrid.admin.IConfig;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
 import de.ingrid.utils.PlugDescription;
+import de.ingrid.utils.query.IngridQuery;
 
 @PropertiesFiles({ "config", "elasticsearch" })
 @PropertyLocations(directories = { "conf" }, fromClassLoader = true)
@@ -150,7 +151,11 @@ public class Configuration implements IConfig {
             if (providers.isEmpty()) {
                 providers.add("all");
             }
-        }        
+        }
+        
+        if (!pdObject.containsRankingType(IngridQuery.SCORE_RANKED)) {
+            pdObject.addToList(IngridQuery.RANKED, IngridQuery.SCORE_RANKED);
+        }
         
         // pdObject.addField("incl_meta");
         // pdObject.addField("t01_object.obj_class");
