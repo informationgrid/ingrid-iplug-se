@@ -25,6 +25,7 @@ import com.tngtech.configbuilder.annotation.valueextractor.PropertyValue;
 
 import de.ingrid.admin.IConfig;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
+import de.ingrid.utils.PlugDescription;
 
 @PropertiesFiles({ "config", "elasticsearch" })
 @PropertyLocations(directories = { "conf" }, fromClassLoader = true)
@@ -118,6 +119,39 @@ public class Configuration implements IConfig {
     public void addPlugdescriptionValues(PlugdescriptionCommandObject pdObject) {
         pdObject.put("iPlugClass", "de.ingrid.iplug.se.SEIPlug");
 
+        // make sure only partner=all is communicated to iBus
+        @SuppressWarnings("unchecked")
+        List<String> partners = pdObject.getArrayList(PlugDescription.PARTNER);
+        //
+        if (partners == null) {
+            pdObject.addPartner("all");
+        } else {
+            for (String partner : partners) {
+                if (!partner.equalsIgnoreCase("all")) {
+                    pdObject.removeFromList(PlugDescription.PARTNER, partner);
+                }
+            }
+            if (partners.isEmpty()) {
+                partners.add("all");
+            }
+        }
+
+        // make sure only provider=all is communicated to iBus
+        @SuppressWarnings("unchecked")
+        List<String> providers = pdObject.getArrayList(PlugDescription.PROVIDER);
+        if (providers == null) {
+            pdObject.addProvider("all");
+        } else {
+            for (String provider : providers) {
+                if (!provider.equalsIgnoreCase("all")) {
+                    pdObject.removeFromList(PlugDescription.PROVIDER, provider);
+                }
+            }
+            if (providers.isEmpty()) {
+                providers.add("all");
+            }
+        }        
+        
         // pdObject.addField("incl_meta");
         // pdObject.addField("t01_object.obj_class");
         // pdObject.addField("metaclass");
