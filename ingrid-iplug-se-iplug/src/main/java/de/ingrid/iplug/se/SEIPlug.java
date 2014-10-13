@@ -23,10 +23,10 @@ import com.tngtech.configbuilder.ConfigBuilder;
 
 import de.ingrid.admin.JettyStarter;
 import de.ingrid.iplug.HeartBeatPlug;
+import de.ingrid.iplug.PlugDescriptionFieldFilters;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Metadata;
 import de.ingrid.iplug.se.db.model.Url;
-import de.ingrid.utils.IPlugDescriptionFilter;
 import de.ingrid.utils.IngridHit;
 import de.ingrid.utils.IngridHitDetail;
 import de.ingrid.utils.IngridHits;
@@ -48,9 +48,9 @@ public class SEIPlug extends HeartBeatPlug {
     /**
      * The logging object
      */
-    private static Logger log = Logger.getLogger( SEIPlug.class );
+    private static Logger log = Logger.getLogger(SEIPlug.class);
 
-	public static Configuration conf;
+    public static Configuration conf;
 
     /**
      * The <code>PlugDescription</code> object passed at startup
@@ -60,29 +60,29 @@ public class SEIPlug extends HeartBeatPlug {
     /**
      * Workingdirectory of the iPlug instance as absolute path
      */
-    //private String fWorkingDir = ".";
+    // private String fWorkingDir = ".";
 
     /**
      * Unique Plug-iD
      */
     private String fPlugId = null;
 
-    //private static final long serialVersionUID = SEIPlug.class.getName().hashCode();
+    // private static final long serialVersionUID =
+    // SEIPlug.class.getName().hashCode();
 
     @Autowired
-	private Index index;
-
+    private Index index;
 
     public SEIPlug() {
         super(30000, null, null, null, null);
     };
-    
+
     @Autowired
-    public SEIPlug(IPlugDescriptionFilter[] filters, IMetadataInjector[] injector, IPreProcessor[] preProcessors, IPostProcessor[] postProcessors) {
-        super(30000, filters, injector, preProcessors, postProcessors);
-        
+    public SEIPlug(IMetadataInjector[] injector, IPreProcessor[] preProcessors, IPostProcessor[] postProcessors) {
+        super(30000, new PlugDescriptionFieldFilters(), injector, preProcessors, postProcessors);
+
     }
-    
+
     /**
      * @see de.ingrid.utils.IPlug#configure(de.ingrid.utils.PlugDescription)
      */
@@ -93,10 +93,10 @@ public class SEIPlug extends HeartBeatPlug {
 
         this.fPlugDesc = plugDescription;
         this.fPlugId = fPlugDesc.getPlugId();
-        
+
         // TODO: add plug id as index information
         // ...
-        
+
         log.info("Done.");
     }
 
@@ -116,19 +116,19 @@ public class SEIPlug extends HeartBeatPlug {
         if (log.isDebugEnabled()) {
             log.debug("incomming query : " + query.toString());
         }
-        
+
         // check if query is rejected and return 0 hits instead of search within
         // the iplug
         if (query.isRejected()) {
             return new IngridHits(fPlugId, 0, new IngridHit[] {}, true);
         }
-        
+
         // remove "meta" field from query so search works !
         QueryUtil.removeFieldFromQuery(query, QueryUtil.FIELDNAME_METAINFO);
         QueryUtil.removeFieldFromQuery(query, QueryUtil.FIELDNAME_INCL_META);
-        
-        return index.search( query, 0, 10 );
-        
+
+        return index.search(query, 0, 10);
+
     }
 
     /**
@@ -136,7 +136,7 @@ public class SEIPlug extends HeartBeatPlug {
      *      de.ingrid.utils.query.IngridQuery, java.lang.String[])
      */
     public IngridHitDetail getDetail(IngridHit hit, IngridQuery query, String[] requestedFields) throws Exception {
-        return index.getDetail(hit, query, requestedFields );
+        return index.getDetail(hit, query, requestedFields);
     }
 
     /**
@@ -144,39 +144,40 @@ public class SEIPlug extends HeartBeatPlug {
      *      de.ingrid.utils.query.IngridQuery, java.lang.String[])
      */
     public IngridHitDetail[] getDetails(IngridHit[] hits, IngridQuery query, String[] requestedFields) throws Exception {
-        IngridHitDetail[] detailHits = new IngridHitDetail[ hits.length ];
-        
+        IngridHitDetail[] detailHits = new IngridHitDetail[hits.length];
+
         for (int i = 0; i < hits.length; i++) {
-            detailHits[i] = getDetail( hits[i], query, requestedFields );
-            
+            detailHits[i] = getDetail(hits[i], query, requestedFields);
+
         }
         return detailHits;
     }
-    
+
     public static void main(String[] args) throws Exception {
         conf = new ConfigBuilder<Configuration>(Configuration.class).withCommandLineArgs(args).build();
-        new JettyStarter( conf );
-        
+        new JettyStarter(conf);
+
         // set the directory of the database to the configured one
         Map<String, String> properties = new HashMap<String, String>();
-        Path dbDir = Paths.get( conf.databaseDir );
+        Path dbDir = Paths.get(conf.databaseDir);
         properties.put("javax.persistence.jdbc.url", "jdbc:h2:" + dbDir.toFile().getAbsolutePath() + "/urls;MVCC=true");
-        
-        // get an entity manager instance (initializes properties in the DBManager)
+
+        // get an entity manager instance (initializes properties in the
+        // DBManager)
         EntityManagerFactory emf = null;
         // for development use the settings from the persistence.xml
-        if ( "iplug-se-dev".equals( conf.databaseID ) ) {
+        if ("iplug-se-dev".equals(conf.databaseID)) {
             emf = Persistence.createEntityManagerFactory(conf.databaseID);
         } else {
             emf = Persistence.createEntityManagerFactory(conf.databaseID, properties);
         }
         DBManager.INSTANCE.intialize(emf);
         EntityManager em = DBManager.INSTANCE.getEntityManager();
-        
+
         // apply test-data during development
-        if ( "iplug-se-dev".equals( conf.databaseID ) ) {
-            setupTestData( em );
-            
+        if ("iplug-se-dev".equals(conf.databaseID)) {
+            setupTestData(em);
+
         } else {
             // do database migrations
             Flyway flyway = new Flyway();
@@ -184,102 +185,96 @@ public class SEIPlug extends HeartBeatPlug {
             flyway.setDataSource(dbUrl, "", "");
             flyway.migrate();
         }
-        
+
     }
-    
+
     private static void setupTestData(EntityManager em) {
         em.getTransaction().begin();
-        Url url = new Url( "catalog" );
-        url.setStatus( 200 );
-        url.setUrl( "http://www.wemove.com/" );
+        Url url = new Url("catalog");
+        url.setStatus(200);
+        url.setUrl("http://www.wemove.com/");
         List<Metadata> metadata = new ArrayList<Metadata>();
         Metadata m1 = new Metadata();
-        m1.setMetaKey( "lang" );
-        m1.setMetaValue( "en" );
+        m1.setMetaKey("lang");
+        m1.setMetaValue("en");
         Metadata m2 = new Metadata();
-        m2.setMetaKey( "topic" );
-        m2.setMetaValue( "t2" );
+        m2.setMetaKey("topic");
+        m2.setMetaValue("t2");
         Metadata m3 = new Metadata();
-        m3.setMetaKey( "topic" );
-        m3.setMetaValue( "t3" );
+        m3.setMetaKey("topic");
+        m3.setMetaValue("t3");
         Metadata m4 = new Metadata();
-        m4.setMetaKey( "unknown" );
-        m4.setMetaValue( "xxx" );
+        m4.setMetaKey("unknown");
+        m4.setMetaValue("xxx");
         Metadata m5 = new Metadata();
-        m5.setMetaKey( "topic" );
-        m5.setMetaValue( "angularjs" );
-        metadata.add( m1 );
-        metadata.add( m2 );
-        metadata.add( m3 );
-        metadata.add( m4 );
-        metadata.add( m5 );
-        url.setMetadata( metadata );
+        m5.setMetaKey("topic");
+        m5.setMetaValue("angularjs");
+        metadata.add(m1);
+        metadata.add(m2);
+        metadata.add(m3);
+        metadata.add(m4);
+        metadata.add(m5);
+        url.setMetadata(metadata);
         List<String> limitUrls = new ArrayList<String>();
-        limitUrls.add( "http://www.wemove.com/" );
-        url.setLimitUrls( limitUrls );
+        limitUrls.add("http://www.wemove.com/");
+        url.setLimitUrls(limitUrls);
         List<String> excludeUrls = new ArrayList<String>();
-        excludeUrls.add( "http://www.wemove.com/about" );
-        url.setExcludeUrls( excludeUrls );
-        
+        excludeUrls.add("http://www.wemove.com/about");
+        url.setExcludeUrls(excludeUrls);
+
         em.persist(url);
-        
-        String[] urls = new String[] { "http://www.spiegel.de", "http://www.heise.de", "http://www.apple.com", 
-                "http://www.engadget.com", "http://www.tagesschau.de", "http://www.home-mag.com/", "http://www.ultramusicfestival.com/",
-                "http://www.ebook.de/de/", "http://www.audible.de", "http://www.amazon.com", "http://www.powerint.com/", "http://www.tanzkongress.de/",
-                "http://www.thesourcecode.de/", "http://werk-x.at/", "http://keinundapel.com/", "http://www.ta-trung.com/", "http://www.attac.de/", 
-                "http://www.altana-kulturstiftung.de/", "http://www.lemagazinedouble.com/", "http://www.montessori-muehlheim.de/", 
-                "http://missy-magazine.de/", "http://www.eh-darmstadt.de/", "http://herbert.de/", "http://www.mousonturm.de/", "http://www.zeit.de/",
-                "https://read2burn.com/"};
-        
-        
+
+        String[] urls = new String[] { "http://www.spiegel.de", "http://www.heise.de", "http://www.apple.com", "http://www.engadget.com", "http://www.tagesschau.de", "http://www.home-mag.com/", "http://www.ultramusicfestival.com/",
+                "http://www.ebook.de/de/", "http://www.audible.de", "http://www.amazon.com", "http://www.powerint.com/", "http://www.tanzkongress.de/", "http://www.thesourcecode.de/", "http://werk-x.at/", "http://keinundapel.com/",
+                "http://www.ta-trung.com/", "http://www.attac.de/", "http://www.altana-kulturstiftung.de/", "http://www.lemagazinedouble.com/", "http://www.montessori-muehlheim.de/", "http://missy-magazine.de/",
+                "http://www.eh-darmstadt.de/", "http://herbert.de/", "http://www.mousonturm.de/", "http://www.zeit.de/", "https://read2burn.com/" };
+
         metadata = new ArrayList<Metadata>();
         Metadata md = new Metadata();
-        md.setMetaKey( "lang" );
-        md.setMetaValue( "de" );
-        metadata.add(md);
-        
-        md = new Metadata();
-        md.setMetaKey( "partner" );
-        md.setMetaValue( "bund" );
+        md.setMetaKey("lang");
+        md.setMetaValue("de");
         metadata.add(md);
 
         md = new Metadata();
-        md.setMetaKey( "provider" );
-        md.setMetaValue( "bu_bmu" );
-        metadata.add(md);
-        
-        md = new Metadata();
-        md.setMetaKey( "datatype" );
-        md.setMetaValue( "www" );
+        md.setMetaKey("partner");
+        md.setMetaValue("bund");
         metadata.add(md);
 
         md = new Metadata();
-        md.setMetaKey( "datatype" );
-        md.setMetaValue( "default" );
+        md.setMetaKey("provider");
+        md.setMetaValue("bu_bmu");
         metadata.add(md);
-        
-        
+
+        md = new Metadata();
+        md.setMetaKey("datatype");
+        md.setMetaValue("www");
+        metadata.add(md);
+
+        md = new Metadata();
+        md.setMetaKey("datatype");
+        md.setMetaValue("default");
+        metadata.add(md);
+
         for (String uri : urls) {
-            url = new Url( "catalog" );
-            url.setStatus( 400 );
-            url.setUrl( uri );
+            url = new Url("catalog");
+            url.setStatus(400);
+            url.setUrl(uri);
             List<String> limit = new ArrayList<String>();
-            limit.add( uri );
-            url.setLimitUrls( limit );
+            limit.add(uri);
+            url.setLimitUrls(limit);
             url.setMetadata(metadata);
             em.persist(url);
         }
-        
-        url = new Url( "other" );
-        url.setStatus( 200 );
-        url.setUrl( "http://de.wikipedia.org/" );
+
+        url = new Url("other");
+        url.setStatus(200);
+        url.setUrl("http://de.wikipedia.org/");
         List<String> limit = new ArrayList<String>();
-        limit.add( "http://de.wikipedia.org" );
-        url.setLimitUrls( limit );
+        limit.add("http://de.wikipedia.org");
+        url.setLimitUrls(limit);
         em.persist(url);
-        
-        
+
         em.getTransaction().commit();
     }
-    
+
 }

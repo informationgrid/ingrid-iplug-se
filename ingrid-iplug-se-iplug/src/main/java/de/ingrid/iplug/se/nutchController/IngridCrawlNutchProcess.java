@@ -17,6 +17,7 @@ import org.apache.commons.exec.Executor;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
 import de.ingrid.iplug.se.nutchController.StatusProvider.Classification;
 import de.ingrid.iplug.se.utils.FileUtils;
 
@@ -33,9 +34,11 @@ public class IngridCrawlNutchProcess extends NutchProcess {
         START, INJECT_START, INJECT_BW, CLEANUP_HADOOP, FINISHED, INDEX, FILTER_LINKDB, UPDATE_LINKDB, FILTER_WEBGRAPH, UPDATE_WEBGRAPH, FILTER_SEGMENT, MERGE_SEGMENT, INJECT_META, FILTER_CRAWLDB, GENERATE, FETCH, UPDATE_CRAWLDB, UPDATE_MD, CREATE_HOST_STATISTICS, GENERATE_ZERO_URLS, CRAWL_CLEANUP;
     };
 
-    Integer depth = 1;
+    public Integer depth = 1;
 
     Integer noUrls = 1;
+
+    IPostCrawlProcessor[] postCrawlProcessors;
 
     @Override
     public void run() {
@@ -226,6 +229,12 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             if (status == STATUS.RUNNING) {
                 status = STATUS.FINISHED;
                 this.statusProvider.addState(STATES.FINISHED.name(), "Finished crawl.");
+
+                if (postCrawlProcessors != null) {
+                    for (IPostCrawlProcessor postCrawlProcessor : postCrawlProcessors) {
+                        postCrawlProcessor.execute();
+                    }
+                }
             }
 
         } catch (InterruptedException e) {
@@ -340,6 +349,10 @@ public class IngridCrawlNutchProcess extends NutchProcess {
 
     public void setNoUrls(Integer noUrls) {
         this.noUrls = noUrls;
+    }
+
+    public void setPostCrawlProcessors(IPostCrawlProcessor[] postCrawlProcessors) {
+        this.postCrawlProcessors = postCrawlProcessors;
     }
 
 }

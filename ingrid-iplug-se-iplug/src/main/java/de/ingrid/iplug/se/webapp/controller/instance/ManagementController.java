@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import de.ingrid.admin.controller.AbstractController;
+import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
 import de.ingrid.iplug.se.nutchController.IngridCrawlNutchProcess;
 import de.ingrid.iplug.se.nutchController.NutchController;
 import de.ingrid.iplug.se.nutchController.NutchProcessFactory;
@@ -27,10 +28,13 @@ import de.ingrid.iplug.se.webapp.controller.AdminViews;
 public class ManagementController extends AbstractController {
 
     private NutchController nutchController;
+    
+    private IPostCrawlProcessor[] postCrawlProcessors;
 
     @Autowired
-    public ManagementController(NutchController nutchController) {
+    public ManagementController(NutchController nutchController, IPostCrawlProcessor[] postCrawlProcessors) {
         this.nutchController = nutchController;
+        this.postCrawlProcessors = postCrawlProcessors;
     }
 
     @RequestMapping(value = { "/iplug-pages/instanceManagement.html" }, method = RequestMethod.GET)
@@ -52,7 +56,7 @@ public class ManagementController extends AbstractController {
         // configure crawl process        
         Instance instance = InstanceController.getInstanceData( name );
 
-        IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, depth, numUrls);
+        IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, depth, numUrls, postCrawlProcessors);
 
         // run crawl process
         nutchController.start(instance, process);

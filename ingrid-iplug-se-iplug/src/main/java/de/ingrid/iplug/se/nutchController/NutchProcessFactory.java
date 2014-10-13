@@ -4,24 +4,18 @@
 package de.ingrid.iplug.se.nutchController;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang.StringUtils;
-import org.xml.sax.SAXException;
-
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonSyntaxException;
 
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.db.DBManager;
+import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
 import de.ingrid.iplug.se.webapp.container.Instance;
 import edu.emory.mathcs.backport.java.util.Arrays;
 
@@ -37,22 +31,17 @@ public class NutchProcessFactory {
     // LogFactory.getLog(NutchProcessFactory.class);
 
     /**
-     * 
-     * 
      * @param instance
      * @param depth
      * @param noUrls
+     * @param postCrawlProcessors
      * @return
-     * @throws JsonSyntaxException
-     * @throws JsonIOException
-     * @throws SAXException
-     * @throws IOException
-     * @throws ParserConfigurationException
-     * @throws TransformerException
      */
     @SuppressWarnings("unchecked")
-    public static IngridCrawlNutchProcess getIngridCrawlNutchProcess(Instance instance, int depth, int noUrls) {
+    public static IngridCrawlNutchProcess getIngridCrawlNutchProcess(Instance instance, int depth, int noUrls, IPostCrawlProcessor[] postCrawlProcessors) {
         IngridCrawlNutchProcess process = new IngridCrawlNutchProcess();
+
+        process.setPostCrawlProcessors(postCrawlProcessors);
         process.setDepth(depth);
         process.setNoUrls(noUrls);
 

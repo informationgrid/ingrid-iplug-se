@@ -25,7 +25,6 @@ import com.tngtech.configbuilder.annotation.valueextractor.PropertyValue;
 
 import de.ingrid.admin.IConfig;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
-import de.ingrid.utils.PlugDescription;
 
 @PropertiesFiles({ "config", "elasticsearch" })
 @PropertyLocations(directories = { "conf" }, fromClassLoader = true)
