@@ -104,10 +104,10 @@ public class RestDataController extends InstanceController {
         EntityManager em = DBManager.INSTANCE.getEntityManager();
         
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-        CriteriaQuery<Url> createQuery = em.getCriteriaBuilder().createQuery(Url.class);
+        CriteriaQuery<Url> createQuery = criteriaBuilder.createQuery(Url.class);
         Root<Url> urlTable = createQuery.from(Url.class);
 
-        CriteriaQuery<Long> countQuery = em.getCriteriaBuilder().createQuery(Long.class);
+        CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
         
         List<Predicate> criteria = new ArrayList<Predicate>();
         
@@ -253,7 +253,7 @@ private Expression<?> getColumnForSort(Root<Url> urlTable, int columnPos) {
     public ResponseEntity<String> getHadoopLog(@PathVariable("instance") String name) throws IOException {
         
         Path path = Paths.get( SEIPlug.conf.getInstancesDir(), name, "logs", "hadoop.log" );
-        String content = FileUtils.readFile( path );
+        String content = FileUtils.tail( path.toFile(), 1000 );
         
         return new ResponseEntity<String>( content, HttpStatus.OK );
     }

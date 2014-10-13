@@ -1,0 +1,17 @@
+{
+    "properties": {
+        "boost": { "type": "float" },
+        "content": { "type": "string" },
+        "contentLength": { "type": "long" },
+        "date": { "type": "date" },
+        "digest": { "type": "string" },
+        "host": { "type": "string" },
+        "id": { "type": "string" },
+        "lang": { "type": "string" },
+        "segment": { "type": "string" },
+        "title": { "type": "string" },
+        "tstamp": { "type": "date" },
+        "type": { "type": "string" },
+        "url": { "type": "string" }
+    }
+}

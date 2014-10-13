@@ -7,7 +7,8 @@
             "children": [
                 {
                     "label": "Deutsch",
-                    "id": "de"
+                    "id": "de",
+                    "isDefault": true
                 },
                 {
                     "label": "Englisch",
@@ -183,7 +184,8 @@
             "children": [
                 {
                     "id": "default",
-                    "label": "Allgemeine Umweltinformation"
+                    "label": "Allgemeine Umweltinformation",
+                    "isDefault": true
                 },
                 {
                     "id": "law",
@@ -207,7 +209,8 @@
                 },
                 {
                     "id": "www",
-                    "label": "Webseiten"
+                    "label": "Webseiten",
+                    "isDefault": true
                 }
             ]
         },

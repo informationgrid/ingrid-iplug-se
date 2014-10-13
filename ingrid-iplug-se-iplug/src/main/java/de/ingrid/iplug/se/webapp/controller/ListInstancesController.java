@@ -13,6 +13,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
 import org.elasticsearch.client.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -31,6 +37,8 @@ import de.ingrid.admin.command.PlugdescriptionCommandObject;
 import de.ingrid.admin.controller.AbstractController;
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
+import de.ingrid.iplug.se.db.DBManager;
+import de.ingrid.iplug.se.db.model.Url;
 import de.ingrid.iplug.se.elasticsearch.bean.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.utils.ElasticSearchUtils;
 import de.ingrid.iplug.se.utils.FileUtils;
@@ -47,10 +55,10 @@ import de.ingrid.iplug.se.webapp.controller.instance.scheduler.SchedulerManager;
 @Controller
 @SessionAttributes("plugDescription")
 public class ListInstancesController extends AbstractController {
-    
+
     @Autowired
     private ElasticsearchNodeFactoryBean elasticSearch;
-    
+
     @Autowired
     private SchedulerManager schedulerManager;
 
@@ -59,11 +67,11 @@ public class ListInstancesController extends AbstractController {
     public ListInstancesController() {
         this.conf = SEIPlug.conf;
     }
-    
+
     public ListInstancesController(Configuration conf) {
         this.conf = conf;
     }
-    
+
     // @ModelAttribute("instances")
     public List<Instance> getInstances() throws Exception {
         ArrayList<Instance> list = new ArrayList<Instance>();
@@ -93,25 +101,25 @@ public class ListInstancesController extends AbstractController {
     public String getParameters(final ModelMap modelMap) throws Exception {
 
         List<Instance> instances = getInstances();
-        
+
         // check for invalid instances and remove them from the active ones
         Iterator<String> activeInstancesIt = conf.activeInstances.iterator();
         while (activeInstancesIt.hasNext()) {
             String active = activeInstancesIt.next();
-            
+
             boolean found = false;
             for (Instance instance : instances) {
                 if (instance.getName().equals( active )) {
-                    found  = true;
+                    found = true;
                     break;
                 }
             }
-            
+
             if (!found) {
                 activeInstancesIt.remove();
             }
         }
-        
+
         modelMap.put( "instances", instances );
         return AdminViews.SE_LIST_INSTANCES;
     }
@@ -129,7 +137,7 @@ public class ListInstancesController extends AbstractController {
         ElasticSearchUtils.createIndexType( name, client );
         return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );
     }
-    
+
     @RequestMapping(value = "/iplug-pages/listInstances.html", method = RequestMethod.POST, params = "add")
     public String addInstance(final ModelMap modelMap, @RequestParam("instance") String name) throws Exception {
 
@@ -142,65 +150,66 @@ public class ListInstancesController extends AbstractController {
         // create directory and copy necessary configuration files
         boolean success = initializeInstanceDir( dir + "/" + name );
         if (success) {
-            
+
             schedulerManager.addInstance( name );
-            
+
             Client client = elasticSearch.getObject().client();
-            // if a type within an index already exists, then return error and ask user what to do
+            // if a type within an index already exists, then return error and
+            // ask user what to do
             boolean typeExists = ElasticSearchUtils.typeExists( name, client );
-            
+
             if (typeExists) {
                 modelMap.put( "instances", getInstances() );
                 modelMap.put( "error", "Type already exists in index" );
-                
+
                 return AdminViews.SE_LIST_INSTANCES;
-                
+
             } else {
                 ElasticSearchUtils.createIndexType( name, client );
             }
-            
+
         } else {
             modelMap.put( "error", "Default configuration could not be copied to: " + dir + "/" + name );
         }
-        
+
         modelMap.put( "instances", getInstances() );
-        
+
         return AdminViews.SE_LIST_INSTANCES;
     }
 
     public static boolean initializeInstanceDir(String path) {
         boolean result = false;
-        
+
         try {
             final Path newInstanceDir = Files.createDirectories( Paths.get( path ) );
             if (newInstanceDir == null) {
                 throw new RuntimeException( "Directory could not be created: " + path );
             }
-            
 
             // copy nutch configurations
             Path destDir = Paths.get( newInstanceDir.toString(), "conf" );
             Path sourceDir = Paths.get( "apache-nutch-runtime", "runtime", "local", "conf" );
             try {
-                FileUtils.copyDirectories(sourceDir, destDir);
+                FileUtils.copyDirectories( sourceDir, destDir );
             } catch (IOException e) {
                 e.printStackTrace();
-                //modelMap.put( "error", "Default configuration could not be copied to: " + destDir );
+                // modelMap.put( "error",
+                // "Default configuration could not be copied to: " + destDir );
             }
 
             // copy default configuration
             destDir = Paths.get( newInstanceDir.toString(), "conf" );
             ClassPathResource instanceResourcesDir = new ClassPathResource( "instance-data" );
             sourceDir = Paths.get( instanceResourcesDir.getFile().getPath() );
-            
+
             try {
-                FileUtils.copyDirectories(sourceDir, destDir);
+                FileUtils.copyDirectories( sourceDir, destDir );
             } catch (IOException e) {
                 e.printStackTrace();
-                //modelMap.put( "error", "Default configuration could not be copied to: " + destDir );
+                // modelMap.put( "error",
+                // "Default configuration could not be copied to: " + destDir );
             }
 
-            
             result = true;
         } catch (IOException e) {
             // TODO Auto-generated catch block
@@ -209,7 +218,7 @@ public class ListInstancesController extends AbstractController {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
+
         return result;
     }
 
@@ -240,8 +249,22 @@ public class ListInstancesController extends AbstractController {
         
         // remove instance (type) from index
         ElasticSearchUtils.deleteType( name, elasticSearch.getObject().client() );
-
+        
+        // remove url from database belonging to this instance
+        EntityManager em = DBManager.INSTANCE.getEntityManager();
+        
+        em.getTransaction().begin();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaDelete<Url> criteriaDelete = cb.createCriteriaDelete( Url.class );
+        Root<Url> urlTable = criteriaDelete.from(Url.class);
+        Predicate instanceCriteria = cb.equal( urlTable.get("instance"), name );
+        
+        criteriaDelete.from( Url.class );
+        criteriaDelete.where( instanceCriteria );
+        
+        em.createQuery( criteriaDelete ).executeUpdate();
+        em.getTransaction().commit();
+        
         return new ResponseEntity<String>( HttpStatus.OK );
     }
-
 }

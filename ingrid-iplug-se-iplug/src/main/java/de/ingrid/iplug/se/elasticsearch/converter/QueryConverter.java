@@ -5,9 +5,14 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
+import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
+import org.elasticsearch.index.query.functionscore.fieldvaluefactor.FieldValueFactorFunctionBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.utils.query.ClauseQuery;
 import de.ingrid.utils.query.IngridQuery;
 
@@ -61,6 +66,25 @@ public class QueryConverter {
                 log.debug(queryConverter.toString() + ": resulting boolean query:" + booleanQuery.toString());
             }
         }
+    }
+
+    /**
+     * Wrap a score modifier around the query, which uses a field from the document
+     * to boost the score.
+     * @param query is the query to apply the score modifier on
+     * @return a new query which contains the score modifier and the given query
+     */
+    public QueryBuilder addScoreModifier(QueryBuilder query) {
+        // describe the function to manipulate the score
+        FieldValueFactorFunctionBuilder scoreFunc = ScoreFunctionBuilders.fieldValueFactorFunction( SEIPlug.conf.esBoostField );
+        scoreFunc.modifier( SEIPlug.conf.esBoostModifier );
+        scoreFunc.factor( SEIPlug.conf.esBoostFactor );
+        
+        // create the wrapper query to apply the score function to the query
+        FunctionScoreQueryBuilder funcScoreQuery = new FunctionScoreQueryBuilder( query );
+        funcScoreQuery.add( scoreFunc );
+        funcScoreQuery.boostMode( SEIPlug.conf.esBoostMode );
+        return funcScoreQuery;
     }
 
 }

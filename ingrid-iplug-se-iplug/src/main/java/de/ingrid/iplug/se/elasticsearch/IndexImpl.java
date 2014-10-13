@@ -11,9 +11,13 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.lucene.search.function.FieldValueFactorFunction.Modifier;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
+import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
+import org.elasticsearch.index.query.functionscore.fieldvaluefactor.FieldValueFactorFunctionBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
@@ -35,24 +39,24 @@ import de.ingrid.utils.query.IngridQuery;
 @Component
 public class IndexImpl implements Index {
 
-    private static Logger log = Logger.getLogger(IndexImpl.class);
+    private static Logger log = Logger.getLogger( IndexImpl.class );
 
     private ElasticsearchNodeFactoryBean elasticSearch;
 
     private Client client;
 
     private QueryConverter queryConverter;
-
+    
     private FacetConverter facetConverter;
-
-    private final static String[] detailFields = { "url", "title" };
+    
+    private final static String[] detailFields =  { "url", "title" };
 
     private static final String ELASTIC_SEARCH_ID = "es_id";
 
     private static final String ELASTIC_SEARCH_INDEX = "es_index";
 
     private static final String ELASTIC_SEARCH_INDEX_TYPE = "es_type";
-
+    
     private String plugId = null;
 
     // SearchType see:
@@ -66,40 +70,38 @@ public class IndexImpl implements Index {
         this.indexName = SEIPlug.conf.index;
         this.searchType = SEIPlug.conf.searchType;
         this.plugId = JettyStarter.getInstance().config.communicationProxyUrl;
-
+        
         try {
             this.elasticSearch = elasticSearch;
             this.queryConverter = qc;
             this.facetConverter = fc;
             client = elasticSearch.getObject().client();
 
-            log.info("Elastic Search Settings: " + elasticSearch.getObject().settings().toDelimitedString(','));
-            boolean indexExists = client.admin().indices().prepareExists(indexName).execute().actionGet().isExists();
+            log.info( "Elastic Search Settings: " + elasticSearch.getObject().settings().toDelimitedString( ',' ) );
+            boolean indexExists = client.admin().indices().prepareExists( indexName ).execute().actionGet().isExists();
             if (!indexExists) {
-                client.admin().indices().prepareCreate(indexName).execute().actionGet();
+                client.admin().indices().prepareCreate( indexName ).execute().actionGet();
             }
-
+            
         } catch (Exception e) {
-            log.error("Error during initialization of ElasticSearch-Client!");
+            log.error( "Error during initialization of ElasticSearch-Client!" );
             e.printStackTrace();
         }
-
+        
     }
-
+    
     @Override
     public IngridHits search(IngridQuery ingridQuery, int startHit, int num) {
 
         // convert InGrid-query to QueryBuilder
-        QueryBuilder query = queryConverter.convert(ingridQuery);
-
-        if (log.isDebugEnabled()) {
-            log.debug("Elastic Search Query: \n" + query);
-        }
-
-        boolean isLocationSearch = ingridQuery.containsField("x1");
-        boolean hasFacets = ingridQuery.containsKey("FACETS");
-        String[] instances = SEIPlug.conf.activeInstances.toArray(new String[0]);
-
+        QueryBuilder query = queryConverter.convert( ingridQuery );
+        
+        QueryBuilder funcScoreQuery = queryConverter.addScoreModifier( query );
+        
+        boolean isLocationSearch = ingridQuery.containsField( "x1" );
+        boolean hasFacets = ingridQuery.containsKey( "FACETS" );
+        String[] instances = SEIPlug.conf.activeInstances.toArray( new String[0] );
+        
         // request grouping information from index if necessary
         // see IndexImpl.getHitsFromResponse for usage
         String groupedBy = ingridQuery.getGrouped();
@@ -113,41 +115,50 @@ public class IndexImpl implements Index {
         }
 
         // search prepare
-        SearchRequestBuilder srb;
+        SearchRequestBuilder srb = client.prepareSearch( indexName )
+                .setTypes( instances )
+                .setSearchType( searchType  )
+                //.setQuery( query ) // Query
+                .setQuery( funcScoreQuery ) // Query
+                .setFrom( startHit ).setSize( num )
+                .setExplain( false );
+        
         if (fields == null) {
-            srb = client.prepareSearch(indexName).setTypes(instances).setSearchType(searchType).setQuery(query) // Query
-                    .setFrom(startHit).setSize(num).setExplain(false).setNoFields();
+            srb = srb.setNoFields();
         } else {
-            srb = client.prepareSearch(indexName).setTypes(instances).setSearchType(searchType).setQuery(query) // Query
-                    .setFrom(startHit).setSize(num).setExplain(false).addFields(fields);
+            srb = srb.addFields(fields);
         }
-
+        
         // Filter for results only with location information
         if (isLocationSearch) {
-            srb.setPostFilter(FilterBuilders.existsFilter("x1"));
+            srb.setPostFilter( FilterBuilders.existsFilter( "x1" ) );
         }
 
         // pre-processing: add facets/aggregations to the query
         if (hasFacets) {
-            List<AbstractAggregationBuilder> aggregations = facetConverter.getAggregations(ingridQuery, queryConverter);
+            List<AbstractAggregationBuilder> aggregations = facetConverter.getAggregations( ingridQuery, queryConverter );
             for (AbstractAggregationBuilder aggregation : aggregations) {
-                srb.addAggregation(aggregation);
+                srb.addAggregation( aggregation );
             }
         }
 
+        if (log.isDebugEnabled()) {
+            log.debug( "Final Elastic Search Query: \n" + srb );
+        }
+        
         // search!
         SearchResponse searchResponse = srb.execute().actionGet();
 
         // convert to IngridHits
-        IngridHits hits = getHitsFromResponse(searchResponse, ingridQuery);
-
+        IngridHits hits = getHitsFromResponse( searchResponse, ingridQuery );
+        
         // post-processing: extract and convert facets to InGrid-Document
         if (hasFacets) {
             // add facets from response
-            IngridDocument facets = facetConverter.convertFacetResultsToDoc(searchResponse);
-            hits.put("FACETS", facets);
+            IngridDocument facets = facetConverter.convertFacetResultsToDoc( searchResponse );
+            hits.put( "FACETS", facets );
         }
-
+        
         return hits;
     }
 
@@ -171,10 +182,10 @@ public class IndexImpl implements Index {
         int docId = 0;
         String groupBy = ingridQuery.getGrouped();
         for (SearchHit hit : hits.hits()) {
-            IngridHit ingridHit = new IngridHit(this.plugId, docId++, -1, hit.getScore());
-            ingridHit.put(ELASTIC_SEARCH_ID, hit.getId());
-            ingridHit.put(ELASTIC_SEARCH_INDEX, hit.getIndex());
-            ingridHit.put(ELASTIC_SEARCH_INDEX_TYPE, hit.getType());
+            IngridHit ingridHit = new IngridHit(this.plugId, docId++, -1, hit.getScore() );
+            ingridHit.put( ELASTIC_SEARCH_ID, hit.getId() );
+            ingridHit.put( ELASTIC_SEARCH_INDEX, hit.getIndex() );
+            ingridHit.put( ELASTIC_SEARCH_INDEX_TYPE, hit.getType() );
 
             // get grouing information, add if exist
             String groupValue = null;
@@ -194,60 +205,60 @@ public class IndexImpl implements Index {
                 ingridHit.addGroupedField(groupValue);
             }
 
-            hitArray[pos] = ingridHit;
+            hitArray[pos] = ingridHit; 
             pos++;
         }
 
-        IngridHits ingridHits = new IngridHits(totalHits, hitArray);
-
+        IngridHits ingridHits = new IngridHits( totalHits, hitArray );
+        
         return ingridHits;
     }
 
     @Override
     public IngridHitDetail getDetail(IngridHit hit, IngridQuery ingridQuery, String[] requestedFields) {
-        String documentId = hit.getString(ELASTIC_SEARCH_ID);
-        String fromIndex = hit.getString(ELASTIC_SEARCH_INDEX);
-        String fromType = hit.getString(ELASTIC_SEARCH_INDEX_TYPE);
-        String[] allFields = (String[]) ArrayUtils.addAll(detailFields, requestedFields);
-
-        // convert InGrid-query to QueryBuilder
+        String documentId = hit.getString( ELASTIC_SEARCH_ID );
+        String fromIndex = hit.getString( ELASTIC_SEARCH_INDEX );
+        String fromType = hit.getString( ELASTIC_SEARCH_INDEX_TYPE );
+        String[] allFields = (String[]) ArrayUtils.addAll( detailFields, requestedFields );
+        
+     // convert InGrid-query to QueryBuilder
         // QueryBuilder query =
         // QueryBuilders.boolQuery().must(QueryBuilders.idsQuery(documentId)).should(queryConverter.convert(
         // ingridQuery ));
-        QueryBuilder query = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("_id", documentId)).must(queryConverter.convert(ingridQuery));
-
+        QueryBuilder query = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("_id", documentId)).must(queryConverter.convert( ingridQuery ));
+        
         // search prepare
         SearchRequestBuilder srb = client.prepareSearch(fromIndex).setTypes(fromType).setSearchType(searchType).setQuery(query) // Query
                 .setFrom(0).setSize(1).setExplain(false).addHighlightedField("content").addFields(allFields).setSource("");
 
         SearchResponse searchResponse = srb.execute().actionGet();
-
+        
         SearchHits dHits = searchResponse.getHits();
         SearchHit dHit = dHits.getAt(0);
-
+        
         /*
          * GetResponse response = client.prepareGet( fromIndex, fromType,
          * documentId ) .setFields( allFields ) .execute() .actionGet();
-         */
+*/
         String title = "untitled";
-        if (dHit.field(IndexFields.TITLE) != null) {
-            title = (String) dHit.field(IndexFields.TITLE).getValue();
+        if (dHit.field( IndexFields.TITLE ) != null) {
+            title = (String) dHit.field( IndexFields.TITLE ).getValue();
         }
         String summary = "";
         if (dHit.getHighlightFields().containsKey("content")) {
-            summary = StringUtils.join(dHit.getHighlightFields().get("content").fragments(), " ... ");
+            summary = StringUtils.join(dHit.getHighlightFields().get( "content" ).fragments(), " ... ");
         }
-        // (String) response.getField( IndexFields.ABSTRACT ).getValue();
+                //(String) response.getField( IndexFields.ABSTRACT ).getValue();
         IngridHitDetail detail = new IngridHitDetail(hit, title, summary);
         if (requestedFields != null) {
             for (String field : requestedFields) {
-                if (dHit.field(field) != null) {
-                    detail.put(field, dHit.field(field).getValue());
+                if (dHit.field( field ) != null) {
+                    detail.put( field, dHit.field( field ).getValue());
                 }
             }
         }
         detail.put("url", documentId);
-
+        
         return detail;
     }
 

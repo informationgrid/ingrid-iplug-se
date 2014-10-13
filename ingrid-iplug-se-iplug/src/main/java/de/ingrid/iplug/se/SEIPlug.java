@@ -194,6 +194,9 @@ public class SEIPlug extends HeartBeatPlug {
             flyway.migrate();
         }
 
+        // TODO: fix index if necessary
+        // see: http://elasticsearch-users.115913.n3.nabble.com/Shard-index-gone-bad-anyone-know-how-to-fix-this-java-io-EOFException-read-past-EOF-NIOFSIndexInput-td4027683.html
+        
     }
 
     private static void setupTestData(EntityManager em) {
