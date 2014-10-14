@@ -1,0 +1,7 @@
+{
+    "disallowTrailingWhitespace": true,
+    "disallowMixedSpacesAndTabs": true,
+    "disallowTrailingComma": true,
+    "disallowSpaceAfterObjectKeys": true,
+    "requireSpaceBeforeObjectValues": true
+}

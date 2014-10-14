@@ -4,6 +4,10 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Url;
@@ -12,21 +16,17 @@ public class DBUtils {
     
     public static List<Url> getAllUrlsFromInstance(String instance) {
         EntityManager em = DBManager.INSTANCE.getEntityManager();
-        em.getTransaction().begin();
         
-//        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-//        CriteriaQuery<Url> createQuery = criteriaBuilder.createQuery(Url.class);
-//        Root<Url> urlTable = createQuery.from(Url.class);
-//        
-//        Predicate instanceCriteria = criteriaBuilder.equal( urlTable.get("instance"), instance );
-//        
-//        createQuery.from( Url.class );
-//        createQuery.where( instanceCriteria );
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<Url> createQuery = criteriaBuilder.createQuery(Url.class);
+        Root<Url> urlTable = createQuery.from(Url.class);
         
-        //List<Url> resultList = em.createQuery( createQuery ).getResultList();
-        TypedQuery<Url> query = em.createQuery("select u from Url u where u.instance=\"" + instance + "\"", Url.class);
-        em.getTransaction().commit();
-        return query.getResultList();
+        Predicate instanceCriteria = criteriaBuilder.equal( urlTable.get("instance"), instance );
+        createQuery.select( urlTable ).where( instanceCriteria );
+        
+        List<Url> resultList = em.createQuery( createQuery ).getResultList();
+        //TypedQuery<Url> query = em.createQuery("select u from Url u where u.instance=\"" + instance + "\"", Url.class);
+        return resultList;
     }
 
     private static void persistUrl(EntityManager em, Url url) {
