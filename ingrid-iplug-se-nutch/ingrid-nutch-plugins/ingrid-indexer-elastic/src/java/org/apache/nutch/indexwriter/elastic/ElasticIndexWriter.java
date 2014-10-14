@@ -60,6 +60,9 @@ public class ElasticIndexWriter implements IndexWriter {
         // Loop through all fields of this doc
         for (String fieldName : doc.getFieldNames()) {
             if (doc.getField(fieldName).getValues().size() > 1) {
+                if (fieldName.equalsIgnoreCase("boost")) {
+                    source.put("doc_boost", doc.getField(fieldName).getValues());
+                }
                 source.put(fieldName, doc.getField(fieldName).getValues());
                 // Loop through the values to keep track of the size of this
                 // document
@@ -67,6 +70,9 @@ public class ElasticIndexWriter implements IndexWriter {
                     requestLength += value.toString().length();
                 }
             } else {
+                if (fieldName.equalsIgnoreCase("boost")) {
+                    source.put("doc_boost", doc.getField(fieldName).getValues());
+                }
                 source.put(fieldName, doc.getFieldValue(fieldName));
                 requestLength += doc.getFieldValue(fieldName).toString().length();
             }
