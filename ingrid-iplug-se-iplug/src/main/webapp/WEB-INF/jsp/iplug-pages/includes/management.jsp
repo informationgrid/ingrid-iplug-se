@@ -34,7 +34,8 @@
         <div id="moreInfo" style="padding-top: 10px;">weitere Informationen: <a href='#' onclick='showHadoopLog()'>hadoop.log</a></div>
     </div>
 </fieldset>
-    
+
+<div id="overallStatistic">Insgesamt bekannt: <span class="known"></span> davon analysiert: <span class="fetched"></span></div>
 <table id="statisticTable" class="data tablesorter">
     <thead>
         <tr>

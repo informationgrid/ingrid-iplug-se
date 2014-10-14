@@ -13,6 +13,10 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 import org.apache.log4j.Logger;
 import org.flywaydb.core.Flyway;
@@ -27,6 +31,7 @@ import de.ingrid.iplug.PlugDescriptionFieldFilters;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Metadata;
 import de.ingrid.iplug.se.db.model.Url;
+import de.ingrid.iplug.se.elasticsearch.bean.ElasticsearchNodeFactoryBean;
 import de.ingrid.utils.IngridHit;
 import de.ingrid.utils.IngridHitDetail;
 import de.ingrid.utils.IngridHits;
@@ -73,14 +78,16 @@ public class SEIPlug extends HeartBeatPlug {
     @Autowired
     private Index index;
 
+    private static ElasticsearchNodeFactoryBean esBean;
+
     public SEIPlug() {
         super(30000, null, null, null, null);
     };
 
     @Autowired
-    public SEIPlug(IMetadataInjector[] injector, IPreProcessor[] preProcessors, IPostProcessor[] postProcessors) {
+    public SEIPlug(IMetadataInjector[] injector, IPreProcessor[] preProcessors, IPostProcessor[] postProcessors, ElasticsearchNodeFactoryBean esBean) {
         super(30000, new PlugDescriptionFieldFilters(), injector, preProcessors, postProcessors);
-
+        SEIPlug.esBean = esBean;
     }
 
     /**
@@ -194,97 +201,119 @@ public class SEIPlug extends HeartBeatPlug {
             flyway.migrate();
         }
 
-        // TODO: fix index if necessary
-        // see: http://elasticsearch-users.115913.n3.nabble.com/Shard-index-gone-bad-anyone-know-how-to-fix-this-java-io-EOFException-read-past-EOF-NIOFSIndexInput-td4027683.html
-        
+        // normally shutdown the elastic search node
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                try {
+                    esBean.destroy();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     private static void setupTestData(EntityManager em) {
         em.getTransaction().begin();
-        Url url = new Url("catalog");
-        url.setStatus(200);
-        url.setUrl("http://www.wemove.com/");
-        List<Metadata> metadata = new ArrayList<Metadata>();
-        Metadata m1 = new Metadata();
-        m1.setMetaKey("lang");
-        m1.setMetaValue("en");
-        Metadata m2 = new Metadata();
-        m2.setMetaKey("topic");
-        m2.setMetaValue("t2");
-        Metadata m3 = new Metadata();
-        m3.setMetaKey("topic");
-        m3.setMetaValue("t3");
-        Metadata m4 = new Metadata();
-        m4.setMetaKey("unknown");
-        m4.setMetaValue("xxx");
-        Metadata m5 = new Metadata();
-        m5.setMetaKey("topic");
-        m5.setMetaValue("angularjs");
-        metadata.add(m1);
-        metadata.add(m2);
-        metadata.add(m3);
-        metadata.add(m4);
-        metadata.add(m5);
-        url.setMetadata(metadata);
-        List<String> limitUrls = new ArrayList<String>();
-        limitUrls.add("http://www.wemove.com/");
-        url.setLimitUrls(limitUrls);
-        List<String> excludeUrls = new ArrayList<String>();
-        excludeUrls.add("http://www.wemove.com/about");
-        url.setExcludeUrls(excludeUrls);
-
-        em.persist(url);
-
-        String[] urls = new String[] { "http://www.spiegel.de", "http://www.heise.de", "http://www.apple.com", "http://www.engadget.com", "http://www.tagesschau.de", "http://www.home-mag.com/", "http://www.ultramusicfestival.com/",
-                "http://www.ebook.de/de/", "http://www.audible.de", "http://www.amazon.com", "http://www.powerint.com/", "http://www.tanzkongress.de/", "http://www.thesourcecode.de/", "http://werk-x.at/", "http://keinundapel.com/",
-                "http://www.ta-trung.com/", "http://www.attac.de/", "http://www.altana-kulturstiftung.de/", "http://www.lemagazinedouble.com/", "http://www.montessori-muehlheim.de/", "http://missy-magazine.de/",
-                "http://www.eh-darmstadt.de/", "http://herbert.de/", "http://www.mousonturm.de/", "http://www.zeit.de/", "https://read2burn.com/" };
-
-        metadata = new ArrayList<Metadata>();
-        Metadata md = new Metadata();
-        md.setMetaKey("lang");
-        md.setMetaValue("de");
-        metadata.add(md);
-
-        md = new Metadata();
-        md.setMetaKey("partner");
-        md.setMetaValue("bund");
-        metadata.add(md);
-
-        md = new Metadata();
-        md.setMetaKey("provider");
-        md.setMetaValue("bu_bmu");
-        metadata.add(md);
-
-        md = new Metadata();
-        md.setMetaKey("datatype");
-        md.setMetaValue("www");
-        metadata.add(md);
-
-        md = new Metadata();
-        md.setMetaKey("datatype");
-        md.setMetaValue("default");
-        metadata.add(md);
-
-        for (String uri : urls) {
-            url = new Url("catalog");
-            url.setStatus(400);
-            url.setUrl(uri);
-            List<String> limit = new ArrayList<String>();
-            limit.add(uri);
-            url.setLimitUrls(limit);
+        
+        // check first if test data already has been added
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Url> criteria = cb.createQuery( Url.class );
+        Root<Url> urlTable = criteria.from(Url.class);
+        Predicate instanceCriteria = cb.equal( urlTable.get("instance"), "catalog" );
+        
+        criteria.from( Url.class );
+        criteria.where( instanceCriteria );
+        
+        int size = em.createQuery( criteria ).getResultList().size();
+        
+        if (size == 0) {
+        
+            Url url = new Url("catalog");
+            url.setStatus(200);
+            url.setUrl("http://www.wemove.com/");
+            List<Metadata> metadata = new ArrayList<Metadata>();
+            Metadata m1 = new Metadata();
+            m1.setMetaKey("lang");
+            m1.setMetaValue("en");
+            Metadata m2 = new Metadata();
+            m2.setMetaKey("topic");
+            m2.setMetaValue("t2");
+            Metadata m3 = new Metadata();
+            m3.setMetaKey("topic");
+            m3.setMetaValue("t3");
+            Metadata m4 = new Metadata();
+            m4.setMetaKey("unknown");
+            m4.setMetaValue("xxx");
+            Metadata m5 = new Metadata();
+            m5.setMetaKey("topic");
+            m5.setMetaValue("angularjs");
+            metadata.add(m1);
+            metadata.add(m2);
+            metadata.add(m3);
+            metadata.add(m4);
+            metadata.add(m5);
             url.setMetadata(metadata);
+            List<String> limitUrls = new ArrayList<String>();
+            limitUrls.add("http://www.wemove.com/");
+            url.setLimitUrls(limitUrls);
+            List<String> excludeUrls = new ArrayList<String>();
+            excludeUrls.add("http://www.wemove.com/about");
+            url.setExcludeUrls(excludeUrls);
+    
+            em.persist(url);
+    
+            String[] urls = new String[] { "http://www.spiegel.de", "http://www.heise.de", "http://www.apple.com", "http://www.engadget.com", "http://www.tagesschau.de", "http://www.home-mag.com/", "http://www.ultramusicfestival.com/",
+                    "http://www.ebook.de/de/", "http://www.audible.de", "http://www.amazon.com", "http://www.powerint.com/", "http://www.tanzkongress.de/", "http://www.thesourcecode.de/", "http://werk-x.at/", "http://keinundapel.com/",
+                    "http://www.ta-trung.com/", "http://www.attac.de/", "http://www.altana-kulturstiftung.de/", "http://www.lemagazinedouble.com/", "http://www.montessori-muehlheim.de/", "http://missy-magazine.de/",
+                    "http://www.eh-darmstadt.de/", "http://herbert.de/", "http://www.mousonturm.de/", "http://www.zeit.de/", "https://read2burn.com/" };
+    
+            metadata = new ArrayList<Metadata>();
+            Metadata md = new Metadata();
+            md.setMetaKey("lang");
+            md.setMetaValue("de");
+            metadata.add(md);
+    
+            md = new Metadata();
+            md.setMetaKey("partner");
+            md.setMetaValue("bund");
+            metadata.add(md);
+    
+            md = new Metadata();
+            md.setMetaKey("provider");
+            md.setMetaValue("bu_bmu");
+            metadata.add(md);
+    
+            md = new Metadata();
+            md.setMetaKey("datatype");
+            md.setMetaValue("www");
+            metadata.add(md);
+    
+            md = new Metadata();
+            md.setMetaKey("datatype");
+            md.setMetaValue("default");
+            metadata.add(md);
+    
+            for (String uri : urls) {
+                url = new Url("catalog");
+                url.setStatus(400);
+                url.setUrl(uri);
+                List<String> limit = new ArrayList<String>();
+                limit.add(uri);
+                url.setLimitUrls(limit);
+                url.setMetadata(metadata);
+                em.persist(url);
+            }
+    
+            url = new Url("other");
+            url.setStatus(200);
+            url.setUrl("http://de.wikipedia.org/");
+            List<String> limit = new ArrayList<String>();
+            limit.add("http://de.wikipedia.org");
+            url.setLimitUrls(limit);
             em.persist(url);
         }
-
-        url = new Url("other");
-        url.setStatus(200);
-        url.setUrl("http://de.wikipedia.org/");
-        List<String> limit = new ArrayList<String>();
-        limit.add("http://de.wikipedia.org");
-        url.setLimitUrls(limit);
-        em.persist(url);
-
+        
         em.getTransaction().commit();
     }
 

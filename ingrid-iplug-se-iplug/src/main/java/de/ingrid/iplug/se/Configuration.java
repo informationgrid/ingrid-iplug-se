@@ -186,13 +186,8 @@ public class Configuration implements IConfig {
         //
         if (partners == null) {
             pdObject.addPartner("all");
+
         } else {
-            /*for (String partner : partners) {
-                if (!partner.equalsIgnoreCase("all")) {
-                    pdObject.removeFromList(PlugDescription.PARTNER, partner);
-                }
-            }*/
-            
             partners.clear();
             partners.add("all");
         }
@@ -217,16 +212,8 @@ public class Configuration implements IConfig {
             pdObject.addToList(IngridQuery.RANKED, IngridQuery.SCORE_RANKED);
         }
         
-//        pdObject.addField("incl_meta");
-//        pdObject.addField("t01_object.obj_class");
-//        pdObject.addField("metaclass");
-//        
-        // DatabaseConnection dbc = new DatabaseConnection( databaseDriver,
-        // databaseUrl, databaseUsername, databasePassword, databaseSchema );
-//        pdObject.setConnection( dbc );
     }
 
-//
     @Override
     public void setPropertiesFromPlugdescription( Properties props, PlugdescriptionCommandObject pd ) {
         props.setProperty( "db.dir", this.databaseDir );

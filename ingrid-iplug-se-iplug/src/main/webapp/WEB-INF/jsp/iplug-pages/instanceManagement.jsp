@@ -165,14 +165,16 @@
             success: function(data) {
                 if (!data) {
                     $("#statisticTable").hide();
+                    $("#overallStatistic").hide();
                     return;
                 } else {
                     $("#statisticTable").show();
+                    $("#overallStatistic").show();
                 }
                 
                 var json = JSON.parse( data );
                 var overall = json.splice(0, 1);
-                var labels = [], dataKnown = [], dataFetched = [];
+                // var labels = [], dataKnown = [], dataFetched = [];
                 
                 // determine highest known and fetched values
                 var biggest = { known: -1, fetched: -1 };
@@ -190,6 +192,10 @@
                     addTableRow( item, biggest );
                 });
                 
+
+                $("#overallStatistic .known").text( overall[0].known );
+                $("#overallStatistic .fetched").text( overall[0].fetched );
+
                 /*var ctx = document.getElementById("myChart").getContext("2d");
                 var data = {
                     labels: labels,
