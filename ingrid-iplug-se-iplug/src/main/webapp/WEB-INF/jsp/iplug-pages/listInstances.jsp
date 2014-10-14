@@ -59,18 +59,36 @@
                 }
             });
         });
+
+        dialogConfirm = $( "#dialog-confirm" ).dialog({
+            resizable: false,
+            autoOpen: false,
+            height:140,
+            modal: true,
+            buttons: {
+                "Abbrechen": function() {
+                    $( this ).dialog( "close" );
+                },
+                "Löschen": function() {
+                    var action = dialogConfirm.data("action");
+                    $.ajax({
+                        url: "listInstances",
+                        type: 'DELETE',
+                        success: function() {
+                            location.reload();
+                        },
+                        data: action.id,
+                        contentType: 'application/json'
+                    });
+                    $( this ).dialog( "close" );
+                }
+            }
+        });
         
         $(".btnInstance").button().click(function() {
-            var id = this.getAttribute("data-id");
-            $.ajax({
-                url: "listInstances",
-                type: 'DELETE',
-                success: function() {
-                    location.reload();
-                },
-                data: id,
-                contentType: 'application/json'
-            });
+            var id = $(this).parents("tr").attr("data-id");
+            location.href = "instanceUrls.html?instance=" + id;
+
         }).next().button({
             text : false,
             icons : {
@@ -84,11 +102,16 @@
             });
             $(document).one("click", function(evt) {
                 var action = evt.target.getAttribute("action");
+                var id = $(evt.target).parents("tr").attr("data-id");
                 if (action == "recreateIndex") {
-                    var id = $(evt.target).parents("tr").children().find("a")[0].innerHTML;
                     $.post("listInstances.html?instance=" + id + "&" + action, null, function() {
                     	location.reload();
                     });
+                } else if (action == "delete") {
+                    dialogConfirm.data("action", {
+                        id: id
+                    });
+                    dialogConfirm.dialog( "open" );
                 }
                 menu.hide();
             });
@@ -152,7 +175,7 @@
 					</thead>
 					<tbody>
 						<c:forEach items="${instances}" var="instance" varStatus="loop">
-							<tr>
+							<tr data-id="${instance.name}">
 								<td><a href="instanceUrls.html?instance=${instance.name}">${instance.name}</a><c:if test="${ instance.indexTypeExists == false }"> <span class="error">(Index/Typ fehlt)</span></c:if></td>
 								<td>${instance.status}
                                     <div class="radio" data-id="${instance.name}">
@@ -169,10 +192,11 @@
                                     <%-- <a href="listInstances.html?instance=${instance.name}&delete">Löschen</a> --%>
                                     <div>
                                         <div>
-                                            <button type="button" class="btnInstance" data-id="${ instance.name }">Löschen</button>
+                                            <button type="button" class="btnInstance" data-id="${ instance.name }">Bearbeiten</button>
                                             <button class="select">Weitere Optionen</button>
                                         </div>
                                         <ul style="position:absolute; padding-left: 0; min-width: 100px; z-index: 100;">
+                                            <li action="delete">Löschen</li>
                                             <li action="recreateIndex" <c:if test="${ instance.indexTypeExists == true }">disabled</c:if>>Index/Typ erstellen</li>
                                         </ul>
                                     </div>
@@ -194,6 +218,14 @@
 	</div>
 
 	<div id="footer" style="height: 100px; width: 90%"></div>
+
+    <div id="dialog-confirm" title="Wirklich löschen?">
+        <p>
+            <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+            Möchten Sie die Instanz wirklich löschen?
+        </p>
+    </div>
+
 </body>
 </html>
 
