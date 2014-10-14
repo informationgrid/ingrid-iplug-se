@@ -2,6 +2,7 @@ package de.ingrid.iplug.se.utils;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -278,4 +279,19 @@ public class FileUtils {
         }
     }
 
+    public static File[] getInstancesDirs() {
+        File[] subDirs = new File[0];
+        String dir = SEIPlug.conf.getInstancesDir();
+        if (Files.isDirectory( Paths.get( dir ) )) {
+            FileFilter directoryFilter = new FileFilter() {
+                public boolean accept(File file) {
+                    return file.isDirectory();
+                }
+            };
+            File instancesDirObject = new File( dir );
+            subDirs = instancesDirObject.listFiles( directoryFilter );
+        }
+        
+        return subDirs;
+    }
 }

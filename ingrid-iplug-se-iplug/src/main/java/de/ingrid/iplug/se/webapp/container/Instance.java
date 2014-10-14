@@ -12,7 +12,6 @@ public class Instance {
     private String status;
     private boolean isActive;
     private List<Url> urls;
-    private boolean indexTypeExists;
     private String esTransportTcpPort;
     private String esHttpHost;
 
@@ -56,14 +55,6 @@ public class Instance {
 
     public void setIsActive(boolean isActive) {
         this.isActive = isActive;
-    }
-
-    public boolean getIndexTypeExists() {
-        return this.indexTypeExists;        
-    }
-    
-    public void setIndexTypeExists(boolean typeExists) {
-        this.indexTypeExists = typeExists;        
     }
 
     public String getIndexName() {

@@ -24,7 +24,7 @@ public class ListInstancesControllerTest {
         SEIPlug.conf = configuration;
         
         ListInstancesController lic = new ListInstancesController();
-        lic.addInstance(new ModelMap(), "test");
+        lic.addInstance(new ModelMap(), "test", null);
         
         assertTrue("Instance path created", Files.exists(Paths.get("test-instances", "test")));
         assertTrue("Instance configuration path created", Files.exists(Paths.get("test-instances", "test", "conf")));

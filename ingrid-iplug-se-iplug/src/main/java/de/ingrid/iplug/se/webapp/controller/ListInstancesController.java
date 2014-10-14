@@ -1,14 +1,10 @@
 package de.ingrid.iplug.se.webapp.controller;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -19,6 +15,7 @@ import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import org.apache.log4j.Logger;
 import org.elasticsearch.client.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -40,6 +37,8 @@ import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Url;
 import de.ingrid.iplug.se.elasticsearch.bean.ElasticsearchNodeFactoryBean;
+import de.ingrid.iplug.se.nutchController.NutchController;
+import de.ingrid.iplug.se.utils.DBUtils;
 import de.ingrid.iplug.se.utils.ElasticSearchUtils;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
@@ -55,12 +54,17 @@ import de.ingrid.iplug.se.webapp.controller.instance.scheduler.SchedulerManager;
 @Controller
 @SessionAttributes("plugDescription")
 public class ListInstancesController extends AbstractController {
+    
+    private static Logger log = Logger.getLogger( ListInstancesController.class );
 
     @Autowired
     private ElasticsearchNodeFactoryBean elasticSearch;
 
     @Autowired
     private SchedulerManager schedulerManager;
+
+    @Autowired
+    private NutchController nutchController;
 
     private Configuration conf;
 
@@ -76,22 +80,16 @@ public class ListInstancesController extends AbstractController {
     public List<Instance> getInstances() throws Exception {
         ArrayList<Instance> list = new ArrayList<Instance>();
 
-        String dir = conf.getInstancesDir();
-        if (Files.isDirectory( Paths.get( dir ) )) {
-            FileFilter directoryFilter = new FileFilter() {
-                public boolean accept(File file) {
-                    return file.isDirectory();
-                }
-            };
-            File instancesDirObject = new File( dir );
-            File[] subDirs = instancesDirObject.listFiles( directoryFilter );
-            for (File subDir : subDirs) {
-                Instance instance = InstanceController.getInstanceData( subDir.getName() );
-                Client client = elasticSearch.getObject().client();
-                boolean typeExists = ElasticSearchUtils.typeExists( subDir.getName(), client );
-                instance.setIndexTypeExists( typeExists );
-                list.add( instance );
+        File[] instancesDirs = FileUtils.getInstancesDirs();
+        for (File subDir : instancesDirs) {
+            Instance instance = InstanceController.getInstanceData( subDir.getName() );
+            Client client = elasticSearch.getObject().client();
+            boolean typeExists = ElasticSearchUtils.typeExists( subDir.getName(), client );
+            // automatically create index type
+            if (!typeExists) {
+                ElasticSearchUtils.createIndexType( subDir.getName(), client );
             }
+            list.add( instance );
         }
 
         return list;
@@ -131,15 +129,10 @@ public class ListInstancesController extends AbstractController {
         return AdminViews.SAVE;
     }
 
-    @RequestMapping(value = "/iplug-pages/listInstances.html", method = RequestMethod.POST, params = "recreateIndex")
-    public String addTypeToIndex(@RequestParam("instance") String name) throws Exception {
-        Client client = elasticSearch.getObject().client();
-        ElasticSearchUtils.createIndexType( name, client );
-        return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );
-    }
-
     @RequestMapping(value = "/iplug-pages/listInstances.html", method = RequestMethod.POST, params = "add")
-    public String addInstance(final ModelMap modelMap, @RequestParam("instance") String name) throws Exception {
+    public String addInstance(final ModelMap modelMap,
+            @RequestParam("instance") String name,
+            @RequestParam(value = "duplicateFrom", required = false) String from) throws Exception {
 
         // convert illegal chars to "_"
         name = name.replaceAll( "[:\\\\/*?|<>\\W]", "_" );
@@ -149,6 +142,11 @@ public class ListInstancesController extends AbstractController {
         name = name.replaceAll( "[:\\\\/*?|<>\\W]", "_" );
         // create directory and copy necessary configuration files
         boolean success = initializeInstanceDir( dir + "/" + name );
+        
+        if (from != null) {
+            success = success && copyUrlsFromInstanceTo( from, name );
+        }
+        
         if (success) {
 
             schedulerManager.addInstance( name );
@@ -160,7 +158,7 @@ public class ListInstancesController extends AbstractController {
 
             if (typeExists) {
                 modelMap.put( "instances", getInstances() );
-                modelMap.put( "error", "Type already exists in index" );
+                modelMap.put( "error", "Index already exists for instance " + name + ", which might already contain data." );
 
                 return AdminViews.SE_LIST_INSTANCES;
 
@@ -169,12 +167,38 @@ public class ListInstancesController extends AbstractController {
             }
 
         } else {
-            modelMap.put( "error", "Default configuration could not be copied to: " + dir + "/" + name );
+            if (from == null) {
+                modelMap.put( "error", "Default configuration could not be copied to: " + dir + "/" + name );
+            } else {
+                modelMap.put( "error", "Default configuration and/or URLs in database could not be copied to: " + dir + "/" + name );
+            }
         }
 
         modelMap.put( "instances", getInstances() );
 
         return AdminViews.SE_LIST_INSTANCES;
+    }
+
+    private boolean copyUrlsFromInstanceTo(String from, String name) {
+        
+        try {
+            List<Url> fromUrls = DBUtils.getAllUrlsFromInstance( from );
+            log.debug( "Copy Urls: " + fromUrls.size() );
+            
+            // reset the IDs and set the name of the new instance
+            for (Url url : fromUrls) {
+                url.setId( null );
+                url.setInstance( name );
+            }
+            
+            DBUtils.addUrls( fromUrls );
+        } catch (Exception e) { 
+            log.error( "Error during duplication of URLs", e );
+            e.printStackTrace();
+            return false;
+        }
+        
+        return true;
     }
 
     public static boolean initializeInstanceDir(String path) {
@@ -224,29 +248,21 @@ public class ListInstancesController extends AbstractController {
 
     @RequestMapping(value = "/iplug-pages/listInstances", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteInstance(@RequestBody String name) throws Exception {
+        
+        // stop all nutch processes first
+        Instance instance = InstanceController.getInstanceData( name );
+        nutchController.stop( instance );
+        
+        // remove instance directory
         String dir = conf.getInstancesDir();
         Path directoryToDelete = Paths.get( dir, name );
         try {
-            Files.walkFileTree( directoryToDelete, new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    Files.delete( file );
-                    return FileVisitResult.CONTINUE;
-                }
-
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                    Files.delete( dir );
-                    return FileVisitResult.CONTINUE;
-                }
-
-            } );
+            FileUtils.removeRecursive( directoryToDelete );
         } catch (IOException e) {
             e.printStackTrace();
-            //modelMap.put( "error", "Directory '" + directoryToDelete.toString() + "' could not be deleted!" );
             return new ResponseEntity<String>( HttpStatus.INTERNAL_SERVER_ERROR );
         }
-        
+
         // remove instance (type) from index
         ElasticSearchUtils.deleteType( name, elasticSearch.getObject().client() );
         
@@ -263,6 +279,7 @@ public class ListInstancesController extends AbstractController {
         criteriaDelete.where( instanceCriteria );
         
         em.createQuery( criteriaDelete ).executeUpdate();
+        em.flush();
         em.getTransaction().commit();
         
         return new ResponseEntity<String>( HttpStatus.OK );

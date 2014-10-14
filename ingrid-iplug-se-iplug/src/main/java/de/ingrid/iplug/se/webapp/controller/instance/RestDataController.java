@@ -37,6 +37,7 @@ import de.ingrid.iplug.se.nutchController.NutchController;
 import de.ingrid.iplug.se.nutchController.NutchProcess;
 import de.ingrid.iplug.se.nutchController.StatusProvider;
 import de.ingrid.iplug.se.nutchController.StatusProvider.State;
+import de.ingrid.iplug.se.utils.DBUtils;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
 
@@ -63,15 +64,7 @@ public class RestDataController extends InstanceController {
 
     @RequestMapping(value = { "url" }, method = RequestMethod.POST)
     public ResponseEntity<Url> addUrl(@RequestBody Url url) {
-        EntityManager em = DBManager.INSTANCE.getEntityManager();
-        em.getTransaction().begin();
-        if (url.getId() == null) {
-            em.persist( url );
-            
-        } else {
-            em.merge( url );            
-        }
-        em.getTransaction().commit();
+        DBUtils.addUrl( url );
         return new ResponseEntity<Url>( url, HttpStatus.OK );
     }
     
@@ -82,13 +75,7 @@ public class RestDataController extends InstanceController {
     
     @RequestMapping(value = { "urls" }, method = RequestMethod.DELETE)
     public ResponseEntity<Map<String, String>> deleteUrls(@RequestBody Long[] ids) {
-        EntityManager em = DBManager.INSTANCE.getEntityManager();
-        em.getTransaction().begin();
-        for (Long id : ids) {
-            Url url = em.find( Url.class, id );
-            em.remove( url );
-        }
-        em.getTransaction().commit();
+        DBUtils.deleteUrls( ids );
         Map<String, String> result = new HashMap<String, String>();
         result.put( "result", "OK" );
         return new ResponseEntity<Map<String, String>>( result, HttpStatus.OK );
@@ -158,59 +145,13 @@ public class RestDataController extends InstanceController {
         return json;
     }
     
-private Expression<?> getColumnForSort(Root<Url> urlTable, int columnPos) {
+    private Expression<?> getColumnForSort(Root<Url> urlTable, int columnPos) {
         switch (columnPos) {
         case 1: return urlTable.get( "url" );
         case 2: return urlTable.get( "status" );
         }
         return null;
     }
-
-//    @RequestMapping(value = { "urlsObj/{instance}" }, method = RequestMethod.GET)
-//    public List<Url> getUrlsAsObject(@PathVariable("instance") String name,
-//            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-//            @RequestParam(value = "filter", required = false, defaultValue = "") String filter,
-//            @RequestParam(value = "column", required = false, defaultValue = "") String sortColumn) {
-//        EntityManager em = DBManager.INSTANCE.getEntityManager();
-//        
-//        
-//        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-//        CriteriaQuery<Url> createQuery = em.getCriteriaBuilder().createQuery(Url.class);
-//        Root<Url> urlTable = createQuery.from(Url.class);
-//
-//        CriteriaQuery<Long> countQuery = em.getCriteriaBuilder().createQuery(Long.class);
-//        
-//        List<Predicate> criteria = new ArrayList<Predicate>();
-//        criteria.add(criteriaBuilder.equal(urlTable.<String> get("instance"), name));
-//
-//        if (!filter.isEmpty()) {
-//            String[] metaOptions = filter.split(",");
-//            for (String meta : metaOptions) {
-//                Join<Url, Metadata> j = urlTable.join("metadata", JoinType.LEFT);
-//                String[] metaSplit = meta.split(":");
-//                if (metaSplit.length == 2) {
-//                    criteria.add(criteriaBuilder.equal(j.get("metaKey"), metaSplit[0]));
-//                    criteria.add(criteriaBuilder.equal(j.get("metaValue"), metaSplit[1]));
-//                }
-//            }
-//        }
-//
-//        countQuery.select(criteriaBuilder.count(urlTable)).where(criteriaBuilder.and(criteria.toArray(new Predicate[0])));
-//        Long count = em.createQuery( countQuery ).getSingleResult();
-//        
-//        createQuery.select(urlTable).where(criteriaBuilder.and(criteria.toArray(new Predicate[0])));
-//        
-//        List<Url> resultList = em.createQuery(createQuery)
-//                .setFirstResult( page * PAGE_SIZE )
-//                .setMaxResults( PAGE_SIZE )
-//                .getResultList();
-//        
-//        JSONObject json = new JSONObject();
-//        json.put( "data", resultList );
-//        json.put( "totalUrls",  count );
-//        
-//        return resultList;
-//    }
 
     @RequestMapping(value = { "instance/{name}/{value}" }, method = RequestMethod.POST)
     public ResponseEntity<Map<String, String>> toggleInstanceActive(@PathVariable("name") String name, @PathVariable("value") String value) {

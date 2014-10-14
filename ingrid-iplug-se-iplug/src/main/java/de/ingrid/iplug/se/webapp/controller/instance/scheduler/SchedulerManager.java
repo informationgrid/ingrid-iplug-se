@@ -59,8 +59,7 @@ public class SchedulerManager {
 
             // check if elastic search index is present and create it otherwise
             // this can be missing if old database has been migrated or an
-            // instance dir
-            // has been added manually
+            // instance dir has been added manually
             Client client = elasticSearch.getObject().client();
             boolean typeExists = ElasticSearchUtils.typeExists(name, client);
             if (!typeExists) {

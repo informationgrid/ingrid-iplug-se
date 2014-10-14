@@ -2,8 +2,8 @@
 
 <div id="configTabs" class="tab-container">
     <ul class="etabs">
-        <li class="tab"><a href="#tab1"><em><fmt:message key="configuration.metadata.title" /></em></a></li>
         <li class="tab"><a href="#tab2"><em><fmt:message key="configuration.nutch.title" /></em></a></li>
+        <li class="tab"><a href="#tab1"><em><fmt:message key="configuration.metadata.title" /></em></a></li>
     </ul>
     <div class="panel-container">
         <div id="tab1">

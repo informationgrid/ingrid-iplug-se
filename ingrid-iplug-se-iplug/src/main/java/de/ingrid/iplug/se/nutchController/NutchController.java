@@ -54,7 +54,7 @@ public class NutchController {
      */
     public synchronized void stop(Instance instance) {
         NutchProcess command = instances.get(instance.getName());
-        if (command.getStatus() == NutchProcess.STATUS.RUNNING) {
+        if (command != null && command.getStatus() == NutchProcess.STATUS.RUNNING) {
             command.stopExecution();
         }
     }

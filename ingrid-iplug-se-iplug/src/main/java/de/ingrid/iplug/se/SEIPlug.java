@@ -3,6 +3,7 @@
  */
 package de.ingrid.iplug.se;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceException;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -20,6 +22,7 @@ import javax.persistence.criteria.Root;
 
 import org.apache.log4j.Logger;
 import org.flywaydb.core.Flyway;
+import org.h2.tools.Recover;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +35,10 @@ import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Metadata;
 import de.ingrid.iplug.se.db.model.Url;
 import de.ingrid.iplug.se.elasticsearch.bean.ElasticsearchNodeFactoryBean;
+import de.ingrid.iplug.se.nutchController.NutchController;
+import de.ingrid.iplug.se.utils.FileUtils;
+import de.ingrid.iplug.se.webapp.container.Instance;
+import de.ingrid.iplug.se.webapp.controller.instance.InstanceController;
 import de.ingrid.utils.IngridHit;
 import de.ingrid.utils.IngridHitDetail;
 import de.ingrid.utils.IngridHits;
@@ -80,14 +87,18 @@ public class SEIPlug extends HeartBeatPlug {
 
     private static ElasticsearchNodeFactoryBean esBean;
 
+    private static NutchController nutchController;
+
     public SEIPlug() {
         super(30000, null, null, null, null);
     };
 
     @Autowired
-    public SEIPlug(IMetadataInjector[] injector, IPreProcessor[] preProcessors, IPostProcessor[] postProcessors, ElasticsearchNodeFactoryBean esBean) {
+    public SEIPlug(IMetadataInjector[] injector, IPreProcessor[] preProcessors, IPostProcessor[] postProcessors, 
+            ElasticsearchNodeFactoryBean esBean, NutchController nutchController) {
         super(30000, new PlugDescriptionFieldFilters(), injector, preProcessors, postProcessors);
         SEIPlug.esBean = esBean;
+        SEIPlug.nutchController = nutchController;
     }
 
     /**
@@ -187,8 +198,16 @@ public class SEIPlug extends HeartBeatPlug {
             emf = Persistence.createEntityManagerFactory(conf.databaseID, properties);
         }
         DBManager.INSTANCE.intialize(emf);
-        EntityManager em = DBManager.INSTANCE.getEntityManager();
-
+        EntityManager em = null;
+        try {
+            em = DBManager.INSTANCE.getEntityManager();
+        } catch( PersistenceException e) {
+            log.error( "Database seems to be corrupt. Starting recovery process ..." );
+            Recover.main( "-dir", dbDir.toString() );
+            log.error( "Done. Please execute SQL file manually." );
+            System.exit( -1 );
+        }
+        
         // apply test-data during development
         if ("iplug-se-dev".equals(conf.databaseID)) {
             setupTestData(em);
@@ -201,11 +220,18 @@ public class SEIPlug extends HeartBeatPlug {
             flyway.migrate();
         }
 
-        // normally shutdown the elastic search node
+        // normally shutdown the elastic search node and stop all running
+        // nutch processes
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 try {
                     esBean.destroy();
+                    File[] instancesDirs = FileUtils.getInstancesDirs();
+                    for (File subDir : instancesDirs) {
+                        Instance instance = InstanceController.getInstanceData( subDir.getName() );
+                        nutchController.stop( instance );
+                    }
+                        
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
