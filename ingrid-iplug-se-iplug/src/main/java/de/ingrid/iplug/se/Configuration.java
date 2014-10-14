@@ -237,7 +237,6 @@ public class Configuration implements IConfig {
                 resource = new FileSystemResource( "conf/elasticsearch.properties" );
             }
             p.put( "http.port", esHttpPort );
-            p.put( "script.disable_dynamic", false );
             OutputStream os = new FileOutputStream( resource.getFile() ); 
             p.store( os, "Override configuration written by the application" );
             os.close();
