@@ -146,7 +146,7 @@ public class Configuration implements IConfig {
     public String esHttpHost;
     
     @PropertyValue("elastic.boost.field")
-    @DefaultValue("boost")
+    @DefaultValue("doc_boost")
     public String esBoostField;
     
     @TypeTransformers(Configuration.StringToModifier.class)
@@ -186,7 +186,6 @@ public class Configuration implements IConfig {
         //
         if (partners == null) {
             pdObject.addPartner("all");
-
         } else {
             partners.clear();
             partners.add("all");
@@ -196,16 +195,10 @@ public class Configuration implements IConfig {
         @SuppressWarnings("unchecked")
         List<String> providers = pdObject.getArrayList(PlugDescription.PROVIDER);
         if (providers == null) {
-        pdObject.addProvider("all");
+            pdObject.addProvider("all");
         } else {
-            for (String provider : providers) {
-                if (!provider.equalsIgnoreCase("all")) {
-                    pdObject.removeFromList(PlugDescription.PROVIDER, provider);
-                }
-            }
-            if (providers.isEmpty()) {
-                providers.add("all");
-            }
+            providers.clear();
+            providers.add("all");
         }
         
         if (!pdObject.containsRankingType(IngridQuery.SCORE_RANKED)) {

@@ -89,7 +89,7 @@ public class IndexerTests {
     @Test
     public void test05_1Generate() throws Exception {
 
-        ToolRunner.run(NutchConfiguration.create(), new Generator(), new String[] { "test/crawldb", "test/segments" });
+        ToolRunner.run(NutchConfiguration.create(), new Generator(), new String[] { "test/crawldb", "test/segments", "-topN", "10" });
     }
 
     @Test
@@ -146,7 +146,7 @@ public class IndexerTests {
     @Test
     public void test06_01Generate() throws Exception {
 
-        ToolRunner.run(NutchConfiguration.create(), new Generator(), new String[] { "test/crawldb", "test/segments" });
+        ToolRunner.run(NutchConfiguration.create(), new Generator(), new String[] { "test/crawldb", "test/segments", "-topN", "10" });
     }
 
     @Test

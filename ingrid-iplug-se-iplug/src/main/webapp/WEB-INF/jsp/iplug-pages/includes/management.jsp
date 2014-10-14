@@ -43,6 +43,7 @@
             <th data-sort="string">Host</th>
             <th data-sort="int" width="70px">Bekannt</th>
             <th data-sort="int" width="70px">Analysiert</th>
+            <th data-sort="int" width="70px">Ratio</th>
         </tr>
     </thead>
     <tbody>

@@ -155,6 +155,7 @@
                         "<td>" + item.host + "</td>" +
                         "<td>" + item.known + "</td>" +
                         "<td>" + item.fetched + "</td>" +
+                        "<td>" + item.ratio + "</td>" +
                     "</tr>"
             );
         };

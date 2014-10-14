@@ -208,6 +208,11 @@ public class HostStatistic extends Configured implements Tool {
                 jsn.put("host", new String( value.toString() ));
                 jsn.put("fetched", key.getFetchSuccessCount());
                 jsn.put("known", key.getOverallCount());
+                float ratio = 0; 
+                if (key.getOverallCount() > 0) {
+                    ratio = (float) key.getFetchSuccessCount() / key.getOverallCount();
+                }
+                jsn.put("ratio", String.format("%.5f", ratio));
                 array.put( jsn );
             }
             br.write(array.toString());

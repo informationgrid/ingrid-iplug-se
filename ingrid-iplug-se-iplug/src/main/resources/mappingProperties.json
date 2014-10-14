@@ -1,6 +1,7 @@
 {
     "properties": {
         "boost": { "type": "float" },
+        "doc_boost": { "type": "float" },
         "content": { "type": "string" },
         "contentLength": { "type": "long" },
         "date": { "type": "date" },
