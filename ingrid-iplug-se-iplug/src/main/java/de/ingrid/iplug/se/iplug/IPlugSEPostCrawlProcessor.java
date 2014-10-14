@@ -1,5 +1,6 @@
 package de.ingrid.iplug.se.iplug;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +50,10 @@ public class IPlugSEPostCrawlProcessor implements IPostCrawlProcessor {
             ImmutableOpenMap<String, MappingMetaData> metad = inMetaData.getMappings();
             @SuppressWarnings("unchecked")
             List<String> fields = pd.getArrayList(PlugDescription.FIELDS);
+            if (fields == null) {
+                fields = new ArrayList<String>();
+                pd.put(PlugDescription.FIELDS, fields);
+            }
 
             for (Iterator<MappingMetaData> i = metad.valuesIt(); i.hasNext();) {
                 MappingMetaData mmd = i.next();

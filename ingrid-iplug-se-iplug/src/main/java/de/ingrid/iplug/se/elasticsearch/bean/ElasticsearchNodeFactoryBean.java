@@ -52,7 +52,7 @@ public class ElasticsearchNodeFactoryBean implements FactoryBean<Node>,
 
 	private Map<String, String> settings;
 
-	private Node node;
+	private Node node = null;
 
     private Properties properties;
 
@@ -81,6 +81,8 @@ public class ElasticsearchNodeFactoryBean implements FactoryBean<Node>,
 	}
 
 	private void internalCreateNode() {
+	    
+	    
 		final NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder();
 		
 		// set inital configurations coming from the property file
@@ -94,7 +96,7 @@ public class ElasticsearchNodeFactoryBean implements FactoryBean<Node>,
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+		
 		// other possibilities for configuration
 		// TODO: remove those not needed!
 		if (null != configLocation) {
@@ -114,7 +116,9 @@ public class ElasticsearchNodeFactoryBean implements FactoryBean<Node>,
 		    nodeBuilder.getSettings().put( properties );
 		}
 
-		node = nodeBuilder.local( isLocal ).node();
+		Node localNode = nodeBuilder.local( isLocal ).node();
+		localNode.client().admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
+		node = localNode;
 	}
 
 	private void internalLoadSettings(final NodeBuilder nodeBuilder,
@@ -145,7 +149,17 @@ public class ElasticsearchNodeFactoryBean implements FactoryBean<Node>,
 
 	@Override
 	public Node getObject() throws Exception {
-		return node;
+		int cnt = 1;
+	    while (node == null && cnt <= 10) {
+		    logger.info("Wait for elastic search node to start: " + cnt + " sec.");
+	        Thread.sleep(1000);
+		    cnt ++;
+		}
+	    if (node == null) {
+	        logger.error("Could not start Elastic Search node within 10 sec!");
+	        throw new RuntimeException("Could not start Elastic Search node within 10 sec!");
+	    }
+	    return node;
 	}
 
 	@Override
