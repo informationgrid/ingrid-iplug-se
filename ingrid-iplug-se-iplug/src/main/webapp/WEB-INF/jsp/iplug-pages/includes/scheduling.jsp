@@ -39,7 +39,12 @@
                                     <legend>
                                         <fmt:message key="scheduling.daily" />
                                     </legend>
-                                    <row> <label>um:</label> <form:input type="text" class="time" path="time" /> </row>
+                                    <row> 
+                                        <label>um:</label>
+                                        <div class="input inline">
+                                            <form:input type="text" class="time" path="time" />
+                                        </div>
+                                    </row>
                                 </fieldset>
                                 <fieldset>
                                     <legend>
@@ -84,7 +89,11 @@
                                         <fmt:message key="scheduling.weekly" />
                                     </legend>
 
-                                    <row> <label>um:</label> <form:input type="text" class="time" path="time" /> </row>
+                                    <row> <label>um:</label>
+                                        <div class="input inline">
+                                            <form:input type="text" class="time" path="time" />
+                                        </div>
+                                    </row>
                                     <row> <label> <fmt:message key="scheduling.weekdays" /> :</label>
                                     <div style="clear:left;"></div>
                                     <field id="weekDays"> <c:forEach var="day" items="${days}">
@@ -138,7 +147,11 @@
                                         <fmt:message key="scheduling.monthly" />
                                     </legend>
 
-                                    <row> <label>um:</label> <form:input type="text" class="time" path="time" /> </row>
+                                    <row> <label>um:</label>
+                                        <div class="input inline">
+                                            <form:input type="text" class="time" path="time" />
+                                        </div>
+                                    </row>
                                     <row> <label> <fmt:message key="scheduling.atDays" /> :</label>
                                     <field id="monthDays"> <c:forEach items="${month}" var="dayOfMonth">
                                         <div style="float: left; margin: 2px 2px 0 0;">
