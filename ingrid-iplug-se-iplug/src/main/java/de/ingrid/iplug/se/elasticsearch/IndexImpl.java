@@ -98,7 +98,7 @@ public class IndexImpl implements Index {
         
         boolean isLocationSearch = ingridQuery.containsField( "x1" );
         boolean hasFacets = ingridQuery.containsKey( "FACETS" );
-        String[] instances = SEIPlug.conf.activeInstances.toArray( new String[0] );
+        String[] instances = getSearchInstances( ingridQuery ); 
         
         // request grouping information from index if necessary
         // see IndexImpl.getHitsFromResponse for usage
@@ -158,6 +158,24 @@ public class IndexImpl implements Index {
         }
         
         return hits;
+    }
+
+    /**
+     * Check first the query for a hidden field which contains the information of the
+     * instances to search in for. If there's none, then use the defined one in the
+     * configuration.
+     * The parameter in the query should be only used for an internal search within
+     * the iPlug.
+     * 
+     * @param ingridQuery
+     * @return
+     */
+    private String[] getSearchInstances(IngridQuery ingridQuery) {
+        String[] instances = (String[]) ingridQuery.getArray( "searchInInstances" );
+        if (instances == null || instances.length == 0) {
+            instances = SEIPlug.conf.activeInstances.toArray( new String[0] );
+        }
+        return instances;
     }
 
     /**
