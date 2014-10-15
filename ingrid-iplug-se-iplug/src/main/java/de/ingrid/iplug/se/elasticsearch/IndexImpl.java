@@ -11,13 +11,9 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.lucene.search.function.FieldValueFactorFunction.Modifier;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
-import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
-import org.elasticsearch.index.query.functionscore.fieldvaluefactor.FieldValueFactorFunctionBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
@@ -39,6 +35,8 @@ import de.ingrid.utils.query.IngridQuery;
 @Component
 public class IndexImpl implements Index {
 
+    public static final String DETAIL_URL = "url";
+
     private static Logger log = Logger.getLogger( IndexImpl.class );
 
     private ElasticsearchNodeFactoryBean elasticSearch;
@@ -51,7 +49,7 @@ public class IndexImpl implements Index {
     
     private final static String[] detailFields =  { "url", "title" };
 
-    private static final String ELASTIC_SEARCH_ID = "es_id";
+    public static final String ELASTIC_SEARCH_ID = "es_id";
 
     private static final String ELASTIC_SEARCH_INDEX = "es_index";
 
@@ -239,7 +237,7 @@ public class IndexImpl implements Index {
         /*
          * GetResponse response = client.prepareGet( fromIndex, fromType,
          * documentId ) .setFields( allFields ) .execute() .actionGet();
-*/
+         */
         String title = "untitled";
         if (dHit.field( IndexFields.TITLE ) != null) {
             title = (String) dHit.field( IndexFields.TITLE ).getValue();
@@ -257,7 +255,8 @@ public class IndexImpl implements Index {
                 }
             }
         }
-        detail.put("url", documentId);
+        String url = dHit.getFields().get( DETAIL_URL ).getValue();
+        detail.put(DETAIL_URL, url);
         
         return detail;
     }

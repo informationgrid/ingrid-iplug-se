@@ -284,4 +284,12 @@ public class ListInstancesController extends AbstractController {
         
         return new ResponseEntity<String>( HttpStatus.OK );
     }
+    
+    public void setSchedulerManager(SchedulerManager schedulerManager) {
+        this.schedulerManager = schedulerManager;
+    }
+
+    public void setElasticSearch(ElasticsearchNodeFactoryBean esBean) {
+        this.elasticSearch = esBean;
+    }
 }

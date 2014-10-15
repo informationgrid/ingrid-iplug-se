@@ -35,6 +35,7 @@ public class NutchControllerTest {
         
         Configuration configuration = new Configuration();
         configuration.setInstancesDir("test-instances");
+        configuration.nutchCallJavaOptions = java.util.Arrays.asList( "-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8" );
         SEIPlug.conf = configuration;
         
         Instance instance = new Instance();
@@ -48,7 +49,7 @@ public class NutchControllerTest {
 
         FileUtils.copyDirectories(Paths.get("apache-nutch-runtime/runtime/local/conf").toAbsolutePath(), conf);
         FileUtils.copyDirectories(Paths.get("../ingrid-iplug-se-nutch/src/test/resources/urls").toAbsolutePath(), urls);
-        FileUtils.copyDirectories(Paths.get("conf/default/conf").toAbsolutePath(), conf);
+        // TODO: copy dir with metadata-mapping
         
         IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, 2, 100, null);
 
@@ -89,6 +90,7 @@ public class NutchControllerTest {
         
         Configuration configuration = new Configuration();
         configuration.setInstancesDir("test-instances");
+        configuration.nutchCallJavaOptions = java.util.Arrays.asList( "-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8" );
         SEIPlug.conf = configuration;
         
         Instance instance = new Instance();
@@ -102,7 +104,7 @@ public class NutchControllerTest {
 
         FileUtils.copyDirectories(Paths.get("apache-nutch-runtime/runtime/local/conf").toAbsolutePath(), conf);
         FileUtils.copyDirectories(Paths.get("../ingrid-iplug-se-nutch/src/test/resources/urls").toAbsolutePath(), urls);
-        FileUtils.copyDirectories(Paths.get("conf/default/conf").toAbsolutePath(), conf);
+        // TODO: copy dir with metadata-mapping
         
         IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, 1, 100, null);
 

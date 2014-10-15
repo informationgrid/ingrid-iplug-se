@@ -89,6 +89,10 @@
                     });
                     $( this ).dialog( "close" );
                 }
+            },
+            open: function() {
+                // clear input
+                $("#instanceName").val("");
             }
         });
 

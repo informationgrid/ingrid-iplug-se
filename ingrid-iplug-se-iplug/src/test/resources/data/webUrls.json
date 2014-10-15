@@ -1,22 +1,22 @@
 { "index" : { "_index" : "test", "_type" : "web", "_id" : "1" } }
-{ "url" : "http://www.wemove.com", "title": "wemove", "partner": "bund", "datatype": "pdf", "abstract": "Die beste IT-Firma auf der Welt!", "fetched": "2014-06-03", "t0": "2014-06-03" }
+{ "url" : "http://www.wemove.com", "title": "wemove", "partner": "bund", "datatype": "pdf", "content": "Die beste IT-Firma auf der Welt!", "boost": "0.3", "fetched": "2014-06-03", "t0": "2014-06-03" }
 { "index" : { "_index" : "test", "_type" : "web", "_id" : "2" } }
-{ "url" : "http://www.heise.de", "title": "Heise", "partner": "bund", "datatype": "www", "abstract": "Informationen über IT stets aktuell. Like fox news", "fetched": "2014-04-13", "t1": "2014-04-01", "t2": "2014-04-15", "x1": 9.89, "y1": 51.89, "x2": 11.15, "y2": 52.70  }
+{ "url" : "http://www.heise.de", "title": "Heise", "partner": "bund", "datatype": "www", "content": "Informationen über IT stets aktuell. Like fox news", "boost": "0.0", "fetched": "2014-04-13", "t1": "2014-04-01", "t2": "2014-04-15", "x1": 9.89, "y1": 51.89, "x2": 11.15, "y2": 52.70  }
 { "index" : { "_index" : "test", "_type" : "web", "_id" : "3" } }
-{ "url" : "http://www.spiegel.de", "title": "Spiegel", "partner": "bw", "datatype": "www", "abstract": "Nachrichten von heute mit genialen Beiträgen", "fetched": "2014-05-22", "t0": "2014-08-11" }
+{ "url" : "http://www.spiegel.de", "title": "Spiegel", "partner": "bw", "datatype": "www", "content": "Nachrichten von heute mit genialen Beiträgen", "boost": "0.0", "fetched": "2014-05-22", "t0": "2014-08-11" }
 { "index" : { "_index" : "test", "_type" : "web", "_id" : "4" } }
-{ "url" : "http://www.golem.de", "title": "golem computer news", "partner": "bund", "datatype": "www", "abstract": "Neuigkeiten aus der Welt der Computer", "fetched": "2014-03-14", "t0": "2014-03-11" }
+{ "url" : "http://www.golem.de", "title": "golem computer news", "partner": "bund", "datatype": "www", "content": "Neuigkeiten aus der Welt der Computer", "boost": "0.0", "fetched": "2014-03-14", "t0": "2014-03-11" }
 { "index" : { "_index" : "test", "_type" : "web", "_id" : "5" } }
-{ "url" : "http://www.golem.de/special", "title": "golem computer news", "partner": "bund", "datatype": "www", "abstract": "Die besten Artikel", "fetched": "2014-03-16", "t1": "2014-02-01", "t2": "2014-04-09" }
+{ "url" : "http://www.golem.de/special", "title": "golem computer news", "partner": "bund", "datatype": "www", "content": "Die besten Artikel", "boost": "0.0", "fetched": "2014-03-16", "t1": "2014-02-01", "t2": "2014-04-09" }
 { "index" : { "_index" : "test", "_type" : "web", "_id" : "6" } }
-{ "url" : "http://www.wemove.com/about.html", "title": "wemove - about", "partner": "bb", "datatype": "www", "abstract": "Über uns und unsere Entstehung", "fetched": "2013-02-08" }
+{ "url" : "http://www.wemove.com/about.html", "title": "wemove - about", "partner": "bb", "datatype": "www", "content": "Über uns und unsere Entstehung", "boost": "0.0", "fetched": "2013-02-08" }
 { "index" : { "_index" : "test", "_type" : "web", "_id" : "7" } }
-{ "url" : "http://www.wemove.com/contact", "title": "wemove - contact", "partner": "bund", "datatype": "xml", "abstract": "Hier können Sie uns erreichen. Sie können uns auch faxen", "fetched": "2014-08-01", "t0": "2014-04-04" }
+{ "url" : "http://www.wemove.com/contact", "title": "wemove - contact", "partner": "bund", "datatype": "xml", "content": "Hier können Sie uns erreichen. Sie können uns auch faxen", "boost": "0.0", "fetched": "2014-08-01", "t0": "2014-04-04" }
 { "index" : { "_index" : "test", "_type" : "web", "_id" : "8" } }
-{ "url" : "http://www.wemove.com/jobs", "title": "wemove - jobs", "partner": "th", "datatype": "pdf", "abstract": "Diese Stellen haben wir für Sie", "fetched": "2014-04-24", "t1": "2014-01-01", "t2": "2014-07-15" }
+{ "url" : "http://www.wemove.com/jobs", "title": "wemove - jobs", "partner": "th", "datatype": "pdf", "content": "Diese Stellen haben wir für Sie", "boost": "0.0", "fetched": "2014-04-24", "t1": "2014-01-01", "t2": "2014-07-15" }
 { "index" : { "_index" : "test", "_type" : "web", "_id" : "9" } }
-{ "url" : "http://www.spiegel.de/ausland", "title": "Ausland", "partner": "bund", "datatype": "www", "abstract": "Was geht ab außerhalb von Deutschland? Auch per Fax.", "fetched": "2014-05-18", "t1": "2014-01-21", "t2": "2014-02-09" }
+{ "url" : "http://www.spiegel.de/ausland", "title": "Ausland", "partner": "bund", "datatype": "www", "content": "Was geht ab außerhalb von Deutschland? Auch per Fax.", "boost": "0.0", "fetched": "2014-05-18", "t1": "2014-01-21", "t2": "2014-02-09" }
 { "index" : { "_index" : "test", "_type" : "web", "_id" : "10" } }
-{ "url" : "http://www.spiegel.de/wirtschaft", "title": "Wirtschaft", "partner": "bw", "datatype": "pdf", "abstract": "Neues aus der Wirtschaft", "fetched": "2014-03-11", "t0": "2014-01-25" }
+{ "url" : "http://www.spiegel.de/wirtschaft", "title": "Wirtschaft", "partner": "bw", "datatype": "pdf", "content": "Neues aus der Wirtschaft", "boost": "0.0", "fetched": "2014-03-11", "t0": "2014-01-25" }
 { "index" : { "_index" : "test", "_type" : "web", "_id" : "11" } }
-{ "url" : "http://www.spiegel.de/reise", "title": "Reisen", "partner": "bw", "datatype": "xml", "abstract": "Wohin in den Urlaub, wenn man die Welt bereisen will? Warum überhaupt ins Ausland und dann ohne Computer?", "fetched": "2014-01-09" }
+{ "url" : "http://www.spiegel.de/reise", "title": "Reisen", "partner": "bw", "datatype": "xml", "content": "Wohin in den Urlaub, wenn man die Welt bereisen will? Warum überhaupt ins Ausland und dann ohne Computer?", "boost": "0.2", "fetched": "2014-01-09" }

@@ -16,6 +16,7 @@ import java.util.Map;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.lucene.search.function.FieldValueFactorFunction.Modifier;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.springframework.core.io.ClassPathResource;
@@ -53,6 +54,12 @@ public class Utils {
         // set necessary configurations for startup
         Configuration configuration = new Configuration();
         configuration.searchType = SearchType.DFS_QUERY_THEN_FETCH;
+        configuration.index = "test";
+        configuration.activeInstances = Arrays.asList( "web" );
+        configuration.esBoostField = "boost";
+        configuration.esBoostModifier = Modifier.LOG1P;
+        configuration.esBoostFactor = 0.1f;
+        configuration.esBoostMode = "sum";
         SEIPlug.conf = configuration;
         
         
@@ -145,7 +152,7 @@ public class Utils {
         for (int id : ids) {
             boolean found = false;
             for (IngridHit hit : hits) {
-                if (hit.getDocumentId() == id) {
+                if (Integer.valueOf( (String)hit.get( IndexImpl.ELASTIC_SEARCH_ID ) ) == id) {
                     found = true;
                     break;
                 }

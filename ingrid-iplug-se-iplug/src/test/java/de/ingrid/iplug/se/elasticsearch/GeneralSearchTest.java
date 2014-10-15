@@ -207,7 +207,7 @@ public class GeneralSearchTest {
     
     @Test
     public void searchFieldAND() {
-        IngridQuery q = Utils.getIngridQuery( "abstract:urlaub abstract:welt" );
+        IngridQuery q = Utils.getIngridQuery( "content:urlaub content:welt" );
         IngridHits search = Utils.index.search( q, 0, 10 );
         assertThat( search, not( is( nullValue() ) ) );
         assertThat( search.length(), is( 1l ) );
@@ -216,7 +216,7 @@ public class GeneralSearchTest {
     
     @Test
     public void searchFieldOR() {
-        IngridQuery q = Utils.getIngridQuery( "abstract:urlaub OR abstract:welt" );
+        IngridQuery q = Utils.getIngridQuery( "content:urlaub OR content:welt" );
         IngridHits search = Utils.index.search( q, 0, 10 );
         assertThat( search, not( is( nullValue() ) ) );
         assertThat( search.length(), is( 3l ) );
@@ -298,10 +298,10 @@ public class GeneralSearchTest {
         IngridHitDetail detail = Utils.index.getDetail( search.getHits()[0], q, null );
         assertThat( detail, not( is( nullValue() ) ) );
         // assertThat( detail.getHitId(), is( "1" ) );
-        assertThat( detail.getDocumentId(), is( 1 ) );
+        assertThat( detail.getString( IndexImpl.DETAIL_URL ), is( "http://www.wemove.com" ) );
         assertThat( detail.get("fetched"), is( nullValue() ) );
         assertThat( detail.getTitle(), is( "wemove" ) );
-        assertThat( detail.getSummary(), is( "Die beste IT-Firma auf der Welt!" ) );
+        assertThat( detail.getSummary(), is( "Die beste IT-Firma auf der <em>Welt</em>!" ) );
         assertThat( detail.getScore(), greaterThan( 0.1f ) );
     }
     
@@ -313,7 +313,7 @@ public class GeneralSearchTest {
         IngridHitDetail detail = Utils.index.getDetail( search.getHits()[0], q, extraFields );
         assertThat( detail, not( is( nullValue() ) ) );
         // assertThat( detail.getHitId(), is( "1" ) );
-        assertThat( detail.getDocumentId(), is( 1 ) );
+        assertThat( detail.getString( IndexImpl.DETAIL_URL ), is( "http://www.wemove.com" ) );
         assertThat( detail.getString( "fetched" ), is( "2014-06-03" ) );
     }
     
