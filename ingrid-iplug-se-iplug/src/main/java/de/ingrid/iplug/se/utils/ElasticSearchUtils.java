@@ -1,10 +1,9 @@
 package de.ingrid.iplug.se.utils;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
 
 import org.elasticsearch.action.admin.indices.exists.types.TypesExistsRequest;
 import org.elasticsearch.client.Client;
@@ -31,12 +30,15 @@ public class ElasticSearchUtils {
     
     private static String getMappingSource() throws IOException {
         ClassPathResource resource = new ClassPathResource( "mappingProperties.json" );
-        List<String> urlsData = Files.readAllLines( Paths.get( resource.getURI() ), Charset.defaultCharset() );
-        String mappingSource = "";
-        for (String line : urlsData) {
-            mappingSource  += line;
+        BufferedReader in = new BufferedReader(new InputStreamReader( resource.getInputStream(), Charset.defaultCharset() ));
+        String line = null;
+
+        StringBuilder mappingSource = new StringBuilder();
+        while((line = in.readLine()) != null) {
+            mappingSource.append(line);
         }
-        return mappingSource;
+
+        return mappingSource.toString();
     }
 
     public static void deleteType(String name, Client client) {

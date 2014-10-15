@@ -48,7 +48,7 @@ public class IPlugSeOperatorFinder implements IPlugOperatorFinder {
         try {
             return findIndexValues("partner");
         } catch (Exception e) {
-            LOG.error("Error obzaining partners from index.", e);
+            LOG.error("Error obtaining partners from index.", e);
             throw new IOException(e);
         }
     }
@@ -58,7 +58,7 @@ public class IPlugSeOperatorFinder implements IPlugOperatorFinder {
         try {
             return findIndexValues("provider");
         } catch (Exception e) {
-            LOG.error("Error obzaining partners from index.", e);
+            LOG.error("Error obtaining providers from index.", e);
             throw new IOException(e);
         }
     }
