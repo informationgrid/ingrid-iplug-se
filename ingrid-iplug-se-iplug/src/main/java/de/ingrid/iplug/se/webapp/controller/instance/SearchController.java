@@ -40,10 +40,11 @@ public class SearchController extends AbstractController {
     }
 
     @RequestMapping(value = { "/iplug-pages/instanceSearch.html" }, method = RequestMethod.GET)
-    public String showSearch(final ModelMap modelMap, @RequestParam("instance") String name) {
-        Instance instance = InstanceController.getInstanceData( name );
+    public String showSearch(final ModelMap modelMap, @RequestParam(value = "instance", required = false) String name) {
 
-        if (instance == null) {
+        Instance instance = null;
+        // if no instance name was found or no belonging directory then show the instance list page
+        if (name == null || (instance = InstanceController.getInstanceData( name )) == null) {
             return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );
         } else {
             modelMap.put( "instance", instance );

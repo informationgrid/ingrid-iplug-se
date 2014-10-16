@@ -62,11 +62,12 @@ public class GeneralSearchTest {
 
     @Test
     public void searchForMultipleTermsWithAnd() {
-        IngridQuery q = Utils.getIngridQuery( "Welt wemove" );
+        // both words must be present inside a field!
+        IngridQuery q = Utils.getIngridQuery( "Welt Neuigkeit" );
         IngridHits search = Utils.index.search( q, 0, 10 );
         assertThat( search, not( is( nullValue() ) ) );
         assertThat( search.getHits().length, is( 1 ) );
-        Utils.checkHitsForIDs( search.getHits(), 1 );
+        Utils.checkHitsForIDs( search.getHits(), 4 );
     }
 
     @Test
@@ -90,7 +91,7 @@ public class GeneralSearchTest {
      */
     @Test
     public void searchForMultipleTermsWithAndOr() {
-        IngridQuery q = Utils.getIngridQuery( "Welt AND wemove OR golem" );
+        IngridQuery q = Utils.getIngridQuery( "Welt AND Firma OR golem" );
         IngridHits search = Utils.index.search( q, 0, 10 );
         assertThat( search, not( is( nullValue() ) ) );
         assertThat( search.getHits().length, is( 3 ) );
@@ -99,7 +100,7 @@ public class GeneralSearchTest {
     
     @Test
     public void searchForMultipleTermsWithAndOrParentheses() {
-        IngridQuery q = Utils.getIngridQuery( "Welt AND (wemove OR golem)" );
+        IngridQuery q = Utils.getIngridQuery( "Welt AND (Firma OR golem)" );
         IngridHits search = Utils.index.search( q, 0, 10 );
         assertThat( search, not( is( nullValue() ) ) );
         assertThat( search.getHits().length, is( 2 ) );
@@ -117,7 +118,7 @@ public class GeneralSearchTest {
     
     @Test
     public void searchForMultipleTermsNot() {
-        IngridQuery q = Utils.getIngridQuery( "Welt -wemove" );
+        IngridQuery q = Utils.getIngridQuery( "Welt -Firma" );
         IngridHits search = Utils.index.search( q, 0, 10 );
         assertThat( search, not( is( nullValue() ) ) );
         assertThat( search.getHits().length, is( 2 ) );
@@ -254,11 +255,12 @@ public class GeneralSearchTest {
         assertThat( search, not( is( nullValue() ) ) );
         assertThat( search.getHits().length, is( 1 ) );
         Utils.checkHitsForIDs( search.getHits(), 4 );
-        
-        // TODO: this should return two documents but somehow is a query of a stopword (here 'der')
-        // resulting in no results!!!
-        q = Utils.getIngridQuery( "Welt der Computer" );
-        search = Utils.index.search( q, 0, 10 );
+    }
+    
+    @Test
+    public void stopWordsRemoval() {
+        IngridQuery q = Utils.getIngridQuery( "Welt das ein Computer" );
+        IngridHits search = Utils.index.search( q, 0, 10 );
         assertThat( search, not( is( nullValue() ) ) );
         assertThat( search.getHits().length, is( 2 ) );
         Utils.checkHitsForIDs( search.getHits(), 4, 11 );
@@ -293,7 +295,7 @@ public class GeneralSearchTest {
 
     @Test
     public void getDetail() {
-        IngridQuery q = Utils.getIngridQuery( "Welt wemove" );
+        IngridQuery q = Utils.getIngridQuery( "Welt Firma" );
         IngridHits search = Utils.index.search( q, 0, 10 );
         IngridHitDetail detail = Utils.index.getDetail( search.getHits()[0], q, null );
         assertThat( detail, not( is( nullValue() ) ) );
@@ -301,13 +303,13 @@ public class GeneralSearchTest {
         assertThat( detail.getString( IndexImpl.DETAIL_URL ), is( "http://www.wemove.com" ) );
         assertThat( detail.get("fetched"), is( nullValue() ) );
         assertThat( detail.getTitle(), is( "wemove" ) );
-        assertThat( detail.getSummary(), is( "Die beste IT-Firma auf der <em>Welt</em>!" ) );
+        assertThat( detail.getSummary(), is( "Die beste IT-<em>Firma</em> auf der <em>Welt</em>!" ) );
         assertThat( detail.getScore(), greaterThan( 0.1f ) );
     }
     
     @Test
     public void getDetailWithRequestedField() {
-        IngridQuery q = Utils.getIngridQuery( "Welt wemove" );
+        IngridQuery q = Utils.getIngridQuery( "Welt Firma" );
         IngridHits search = Utils.index.search( q, 0, 10 );
         String[] extraFields = new String[] { "fetched" };
         IngridHitDetail detail = Utils.index.getDetail( search.getHits()[0], q, extraFields );

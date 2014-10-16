@@ -7,9 +7,10 @@
             },
             "title": {
                 "analyzer": "german",
-                "type": "string"
+                "type": "string",
+                "boost": 1.1
             },
-            "abstract": {
+            "content": {
                 "analyzer": "german",
                 "type": "string"
             },

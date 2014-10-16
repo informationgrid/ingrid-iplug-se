@@ -1,6 +1,12 @@
 package de.ingrid.iplug.se.elasticsearch.converter;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder.Operator;
+import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.stereotype.Service;
@@ -20,7 +26,8 @@ public class DefaultFieldsQueryConverter implements IQueryConverter {
         BoolQueryBuilder bq = null;//QueryBuilders.boolQuery();
         
         if (terms.length > 0) {
-            
+            List<String> termsAnd = new ArrayList<String>();
+            List<String> termsOr = new ArrayList<String>();
             for (TermQuery term : terms) {
                 String t = term.getTerm();
                 QueryBuilder subQuery = null;
@@ -34,27 +41,22 @@ public class DefaultFieldsQueryConverter implements IQueryConverter {
                 // in case a term was not identified as a wildcard-term, e.g. "Deutsch*"
                 } else if (t.contains( "*" )) {
                     subQuery = QueryBuilders.boolQuery();
-                    //for (String field : content) {
-                        //((BoolQueryBuilder)subQuery).should( QueryBuilders.wildcardQuery( field, t ) );
-                        ((BoolQueryBuilder)subQuery).should( QueryBuilders.queryString( t ) );
-//                        try {
-//                            TokenStream tokenStream = (new GermanAnalyzer(Version.LUCENE_CURRENT)).tokenStream( null, "Fa?en");//t );
-//                            CharTermAttribute termAttr = tokenStream.addAttribute(CharTermAttribute.class);
-//                            tokenStream.reset();
-//                            while (tokenStream.incrementToken()) {
-//                                System.out.println( termAttr.toString() );
-//                            }
-//                            tokenStream.end();
-//                            tokenStream.close();
-//                        } catch (IOException e) {
-//                            // TODO Auto-generated catch block
-//                            e.printStackTrace();
-//                        }
-                    //}
+                    ((BoolQueryBuilder)subQuery).should( QueryBuilders.queryString( t ) );
+                    
+                } else if (term.isProhibited()) {
+                    subQuery = QueryBuilders.multiMatchQuery( t, content );
                     
                 } else {
                 
-                    subQuery = QueryBuilders.multiMatchQuery( t, content );
+                    // only add term to the correct list, so that the whole terms will be matched correctly
+                    // even with stopwords filtered!!!
+                    if (term.isRequred()) {
+                        termsAnd.add( t );
+                    } else { 
+                        termsOr.add( t );
+                    }
+                    
+                    continue;
                 }
                 
                 if (term.isRequred()) {
@@ -81,6 +83,19 @@ public class DefaultFieldsQueryConverter implements IQueryConverter {
                     }
                     
                 }
+            }
+            
+            if (!termsAnd.isEmpty()) {
+                String join = StringUtils.join( termsAnd, " " );
+                MultiMatchQueryBuilder subQuery = QueryBuilders.multiMatchQuery( join, content ).operator( Operator.AND );
+                if (bq == null) bq = QueryBuilders.boolQuery();
+                bq.should( subQuery );
+            }
+            if (!termsOr.isEmpty()) {
+                String join = StringUtils.join( termsOr, " " );
+                MultiMatchQueryBuilder subQuery = QueryBuilders.multiMatchQuery( join, content ).operator( Operator.OR );
+                if (bq == null) bq = QueryBuilders.boolQuery();
+                bq.should( subQuery );
             }
                 
             queryBuilder.must( bq );
