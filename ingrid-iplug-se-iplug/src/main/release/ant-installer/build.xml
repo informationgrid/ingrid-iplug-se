@@ -5,7 +5,7 @@
 
     <!-- set global properties for this build -->
     <property name="iPlugName"          value="${project.build.finalName}"/>
-    
+
     <!-- THIS PORPERTIES ARE NECESSARY FOR UPDATES -->
     <property name="libraryDir"         value="lib" />
     <property name="libraryIdent"       value="ingrid-iplug-se-iplug-" />
@@ -21,39 +21,39 @@
         <property name="updateProcedure" value="true" />
         <property name="installProcedure" value="false" />
     </target>
-    
+
     <target name="setInstallProperty" depends="extract">
         <property name="installProcedure" value="true" />
         <property name="updateProcedure" value="false" />
     </target>
-    
-    
+
+
     <target name="extract" description="Extract all files to the installation directory.">
         <unzip src="${antinstaller.jar}" dest="${installDir}">
             <patternset>
-                <include name="${iPlugName}/**/*.*"/>
+                <include name="${iPlugName}/**/*"/>
             </patternset>
         </unzip>
-        
+
         <move toDir="${installDir}">
             <fileset dir="${installDir}/${iPlugName}"/>
         </move>
-        
+
         <mkdir dir="${installDir}/webapp/WEB-INF/work"/>
     </target>
-    
+
     <target name="extractUpdate">
         <unzip src="${antinstaller.jar}" dest=".">
             <patternset>
-                <include name="**/*.*"/>
+                <include name="${iPlugName}/**/*"/>
                 <!-- <exclude name="${iPlugName}/start.sh" /> -->
             </patternset>
         </unzip>
-        
+
         <delete>
             <fileset dir="${installDir}/lib" includes="**/*"/>
         </delete>
-        
+
         <move toDir="${installDir}">
             <fileset dir="./${iPlugName}"/>
         </move>
@@ -64,7 +64,7 @@
             <entry  key="jetty.port" type="string" value="${localServerPort}" />
         </propertyfile>
     </target>
-    
+
     <target name="startIPlug">
         <echo>
             =================
