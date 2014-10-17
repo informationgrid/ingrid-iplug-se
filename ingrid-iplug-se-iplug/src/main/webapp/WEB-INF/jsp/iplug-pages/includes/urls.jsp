@@ -41,11 +41,19 @@
             <!-- this can be any element, including an input -->
             <img src="../img/next.png" class="next" />
             <img src="../img/last.png" class="last" />
+            ( pro Seite:
+            <select class="pagesize" style="width: 45px;">
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+            )
         </form>
     </div>
 
     <button id="btnAddUrl" type="button" name="add" class="right" style="margin-top: 8px;">Neue URL</button>
-    
+
     <table id="urlTable" class="data tablesorter space">
         <thead>
             <tr>
@@ -69,12 +77,12 @@
             <fieldset>
                 <div>
                     <h3>Start-URL</h3>
-                    <div class="input full">                
+                    <div class="input full">
                         <input type="text" name="startUrl" id="startUrl" value="http://" class="text ui-widget-content ui-corner-all">
                     </div>
                     <span id="errorStartUrl" class="error startUrl">Die URL ist nicht korrekt</span>
                 </div>
-                
+
                 <div>
                     <h3>Limit-URLs</h3>
                     <table id="limitUrlTable" class="data tablesorter">
@@ -92,7 +100,7 @@
                         </tbody>
                     </table>
                 </div>
-                
+
                 <div>
                     <h3>Exclude-URLs</h3>
                     <table id="excludeUrlTable" class="data tablesorter">
@@ -110,16 +118,16 @@
                         </tbody>
                     </table>
                 </div>
-                
-                
+
+
                 <!-- <h3>Metadaten</h3> -->
-                
+
                 <c:forEach items="${ metadata }" var="meta">
                     <div class="meta_${ meta.id }">
                     <h3>${ meta.label }</h3>
-                    
+
                     <c:if test="${meta.type == 'select' || meta.type == null}" >
-                        <select id="${ meta.id }" 
+                        <select id="${ meta.id }"
                             <c:if test="${ meta.isMultiple == true }">multiple</c:if>
                             <c:if test="${ meta.isDisabled == true }">disabled</c:if>
                         >
@@ -140,7 +148,7 @@
                         </c:forEach>
                         </select>
                     </c:if>
-                    
+
                     <c:if test="${meta.type == 'checkbox'}" >
                         <fieldset>
                         <legend>${ meta.label }</legend>
@@ -149,7 +157,7 @@
                         </c:forEach>
                         </fieldset>
                     </c:if>
-                    
+
                     <c:if test="${meta.type == 'radio'}" >
                         <c:forEach items="${ meta.children }" var="group">
                             <label><input type="radio" name="meta.id" value="${ meta.id }:${ group.id }"> ${ group.label }</label>
@@ -165,10 +173,10 @@
                             </c:if>
                         </c:forEach>
                     </c:if>
-                    
+
                     </div>
                 </c:forEach>
-                
+
                 <!-- User defined metadata -->
                 <div>
                     <h3>Weitere Metadaten</h3>
@@ -188,7 +196,7 @@
                     </table>
                     <p id="userMetaError" class="error">Ein Metadatum muss aus einem Schlüssel und einem Wert bestehen, welche durch einen Doppelpunkt getrennt sind. Bsp.: lang:de</p>
                 </div>
-                    
+
                 <!-- Allow form submission with keyboard without duplicating the dialog button -->
                 <!-- <input type="submit" tabindex="-1" style="position: absolute; top: -1000px"> -->
             </fieldset>

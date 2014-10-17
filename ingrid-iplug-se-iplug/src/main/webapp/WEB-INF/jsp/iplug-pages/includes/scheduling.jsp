@@ -23,7 +23,7 @@
 
             <div style="margin-top: 25px"></div>
 
-            <div id="schedulingTabs" class="tab-container">
+            <div id="schedulingTabs" class="tab-container" style="width: 700px;">
                 <ul class="etabs">
                     <li class="tab"><a href="#tab1"><em><fmt:message key="scheduling.day" /></em></a></li>
                     <li class="tab"><a href="#tab2"><em><fmt:message key="scheduling.week" /></em></a></li>
@@ -39,7 +39,7 @@
                                     <legend>
                                         <fmt:message key="scheduling.daily" />
                                     </legend>
-                                    <row> 
+                                    <row>
                                         <label>um:</label>
                                         <div class="input inline">
                                             <form:input type="text" class="time" path="time" />
@@ -52,7 +52,7 @@
                                     </legend>
 
                                     <row> <label> <fmt:message key="scheduling.crawlDepth" /> :
-                                    </label> <field> 
+                                    </label> <field>
                                     <div class="input full">
                                         <form:select path="depth">
                                             <form:options items="${depths}" />
@@ -64,7 +64,7 @@
                                     </field> <desc></desc> </row>
 
                                     <row> <label> <fmt:message key="scheduling.pagesPerSegment" /> :
-                                    </label> <field> 
+                                    </label> <field>
                                     <div class="input full">
                                         <form:input path="topn" />
                                     </div>
@@ -111,7 +111,7 @@
                                     </legend>
 
                                     <row> <label> <fmt:message key="scheduling.crawlDepth" /> :
-                                    </label> <field> 
+                                    </label> <field>
                                     <div class="input full">
                                         <form:select path="depth">
                                             <form:options items="${depths}" />
@@ -123,7 +123,7 @@
                                     </field> <desc></desc> </row>
 
                                     <row> <label> <fmt:message key="scheduling.pagesPerSegment" /> :
-                                    </label> <field> 
+                                    </label> <field>
                                     <div class="input full">
                                         <form:input path="topn" />
                                     </div>
@@ -159,7 +159,7 @@
                                                 id="daysOfMonth_${dayOfMonth}" />
                                             <label><fmt:formatNumber value="${dayOfMonth}" pattern="00"/></label>
                                         </div>
-                                    </c:forEach> 
+                                    </c:forEach>
                                     <div style="clear:left;"></div>
                                     </field>
                                     </row>
@@ -171,7 +171,7 @@
                                     </legend>
 
                                     <row> <label> <fmt:message key="scheduling.crawlDepth" /> :
-                                    </label> <field> 
+                                    </label> <field>
                                     <div class="input full">
                                         <form:select path="depth">
                                             <form:options items="${depths}" />
@@ -183,7 +183,7 @@
                                     </field> <desc></desc> </row>
 
                                     <row> <label> <fmt:message key="scheduling.pagesPerSegment" /> :
-                                    </label> <field> 
+                                    </label> <field>
                                     <div class="input full">
                                         <form:input path="topn" />
                                     </div>

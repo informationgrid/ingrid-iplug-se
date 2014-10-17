@@ -50,7 +50,6 @@ import de.ingrid.iplug.se.webapp.container.Instance;
 @SessionAttributes("plugDescription")
 public class RestDataController extends InstanceController {
     
-    private static final int PAGE_SIZE = 10;
     @Autowired
     private NutchController nutchController;
     
@@ -89,6 +88,7 @@ public class RestDataController extends InstanceController {
     @RequestMapping(value = { "urls/{instance}" }, method = RequestMethod.GET)
     public JSONObject getUrls(@PathVariable("instance") String name,
             @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(value = "pagesize", required = false, defaultValue = "10") int pageSize,
             @RequestParam(value = "urlfilter", required = false, defaultValue = "") String urlFilter,
             @RequestParam(value = "metafilter", required = false, defaultValue = "") String[] metaOptions,
             @RequestParam(value = "sort", required = false, defaultValue = "") int[] sort) {
@@ -139,8 +139,8 @@ public class RestDataController extends InstanceController {
         }
         
         List<Url> resultList = em.createQuery(createQuery)
-                .setFirstResult( page * PAGE_SIZE )
-                .setMaxResults( PAGE_SIZE )
+                .setFirstResult( page * pageSize )
+                .setMaxResults( pageSize )
                 .getResultList();
         
         JSONObject json = new JSONObject();
