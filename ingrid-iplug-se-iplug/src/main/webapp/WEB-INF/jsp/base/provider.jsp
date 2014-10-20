@@ -54,19 +54,15 @@
                     <tr>
                         <td class="leftCol">Anbieter:</td>
                         <td>
-                            <div class="input full">
-                                <input type="hidden" name="provider" value="all" />
-                            </div>
+                            <input type="hidden" name="provider" value="all" />
                         </td>
                         <td class="rightCol">
                         </td>
                     </tr>
                     <tr><td colspan=3><br /><hr /><br /></td></tr>
                     <tr>
-                        <td>
+                        <td colspan=3>
                             <span>Keine Auswahl, alle Anbieter erlaubt.</span>
-                        </td>
-                        <td>
                         </td>
                     </tr>
                             

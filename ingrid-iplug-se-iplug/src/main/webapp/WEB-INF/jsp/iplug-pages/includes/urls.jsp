@@ -60,7 +60,7 @@
                 <th data-sort="string" width="20px"></th>
                 <th data-sort="string">URL</th>
                 <th data-sort="string" width="60px">Status</th>
-                <th data-sort="string" width="150px"></th>
+                <th data-sort="string" width="100px"></th>
             </tr>
         </thead>
         <tbody>
@@ -208,6 +208,16 @@
             <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
             Möchten Sie die Url(s) wirklich löschen?
         </p>
+    </div>
+
+    <div id="dialog-testresult" title="URL - Test">
+        <div class="loading">Bitte warten ...</div>
+        <table class="result">
+            <tr>
+                <td>Erreichbar:</td>
+                <td class="reachable"></td>
+            </tr>
+        </table>
     </div>
 
     <!-- <div id="dialog-form-limit" title="Add new Limit-URL">

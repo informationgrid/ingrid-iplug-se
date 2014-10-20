@@ -65,7 +65,7 @@
                         // cells
                         rows += "<tr data-id='" + d[r].id + "'>" +
                                 "<td><input type='checkbox'></td>" +
-                                "<td>" + d[r].url + "</td>" +
+                                "<td>" + d[r].url + " <a target='_blank' href='" + d[r].url + "' title='Link öffnen'><span class='ui-icon ui-icon-extlink' style='display:inline-block;'></span></a></td>" +
                                 "<td>" + d[r].status + "</td>" +
                                 "<td>" + actionButtonTemplate + "</td>" +
                                 "</tr>";
@@ -82,7 +82,7 @@
                                 "<div class='metadata'>Metadaten: " + metadata.join(',') + "</div>" +
                                 "</td></tr>";
                     }
-                    setTimeout( function() { createActionButton( $("tr .btnUrl") ); }, 0);
+                    //setTimeout( function() { createActionButton( $("tr .btnUrl") ); }, 0);
 
                     // in version 2.10, you can optionally return $(rows) a set of table rows within a jQuery object
                     return [ total, $(rows) ];
@@ -424,6 +424,22 @@
             }
         });
 
+        dialogTestResult = $( "#dialog-testresult" ).dialog({
+            resizable: false,
+            autoOpen: false,
+            height:140,
+            modal: true,
+            buttons: {
+                "Schliessen": function() {
+                    $( this ).dialog( "close" );
+                }
+            },
+            open: function() {
+                $("#dialog-testresult .loading").show();
+                $("#dialog-testresult .result").hide();
+            }
+        });
+
 /*      dialogLimit = $("#dialog-form-limit").dialog({
             autoOpen : false,
             height : 250,
@@ -470,9 +486,21 @@
         function actionHandler( action, target ) {
             var type = null,
                 id = null;
+
+            id = $( target ).parents("tr").attr("data-id");
             switch (action) {
+            case "edit":
+                $.get("../rest/url/" + id, function(data) {
+                    // reload page if data was not received, which calls login page
+                    if (typeof data === "string") location.reload();
+                    console.log("Data: ", data);
+                    dialog.data("isNew", false);
+                    data.userMetadata = [];
+                    dialog.data("urlDataObject", data);
+                    dialog.dialog("open");
+                });
+                break;
             case "createNewFromTemplate":
-                id = $( target ).parents("tr").attr("data-id");
                 $.get("../rest/url/" + id, function(data) {
                     // reload page if data was not received, which calls login page
                     if (typeof data === "string") location.reload();
@@ -506,12 +534,29 @@
                 row.remove();
                 break;
             case "delete":
-                id = $( target ).parents("tr").attr("data-id");
                 dialogConfirm.data("action", {
                     type: "deleteSingleUrl",
                     id: id
                 });
                 dialogConfirm.dialog("open");
+                break;
+            case "test":
+                var url = $( target ).parents("tr").find("td:nth-child(2)").text();
+                dialogTestResult.dialog("open");
+                $.ajax({
+                    type: "POST",
+                    url: "../rest/url/check",
+                    contentType: 'application/json',
+                    data: url,
+                    success: function(data) {
+                        $("#dialog-testresult .reachable").text( data.reachable ? "Ja" : "Nein" );
+                        $("#dialog-testresult .loading").hide();
+                        $("#dialog-testresult .result").show();
+                    },
+                    error: function(jqXHR, text, error) {
+                        console.error(text, error);
+                    }
+                });
                 break;
             default:
                 alert( "Unbekannte Aktion: ", action );
@@ -682,21 +727,25 @@
 
         /* PUBLIC FUNCTIONS */
         urlMaintenance = {
-            deleteRow: deleteRow
+            deleteRow: deleteRow,
+            actionHandler: actionHandler
         };
     });
 
     var actionButtonTemplate =
         '<div class="actionButtons">' +
-            '<div>' +
-                '<button class="btnUrl">Bearbeiten</button>' +
-                '<button class="select">Weitere Optionen</button>' +
-            '</div>' +
-            '<ul style="position:absolute; padding-left: 0; min-width: 180px; z-index: 100; display: none;">' +
-                '<li action="delete">Löschen</li>' +
-                '<li action="test">Testen</li>' +
-                '<li action="createNewFromTemplate">Als Template verwenden ...</li>' +
-            '</ul>' +
+            // '<div>' +
+            //     '<button class="btnUrl">Bearbeiten</button>' +
+            //     '<button class="select">Weitere Optionen</button>' +
+            // '</div>' +
+            // '<ul style="position:absolute; padding-left: 0; min-width: 180px; z-index: 100; display: none;">' +
+            //     '<li action="delete">Löschen</li>' +
+            //     '<li action="test">Testen</li>' +
+            //     '<li action="createNewFromTemplate">Als Template verwenden ...</li>' +
+            // '</ul>' +
+            '<span class="ui-state-default ui-corner-all" onclick="urlMaintenance.actionHandler(\'edit\', event.target)"><span class="btnUrl ui-icon ui-icon-pencil" title="Bearbeiten"></span></span>' +
+            '<span class="ui-state-default ui-corner-all" onclick="urlMaintenance.actionHandler(\'createNewFromTemplate\', event.target)"><span class="btnUrl ui-icon ui-icon-newwin" title="Als Template verwenden ..."></span></span>' +
+            '<span class="ui-state-default ui-corner-all" onclick="urlMaintenance.actionHandler(\'test\', event.target)"><span class="btnUrl ui-icon ui-icon-transfer-e-w" title="Testen"></span></span>' +
         '</div>';
 </script>
 

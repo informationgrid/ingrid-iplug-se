@@ -54,20 +54,16 @@
 					<tr>
 						<td class="leftCol">Partner:</td>
 						<td>
-                            <div class="input full">
-    							<input type="hidden" name="partner" value="all" />
-                            </div>
+							<input type="hidden" name="partner" value="all" />
                         </td>
                         <td class="rightCol">
                         </td>
                     </tr>
                     <tr><td colspan=3><br /><hr /><br /></td></tr>
                     <tr>
-                        <td>
+                        <td colspan=3>
                             <span>Keine Auswahl, alle Partner erlaubt.</span>
                         </td>
-                        <td>
-						</td>
 					</tr>
 							
 				</table>

@@ -1,6 +1,8 @@
 package de.ingrid.iplug.se.webapp.controller.instance;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -207,6 +209,20 @@ public class RestDataController extends InstanceController {
         String content = FileUtils.tail( path.toFile(), 1000 );
         
         return new ResponseEntity<String>( content, HttpStatus.OK );
+    }
+    
+    @RequestMapping(value = { "url/check" }, method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> checkUrl(@RequestBody String urlString) throws IOException {
+        URL url = new URL( urlString );
+        HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.connect();
+
+        int code = connection.getResponseCode();
+        Map<String, Object> result = new HashMap<String, Object>();
+        result.put( "reachable", code == 200 ? true : false );
+        result.put( "httpcode", code );
+        return new ResponseEntity<Map<String, Object>>( result, HttpStatus.OK );
     }
     
     

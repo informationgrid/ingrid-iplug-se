@@ -1,235 +1,250 @@
 .warn {
-	color: #ff8000;
+    color: #ff8000;
 }
 
 .error {
-	color: #ff0000;
+    color: #ff0000;
 }
 
 button {
-	cursor: pointer;
+    cursor: pointer;
 }
 
 .radio .ui-state-default {
-	color: #888;
-	background: #EEE;
+    color: #888;
+    background: #EEE;
 }
 
 .radio .ui-state-active {
-	color: #FFF;
-	background: #68A5D2;
+    color: #FFF;
+    background: #68A5D2;
 }
 
 div.input.error {
-	border-color: #ff0000;
+    border-color: #ff0000;
 }
 
 button:hover { color:#ffffff; }
 
 .hideButtons .actionButtons {
-	display: none;
+    display: none;
+}
+
+.actionButtons .ui-state-default {
+    float: left;
+    padding: 4px 0;
+    margin: 2px;
+    cursor: pointer;
+}
+
+.actionButtons .ui-state-default:hover {
+    background: #1B78B1;
+}
+
+.actionButtons .ui-icon {
+    margin: 0 4px;
 }
 
 /* set height to match with the height of the action button
    to prevent flicker during initialization */
 .tablesorter-hasChildRow {
-	height: 37px;
+    height: 37px;
 }
 
 #schedulingTabs fieldset {
-	border: 1px solid #CCC;
-	margin: 8px 0px 30px 0px;
-	padding: 16px 45px;
-	position: relative;
+    border: 1px solid #CCC;
+    margin: 8px 0px 30px 0px;
+    padding: 16px 45px;
+    position: relative;
 }
 
 #statusContainer {
-	background-color: #F5F8EB;
+    background-color: #F5F8EB;
 }
 
 .ui-dialog fieldset, #tab-container fieldset {
-	border: 1px solid #CCC;
-	margin: 10px 0px;
-	padding: 15px 15px;
-	position: relative;
+    border: 1px solid #CCC;
+    margin: 10px 0px;
+    padding: 15px 15px;
+    position: relative;
 }
 
 .ui-dialog fieldset label {
-	width: 165px;
+    width: 165px;
 }
 
 .ui-dialog fieldset > div {
-	padding-bottom: 10px;
+    padding-bottom: 10px;
 }
 
 label input {
-	vertical-align: bottom;
+    vertical-align: bottom;
 }
 
 .right {
-	float: right;
+    float: right;
 }
 
 .left {
-	float: left;
+    float: left;
 }
 
 /* #dialog-form fieldset>div {
-	padding-bottom: 10px;
+    padding-bottom: 10px;
 } */
 
 .ui-buttonset {
-	padding-bottom: 4px;
-	text-align: center;
+    padding-bottom: 4px;
+    text-align: center;
 }
 
 /* #dialog-form input[type=text], #dialog-form select, #dialog-form .chosen-container
-	{
-	width: 100%;
+    {
+    width: 100%;
 } */
 
 row {
-	float: left;
-	clear: left;
-	min-height: 30px;
-	margin-bottom: 15px;
-	width: 100%;
+    float: left;
+    clear: left;
+    min-height: 30px;
+    margin-bottom: 15px;
+    width: 100%;
 }
 
 /* label {
-	float: left;
-	width: 130px;
+    float: left;
+    width: 130px;
 } */
 
 .url-info {
-	padding-left: 20px;
+    padding-left: 20px;
 }
 
 .url-info .limit {
-	color: green;
+    color: green;
 }
 
 .url-info .exclude {
-	color: red;
+    color: red;
 }
 
 .url-info .metadata {
-	color: gray;
+    color: gray;
 }
 
 /* Time Picker  */
 .ui-widget-header {
-	border-bottom: 1px solid #AAA;
+    border-bottom: 1px solid #AAA;
 }
 
 #ptTimeSelectSetButton a {
-	border: 1px solid;
+    border: 1px solid;
 }
 
 .ui-widget-content.ptTimeSelectLeftPane {
-	border-right: 1px solid #AAA !important;
+    border-right: 1px solid #AAA !important;
 }
 
 .ptTimeSelectHrAmPmCntr {
-	border: 1px solid #AAA;
-	background-color: #EEE;
+    border: 1px solid #AAA;
+    background-color: #EEE;
 }
 
 /* TABS */
 #weekDays, #monthDays {
-	float: left;
-	position: relative;
-	left: 130px;
-	padding-right: 130px;
-	top: -17px;
+    float: left;
+    position: relative;
+    left: 130px;
+    padding-right: 130px;
+    top: -17px;
 }
 
 /* input, select {
-	width: 100% !important;
+    width: 100% !important;
 }
   */
 input[name='time'] {
-	width: 100px;
+    width: 100px;
 }
 
 #tab-container {
-	padding: 10px;
+    padding: 10px;
 }
 
 .etabs {
-	margin: 0;
-	padding: 0 !important;
+    margin: 0;
+    padding: 0 !important;
 }
 
 .tab {
-	display: inline-block;
-	zoom: 1;
-	*display: inline;
-	background: #F5F8EB;
-	border: solid 1px #DDE9BD;
-	border-bottom: none;
-	padding-bottom: 0 !important;
-	-moz-border-radius: 4px 4px 0 0;
-	-webkit-border-radius: 4px 4px 0 0;
+    display: inline-block;
+    zoom: 1;
+    *display: inline;
+    background: #F5F8EB;
+    border: solid 1px #DDE9BD;
+    border-bottom: none;
+    padding-bottom: 0 !important;
+    -moz-border-radius: 4px 4px 0 0;
+    -webkit-border-radius: 4px 4px 0 0;
 }
 
 .tab a {
-	font-size: 14px;
-	line-height: 2em;
-	display: block;
-	padding: 0 10px;
-	outline: none;
+    font-size: 14px;
+    line-height: 2em;
+    display: block;
+    padding: 0 10px;
+    outline: none;
 }
 
 .tab a:hover {
-	text-decoration: none;
+    text-decoration: none;
 }
 
 .tab.active {
-	background: #fff;
-	padding-top: 6px;
-	position: relative;
-	top: 1px;
-	border-color: #DDE9BD;
+    background: #fff;
+    padding-top: 6px;
+    position: relative;
+    top: 1px;
+    border-color: #DDE9BD;
 }
 
 .tab a.active {
-	font-weight: bold;
+    font-weight: bold;
 }
 
 .tab-container .panel-container {
-	background: #fff;
-	border: solid #DDE9BD 1px;
-	padding: 10px;
-	-moz-border-radius: 0 4px 4px 4px;
-	-webkit-border-radius: 0 4px 4px 4px;
+    background: #fff;
+    border: solid #DDE9BD 1px;
+    padding: 10px;
+    -moz-border-radius: 0 4px 4px 4px;
+    -webkit-border-radius: 0 4px 4px 4px;
 }
 
 /* table, th, td {
-	border: 1px solid #999;
-	padding: 8px 16px;
-	text-align: left;
-	font-size: 1em;
-	border-collapse: collapse;
+    border: 1px solid #999;
+    padding: 8px 16px;
+    text-align: left;
+    font-size: 1em;
+    border-collapse: collapse;
 } */
 #instances {
-	margin: 20px;
+    margin: 20px;
 }
 
 #instances table {
-	width: 100%;
-	margin-bottom: 5px;
+    width: 100%;
+    margin-bottom: 5px;
 }
 
 /* tables */
 table.tablesorter {
-	font-family: arial;
-	background-color: #CDCDCD;
-	/* margin: 0px 0pt 15px; */
-	font-size: 8pt;
-	width: 100%;
-	text-align: left;
-	border-spacing: 1px;
+    font-family: arial;
+    background-color: #CDCDCD;
+    /* margin: 0px 0pt 15px; */
+    font-size: 8pt;
+    width: 100%;
+    text-align: left;
+    border-spacing: 1px;
 }
 
 .tablesorter .filtered {
@@ -237,40 +252,40 @@ table.tablesorter {
 }
 
 table.tablesorter thead tr th, table.tablesorter tfoot tr th {
-	font-size: 8pt;
-	padding: 4px;
+    font-size: 8pt;
+    padding: 4px;
 }
 
 table.tablesorter thead tr .header, .tablesorter-header {
-	background-image: url(../img/bg.gif);
-	background-repeat: no-repeat;
-	background-position: center right;
-	cursor: pointer;
+    background-image: url(../img/bg.gif);
+    background-repeat: no-repeat;
+    background-position: center right;
+    cursor: pointer;
 }
 
 table.tablesorter tbody td {
-	color: #3D3D3D;
-	padding: 4px;
-	background-color: #FFF;
-	/* vertical-align: top; */
-	word-break: break-word;
+    color: #3D3D3D;
+    padding: 4px;
+    background-color: #FFF;
+    /* vertical-align: top; */
+    word-break: break-word;
 }
 
 table.tablesorter tbody tr.odd td {
-	background-color: #F0F0F6;
+    background-color: #F0F0F6;
 }
 
 table.tablesorter thead tr .headerSortUp, table.tablesorter thead tr .tablesorter-headerAsc {
-	background-image: url(../img/asc.gif);
+    background-image: url(../img/asc.gif);
 }
 
 table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .tablesorter-headerDesc {
-	background-image: url(../img/desc.gif);
+    background-image: url(../img/desc.gif);
 }
 
 table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp
-	{
-	background-color: #8dbdd8;
+    {
+    background-color: #8dbdd8;
 }
 
 table.tablesorter thead .sorter-false {
@@ -282,42 +297,42 @@ table.tablesorter thead .sorter-false {
 /* Table Sorter */
 /* pager wrapper, div */
 .tablesorter-pager {
-	padding: 15px 5px 5px;
+    padding: 15px 5px 5px;
 }
 /* pager wrapper, in thead/tfoot */
 td.tablesorter-pager {
-	background-color: #e6eeee;
-	margin: 0; /* needed for bootstrap .pager gets a 18px bottom margin */
+    background-color: #e6eeee;
+    margin: 0; /* needed for bootstrap .pager gets a 18px bottom margin */
 }
 /* pager navigation arrows */
 .tablesorter-pager img {
-	vertical-align: middle;
-	margin-right: 2px;
-	cursor: pointer;
+    vertical-align: middle;
+    margin-right: 2px;
+    cursor: pointer;
 }
 
 /* pager output text */
 .tablesorter-pager .pagedisplay {
-	padding: 0 5px 0 5px;
-	width: 50px;
-	text-align: center;
+    padding: 0 5px 0 5px;
+    width: 50px;
+    text-align: center;
 }
 
 /* pager element reset (needed for bootstrap) */
 .tablesorter-pager select {
-	margin: 0;
-	padding: 0;
+    margin: 0;
+    padding: 0;
 }
 
 /*** css used when "updateArrows" option is true ***/
 /* the pager itself gets a disabled class when the number of rows is less than the size */
 .tablesorter-pager.disabled {
-	display: none;
+    display: none;
 }
 /* hide or fade out pager arrows when the first or last row is visible */
 .tablesorter-pager .disabled {
-	/* visibility: hidden */
-	opacity: 0.5;
-	filter: alpha(opacity = 50);
-	cursor: default;
+    /* visibility: hidden */
+    opacity: 0.5;
+    filter: alpha(opacity = 50);
+    cursor: default;
 }

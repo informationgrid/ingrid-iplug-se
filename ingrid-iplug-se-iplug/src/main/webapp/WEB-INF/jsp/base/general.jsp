@@ -53,19 +53,15 @@
 					<tr>
 						<td>Partner:</td>
 						<td>
-                            <div class="input full">
-    							<input type="hidden" name="organisationPartnerAbbr" value="all" />
-                            </div>
+   							<input type="hidden" name="organisationPartnerAbbr" value="all" />
                             <span>Keine Auswahl, alle Partner erlaubt.</span>
 						</td>
 					</tr>
 					<tr>
 						<td class="leftCol">Name des Anbieters:</td>
 						<td>
-                            <div class="input full">
-                                <input type="hidden" name="organisationAbbr" value="all" />
-                                <input type="hidden" name="organisation" value="all" />
-                            </div>
+                            <input type="hidden" name="organisationAbbr" value="all" />
+                            <input type="hidden" name="organisation" value="all" />
                             <span>Keine Auswahl, alle Anbieter erlaubt.</span>
 						</td>
 					</tr>
