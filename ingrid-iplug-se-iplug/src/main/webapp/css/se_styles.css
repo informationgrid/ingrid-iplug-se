@@ -239,12 +239,12 @@ input[name='time'] {
 /* tables */
 table.tablesorter {
     font-family: arial;
-    background-color: #CDCDCD;
+    background-color: #DADADA;
     /* margin: 0px 0pt 15px; */
     font-size: 8pt;
     width: 100%;
     text-align: left;
-    border-spacing: 1px;
+    border-spacing: 2px;
 }
 
 .tablesorter .filtered {
