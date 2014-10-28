@@ -175,6 +175,9 @@ public class Configuration implements IConfig {
     @Separator(" ")
     public List<String> nutchCallJavaOptions;
 
+    @PropertyValue("plugdescription.fields")
+    @DefaultValue("")
+    public List<String> fields;
 	
 	@Override
     public void addPlugdescriptionValues( PlugdescriptionCommandObject pdObject ) {
@@ -205,6 +208,11 @@ public class Configuration implements IConfig {
             pdObject.addToList(IngridQuery.RANKED, IngridQuery.SCORE_RANKED);
         }
         
+        // add fields
+        for (String field : fields) {
+            pdObject.remove( field );
+            pdObject.addField( field );
+        }
     }
 
     @Override
