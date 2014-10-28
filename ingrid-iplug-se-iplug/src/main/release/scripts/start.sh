@@ -44,7 +44,7 @@ stopIplug()
 			else
 				COUNTER=1
 				SECS=0
-				while [  $COUNTER -lt 10 ]; 
+				while [  $COUNTER -lt 10 ];
 				do
 					COUNTER=$(($COUNTER + 1))
 					echo "process is still running. wait 1 more sec."
@@ -55,15 +55,15 @@ stopIplug()
 					    echo "process ($procid) has been terminated after $SECS sec."
 					    unlink $PID
 					    exit 0
-					fi					
+					fi
 				done
 				echo "process is still running. force kill -9."
 				kill -9 `cat $PID`
 				exit 0
-			fi 
+			fi
 		else
 			echo "process is not running. Exit."
-			unlink $PID 
+			unlink $PID
 		fi
 	else
 		echo "process is not running. Exit."
@@ -87,7 +87,7 @@ stopNoExitIplug()
 			else
 				COUNTER=1
 				SECS=0
-				while [  $COUNTER -lt 10 ]; 
+				while [  $COUNTER -lt 10 ];
 				do
 					COUNTER=$(($COUNTER + 1))
 					echo "process is still running. wait 1 more sec."
@@ -97,13 +97,13 @@ stopNoExitIplug()
 						SECS=$(($COUNTER + $SECS))
 					    echo "process ($procid) has been terminated after $SECS sec."
 					    unlink $PID
-					fi					
+					fi
 				done
 				echo "process is still running. force kill -9."
 				kill -9 `cat $PID`
 			fi
 		else
-			echo "process is not running. Exit."			
+			echo "process is not running. Exit."
 		fi
     else
       echo "process is not running. Exit."
@@ -122,21 +122,21 @@ startIplug()
         exit 1
       fi
   fi
-  
+
   # some Java parameters
   if [ "$INGRID_JAVA_HOME" != "" ]; then
     #echo "run java in $INGRID_JAVA_HOME"
     JAVA_HOME=$INGRID_JAVA_HOME
   fi
-  
+
   if [ "$JAVA_HOME" = "" ]; then
     echo "Error: JAVA_HOME is not set."
     exit 1
   fi
-  
+
   JAVA=$JAVA_HOME/bin/java
-  JAVA_HEAP_MAX=-Xmx128m
-  
+  JAVA_HEAP_MAX=-Xmx256m
+
   # check envvars which might override default args
   if [ "$INGRID_HEAPSIZE" != "" ]; then
     JAVA_HEAP_MAX="-Xmx""$INGRID_HEAPSIZE""m"
@@ -152,7 +152,7 @@ startIplug()
   done
   # restore ordinary behaviour
   unset IFS
-  
+
   # cygwin path translation
   if expr `uname` : 'CYGWIN*' > /dev/null; then
     CLASSPATH=`cygpath -p -w "$CLASSPATH"`
@@ -162,9 +162,9 @@ startIplug()
   export CLASSPATH="$CLASSPATH"
   INGRID_OPTS="$INGRID_OPTS -Dingrid_home=$INGRID_HOME -Dfile.encoding=UTF8"
   CLASS=de.ingrid.iplug.se.SEIPlug
-	
-  exec nohup "$JAVA" $JAVA_HEAP_MAX $INGRID_OPTS $CLASS > console.log & 
-  
+
+  exec nohup "$JAVA" $JAVA_HEAP_MAX $INGRID_OPTS $CLASS > console.log &
+
   echo "jetty ($INGRID_HOME) started."
   echo $! > $PID
 }
@@ -178,7 +178,7 @@ STARTING_USER=`whoami`
 if [ "$STARTING_USER" != "$INGRID_USER" ]; then
   echo "You must be user '$INGRID_USER' to start that script! Set INGRID_USER in environment to overwrite this."
   exit 1
-fi 
+fi
 
 case "$1" in
   start)

@@ -21,6 +21,7 @@ import de.ingrid.utils.IngridHitDetail;
 import de.ingrid.utils.IngridHits;
 import de.ingrid.utils.query.IngridQuery;
 import de.ingrid.utils.queryparser.QueryStringParser;
+import de.ingrid.utils.queryparser.TokenMgrError;
 
 /**
  * Control the database parameter page.
@@ -57,9 +58,16 @@ public class SearchController extends AbstractController {
             @RequestParam(value = "query", required = false) final String queryString,
             @RequestParam("instance") String instance) throws Exception {
 
+        modelMap.addAttribute( "instance", InstanceController.getInstanceData( instance ) );
+        
         if (queryString != null) {
             modelMap.addAttribute( "query", queryString );
-            final IngridQuery query = QueryStringParser.parse( queryString );
+            IngridQuery query = null;
+            try {
+                query = QueryStringParser.parse( queryString );
+            } catch (TokenMgrError e) {
+                return AdminViews.SE_INSTANCE_SEARCH;
+            }
 
             // add instance information into query which is understood by this
             // iPlug
@@ -80,7 +88,6 @@ public class SearchController extends AbstractController {
                 }
             }
 
-            modelMap.addAttribute( "instance", InstanceController.getInstanceData( instance ) );
             modelMap.addAttribute( "hitCount", details.length );
             modelMap.addAttribute( "hits", detailsMap );
             modelMap.addAttribute( "details", _plug instanceof IRecordLoader );

@@ -30,6 +30,12 @@
             </c:forEach>
         </c:forEach>
         </select>
+        <div class="hint" onclick="$('#filterComment').toggle()"><span class="ui-icon ui-icon-arrow-1-e"></span>Hinweis</div>
+        <div id="filterComment" class="comment" style="display: none;">
+            Suchen Sie hier nach einer gewünschten URL. Jede Eingabe im URL-Feld, aktualisiert das Ergebnis und zeigt nur URLs an, die die eingegebene Zeichenkette enthalten.
+            Es können weiterhin beliebig viele Metadaten zum Filter hinzugefügt werden, um die Suche noch mehr einzugrenzen. Für eine schnellere Mehrfachauswahl muss die "Strg"-Taste gedrückt werden.
+            Das Löschen der Metadaten erfolgt über das jeweilige "x" des Feldes.
+        </div>
     </fieldset>
 
     <!-- pager -->
@@ -236,4 +242,9 @@
             </fieldset>
         </form>
     </div> -->
+</div>
+
+<div id="waitScreen" style="display: none;">
+    <div class="blocker"></div>
+    <div class="text">Bitte warten ...</div>
 </div>

@@ -179,7 +179,7 @@
 
             if ( valid ) {
                 delete data.userMetadata;
-
+                $("#waitScreen").show();
                 $.ajax({
                     type: "POST",
                     url: "../rest/url",
@@ -191,6 +191,7 @@
                     },
                     error: function(jqXHR, text, error) {
                         console.error(text, error);
+                        $("#waitScreen").hide();
                     }
                 });
 

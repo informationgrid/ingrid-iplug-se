@@ -6,6 +6,40 @@
     color: #ff0000;
 }
 
+.hint {
+	padding-top: 5px;
+	cursor: pointer;
+	vertical-align: top;
+	color: #176798;
+}
+
+.hint .ui-icon {
+	display: inline-block;
+}
+
+.comment {
+	color: #AAA;
+}
+
+#waitScreen .blocker {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	background-color: #FFF;
+	right: 0;
+	left: 0;
+	opacity: 0.9
+}
+
+#waitScreen .text {
+	background-color: #FFF;
+	position: absolute;
+	top: 40px;
+	padding: 50px;
+	border: 1px solid #AAA;
+	left: 40%;
+}
+
 button {
     cursor: pointer;
 }
