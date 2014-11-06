@@ -1,5 +1,6 @@
 package de.ingrid.iplug.se.nutchController;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.Executor;
+import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -22,7 +24,7 @@ public class GenericNutchProcess extends NutchProcess {
     private static Logger log = Logger.getLogger(GenericNutchProcess.class);
 
     private List<String[]> commands = new ArrayList<String[]>();
-
+    
     @Override
     public void run() {
         status = STATUS.RUNNING;
@@ -78,6 +80,8 @@ public class GenericNutchProcess extends NutchProcess {
 
         CommandResultHandler resultHandler;
         Executor executor = new DefaultExecutor();
+        consoleOutput = new ByteArrayOutputStream();
+        executor.setStreamHandler(new PumpStreamHandler(consoleOutput));
         if (workingDirectory != null) {
             executor.setWorkingDirectory(workingDirectory);
         } else {
@@ -85,12 +89,14 @@ public class GenericNutchProcess extends NutchProcess {
         }
         ExecuteWatchdog watchdog = new ExecuteWatchdog(timeout);
         executor.setWatchdog(watchdog);
+        
         resultHandler = new CommandResultHandler(watchdog);
         if (log.isDebugEnabled()) {
             log.debug("Call: " + StringUtils.join(cmdLine.toStrings(), " "));
         }
         executor.execute(cmdLine, resultHandler);
+        
         return resultHandler;
     }
-
+    
 }

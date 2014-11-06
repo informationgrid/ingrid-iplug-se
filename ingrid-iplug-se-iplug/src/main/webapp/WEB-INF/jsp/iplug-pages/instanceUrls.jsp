@@ -426,9 +426,10 @@
         });
 
         dialogTestResult = $( "#dialog-testresult" ).dialog({
-            resizable: false,
+            resizable: true,
             autoOpen: false,
-            height:140,
+            height:400,
+            width:500,
             modal: true,
             buttons: {
                 "Schliessen": function() {
@@ -546,11 +547,11 @@
                 dialogTestResult.dialog("open");
                 $.ajax({
                     type: "POST",
-                    url: "../rest/url/check",
+                    url: "../rest/url/${instance.name}/check",
                     contentType: 'application/json',
                     data: url,
                     success: function(data) {
-                        $("#dialog-testresult .reachable").text( data.reachable ? "Ja" : "Nein" );
+                        $("#dialog-testresult .result").html( nl2br(data) );
                         $("#dialog-testresult .loading").hide();
                         $("#dialog-testresult .result").show();
                     },
@@ -748,6 +749,11 @@
             '<span class="ui-state-default ui-corner-all" onclick="urlMaintenance.actionHandler(\'createNewFromTemplate\', event.target)"><span class="btnUrl ui-icon ui-icon-newwin" title="Als Template verwenden ..."></span></span>' +
             '<span class="ui-state-default ui-corner-all" onclick="urlMaintenance.actionHandler(\'test\', event.target)"><span class="btnUrl ui-icon ui-icon-transfer-e-w" title="Testen"></span></span>' +
         '</div>';
+        
+        function nl2br (str, is_xhtml) {
+            var breakTag = (is_xhtml || typeof is_xhtml === 'undefined') ? '<br />' : '<br>';
+            return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2');
+        }
 </script>
 
 </head>

@@ -1,5 +1,6 @@
 package de.ingrid.iplug.se.nutchController;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Arrays;
@@ -40,9 +41,10 @@ public abstract class NutchProcess extends Thread {
     CommandResultHandler resultHandler = null;
 
     STATUS status = STATUS.CREATED;
-    
+
     StatusProvider statusProvider = null;
 
+    ByteArrayOutputStream consoleOutput = null;
 
     /**
      * Stops the execution of the commands and kills the process
@@ -54,7 +56,7 @@ public abstract class NutchProcess extends Thread {
         if (status == STATUS.RUNNING) {
             status = STATUS.INTERRUPTED;
             if (resultHandler != null && !resultHandler.hasResult()) {
-                this.statusProvider.addState( STATES.ABORT.name(), "The process has been aborted by a user", Classification.WARN );
+                this.statusProvider.addState(STATES.ABORT.name(), "The process has been aborted by a user", Classification.WARN);
                 resultHandler.getWatchdog().destroyProcess();
                 try {
                     resultHandler.waitFor(60 * 1000);
@@ -185,13 +187,17 @@ public abstract class NutchProcess extends Thread {
     public void setStatusProvider(StatusProvider statusProvider) {
         this.statusProvider = statusProvider;
     }
-    
-    
+
     public StatusProvider getStatusProvider() {
         return this.statusProvider;
     }
-    
 
-    
-    
+    public String getConsoleOutput() {
+        if (consoleOutput != null) {
+            return consoleOutput.toString();
+        } else {
+            return "";
+        }
+    }
+
 }

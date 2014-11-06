@@ -220,8 +220,7 @@
         <div class="loading">Bitte warten ...</div>
         <table class="result">
             <tr>
-                <td>Erreichbar:</td>
-                <td class="reachable"></td>
+                <td class="result"></td>
             </tr>
         </table>
     </div>

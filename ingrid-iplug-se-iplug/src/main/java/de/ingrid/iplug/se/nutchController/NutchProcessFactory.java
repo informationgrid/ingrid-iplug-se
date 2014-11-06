@@ -88,5 +88,20 @@ public class NutchProcessFactory {
         return process;
 
     }
+    
+    public static NutchProcess getUrlTesterProcess(Instance instance, String url) { 
+        GenericNutchProcess process = new GenericNutchProcess();
+
+        process.setWorkingDirectory(instance.getWorkingDirectory());
+        process.addClassPath(Paths.get(instance.getWorkingDirectory(), "conf").toAbsolutePath().toString());
+        // add default properties
+        process.addJavaOptions(SEIPlug.conf.nutchCallJavaOptions.toArray(new String[] {}));
+        process.addClassPath(Paths.get("apache-nutch-runtime/runtime/local").toAbsolutePath().toString());
+        process.addClassPath(Paths.get("apache-nutch-runtime", "runtime", "local", "lib").toAbsolutePath().toString().concat(File.separator).concat("*"));
+
+        process.addCommand("de.ingrid.iplug.se.nutch.analysis.UrlTester", url);
+        
+        return process;        
+    }
 
 }
