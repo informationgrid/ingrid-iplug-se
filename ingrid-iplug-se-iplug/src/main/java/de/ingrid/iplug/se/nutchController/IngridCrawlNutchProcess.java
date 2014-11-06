@@ -183,7 +183,10 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             this.statusProvider.appendToState(STATES.MERGE_SEGMENT.name(), " done.");
 
             this.statusProvider.addState(STATES.FILTER_SEGMENT.name(), "Filter segment by limit/exclude urls...");
-            execute("de.ingrid.iplug.se.nutch.segment.SegmentFilter", filteredSegments, crawlDb, "-dir", segments);
+            ret = execute("de.ingrid.iplug.se.nutch.segment.SegmentFilter", filteredSegments, crawlDb, "-dir", segments);
+            if (ret != 0) {
+                throwCrawlError("Error during Execution of: de.ingrid.iplug.se.nutch.segment.SegmentFilter");
+            }
             if (fs.getPath(filteredSegments).toFile().exists()) {
                 FileUtils.removeRecursive(fs.getPath(segments));
                 Files.move(fs.getPath(filteredSegments), fs.getPath(segments), StandardCopyOption.REPLACE_EXISTING);
