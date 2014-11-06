@@ -31,7 +31,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
     private static Logger log = Logger.getLogger(IngridCrawlNutchProcess.class);
 
     public static enum STATES {
-        START, INJECT_START, INJECT_BW, CLEANUP_HADOOP, FINISHED, INDEX, FILTER_LINKDB, UPDATE_LINKDB, FILTER_WEBGRAPH, UPDATE_WEBGRAPH, FILTER_SEGMENT, MERGE_SEGMENT, INJECT_META, FILTER_CRAWLDB, GENERATE, FETCH, UPDATE_CRAWLDB, UPDATE_MD, CREATE_HOST_STATISTICS, GENERATE_ZERO_URLS, CRAWL_CLEANUP;
+        START, INJECT_START, INJECT_BW, CLEANUP_HADOOP, FINISHED, DEDUPLICATE, INDEX, FILTER_LINKDB, UPDATE_LINKDB, FILTER_WEBGRAPH, UPDATE_WEBGRAPH, FILTER_SEGMENT, MERGE_SEGMENT, INJECT_META, FILTER_CRAWLDB, GENERATE, FETCH, UPDATE_CRAWLDB, UPDATE_MD, CREATE_HOST_STATISTICS, GENERATE_ZERO_URLS, CRAWL_CLEANUP, CLEAN_DUPLICATES;
     };
 
     public Integer depth = 1;
@@ -215,6 +215,13 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             }
             this.statusProvider.appendToState(STATES.UPDATE_LINKDB.name(), " done.");
 
+            this.statusProvider.addState(STATES.DEDUPLICATE.name(), "Deduplication...");
+            ret = execute("org.apache.nutch.crawl.DeduplicationJob", crawlDb);
+            if (ret != 0) {
+                throwCrawlError("Error during Execution of: org.apache.nutch.crawl.DeduplicationJob");
+            }
+            this.statusProvider.appendToState(STATES.DEDUPLICATE.name(), " done.");
+            
             this.statusProvider.addState(STATES.INDEX.name(), "Create index...");
             ret = execute("org.apache.nutch.indexer.IndexingJob", crawlDb, "-linkdb", linkDb, "-dir", segments, "-deleteGone");
             if (ret != 0) {
@@ -222,6 +229,13 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             }
             this.statusProvider.appendToState(STATES.INDEX.name(), " done.");
 
+            this.statusProvider.addState(STATES.CLEAN_DUPLICATES.name(), "Clean up duplicates in index...");
+            ret = execute("org.apache.nutch.indexer.CleaningJob", crawlDb);
+            if (ret != 0) {
+                throwCrawlError("Error during Execution of: org.apache.nutch.indexer.CleaningJob");
+            }
+            this.statusProvider.appendToState(STATES.CLEAN_DUPLICATES.name(), " done.");
+            
             this.statusProvider.addState(STATES.CLEANUP_HADOOP.name(), "Clean up ...");
             FileUtils.removeRecursive(Paths.get(workingDirectory.getAbsolutePath(), "hadoop-tmp"));
             this.statusProvider.appendToState(STATES.CLEANUP_HADOOP.name(), " done.");

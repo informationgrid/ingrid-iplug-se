@@ -174,7 +174,9 @@ public class SegmentMerger extends Configured implements Mapper<Text, MetaWrappe
                 return new SequenceFileRecordReader<Text, MetaWrapper>(job, fSplit) {
 
                     public synchronized boolean next(Text key, MetaWrapper wrapper) throws IOException {
-                        LOG.debug("Running OIF.next()");
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("Running OIF.next()");
+                        }
 
                         boolean res = splitReader.next(key, w);
                         wrapper.set(w);

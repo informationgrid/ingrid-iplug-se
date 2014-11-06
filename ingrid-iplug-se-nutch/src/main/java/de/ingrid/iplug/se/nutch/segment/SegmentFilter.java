@@ -16,6 +16,7 @@
  */
 package de.ingrid.iplug.se.nutch.segment;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,7 +28,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.MapFile;
 import org.apache.hadoop.io.SequenceFile;
@@ -77,13 +77,13 @@ import org.apache.nutch.util.NutchJob;
 public class SegmentFilter extends Configured implements Tool, Mapper<Text, MetaWrapper, Text, MetaWrapper>, Reducer<Text, MetaWrapper, Text, MetaWrapper> {
     private static final Log LOG = LogFactory.getLog(SegmentFilter.class);
 
+    private static final String SEGMENT_PART_KEY = "part";
+    private static final String SEGMENT_SLICE_KEY = "slice";
+
     private URLFilters filters = null;
-
     private URLNormalizers normalizers = null;
-
+    private long sliceSize = -1;
     private long curCount = 0;
-
-    private static final String INPUT_PART_KEY = "part";
 
     /**
      * Wraps inputs in an {@link MetaWrapper}, to permit merging different types
@@ -108,35 +108,44 @@ public class SegmentFilter extends Configured implements Tool, Mapper<Text, Meta
                 segmentPart = SegmentPart.get(fSplit);
                 spString = segmentPart.toString();
             } catch (IOException e) {
-                throw new RuntimeException("Cannot identify segment or cawldb:", e);
+                throw new RuntimeException("Cannot identify segment or crawldb:", e);
             }
 
-            final SequenceFile.Reader reader = new SequenceFile.Reader(FileSystem.get(job), fSplit.getPath(), job);
+            SequenceFile.Reader reader = new SequenceFile.Reader(FileSystem.get(job), fSplit.getPath(), job);
 
             final Writable w;
             try {
                 w = (Writable) reader.getValueClass().newInstance();
             } catch (Exception e) {
                 throw new IOException(e.toString());
+            } finally {
+                try {
+                    reader.close();
+                } catch (Exception e) {
+                    // ignore
+                }
             }
+            final SequenceFileRecordReader<Text, Writable> splitReader = new SequenceFileRecordReader<Text, Writable>(job, (FileSplit) split);
 
             try {
                 return new SequenceFileRecordReader<Text, MetaWrapper>(job, fSplit) {
 
                     public synchronized boolean next(Text key, MetaWrapper wrapper) throws IOException {
 
-                        boolean res = reader.next(key, w);
+                        boolean res = splitReader.next(key, w);
+
                         if (LOG.isDebugEnabled()) {
-                            LOG.debug("Running OIF.next(), reading key: '" + key.toString() + "'. Setting Metadata." + INPUT_PART_KEY + ": '" + spString + "'");
+                            LOG.debug("Running OIF.next(), reading key: '" + key.toString() + "'. Setting Metadata." + SEGMENT_PART_KEY + ": '" + spString + "'");
                         }
+
                         wrapper.set(w);
-                        wrapper.setMeta(INPUT_PART_KEY, spString);
+                        wrapper.setMeta(SEGMENT_PART_KEY, spString);
                         return res;
                     }
 
                     @Override
                     public synchronized void close() throws IOException {
-                        reader.close();
+                        splitReader.close();
                     }
 
                     @Override
@@ -152,91 +161,101 @@ public class SegmentFilter extends Configured implements Tool, Mapper<Text, Meta
     }
 
     public static class SegmentOutputFormat extends FileOutputFormat<Text, MetaWrapper> {
+        private static final String DEFAULT_SLICE = "default";
 
         @Override
         public RecordWriter<Text, MetaWrapper> getRecordWriter(final FileSystem fs, final JobConf job, final String name, final Progressable progress) throws IOException {
             return new RecordWriter<Text, MetaWrapper>() {
                 MapFile.Writer c_out = null;
-
                 MapFile.Writer f_out = null;
-
                 MapFile.Writer pd_out = null;
-
                 MapFile.Writer pt_out = null;
-
                 SequenceFile.Writer g_out = null;
-
                 SequenceFile.Writer p_out = null;
-
-                HashMap sliceWriters = new HashMap();
+                HashMap<String, Closeable> sliceWriters = new HashMap<String, Closeable>();
+                String segmentName = job.get("segment.filter.segmentName");
 
                 public void write(Text key, MetaWrapper wrapper) throws IOException {
-
                     // unwrap
-                    SegmentPart sp = SegmentPart.parse(wrapper.getMeta(INPUT_PART_KEY));
-                    Writable o = (Writable) wrapper.get();
+                    SegmentPart sp = SegmentPart.parse(wrapper.getMeta(SEGMENT_PART_KEY));
+                    Writable o = wrapper.get();
+                    String slice = wrapper.getMeta(SEGMENT_SLICE_KEY);
                     if (o instanceof CrawlDatum) {
                         if (sp.partName.equals(CrawlDatum.GENERATE_DIR_NAME)) {
-                            g_out = ensureSequenceFile(sp.segmentName, CrawlDatum.GENERATE_DIR_NAME);
+                            g_out = ensureSequenceFile(slice, CrawlDatum.GENERATE_DIR_NAME);
                             g_out.append(key, o);
                         } else if (sp.partName.equals(CrawlDatum.FETCH_DIR_NAME)) {
-                            f_out = ensureMapFile(sp.segmentName, CrawlDatum.FETCH_DIR_NAME, CrawlDatum.class);
+                            f_out = ensureMapFile(slice, CrawlDatum.FETCH_DIR_NAME, CrawlDatum.class);
                             f_out.append(key, o);
                         } else if (sp.partName.equals(CrawlDatum.PARSE_DIR_NAME)) {
-                            p_out = ensureSequenceFile(sp.segmentName, CrawlDatum.PARSE_DIR_NAME);
+                            p_out = ensureSequenceFile(slice, CrawlDatum.PARSE_DIR_NAME);
                             p_out.append(key, o);
                         } else {
                             throw new IOException("Cannot determine segment part: " + sp.partName);
                         }
                     } else if (o instanceof Content) {
-                        c_out = ensureMapFile(sp.segmentName, Content.DIR_NAME, Content.class);
+                        c_out = ensureMapFile(slice, Content.DIR_NAME, Content.class);
                         c_out.append(key, o);
                     } else if (o instanceof ParseData) {
                         // update the segment name inside contentMeta - required
                         // by Indexer
-                        ((ParseData) o).getContentMeta().set(Nutch.SEGMENT_NAME_KEY, sp.segmentName);
-                        pd_out = ensureMapFile(sp.segmentName, ParseData.DIR_NAME, ParseData.class);
+                        if (slice == null) {
+                            ((ParseData) o).getContentMeta().set(Nutch.SEGMENT_NAME_KEY, segmentName);
+                        } else {
+                            ((ParseData) o).getContentMeta().set(Nutch.SEGMENT_NAME_KEY, segmentName + "-" + slice);
+                        }
+                        pd_out = ensureMapFile(slice, ParseData.DIR_NAME, ParseData.class);
                         pd_out.append(key, o);
                     } else if (o instanceof ParseText) {
-                        pt_out = ensureMapFile(sp.segmentName, ParseText.DIR_NAME, ParseText.class);
+                        pt_out = ensureMapFile(slice, ParseText.DIR_NAME, ParseText.class);
                         pt_out.append(key, o);
                     }
                 }
 
                 // lazily create SequenceFile-s.
-                private SequenceFile.Writer ensureSequenceFile(String segName, String dirName) throws IOException {
-                    return ensureSequenceFile(segName, dirName, CrawlDatum.class);
-                }
-
-                private SequenceFile.Writer ensureSequenceFile(String segName, String dirName, Class<? extends Writable> clazz) throws IOException {
-                    SequenceFile.Writer res = (SequenceFile.Writer) sliceWriters.get(segName + dirName);
+                private SequenceFile.Writer ensureSequenceFile(String slice, String dirName) throws IOException {
+                    if (slice == null)
+                        slice = DEFAULT_SLICE;
+                    SequenceFile.Writer res = (SequenceFile.Writer) sliceWriters.get(slice + dirName);
                     if (res != null)
                         return res;
+                    Path wname;
                     Path out = FileOutputFormat.getOutputPath(job);
-                    Path wname = new Path(new Path(new Path(out, segName), dirName), name);
-                    res = SequenceFile.createWriter(fs, job, wname, Text.class, clazz, SequenceFileOutputFormat.getOutputCompressionType(job), progress);
-                    sliceWriters.put(segName + dirName, res);
+                    if (slice == DEFAULT_SLICE) {
+                        wname = new Path(out, name);
+                    } else {
+                        wname = new Path(new Path(new Path(out.getParent().getParent(), segmentName + "-" + slice), dirName), name);
+                    }
+                    res = SequenceFile.createWriter(fs, job, wname, Text.class, CrawlDatum.class, SequenceFileOutputFormat.getOutputCompressionType(job), progress);
+                    sliceWriters.put(slice + dirName, res);
                     return res;
                 }
 
                 // lazily create MapFile-s.
-                private MapFile.Writer ensureMapFile(String segName, String dirName, Class<? extends Writable> clazz) throws IOException {
-                    MapFile.Writer res = (MapFile.Writer) sliceWriters.get(segName + dirName);
+                private MapFile.Writer ensureMapFile(String slice, String dirName, Class<? extends Writable> clazz) throws IOException {
+                    if (slice == null)
+                        slice = DEFAULT_SLICE;
+                    MapFile.Writer res = (MapFile.Writer) sliceWriters.get(slice + dirName);
                     if (res != null)
                         return res;
+                    Path wname;
                     Path out = FileOutputFormat.getOutputPath(job);
-                    Path wname = new Path(new Path(new Path(out, segName), dirName), name);
+                    if (slice == DEFAULT_SLICE) {
+                        wname = new Path(out, name);
+                    } else {
+                        wname = new Path(new Path(new Path(out.getParent().getParent(), segmentName + "-" + slice), dirName), name);
+                    }
                     CompressionType compType = SequenceFileOutputFormat.getOutputCompressionType(job);
                     if (clazz.isAssignableFrom(ParseText.class)) {
                         compType = CompressionType.RECORD;
                     }
                     res = new MapFile.Writer(job, fs, wname.toString(), Text.class, clazz, compType, progress);
-                    sliceWriters.put(segName + dirName, res);
+                    sliceWriters.put(slice + dirName, res);
                     return res;
                 }
 
                 public void close(Reporter reporter) throws IOException {
-                    Iterator<Object> it = sliceWriters.values().iterator();
+                    Iterator<Closeable> it = sliceWriters.values().iterator();
                     while (it.hasNext()) {
                         Object o = it.next();
                         if (o instanceof SequenceFile.Writer) {
@@ -251,32 +270,31 @@ public class SegmentFilter extends Configured implements Tool, Mapper<Text, Meta
     }
 
     public SegmentFilter() {
+        super(null);
     }
 
     public SegmentFilter(Configuration conf) {
         super(conf);
     }
 
-    HashMap<String, String> segments = null;
+    String segmentName = null;
 
     public void setConf(Configuration conf) {
         super.setConf(conf);
         if (conf == null)
             return;
-        if (conf.getBoolean("segment.filter.filter", false))
+        if (conf.getBoolean("segment.filter.filter", false)) {
             filters = new URLFilters(conf);
+        }
         if (conf.getBoolean("segment.filter.normalizer", false))
             normalizers = new URLNormalizers(conf, URLNormalizers.SCOPE_DEFAULT);
 
-        String[] inSegs = conf.getStrings("segment.filter.segments.input");
-        String[] outSegs = conf.getStrings("segment.filter.segments.output");
-
-        if (segments == null && inSegs != null && outSegs != null) {
-            segments = new HashMap<String, String>();
-            for (int i = 0; i < inSegs.length; i++) {
-                segments.put(inSegs[i], outSegs[i]);
-            }
+        sliceSize = conf.getLong("segment.filter.slice", -1);
+        if ((sliceSize > 0) && (LOG.isInfoEnabled())) {
+            LOG.info("Slice size: " + sliceSize + " URLs.");
         }
+        
+        segmentName = conf.get("segment.filter.segmentName");
 
     }
 
@@ -285,6 +303,9 @@ public class SegmentFilter extends Configured implements Tool, Mapper<Text, Meta
 
     public void configure(JobConf conf) {
         setConf(conf);
+        if (sliceSize > 0) {
+            sliceSize = sliceSize / conf.getNumReduceTasks();
+        }
     }
 
     private Text newKey = new Text();
@@ -330,7 +351,10 @@ public class SegmentFilter extends Configured implements Tool, Mapper<Text, Meta
         while (values.hasNext()) {
             MetaWrapper wrapper = values.next();
             Writable o = wrapper.get();
-            String spString = wrapper.getMeta(INPUT_PART_KEY);
+            String spString = wrapper.getMeta(SEGMENT_PART_KEY);
+            if (spString == null) {
+                throw new IOException("Null segment part, key=" + key);
+            }
             SegmentPart sp = SegmentPart.parse(spString);
             // check for crawldatum entry
             if (o instanceof CrawlDatum && CrawlDatum.hasDbStatus((CrawlDatum) o)) {
@@ -347,7 +371,16 @@ public class SegmentFilter extends Configured implements Tool, Mapper<Text, Meta
                         segLinked = new ArrayList<CrawlDatum>();
                         linked.put(sp.segmentName, segLinked);
                     }
-                    segLinked.add(val);
+                    boolean cdExists = false;
+                    for (CrawlDatum cd : segLinked) {
+                        if (cd.equals(val)) {
+                            cdExists = true;
+                            break;
+                        }
+                    }
+                    if (!cdExists) {
+                        segLinked.add(val);
+                    }
                     continue;
                 }
                 // check for link data
@@ -369,14 +402,20 @@ public class SegmentFilter extends Configured implements Tool, Mapper<Text, Meta
 
         if (hasCrawlDbEntry) {
             // ok we had a crawl db entry
+            curCount++;
+            String sliceName = null;
             MetaWrapper wrapper = new MetaWrapper();
+            if (sliceSize > 0) {
+                sliceName = String.valueOf(curCount / sliceSize);
+                wrapper.setMeta(SEGMENT_SLICE_KEY, sliceName);
+            }
             SegmentPart sp = new SegmentPart();
             for (String spString : segData.keySet()) {
                 // write out segment data
                 sp = SegmentPart.parse(spString);
                 // translate segment name to the new segment name
-                sp = new SegmentPart(segments.get(sp.segmentName), sp.partName);
-                wrapper.setMeta(INPUT_PART_KEY, sp.toString());
+                sp = new SegmentPart(segmentName, sp.partName);
+                wrapper.setMeta(SEGMENT_PART_KEY, sp.toString());
                 wrapper.set(segData.get(spString));
                 output.collect(key, wrapper);
             }
@@ -385,8 +424,8 @@ public class SegmentFilter extends Configured implements Tool, Mapper<Text, Meta
                 for (String name : linked.keySet()) {
                     sp.partName = CrawlDatum.PARSE_DIR_NAME;
                     // translate segment name to the new segment name
-                    sp.segmentName = segments.get(name);
-                    wrapper.setMeta(INPUT_PART_KEY, sp.toString());
+                    sp.segmentName = segmentName;
+                    wrapper.setMeta(SEGMENT_PART_KEY, sp.toString());
                     // write out link data
                     ArrayList<CrawlDatum> segLinked = linked.get(name);
                     for (int i = 0; i < segLinked.size(); i++) {
@@ -402,8 +441,8 @@ public class SegmentFilter extends Configured implements Tool, Mapper<Text, Meta
                 for (String name : linkedFetchDatum.keySet()) {
                     sp.partName = CrawlDatum.FETCH_DIR_NAME;
                     // translate segment name to the new segment name
-                    sp.segmentName = segments.get(name);
-                    wrapper.setMeta(INPUT_PART_KEY, sp.toString());
+                    sp.segmentName = segmentName;
+                    wrapper.setMeta(SEGMENT_PART_KEY, sp.toString());
                     // write out link data
                     ArrayList<CrawlDatum> segLinkedFetchDatum = linkedFetchDatum.get(name);
                     for (int i = 0; i < segLinkedFetchDatum.size(); i++) {
@@ -416,7 +455,7 @@ public class SegmentFilter extends Configured implements Tool, Mapper<Text, Meta
             }
         } else {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Remove entries in segments '" + segments.keySet() + "' for key: " + key);
+                LOG.debug("Remove entries in segments for key: " + key);
             }
         }
     }
@@ -433,12 +472,6 @@ public class SegmentFilter extends Configured implements Tool, Mapper<Text, Meta
         directories.add(ParseData.DIR_NAME);
         directories.add(ParseText.DIR_NAME);
 
-        JobConf job = new NutchJob(getConf());
-
-        job.setJobName("filtersegs " + out);
-        job.setBoolean("segment.merger.filter", filter);
-        job.setBoolean("segment.merger.normalizer", normalize);
-
         Path currentCrawlDbPath = new Path(crawlDbPath, CrawlDb.CURRENT_NAME);
         FileSystem fs = FileSystem.get(getConf());
 
@@ -447,53 +480,40 @@ public class SegmentFilter extends Configured implements Tool, Mapper<Text, Meta
             return;
         }
 
-        FileInputFormat.addInputPath(job, currentCrawlDbPath);
+        for (Path srcSegmentPath : segs) {
+            String srcSegment = srcSegmentPath.getName();
+            String dstSegment = Generator.generateSegmentName();
+            for (String dir : directories) {
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("Filter segment " + srcSegment + " to " + out + "/" + dstSegment + "for part " + dir);
+                }
+                JobConf job = new NutchJob(getConf());
 
-        String[] inSegs = new String[segs.length];
-        String[] outSegs = new String[segs.length];
+                job.setJobName("filtersegs " + out + "_" + dir);
+                job.setBoolean("segment.filter.filter", filter);
+                job.setBoolean("segment.filter.normalizer", normalize);
 
-        for (int i = 0; i < segs.length; i++) {
-            inSegs[i] = segs[i].getName();
-            outSegs[i] = Generator.generateSegmentName();
-            if (LOG.isInfoEnabled()) {
-                LOG.info("Filter segment " + segs[i] + " to " + out + "/" + outSegs[i]);
-            }
-            for (int j = 0; j < directories.size(); j++) {
-                Path gDir = new Path(segs[i], directories.get(j));
+                FileInputFormat.addInputPath(job, currentCrawlDbPath);
+
+                Path gDir = new Path(srcSegmentPath, dir);
                 if (fs.exists(gDir)) {
                     FileInputFormat.addInputPath(job, gDir);
+                    job.setLong("segment.filter.slice", 0);
+                    job.set("segment.filter.segmentName", dstSegment);
+
+                    job.setInputFormat(ObjectInputFormat.class);
+                    job.setMapperClass(SegmentFilter.class);
+                    job.setReducerClass(SegmentFilter.class);
+                    FileOutputFormat.setOutputPath(job, new Path(new Path(out, dstSegment), dir));
+                    job.setOutputKeyClass(Text.class);
+                    job.setOutputValueClass(MetaWrapper.class);
+                    job.setOutputFormat(SegmentOutputFormat.class);
+
+                    JobClient.runJob(job);
                 }
+
             }
         }
-
-        job.setStrings("segment.filter.segments.input", inSegs);
-        job.setStrings("segment.filter.segments.output", outSegs);
-
-        job.setInputFormat(ObjectInputFormat.class);
-        job.setMapperClass(SegmentFilter.class);
-        job.setReducerClass(SegmentFilter.class);
-        FileOutputFormat.setOutputPath(job, out);
-        job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(MetaWrapper.class);
-        job.setOutputFormat(SegmentOutputFormat.class);
-
-        JobClient.runJob(job);
-
-        // ensure empty segment parts are copied
-        // as empty parts will not be created by the merge process
-        for (int i = 0; i < segs.length; i++) {
-            for (int j = 0; j < directories.size(); j++) {
-                Path gDir = new Path(segs[i], directories.get(j));
-                Path oDir = new Path(new Path(out, outSegs[i]), directories.get(j));
-                if (fs.exists(gDir) && !fs.exists(oDir)) {
-                    if (LOG.isInfoEnabled()) {
-                        LOG.info("Possibly empty source directory? Copy " + gDir + " to " + oDir);
-                    }
-                    FileUtil.copy(fs, gDir, fs, oDir, false, getConf());
-                }
-            }
-        }
-
     }
 
     public static void main(String[] args) throws Exception {
