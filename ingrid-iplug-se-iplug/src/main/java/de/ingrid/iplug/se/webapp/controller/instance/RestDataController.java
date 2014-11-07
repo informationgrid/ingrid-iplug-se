@@ -1,6 +1,8 @@
 package de.ingrid.iplug.se.webapp.controller.instance;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -69,6 +71,44 @@ public class RestDataController extends InstanceController {
 
     @RequestMapping(value = { "url" }, method = RequestMethod.POST)
     public ResponseEntity<Url> addUrl(@RequestBody Url url) {
+
+        // fix domains without slashes
+        try {
+            URL tmpUrl = new URL(url.getUrl());
+            if (tmpUrl.getPath().isEmpty()) {
+                url.setUrl(url.getUrl().concat("/"));
+            }
+        } catch (MalformedURLException e) {
+        }
+        List<String> limits = new ArrayList<String>();
+        for (String limit : url.getLimitUrls()) {
+            try {
+                URL tmpUrl = new URL(limit);
+                if (tmpUrl.getPath().isEmpty()) {
+                    limits.add(limit.concat("/"));
+                } else {
+                    limits.add(limit);
+                }
+            } catch (MalformedURLException e) {
+                limits.add(limit);
+            }
+        }
+        url.setLimitUrls(limits);
+        List<String> excludes = new ArrayList<String>();
+        for (String exclude : url.getExcludeUrls()) {
+            try {
+                URL tmpUrl = new URL(exclude);
+                if (tmpUrl.getPath().isEmpty()) {
+                    excludes.add(exclude.concat("/"));
+                } else {
+                    excludes.add(exclude);
+                }
+            } catch (MalformedURLException e) {
+                excludes.add(exclude);
+            }
+        }
+        url.setExcludeUrls(excludes);
+
         DBUtils.addUrl(url);
         return new ResponseEntity<Url>(url, HttpStatus.OK);
     }
