@@ -52,8 +52,8 @@ public class Url {
 //    //@XmlSchemaType(name="deleted")
 //    private Date deleted;
 
-    @Column
-    private int status;
+    @Column(length=1024)
+    private String status;
 
     @OneToMany(cascade=CascadeType.ALL)
     private List<Metadata> metadata;
@@ -86,11 +86,11 @@ public class Url {
         this.url = url;
     }
 
-    public int getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 

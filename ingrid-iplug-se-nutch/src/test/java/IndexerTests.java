@@ -41,6 +41,7 @@ import de.ingrid.iplug.se.nutch.fetcher.Fetcher;
 import de.ingrid.iplug.se.nutch.segment.SegmentFilter;
 import de.ingrid.iplug.se.nutch.segment.SegmentMerger;
 import de.ingrid.iplug.se.nutch.statistics.HostStatistic;
+import de.ingrid.iplug.se.nutch.statistics.StartUrlStatusReport;
 
 /**
  * 
@@ -204,6 +205,12 @@ public class IndexerTests {
     }
 
     @Test
+    public void test09_2StartUrlReport() throws Exception {
+
+        ToolRunner.run(NutchConfiguration.create(), new StartUrlStatusReport(), new String[] { "test/crawldb", "src/test/resources/urls/start", "test" });
+    }
+    
+    @Test
     public void test10WebgraphCreate() throws Exception {
 
         ToolRunner.run(NutchConfiguration.create(), new WebGraph(), new String[] { "-webgraphdb", "test/webgraph", "-segmentDir", "test/segments" });
@@ -270,6 +277,13 @@ public class IndexerTests {
         ToolRunner.run(NutchConfiguration.create(), new BWLinkDbFilter(), new String[] { "test/linkdb", "test/bwdb", "false", "false", "true" });
     }
 
+    @Test
+    public void test17_5DeleteDuplicates() throws Exception {
+
+        ToolRunner.run(NutchConfiguration.create(), new BWLinkDbFilter(), new String[] { "test/linkdb", "test/bwdb", "false", "false", "true" });
+    }
+
+    
     @Test
     public void test18Index() throws Exception {
 

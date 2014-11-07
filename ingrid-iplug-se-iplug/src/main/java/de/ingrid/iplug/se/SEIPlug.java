@@ -256,7 +256,7 @@ public class SEIPlug extends HeartBeatPlug {
         if (size == 0) {
         
             Url url = new Url("catalog");
-            url.setStatus(200);
+            url.setStatus("200");
             url.setUrl("http://www.wemove.com/");
             List<Metadata> metadata = new ArrayList<Metadata>();
             Metadata m1 = new Metadata();
@@ -322,7 +322,7 @@ public class SEIPlug extends HeartBeatPlug {
     
             for (String uri : urls) {
                 url = new Url("catalog");
-                url.setStatus(400);
+                url.setStatus("400");
                 url.setUrl(uri);
                 List<String> limit = new ArrayList<String>();
                 limit.add(uri);
@@ -332,7 +332,7 @@ public class SEIPlug extends HeartBeatPlug {
             }
     
             url = new Url("other");
-            url.setStatus(200);
+            url.setStatus("200");
             url.setUrl("http://de.wikipedia.org/");
             List<String> limit = new ArrayList<String>();
             limit.add("http://de.wikipedia.org");

@@ -54,7 +54,7 @@ public class Migrator {
         // u.setDeleted( rs.getDate( DELETED ) );
         // u.setStatusUpdated( rs.getDate( STATUS_UPDATED ) );
         // u.setUpdated( rs.getDate( UPDATED ) );
-        u.setStatus( rs.getInt( STATUS ) );
+        u.setStatus( rs.getString( STATUS ) );
         
         // get provider/partner
         // not needed ... these are defined per iPlug

@@ -10,6 +10,7 @@ import javax.persistence.criteria.Root;
 
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Url;
+import de.ingrid.iplug.se.webapp.container.Instance;
 
 public class DBUtils {
     
@@ -63,5 +64,34 @@ public class DBUtils {
         }
         em.flush();
         em.getTransaction().commit();
+    }
+    
+    public static void setStatus(Instance instance, String srcUrl, String status) {
+        EntityManager em = DBManager.INSTANCE.getEntityManager();
+
+        em.getTransaction().begin();
+        
+        try {
+            CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+            CriteriaQuery<Url> createQuery = criteriaBuilder.createQuery(Url.class);
+            Root<Url> urlTable = createQuery.from(Url.class);
+            
+            Predicate instanceCriteria = criteriaBuilder.equal( urlTable.get("instance"), instance.getName() );
+            Predicate urlCriteria = criteriaBuilder.equal( urlTable.get("url"), srcUrl );
+            createQuery.select( urlTable ).where( criteriaBuilder.and(instanceCriteria, urlCriteria) );
+            
+            List<Url> resultList = em.createQuery( createQuery ).getResultList();
+            if (!resultList.isEmpty()) {
+                for (Url url : resultList) {
+                    url.setStatus(status);
+                    persistUrl( em, url );
+                }
+            }
+            em.flush();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            em.getTransaction().rollback();
+        }
+        
     }
 }

@@ -40,6 +40,8 @@ public class NutchProcessFactory {
     @SuppressWarnings("unchecked")
     public static IngridCrawlNutchProcess getIngridCrawlNutchProcess(Instance instance, int depth, int noUrls, IPostCrawlProcessor[] postCrawlProcessors) {
         IngridCrawlNutchProcess process = new IngridCrawlNutchProcess();
+        
+        process.setInstance(instance);
 
         process.setPostCrawlProcessors(postCrawlProcessors);
         process.setDepth(depth);

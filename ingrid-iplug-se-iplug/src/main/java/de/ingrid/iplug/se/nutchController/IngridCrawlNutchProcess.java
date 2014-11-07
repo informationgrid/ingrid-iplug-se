@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
@@ -16,10 +17,16 @@ import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
+import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
 import de.ingrid.iplug.se.nutchController.StatusProvider.Classification;
+import de.ingrid.iplug.se.utils.DBUtils;
 import de.ingrid.iplug.se.utils.FileUtils;
+import de.ingrid.iplug.se.webapp.container.Instance;
 
 /**
  * Wrapper for a ingrid specific nutch process execution. This is too complex to
@@ -31,7 +38,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
     private static Logger log = Logger.getLogger(IngridCrawlNutchProcess.class);
 
     public static enum STATES {
-        START, INJECT_START, INJECT_BW, CLEANUP_HADOOP, FINISHED, DEDUPLICATE, INDEX, FILTER_LINKDB, UPDATE_LINKDB, FILTER_WEBGRAPH, UPDATE_WEBGRAPH, FILTER_SEGMENT, MERGE_SEGMENT, INJECT_META, FILTER_CRAWLDB, GENERATE, FETCH, UPDATE_CRAWLDB, UPDATE_MD, CREATE_HOST_STATISTICS, GENERATE_ZERO_URLS, CRAWL_CLEANUP, CLEAN_DUPLICATES;
+        START, INJECT_START, INJECT_BW, CLEANUP_HADOOP, FINISHED, DEDUPLICATE, INDEX, FILTER_LINKDB, UPDATE_LINKDB, FILTER_WEBGRAPH, UPDATE_WEBGRAPH, FILTER_SEGMENT, MERGE_SEGMENT, INJECT_META, FILTER_CRAWLDB, GENERATE, FETCH, UPDATE_CRAWLDB, UPDATE_MD, CREATE_HOST_STATISTICS, GENERATE_ZERO_URLS, CRAWL_CLEANUP, CLEAN_DUPLICATES, CREATE_STARTURL_REPORT;
     };
 
     public Integer depth = 1;
@@ -39,6 +46,8 @@ public class IngridCrawlNutchProcess extends NutchProcess {
     Integer noUrls = 1;
 
     IPostCrawlProcessor[] postCrawlProcessors;
+
+    Instance instance;
 
     @Override
     public void run() {
@@ -171,6 +180,32 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             }
             this.statusProvider.appendToState(STATES.CREATE_HOST_STATISTICS.name(), " done.");
 
+            this.statusProvider.addState(STATES.CREATE_STARTURL_REPORT.name(), "Create start url report...");
+            ret = execute("de.ingrid.iplug.se.nutch.statistics.StartUrlStatusReport", crawlDb, startUrls, workingPath);
+            if (ret != 0) {
+                throwCrawlError("Error during Execution of: de.ingrid.iplug.se.nutch.statistics.StartUrlStatusReport");
+            } else {
+                // update start url status of this instance
+                Path path = Paths.get(SEIPlug.conf.getInstancesDir(), instance.getName(), "statistic", "starturlreport", "data.json");
+
+                String content = FileUtils.readFile(path);
+                JSONParser parser = new JSONParser();
+                JSONArray a = (JSONArray) parser.parse(content);
+                for (Object o : a) {
+                    JSONObject entry = (JSONObject) o;
+
+                    String lastFetchTime = (String) entry.get("lastFetchTime");
+                    String url = (String) entry.get("url");
+                    String status = (String) entry.get("status");
+                    // Float score = (Float) entry.get("score");
+                    // Integer fetchIntervall = (Integer) entry.get("fetchInterval");
+
+                    String urlStatus = lastFetchTime + " (" + status + ")";
+                    DBUtils.setStatus(instance, url, urlStatus);
+                }
+            }
+            this.statusProvider.appendToState(STATES.CREATE_STARTURL_REPORT.name(), " done.");
+
             this.statusProvider.addState(STATES.MERGE_SEGMENT.name(), "Merge segments...");
             ret = execute("de.ingrid.iplug.se.nutch.segment.SegmentMerger", mergedSegments, "-dir", segments);
             if (ret != 0) {
@@ -224,7 +259,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
                 throwCrawlError("Error during Execution of: org.apache.nutch.crawl.DeduplicationJob");
             }
             this.statusProvider.appendToState(STATES.DEDUPLICATE.name(), " done.");
-            
+
             this.statusProvider.addState(STATES.INDEX.name(), "Create index...");
             ret = execute("org.apache.nutch.indexer.IndexingJob", crawlDb, "-linkdb", linkDb, "-dir", segments, "-deleteGone");
             if (ret != 0) {
@@ -238,7 +273,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
                 throwCrawlError("Error during Execution of: org.apache.nutch.indexer.CleaningJob");
             }
             this.statusProvider.appendToState(STATES.CLEAN_DUPLICATES.name(), " done.");
-            
+
             this.statusProvider.addState(STATES.CLEANUP_HADOOP.name(), "Clean up ...");
             FileUtils.removeRecursive(Paths.get(workingDirectory.getAbsolutePath(), "hadoop-tmp"));
             this.statusProvider.appendToState(STATES.CLEANUP_HADOOP.name(), " done.");
@@ -370,6 +405,14 @@ public class IngridCrawlNutchProcess extends NutchProcess {
 
     public void setPostCrawlProcessors(IPostCrawlProcessor[] postCrawlProcessors) {
         this.postCrawlProcessors = postCrawlProcessors;
+    }
+
+    public Instance getInstance() {
+        return instance;
+    }
+
+    public void setInstance(Instance instance) {
+        this.instance = instance;
     }
 
 }

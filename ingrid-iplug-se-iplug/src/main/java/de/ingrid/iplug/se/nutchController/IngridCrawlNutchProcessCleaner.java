@@ -123,6 +123,9 @@ public class IngridCrawlNutchProcessCleaner {
             } else if (lastState.key.equals(IngridCrawlNutchProcess.STATES.CREATE_HOST_STATISTICS.name())) {
                 // nothing todo, since all temp data will be removed by the
                 // crawldb cleansing
+            } else if (lastState.key.equals(IngridCrawlNutchProcess.STATES.CREATE_STARTURL_REPORT.name())) {
+                // nothing todo, since all temp data will be removed by the
+                // crawldb cleansing
             } else if (lastState.key.equals(IngridCrawlNutchProcess.STATES.MERGE_SEGMENT.name())) {
                 // remove segments_merged, move it, if no segments dir exists
                 // because then the merge process has already completed
@@ -180,6 +183,9 @@ public class IngridCrawlNutchProcessCleaner {
                     LOG.error("Error recovering from state '" + STATES.UPDATE_LINKDB.name() + "'.", e);
                 }
 
+            } else if (lastState.key.equals(IngridCrawlNutchProcess.STATES.DEDUPLICATE.name())) {
+                // nothing todo, since all temp data will be removed by the
+                // crawldb cleansing
             } else if (lastState.key.equals(IngridCrawlNutchProcess.STATES.INDEX.name())) {
                 // remove WORKING_DIR/tmp_.*
                 try {
@@ -188,6 +194,9 @@ public class IngridCrawlNutchProcessCleaner {
                 } catch (IOException e) {
                     LOG.error("Error recovering from state '" + STATES.INDEX.name() + "'.", e);
                 }
+            } else if (lastState.key.equals(IngridCrawlNutchProcess.STATES.CLEAN_DUPLICATES.name())) {
+                // nothing todo, since all temp data will be removed by the
+                // crawldb cleansing
             }
 
             // remove invalid segments
