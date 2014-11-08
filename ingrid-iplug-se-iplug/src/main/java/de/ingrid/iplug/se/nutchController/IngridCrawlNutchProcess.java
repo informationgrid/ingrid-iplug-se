@@ -61,7 +61,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             if (ingridCrawlNutchProcessCleaner.cleanup(workingDirectory.toPath())) {
                 // clear previously set states
                 this.statusProvider.clear();
-                this.statusProvider.addState(STATES.CRAWL_CLEANUP.name(), "Crawl was cleaned up after crash or user abort.");
+                this.statusProvider.appendToState(STATES.CRAWL_CLEANUP.name(), " done.");
             } else {
                 this.statusProvider.clear();
             }

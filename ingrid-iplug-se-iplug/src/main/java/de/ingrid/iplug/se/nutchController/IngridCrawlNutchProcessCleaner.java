@@ -49,6 +49,8 @@ public class IngridCrawlNutchProcessCleaner {
                 lastState = states[--i];
             }
             LOG.info("Last state '" + lastState.getKey() + "' detected.");
+            
+            statusProvider.addState(STATES.CRAWL_CLEANUP.name(), "Clean up crawl after crash or user abort...");
 
             if (lastState.key.equals(IngridCrawlNutchProcess.STATES.FINISHED.name())) {
                 // nothing todo
