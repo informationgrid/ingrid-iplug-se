@@ -123,6 +123,67 @@
                 valid = false;
             }
 
+            // ************************************
+            // Check if limitUrls are valid and set
+            // ************************************
+            $.each( data.limitUrls, function(index, url) {
+            	var localValid = true;
+            	if (url.startsWith("/") && url.endsWith("/")) {
+            		var innerUrl = url.substring(1, url.length - 1);
+                    if ( !isUrl( innerUrl ) ) {
+                    	localValid = false;
+                    } else {
+                    	try {
+                    		var regex = new RegExp(innerUrl, "g");
+                    	} catch (e) {
+                        	localValid = false;
+                    	}
+                    }
+            	} else {
+                    if ( !isUrl( url ) ) {
+                    	localValid = false;
+                    }
+            	}
+            	if (!localValid ) {
+                	$("#limitUrlTable_" + index).css('border','1px solid red');
+                    $("#errorLimitUrl").show();
+                    valid = false;
+            	}
+            });
+
+            // ************************************
+            // Check if excludeUrls are valid and set
+            // ************************************
+            $.each( data.excludeUrls, function(index, url) {
+            	var localValid = true;
+            	if (url.startsWith("/") && url.endsWith("/")) {
+            		var innerUrl = url.substring(1, url.length - 1);
+                    if ( !isUrl( innerUrl ) ) {
+                    	localValid = false;
+                    } else {
+                    	try {
+                    		var regex = new RegExp(innerUrl, "g");
+                    	} catch (e) {
+                        	localValid = false;
+                    	}
+                    }
+            	} else {
+                    if ( !isUrl( url ) ) {
+                    	localValid = false;
+                    }
+            	}
+            	if (!localValid ) {
+                	$("#excludeUrlTable_" + index).css('border','1px solid red');
+                    $("#errorExcludeUrl").show();
+                    valid = false;
+            	}
+            });
+            
+            // if no limit url has been set, then take the start url
+            if (data.limitUrls.length === 0) {
+                data.limitUrls.push( data.url );
+            }
+            
             data.metadata = [];
 
             // get metadata from all selects
@@ -163,18 +224,6 @@
                 $.each( data.userMetadata, function(index, item) {
                     handleMetadataItem( item );
                 });
-            }
-
-            // ************************************
-            // Check if limitUrls are valid and set
-            // ************************************
-            // $.each( data.limitUrls, function(index, url) {
-
-            // });
-
-            // if no limit url has been set, then take the start url
-            if (data.limitUrls.length === 0) {
-                data.limitUrls.push( data.url );
             }
 
             if ( valid ) {
@@ -222,10 +271,11 @@
 
             // var actionButton = $("#" + id + " tbody .newRow");
             var newRow = $(
-                "<tr data-row='" + pos + "'>" +
-                   "<td>" + url + "</td>" +
+                "<tr>" +
+                   "<td id='" + id + "_" + pos + "'>" + url + "</td>" +
                    "<td data-editable='false'>" + button + "</td>" +
                 "</tr>"
+                   
             );
             newRow.insertBefore( $("#" + id + " tbody .newRow") );
             //.find("tr .btnUrl");

@@ -105,6 +105,7 @@
                             </tr>
                         </tbody>
                     </table>
+                    <span id="errorLimitUrl" class="error">URL Patterns sind nicht korrekt. Zulässig sind gültige URLs und reguläre Ausdrücke im folgenden Format: "/PROTOKOLL://DOMAIN/REGEXP/".</span>
                 </div>
 
                 <div>
@@ -123,6 +124,7 @@
                             </tr>
                         </tbody>
                     </table>
+                    <span id="errorExcludeUrl" class="error">URL Patterns sind nicht korrekt. Zulässig sind gültige URLs und reguläre Ausdrücke im folgenden Format: "/PROTOKOLL://DOMAIN/REGEXP/"</span>
                 </div>
 
 
