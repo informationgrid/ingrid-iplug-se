@@ -15,7 +15,7 @@ public class LogFileWatcher {
     Tailer tailer = null;
 
     public LogFileWatcher(File file, TailerListener listener) {
-        tailer = Tailer.create(file, listener, 1000);
+        tailer = Tailer.create(file, listener, 1000, true);
     }
 
     public void close() {
