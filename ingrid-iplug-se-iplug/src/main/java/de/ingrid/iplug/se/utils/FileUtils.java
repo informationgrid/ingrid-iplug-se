@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Writer;
+import java.net.URL;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -32,24 +33,24 @@ import edu.emory.mathcs.backport.java.util.Arrays;
 
 public class FileUtils {
 
-    private static Logger log = Logger.getLogger( FileUtils.class );
+    private static Logger log = Logger.getLogger(FileUtils.class);
 
     public static void removeRecursive(Path path) throws IOException {
-        removeRecursive( path, ".*" );
+        removeRecursive(path, ".*");
     }
 
     public static void removeRecursive(Path path, final String pattern) throws IOException {
 
-        final PathMatcher matcher = FileSystems.getDefault().getPathMatcher( "regex:" + pattern );
+        final PathMatcher matcher = FileSystems.getDefault().getPathMatcher("regex:" + pattern);
 
-        if (!Files.exists( path ))
+        if (!Files.exists(path))
             return;
 
-        Files.walkFileTree( path, new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                if (pattern != null && matcher.matches( file.getFileName() )) {
-                    Files.delete( file );
+                if (pattern != null && matcher.matches(file.getFileName())) {
+                    Files.delete(file);
                 }
                 return FileVisitResult.CONTINUE;
             }
@@ -59,8 +60,8 @@ public class FileUtils {
                 // try to delete the file anyway, even if its attributes
                 // could not be read, since delete-only access is
                 // theoretically possible
-                if (pattern != null && matcher.matches( file.getFileName() )) {
-                    Files.delete( file );
+                if (pattern != null && matcher.matches(file.getFileName())) {
+                    Files.delete(file);
                 }
                 return FileVisitResult.CONTINUE;
             }
@@ -68,12 +69,12 @@ public class FileUtils {
             @Override
             public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
                 if (exc == null) {
-                    if (matcher.matches( dir.getFileName() )) {
+                    if (matcher.matches(dir.getFileName())) {
                         if (dir.toFile().list().length > 0) {
                             // remove even if not empty
-                            FileUtils.removeRecursive( dir );
+                            FileUtils.removeRecursive(dir);
                         } else {
-                            Files.delete( dir );
+                            Files.delete(dir);
                         }
                     }
                     return FileVisitResult.CONTINUE;
@@ -83,28 +84,28 @@ public class FileUtils {
                 }
             }
 
-        } );
+        });
     }
 
     public static void copyDirectories(Path source, Path destination) throws IOException {
 
-        Files.walkFileTree( source, new CopyVisitor( source, destination ) );
+        Files.walkFileTree(source, new CopyVisitor(source, destination));
 
     }
 
     public static void writeToFile(Path path, String name, List<String> listContent) throws IOException {
         if (path != null) {
-            Files.createDirectories( path );
+            Files.createDirectories(path);
             if (listContent != null) {
-                Writer writer = new FileWriter( path.resolve( name ).toString() );
-                BufferedWriter bWriter = new BufferedWriter( writer );
+                Writer writer = new FileWriter(path.resolve(name).toString());
+                BufferedWriter bWriter = new BufferedWriter(writer);
                 for (String content : listContent) {
-                    bWriter.write( content );
+                    bWriter.write(content);
                     bWriter.newLine();
                 }
                 bWriter.close();
             } else {
-                log.error( "Content is null!" );
+                log.error("Content is null!");
             }
         }
     }
@@ -121,16 +122,16 @@ public class FileUtils {
 
         @Override
         public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-            Path targetPath = toPath.resolve( fromPath.relativize( dir ) );
-            if (!Files.exists( targetPath )) {
-                Files.createDirectory( targetPath );
+            Path targetPath = toPath.resolve(fromPath.relativize(dir));
+            if (!Files.exists(targetPath)) {
+                Files.createDirectory(targetPath);
             }
             return FileVisitResult.CONTINUE;
         }
 
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            Files.copy( file, toPath.resolve( fromPath.relativize( file ) ), copyOption );
+            Files.copy(file, toPath.resolve(fromPath.relativize(file)), copyOption);
             return FileVisitResult.CONTINUE;
         }
     }
@@ -140,7 +141,7 @@ public class FileUtils {
         String workDir = SEIPlug.conf.getInstancesDir() + "/" + name;
 
         // get all urls belonging to the given instance
-        List<Url> urls = UrlHandler.getUrlsByInstance( name );
+        List<Url> urls = UrlHandler.getUrlsByInstance(name);
         Map<String, Map<String, List<String>>> startUrls = new HashMap<String, Map<String, List<String>>>();
         List<String> limitUrls = new ArrayList<String>();
         List<String> excludeUrls = new ArrayList<String>();
@@ -150,44 +151,55 @@ public class FileUtils {
             if (url.getUrl() == null)
                 continue;
 
-            Map<String, List<String>> metadata = new HashMap<String, List<String>>();
-            for (Metadata meta : url.getMetadata()) {
-                List<String> metaValues = metadata.get( meta.getMetaKey() );
-                if (metaValues == null) {
-                    metaValues = new ArrayList<String>();
-                    metadata.put( meta.getMetaKey(), metaValues );
+            // ensure trailing slash on domain only urls
+            // skip invalid urls
+            try {
+                URL tmpUrl = new URL(url.getUrl());
+                if (tmpUrl.getPath().isEmpty() && tmpUrl.getQuery() == null) {
+                    url.setUrl(url.getUrl() + "/");
                 }
-                metaValues.add( meta.getMetaValue() );
+            } catch (Exception e) {
+                log.error("Invalid start url detected. Skipping: " + url.getUrl());
+                continue;
             }
 
-            startUrls.put( url.getUrl(), metadata );
+            Map<String, List<String>> metadata = new HashMap<String, List<String>>();
+            for (Metadata meta : url.getMetadata()) {
+                List<String> metaValues = metadata.get(meta.getMetaKey());
+                if (metaValues == null) {
+                    metaValues = new ArrayList<String>();
+                    metadata.put(meta.getMetaKey(), metaValues);
+                }
+                metaValues.add(meta.getMetaValue());
+            }
+
+            startUrls.put(url.getUrl(), metadata);
             for (String limit : url.getLimitUrls()) {
-                limitUrls.add( limit );
+                limitUrls.add(limit);
             }
             for (String exclude : url.getExcludeUrls()) {
-                excludeUrls.add( exclude );
+                excludeUrls.add(exclude);
             }
         }
 
         // output urls and metadata
-        String[] startUrlsValue = startUrls.keySet().toArray( new String[0] );
-        FileUtils.writeToFile( Paths.get( workDir, "urls", "start" ).toAbsolutePath(), "seed.txt",
-                Arrays.asList( startUrlsValue ) );
+        String[] startUrlsValue = startUrls.keySet().toArray(new String[0]);
+        FileUtils.writeToFile(Paths.get(workDir, "urls", "start").toAbsolutePath(), "seed.txt", Arrays.asList(startUrlsValue));
 
         List<String> metadataValues = new ArrayList<String>();
         for (String start : startUrlsValue) {
-            Map<String, List<String>> metas = startUrls.get( start );
+            Map<String, List<String>> metas = startUrls.get(start);
 
             String metasConcat = start;
             for (String key : metas.keySet()) {
-                metasConcat += "\t" + key + ":\t" + StringUtils.join( metas.get( key ), "\t" );
+                metasConcat += "\t" + key + ":\t" + StringUtils.join(metas.get(key), "\t");
             }
-            metadataValues.add( metasConcat );
+            metadataValues.add(metasConcat);
         }
 
-        FileUtils.writeToFile( Paths.get( workDir, "urls", "metadata" ).toAbsolutePath(), "seed.txt", metadataValues );
-        FileUtils.writeToFile( Paths.get( workDir, "urls", "limit" ).toAbsolutePath(), "seed.txt", limitUrls );
-        FileUtils.writeToFile( Paths.get( workDir, "urls", "exclude" ).toAbsolutePath(), "seed.txt", excludeUrls );
+        FileUtils.writeToFile(Paths.get(workDir, "urls", "metadata").toAbsolutePath(), "seed.txt", metadataValues);
+        FileUtils.writeToFile(Paths.get(workDir, "urls", "limit").toAbsolutePath(), "seed.txt", limitUrls);
+        FileUtils.writeToFile(Paths.get(workDir, "urls", "exclude").toAbsolutePath(), "seed.txt", excludeUrls);
     }
 
     /**
@@ -202,21 +214,21 @@ public class FileUtils {
     public static String readFile(Path path) throws IOException {
         if (!path.toFile().exists())
             return null;
-        
+
         byte[] encoded = Files.readAllBytes(path);
         return new String(encoded, "UTF-8");
     }
 
     public static String[] getSortedSubDirectories(Path path) {
 
-        String[] directories = path.toFile().list( new FilenameFilter() {
+        String[] directories = path.toFile().list(new FilenameFilter() {
             @Override
             public boolean accept(File current, String name) {
-                return new File( current, name ).isDirectory();
+                return new File(current, name).isDirectory();
             }
-        } );
+        });
         if (directories != null) {
-            Arrays.sort( directories );
+            Arrays.sort(directories);
         } else {
             directories = new String[] {};
         }
@@ -227,6 +239,7 @@ public class FileUtils {
 
     /**
      * Read the last N lines of a file
+     * 
      * @param file
      * @param lines
      * @return
@@ -234,13 +247,13 @@ public class FileUtils {
     public static String tail(File file, int lines) {
         java.io.RandomAccessFile fileHandler = null;
         try {
-            fileHandler = new java.io.RandomAccessFile( file, "r" );
+            fileHandler = new java.io.RandomAccessFile(file, "r");
             long fileLength = fileHandler.length() - 1;
             StringBuilder sb = new StringBuilder();
             int line = 0;
 
             for (long filePointer = fileLength; filePointer != -1; filePointer--) {
-                fileHandler.seek( filePointer );
+                fileHandler.seek(filePointer);
                 int readByte = fileHandler.readByte();
 
                 if (readByte == 0xA) {
@@ -260,7 +273,7 @@ public class FileUtils {
                         break;
                     }
                 }
-                sb.append( (char) readByte );
+                sb.append((char) readByte);
             }
 
             String lastLine = sb.reverse().toString();
@@ -275,23 +288,24 @@ public class FileUtils {
             if (fileHandler != null)
                 try {
                     fileHandler.close();
-                } catch (IOException e) {}
+                } catch (IOException e) {
+                }
         }
     }
 
     public static File[] getInstancesDirs() {
         File[] subDirs = new File[0];
         String dir = SEIPlug.conf.getInstancesDir();
-        if (Files.isDirectory( Paths.get( dir ) )) {
+        if (Files.isDirectory(Paths.get(dir))) {
             FileFilter directoryFilter = new FileFilter() {
                 public boolean accept(File file) {
                     return file.isDirectory();
                 }
             };
-            File instancesDirObject = new File( dir );
-            subDirs = instancesDirObject.listFiles( directoryFilter );
+            File instancesDirObject = new File(dir);
+            subDirs = instancesDirObject.listFiles(directoryFilter);
         }
-        
+
         return subDirs;
     }
 }

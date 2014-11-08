@@ -1,5 +1,6 @@
 package de.ingrid.iplug.se.utils;
 
+import java.net.URL;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -8,11 +9,15 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import org.apache.log4j.Logger;
+
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Url;
 import de.ingrid.iplug.se.webapp.container.Instance;
 
 public class DBUtils {
+    
+    private static Logger log = Logger.getLogger(DBUtils.class);
     
     public static List<Url> getAllUrlsFromInstance(String instance) {
         EntityManager em = DBManager.INSTANCE.getEntityManager();
@@ -40,30 +45,45 @@ public class DBUtils {
     
     public static void addUrl(Url url) {
         EntityManager em = DBManager.INSTANCE.getEntityManager();
-        em.getTransaction().begin();
-        persistUrl( em, url );
-        em.getTransaction().commit();
+        try {
+            em.getTransaction().begin();
+            persistUrl( em, url );
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            log.error("Error add url: " + url.getUrl(), e);
+            em.getTransaction().rollback();
+        }
     }
 
     public static void addUrls(List<Url> fromUrls) {
         EntityManager em = DBManager.INSTANCE.getEntityManager();
         em.getTransaction().begin();
-        for (Url url : fromUrls) {
-            persistUrl( em, url );
+        try {
+            for (Url url : fromUrls) {
+                persistUrl( em, url );
+            }
+            em.flush();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            log.error("Error adding urls.", e);
+            em.getTransaction().rollback();
         }
-        em.flush();
-        em.getTransaction().commit();
     }
 
     public static void deleteUrls(Long[] ids) {
         EntityManager em = DBManager.INSTANCE.getEntityManager();
         em.getTransaction().begin();
-        for (Long id : ids) {
-            Url url = em.find( Url.class, id );
-            em.remove( url );
+        try {
+            for (Long id : ids) {
+                Url url = em.find( Url.class, id );
+                em.remove( url );
+            }
+            em.flush();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            log.error("Error deleting urls.", e);
+            em.getTransaction().rollback();
         }
-        em.flush();
-        em.getTransaction().commit();
     }
     
     public static void setStatus(Instance instance, String srcUrl, String status) {
@@ -78,6 +98,11 @@ public class DBUtils {
             
             Predicate instanceCriteria = criteriaBuilder.equal( urlTable.get("instance"), instance.getName() );
             Predicate urlCriteria = criteriaBuilder.equal( urlTable.get("url"), srcUrl );
+            URL tmpUrl = new URL(srcUrl);
+            if (tmpUrl.getPath().equals("/")) {
+                Predicate urlCriteria2 = criteriaBuilder.equal( urlTable.get("url"), srcUrl.substring(0, srcUrl.length() -1) );
+                urlCriteria = criteriaBuilder.or(urlCriteria, urlCriteria2);
+            }
             createQuery.select( urlTable ).where( criteriaBuilder.and(instanceCriteria, urlCriteria) );
             
             List<Url> resultList = em.createQuery( createQuery ).getResultList();
@@ -90,6 +115,7 @@ public class DBUtils {
             em.flush();
             em.getTransaction().commit();
         } catch (Exception e) {
+            log.error("Error set status for url: " + srcUrl, e);
             em.getTransaction().rollback();
         }
         
