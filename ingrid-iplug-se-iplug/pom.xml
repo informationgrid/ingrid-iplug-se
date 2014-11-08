@@ -131,6 +131,11 @@
 			<artifactId>commons-exec</artifactId>
 			<version>1.2</version>
 		</dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+        </dependency>
 
 		<!-- The following two libs are needed for geo_shape based search! see: 
 		http://www.elasticsearch.org/guide/en/elasticsearch/client/java-api/current/query-dsl-filters.html -->

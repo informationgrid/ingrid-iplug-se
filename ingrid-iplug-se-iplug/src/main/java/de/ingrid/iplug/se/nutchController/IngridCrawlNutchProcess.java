@@ -48,6 +48,8 @@ public class IngridCrawlNutchProcess extends NutchProcess {
     IPostCrawlProcessor[] postCrawlProcessors;
 
     Instance instance;
+    
+    LogFileWatcher logFileWatcher = null;
 
     @Override
     public void run() {
@@ -149,10 +151,12 @@ public class IngridCrawlNutchProcess extends NutchProcess {
 
                 this.statusProvider.addState(STATES.FETCH.name() + i, "Fetching " + "[" + (i + 1) + "/" + depth + "] ...");
                 this.statusProvider.setStateProperty(STATES.FETCH.name(), "i", Integer.toString(i));
+                logFileWatcher = LogFileWatcherFactory.getFetchLogfileWatcher(Paths.get(instance.getWorkingDirectory(), "logs", "hadoop.log").toFile(), statusProvider, STATES.FETCH.name() + i);
                 ret = execute("de.ingrid.iplug.se.nutch.fetcher.Fetcher", currentSegment);
                 if (ret != 0) {
                     throwCrawlError("Error during Execution of: org.apache.nutch.fetcher.Fetcher");
                 }
+                logFileWatcher.close();
                 this.statusProvider.appendToState(STATES.FETCH.name() + i, " done.");
 
                 this.statusProvider.addState(STATES.UPDATE_CRAWLDB.name() + i, "Update database with new urls and links " + "[" + (i + 1) + "/" + depth + "] ...");
@@ -303,6 +307,9 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             status = STATUS.INTERRUPTED;
             log.error("Process exited with errors.", t);
         } finally {
+            if (logFileWatcher != null) {
+                logFileWatcher.close();
+            }
             try {
                 this.statusProvider.write();
             } catch (IOException e) {
