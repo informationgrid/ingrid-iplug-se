@@ -138,6 +138,11 @@
                     	} catch (e) {
                         	localValid = false;
                     	}
+                    	var parser = document.createElement('a');
+                    	parser.href = innerUrl;
+                        if (innerUrl.indexOf(parser.host+"/")  == -1 ) {
+                        	localValid = false;
+                        }
                     }
             	} else {
                     if ( !isUrl( url ) ) {
@@ -166,6 +171,11 @@
                     	} catch (e) {
                         	localValid = false;
                     	}
+                    	var parser = document.createElement('a');
+                    	parser.href = innerUrl;
+                        if (innerUrl.indexOf(parser.host+"/")  == -1 ) {
+                        	localValid = false;
+                        }
                     }
             	} else {
                     if ( !isUrl( url ) ) {
