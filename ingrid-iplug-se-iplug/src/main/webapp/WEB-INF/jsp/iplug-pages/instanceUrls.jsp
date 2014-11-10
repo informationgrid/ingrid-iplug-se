@@ -122,13 +122,17 @@
                 $(".error.startUrl").show();
                 valid = false;
             }
+            
+            // automatically add limit/exclude URLs if forgotten
+            $('#btnAddLimitUrl').click();
+            $('#btnAddExcludeUrl').click();
 
             // ************************************
             // Check if limitUrls are valid and set
             // ************************************
             $.each( data.limitUrls, function(index, url) {
             	var localValid = true;
-            	if (url.startsWith("/") && url.endsWith("/")) {
+            	if (url.indexOf("/") === 0 && url.lastIndexOf("/") === (url.length + 1)) {
             		var innerUrl = url.substring(1, url.length - 1);
                     if ( !isUrl( innerUrl ) ) {
                     	localValid = false;
@@ -161,7 +165,7 @@
             // ************************************
             $.each( data.excludeUrls, function(index, url) {
             	var localValid = true;
-            	if (url.startsWith("/") && url.endsWith("/")) {
+            	if (url.indexOf("/") === 0 && url.lastIndexOf("/") === (url.length + 1)) {
             		var innerUrl = url.substring(1, url.length - 1);
                     if ( !isUrl( innerUrl ) ) {
                     	localValid = false;
@@ -281,7 +285,7 @@
 
             // var actionButton = $("#" + id + " tbody .newRow");
             var newRow = $(
-                "<tr>" +
+                "<tr data-row='" + pos + "'>" +
                    "<td id='" + id + "_" + pos + "'>" + url + "</td>" +
                    "<td data-editable='false'>" + button + "</td>" +
                 "</tr>"
@@ -674,16 +678,20 @@
         $( "#btnAddLimitUrl" ).on( "click", function() {
             //dialogLimit.dialog("open");
             var url = $("#newLimitUrl").val();
-            addUrlRowTo( "limitUrlTable", url, dialog.data("urlDataObject").limitUrls.length );
-            dialog.data("urlDataObject").limitUrls.push( url );
-            $("#newLimitUrl").val("");
+            if (url.trim() !== "") {
+                addUrlRowTo( "limitUrlTable", url, dialog.data("urlDataObject").limitUrls.length );
+                dialog.data("urlDataObject").limitUrls.push( url );
+                $("#newLimitUrl").val("");
+            }
         });
         $( "#btnAddExcludeUrl" ).on( "click", function() {
             //dialogExclude.dialog("open");
             var url = $("#newExcludeUrl").val();
-            addUrlRowTo( "excludeUrlTable", url, dialog.data("urlDataObject").excludeUrls.length );
-            dialog.data("urlDataObject").excludeUrls.push( url );
-            $("#newExcludeUrl").val("");
+            if (url.trim() !== "") {
+                addUrlRowTo( "excludeUrlTable", url, dialog.data("urlDataObject").excludeUrls.length );
+                dialog.data("urlDataObject").excludeUrls.push( url );
+                $("#newExcludeUrl").val("");
+            }
         });
 
         // action for button to add user metadata
