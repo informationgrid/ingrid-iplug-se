@@ -16,7 +16,7 @@
 		<developerConnection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid-mdek/trunk/ingrid-iplug-se/branches/3.5.x_new_architecture/ingrid-iplug-se-iplug</developerConnection>
 	</scm>
 	<repositories>
-		<!-- Repo of parent pom needed, parent pom may not be installed locally 
+		<!-- Repo of parent pom needed, parent pom may not be installed locally
 		yet -->
 		<repository>
 			<id>de.ingrid.all</id>
@@ -52,7 +52,7 @@
 				<artifactId>xalan</artifactId>
 				<version>2.7.1</version>
 			</dependency>
-			<!--<dependency> <groupId>com.tngtech.java</groupId> <artifactId>config-builder</artifactId> 
+			<!--<dependency> <groupId>com.tngtech.java</groupId> <artifactId>config-builder</artifactId>
 			<version>1.4-SNAPSHOT</version> </dependency> -->
 			<dependency>
 				<groupId>de.ingrid</groupId>
@@ -137,17 +137,20 @@
             <version>2.4</version>
         </dependency>
 
-		<!-- The following two libs are needed for geo_shape based search! see: 
+		<!-- The following two libs are needed for geo_shape based search! see:
 		http://www.elasticsearch.org/guide/en/elasticsearch/client/java-api/current/query-dsl-filters.html -->
-		<!-- <dependency> <groupId>com.spatial4j</groupId> <artifactId>spatial4j</artifactId> 
-			<version>0.4.1</version> </dependency> <dependency> <groupId>com.vividsolutions</groupId> 
-			<artifactId>jts</artifactId> <version>1.13</version> <exclusions> <exclusion> 
-			<groupId>xerces</groupId> <artifactId>xercesImpl</artifactId> </exclusion> 
+		<!-- <dependency> <groupId>com.spatial4j</groupId> <artifactId>spatial4j</artifactId>
+			<version>0.4.1</version> </dependency> <dependency> <groupId>com.vividsolutions</groupId>
+			<artifactId>jts</artifactId> <version>1.13</version> <exclusions> <exclusion>
+			<groupId>xerces</groupId> <artifactId>xercesImpl</artifactId> </exclusion>
 		</exclusions> </dependency> -->
 
 		<!-- needed for Java8 compatibility with PowerMock -->
-		<!-- <dependency> <groupId>org.javassist</groupId> <artifactId>javassist</artifactId> 
-		<version>3.18.2-GA</version> </dependency> -->
+		<dependency>
+			<groupId>org.javassist</groupId>
+			<artifactId>javassist</artifactId>
+			<version>3.18.2-GA</version>
+		</dependency>
 
 		<!-- DB Migration -->
 		<dependency>
@@ -173,6 +176,7 @@
 		<dependency>
 			<groupId>commons-fileupload</groupId>
 			<artifactId>commons-fileupload</artifactId>
+			<version>1.2.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -186,14 +190,14 @@
 			<version>1.5.6</version>
 			<!-- <scope>test</scope> -->
 		</dependency>
-		
+
 		<!-- Library used for the migration of old database to new one -->
 		<dependency>
 		    <groupId>mysql</groupId>
 		    <artifactId>mysql-connector-java</artifactId>
 		    <version>5.1.33</version>
 		</dependency>
-				
+
 
 	</dependencies>
 	<build>
@@ -256,7 +260,7 @@
 				<configuration>
 					<archive>
 						<manifestEntries>
-							<!-- one of these: IPLUG_SE, IPLUG_DSC, IPLUG_SNS, IPLUG_TAMINO, IPLUG_FPN, 
+							<!-- one of these: IPLUG_SE, IPLUG_DSC, IPLUG_SNS, IPLUG_TAMINO, IPLUG_FPN,
 							IPLUG_G2K, IPLUG_CSW, IPLUG_CSW_DSC, OTHER see ingrid-utils:de.ingrid.utils.metadata.IPlugType -->
 							<iPlug-Type>IPLUG_SE</iPlug-Type>
 						</manifestEntries>
@@ -362,6 +366,25 @@
 					<url>file:///opt/ingrid/distributions/${project.parent.artifactId}/${project.version}</url>
 				</configuration>
 			</plugin>
+			<plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/webapp/css/blue.css</exclude>
+                        <exclude>**/webapp/css/chosen**</exclude>
+                        <exclude>**/webapp/css/jquery**</exclude>
+                        <exclude>**/webapp/js/chart**</exclude>
+                        <exclude>**/webapp/js/chosen**</exclude>
+                        <exclude>**/webapp/js/icheck**</exclude>
+                        <exclude>**/webapp/js/jquery**</exclude>
+                        <exclude>**/webapp/js/mindmup**</exclude>
+                        <exclude>**/webapp/js/localization/**</exclude>
+                        <exclude>**/db/migration/**</exclude>
+                        <exclude>**/log4j.properties</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
 		</plugins>
 	</build>
 </project>

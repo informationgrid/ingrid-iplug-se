@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>de.ingrid</groupId>
 		<artifactId>ingrid-releases-pom</artifactId>
-		<version>3.5.0-SNAPSHOT</version>
+		<version>3.5.0-SNAPSHOT-R304</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ingrid</groupId>
@@ -18,7 +18,7 @@
 		<developerConnection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid-iplug-se/branches/3.5.x_new_architecture</developerConnection>
 	</scm>
 	<repositories>
-		<!-- Repo of parent pom needed, parent pom may not be installed locally 
+		<!-- Repo of parent pom needed, parent pom may not be installed locally
 			yet -->
 		<repository>
 			<id>de.ingrid.all</id>
@@ -85,7 +85,7 @@
                     <skipAssembly>true</skipAssembly>
 				</configuration>
 			</plugin>
-			<!-- DISABLE RELEASE / ASSEMBLY STUFF FOR SUBMODULES ! RELEASE/BUNDLE 
+			<!-- DISABLE RELEASE / ASSEMBLY STUFF FOR SUBMODULES ! RELEASE/BUNDLE
 				ONLY IN TOP MODULE !!! -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -107,8 +107,8 @@
 				<!-- the inherited plugin extracts the installer which must not be done by sub-modules -->
 				<inherited>false</inherited>
 				<dependencies>
-					<!-- following is needed since this plugin mixes up the JAVA_HOME directory 
-						a bit. This dependency is necessary to be able to call javac ant task in 
+					<!-- following is needed since this plugin mixes up the JAVA_HOME directory
+						a bit. This dependency is necessary to be able to call javac ant task in
 						a multi module maven project setup. -->
 					<dependency>
 						<groupId>com.sun</groupId>
@@ -119,7 +119,7 @@
 					</dependency>
 				</dependencies>
 			</plugin>
-			
+
 		</plugins>
 	</build>
 	<reporting>
@@ -152,7 +152,7 @@
 	</reporting>
 	<profiles>
 		<profile>
-			<!-- This profile is only used for deploying the installer into the repository 
+			<!-- This profile is only used for deploying the installer into the repository
 				during a normal build! Used in Hudson! -->
 			<id>noRelease</id>
 			<build>
