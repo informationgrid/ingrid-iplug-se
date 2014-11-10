@@ -127,7 +127,7 @@
 	</property>
 	<property>
 		<name>db.max.outlinks.per.page</name>
-		<value>200</value>
+		<value>500</value>
 		<description>The maximum number of outlinks that we'll process for a
 			page.
 			If this value is nonnegative (>=0), at most db.max.outlinks.per.page
