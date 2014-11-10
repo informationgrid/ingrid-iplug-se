@@ -52,7 +52,11 @@ public class Migrator {
     
     private static Url convertBasicUrl( ResultSet rs ) throws SQLException, MalformedURLException {
         Url u = new Url();
-        String urlStr = rs.getString( URL ).trim();
+        String urlStr = rs.getString( URL );
+        if (urlStr == null) {
+            throw new MalformedURLException("Null url detected.");
+        }
+        urlStr = urlStr.trim();
         URL url = new URL(urlStr);
         if (url.getPath().isEmpty() && url.getQuery() == null) {
             urlStr = urlStr + "/";
