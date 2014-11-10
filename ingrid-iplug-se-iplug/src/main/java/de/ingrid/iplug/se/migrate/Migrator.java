@@ -27,7 +27,6 @@ import com.tngtech.configbuilder.ConfigBuilder;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Metadata;
 import de.ingrid.iplug.se.db.model.Url;
-import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.controller.ListInstancesController;
 
 public class Migrator {
@@ -235,10 +234,6 @@ public class Migrator {
                 emf = Persistence.createEntityManagerFactory(conf.databaseID);
             } else {
                 emf = Persistence.createEntityManagerFactory(conf.databaseID, properties);
-                Path dbPath = Paths.get(dbDir.toFile().getAbsolutePath());
-                if (dbPath.toFile().exists()) {
-                    FileUtils.removeRecursive(dbPath);
-                }
                 // do database migrations
                 Flyway flyway = new Flyway();
                 String dbUrl = "jdbc:h2:" + dbDir.toFile().getAbsolutePath() + "/urls;MVCC=true";
