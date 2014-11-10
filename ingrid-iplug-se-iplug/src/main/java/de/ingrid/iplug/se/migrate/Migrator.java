@@ -1,5 +1,7 @@
 package de.ingrid.iplug.se.migrate;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
@@ -18,12 +20,14 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.apache.log4j.Logger;
+import org.flywaydb.core.Flyway;
 
 import com.tngtech.configbuilder.ConfigBuilder;
 
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Metadata;
 import de.ingrid.iplug.se.db.model.Url;
+import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.controller.ListInstancesController;
 
 public class Migrator {
@@ -47,14 +51,19 @@ public class Migrator {
 
     private static MigratorConfig conf;
     
-    private static Url convertBasicUrl( ResultSet rs ) throws SQLException {
+    private static Url convertBasicUrl( ResultSet rs ) throws SQLException, MalformedURLException {
         Url u = new Url();
-        u.setUrl( rs.getString( URL ) );
+        String urlStr = rs.getString( URL ).trim();
+        URL url = new URL(urlStr);
+        if (url.getPath().isEmpty() && url.getQuery() == null) {
+            urlStr = urlStr + "/";
+        }
+        u.setUrl( urlStr );
         // u.setCreated( rs.getDate( CREATED ) );
         // u.setDeleted( rs.getDate( DELETED ) );
         // u.setStatusUpdated( rs.getDate( STATUS_UPDATED ) );
         // u.setUpdated( rs.getDate( UPDATED ) );
-        u.setStatus( rs.getString( STATUS ) );
+        u.setStatus( "" );
         
         // get provider/partner
         // not needed ... these are defined per iPlug
@@ -80,7 +89,13 @@ public class Migrator {
         while (rs.next()) {
             
             log.debug( "Processing: " + rs.getInt( ID ) );
-            Url u = convertBasicUrl( rs );
+            Url u;
+            try {
+                u = convertBasicUrl( rs );
+            } catch (MalformedURLException e) {
+                log.warn("Skip invalid URL: " + rs.getString( URL ));
+                continue;
+            } 
             
             u.setInstance( conf.webInstance );
             
@@ -91,7 +106,7 @@ public class Migrator {
             List<String> limitUrls = new ArrayList<String>();
             List<Metadata> metadata = new ArrayList<Metadata>();
             while (rs_limit.next()) {
-                limitUrls.add( rs_limit.getString( URL ) );
+                limitUrls.add( rs_limit.getString( URL ).trim() );
                 
                 // get metadata connected to the limit urls
                 PreparedStatement stmtMeta = con.prepareStatement( "SELECT * FROM url u, url_metadata um, metadata m WHERE u.id=? AND um.url__id=u.id AND um.metadatas__id=m.id");
@@ -112,9 +127,17 @@ public class Migrator {
             ResultSet rs_exclude = stmt.executeQuery();
             List<String> excludeUrls = new ArrayList<String>();
             while (rs_exclude.next()) {
-                excludeUrls.add( rs_exclude.getString( URL ) );
+                excludeUrls.add( rs_exclude.getString( URL ).trim() );
             }
             rs_exclude.close();
+            // if the start url has no query string, exclude all urls with a query string by default
+            if (!u.getUrl().matches(".*[?\\*!@=].*")) {
+                try {
+                    URL url = new URL(u.getUrl());
+                    excludeUrls.add("/" + url.getProtocol() + "://" + url.getAuthority()+ "/.*[?\\*!@=].*/");
+                } catch (MalformedURLException e) {
+                }
+            }
             
             u.setLimitUrls( limitUrls );
             u.setExcludeUrls( excludeUrls );
@@ -139,7 +162,13 @@ public class Migrator {
         // iterate over all Catalog Urls and convert them to the new format
         while (rs.next()) {
             log.debug( "Processing Catalog: " + rs.getInt( ID ) );
-            Url u = convertBasicUrl( rs );
+            Url u;
+            try {
+                u = convertBasicUrl( rs );
+            } catch (MalformedURLException e) {
+                log.warn("Skip invalid URL: " + rs.getString( URL ));
+                continue;
+            } 
             
             u.setInstance( conf.catalogInstance );
             
@@ -206,7 +235,18 @@ public class Migrator {
                 emf = Persistence.createEntityManagerFactory(conf.databaseID);
             } else {
                 emf = Persistence.createEntityManagerFactory(conf.databaseID, properties);
+                Path dbPath = Paths.get(dbDir.toFile().getAbsolutePath());
+                if (dbPath.toFile().exists()) {
+                    FileUtils.removeRecursive(dbPath);
+                }
+                // do database migrations
+                Flyway flyway = new Flyway();
+                String dbUrl = "jdbc:h2:" + dbDir.toFile().getAbsolutePath() + "/urls;MVCC=true";
+                flyway.setDataSource(dbUrl, "", "");
+                flyway.migrate();
             }
+            
+            
             
             log.info( "Create instance directories." );
             // create directory for web instance
