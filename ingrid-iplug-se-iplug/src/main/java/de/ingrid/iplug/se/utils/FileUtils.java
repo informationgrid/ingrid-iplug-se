@@ -217,7 +217,7 @@ public class FileUtils {
         for (String start : startUrlsValue) {
             Map<String, List<String>> metas = startUrls.get(start);
 
-            String metasConcat = start;
+            String metasConcat = checkForRegularExpressions(start);
             for (String key : metas.keySet()) {
                 metasConcat += "\t" + key + ":\t" + StringUtils.join(metas.get(key), "\t");
             }
