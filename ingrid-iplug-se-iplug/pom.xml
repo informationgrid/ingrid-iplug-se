@@ -381,6 +381,7 @@
                         <exclude>**/webapp/js/mindmup**</exclude>
                         <exclude>**/webapp/js/localization/**</exclude>
                         <exclude>**/db/migration/**</exclude>
+                        <exclude>**/*.json</exclude>
                         <exclude>**/log4j.properties</exclude>
                     </excludes>
                 </configuration>
