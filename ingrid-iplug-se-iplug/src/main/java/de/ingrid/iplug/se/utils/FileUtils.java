@@ -29,6 +29,7 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Writer;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
@@ -43,6 +44,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -56,6 +59,8 @@ import edu.emory.mathcs.backport.java.util.Arrays;
 public class FileUtils {
 
     private static Logger log = Logger.getLogger(FileUtils.class);
+
+    private static final Pattern REGEXP_SPECIAL_CHARS = Pattern.compile("([\\\\*+\\[\\](){}\\$.?\\^|])");
 
     public static void removeRecursive(Path path) throws IOException {
         removeRecursive(path, ".*");
@@ -195,12 +200,12 @@ public class FileUtils {
                 metaValues.add(meta.getMetaValue());
             }
 
-            startUrls.put(url.getUrl(), metadata);
+            startUrls.put(url.getUrl().trim(), metadata);
             for (String limit : url.getLimitUrls()) {
-                limitUrls.add(limit);
+                limitUrls.add(checkForRegularExpressions(limit.trim()));
             }
             for (String exclude : url.getExcludeUrls()) {
-                excludeUrls.add(exclude);
+                excludeUrls.add(checkForRegularExpressions(exclude.trim()));
             }
         }
 
@@ -330,4 +335,23 @@ public class FileUtils {
 
         return subDirs;
     }
+
+    private static String checkForRegularExpressions(String urlStr) {
+        if (urlStr.startsWith("/") && urlStr.endsWith("/")) {
+            urlStr = urlStr.substring(1, urlStr.length() - 1);
+        } else {
+            URL uri;
+            try {
+                uri = new URL(urlStr);
+                if (uri.getPath() != null || uri.getQuery() != null) {
+                    Matcher match = REGEXP_SPECIAL_CHARS.matcher((uri.getPath() != null ? uri.getPath() : "") + (uri.getQuery() != null ? "?" + uri.getQuery() : ""));
+                    urlStr = uri.getProtocol() + "://" + uri.getHost() + (uri.getPort() > 0 ? ":" + uri.getPort() : "") + match.replaceAll("\\\\$1");
+                }
+            } catch (MalformedURLException e) {
+                log.error("The url pattern: '" + urlStr + "' is not a valid url.");
+            }
+        }
+        return urlStr;
+    }
+
 }
