@@ -154,7 +154,7 @@
             // ************************************
             $.each( data.limitUrls, function(index, url) {
             	var localValid = true;
-            	if (url.indexOf("/") === 0 && url.lastIndexOf("/") === (url.length + 1)) {
+            	if (url.indexOf("/") === 0 && url.lastIndexOf("/") === (url.length - 1)) {
             		var innerUrl = url.substring(1, url.length - 1);
                     if ( !isUrl( innerUrl ) ) {
                     	localValid = false;
@@ -187,7 +187,7 @@
             // ************************************
             $.each( data.excludeUrls, function(index, url) {
             	var localValid = true;
-            	if (url.indexOf("/") === 0 && url.lastIndexOf("/") === (url.length + 1)) {
+            	if (url.indexOf("/") === 0 && url.lastIndexOf("/") === (url.length - 1)) {
             		var innerUrl = url.substring(1, url.length - 1);
                     if ( !isUrl( innerUrl ) ) {
                     	localValid = false;
