@@ -40,6 +40,7 @@ THIS="$0"
 THIS_DIR=`dirname "$THIS"`
 INGRID_HOME=`cd "$THIS_DIR" ; pwd`
 PID=$INGRID_HOME/ingrid.pid
+INGRID_OPTS=-XX:MaxPermSize=128m
 
 # include a debug script, if available, i.e. to specify debug port, etc.
 # caution: the debug script must echo the actual command to be able to work in the current environment
@@ -157,8 +158,7 @@ startIplug()
   fi
 
   JAVA=$JAVA_HOME/bin/java
-  JAVA_HEAP_MAX=-Xmx256m
-
+  
   # check envvars which might override default args
   if [ "$INGRID_HEAPSIZE" != "" ]; then
     JAVA_HEAP_MAX="-Xmx""$INGRID_HEAPSIZE""m"
