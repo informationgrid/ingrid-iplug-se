@@ -288,14 +288,24 @@ public class Migrator {
             
             // get all start Urls
             log.info( "Fetch all web urls ..." );
-            rs = st.executeQuery( "SELECT * FROM url WHERE type='START' AND deleted IS NULL" );
+            if (conf.partner == null || conf.partner.isEmpty()) {
+                rs = st.executeQuery( "SELECT * FROM url WHERE type='START' AND deleted IS NULL" );
+            } else {
+                rs = st.executeQuery( "SELECT u.* FROM url u, provider pr, partner pa WHERE type='START' AND deleted IS NULL AND u.provider_fk=pr.ID AND pr.partner_fk=pa.ID AND pa.SHORTNAME='" + conf.partner + "'" );
+            }
             webUrls = convertToWebUrls( rs );
             rs.close();
             
             // get all catalog Urls
+            st = con.createStatement();
             log.info( "Fetch all catalog urls ..." );
-            rs = st.executeQuery( "SELECT * FROM url WHERE type='CATALOG' AND deleted IS NULL" );
+            if (conf.partner == null || conf.partner.isEmpty()) {
+                rs = st.executeQuery( "SELECT * FROM url WHERE type='CATALOG' AND deleted IS NULL" );
+            } else {
+                rs = st.executeQuery( "SELECT u.* FROM url u, provider pr, partner pa WHERE type='CATALOG' AND deleted IS NULL AND u.provider_fk=pr.ID AND pr.partner_fk=pa.ID AND pa.SHORTNAME='" + conf.partner + "'" );
+            }
             catalogUrls = convertToCatalogUrls( rs );
+            rs.close();
 
             // add urls to h2 database
             Map<String, String> properties = new HashMap<String, String>();

@@ -48,6 +48,9 @@ public class MigratorConfig extends Configuration {
     @CommandLineValue(shortOpt="catalog", longOpt="catalogInstance", hasArg=true)
     public String catalogInstance;
 
+    @CommandLineValue(shortOpt="partner", longOpt="partner", hasArg=true)
+    public String partner;
+    
     @Validation
     private void validate() {
         if (username == null || dbPath == null || webInstance == null || catalogInstance == null) {
