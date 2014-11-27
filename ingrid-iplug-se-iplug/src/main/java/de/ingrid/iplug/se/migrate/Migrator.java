@@ -125,7 +125,7 @@ public class Migrator {
             u.setInstance( conf.webInstance );
             
             // LIMIT-Urls
-            PreparedStatement stmt = con.prepareStatement( "SELECT * FROM url WHERE startUrl_fk=? AND type='LIMIT'" );
+            PreparedStatement stmt = con.prepareStatement( "SELECT * FROM url WHERE startUrl_fk=? AND type='LIMIT' AND deleted IS NULL" );
             stmt.setInt( 1, rs.getInt( ID ) );
             ResultSet rs_limit = stmt.executeQuery();
             List<String> limitUrls = new ArrayList<String>();
@@ -147,7 +147,7 @@ public class Migrator {
             rs_limit.close();
             
             // EXCLUDE-Urls
-            stmt = con.prepareStatement( "SELECT * FROM url WHERE startUrl_fk=? AND type='EXCLUDE'" );
+            stmt = con.prepareStatement( "SELECT * FROM url WHERE startUrl_fk=? AND type='EXCLUDE' AND deleted IS NULL" );
             stmt.setInt( 1, rs.getInt( ID ) );
             ResultSet rs_exclude = stmt.executeQuery();
             List<String> excludeUrls = new ArrayList<String>();
@@ -265,13 +265,13 @@ public class Migrator {
             
             // get all start Urls
             log.info( "Fetch all web urls ..." );
-            rs = st.executeQuery( "SELECT * FROM url WHERE type='START'" );
+            rs = st.executeQuery( "SELECT * FROM url WHERE type='START' AND deleted IS NULL" );
             webUrls = convertToWebUrls( rs );
             rs.close();
             
             // get all catalog Urls
             log.info( "Fetch all catalog urls ..." );
-            rs = st.executeQuery( "SELECT * FROM url WHERE type='CATALOG'" );
+            rs = st.executeQuery( "SELECT * FROM url WHERE type='CATALOG' AND deleted IS NULL" );
             catalogUrls = convertToCatalogUrls( rs );
 
             // add urls to h2 database
