@@ -238,6 +238,29 @@ public class Migrator {
             limitUrls.add( u.getUrl() );
             u.setLimitUrls( limitUrls );
             
+            // partner and provider
+            stmt = con.prepareStatement( "SELECT pr.SHORTNAME PR_SHORT, pr.NAME PR_NAME, pa.SHORTNAME PA_SHORT, pa.NAME PA_NAME  FROM url u, provider pr, partner pa WHERE u.id=? AND u.provider_fk=pr.ID AND pr.partner_fk=pa.ID" );
+            stmt.setInt( 1, rs.getInt( ID ) );
+            ResultSet rs_partnerProvider = stmt.executeQuery();
+            List <Metadata> urlMetadata = new ArrayList<Metadata>();
+            if (rs_partnerProvider.next()) {
+                Metadata md = new Metadata();
+                md.setMetaKey("partner");
+                md.setMetaValue(rs_partnerProvider.getString("PA_SHORT"));
+                urlMetadata.add(md);
+                md = new Metadata();
+                md.setMetaKey("provider");
+                md.setMetaValue(rs_partnerProvider.getString("PR_SHORT"));
+                urlMetadata.add(md);
+            }
+            rs_partnerProvider.close();
+            
+            if (u.getMetadata() != null) {
+                u.getMetadata().addAll(urlMetadata);
+            } else {
+                u.setMetadata(urlMetadata);
+            }            
+            
             catalogUrls.add( u );
         }
         return catalogUrls;
