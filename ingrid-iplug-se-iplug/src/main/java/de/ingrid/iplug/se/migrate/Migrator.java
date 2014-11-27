@@ -176,6 +176,7 @@ public class Migrator {
                 Metadata md = new Metadata();
                 md.setMetaKey("partner");
                 md.setMetaValue(rs_partnerProvider.getString("PA_SHORT"));
+                urlMetadata.add(md);
                 md = new Metadata();
                 md.setMetaKey("provider");
                 md.setMetaValue(rs_partnerProvider.getString("PR_SHORT"));
