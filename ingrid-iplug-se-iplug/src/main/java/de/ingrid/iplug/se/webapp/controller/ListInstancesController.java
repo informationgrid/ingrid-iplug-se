@@ -163,10 +163,13 @@ public class ListInstancesController extends AbstractController {
         // convert illegal chars to "_"
         name = name.replaceAll( "[:\\\\/*?|<>\\W]", "_" );
         // create directory and copy necessary configuration files
-        boolean success = initializeInstanceDir( dir + "/" + name );
+        boolean success = true;
         
-        if (from != null) {
-            success = success && copyUrlsFromInstanceTo( from, name );
+        if (from == null) {
+            success = initializeInstanceDir( dir + "/" + name );
+            
+        } else {
+            success = success && copyUrlsFromInstanceTo( from, name ) && copyInstanceDir( dir + "/" + from, dir + "/" + name );
         }
         
         if (success) {
@@ -266,6 +269,24 @@ public class ListInstancesController extends AbstractController {
         }
 
         return result;
+    }
+    
+    private boolean copyInstanceDir(String from, String to) {
+        Path sourceDir = Paths.get( from, "conf" );
+        Path destDir = Paths.get( to, "conf" );
+        
+        try {
+            final Path newInstanceDir = Files.createDirectories( destDir );
+            if (newInstanceDir == null) {
+                throw new RuntimeException( "Directory could not be created: " + destDir );
+            }
+            
+            FileUtils.copyDirectories( sourceDir, destDir );
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     @RequestMapping(value = "/iplug-pages/listInstances", method = RequestMethod.DELETE)
