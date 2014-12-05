@@ -14,8 +14,8 @@
 	<name>ingrid-iplug-se</name>
 
 	<scm>
-		<connection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid-iplug-se/branches/3.5.x_new_architecture</connection>
-		<developerConnection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid-iplug-se/branches/3.5.x_new_architecture</developerConnection>
+		<connection>scm:git:git@github.com:informationgrid/ingrid-iplug-se.git</connection>
+		<developerConnection>scm:git:git@github.com:informationgrid/ingrid-iplug-se.git</developerConnection>
 	</scm>
 	<repositories>
 		<!-- Repo of parent pom needed, parent pom may not be installed locally
@@ -23,7 +23,7 @@
 		<repository>
 			<id>de.ingrid.all</id>
 			<name>Maven Repo InGrid</name>
-			<url>http://harrison.its-technidata.de/archiva/repository/ingrid-all</url>
+			<url>https://dev.informationgrid.eu/archiva/repository/ingrid-all</url>
 		</repository>
 	</repositories>
 
@@ -150,24 +150,4 @@
 			</plugin>
 		</plugins>
 	</reporting>
-	<profiles>
-		<profile>
-			<!-- This profile is only used for deploying the installer into the repository
-				during a normal build! Used in Hudson! -->
-			<id>noRelease</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>wagon-maven-plugin</artifactId>
-						<inherited>false</inherited>
-						<configuration>
-							<!-- NOTICE: REDEFINE directory on distribution server -->
-							<url>file:///srv/www/htdocs/ingrid/maven2/de/ingrid/mdek/${project.name}/${project.version}</url>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>
