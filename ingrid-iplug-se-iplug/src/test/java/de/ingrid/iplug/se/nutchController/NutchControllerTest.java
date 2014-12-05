@@ -30,6 +30,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
@@ -45,6 +47,7 @@ import com.google.gson.JsonSyntaxException;
 
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
+import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
 
@@ -57,8 +60,16 @@ public class NutchControllerTest {
         
         Configuration configuration = new Configuration();
         configuration.setInstancesDir("test-instances");
+        configuration.databaseID = "iplug-se-dev";
         configuration.nutchCallJavaOptions = java.util.Arrays.asList( "-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8" );
         SEIPlug.conf = configuration;
+        
+        // get an entity manager instance (initializes properties in the
+        // DBManager)
+        EntityManagerFactory emf = null;
+        // for development use the settings from the persistence.xml
+        emf = Persistence.createEntityManagerFactory(configuration.databaseID);
+        DBManager.INSTANCE.intialize(emf);
         
         Instance instance = new Instance();
         instance.setName("test");
@@ -73,7 +84,7 @@ public class NutchControllerTest {
         FileUtils.copyDirectories(Paths.get("../ingrid-iplug-se-nutch/src/test/resources/urls").toAbsolutePath(), urls);
         // TODO: copy dir with metadata-mapping
         
-        IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, 2, 100, null);
+        IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, 2, 10, null);
 
         NutchController nutchController = new NutchController();
         nutchController.start(instance, process);
@@ -112,12 +123,20 @@ public class NutchControllerTest {
         
         Configuration configuration = new Configuration();
         configuration.setInstancesDir("test-instances");
+        configuration.databaseID = "iplug-se-dev";
         configuration.nutchCallJavaOptions = java.util.Arrays.asList( "-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8" );
         SEIPlug.conf = configuration;
         
         Instance instance = new Instance();
         instance.setName("test");
         instance.setWorkingDirectory(SEIPlug.conf.getInstancesDir() + "/test");
+
+        // get an entity manager instance (initializes properties in the
+        // DBManager)
+        EntityManagerFactory emf = null;
+        // for development use the settings from the persistence.xml
+        emf = Persistence.createEntityManagerFactory(configuration.databaseID);
+        DBManager.INSTANCE.intialize(emf);
 
         Path conf = Paths.get(SEIPlug.conf.getInstancesDir(), "test", "conf").toAbsolutePath();
         Path urls = Paths.get(SEIPlug.conf.getInstancesDir(), "test", "urls").toAbsolutePath();
