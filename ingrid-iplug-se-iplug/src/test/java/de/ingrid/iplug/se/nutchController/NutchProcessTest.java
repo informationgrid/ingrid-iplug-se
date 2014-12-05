@@ -30,6 +30,9 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
@@ -38,6 +41,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import de.ingrid.iplug.se.Configuration;
+import de.ingrid.iplug.se.SEIPlug;
+import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
 
@@ -100,12 +106,32 @@ public class NutchProcessTest {
         Path urls = fs.getPath("test", "urls").toAbsolutePath();
         Path logs = fs.getPath("test", "logs").toAbsolutePath();
         Files.createDirectories(logs);
-
+        
+        Configuration configuration = new Configuration();
+        configuration.setInstancesDir(".");
+        configuration.databaseID = "iplug-se-dev";
+        configuration.nutchCallJavaOptions = java.util.Arrays.asList( "-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8" );
+        SEIPlug.conf = configuration;
+        
+        // get an entity manager instance (initializes properties in the
+        // DBManager)
+        EntityManagerFactory emf = null;
+        // for development use the settings from the persistence.xml
+        emf = Persistence.createEntityManagerFactory(configuration.databaseID);
+        DBManager.INSTANCE.intialize(emf);
+        
+        
         FileUtils.copyDirectories(fs.getPath("../ingrid-iplug-se-nutch/src/test/resources/conf").toAbsolutePath(), conf);
         FileUtils.copyDirectories(fs.getPath("../ingrid-iplug-se-nutch/src/test/resources/urls").toAbsolutePath(), urls);
 
         IngridCrawlNutchProcess p = new IngridCrawlNutchProcess();
         p.setWorkingDirectory(workingDir.toString());
+        
+        Instance instance = new Instance();
+        instance.setWorkingDirectory(workingDir.toString());
+        instance.setName("test");
+
+        p.setInstance(instance);
         p.addClassPath(conf.toString());
         p.addClassPath("../../ingrid-iplug-se-nutch/build/apache-nutch-1.9/runtime/local");
         p.addClassPath("../../ingrid-iplug-se-nutch/build/apache-nutch-1.9/runtime/local/lib/*");
