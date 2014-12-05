@@ -143,6 +143,13 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             }
             this.statusProvider.appendToState(STATES.FILTER_CRAWLDB.name(), " done.");
 
+            this.statusProvider.addState(STATES.CREATE_HOST_STATISTICS.name(), "Create hosts statistic...");
+            ret = execute("de.ingrid.iplug.se.nutch.statistics.HostStatistic", crawlDb, workingPath);
+            if (ret != 0) {
+                throwCrawlError("Error during Execution of: de.ingrid.iplug.se.nutch.statistics.HostStatistic");
+            }
+            this.statusProvider.appendToState(STATES.CREATE_HOST_STATISTICS.name(), " done.");
+            
             for (int i = 0; i < depth; i++) {
                 this.statusProvider.addState(STATES.GENERATE.name() + i, "Generate up to " + noUrls.toString() + " urls for fetching " + "[" + (i + 1) + "/" + depth + "] ...");
                 this.statusProvider.setStateProperty(STATES.GENERATE.name(), "i", Integer.toString(i));
