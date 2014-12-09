@@ -83,6 +83,10 @@
 					<groupId>org.apache.lucene</groupId>
 					<artifactId>lucene-analyzers</artifactId>
 				</exclusion>
+                <exclusion>
+                    <groupId>javassist</groupId>
+                    <artifactId>javassist</artifactId>
+                </exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -92,10 +96,10 @@
 			<classifier>res</classifier>
 			<type>zip</type>
 			<exclusions>
-				<exclusion>
-					<groupId>org.apache.lucene</groupId>
-					<artifactId>lucene-analyzers</artifactId>
-				</exclusion>
+                <exclusion>
+                    <groupId>org.apache.lucene</groupId>
+                    <artifactId>lucene-analyzers</artifactId>
+                </exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
