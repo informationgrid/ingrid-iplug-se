@@ -233,9 +233,10 @@ public class Configuration implements IConfig {
         }
         
         // add fields
+        @SuppressWarnings("unchecked")
+        List<String> pdFields = pdObject.getArrayList(PlugDescription.FIELDS);
         for (String field : fields) {
-            if (field != null && !field.isEmpty()) {
-                pdObject.remove( field );
+            if (field != null && !field.isEmpty() && !pdFields.contains(field)) {
                 pdObject.addField( field );
             }
         }
