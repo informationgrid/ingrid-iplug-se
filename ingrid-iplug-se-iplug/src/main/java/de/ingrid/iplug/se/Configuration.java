@@ -203,7 +203,9 @@ public class Configuration implements IConfig {
 	
 	@Override
     public void addPlugdescriptionValues( PlugdescriptionCommandObject pdObject ) {
-        pdObject.put( "iPlugClass", "de.ingrid.iplug.se.SEIPlug" );
+        log.info("Add iPlug specific properties into plugdescription.");
+	    
+	    pdObject.put( "iPlugClass", "de.ingrid.iplug.se.SEIPlug" );
 
         // make sure only partner=all is communicated to iBus
         @SuppressWarnings("unchecked")
@@ -232,8 +234,10 @@ public class Configuration implements IConfig {
         
         // add fields
         for (String field : fields) {
-            pdObject.remove( field );
-            pdObject.addField( field );
+            if (field != null && !field.isEmpty()) {
+                pdObject.remove( field );
+                pdObject.addField( field );
+            }
         }
     }
 

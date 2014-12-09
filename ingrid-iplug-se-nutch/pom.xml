@@ -11,10 +11,6 @@
 	<artifactId>ingrid-iplug-se-nutch</artifactId>
 	<packaging>jar</packaging>
 	<name>ingrid-iplug-se-nutch</name>
-	<scm>
-		<connection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid/ingrid-iplug-se/branches/3.5.x_new_architecture/ingrid-iplug-se-nutch</connection>
-		<developerConnection>scm:svn:https://harrison.its-technidata.de:444/svn/ingrid/ingrid-mdek/trunk/ingrid-iplug-se/branches/3.5.x_new_architecture/ingrid-iplug-se-nutch</developerConnection>
-	</scm>
 	<properties>
 		<apache-nutch-version>apache-nutch-1.9</apache-nutch-version>
 	</properties>
@@ -24,7 +20,7 @@
 		<repository>
 			<id>de.ingrid.all</id>
 			<name>Maven Repo InGrid</name>
-			<url>http://harrison.its-technidata.de/archiva/repository/ingrid-all</url>
+			<url>https://dev.informationgrid.eu/archiva/repository/ingrid-all</url>
 		</repository>
 	</repositories>
 	<dependencyManagement>
