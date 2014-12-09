@@ -66,11 +66,13 @@ public class Utils {
     
     public static IndexImpl index = null;
 
-    private static ElasticsearchNodeFactoryBean elastic;
+    public static ElasticsearchNodeFactoryBean elastic;
 
     public static void setupES() throws Exception {
+        
         elastic = new ElasticsearchNodeFactoryBean();
         elastic.setLocal( true );
+        elastic.setSettings(new HashMap<String, String>() {{put("transport.tcp.port", "54345"); put("http.port", "54355");}});
         elastic.afterPropertiesSet();
         
         // set necessary configurations for startup

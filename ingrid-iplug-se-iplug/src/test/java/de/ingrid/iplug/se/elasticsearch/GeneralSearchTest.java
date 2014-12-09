@@ -63,6 +63,7 @@ public class GeneralSearchTest {
     @AfterClass
     public static void tearDown() throws Exception {
         Utils.index.close();
+        Utils.elastic.destroy();
     }
 
     @Test

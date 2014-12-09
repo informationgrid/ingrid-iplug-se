@@ -59,6 +59,7 @@ public class LocationSearchTest  {
     @AfterClass
     public static void tearDown() throws Exception {
         Utils.index.close();
+        Utils.elastic.destroy();
     }
 
     /**

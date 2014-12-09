@@ -57,8 +57,9 @@ public class DateSearchTest  {
     }
     
     @AfterClass
-    public static void tearDown() {
+    public static void tearDown() throws Exception {
         Utils.index.close();
+        Utils.elastic.destroy();
     }
     
     @Test

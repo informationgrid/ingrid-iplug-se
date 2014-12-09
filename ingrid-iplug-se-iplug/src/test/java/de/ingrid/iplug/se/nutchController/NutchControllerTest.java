@@ -56,7 +56,11 @@ public class NutchControllerTest {
     @Test
     public void test() throws InterruptedException, IOException, JsonSyntaxException, JsonIOException, SAXException, ParserConfigurationException, TransformerException {
         
-        FileUtils.removeRecursive(Paths.get("test-instances"));
+        Node node = null;
+        
+        try {
+        
+            FileUtils.removeRecursive(Paths.get("test-instances"));
         
         Configuration configuration = new Configuration();
         configuration.setInstancesDir("test-instances");
@@ -89,10 +93,10 @@ public class NutchControllerTest {
         NutchController nutchController = new NutchController();
         nutchController.start(instance, process);
         
-        Settings settings = ImmutableSettings.settingsBuilder().put("path.data", SEIPlug.conf.getInstancesDir() + "/test").build();
+        Settings settings = ImmutableSettings.settingsBuilder().put("path.data", SEIPlug.conf.getInstancesDir() + "/test").put("transport.tcp.port", 54346).put("http.port", 54347).build();
         NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().clusterName("elasticsearch").data(true).settings(settings);
         nodeBuilder = nodeBuilder.local(false);
-        Node node = nodeBuilder.node();
+        node = nodeBuilder.node();
 
         long start = System.currentTimeMillis();
         Thread.sleep(500);
@@ -114,6 +118,10 @@ public class NutchControllerTest {
         System.out.println(nutchController.getNutchProcess(instance).getStatusProvider().toString());
 
         FileUtils.removeRecursive(Paths.get("test-instances"));
+        } finally {
+            if (node != null) node.close();
+            
+        }
     }
     
     @Test
