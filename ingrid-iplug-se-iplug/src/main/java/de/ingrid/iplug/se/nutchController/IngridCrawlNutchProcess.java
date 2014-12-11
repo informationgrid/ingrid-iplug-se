@@ -269,10 +269,12 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             if (ret != 0) {
                 throwCrawlError("Error during Execution of: org.apache.nutch.scoring.webgraph.WebGraph");
             }
+            logFileWatcher = LogFileWatcherFactory.getWepgraphLogfileWatcher(Paths.get(instance.getWorkingDirectory(), "logs", "hadoop.log").toFile(), statusProvider, STATES.UPDATE_WEBGRAPH.name());
             ret = execute("org.apache.nutch.scoring.webgraph.LinkRank", "-webgraphdb", webgraph);
             if (ret != 0) {
                 throwCrawlError("Error during Execution of: org.apache.nutch.scoring.webgraph.LinkRank");
             }
+            logFileWatcher.close();
             ret = execute("org.apache.nutch.scoring.webgraph.ScoreUpdater", "-webgraphdb", webgraph, "-crawldb", crawlDb);
             if (ret != 0) {
                 throwCrawlError("Error during Execution of: org.apache.nutch.scoring.webgraph.ScoreUpdater");
@@ -287,10 +289,12 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             this.statusProvider.appendToState(STATES.UPDATE_LINKDB.name(), " done.");
 
             this.statusProvider.addState(STATES.DEDUPLICATE.name(), "Deduplication...");
+            logFileWatcher = LogFileWatcherFactory.getDeduplicationLogfileWatcher(Paths.get(instance.getWorkingDirectory(), "logs", "hadoop.log").toFile(), statusProvider, STATES.DEDUPLICATE.name());
             ret = execute("org.apache.nutch.crawl.DeduplicationJob", crawlDb);
             if (ret != 0) {
                 throwCrawlError("Error during Execution of: org.apache.nutch.crawl.DeduplicationJob");
             }
+            logFileWatcher.close();
             this.statusProvider.appendToState(STATES.DEDUPLICATE.name(), " done.");
 
             this.statusProvider.addState(STATES.INDEX.name(), "Create index...");
@@ -301,10 +305,12 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             this.statusProvider.appendToState(STATES.INDEX.name(), " done.");
 
             this.statusProvider.addState(STATES.CLEAN_DUPLICATES.name(), "Clean up duplicates in index...");
+            logFileWatcher = LogFileWatcherFactory.getCleaningJobLogfileWatcher(Paths.get(instance.getWorkingDirectory(), "logs", "hadoop.log").toFile(), statusProvider, STATES.CLEAN_DUPLICATES.name());
             ret = execute("org.apache.nutch.indexer.CleaningJob", crawlDb);
             if (ret != 0) {
                 throwCrawlError("Error during Execution of: org.apache.nutch.indexer.CleaningJob");
             }
+            logFileWatcher.close();
             this.statusProvider.appendToState(STATES.CLEAN_DUPLICATES.name(), " done.");
 
             this.statusProvider.addState(STATES.CLEANUP_HADOOP.name(), "Clean up ...");

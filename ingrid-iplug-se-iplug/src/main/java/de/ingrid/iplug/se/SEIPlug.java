@@ -169,7 +169,7 @@ public class SEIPlug extends HeartBeatPlug {
         
         preProcess(query);
 
-        return index.search(query, 0, 10);
+        return index.search(query, start, length);
 
     }
 
