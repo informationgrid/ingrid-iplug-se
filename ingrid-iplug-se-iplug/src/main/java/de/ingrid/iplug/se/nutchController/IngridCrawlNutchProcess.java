@@ -270,9 +270,9 @@ public class IngridCrawlNutchProcess extends NutchProcess {
                 throwCrawlError("Error during Execution of: org.apache.nutch.scoring.webgraph.WebGraph");
             }
             logFileWatcher = LogFileWatcherFactory.getWepgraphLogfileWatcher(Paths.get(instance.getWorkingDirectory(), "logs", "hadoop.log").toFile(), statusProvider, STATES.UPDATE_WEBGRAPH.name());
-            ret = execute("org.apache.nutch.scoring.webgraph.LinkRank", "-webgraphdb", webgraph);
+            ret = execute("de.ingrid.iplug.se.nutch.scoring.webgraph.LinkRankWrapper", "-webgraphdb", webgraph);
             if (ret != 0) {
-                throwCrawlError("Error during Execution of: org.apache.nutch.scoring.webgraph.LinkRank");
+                throwCrawlError("Error during Execution of: de.ingrid.iplug.se.nutch.scoring.webgraph.LinkRankWrapper");
             }
             logFileWatcher.close();
             ret = execute("org.apache.nutch.scoring.webgraph.ScoreUpdater", "-webgraphdb", webgraph, "-crawldb", crawlDb);
