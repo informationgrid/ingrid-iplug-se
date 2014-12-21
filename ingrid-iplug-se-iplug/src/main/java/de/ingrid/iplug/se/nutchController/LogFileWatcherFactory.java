@@ -63,7 +63,7 @@ public class LogFileWatcherFactory {
 
         // 10 threads (2 waiting), 11 queues, 493 URLs queued, 5693 pages, 135
         // errors, 7.03 pages/s (3 last sec), 6011 kbits/s (18810 last sec)
-        final Pattern p = Pattern.compile(".*queued, (\\d+) pages, (\\d+) errors, ([\\d\\.]+) pages/s.*");
+        final Pattern p = Pattern.compile(".*queued, (\\d+) pages, (\\d+) errors, ([\\d\\.,]+) pages/s.*");
 
         public FetchTailerListener(StatusProvider statusProvider, String statusKey) {
             this.statusProvider = statusProvider;
