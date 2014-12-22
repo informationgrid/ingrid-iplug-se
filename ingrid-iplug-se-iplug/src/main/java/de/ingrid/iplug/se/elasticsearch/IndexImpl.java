@@ -291,7 +291,11 @@ public class IndexImpl implements Index {
         if (requestedFields != null) {
             for (String field : requestedFields) {
                 if (dHit.field( field ) != null) {
-                    detail.put( field, dHit.field( field ).getValue());
+                    if (dHit.field( field ).getValue() instanceof String) {
+                        detail.put( field, new String[] {dHit.field( field ).getValue()});
+                    } else {
+                        detail.put( field, dHit.field( field ).getValue());
+                    }
                 }
             }
         }
