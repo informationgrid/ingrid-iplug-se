@@ -341,5 +341,10 @@
         and removal.</description>
     </property>
 
+    <property>
+        <name>bw.accept.http.and.https</name>
+        <value>true</value>
+        <description>If true the bw filter mechanism makes no difference between http and https URLs.</description>
+    </property>
 
 </configuration>

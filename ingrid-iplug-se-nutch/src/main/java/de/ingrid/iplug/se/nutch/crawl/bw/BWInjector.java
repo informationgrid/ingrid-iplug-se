@@ -84,6 +84,7 @@ public class BWInjector extends Configured implements Tool {
 
     private static final String PROHIBITED = "prohibited";
     private static final String NORMALIZE = "normalize";
+    private static final String ACCEPT_HTTP_AND_HTTPS = "bw.accept.http.and.https";
 
     public BWInjector(Configuration conf) {
         super(conf);
@@ -105,12 +106,15 @@ public class BWInjector extends Configured implements Tool {
 
         private boolean _prohibited;
         private boolean _normalize;
+        private boolean _acceptHttpAndHttps;
 
         public void configure(JobConf job) {
             this.jobConf = job;
             _urlNormalizers = new URLNormalizers(jobConf, URLNormalizers.SCOPE_INJECT);
             _prohibited = jobConf.getBoolean(PROHIBITED, true);
             _normalize = jobConf.getBoolean(NORMALIZE, true);
+            _normalize = jobConf.getBoolean(NORMALIZE, true);
+            _acceptHttpAndHttps = jobConf.getBoolean(ACCEPT_HTTP_AND_HTTPS, false);
         }
 
         public void close() {
@@ -135,6 +139,10 @@ public class BWInjector extends Configured implements Tool {
                 } catch (Exception e) {
                     LOG.warn("unable to get host from: " + url + " : " + e.toString());
                     return;
+                }
+                if (_acceptHttpAndHttps) {
+                    url = url.replace("http:", "htt(p|ps):");
+                    url = url.replace("https:", "htt(p|ps):");
                 }
                 BWPatterns patterns;
                 if (_prohibited) {
