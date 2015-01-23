@@ -87,7 +87,7 @@
             <tr>
                 <th data-sort="string" width="20px"></th>
                 <th data-sort="string">URL</th>
-                <th data-sort="string" width="60px">Status</th>
+                <th data-sort="string" width="110px">Status</th>
                 <th data-sort="string" width="100px"></th>
             </tr>
         </thead>
