@@ -339,7 +339,7 @@ public class GeneralSearchTest {
         assertThat( detail, not( is( nullValue() ) ) );
         // assertThat( detail.getHitId(), is( "1" ) );
         assertThat( detail.getString( IndexImpl.DETAIL_URL ), is( "http://www.wemove.com" ) );
-        assertThat( detail.getString( "fetched" ), is( "2014-06-03" ) );
+        assertThat( (String)detail.getArray( "fetched" )[0], is( "2014-06-03" ) );
     }
     
 
