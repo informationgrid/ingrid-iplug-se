@@ -28,9 +28,15 @@
 		<author email="joachim@wemove.com">Joachim Müller</author>
 	</properties>
 	<body>
-		<release version="3.5.0-SNAPSHOT" date="2014-xx-xx" description="Release InGrid 3.5">
+		<release version="3.5.0" date="2015-01-30" description="Release InGrid 3.5.0">
 			<action type="add" dev="wemove" issue="REDMINE-524">
         Added license header to all source files for Open Source migration.
+      </action>
+      <action type="add" dev="wemove">
+        Redesigned iPlug with better separation of Nutch and the administration page.
+      </action>
+      <action type="update" dev="wemove" issue="REDMINE-307">
+        Updated Nutch to version 1.9.
       </action>
 		</release>
 	</body>
