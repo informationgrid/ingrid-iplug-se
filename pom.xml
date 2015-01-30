@@ -9,13 +9,13 @@
     <groupId>de.ingrid</groupId>
     <artifactId>ingrid-iplug-se</artifactId>
     <packaging>pom</packaging>
-    <version>3.5.0</version>
+    <version>3.6.0-SNAPSHOT</version>
     <name>ingrid-iplug-se</name>
 
     <scm>
         <connection>scm:git:git@github.com:informationgrid/ingrid-iplug-se.git</connection>
         <developerConnection>scm:git:git@github.com:informationgrid/ingrid-iplug-se.git</developerConnection>
-      <tag>ingrid-iplug-se-3.5.0</tag>
+      <tag>HEAD</tag>
   </scm>
     <repositories>
         <!-- Repo of parent pom needed, parent pom may not be installed locally
