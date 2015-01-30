@@ -7,7 +7,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.ingrid</groupId>
-    <artifactId>ingrid-iplug-se-project</artifactId>
+    <artifactId>ingrid-iplug-se</artifactId>
     <packaging>pom</packaging>
     <version>3.6.0-SNAPSHOT</version>
     <name>ingrid-iplug-se</name>
@@ -124,6 +124,11 @@
                 </dependencies>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-changes-plugin</artifactId>
+                <inherited>false</inherited>
+            </plugin>
+            <plugin>
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5.1</version>
                 <configuration>
@@ -132,7 +137,7 @@
                     assembly:single wagon:upload changes:announcement-mail to upload
                     the distribution to /opt/ingrid/distributions
                   -->
-                  <preparationGoals>clean verify deploy changes:changes-report wagon:upload -Dlicense.failOnMissingHeader=true -Dlicense.failOnNotUptodateHeader=true -Dproject.url=</preparationGoals>
+                  <preparationGoals>clean verify changes:changes-report deploy wagon:upload -Dlicense.failOnMissingHeader=true -Dlicense.failOnNotUptodateHeader=true -Dproject.url=</preparationGoals>
                   <goals>changes:announcement-mail -Dproject.url= --non-recursive</goals>
                 </configuration>
             </plugin>
