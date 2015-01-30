@@ -85,6 +85,11 @@ public class NutchControllerTest {
             Files.createDirectories(logs);
 
             FileUtils.copyDirectories(Paths.get("apache-nutch-runtime/runtime/local/conf").toAbsolutePath(), conf);
+            
+            NutchConfigTool nct = new NutchConfigTool(Paths.get(conf.toAbsolutePath().toString(), "nutch-site.xml"));
+            nct.addOrUpdateProperty("elastic.port", "54346", "");
+            nct.write();
+            
             FileUtils.copyDirectories(Paths.get("../ingrid-iplug-se-nutch/src/test/resources/urls").toAbsolutePath(), urls);
             // TODO: copy dir with metadata-mapping
 
@@ -93,7 +98,7 @@ public class NutchControllerTest {
             NutchController nutchController = new NutchController();
             nutchController.start(instance, process);
 
-            Settings settings = ImmutableSettings.settingsBuilder().put("path.data", SEIPlug.conf.getInstancesDir() + "/test").build();
+            Settings settings = ImmutableSettings.settingsBuilder().put("path.data", SEIPlug.conf.getInstancesDir() + "/test").put("transport.tcp.port", 54346).put("http.port", 54347).build();
             NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().clusterName("elasticsearch").data(true).settings(settings);
             nodeBuilder = nodeBuilder.local(false);
             node = nodeBuilder.node();

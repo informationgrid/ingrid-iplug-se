@@ -326,6 +326,13 @@
 			ingrid.indexer.elastic plugin..</description>
 	</property>
 
+    <property>
+		<name>elastic.port</name>
+		<value>54346</value>
+		<description>The port to connect to using TransportClient.</description>
+	</property>
+
+
 	<property>
 		<name>scoring.depth.max</name>
 		<value>10</value>

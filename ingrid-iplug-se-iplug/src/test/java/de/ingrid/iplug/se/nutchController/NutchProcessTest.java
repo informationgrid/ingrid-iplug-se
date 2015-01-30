@@ -29,6 +29,7 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -126,6 +127,11 @@ public class NutchProcessTest {
             DBManager.INSTANCE.intialize(emf);
 
             FileUtils.copyDirectories(fs.getPath("../ingrid-iplug-se-nutch/src/test/resources/conf").toAbsolutePath(), conf);
+
+            NutchConfigTool nct = new NutchConfigTool(Paths.get(conf.toAbsolutePath().toString(), "nutch-site.xml"));
+            nct.addOrUpdateProperty("elastic.port", "54346", "");
+            nct.write();
+            
             FileUtils.copyDirectories(fs.getPath("../ingrid-iplug-se-nutch/src/test/resources/urls").toAbsolutePath(), urls);
 
             IngridCrawlNutchProcess p = new IngridCrawlNutchProcess();

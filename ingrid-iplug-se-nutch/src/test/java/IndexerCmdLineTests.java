@@ -370,7 +370,7 @@ public class IndexerCmdLineTests {
         call.add("test/segments");
         call.add("-deleteGone");
 
-        Settings settings = ImmutableSettings.settingsBuilder().put("path.data", "test").build();
+        Settings settings = ImmutableSettings.settingsBuilder().put("path.data", "test").put("transport.tcp.port", 54346).put("http.port", 54347).build();
         NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().clusterName("elasticsearch").data(true).settings(settings);
         nodeBuilder = nodeBuilder.local(false);
         Node node = nodeBuilder.node();

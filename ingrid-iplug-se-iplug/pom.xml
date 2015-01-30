@@ -12,8 +12,8 @@
 	<packaging>jar</packaging>
 	<name>ingrid-iplug-se-iplug</name>
 	<repositories>
-		<!-- Repo of parent pom needed, parent pom may not be installed locally
-		yet -->
+		<!-- Repo of parent pom needed, parent pom may not be installed locally 
+			yet -->
 		<repository>
 			<id>de.ingrid.all</id>
 			<name>Maven Repo InGrid</name>
@@ -48,8 +48,8 @@
 				<artifactId>xalan</artifactId>
 				<version>2.7.1</version>
 			</dependency>
-			<!--<dependency> <groupId>com.tngtech.java</groupId> <artifactId>config-builder</artifactId>
-			<version>1.4-SNAPSHOT</version> </dependency> -->
+			<!--<dependency> <groupId>com.tngtech.java</groupId> <artifactId>config-builder</artifactId> 
+				<version>1.4-SNAPSHOT</version> </dependency> -->
 			<dependency>
 				<groupId>de.ingrid</groupId>
 				<artifactId>ingrid-iplug</artifactId>
@@ -61,15 +61,15 @@
 				<version>3.5.0-SNAPSHOT</version>
 			</dependency>
 			<dependency>
-                <groupId>de.ingrid</groupId>
-                <artifactId>ingrid-communication</artifactId>
-                <version>3.5.0-SNAPSHOT</version>
-            </dependency>
+				<groupId>de.ingrid</groupId>
+				<artifactId>ingrid-communication</artifactId>
+				<version>3.5.0-SNAPSHOT</version>
+			</dependency>
 			<dependency>
-	            <groupId>org.mortbay.jetty</groupId>
-	            <artifactId>jetty</artifactId>
-	            <version>6.1.26</version>
-	        </dependency>
+				<groupId>org.mortbay.jetty</groupId>
+				<artifactId>jetty</artifactId>
+				<version>6.1.26</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -83,10 +83,10 @@
 					<groupId>org.apache.lucene</groupId>
 					<artifactId>lucene-analyzers</artifactId>
 				</exclusion>
-                <exclusion>
-                    <groupId>javassist</groupId>
-                    <artifactId>javassist</artifactId>
-                </exclusion>
+				<exclusion>
+					<groupId>javassist</groupId>
+					<artifactId>javassist</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -96,10 +96,10 @@
 			<classifier>res</classifier>
 			<type>zip</type>
 			<exclusions>
-                <exclusion>
-                    <groupId>org.apache.lucene</groupId>
-                    <artifactId>lucene-analyzers</artifactId>
-                </exclusion>
+				<exclusion>
+					<groupId>org.apache.lucene</groupId>
+					<artifactId>lucene-analyzers</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -131,19 +131,19 @@
 			<artifactId>commons-exec</artifactId>
 			<version>1.2</version>
 		</dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.4</version>
-        </dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+		</dependency>
 
-		<!-- The following two libs are needed for geo_shape based search! see:
-		http://www.elasticsearch.org/guide/en/elasticsearch/client/java-api/current/query-dsl-filters.html -->
-		<!-- <dependency> <groupId>com.spatial4j</groupId> <artifactId>spatial4j</artifactId>
-			<version>0.4.1</version> </dependency> <dependency> <groupId>com.vividsolutions</groupId>
-			<artifactId>jts</artifactId> <version>1.13</version> <exclusions> <exclusion>
-			<groupId>xerces</groupId> <artifactId>xercesImpl</artifactId> </exclusion>
-		</exclusions> </dependency> -->
+		<!-- The following two libs are needed for geo_shape based search! see: 
+			http://www.elasticsearch.org/guide/en/elasticsearch/client/java-api/current/query-dsl-filters.html -->
+		<!-- <dependency> <groupId>com.spatial4j</groupId> <artifactId>spatial4j</artifactId> 
+			<version>0.4.1</version> </dependency> <dependency> <groupId>com.vividsolutions</groupId> 
+			<artifactId>jts</artifactId> <version>1.13</version> <exclusions> <exclusion> 
+			<groupId>xerces</groupId> <artifactId>xercesImpl</artifactId> </exclusion> 
+			</exclusions> </dependency> -->
 
 		<!-- needed for Java8 compatibility with PowerMock -->
 		<dependency>
@@ -155,8 +155,8 @@
 		<!-- DB Migration -->
 		<dependency>
 			<groupId>org.flywaydb</groupId>
-		    <artifactId>flyway-core</artifactId>
-		    <version>3.0</version>
+			<artifactId>flyway-core</artifactId>
+			<version>3.0</version>
 		</dependency>
 
 		<!-- JPA provider -->
@@ -193,9 +193,9 @@
 
 		<!-- Library used for the migration of old database to new one -->
 		<dependency>
-		    <groupId>mysql</groupId>
-		    <artifactId>mysql-connector-java</artifactId>
-		    <version>5.1.33</version>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.33</version>
 		</dependency>
 
 
@@ -203,6 +203,14 @@
 	<build>
 		<finalName>${project.parent.artifactId}-${project.version}</finalName>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.18.1</version>
+				<configuration>
+                    <reuseForks>false</reuseForks>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -260,8 +268,8 @@
 				<configuration>
 					<archive>
 						<manifestEntries>
-							<!-- one of these: IPLUG_SE, IPLUG_DSC, IPLUG_SNS, IPLUG_TAMINO, IPLUG_FPN,
-							IPLUG_G2K, IPLUG_CSW, IPLUG_CSW_DSC, OTHER see ingrid-utils:de.ingrid.utils.metadata.IPlugType -->
+							<!-- one of these: IPLUG_SE, IPLUG_DSC, IPLUG_SNS, IPLUG_TAMINO, IPLUG_FPN, 
+								IPLUG_G2K, IPLUG_CSW, IPLUG_CSW_DSC, OTHER see ingrid-utils:de.ingrid.utils.metadata.IPlugType -->
 							<iPlug-Type>IPLUG_SE</iPlug-Type>
 						</manifestEntries>
 					</archive>
@@ -279,14 +287,14 @@
 					</archive>
 				</configuration>
 				<executions>
-	                <execution>
-	                    <id>installer-builder</id>
-	                    <goals>
-	                        <goal>single</goal>
-	                    </goals>
-	                    <phase>package</phase>
-	                </execution>
-	            </executions>
+					<execution>
+						<id>installer-builder</id>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<phase>package</phase>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
@@ -300,27 +308,27 @@
 							</includes>
 							<followSymlinks>false</followSymlinks>
 						</fileset>
-                        <fileset>
-                            <directory>test</directory>
-                            <includes>
-                                <include>**/*</include>
-                            </includes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                        <fileset>
-                            <directory>test-data</directory>
-                            <includes>
-                                <include>**/*</include>
-                            </includes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                        <fileset>
-                            <directory>elasticsearch</directory>
-                            <includes>
-                                <include>**/*</include>
-                            </includes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
+						<fileset>
+							<directory>test</directory>
+							<includes>
+								<include>**/*</include>
+							</includes>
+							<followSymlinks>false</followSymlinks>
+						</fileset>
+						<fileset>
+							<directory>test-data</directory>
+							<includes>
+								<include>**/*</include>
+							</includes>
+							<followSymlinks>false</followSymlinks>
+						</fileset>
+						<fileset>
+							<directory>elasticsearch</directory>
+							<includes>
+								<include>**/*</include>
+							</includes>
+							<followSymlinks>false</followSymlinks>
+						</fileset>
 					</filesets>
 				</configuration>
 			</plugin>
@@ -332,12 +340,12 @@
 					<skip>true</skip>
 				</configuration>
 				<executions>
-	                <execution>
-	                    <id>installer-install</id>
-	                    <goals>
-	                        <goal>install-file</goal>
-	                    </goals>
-	                    <phase>install</phase>
+					<execution>
+						<id>installer-install</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<phase>install</phase>
 						<configuration>
 							<skip>false</skip>
 							<packaging>jar</packaging>
@@ -359,12 +367,12 @@
 					<uniqueVersion>false</uniqueVersion>
 				</configuration>
 				<executions>
-	                <execution>
-	                    <id>installer-deploy</id>
-	                    <goals>
-	                        <goal>deploy-file</goal>
-	                    </goals>
-	                    <phase>deploy</phase>
+					<execution>
+						<id>installer-deploy</id>
+						<goals>
+							<goal>deploy-file</goal>
+						</goals>
+						<phase>deploy</phase>
 						<configuration>
 							<skip>false</skip>
 							<packaging>jar</packaging>
@@ -388,25 +396,25 @@
 				</configuration>
 			</plugin>
 			<plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>license-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>**/webapp/css/blue.css</exclude>
-                        <exclude>**/webapp/css/chosen**</exclude>
-                        <exclude>**/webapp/css/jquery**</exclude>
-                        <exclude>**/webapp/js/chart**</exclude>
-                        <exclude>**/webapp/js/chosen**</exclude>
-                        <exclude>**/webapp/js/icheck**</exclude>
-                        <exclude>**/webapp/js/jquery**</exclude>
-                        <exclude>**/webapp/js/mindmup**</exclude>
-                        <exclude>**/webapp/js/localization/**</exclude>
-                        <exclude>**/db/migration/**</exclude>
-                        <exclude>**/*.json</exclude>
-                        <exclude>**/log4j.properties</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>**/webapp/css/blue.css</exclude>
+						<exclude>**/webapp/css/chosen**</exclude>
+						<exclude>**/webapp/css/jquery**</exclude>
+						<exclude>**/webapp/js/chart**</exclude>
+						<exclude>**/webapp/js/chosen**</exclude>
+						<exclude>**/webapp/js/icheck**</exclude>
+						<exclude>**/webapp/js/jquery**</exclude>
+						<exclude>**/webapp/js/mindmup**</exclude>
+						<exclude>**/webapp/js/localization/**</exclude>
+						<exclude>**/db/migration/**</exclude>
+						<exclude>**/*.json</exclude>
+						<exclude>**/log4j.properties</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 </project>
