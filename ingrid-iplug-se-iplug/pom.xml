@@ -3,16 +3,16 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
 		<groupId>de.ingrid</groupId>
-		<artifactId>ingrid-iplug-se</artifactId>
+		<artifactId>ingrid-iplug-se-project</artifactId>
 		<version>3.5.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ingrid</groupId>
-	<artifactId>ingrid-iplug-se-iplug</artifactId>
+	<artifactId>ingrid-iplug-se</artifactId>
 	<packaging>jar</packaging>
 	<name>ingrid-iplug-se-iplug</name>
 	<repositories>
-		<!-- Repo of parent pom needed, parent pom may not be installed locally 
+		<!-- Repo of parent pom needed, parent pom may not be installed locally
 			yet -->
 		<repository>
 			<id>de.ingrid.all</id>
@@ -103,12 +103,12 @@
 			<version>2.4</version>
 		</dependency>
 
-		<!-- The following two libs are needed for geo_shape based search! see: 
+		<!-- The following two libs are needed for geo_shape based search! see:
 			http://www.elasticsearch.org/guide/en/elasticsearch/client/java-api/current/query-dsl-filters.html -->
-		<!-- <dependency> <groupId>com.spatial4j</groupId> <artifactId>spatial4j</artifactId> 
-			<version>0.4.1</version> </dependency> <dependency> <groupId>com.vividsolutions</groupId> 
-			<artifactId>jts</artifactId> <version>1.13</version> <exclusions> <exclusion> 
-			<groupId>xerces</groupId> <artifactId>xercesImpl</artifactId> </exclusion> 
+		<!-- <dependency> <groupId>com.spatial4j</groupId> <artifactId>spatial4j</artifactId>
+			<version>0.4.1</version> </dependency> <dependency> <groupId>com.vividsolutions</groupId>
+			<artifactId>jts</artifactId> <version>1.13</version> <exclusions> <exclusion>
+			<groupId>xerces</groupId> <artifactId>xercesImpl</artifactId> </exclusion>
 			</exclusions> </dependency> -->
 
 		<!-- needed for Java8 compatibility with PowerMock -->
@@ -167,7 +167,7 @@
 
 	</dependencies>
 	<build>
-		<finalName>${project.parent.artifactId}-${project.version}</finalName>
+		<finalName>${project.artifactId}-${project.version}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -234,7 +234,7 @@
 				<configuration>
 					<archive>
 						<manifestEntries>
-							<!-- one of these: IPLUG_SE, IPLUG_DSC, IPLUG_SNS, IPLUG_TAMINO, IPLUG_FPN, 
+							<!-- one of these: IPLUG_SE, IPLUG_DSC, IPLUG_SNS, IPLUG_TAMINO, IPLUG_FPN,
 								IPLUG_G2K, IPLUG_CSW, IPLUG_CSW_DSC, OTHER see ingrid-utils:de.ingrid.utils.metadata.IPlugType -->
 							<iPlug-Type>IPLUG_SE</iPlug-Type>
 						</manifestEntries>

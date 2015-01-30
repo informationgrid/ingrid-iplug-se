@@ -8,7 +8,7 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ingrid</groupId>
-	<artifactId>ingrid-iplug-se</artifactId>
+	<artifactId>ingrid-iplug-se-project</artifactId>
 	<packaging>pom</packaging>
 	<version>3.5.0-SNAPSHOT</version>
 	<name>ingrid-iplug-se</name>

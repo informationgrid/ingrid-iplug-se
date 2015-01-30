@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
 		<groupId>de.ingrid</groupId>
-		<artifactId>ingrid-iplug-se</artifactId>
+		<artifactId>ingrid-iplug-se-project</artifactId>
 		<version>3.5.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
@@ -15,7 +15,7 @@
 		<apache-nutch-version>apache-nutch-1.9</apache-nutch-version>
 	</properties>
 	<repositories>
-		<!-- Repo of parent pom needed, parent pom may not be installed locally 
+		<!-- Repo of parent pom needed, parent pom may not be installed locally
 			yet -->
 		<repository>
 			<id>de.ingrid.all</id>
@@ -50,7 +50,7 @@
 			<groupId>org.apache.nutch</groupId>
 			<artifactId>nutch</artifactId>
 			<version>1.9</version>
-			<!-- O <exclusions> <exclusion> <groupId>xerces</groupId> <artifactId>xercesImpl</artifactId> 
+			<!-- O <exclusions> <exclusion> <groupId>xerces</groupId> <artifactId>xercesImpl</artifactId>
 				</exclusion> </exclusions> -->
 		</dependency>
 
@@ -75,8 +75,8 @@
 			<version>1.6.1</version>
 			<optional>true</optional>
 		</dependency>
-		<!-- PROVIDED BY INGRID, see below <dependency> <groupId>log4j</groupId> 
-			<artifactId>log4j</artifactId> <version>1.2.15</version> <optional>true</optional> 
+		<!-- PROVIDED BY INGRID, see below <dependency> <groupId>log4j</groupId>
+			<artifactId>log4j</artifactId> <version>1.2.15</version> <optional>true</optional>
 			</dependency> -->
 		<dependency>
 			<groupId>commons-lang</groupId>
@@ -133,9 +133,9 @@
 			<version>4.0.1</version>
 			<scope>compile</scope>
 		</dependency>
-		<!-- <dependency> <groupId>xerces</groupId> <artifactId>xercesImpl</artifactId> 
-			<version>2.9.1</version> <scope>compile</scope> </dependency> <dependency> 
-			<groupId>xerces</groupId> <artifactId>xmlParserAPIs</artifactId> <version>2.6.2</version> 
+		<!-- <dependency> <groupId>xerces</groupId> <artifactId>xercesImpl</artifactId>
+			<version>2.9.1</version> <scope>compile</scope> </dependency> <dependency>
+			<groupId>xerces</groupId> <artifactId>xmlParserAPIs</artifactId> <version>2.6.2</version>
 			<scope>compile</scope> </dependency> -->
 		<dependency>
 			<groupId>oro</groupId>
@@ -293,7 +293,7 @@
 				</executions>
 				<dependencies>
 
-					<!-- following is needed since this plugin mixes up the JAVA_HOME directory 
+					<!-- following is needed since this plugin mixes up the JAVA_HOME directory
 						a bit -->
 					<dependency>
 						<groupId>com.sun</groupId>
@@ -309,7 +309,7 @@
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.4.1</version>
 				<configuration>
-					<!-- when called from parent POM this does not havt to be executed since 
+					<!-- when called from parent POM this does not havt to be executed since
 						it already was in the package phase -->
 					<skipAssembly>true</skipAssembly>
 				</configuration>
