@@ -93,7 +93,7 @@ public class NutchControllerTest {
             NutchController nutchController = new NutchController();
             nutchController.start(instance, process);
 
-            Settings settings = ImmutableSettings.settingsBuilder().put("path.data", SEIPlug.conf.getInstancesDir() + "/test").put("transport.tcp.port", 54346).put("http.port", 54347).build();
+            Settings settings = ImmutableSettings.settingsBuilder().put("path.data", SEIPlug.conf.getInstancesDir() + "/test").build();
             NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().clusterName("elasticsearch").data(true).settings(settings);
             nodeBuilder = nodeBuilder.local(false);
             node = nodeBuilder.node();

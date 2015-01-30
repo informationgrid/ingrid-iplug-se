@@ -300,6 +300,27 @@
 							</includes>
 							<followSymlinks>false</followSymlinks>
 						</fileset>
+                        <fileset>
+                            <directory>test</directory>
+                            <includes>
+                                <include>**/*</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
+                            <directory>test-data</directory>
+                            <includes>
+                                <include>**/*</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
+                            <directory>elasticsearch</directory>
+                            <includes>
+                                <include>**/*</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
 					</filesets>
 				</configuration>
 			</plugin>
