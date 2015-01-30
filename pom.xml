@@ -69,7 +69,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>${project.name}-${project.version}</finalName>
+		<finalName>${project.artifactId}-${project.version}</finalName>
 
 		<plugins>
             <plugin>
