@@ -101,7 +101,7 @@ public class NutchControllerTest {
             long start = System.currentTimeMillis();
             Thread.sleep(500);
             assertEquals("Status is RUNNING", NutchProcess.STATUS.RUNNING, nutchController.getNutchProcess(instance).getStatus());
-            while ((System.currentTimeMillis() - start) < 300000) {
+            while ((System.currentTimeMillis() - start) < 360000) {
                 Thread.sleep(1000);
                 if (nutchController.getNutchProcess(instance).getStatus() != NutchProcess.STATUS.RUNNING) {
                     break;
@@ -110,7 +110,7 @@ public class NutchControllerTest {
             if (nutchController.getNutchProcess(instance).getStatus() == NutchProcess.STATUS.RUNNING) {
                 node.close();
                 nutchController.stop(instance);
-                fail("Crawl took more than 5 min.");
+                fail("Crawl took more than 6 min.");
             }
             assertEquals("Status is FINISHED", NutchProcess.STATUS.FINISHED, nutchController.getNutchProcess(instance).getStatus());
             node.close();
