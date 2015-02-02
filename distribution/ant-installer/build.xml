@@ -1,0 +1,118 @@
+<!--
+  **************************************************-
+  ingrid-iplug-se-iplug
+  ==================================================
+  Copyright (C) 2014 wemove digital solutions GmbH
+  ==================================================
+  Licensed under the EUPL, Version 1.1 or – as soon they will be
+  approved by the European Commission - subsequent versions of the
+  EUPL (the "Licence");
+  
+  You may not use this work except in compliance with the Licence.
+  You may obtain a copy of the Licence at:
+  
+  http://ec.europa.eu/idabc/eupl5
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the Licence is distributed on an "AS IS" basis,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the Licence for the specific language governing permissions and
+  limitations under the Licence.
+  **************************************************#
+  -->
+<project name="iPlug-SE Installation" basedir="." >
+    <description>
+        iPlug-SE Installation Script
+    </description>
+
+    <!-- set global properties for this build -->
+    <property name="iPlugName"          value="${project.build.finalName}"/>
+
+    <!-- THIS PORPERTIES ARE NECESSARY FOR UPDATES -->
+    <property name="libraryDir"         value="lib" />
+    <property name="libraryIdent"       value="ingrid-iplug-se-iplug-" />
+    <!-- <property name="libraryIdent"       value="MANIFEST.MF" /> -->
+    <property name="versionsWithConfigurations"  value="" />
+    <property name="minSupportedVersion" value="3.5.0" />
+
+    <import file="build-installer-utils.xml"  as="utils" />
+    <import file="build-patch.xml"            as="patch" />
+
+
+    <target name="setUpdateProperty" depends="checkPreconditionsForUpdate, extractUpdate">
+        <property name="updateProcedure" value="true" />
+        <property name="installProcedure" value="false" />
+    </target>
+
+    <target name="setInstallProperty" depends="extract">
+        <property name="installProcedure" value="true" />
+        <property name="updateProcedure" value="false" />
+    </target>
+
+
+    <target name="extract" description="Extract all files to the installation directory.">
+        <unzip src="${antinstaller.jar}" dest="${installDir}">
+            <patternset>
+                <include name="${iPlugName}/**/*"/>
+            </patternset>
+        </unzip>
+
+        <move toDir="${installDir}">
+            <fileset dir="${installDir}/${iPlugName}"/>
+        </move>
+
+        <mkdir dir="${installDir}/webapp/WEB-INF/work"/>
+    </target>
+
+    <target name="extractUpdate">
+        <unzip src="${antinstaller.jar}" dest=".">
+            <patternset>
+                <include name="${iPlugName}/**/*"/>
+                <!-- <exclude name="${iPlugName}/start.sh" /> -->
+            </patternset>
+        </unzip>
+
+        <delete>
+            <fileset dir="${installDir}/lib" includes="**/*"/>
+        </delete>
+
+        <move toDir="${installDir}">
+            <fileset dir="./${iPlugName}"/>
+        </move>
+    </target>
+
+    <target name="writeSettings">
+        <propertyfile file="${installDir}/conf/config.override.properties">
+            <entry  key="jetty.port" type="string" value="${localServerPort}" />
+        </propertyfile>
+    </target>
+
+    <target name="startIPlug">
+        <echo>
+            =================
+            Weiteres Vorgehen
+            =================
+
+        </echo>
+        <if>
+            <equals arg1="${showMdekUpdateMessage}" arg2="true" />
+            <then>
+                <echo>
+                    ==================================
+                    Das iPlug-SE wurde auf die Version ${project.version} aktualisiert.
+                    ==================================
+
+                </echo>
+            </then>
+        </if>
+        <echo>
+            Gehen Sie ins Verzeichnis:
+            ${installDir}
+            und rufen Sie von der Kommandozeile "sh start.sh start"
+            auf, um das iPlug zu starten.
+
+            Log Ausgaben finden sich in log.log
+        </echo>
+    </target>
+
+</project>

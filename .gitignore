@@ -6,3 +6,6 @@ ingrid-iplug-se-iplug/.classpath
 ingrid-iplug-se-iplug/.project
 ingrid-iplug-se-iplug/elasticsearch/
 /target
+ingrid-iplug-se-nutch/bin/
+ingrid-iplug-se-nutch/build/
+ingrid-iplug-se-nutch/ingrid-nutch-libs/

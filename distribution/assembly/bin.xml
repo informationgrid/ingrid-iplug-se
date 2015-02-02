@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  **************************************************-
+  ingrid-iplug-se-iplug
+  ==================================================
+  Copyright (C) 2014 wemove digital solutions GmbH
+  ==================================================
+  Licensed under the EUPL, Version 1.1 or – as soon they will be
+  approved by the European Commission - subsequent versions of the
+  EUPL (the "Licence");
+
+  You may not use this work except in compliance with the Licence.
+  You may obtain a copy of the Licence at:
+
+  http://ec.europa.eu/idabc/eupl5
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the Licence is distributed on an "AS IS" basis,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the Licence for the specific language governing permissions and
+  limitations under the Licence.
+  **************************************************#
+  -->
+<assembly>
+  <id>installer</id>
+  <formats>
+    <format>jar</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <moduleSets>
+    <moduleSet>
+      <!-- Enable access to all projects in the current multimodule build! Needs Assembly Plugin 2.2.1! -->
+      <useAllReactorProjects>true</useAllReactorProjects>
+      <!-- only include the iplug project's dependencies which are needed for the execution
+             the nutch project is self contained and already brings all necessary dependencies -->
+      <includes>
+        <include>de.ingrid:ingrid-iplug-se-iplug</include>
+      </includes>
+      <binaries>
+        <outputDirectory>${project.build.finalName}/lib</outputDirectory>
+        <unpack>false</unpack>
+        <dependencySets>
+          <dependencySet>
+            <scope>runtime</scope>
+            <excludes>
+              <exclude>de.ingrid:ingrid-base-webapp:zip</exclude>
+              <exclude>de.ingrid:ingrid-iplug-se-iplug</exclude>
+            </excludes>
+          </dependencySet>
+        </dependencySets>
+      </binaries>
+    </moduleSet>
+  </moduleSets>
+  <fileSets>
+    <fileSet>
+      <directory>release/scripts</directory>
+      <outputDirectory>${project.build.finalName}</outputDirectory>
+      <lineEnding>unix</lineEnding>
+    </fileSet>
+    <fileSet>
+      <directory>release/conf</directory>
+      <outputDirectory>${project.build.finalName}/conf</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>release/ant-installer</directory>
+      <outputDirectory>/</outputDirectory>
+      <filtered>true</filtered>
+    </fileSet>
+    <fileSet>
+      <directory>../ingrid-iplug-se-iplug/apache-nutch-runtime</directory>
+      <outputDirectory>${project.build.finalName}/apache-nutch-runtime</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>../ingrid-iplug-se-iplug/src/main/webapp</directory>
+      <outputDirectory>${project.build.finalName}/webapp</outputDirectory>
+      <excludes>
+        <exclude>**/WEB-INF/jetty-web.xml</exclude>
+      </excludes>
+    </fileSet>
+    <fileSet>
+      <directory>../ingrid-iplug-se-iplug/target/base-webapp</directory>
+      <outputDirectory>${project.build.finalName}/webapp</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>../target/installer</directory>
+      <outputDirectory>/</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>../target/site</directory>
+      <outputDirectory>${project.build.finalName}/doc</outputDirectory>
+    </fileSet>
+  </fileSets>
+  <files>
+    <file>
+      <source>release/jetty/jetty-web.xml</source>
+      <outputDirectory>${project.build.finalName}/webapp/WEB-INF</outputDirectory>
+      <filtered>true</filtered>
+    </file>
+  </files>
+</assembly>
