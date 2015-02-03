@@ -62,7 +62,7 @@
       <outputDirectory>${project.build.finalName}/conf</outputDirectory>
     </fileSet>
     <fileSet>
-      <directory>release/ant-installer</directory>
+      <directory>ant-installer</directory>
       <outputDirectory>/</outputDirectory>
       <filtered>true</filtered>
     </fileSet>
