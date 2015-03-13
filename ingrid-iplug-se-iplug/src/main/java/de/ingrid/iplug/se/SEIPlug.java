@@ -239,7 +239,12 @@ public class SEIPlug extends HeartBeatPlug {
             Flyway flyway = new Flyway();
             String dbUrl = DBManager.INSTANCE.getProperty("javax.persistence.jdbc.url").toString();
             flyway.setDataSource(dbUrl, "", "");
-            flyway.migrate();
+            flyway.setInitOnMigrate( true );
+            try {
+                flyway.migrate();
+            } catch (Exception ex) {
+                log.error( "Error migrating the database:", ex );
+            }
         }
 
         // normally shutdown the elastic search node and stop all running
