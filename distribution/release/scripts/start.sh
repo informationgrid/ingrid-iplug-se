@@ -40,7 +40,7 @@ THIS="$0"
 THIS_DIR=`dirname "$THIS"`
 INGRID_HOME=`cd "$THIS_DIR" ; pwd`
 PID=$INGRID_HOME/ingrid.pid
-INGRID_OPTS=-XX:MaxPermSize=128m
+INGRID_OPTS=
 
 # include a debug script, if available, i.e. to specify debug port, etc.
 # caution: the debug script must echo the actual command to be able to work in the current environment
@@ -159,12 +159,6 @@ startIplug()
 
   JAVA=$JAVA_HOME/bin/java
   
-  # check envvars which might override default args
-  if [ "$INGRID_HEAPSIZE" != "" ]; then
-    JAVA_HEAP_MAX="-Xmx""$INGRID_HEAPSIZE""m"
-    echo "run with heapsize $JAVA_HEAP_MAX"
-  fi
-
   # so that filenames w/ spaces are handled correctly in loops below
   IFS=
   # add libs to CLASSPATH
@@ -182,10 +176,10 @@ startIplug()
 
   # run it
   export CLASSPATH="$CLASSPATH"
-  INGRID_OPTS="$INGRID_OPTS -Dingrid_home=$INGRID_HOME -Dfile.encoding=UTF8"
+  INGRID_OPTS="$INGRID_OPTS -Dingrid_home=$INGRID_HOME -Dfile.encoding=UTF8 -XX:+UseG1GC -XX:+UseStringDeduplication -XX:NewRatio=3"
   CLASS=de.ingrid.iplug.se.SEIPlug
 
-  exec nohup "$JAVA" $JAVA_HEAP_MAX $INGRID_OPTS $CLASS > console.log &
+  exec nohup "$JAVA" $INGRID_OPTS $CLASS > console.log &
 
   echo "jetty ($INGRID_HOME) started."
   echo $! > $PID

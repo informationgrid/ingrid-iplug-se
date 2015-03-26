@@ -33,7 +33,7 @@ unset IFS
 
 # run it
 export CLASSPATH="$CLASSPATH"
-INGRID_OPTS="$INGRID_OPTS -Dingrid_home=$INGRID_HOME -Dfile.encoding=UTF8"
+INGRID_OPTS="$INGRID_OPTS -Dingrid_home=$INGRID_HOME -Dfile.encoding=UTF8 -XX:+UseG1GC -XX:+UseStringDeduplication -XX:NewRatio=3"
 CLASS=de.ingrid.iplug.se.migrate.Migrator
 
 
@@ -49,6 +49,5 @@ if [ "$JAVA_HOME" = "" ]; then
 fi
 
 JAVA=$JAVA_HOME/bin/java
-JAVA_HEAP_MAX=-Xmx128m
 
-"$JAVA" $JAVA_HEAP_MAX $INGRID_OPTS $CLASS $@
+"$JAVA" $INGRID_OPTS $CLASS $@

@@ -10,3 +10,11 @@ ingrid-iplug-se-nutch/bin/
 ingrid-iplug-se-nutch/build/
 ingrid-iplug-se-nutch/ingrid-nutch-libs/
 bin/
+/ingrid-iplug-se-iplug/.settings
+/ingrid-iplug-se-iplug/target
+/ingrid-iplug-se-iplug/.classpath
+/ingrid-iplug-se-iplug/.project
+/ingrid-iplug-se-nutch/.project
+/ingrid-iplug-se-nutch/.settings
+/ingrid-iplug-se-nutch/target
+/ingrid-iplug-se-nutch/.classpath
