@@ -60,7 +60,7 @@ and import project into eclipse.
 - execute `mvn install` to expand the base web application
 - set up a java application Run Configuration with start class `de.ingrid.iplug.se.SEIPlug`
 - add the VM argument `-Djetty.webapp=src/main/webapp` to the Run Configuration
-- add src/main/resources to class path
+- add src/test/resources to class path
 - the admin gui starts per default on port 8082, change this with VM argument `-Djetty.port=8083`
 
 Support
