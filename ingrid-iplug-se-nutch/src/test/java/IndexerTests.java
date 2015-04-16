@@ -64,6 +64,7 @@ import de.ingrid.iplug.se.nutch.segment.SegmentFilter;
 import de.ingrid.iplug.se.nutch.segment.SegmentMerger;
 import de.ingrid.iplug.se.nutch.statistics.HostStatistic;
 import de.ingrid.iplug.se.nutch.statistics.StartUrlStatusReport;
+import de.ingrid.iplug.se.nutch.statistics.UrlErrorReport;
 
 /**
  * 
@@ -230,6 +231,12 @@ public class IndexerTests {
     public void test09_2StartUrlReport() throws Exception {
 
         ToolRunner.run(NutchConfiguration.create(), new StartUrlStatusReport(), new String[] { "test/crawldb", "src/test/resources/urls/start", "test" });
+    }
+
+    @Test
+    public void test09_3UrlErrorReport() throws Exception {
+
+        ToolRunner.run(NutchConfiguration.create(), new UrlErrorReport(), new String[] { "test/crawldb", "test" });
     }
     
     @Test
