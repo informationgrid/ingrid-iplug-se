@@ -75,26 +75,11 @@
 		</property>
 	</bean>
 
-	<!-- Wraps a plugdescription object. The wrapper implements IConfigurable and will be updated every time the configure phase 
-		takes place (i.e. after changing the iplug configuration). -->
-	<bean id="plugDescriptionWrapper" class="de.ingrid.search.utils.ConfigurablePlugDescriptionWrapper" />
-
-	<bean id="plugDescriptionFacetCounter" class="de.ingrid.search.utils.facet.counter.DscPlugdescriptionFacetCounter">
-		<property name="plugDescriptionWrapper">
-			<ref bean="plugDescriptionWrapper" />
-		</property>
-		<property name="facetClassDefinitions">
-			<list>
-				<!-- Add facets for this iplug. If facet fits, all results will be added to the facet <value>type:www</value> -->
-			</list>
-		</property>
-	</bean>
-
 	<context:component-scan base-package="de.ingrid">
 		<!-- <context:exclude-filter type="regex" expression="de\.ingrid\.admin\.controller\.WorkingDirController"/> -->
 		<!-- <context:exclude-filter type="regex" expression="de.ingrid.admin.search.*Stemmer*" /> -->
-		<context:exclude-filter type="regex" expression="de.ingrid.admin.search.*" />
-		<context:exclude-filter type="regex" expression="de.ingrid.admin.controller.IndexController*" />
+		<!-- <context:exclude-filter type="regex" expression="de.ingrid.admin.search.*" />
+		<context:exclude-filter type="regex" expression="de.ingrid.admin.controller.IndexController*" /> -->
 		<context:exclude-filter type="regex" expression="de.ingrid.admin.controller.SchedulingController*" />
         <!-- exclude this injector because it overridesthe index based partner/provider detection -->
         <context:exclude-filter type="regex" expression="de.ingrid.admin.metadata.DefaultIPlugOperatorInjectorAdapter" />

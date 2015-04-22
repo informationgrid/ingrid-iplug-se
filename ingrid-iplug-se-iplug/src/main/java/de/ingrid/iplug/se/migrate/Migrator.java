@@ -55,14 +55,6 @@ public class Migrator {
     private static Logger log = Logger.getLogger( Migrator.class.getName() );
     
     private static String ID = "ID";
-//    private static String TYPE = "TYPE";
-//    private static String STATUS_UPDATED = "STATUSUPDATED";
-//    private static String CREATED = "CREATED";
-//    private static String UPDATED = "UPDATED";
-//    private static String DELETED = "DELETED";
-//    private static String START_FK = "STARTURL_FK";
-//    private static String PROVIDER_FK = "PROVIDER_FK";
-    private static String STATUS = "STATUS";
     private static String URL = "URL";
     private static String METADATAKEY = "METADATAKEY";
     private static String METADATAVALUE = "METADATAVALUE";

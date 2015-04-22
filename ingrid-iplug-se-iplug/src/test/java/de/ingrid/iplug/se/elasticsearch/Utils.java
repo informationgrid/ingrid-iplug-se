@@ -35,27 +35,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
-import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.lucene.search.function.FieldValueFactorFunction.Modifier;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.springframework.core.io.ClassPathResource;
 
-import de.ingrid.admin.Config;
 import de.ingrid.admin.JettyStarter;
-import de.ingrid.iplug.se.Configuration;
-import de.ingrid.iplug.se.SEIPlug;
-import de.ingrid.iplug.se.elasticsearch.bean.ElasticsearchNodeFactoryBean;
-import de.ingrid.iplug.se.elasticsearch.converter.DatatypePartnerProviderQueryConverter;
-import de.ingrid.iplug.se.elasticsearch.converter.DefaultFieldsQueryConverter;
-import de.ingrid.iplug.se.elasticsearch.converter.FieldQueryIGCConverter;
-import de.ingrid.iplug.se.elasticsearch.converter.FuzzyQueryConverter;
-import de.ingrid.iplug.se.elasticsearch.converter.IQueryConverter;
-import de.ingrid.iplug.se.elasticsearch.converter.MatchAllQueryConverter;
-import de.ingrid.iplug.se.elasticsearch.converter.QueryConverter;
-import de.ingrid.iplug.se.elasticsearch.converter.WildcardQueryConverter;
+import de.ingrid.admin.elasticsearch.FacetConverter;
+import de.ingrid.admin.elasticsearch.IQueryParsers;
+import de.ingrid.admin.elasticsearch.IndexImpl;
+import de.ingrid.admin.elasticsearch.converter.DatatypePartnerProviderQueryConverter;
+import de.ingrid.admin.elasticsearch.converter.DefaultFieldsQueryConverter;
+import de.ingrid.admin.elasticsearch.converter.FieldQueryIGCConverter;
+import de.ingrid.admin.elasticsearch.converter.FuzzyQueryConverter;
+import de.ingrid.admin.elasticsearch.converter.MatchAllQueryConverter;
+import de.ingrid.admin.elasticsearch.converter.QueryConverter;
+import de.ingrid.admin.elasticsearch.converter.WildcardQueryConverter;
+import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.utils.IngridHit;
 import de.ingrid.utils.query.IngridQuery;
 import de.ingrid.utils.queryparser.ParseException;
@@ -71,30 +67,27 @@ public class Utils {
     public static void setupES() throws Exception {
         
         elastic = new ElasticsearchNodeFactoryBean();
-        elastic.setLocal( true );
-        elastic.setSettings(new HashMap<String, String>() {{put("transport.tcp.port", "54345"); put("http.port", "54355");}});
         elastic.afterPropertiesSet();
         
         // set necessary configurations for startup
-        Configuration configuration = new Configuration();
-        configuration.searchType = SearchType.DFS_QUERY_THEN_FETCH;
-        configuration.index = "test";
-        configuration.activeInstances = Arrays.asList( "web" );
-        configuration.esBoostField = "boost";
-        configuration.esBoostModifier = Modifier.LOG1P;
-        configuration.esBoostFactor = 0.1f;
-        configuration.esBoostMode = "sum";
-        SEIPlug.conf = configuration;
+//        Configuration configuration = new Configuration();
+//        configuration.searchType = SearchType.DFS_QUERY_THEN_FETCH;
+//        configuration.index = "test";
+//        configuration.activeInstances = Arrays.asList( "web" );
+//        configuration.esBoostField = "boost";
+//        configuration.esBoostModifier = Modifier.LOG1P;
+//        configuration.esBoostFactor = 0.1f;
+//        configuration.esBoostMode = "sum";
+//        SEIPlug.conf = configuration;
         
         
-        setMapping( elastic );
+        setMapping( elastic, "test_1" );
         prepareIndex( elastic );
     }
     
-    
-    private static void prepareIndex(ElasticsearchNodeFactoryBean elastic) throws Exception {
+    public static void prepareIndex(ElasticsearchNodeFactoryBean elastic, String fileData, String index) throws ElasticsearchException, Exception {
         Client client = elastic.getObject().client();
-        ClassPathResource resource = new ClassPathResource( "data/webUrls.json" );
+        ClassPathResource resource = new ClassPathResource( fileData );
 
         byte[] urlsData = Files.readAllBytes( Paths.get( resource.getURI() ) );
 
@@ -103,11 +96,15 @@ public class Utils {
                 .actionGet();
 
         // make sure the indexed data is available immediately during search!
-        RefreshRequest refreshRequest = new RefreshRequest( "test" );
+        RefreshRequest refreshRequest = new RefreshRequest( index );
         client.admin().indices().refresh( refreshRequest ).actionGet();
     }
+    
+    static void prepareIndex(ElasticsearchNodeFactoryBean elastic) throws Exception {
+        prepareIndex( elastic, "data/webUrls.json", "test_1" );
+    }
 
-    private static void setMapping(ElasticsearchNodeFactoryBean elastic) {
+    public static void setMapping(ElasticsearchNodeFactoryBean elastic, String index) {
         String mappingSource = "";
         try {
             Client client = elastic.getObject().client();
@@ -118,12 +115,12 @@ public class Utils {
                 mappingSource += line;
             }
             
-            if (client.admin().indices().prepareExists("test").execute().actionGet().isExists()) {
-                client.admin().indices().prepareDelete("test").execute().actionGet();
+            if (client.admin().indices().prepareExists(index).execute().actionGet().isExists()) {
+                client.admin().indices().prepareDelete(index).execute().actionGet();
             }
-            client.admin().indices().prepareCreate("test").execute().actionGet();
+            client.admin().indices().prepareCreate(index).execute().actionGet();
             
-            client.admin().indices().preparePutMapping().setIndices( "test" )
+            client.admin().indices().preparePutMapping().setIndices( index )
                     .setType("web")
                     .setSource( mappingSource )
                     .execute()
@@ -142,15 +139,15 @@ public class Utils {
 
 
     public static void initIndex(JettyStarter jettyStarter) {
-        PowerMockito.mockStatic( JettyStarter.class );
-        Mockito.when(JettyStarter.getInstance()).thenReturn( jettyStarter );
+        //PowerMockito.mockStatic( JettyStarter.class );
+        //Mockito.when(JettyStarter.getInstance()).thenReturn( jettyStarter );
         
-        Config config = new Config();
-        config.communicationProxyUrl = "/ingrid-group:iplug-se-test";
-        jettyStarter.config = config;
+//        Config config = new Config();
+//        config.communicationProxyUrl = "/ingrid-group:iplug-se-test";
+//        jettyStarter.config = config;
         
         QueryConverter qc = new QueryConverter();
-        List<IQueryConverter> parsers = new ArrayList<IQueryConverter>();
+        List<IQueryParsers> parsers = new ArrayList<IQueryParsers>();
         parsers.add( new DefaultFieldsQueryConverter() );
         parsers.add( new WildcardQueryConverter() );
         parsers.add( new FuzzyQueryConverter() );
@@ -159,7 +156,7 @@ public class Utils {
         parsers.add( new MatchAllQueryConverter() );
         qc.setQueryParsers( parsers );
         
-        index = new IndexImpl( elastic, qc, new FacetConverter() );
+        index = new IndexImpl( elastic, qc, new FacetConverter(qc) );
     }
     
     public static IngridQuery getIngridQuery( String term ) {

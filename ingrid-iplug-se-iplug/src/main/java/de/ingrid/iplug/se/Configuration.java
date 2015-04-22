@@ -208,8 +208,7 @@ public class Configuration implements IConfig {
 	    pdObject.put( "iPlugClass", "de.ingrid.iplug.se.SEIPlug" );
 
         // make sure only partner=all is communicated to iBus
-        @SuppressWarnings("unchecked")
-        List<String> partners = pdObject.getArrayList(PlugDescription.PARTNER);
+        List<Object> partners = pdObject.getArrayList(PlugDescription.PARTNER);
         //
         if (partners == null) {
             pdObject.addPartner("all");
@@ -219,8 +218,7 @@ public class Configuration implements IConfig {
         }
 
         // make sure only provider=all is communicated to iBus
-        @SuppressWarnings("unchecked")
-        List<String> providers = pdObject.getArrayList(PlugDescription.PROVIDER);
+        List<Object> providers = pdObject.getArrayList(PlugDescription.PROVIDER);
         if (providers == null) {
             pdObject.addProvider("all");
         } else {
@@ -233,8 +231,7 @@ public class Configuration implements IConfig {
         }
         
         // add fields
-        @SuppressWarnings("unchecked")
-        List<String> pdFields = pdObject.getArrayList(PlugDescription.FIELDS);
+        List<Object> pdFields = pdObject.getArrayList(PlugDescription.FIELDS);
         for (String field : fields) {
             if (field != null && !field.isEmpty() && !pdFields.contains(field)) {
                 pdObject.addField( field );

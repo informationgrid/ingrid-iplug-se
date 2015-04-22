@@ -54,11 +54,11 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
 import de.ingrid.admin.controller.AbstractController;
+import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Url;
-import de.ingrid.iplug.se.elasticsearch.bean.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.nutchController.NutchController;
 import de.ingrid.iplug.se.utils.DBUtils;
 import de.ingrid.iplug.se.utils.ElasticSearchUtils;

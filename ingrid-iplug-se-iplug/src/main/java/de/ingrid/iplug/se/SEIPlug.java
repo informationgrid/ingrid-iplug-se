@@ -51,12 +51,13 @@ import org.springframework.stereotype.Service;
 import com.tngtech.configbuilder.ConfigBuilder;
 
 import de.ingrid.admin.JettyStarter;
+import de.ingrid.admin.elasticsearch.IndexImpl;
+import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.HeartBeatPlug;
 import de.ingrid.iplug.PlugDescriptionFieldFilters;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Metadata;
 import de.ingrid.iplug.se.db.model.Url;
-import de.ingrid.iplug.se.elasticsearch.bean.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.nutchController.NutchController;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
@@ -105,7 +106,7 @@ public class SEIPlug extends HeartBeatPlug {
     // SEIPlug.class.getName().hashCode();
 
     @Autowired
-    private Index index;
+    private IndexImpl index;
 
     private static ElasticsearchNodeFactoryBean esBean;
 

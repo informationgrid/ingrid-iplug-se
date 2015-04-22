@@ -103,7 +103,7 @@ public class SearchController extends AbstractController {
             // convert details to map
             // this is necessary because it's not possible to access the
             // document-id by ${hit.documentId}
-            final Map<Integer, IngridHitDetail> detailsMap = new HashMap<Integer, IngridHitDetail>();
+            final Map<String, IngridHitDetail> detailsMap = new HashMap<String, IngridHitDetail>();
             if (details != null) {
                 for (final IngridHitDetail detail : details) {
                     detailsMap.put( detail.getDocumentId(), detail );
