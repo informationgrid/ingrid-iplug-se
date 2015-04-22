@@ -39,6 +39,24 @@
     </dependencies>
   </dependencyManagement>
   <dependencies>
+  
+    <!-- needed for Java8 compatibility with PowerMock -->
+    <dependency>
+      <groupId>org.reflections</groupId>
+      <artifactId>reflections</artifactId>
+      <version>0.9.8</version>
+      <exclusions>
+        <exclusion>
+          <groupId>javassist</groupId>
+          <artifactId>javassist</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.javassist</groupId>
+      <artifactId>javassist</artifactId>
+      <version>3.19.0-GA</version>
+     </dependency>
     <dependency>
       <groupId>de.ingrid</groupId>
       <artifactId>ingrid-utils</artifactId>
@@ -89,12 +107,6 @@
     <!-- The following two libs are needed for geo_shape based search! see:
             http://www.elasticsearch.org/guide/en/elasticsearch/client/java-api/current/query-dsl-filters.html -->
     <!-- <dependency><groupId>com.spatial4j</groupId><artifactId>spatial4j</artifactId><version>0.4.1</version></dependency><dependency><groupId>com.vividsolutions</groupId><artifactId>jts</artifactId><version>1.13</version><exclusions><exclusion><groupId>xerces</groupId><artifactId>xercesImpl</artifactId></exclusion></exclusions></dependency>-->
-    <!-- needed for Java8 compatibility with PowerMock -->
-    <dependency>
-      <groupId>org.javassist</groupId>
-      <artifactId>javassist</artifactId>
-      <version>3.18.2-GA</version>
-    </dependency>
     <!-- DB Migration -->
     <dependency>
       <groupId>org.flywaydb</groupId>

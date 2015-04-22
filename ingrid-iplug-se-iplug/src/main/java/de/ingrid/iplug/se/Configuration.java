@@ -47,6 +47,7 @@ import com.tngtech.configbuilder.annotation.valueextractor.DefaultValue;
 import com.tngtech.configbuilder.annotation.valueextractor.PropertyValue;
 
 import de.ingrid.admin.IConfig;
+import de.ingrid.admin.IKeys;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
 import de.ingrid.utils.PlugDescription;
 import de.ingrid.utils.query.IngridQuery;
@@ -136,6 +137,9 @@ public class Configuration implements IConfig {
     
 	@Override
 	public void initialize() {
+	    // disable the default index menu of the base webapp
+	    // we still have to use the option "indexing=true" to enable elastic search 
+	    System.clearProperty( IKeys.INDEXING );
 	}
 
     @TypeTransformers(Configuration.StringToSearchType.class)

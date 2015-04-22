@@ -37,6 +37,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import de.ingrid.admin.JettyStarter;
+import de.ingrid.admin.elasticsearch.ElasticSearchUtils;
 import de.ingrid.utils.IngridHits;
 import de.ingrid.utils.query.IngridQuery;
 
@@ -48,12 +49,17 @@ public class LocationSearchTest  {
     
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
+        new JettyStarter( false );
+        JettyStarter.getInstance().config.index = "test";
+        JettyStarter.getInstance().config.indexWithAutoId = true;
         Utils.setupES();
     }
     
     @Before
     public void initTest() throws Exception {
         Utils.initIndex( jettyStarter );
+        ElasticSearchUtils.removeAlias( Utils.elastic.getObject().client(), "test_1" );
+        ElasticSearchUtils.switchAlias( Utils.elastic.getObject().client(), null, "test_1" );
     }
     
     @AfterClass

@@ -56,24 +56,19 @@
 	</bean>
 
 	<!-- XML DEFINED BEANS WITH ACCORDING QUALIFIER TO BE AUTOWIRED VIA QUALIFIER ! -->
-
-	<!-- Wraps one ore more lucene index reader. The wrapper is injected via XMLconfiguredIndexWrapper into IngridIndexSearcher 
-		constructor, so it can be updated in the configure phase. -->
-
-	<bean class="de.ingrid.iplug.se.elasticsearch.converter.QueryConverter">
-		<qualifier value="XMLconfigured" />
-		<property name="queryParsers">
-			<list>
+    <bean id="queryConverter" class="de.ingrid.admin.elasticsearch.converter.QueryConverter">
+        <property name="queryParsers">
+            <list>
+                <ref bean="defaultFieldsQueryConverter" />
                 <ref bean="datatypePartnerProviderQueryConverter" />
-				<ref bean="defaultFieldsQueryConverter" />
-				<ref bean="wildcardQueryConverter" />
-				<ref bean="fuzzyQueryConverter" />
-				<ref bean="fieldQueryIGCConverter" />
-				<!-- the match all converter must be the last converter in list -->
-				<ref bean="matchAllQueryConverter" />
-			</list>
-		</property>
-	</bean>
+                <ref bean="fieldQueryIGCConverter" />
+                <ref bean="rangeQueryConverter" />
+                <ref bean="wildcardQueryConverter" />
+                <ref bean="wildcardFieldQueryConverter" />
+                <ref bean="matchAllQueryConverter" />
+            </list>
+        </property>
+    </bean>
 
 	<context:component-scan base-package="de.ingrid">
 		<!-- <context:exclude-filter type="regex" expression="de\.ingrid\.admin\.controller\.WorkingDirController"/> -->

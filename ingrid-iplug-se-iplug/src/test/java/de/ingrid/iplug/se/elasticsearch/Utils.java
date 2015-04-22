@@ -52,6 +52,7 @@ import de.ingrid.admin.elasticsearch.converter.MatchAllQueryConverter;
 import de.ingrid.admin.elasticsearch.converter.QueryConverter;
 import de.ingrid.admin.elasticsearch.converter.WildcardQueryConverter;
 import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
+import de.ingrid.utils.IngridDocument;
 import de.ingrid.utils.IngridHit;
 import de.ingrid.utils.query.IngridQuery;
 import de.ingrid.utils.queryparser.ParseException;
@@ -173,7 +174,7 @@ public class Utils {
         for (int id : ids) {
             boolean found = false;
             for (IngridHit hit : hits) {
-                if (Integer.valueOf( (String)hit.get( IndexImpl.ELASTIC_SEARCH_ID ) ) == id) {
+                if (Integer.valueOf( hit.getDocumentId() ) == id) {
                     found = true;
                     break;
                 }
@@ -183,17 +184,17 @@ public class Utils {
     }
     
     public static void addDefaultFacets(IngridQuery ingridQuery) {
-        Map<String, String> f1 = new HashMap<String, String>();
+        IngridDocument f1 = new IngridDocument();
         f1.put("id", "partner");
 
-        Map<String, Object> f2 = new HashMap<String, Object>();
+        IngridDocument f2 = new IngridDocument();
         f2.put("id", "after");
         Map<String, String> classes = new HashMap<String, String>();
         classes.put("id", "April2014");
         classes.put("query", "t1:2014-05-01 t2:2014-09-01");
         f2.put("classes", Arrays.asList(new Object[] { classes }));
 
-        Map<String, Object> f3 = new HashMap<String, Object>();
+        IngridDocument f3 = new IngridDocument();
         f3.put("id", "datatype");
         Map<String, String> classes2 = new HashMap<String, String>();
         classes2.put("id", "bundPDFs");

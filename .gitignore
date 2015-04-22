@@ -19,3 +19,5 @@ bin/
 /ingrid-iplug-se-nutch/target
 /ingrid-iplug-se-nutch/.classpath
 /.project
+.settings/
+distribution/target/
