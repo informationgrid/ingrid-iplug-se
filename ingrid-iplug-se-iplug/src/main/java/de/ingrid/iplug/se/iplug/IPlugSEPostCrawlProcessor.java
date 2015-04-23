@@ -38,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.ingrid.admin.JettyStarter;
+import de.ingrid.admin.elasticsearch.ElasticSearchUtils;
 import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.admin.service.PlugDescriptionService;
 import de.ingrid.iplug.se.SEIPlug;
@@ -68,7 +69,9 @@ public class IPlugSEPostCrawlProcessor implements IPostCrawlProcessor {
 
             Client client = elasticSearch.getObject().client();
             ClusterState clusterState = client.admin().cluster().prepareState().execute().actionGet().getState();
-            IndexMetaData inMetaData = clusterState.getMetaData().index(SEIPlug.conf.index);
+            String realIndexName = ElasticSearchUtils.getIndexNameFromAliasName( client );
+            IndexMetaData inMetaData = clusterState.getMetaData().index( realIndexName );
+            
             ImmutableOpenMap<String, MappingMetaData> metad = inMetaData.getMappings();
             List<Object> fields = pd.getArrayList(PlugDescription.FIELDS);
             if (fields == null) {
