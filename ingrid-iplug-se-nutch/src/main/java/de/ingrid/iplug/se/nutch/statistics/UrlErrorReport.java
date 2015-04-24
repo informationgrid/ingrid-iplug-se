@@ -192,7 +192,7 @@ public class UrlErrorReport extends Configured implements Tool {
 	public int run(String[] args) throws Exception {
 		if (args.length < 2) {
 			System.err.println("Usage: UrlErrorReport <crawldb> <output_dir>");
-			System.err.println("       The statistic will be written to <output_dir>/statistic/url_error_report.");
+			System.err.println("       The statistic will be written to <output_dir>/statistic/url_error_report/data.json.");
 
 			return -1;
 		}

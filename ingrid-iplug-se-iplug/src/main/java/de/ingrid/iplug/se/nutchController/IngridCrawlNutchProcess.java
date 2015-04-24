@@ -60,7 +60,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
     private static Logger log = Logger.getLogger(IngridCrawlNutchProcess.class);
 
     public static enum STATES {
-        START, INJECT_START, INJECT_BW, CLEANUP_HADOOP, FINISHED, DEDUPLICATE, INDEX, FILTER_LINKDB, UPDATE_LINKDB, FILTER_WEBGRAPH, UPDATE_WEBGRAPH, FILTER_SEGMENT, MERGE_SEGMENT, INJECT_META, FILTER_CRAWLDB, GENERATE, FETCH, UPDATE_CRAWLDB, UPDATE_MD, CREATE_HOST_STATISTICS, GENERATE_ZERO_URLS, CRAWL_CLEANUP, CLEAN_DUPLICATES, CREATE_STARTURL_REPORT;
+        START, INJECT_START, INJECT_BW, CLEANUP_HADOOP, FINISHED, DEDUPLICATE, INDEX, FILTER_LINKDB, UPDATE_LINKDB, FILTER_WEBGRAPH, UPDATE_WEBGRAPH, FILTER_SEGMENT, MERGE_SEGMENT, INJECT_META, FILTER_CRAWLDB, GENERATE, FETCH, UPDATE_CRAWLDB, UPDATE_MD, CREATE_HOST_STATISTICS, GENERATE_ZERO_URLS, CRAWL_CLEANUP, CLEAN_DUPLICATES, CREATE_STARTURL_REPORT, CREATE_URL_ERROR_REPORT;
     };
 
     public Integer depth = 1;
@@ -149,6 +149,13 @@ public class IngridCrawlNutchProcess extends NutchProcess {
                 throwCrawlError("Error during Execution of: de.ingrid.iplug.se.nutch.statistics.HostStatistic");
             }
             this.statusProvider.appendToState(STATES.CREATE_HOST_STATISTICS.name(), " done.");
+
+            this.statusProvider.addState(STATES.CREATE_URL_ERROR_REPORT.name(), "Create url error statistic...");
+            ret = execute("de.ingrid.iplug.se.nutch.statistics.UrlErrorReport", crawlDb, workingPath);
+            if (ret != 0) {
+                throwCrawlError("Error during Execution of: de.ingrid.iplug.se.nutch.statistics.UrlErrorReport");
+            }
+            this.statusProvider.appendToState(STATES.CREATE_URL_ERROR_REPORT.name(), " done.");
             
             for (int i = 0; i < depth; i++) {
                 this.statusProvider.addState(STATES.GENERATE.name() + i, "Generate up to " + noUrls.toString() + " urls for fetching " + "[" + (i + 1) + "/" + depth + "] ...");
@@ -239,6 +246,13 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             }
             this.statusProvider.appendToState(STATES.CREATE_STARTURL_REPORT.name(), " done.");
 
+            this.statusProvider.addState(STATES.CREATE_URL_ERROR_REPORT.name(), "Create url error statistic...");
+            ret = execute("de.ingrid.iplug.se.nutch.statistics.UrlErrorReport", crawlDb, workingPath);
+            if (ret != 0) {
+                throwCrawlError("Error during Execution of: de.ingrid.iplug.se.nutch.statistics.UrlErrorReport");
+            }
+            this.statusProvider.appendToState(STATES.CREATE_URL_ERROR_REPORT.name(), " done.");
+            
             this.statusProvider.addState(STATES.MERGE_SEGMENT.name(), "Merge segments...");
             ret = execute("de.ingrid.iplug.se.nutch.segment.SegmentMerger", mergedSegments, "-dir", segments);
             if (ret != 0) {

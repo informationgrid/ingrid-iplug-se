@@ -23,8 +23,10 @@
 package de.ingrid.iplug.se.webapp.controller.instance;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -42,7 +44,12 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -68,6 +75,7 @@ import de.ingrid.iplug.se.nutchController.StatusProvider;
 import de.ingrid.iplug.se.nutchController.StatusProvider.State;
 import de.ingrid.iplug.se.utils.DBUtils;
 import de.ingrid.iplug.se.utils.FileUtils;
+import de.ingrid.iplug.se.utils.UrlErrorPagableFilter;
 import de.ingrid.iplug.se.webapp.container.Instance;
 
 @RestController
@@ -75,227 +83,283 @@ import de.ingrid.iplug.se.webapp.container.Instance;
 @SessionAttributes("plugDescription")
 public class RestDataController extends InstanceController {
 
-    @Autowired
-    private NutchController nutchController;
+	private static final Log LOG = LogFactory.getLog(RestDataController.class.getName());
 
-    @RequestMapping(value = { "/test" }, method = RequestMethod.GET)
-    public String test() {
-        return "OK";
-    }
+	@Autowired
+	private NutchController nutchController;
 
-    @RequestMapping(value = { "url/{id}" }, method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<Url> getUrl(@PathVariable("id") Long id) {
-        EntityManager em = DBManager.INSTANCE.getEntityManager();
-        Url url = em.find(Url.class, id);
+	@RequestMapping(value = { "/test" }, method = RequestMethod.GET)
+	public String test() {
+		return "OK";
+	}
 
-        return new ResponseEntity<Url>(url, url != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-    }
+	@RequestMapping(value = { "url/{id}" }, method = RequestMethod.GET, produces = "application/json")
+	public ResponseEntity<Url> getUrl(@PathVariable("id") Long id) {
+		EntityManager em = DBManager.INSTANCE.getEntityManager();
+		Url url = em.find(Url.class, id);
 
-    @RequestMapping(value = { "url" }, method = RequestMethod.POST)
-    public ResponseEntity<Url> addUrl(@RequestBody Url url) {
+		return new ResponseEntity<Url>(url, url != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+	}
 
-        // fix domains without slashes
-        try {
-            URL tmpUrl = new URL(url.getUrl());
-            if (tmpUrl.getPath().isEmpty()) {
-                url.setUrl(url.getUrl().concat("/"));
-            }
-        } catch (MalformedURLException e) {
-        }
-        List<String> limits = new ArrayList<String>();
-        for (String limit : url.getLimitUrls()) {
-            try {
-                URL tmpUrl = new URL(limit);
-                if (tmpUrl.getPath().isEmpty()) {
-                    limits.add(limit.concat("/"));
-                } else {
-                    limits.add(limit);
-                }
-            } catch (MalformedURLException e) {
-                limits.add(limit);
-            }
-        }
-        url.setLimitUrls(limits);
-        List<String> excludes = new ArrayList<String>();
-        for (String exclude : url.getExcludeUrls()) {
-            try {
-                URL tmpUrl = new URL(exclude);
-                if (tmpUrl.getPath().isEmpty()) {
-                    excludes.add(exclude.concat("/"));
-                } else {
-                    excludes.add(exclude);
-                }
-            } catch (MalformedURLException e) {
-                excludes.add(exclude);
-            }
-        }
-        url.setExcludeUrls(excludes);
+	@RequestMapping(value = { "url" }, method = RequestMethod.POST)
+	public ResponseEntity<Url> addUrl(@RequestBody Url url) {
 
-        DBUtils.addUrl(url);
-        return new ResponseEntity<Url>(url, HttpStatus.OK);
-    }
+		// fix domains without slashes
+		try {
+			URL tmpUrl = new URL(url.getUrl());
+			if (tmpUrl.getPath().isEmpty()) {
+				url.setUrl(url.getUrl().concat("/"));
+			}
+		} catch (MalformedURLException e) {
+		}
+		List<String> limits = new ArrayList<String>();
+		for (String limit : url.getLimitUrls()) {
+			try {
+				URL tmpUrl = new URL(limit);
+				if (tmpUrl.getPath().isEmpty()) {
+					limits.add(limit.concat("/"));
+				} else {
+					limits.add(limit);
+				}
+			} catch (MalformedURLException e) {
+				limits.add(limit);
+			}
+		}
+		url.setLimitUrls(limits);
+		List<String> excludes = new ArrayList<String>();
+		for (String exclude : url.getExcludeUrls()) {
+			try {
+				URL tmpUrl = new URL(exclude);
+				if (tmpUrl.getPath().isEmpty()) {
+					excludes.add(exclude.concat("/"));
+				} else {
+					excludes.add(exclude);
+				}
+			} catch (MalformedURLException e) {
+				excludes.add(exclude);
+			}
+		}
+		url.setExcludeUrls(excludes);
 
-    @RequestMapping(value = { "url/{id}" }, method = RequestMethod.DELETE)
-    public ResponseEntity<Map<String, String>> deleteUrl(@PathVariable("id") Long id) {
-        return deleteUrls(new Long[] { id });
-    }
+		DBUtils.addUrl(url);
+		return new ResponseEntity<Url>(url, HttpStatus.OK);
+	}
 
-    @RequestMapping(value = { "urls" }, method = RequestMethod.DELETE)
-    public ResponseEntity<Map<String, String>> deleteUrls(@RequestBody Long[] ids) {
-        DBUtils.deleteUrls(ids);
-        Map<String, String> result = new HashMap<String, String>();
-        result.put("result", "OK");
-        return new ResponseEntity<Map<String, String>>(result, HttpStatus.OK);
-    }
+	@RequestMapping(value = { "url/{id}" }, method = RequestMethod.DELETE)
+	public ResponseEntity<Map<String, String>> deleteUrl(@PathVariable("id") Long id) {
+		return deleteUrls(new Long[] { id });
+	}
 
-    @RequestMapping(value = { "urls/{instance}" }, method = RequestMethod.GET)
-    public JSONObject getUrls(@PathVariable("instance") String name, @RequestParam(value = "page", required = false, defaultValue = "0") int page, @RequestParam(value = "pagesize", required = false, defaultValue = "10") int pageSize,
-            @RequestParam(value = "urlfilter", required = false, defaultValue = "") String urlFilter, @RequestParam(value = "metafilter", required = false, defaultValue = "") String[] metaOptions,
-            @RequestParam(value = "sort", required = false, defaultValue = "") int[] sort) {
-        // @RequestParam(value = "column[]", required = false, defaultValue =
-        // "") List<String> sortColumn) {
-        EntityManager em = DBManager.INSTANCE.getEntityManager();
+	@RequestMapping(value = { "urls" }, method = RequestMethod.DELETE)
+	public ResponseEntity<Map<String, String>> deleteUrls(@RequestBody Long[] ids) {
+		DBUtils.deleteUrls(ids);
+		Map<String, String> result = new HashMap<String, String>();
+		result.put("result", "OK");
+		return new ResponseEntity<Map<String, String>>(result, HttpStatus.OK);
+	}
 
-        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-        CriteriaQuery<Url> createQuery = criteriaBuilder.createQuery(Url.class);
-        Root<Url> urlTable = createQuery.from(Url.class);
+	@RequestMapping(value = { "urls/{instance}" }, method = RequestMethod.GET)
+	public JSONObject getUrls(@PathVariable("instance") String name,
+	        @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+	        @RequestParam(value = "pagesize", required = false, defaultValue = "10") int pageSize,
+	        @RequestParam(value = "urlfilter", required = false, defaultValue = "") String urlFilter,
+	        @RequestParam(value = "metafilter", required = false, defaultValue = "") String[] metaOptions,
+	        @RequestParam(value = "sort", required = false, defaultValue = "") int[] sort) {
+		// @RequestParam(value = "column[]", required = false, defaultValue =
+		// "") List<String> sortColumn) {
+		EntityManager em = DBManager.INSTANCE.getEntityManager();
 
-        CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
+		CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+		CriteriaQuery<Url> createQuery = criteriaBuilder.createQuery(Url.class);
+		Root<Url> urlTable = createQuery.from(Url.class);
 
-        List<Predicate> criteria = new ArrayList<Predicate>();
+		CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
 
-        // filter by instance
-        criteria.add(criteriaBuilder.equal(urlTable.<String> get("instance"), name));
+		List<Predicate> criteria = new ArrayList<Predicate>();
 
-        // filter URL (case-insensitive)
-        if (!urlFilter.isEmpty()) {
-            criteria.add(criteriaBuilder.like(criteriaBuilder.lower(urlTable.<String> get("url")), "%" + urlFilter.toLowerCase() + "%"));
-        }
+		// filter by instance
+		criteria.add(criteriaBuilder.equal(urlTable.<String> get("instance"), name));
 
-        // filter metadata
-        for (String meta : metaOptions) {
-            Join<Url, Metadata> j = urlTable.join("metadata", JoinType.LEFT);
-            String[] metaSplit = meta.split(":");
-            if (metaSplit.length == 2) {
-                criteria.add(criteriaBuilder.equal(j.get("metaKey"), metaSplit[0]));
-                criteria.add(criteriaBuilder.equal(j.get("metaValue"), metaSplit[1]));
-            }
-        }
+		// filter URL (case-insensitive)
+		if (!urlFilter.isEmpty()) {
+			criteria.add(criteriaBuilder.like(criteriaBuilder.lower(urlTable.<String> get("url")),
+			        "%" + urlFilter.toLowerCase() + "%"));
+		}
 
-        countQuery.select(criteriaBuilder.count(urlTable)).where(criteriaBuilder.and(criteria.toArray(new Predicate[0])));
-        Long count = em.createQuery(countQuery).getSingleResult();
+		// filter metadata
+		for (String meta : metaOptions) {
+			Join<Url, Metadata> j = urlTable.join("metadata", JoinType.LEFT);
+			String[] metaSplit = meta.split(":");
+			if (metaSplit.length == 2) {
+				criteria.add(criteriaBuilder.equal(j.get("metaKey"), metaSplit[0]));
+				criteria.add(criteriaBuilder.equal(j.get("metaValue"), metaSplit[1]));
+			}
+		}
 
-        createQuery.select(urlTable).where(criteriaBuilder.and(criteria.toArray(new Predicate[0])));
+		countQuery.select(criteriaBuilder.count(urlTable)).where(
+		        criteriaBuilder.and(criteria.toArray(new Predicate[0])));
+		Long count = em.createQuery(countQuery).getSingleResult();
 
-        // sort if necessary
-        if (sort.length == 2) {
-            Expression<?> column = getColumnForSort(urlTable, sort[0]);
-            if (column != null) {
-                if (sort[1] == 0) {
-                    createQuery.orderBy(criteriaBuilder.desc(column));
-                } else {
-                    createQuery.orderBy(criteriaBuilder.asc(column));
-                }
-            }
-        }
+		createQuery.select(urlTable).where(criteriaBuilder.and(criteria.toArray(new Predicate[0])));
 
-        List<Url> resultList = em.createQuery(createQuery).setFirstResult(page * pageSize).setMaxResults(pageSize).getResultList();
+		// sort if necessary
+		if (sort.length == 2) {
+			Expression<?> column = getColumnForSort(urlTable, sort[0]);
+			if (column != null) {
+				if (sort[1] == 0) {
+					createQuery.orderBy(criteriaBuilder.desc(column));
+				} else {
+					createQuery.orderBy(criteriaBuilder.asc(column));
+				}
+			}
+		}
 
-        JSONObject json = new JSONObject();
-        json.put("data", resultList);
-        json.put("totalUrls", count);
+		List<Url> resultList = em.createQuery(createQuery).setFirstResult(page * pageSize).setMaxResults(pageSize)
+		        .getResultList();
 
-        return json;
-    }
+		JSONObject json = new JSONObject();
+		json.put("data", resultList);
+		json.put("totalUrls", count);
 
-    private Expression<?> getColumnForSort(Root<Url> urlTable, int columnPos) {
-        switch (columnPos) {
-        case 1:
-            return urlTable.get("url");
-        case 2:
-            return urlTable.get("status");
-        }
-        return null;
-    }
+		return json;
+	}
 
-    @RequestMapping(value = { "instance/{name}/{value}" }, method = RequestMethod.POST)
-    public ResponseEntity<Map<String, String>> toggleInstanceActive(@ModelAttribute("plugDescription") final PlugdescriptionCommandObject pdCommandObject, @PathVariable("name") String name, @PathVariable("value") String value) {
+	@SuppressWarnings("unchecked")
+    @RequestMapping(value = { "urlerrors/{instance}" }, method = RequestMethod.GET)
+	public JSONObject getUrlErrors(@PathVariable("instance") String name,
+	        @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+	        @RequestParam(value = "pagesize", required = false, defaultValue = "10") int pageSize,
+	        @RequestParam(value = "urlfilter", required = false, defaultValue = "") String urlFilter,
+	        @RequestParam(value = "statusfilter", required = false, defaultValue = "") String[] statusFilter,
+	        @RequestParam(value = "sort", required = false, defaultValue = "") int[] sort) {
+		// @RequestParam(value = "column[]", required = false, defaultValue =
+		// "") List<String> sortColumn) {
 
-        List<String> activeInstances = SEIPlug.conf.activeInstances;
-        if ("on".equals(value)) {
-            activeInstances.add(name);
-        } else {
-            activeInstances.remove(name);
-        }
+		Path path = Paths.get(SEIPlug.conf.getInstancesDir(), name, "statistic", "url_error_report", "data.json");
 
-        // write immediately configuration
-        JettyStarter.getInstance().config.writePlugdescriptionToProperties(pdCommandObject);
+		JSONParser parser = new JSONParser();
+		Reader reader = null;
+		UrlErrorPagableFilter pager = null;
+		try {
+			reader = Files.newBufferedReader(path);
+			pager = new UrlErrorPagableFilter(page, pageSize, urlFilter, statusFilter);
+			parser.parse(reader, pager);
+		} catch (IOException e) {
+			LOG.error("Error open '" + path.toString() + "'.", e);
+		} catch (ParseException e) {
+			LOG.error("Error parsing JSON File '" + path.toString() + "'.", e);
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+				}
+			}
+		}
 
-        return generateOkResponse();
-    }
+		JSONObject json = new JSONObject();
+		if (pager == null) {
+			json.put("data", "");
+			json.put("totalUrls", 0);
+		} else {
+			json.put("data", pager.getResult());
+			json.put("totalUrls", pager.getTotalResults());
+		}
 
-    @RequestMapping(value = { "status/{instance}" }, method = RequestMethod.GET)
-    public ResponseEntity<Collection<State>> getStatus(@PathVariable("instance") String name) {
-        Instance instance = getInstanceData(name);
-        NutchProcess nutchProcess = nutchController.getNutchProcess(instance);
+		return json;
+	}
 
-        if (nutchProcess == null || (nutchProcess != null && nutchProcess.getState() == Thread.State.TERMINATED)) {
-            StatusProvider statusProvider = new StatusProvider(instance.getWorkingDirectory());
-            Collection<State> states = statusProvider.getStates();
-            return new ResponseEntity<Collection<State>>(states.isEmpty() ? null : states, HttpStatus.FOUND);
-        }
+	private Expression<?> getColumnForSort(Root<Url> urlTable, int columnPos) {
+		switch (columnPos) {
+		case 1:
+			return urlTable.get("url");
+		case 2:
+			return urlTable.get("status");
+		}
+		return null;
+	}
 
-        return new ResponseEntity<Collection<State>>(nutchProcess.getStatusProvider().getStates(), HttpStatus.OK);
-    }
+	@RequestMapping(value = { "instance/{name}/{value}" }, method = RequestMethod.POST)
+	public ResponseEntity<Map<String, String>> toggleInstanceActive(
+	        @ModelAttribute("plugDescription") final PlugdescriptionCommandObject pdCommandObject,
+	        @PathVariable("name") String name, @PathVariable("value") String value) {
 
-    @RequestMapping(value = { "status/{instance}/statistic" }, method = RequestMethod.GET)
-    public ResponseEntity<String> getStatistic(@PathVariable("instance") String name) throws IOException {
+		List<String> activeInstances = SEIPlug.conf.activeInstances;
+		if ("on".equals(value)) {
+			activeInstances.add(name);
+		} else {
+			activeInstances.remove(name);
+		}
 
-        Path path = Paths.get(SEIPlug.conf.getInstancesDir(), name, "statistic", "host", "crawldb");
-        String content = FileUtils.readFile(path);
+		// write immediately configuration
+		JettyStarter.getInstance().config.writePlugdescriptionToProperties(pdCommandObject);
 
-        return new ResponseEntity<String>(content, HttpStatus.OK);
-    }
+		return generateOkResponse();
+	}
 
-    @RequestMapping(value = { "status/{instance}/hadoop" }, method = RequestMethod.GET)
-    public ResponseEntity<String> getHadoopLog(@PathVariable("instance") String name) throws IOException {
+	@RequestMapping(value = { "status/{instance}" }, method = RequestMethod.GET)
+	public ResponseEntity<Collection<State>> getStatus(@PathVariable("instance") String name) {
+		Instance instance = getInstanceData(name);
+		NutchProcess nutchProcess = nutchController.getNutchProcess(instance);
 
-        Path path = Paths.get(SEIPlug.conf.getInstancesDir(), name, "logs", "hadoop.log");
-        String content = FileUtils.tail(path.toFile(), 1000);
+		if (nutchProcess == null || (nutchProcess != null && nutchProcess.getState() == Thread.State.TERMINATED)) {
+			StatusProvider statusProvider = new StatusProvider(instance.getWorkingDirectory());
+			Collection<State> states = statusProvider.getStates();
+			return new ResponseEntity<Collection<State>>(states.isEmpty() ? null : states, HttpStatus.FOUND);
+		}
 
-        return new ResponseEntity<String>(content, HttpStatus.OK);
-    }
+		return new ResponseEntity<Collection<State>>(nutchProcess.getStatusProvider().getStates(), HttpStatus.OK);
+	}
 
-    @RequestMapping(value = { "url/{instance}/check" }, method = RequestMethod.POST)
-    public ResponseEntity<String> checkUrl(@PathVariable("instance") String instanceName, @RequestBody String urlString) throws IOException, InterruptedException {
-        Instance instance = getInstanceData(instanceName);
+	@RequestMapping(value = { "status/{instance}/statistic" }, method = RequestMethod.GET)
+	public ResponseEntity<String> getStatistic(@PathVariable("instance") String name) throws IOException {
 
-        NutchProcess process = NutchProcessFactory.getUrlTesterProcess(instance, urlString);
-        process.start();
+		Path path = Paths.get(SEIPlug.conf.getInstancesDir(), name, "statistic", "host", "crawldb");
+		String content = FileUtils.readFile(path);
 
-        long start = System.currentTimeMillis();
-        boolean timeout = true;
-        while ((System.currentTimeMillis() - start) < 30000) {
-            Thread.sleep(1000);
-            if (process.getStatus() != NutchProcess.STATUS.RUNNING) {
-                timeout = false;
-                break;
-            }
-        }
-        String result = process.getConsoleOutput();
-        if (timeout) {
-            if (process.getStatus() == NutchProcess.STATUS.RUNNING) {
-                process.stopExecution();
-                result = "Timeout (30 sec)";
-            }
-        }
+		return new ResponseEntity<String>(content, HttpStatus.OK);
+	}
 
-        return new ResponseEntity<String>(result, HttpStatus.OK);
-    }
+	@RequestMapping(value = { "status/{instance}/hadoop" }, method = RequestMethod.GET)
+	public ResponseEntity<String> getHadoopLog(@PathVariable("instance") String name) throws IOException {
 
-    private ResponseEntity<Map<String, String>> generateOkResponse() {
-        Map<String, String> result = new HashMap<String, String>();
-        result.put("result", "OK");
-        return new ResponseEntity<Map<String, String>>(result, HttpStatus.OK);
-    }
+		Path path = Paths.get(SEIPlug.conf.getInstancesDir(), name, "logs", "hadoop.log");
+		String content = FileUtils.tail(path.toFile(), 1000);
+
+		return new ResponseEntity<String>(content, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = { "url/{instance}/check" }, method = RequestMethod.POST)
+	public ResponseEntity<String> checkUrl(@PathVariable("instance") String instanceName, @RequestBody String urlString)
+	        throws IOException, InterruptedException {
+		Instance instance = getInstanceData(instanceName);
+
+		NutchProcess process = NutchProcessFactory.getUrlTesterProcess(instance, urlString);
+		process.start();
+
+		long start = System.currentTimeMillis();
+		boolean timeout = true;
+		while ((System.currentTimeMillis() - start) < 30000) {
+			Thread.sleep(1000);
+			if (process.getStatus() != NutchProcess.STATUS.RUNNING) {
+				timeout = false;
+				break;
+			}
+		}
+		String result = process.getConsoleOutput();
+		if (timeout) {
+			if (process.getStatus() == NutchProcess.STATUS.RUNNING) {
+				process.stopExecution();
+				result = "Timeout (30 sec)";
+			}
+		}
+
+		return new ResponseEntity<String>(result, HttpStatus.OK);
+	}
+
+	private ResponseEntity<Map<String, String>> generateOkResponse() {
+		Map<String, String> result = new HashMap<String, String>();
+		result.put("result", "OK");
+		return new ResponseEntity<Map<String, String>>(result, HttpStatus.OK);
+	}
 }

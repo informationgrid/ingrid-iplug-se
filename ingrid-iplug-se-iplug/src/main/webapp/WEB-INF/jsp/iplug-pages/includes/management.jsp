@@ -57,22 +57,6 @@
     </div>
 </fieldset>
 
-<div id="overallStatistic">Insgesamt bekannt: <span class="known"></span> davon analysiert: <span class="fetched"></span></div>
-<table id="statisticTable" class="data tablesorter">
-    <thead>
-        <tr>
-            <th width="100px"></th>
-            <th data-sort="string">Host</th>
-            <th data-sort="int" width="70px">Bekannt</th>
-            <th data-sort="int" width="70px">Analysiert</th>
-            <th data-sort="int" width="70px">Ratio</th>
-        </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
-<!-- <canvas id="myChart" width="700" height="400"></canvas> -->
-
 <div id="dialog-hadoop" title="Hadoop-Log">
     <div class="content"></div>
 </div>
