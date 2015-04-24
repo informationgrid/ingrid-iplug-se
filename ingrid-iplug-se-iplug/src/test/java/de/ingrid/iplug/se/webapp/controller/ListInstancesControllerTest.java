@@ -41,9 +41,9 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.ui.ModelMap;
 
+import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
-import de.ingrid.iplug.se.elasticsearch.bean.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.utils.ElasticSearchUtils;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.controller.instance.scheduler.SchedulerManager;

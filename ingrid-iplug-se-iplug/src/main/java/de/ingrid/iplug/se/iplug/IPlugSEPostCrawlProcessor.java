@@ -38,9 +38,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.ingrid.admin.JettyStarter;
+import de.ingrid.admin.elasticsearch.ElasticSearchUtils;
+import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.admin.service.PlugDescriptionService;
-import de.ingrid.iplug.se.SEIPlug;
-import de.ingrid.iplug.se.elasticsearch.bean.ElasticsearchNodeFactoryBean;
 import de.ingrid.utils.PlugDescription;
 
 /**
@@ -68,17 +68,19 @@ public class IPlugSEPostCrawlProcessor implements IPostCrawlProcessor {
 
             Client client = elasticSearch.getObject().client();
             ClusterState clusterState = client.admin().cluster().prepareState().execute().actionGet().getState();
-            IndexMetaData inMetaData = clusterState.getMetaData().index(SEIPlug.conf.index);
+            String realIndexName = ElasticSearchUtils.getIndexNameFromAliasName( client );
+            IndexMetaData inMetaData = clusterState.getMetaData().index( realIndexName );
+            
             ImmutableOpenMap<String, MappingMetaData> metad = inMetaData.getMappings();
-            @SuppressWarnings("unchecked")
-            List<String> fields = pd.getArrayList(PlugDescription.FIELDS);
+            List<Object> fields = pd.getArrayList(PlugDescription.FIELDS);
             if (fields == null) {
-                fields = new ArrayList<String>();
+                fields = new ArrayList<Object>();
                 pd.put(PlugDescription.FIELDS, fields);
             }
 
             for (Iterator<MappingMetaData> i = metad.valuesIt(); i.hasNext();) {
                 MappingMetaData mmd = i.next();
+                @SuppressWarnings("unchecked")
                 Map<String, Object> src = (Map<String, Object>) mmd.getSourceAsMap().get("properties");
                 for (String f : src.keySet()) {
                     if (!fields.contains(f)) {

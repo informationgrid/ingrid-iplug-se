@@ -158,6 +158,7 @@ public class RestDataController extends InstanceController {
 		return new ResponseEntity<Map<String, String>>(result, HttpStatus.OK);
 	}
 
+    @SuppressWarnings("unchecked")
 	@RequestMapping(value = { "urls/{instance}" }, method = RequestMethod.GET)
 	public JSONObject getUrls(@PathVariable("instance") String name,
 	        @RequestParam(value = "page", required = false, defaultValue = "0") int page,

@@ -32,6 +32,11 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.ingrid.admin.JettyStarter;
+import de.ingrid.admin.elasticsearch.IQueryParsers;
+import de.ingrid.admin.elasticsearch.converter.DefaultFieldsQueryConverter;
+import de.ingrid.admin.elasticsearch.converter.MatchAllQueryConverter;
+import de.ingrid.admin.elasticsearch.converter.QueryConverter;
 import de.ingrid.iplug.se.elasticsearch.Utils;
 
 public class QueryConverterTest {
@@ -40,8 +45,9 @@ public class QueryConverterTest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
+        new JettyStarter( false );
         queryConverter = new QueryConverter();
-        List<IQueryConverter> parsers = new ArrayList<IQueryConverter>();
+        List<IQueryParsers> parsers = new ArrayList<IQueryParsers>();
         parsers.add( new MatchAllQueryConverter() );
         parsers.add( new DefaultFieldsQueryConverter() );
         queryConverter.setQueryParsers( parsers );

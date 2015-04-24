@@ -312,7 +312,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             this.statusProvider.appendToState(STATES.DEDUPLICATE.name(), " done.");
 
             this.statusProvider.addState(STATES.INDEX.name(), "Create index...");
-            ret = execute("org.apache.nutch.indexer.IndexingJob", crawlDb, "-linkdb", linkDb, "-dir", segments, "-deleteGone");
+            ret = execute("org.apache.nutch.indexer.IndexingJob", crawlDb, "-linkdb", linkDb, "-dir", segments, "-deleteGone", "-noCommit");
             if (ret != 0) {
                 throwCrawlError("Error during Execution of: org.apache.nutch.indexer.IndexingJob");
             }

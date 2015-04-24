@@ -29,6 +29,10 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -36,28 +40,43 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import de.ingrid.admin.JettyStarter;
+import de.ingrid.admin.elasticsearch.ElasticSearchUtils;
+import de.ingrid.admin.elasticsearch.FacetConverter;
+import de.ingrid.admin.elasticsearch.IQueryParsers;
+import de.ingrid.admin.elasticsearch.IndexImpl;
+import de.ingrid.admin.elasticsearch.converter.DatatypePartnerProviderQueryConverter;
+import de.ingrid.admin.elasticsearch.converter.DefaultFieldsQueryConverter;
+import de.ingrid.admin.elasticsearch.converter.FieldQueryIGCConverter;
+import de.ingrid.admin.elasticsearch.converter.FuzzyQueryConverter;
+import de.ingrid.admin.elasticsearch.converter.MatchAllQueryConverter;
+import de.ingrid.admin.elasticsearch.converter.QueryConverter;
+import de.ingrid.admin.elasticsearch.converter.WildcardQueryConverter;
+import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.utils.IngridHitDetail;
 import de.ingrid.utils.IngridHits;
 import de.ingrid.utils.query.IngridQuery;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(JettyStarter.class)
+//@PrepareForTest(JettyStarter.class)
 public class GeneralSearchTest {
 
     @Mock JettyStarter jettyStarter;
     
     @BeforeClass
     public static void setUp() throws Exception {
+        new JettyStarter( false );
+        JettyStarter.getInstance().config.index = "test";
+        JettyStarter.getInstance().config.indexWithAutoId = true;
         Utils.setupES();
     }    
     
     @Before
     public void initTest() throws Exception {
         Utils.initIndex( jettyStarter );
+        ElasticSearchUtils.switchAlias( Utils.elastic.getObject().client(), "test_1" );
     }
     
     @AfterClass
@@ -67,11 +86,40 @@ public class GeneralSearchTest {
     }
 
     @Test
-    public void searchForAll() {
+    public void searchForAll() throws Exception {
+        // second elastic search node
+        ElasticsearchNodeFactoryBean elastic2 = new ElasticsearchNodeFactoryBean();
+        //elastic.setSettings(new HashMap<String, String>() {{put("transport.tcp.port", "54345"); put("http.port", "54355");}});
+        elastic2.setSettings(new HashMap<String, String>() {{put("path.data", "test-data/elastic-search-data2");}});
+        elastic2.afterPropertiesSet();
+        Utils.setMapping( elastic2, "test2_1" );
+        Utils.prepareIndex( elastic2, "data/webUrls2.json", "test2_1" );
+        
+        QueryConverter qc = new QueryConverter();
+        List<IQueryParsers> parsers = new ArrayList<IQueryParsers>();
+        parsers.add( new DefaultFieldsQueryConverter() );
+        parsers.add( new WildcardQueryConverter() );
+        parsers.add( new FuzzyQueryConverter() );
+        parsers.add( new FieldQueryIGCConverter() );
+        parsers.add( new DatatypePartnerProviderQueryConverter() );
+        parsers.add( new MatchAllQueryConverter() );
+        qc.setQueryParsers( parsers );
+        
         IngridQuery q = Utils.getIngridQuery( "" );
         IngridHits search = Utils.index.search( q, 0, 10 );
         assertThat( search, not( is( nullValue() ) ) );
         assertThat( search.length(), is( Long.valueOf( Utils.MAX_RESULTS ) ) );
+        
+        ElasticSearchUtils.switchAlias( Utils.elastic.getObject().client(), "test2_1" );
+        IndexImpl index2 = new IndexImpl( elastic2, qc, new FacetConverter(qc) );
+        IngridHits search2 = index2.search( q, 0, 10 );
+        assertThat( search2, not( is( nullValue() ) ) );
+        assertThat( search2.length(), is( 3l ) );
+
+        
+        
+        Utils.elastic.getObject().client().settings();
+        elastic2.getObject().client().settings();
     }
 
     @Test
@@ -320,11 +368,11 @@ public class GeneralSearchTest {
     public void getDetail() {
         IngridQuery q = Utils.getIngridQuery( "Welt Firma" );
         IngridHits search = Utils.index.search( q, 0, 10 );
-        IngridHitDetail detail = Utils.index.getDetail( search.getHits()[0], q, null );
+        IngridHitDetail detail = Utils.index.getDetail( search.getHits()[0], q, new String[] { "url", "fetched" } );
         assertThat( detail, not( is( nullValue() ) ) );
         // assertThat( detail.getHitId(), is( "1" ) );
-        assertThat( detail.getString( IndexImpl.DETAIL_URL ), is( "http://www.wemove.com" ) );
-        assertThat( detail.get("fetched"), is( nullValue() ) );
+        assertThat( (String)detail.getArray( IndexImpl.DETAIL_URL )[0], is( "http://www.wemove.com" ) );
+        assertThat( (String)detail.getArray("fetched")[0], is( "2014-06-03" ) );
         assertThat( detail.getTitle(), is( "wemove" ) );
         assertThat( detail.getSummary(), is( "Die beste IT-<em>Firma</em> auf der <em>Welt</em>!" ) );
         assertThat( detail.getScore(), greaterThan( 0.1f ) );
@@ -334,11 +382,11 @@ public class GeneralSearchTest {
     public void getDetailWithRequestedField() {
         IngridQuery q = Utils.getIngridQuery( "Welt Firma" );
         IngridHits search = Utils.index.search( q, 0, 10 );
-        String[] extraFields = new String[] { "fetched" };
+        String[] extraFields = new String[] { "url", "fetched" };
         IngridHitDetail detail = Utils.index.getDetail( search.getHits()[0], q, extraFields );
         assertThat( detail, not( is( nullValue() ) ) );
         // assertThat( detail.getHitId(), is( "1" ) );
-        assertThat( detail.getString( IndexImpl.DETAIL_URL ), is( "http://www.wemove.com" ) );
+        assertThat( (String)detail.getArray( IndexImpl.DETAIL_URL )[0], is( "http://www.wemove.com" ) );
         assertThat( (String)detail.getArray( "fetched" )[0], is( "2014-06-03" ) );
     }
     

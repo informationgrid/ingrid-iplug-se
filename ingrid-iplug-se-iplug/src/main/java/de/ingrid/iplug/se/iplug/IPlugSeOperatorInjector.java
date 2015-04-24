@@ -25,8 +25,8 @@ package de.ingrid.iplug.se.iplug;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.ibus.client.BusClientFactory;
-import de.ingrid.iplug.se.elasticsearch.bean.ElasticsearchNodeFactoryBean;
 import de.ingrid.utils.PlugDescription;
 import de.ingrid.utils.metadata.AbstractIPlugOperatorInjector;
 import de.ingrid.utils.metadata.IPlugOperatorFinder;
