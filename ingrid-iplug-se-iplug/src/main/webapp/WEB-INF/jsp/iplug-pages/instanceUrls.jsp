@@ -367,7 +367,7 @@
 
             } else {
                 $(".ui-dialog-title", dialog.parent()).text( "URL bearbeiten" );
-                $("#dialog-form").next().find("button:last .ui-button-text").text( "ändern" );
+                $("#dialog-form").next().find("button:last .ui-button-text").text( "Ändern" );
             }
 
             // reset all select boxes

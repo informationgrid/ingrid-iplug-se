@@ -35,6 +35,7 @@ import javax.persistence.TypedQuery;
 
 import org.apache.commons.lang.StringUtils;
 
+import de.ingrid.admin.JettyStarter;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
@@ -97,6 +98,10 @@ public class NutchProcessFactory {
         }
         indexParseMdValue = StringUtils.join(metadataList, ",");
 
+        String pdDatatypes = StringUtils.join( JettyStarter.getInstance().config.datatypes.toArray(), "," );
+        String staticFields = "datatype=" + pdDatatypes;
+        
+        nutchConfigTool.addOrUpdateProperty("index.static.fields", staticFields, "Fields (with its values) that shall be added to every indexed document.");
         nutchConfigTool.addOrUpdateProperty("index.parse.md", indexParseMdValue, "Generated metadata from the ingrid instance configuration.");
         nutchConfigTool.addOrUpdateProperty("hadoop.tmp.dir", Paths.get(instance.getWorkingDirectory(), "hadoop-tmp").toAbsolutePath().toString(), "Set hadoop temp directory to the instance.");
         nutchConfigTool.addOrUpdateProperty("mapred.temp.dir", Paths.get(instance.getWorkingDirectory(), "hadoop-tmp").toAbsolutePath().toString(), "Set mapred temp directory to the instance.");

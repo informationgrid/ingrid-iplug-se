@@ -42,6 +42,8 @@ public class ElasticIndexWriter implements IndexWriter {
     private Configuration config;
 
     private IngridElasticSearchClient client = null;
+    
+    private Map<String, Object> staticFieldsMap = new HashMap<String, Object>();
 
     @Override
     public void open(JobConf job, String name) throws IOException {
@@ -77,6 +79,19 @@ public class ElasticIndexWriter implements IndexWriter {
                 requestLength += doc.getFieldValue(fieldName).toString().length();
             }
         }
+        
+        // add static fields from PlugDescription to index if it wasn't already overwritten
+        // by the url matadatas
+        for (String key : staticFieldsMap.keySet()) {
+            if (!source.containsKey( key )) {
+                String[] values = (String[]) staticFieldsMap.get( key );
+                source.put( key, values );
+                for (String value : values) {
+                    requestLength += value.length();
+                }
+            }
+        }
+        
         request.setSource(source);
 
         // Add this indexing request to a bulk request
@@ -134,6 +149,15 @@ public class ElasticIndexWriter implements IndexWriter {
             message += "\n" + describe();
             LOG.error(message);
             throw new RuntimeException(message);
+        }
+        
+        String staticFields = conf.get( ElasticConstants.STATIC_FIELDS );
+        // separate entries
+        String[] entries = staticFields.split( "##" );
+        for (String entry : entries) {
+            // separate keys from values
+            String[] keyValue = entry.split( "=" );
+            staticFieldsMap.put( keyValue[0], keyValue[1].split( "," ) );
         }
     }
 

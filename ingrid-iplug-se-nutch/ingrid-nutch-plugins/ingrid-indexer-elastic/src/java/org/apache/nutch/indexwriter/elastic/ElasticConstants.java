@@ -28,4 +28,6 @@ public interface ElasticConstants {
 
     // INGRID: type of the indexed documents, usually this is the instance name 
     public static final String TYPE = "ingrid.indexer.elastic.type";
+
+    public static final String STATIC_FIELDS = "index.static.fields";
 }
