@@ -85,7 +85,12 @@ public class GeneralSearchTest {
         Utils.elastic.destroy();
     }
 
+    /**
+     * This is a test on multiple indices/nodes, which is not needed at the moment.
+     * @throws Exception
+     */
     @Test
+    @Ignore
     public void searchForAll() throws Exception {
         // second elastic search node
         ElasticsearchNodeFactoryBean elastic2 = new ElasticsearchNodeFactoryBean();
