@@ -246,12 +246,12 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             }
             this.statusProvider.appendToState(STATES.CREATE_STARTURL_REPORT.name(), " done.");
 
-            this.statusProvider.addState(STATES.CREATE_URL_ERROR_REPORT.name(), "Create url error statistic...");
+            this.statusProvider.addState(STATES.CREATE_URL_ERROR_REPORT.name() + 1, "Create url error statistic...");
             ret = execute("de.ingrid.iplug.se.nutch.statistics.UrlErrorReport", crawlDb, workingPath);
             if (ret != 0) {
                 throwCrawlError("Error during Execution of: de.ingrid.iplug.se.nutch.statistics.UrlErrorReport");
             }
-            this.statusProvider.appendToState(STATES.CREATE_URL_ERROR_REPORT.name(), " done.");
+            this.statusProvider.appendToState(STATES.CREATE_URL_ERROR_REPORT.name() + 1, " done.");
             
             this.statusProvider.addState(STATES.MERGE_SEGMENT.name(), "Merge segments...");
             ret = execute("de.ingrid.iplug.se.nutch.segment.SegmentMerger", mergedSegments, "-dir", segments);

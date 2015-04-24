@@ -54,9 +54,9 @@
         </select>
         <div class="hint" onclick="$('#filterComment').toggle()"><span class="ui-icon ui-icon-arrow-1-e"></span>Hinweis</div>
         <div id="filterComment" class="comment" style="display: none;">
-            Suchen Sie hier nach einer gewünschten URL. Jede Eingabe im URL-Feld, aktualisiert das Ergebnis und zeigt nur URLs an, die die eingegebene Zeichenkette enthalten.
-            Es können weiterhin beliebig viele Metadaten zum Filter hinzugefügt werden, um die Suche noch mehr einzugrenzen. Für eine schnellere Mehrfachauswahl muss die "Strg"-Taste gedrückt werden.
-            Das Löschen der Metadaten erfolgt über das jeweilige "x" des Feldes.
+            Suchen Sie hier nach einer gewÃ¼nschten URL. Jede Eingabe im URL-Feld, aktualisiert das Ergebnis und zeigt nur URLs an, die die eingegebene Zeichenkette enthalten.
+            Es kÃ¶nnen weiterhin beliebig viele Metadaten zum Filter hinzugefÃ¼gt werden, um die Suche noch mehr einzugrenzen. FÃ¼r eine schnellere Mehrfachauswahl muss die "Strg"-Taste gedrÃ¼ckt werden.
+            Das LÃ¶schen der Metadaten erfolgt Ã¼ber das jeweilige "x" des Feldes.
         </div>
     </fieldset>
 
@@ -95,7 +95,7 @@
         </tbody>
     </table>
 
-    <button id="btnDeleteUrls" type="button" name="delete" class="left">URLs löschen</button>
+    <button id="btnDeleteUrls" type="button" name="delete" class="left">URLs lÃ¶schen</button>
     <!-- <button id="btnAddUrl" type="button" name="add" class="right">Neue URL</button> -->
     <div style="clear:both;"></div>
 
@@ -127,7 +127,7 @@
                             </tr>
                         </tbody>
                     </table>
-                    <span id="errorLimitUrl" class="error">URL Patterns sind nicht korrekt. Zulässig sind gültige URLs und reguläre Ausdrücke im folgenden Format: "/PROTOKOLL://DOMAIN/REGEXP/".</span>
+                    <span id="errorLimitUrl" class="error">URL Patterns sind nicht korrekt. ZulÃ¤ssig sind gÃ¼ltige URLs und regulÃ¤re AusdrÃ¼cke im folgenden Format: "/PROTOKOLL://DOMAIN/REGEXP/".</span>
                 </div>
 
                 <div>
@@ -146,7 +146,7 @@
                             </tr>
                         </tbody>
                     </table>
-                    <span id="errorExcludeUrl" class="error">URL Patterns sind nicht korrekt. Zulässig sind gültige URLs und reguläre Ausdrücke im folgenden Format: "/PROTOKOLL://DOMAIN/REGEXP/"</span>
+                    <span id="errorExcludeUrl" class="error">URL Patterns sind nicht korrekt. ZulÃ¤ssig sind gÃ¼ltige URLs und regulÃ¤re AusdrÃ¼cke im folgenden Format: "/PROTOKOLL://DOMAIN/REGEXP/"</span>
                 </div>
 
 
@@ -220,11 +220,11 @@
                         <tbody>
                             <tr class="newRow">
                                 <td data-editable='false'><div class="input full"><input id="userMeta" type="text"></div></td>
-                                <td data-editable='false'><button id="btnAddUserMetadata" type="button">Benutzerdefiniertes Metadatum hinzufügen</button></td>
+                                <td data-editable='false'><button id="btnAddUserMetadata" type="button">Benutzerdefiniertes Metadatum hinzufÃ¼gen</button></td>
                             </tr>
                         </tbody>
                     </table>
-                    <p id="userMetaError" class="error">Ein Metadatum muss aus einem Schlüssel und einem Wert bestehen, welche durch einen Doppelpunkt getrennt sind. Bsp.: lang:de</p>
+                    <p id="userMetaError" class="error">Ein Metadatum muss aus einem SchlÃ¼ssel und einem Wert bestehen, welche durch einen Doppelpunkt getrennt sind. Bsp.: lang:de</p>
                 </div>
 
                 <!-- Allow form submission with keyboard without duplicating the dialog button -->
@@ -233,10 +233,10 @@
         </form>
     </div>
 
-    <div id="dialog-confirm" title="Wirklich löschen?">
+    <div id="dialog-confirm" title="Wirklich lÃ¶schen?">
         <p>
             <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-            Möchten Sie die Url(s) wirklich löschen?
+            MÃ¶chten Sie die Url(s) wirklich lÃ¶schen?
         </p>
     </div>
 

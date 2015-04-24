@@ -102,7 +102,7 @@
 						</tr>
 						<tr>
 							<td>ROBOTS_DENIED</td>
-							<td>Der Zugriff wurde für den Crawler durch robots.txt oder Meta Tags unterbunden.</td>
+							<td>Der Zugriff wurde fÃ¼r den Crawler durch robots.txt oder Meta Tags unterbunden.</td>
 						</tr>
 					</table>
 				</div>

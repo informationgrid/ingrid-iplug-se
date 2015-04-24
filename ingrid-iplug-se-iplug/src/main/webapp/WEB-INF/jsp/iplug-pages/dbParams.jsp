@@ -22,12 +22,12 @@
   --%>
 <%@ include file="/WEB-INF/jsp/base/include.jsp" %><%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<%@page import="de.ingrid.admin.security.IngridPrincipal"%>
+<%@ page import="de.ingrid.admin.security.IngridPrincipal"%>
+<%@ page contentType="text/html; charset=UTF-8" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de">
 <head>
 <title><fmt:message key="DatabaseConfig.main.title"/> - Konfiguration</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <meta name="description" content="" />
 <meta name="keywords" content="" />
 <meta name="author" content="wemove digital solutions" />
@@ -71,7 +71,7 @@
                 <table id="konfigForm">
                     <br />
                     <tr>
-                        <td colspan="2"><h3>Einstellungen für das SE-iPlug:</h3></td>
+                        <td colspan="2"><h3>Einstellungen fÃ¼r das SE-iPlug:</h3></td>
                     </tr>
                     <tr>
                         <td class="leftCol">Datenbankpfad</td>
@@ -105,7 +105,7 @@
                             </div>
                             <form:errors path="elasticSearchPort" cssClass="error" element="div" />
                             <br />
-                            Dieser Port wird für die Kommunikation mit dem Index verwendet.
+                            Dieser Port wird fÃ¼r die Kommunikation mit dem Index verwendet.
                             <p style="color: gray;">(Bsp: 3000)</p>
                         </td>
                     </tr>

@@ -21,13 +21,13 @@
   **************************************************#
   --%>
 <%@ include file="/WEB-INF/jsp/base/include.jsp"%>
+<%@ page contentType="text/html; charset=UTF-8" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de">
 <head>
 <title><fmt:message key="DatabaseConfig.main.title" /> -
 	Instanzkonfiguration</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <meta name="description" content="" />
 <meta name="keywords" content="" />
 <meta name="author" content="wemove digital solutions" />
@@ -80,7 +80,7 @@
 			$("#statisticTable tbody")
 					.append(
 							"<tr>"
-									+ "<td title='rot=noch nicht analysiert; gr&uml;n=analysiert'><span style='display: inline-block; background-color: green; height: 3px; width: " + fetchedWidth + "px'></span><span style='display: inline-block; background-color: red; height: 3px; width: " + toFetchWidth + "px'></span></td>"
+									+ "<td title='rot=noch nicht analysiert; grün=analysiert'><span style='display: inline-block; background-color: green; height: 3px; width: " + fetchedWidth + "px'></span><span style='display: inline-block; background-color: red; height: 3px; width: " + toFetchWidth + "px'></span></td>"
 									+ "<td>" + item.host + "</td>" + "<td>"
 									+ item.known + "</td>" + "<td>"
 									+ item.fetched + "</td>" + "<td>"
@@ -239,7 +239,7 @@
 				        var chosenOptions = {
 				            width: "100%",
 				            disable_search_threshold: 5,
-				            placeholder_text_multiple: "Bitte ausw�hlen",
+				            placeholder_text_multiple: "Bitte auswählen",
 				            no_results_text: "Keinen Eintrag gefunden"
 				        };
 						

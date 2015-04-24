@@ -21,12 +21,12 @@
   **************************************************#
   --%>
 <%@ include file="/WEB-INF/jsp/base/include.jsp"%>
+<%@ page contentType="text/html; charset=UTF-8" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de">
 <head>
 <title><fmt:message key="DatabaseConfig.main.title" /> - Management</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <meta name="description" content="" />
 <meta name="keywords" content="" />
 <meta name="author" content="wemove digital solutions" />
@@ -127,10 +127,10 @@
                     //$("#allInfo").hide();
                     var data = "";
                     if (jqXHR.responseText == "") {
-                        $("#crawlInfo").html( "Es l�uft zur Zeit kein Crawl." );
+                        $("#crawlInfo").html( "Es läuft zur Zeit kein Crawl." );
                         
                     } else {
-                        $("#crawlInfo").html( "Es l�uft zur Zeit kein Crawl. (<a href='#' onclick='$(\"#allInfo\").toggle()'>Information zum letzten Crawl) " );
+                        $("#crawlInfo").html( "Es läuft zur Zeit kein Crawl. (<a href='#' onclick='$(\"#allInfo\").toggle()'>Information zum letzten Crawl) " );
                         data = JSON.parse( jqXHR.responseText );
                         setLog( data );
                         // show link to request hadoop.log content
