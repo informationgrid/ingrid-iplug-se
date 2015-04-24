@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -225,7 +226,6 @@ public class RestDataController extends InstanceController {
 		return json;
 	}
 
-	@SuppressWarnings("unchecked")
     @RequestMapping(value = { "urlerrors/{instance}" }, method = RequestMethod.GET)
 	public JSONObject getUrlErrors(@PathVariable("instance") String name,
 	        @RequestParam(value = "page", required = false, defaultValue = "0") int page,
@@ -242,7 +242,7 @@ public class RestDataController extends InstanceController {
 		Reader reader = null;
 		UrlErrorPagableFilter pager = null;
 		try {
-			reader = Files.newBufferedReader(path);
+			reader = Files.newBufferedReader(path, Charset.forName("UTF-8"));
 			pager = new UrlErrorPagableFilter(page, pageSize, urlFilter, statusFilter);
 			parser.parse(reader, pager);
 		} catch (IOException e) {
