@@ -59,8 +59,7 @@ public class FacetSearchTest  {
     @Before
     public void initTest() throws Exception {
         Utils.initIndex( jettyStarter );
-        ElasticSearchUtils.removeAlias( Utils.elastic.getObject().client(), "test_1" );
-        ElasticSearchUtils.switchAlias( Utils.elastic.getObject().client(), null, "test_1" );
+        ElasticSearchUtils.switchAlias( Utils.elastic.getObject().client(), "test_1" );
     }
     
     @AfterClass

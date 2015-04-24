@@ -41,7 +41,6 @@ import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.elasticsearch.ElasticSearchUtils;
 import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.admin.service.PlugDescriptionService;
-import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.utils.PlugDescription;
 
 /**

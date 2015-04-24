@@ -76,8 +76,7 @@ public class GeneralSearchTest {
     @Before
     public void initTest() throws Exception {
         Utils.initIndex( jettyStarter );
-        ElasticSearchUtils.removeAlias( Utils.elastic.getObject().client(), "test_1" );
-        ElasticSearchUtils.switchAlias( Utils.elastic.getObject().client(), null, "test_1" );
+        ElasticSearchUtils.switchAlias( Utils.elastic.getObject().client(), "test_1" );
     }
     
     @AfterClass
@@ -111,7 +110,7 @@ public class GeneralSearchTest {
         assertThat( search, not( is( nullValue() ) ) );
         assertThat( search.length(), is( Long.valueOf( Utils.MAX_RESULTS ) ) );
         
-        ElasticSearchUtils.switchAlias( Utils.elastic.getObject().client(), "test_1", "test2_1" );
+        ElasticSearchUtils.switchAlias( Utils.elastic.getObject().client(), "test2_1" );
         IndexImpl index2 = new IndexImpl( elastic2, qc, new FacetConverter(qc) );
         IngridHits search2 = index2.search( q, 0, 10 );
         assertThat( search2, not( is( nullValue() ) ) );
