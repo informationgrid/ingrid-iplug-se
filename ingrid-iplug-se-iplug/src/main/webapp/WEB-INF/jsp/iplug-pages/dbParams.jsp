@@ -97,7 +97,7 @@
                             <p style="color: gray;">(Bsp: instances)</p>
                         </td>
                     </tr>
-                    <tr>
+                    <%-- <tr>
                         <td class="leftCol">ElasticSearch Port</td>
                         <td>
                             <div class="input full">
@@ -108,7 +108,7 @@
                             Dieser Port wird für die Kommunikation mit dem Index verwendet.
                             <p style="color: gray;">(Bsp: 3000)</p>
                         </td>
-                    </tr>
+                    </tr> --%>
                 </table>
             </form:form>
         </div>

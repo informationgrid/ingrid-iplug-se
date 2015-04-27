@@ -22,12 +22,8 @@
  */
 package de.ingrid.iplug.se.webapp.controller.instance;
 
-import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -37,9 +33,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
-
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonSyntaxException;
 
 import de.ingrid.admin.controller.AbstractController;
 import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
@@ -57,15 +50,8 @@ import de.ingrid.iplug.se.webapp.controller.AdminViews;
 @SessionAttributes("plugDescription")
 public class ReportsController extends AbstractController {
 
-	private NutchController nutchController;
-
-	private IPostCrawlProcessor[] postCrawlProcessors;
-
 	@Autowired
-	public ReportsController(NutchController nutchController, IPostCrawlProcessor[] postCrawlProcessors) {
-		this.nutchController = nutchController;
-		this.postCrawlProcessors = postCrawlProcessors;
-	}
+	public ReportsController(NutchController nutchController, IPostCrawlProcessor[] postCrawlProcessors) {}
 
 	@RequestMapping(value = { "/iplug-pages/instanceReports.html" }, method = RequestMethod.GET)
 	public String showReports(final ModelMap modelMap, @RequestParam("instance") String name) {

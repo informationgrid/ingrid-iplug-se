@@ -47,10 +47,10 @@ import javax.persistence.criteria.Root;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.omg.PortableInterceptor.ACTIVE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -85,6 +85,8 @@ import de.ingrid.iplug.se.webapp.container.Instance;
 public class RestDataController extends InstanceController {
 
 	private static final Log LOG = LogFactory.getLog(RestDataController.class.getName());
+
+    private static final String NO_RESULT_INDEX = "_noresult_";
 
 	@Autowired
 	private NutchController nutchController;
@@ -285,11 +287,20 @@ public class RestDataController extends InstanceController {
 	        @ModelAttribute("plugDescription") final PlugdescriptionCommandObject pdCommandObject,
 	        @PathVariable("name") String name, @PathVariable("value") String value) {
 
-		List<String> activeInstances = SEIPlug.conf.activeInstances;
+	    
+		List<String> activeInstances = JettyStarter.getInstance().config.indexSearchInTypes;
+		// always remove type that leads to no result (in case it was set)
+		activeInstances.remove( NO_RESULT_INDEX );
+		
 		if ("on".equals(value)) {
 			activeInstances.add(name);
 		} else {
 			activeInstances.remove(name);
+		}
+		
+		// add a type which returns no result, if no instance is activated
+		if (activeInstances.size() == 0) {
+		    activeInstances.add( NO_RESULT_INDEX );
 		}
 
 		// write immediately configuration

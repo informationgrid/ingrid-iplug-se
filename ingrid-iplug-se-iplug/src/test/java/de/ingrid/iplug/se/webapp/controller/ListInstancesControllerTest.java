@@ -26,7 +26,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
 
 import org.elasticsearch.client.Client;
 import org.elasticsearch.node.internal.InternalNode;
@@ -74,7 +73,7 @@ public class ListInstancesControllerTest {
 
         Configuration configuration = new Configuration();
         configuration.setInstancesDir( "test-instances" );
-        configuration.activeInstances = Arrays.asList( "web" );
+        //configuration.activeInstances = Arrays.asList( "web" );
         SEIPlug.conf = configuration;
 
         ListInstancesController lic = new ListInstancesController();

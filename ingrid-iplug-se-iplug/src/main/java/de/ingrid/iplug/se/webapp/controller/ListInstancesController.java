@@ -52,6 +52,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
 import de.ingrid.admin.controller.AbstractController;
 import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
@@ -123,7 +124,7 @@ public class ListInstancesController extends AbstractController {
         List<Instance> instances = getInstances();
 
         // check for invalid instances and remove them from the active ones
-        Iterator<String> activeInstancesIt = conf.activeInstances.iterator();
+        Iterator<String> activeInstancesIt = JettyStarter.getInstance().config.indexSearchInTypes.iterator();
         while (activeInstancesIt.hasNext()) {
             String active = activeInstancesIt.next();
 

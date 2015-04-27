@@ -31,18 +31,18 @@ import org.elasticsearch.action.admin.indices.exists.types.TypesExistsRequest;
 import org.elasticsearch.client.Client;
 import org.springframework.core.io.ClassPathResource;
 
-import de.ingrid.iplug.se.SEIPlug;
+import de.ingrid.admin.JettyStarter;
 
 public class ElasticSearchUtils {
 
     public static boolean typeExists(String type, Client client) {
-        TypesExistsRequest typeRequest = new TypesExistsRequest( new String[]{ SEIPlug.conf.index }, type );
+        TypesExistsRequest typeRequest = new TypesExistsRequest( new String[]{ JettyStarter.getInstance().config.index }, type );
         boolean typeExists = client.admin().indices().typesExists( typeRequest ).actionGet().isExists();
         return typeExists;
     }
     
     public static void createIndexType(String type, Client client) throws Exception {
-        String indexName = SEIPlug.conf.index;
+        String indexName = JettyStarter.getInstance().config.index;
         client.admin().indices().preparePutMapping().setIndices( indexName )
             .setType( type )
             .setSource( getMappingSource() )
@@ -64,7 +64,7 @@ public class ElasticSearchUtils {
     }
 
     public static void deleteType(String name, Client client) {
-        client.admin().indices().prepareDeleteMapping( SEIPlug.conf.index )
+        client.admin().indices().prepareDeleteMapping( JettyStarter.getInstance().config.index )
             .setType( name )
             .execute()
             .actionGet();
