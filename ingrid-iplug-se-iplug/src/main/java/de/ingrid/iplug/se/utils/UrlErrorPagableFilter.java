@@ -7,6 +7,14 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.ContentHandler;
 import org.json.simple.parser.ParseException;
 
+/**
+ * Allows to retrieve a filtered, pagable resultset from an rather large JSON
+ * file. Implements the {@link ContentHandler} interface. See
+ * https://code.google.com/p/json-simple/wiki/DecodingExamples#Example_5_-_Stoppable_SAX-like_content_handler
+ * 
+ * @author jm
+ *
+ */
 public class UrlErrorPagableFilter implements ContentHandler {
 
 	int page = 0;
@@ -22,6 +30,16 @@ public class UrlErrorPagableFilter implements ContentHandler {
 	String urlPattern = null;
 	String[] statusFilter = null;
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param page
+	 *            Page of the result, starting with 0.
+	 * @param pageSize
+	 *            Number of results per page.
+	 * @param urlPattern
+	 * @param statusFilter
+	 */
 	public UrlErrorPagableFilter(int page, int pageSize, String urlPattern, String[] statusFilter) {
 		this.page = page;
 		this.pageSize = pageSize;
@@ -53,7 +71,7 @@ public class UrlErrorPagableFilter implements ContentHandler {
 		if (tmpObj.containsKey("url") && tmpObj.containsKey("status")) {
 			String url = tmpObj.get("url").toString();
 			if (urlPattern.length() == 0 || url.contains(urlPattern)) {
-				urlHit=true;
+				urlHit = true;
 			}
 			String status = tmpObj.get("status").toString();
 			if (statusFilter == null || statusFilter.length == 0) {
@@ -66,9 +84,9 @@ public class UrlErrorPagableFilter implements ContentHandler {
 					}
 				}
 			}
-			
+
 			if (urlHit && statusHit) {
-				if (hitCounter >= (page - 1) * pageSize && result.size() <= pageSize) {
+				if (hitCounter >= page * pageSize && result.size() <= pageSize) {
 					result.add(tmpObj);
 				}
 				hitCounter++;
