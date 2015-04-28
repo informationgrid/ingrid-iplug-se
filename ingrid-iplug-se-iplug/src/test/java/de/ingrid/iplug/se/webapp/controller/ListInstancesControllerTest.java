@@ -40,6 +40,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.ui.ModelMap;
 
+import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
@@ -59,6 +60,7 @@ public class ListInstancesControllerTest {
     
     @Before
     public void initTest() throws Exception {
+        new JettyStarter( false );
         MockitoAnnotations.initMocks( this );
         PowerMockito.mockStatic( ElasticSearchUtils.class );
         InternalNode node = new InternalNode();
