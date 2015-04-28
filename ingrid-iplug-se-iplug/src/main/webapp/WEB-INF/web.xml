@@ -116,6 +116,7 @@ http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
             <url-pattern>/css/*</url-pattern>
             <url-pattern>/images/*</url-pattern>
             <url-pattern>/js/*</url-pattern>
+            <url-pattern>/img/*</url-pattern>
             <url-pattern>/base/auth/*</url-pattern>
             <url-pattern>/base/css/*</url-pattern>
             <url-pattern>/base/images/*</url-pattern>
