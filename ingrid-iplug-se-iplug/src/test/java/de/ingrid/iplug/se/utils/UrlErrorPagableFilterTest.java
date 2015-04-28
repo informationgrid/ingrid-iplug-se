@@ -27,54 +27,54 @@ public class UrlErrorPagableFilterTest {
 
 		JSONParser parser = new JSONParser();
 
-		UrlErrorPagableFilter pager = new UrlErrorPagableFilter(1, 10, "", null);
+		UrlErrorPagableFilter pager = new UrlErrorPagableFilter(0, 10, "", null);
 		parser.parse(json, pager);
 		assertEquals(10, pager.getTotalResults());
 		assertEquals(10, pager.getResult().size());
 		JSONObject obj = (JSONObject) pager.getResult().get(0);
 		assertEquals("http://poseidon.bafg.de/servlet/is/2884/", obj.get("url").toString());
 
-		pager = new UrlErrorPagableFilter(1, 10, "boklim", null);
+		pager = new UrlErrorPagableFilter(0, 10, "boklim", null);
 		parser.parse(json, pager);
 		assertEquals(9, pager.getTotalResults());
 		assertEquals(9, pager.getResult().size());
 		obj = (JSONObject) pager.getResult().get(0);
 		assertEquals("http://www.boklim.de/boklimPublic/index.html1", obj.get("url").toString());
 
-		pager = new UrlErrorPagableFilter(2, 5, "boklim", null);
+		pager = new UrlErrorPagableFilter(1, 5, "boklim", null);
 		parser.parse(json, pager);
 		assertEquals(9, pager.getTotalResults());
 		assertEquals(4, pager.getResult().size());
 		obj = (JSONObject) pager.getResult().get(0);
 		assertEquals("http://www.boklim.de/boklimPublic/index.html6", obj.get("url").toString());
 
-		pager = new UrlErrorPagableFilter(1, 5, "poseidon", null);
+		pager = new UrlErrorPagableFilter(0, 5, "poseidon", null);
 		parser.parse(json, pager);
 		assertEquals(1, pager.getTotalResults());
 		assertEquals(1, pager.getResult().size());
 		obj = (JSONObject) pager.getResult().get(0);
 		assertEquals("http://poseidon.bafg.de/servlet/is/2884/", obj.get("url").toString());
 
-		pager = new UrlErrorPagableFilter(2, 5, "poseidon", null);
+		pager = new UrlErrorPagableFilter(1, 5, "poseidon", null);
 		parser.parse(json, pager);
 		assertEquals(1, pager.getTotalResults());
 		assertEquals(0, pager.getResult().size());
 		
-		pager = new UrlErrorPagableFilter(1, 5, "", new String[] {"18"});
+		pager = new UrlErrorPagableFilter(0, 5, "", new String[] {"18"});
 		parser.parse(json, pager);
 		assertEquals(1, pager.getTotalResults());
 		assertEquals(1, pager.getResult().size());
 		obj = (JSONObject) pager.getResult().get(0);
 		assertEquals("http://poseidon.bafg.de/servlet/is/2884/", obj.get("url").toString());
 
-		pager = new UrlErrorPagableFilter(1, 10, "boklim", new String[] {"18", "14"});
+		pager = new UrlErrorPagableFilter(0, 10, "boklim", new String[] {"18", "14"});
 		parser.parse(json, pager);
 		assertEquals(9, pager.getTotalResults());
 		assertEquals(9, pager.getResult().size());
 		obj = (JSONObject) pager.getResult().get(0);
 		assertEquals("http://www.boklim.de/boklimPublic/index.html1", obj.get("url").toString());
 		
-		pager = new UrlErrorPagableFilter(1, 10, "", new String[] {"18", "14"});
+		pager = new UrlErrorPagableFilter(0, 10, "", new String[] {"18", "14"});
 		parser.parse(json, pager);
 		assertEquals(10, pager.getTotalResults());
 		assertEquals(10, pager.getResult().size());
