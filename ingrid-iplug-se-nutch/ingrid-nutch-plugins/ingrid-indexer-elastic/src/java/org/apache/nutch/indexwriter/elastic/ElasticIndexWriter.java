@@ -152,12 +152,15 @@ public class ElasticIndexWriter implements IndexWriter {
         }
         
         String staticFields = conf.get( ElasticConstants.STATIC_FIELDS );
-        // separate entries
-        String[] entries = staticFields.split( "##" );
-        for (String entry : entries) {
-            // separate keys from values
-            String[] keyValue = entry.split( "=" );
-            staticFieldsMap.put( keyValue[0], keyValue[1].split( "," ) );
+
+        if (staticFields != null) {
+            // separate entries
+            String[] entries = staticFields.split( "##" );
+            for (String entry : entries) {
+                // separate keys from values
+                String[] keyValue = entry.split( "=" );
+                staticFieldsMap.put( keyValue[0], keyValue[1].split( "," ) );
+            }
         }
     }
 

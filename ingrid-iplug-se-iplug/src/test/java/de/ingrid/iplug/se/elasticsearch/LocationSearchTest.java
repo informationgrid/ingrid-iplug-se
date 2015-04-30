@@ -27,6 +27,8 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import java.util.ArrayList;
+
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -52,6 +54,7 @@ public class LocationSearchTest  {
         new JettyStarter( false );
         JettyStarter.getInstance().config.index = "test";
         JettyStarter.getInstance().config.indexWithAutoId = true;
+        JettyStarter.getInstance().config.indexSearchInTypes = new ArrayList<String>();
         Utils.setupES();
     }
     

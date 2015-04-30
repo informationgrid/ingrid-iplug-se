@@ -70,6 +70,7 @@ public class GeneralSearchTest {
         new JettyStarter( false );
         JettyStarter.getInstance().config.index = "test";
         JettyStarter.getInstance().config.indexWithAutoId = true;
+        JettyStarter.getInstance().config.indexSearchInTypes = new ArrayList<String>();
         Utils.setupES();
     }    
     
@@ -376,7 +377,7 @@ public class GeneralSearchTest {
         IngridHitDetail detail = Utils.index.getDetail( search.getHits()[0], q, new String[] { "url", "fetched" } );
         assertThat( detail, not( is( nullValue() ) ) );
         // assertThat( detail.getHitId(), is( "1" ) );
-        assertThat( (String)detail.getArray( IndexImpl.DETAIL_URL )[0], is( "http://www.wemove.com" ) );
+        assertThat( detail.getString( IndexImpl.DETAIL_URL ), is( "http://www.wemove.com" ) );
         assertThat( (String)detail.getArray("fetched")[0], is( "2014-06-03" ) );
         assertThat( detail.getTitle(), is( "wemove" ) );
         assertThat( detail.getSummary(), is( "Die beste IT-<em>Firma</em> auf der <em>Welt</em>!" ) );
@@ -391,7 +392,7 @@ public class GeneralSearchTest {
         IngridHitDetail detail = Utils.index.getDetail( search.getHits()[0], q, extraFields );
         assertThat( detail, not( is( nullValue() ) ) );
         // assertThat( detail.getHitId(), is( "1" ) );
-        assertThat( (String)detail.getArray( IndexImpl.DETAIL_URL )[0], is( "http://www.wemove.com" ) );
+        assertThat( detail.getString( IndexImpl.DETAIL_URL ), is( "http://www.wemove.com" ) );
         assertThat( (String)detail.getArray( "fetched" )[0], is( "2014-06-03" ) );
     }
     
