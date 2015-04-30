@@ -747,7 +747,11 @@
         };
 
         var updateBrowserHistory = function() {
-            window.history.pushState(null, null, location.pathname + "?instance=${instance.name}&urlfilter=" + $("#urlTable").data().urlfilter + "&filter=" + $("#urlTable").data().metafilter);
+        	
+            // avoid problem with missing functionality in IE9
+            if (window.history.pushState)  {
+                window.history.pushState(null, null, location.pathname + "?instance=${instance.name}&urlfilter=" + $("#urlTable").data().urlfilter + "&filter=" + $("#urlTable").data().metafilter);
+            }
         };
 
         var setFilterValues = function() {

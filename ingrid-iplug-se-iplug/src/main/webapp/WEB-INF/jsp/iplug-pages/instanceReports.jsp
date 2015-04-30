@@ -21,7 +21,7 @@
   **************************************************#
   --%>
 <%@ include file="/WEB-INF/jsp/base/include.jsp"%>
-<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8"%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de">
@@ -34,9 +34,12 @@
 <meta name="copyright" content="wemove digital solutions GmbH" />
 <link rel="StyleSheet" href="../css/base/portal_u.css" type="text/css"
 	media="all" />
-<link rel="StyleSheet" href="../css/jquery-ui.min.css" type="text/css" media="all" />
-<link rel="StyleSheet" href="../css/chosen.min.css" type="text/css" media="all" />
-<link rel="StyleSheet" href="../css/jquery.tablesorter.pager.css" type="text/css" media="all" />
+<link rel="StyleSheet" href="../css/jquery-ui.min.css" type="text/css"
+	media="all" />
+<link rel="StyleSheet" href="../css/chosen.min.css" type="text/css"
+	media="all" />
+<link rel="StyleSheet" href="../css/jquery.tablesorter.pager.css"
+	type="text/css" media="all" />
 
 <link rel="StyleSheet" href="../css/se_styles.css" type="text/css"
 	media="all" />
@@ -178,7 +181,8 @@
 												+ d[r].url
 												+ "</td>"
 												+ "<td>"
-												+ d[r].msg.toUpperCase() + "</td>" + "</tr>";
+												+ d[r].msg.toUpperCase()
+												+ "</td>" + "</tr>";
 
 										//rows.push(row); // add new row array to rows array
 
@@ -235,24 +239,28 @@
 							}
 						}).tablesorterPager(pagerOptions);
 
-				        // convert select boxes to better ones
-				        var chosenOptions = {
-				            width: "100%",
-				            disable_search_threshold: 5,
-				            placeholder_text_multiple: "Bitte auswählen",
-				            no_results_text: "Keinen Eintrag gefunden"
-				        };
-						
+						// convert select boxes to better ones
+						var chosenOptions = {
+							width : "100%",
+							disable_search_threshold : 5,
+							placeholder_text_multiple : "Bitte auswählen",
+							no_results_text : "Keinen Eintrag gefunden"
+						};
+
 						var updateBrowserHistory = function() {
-							window.history
-									.pushState(
-											null,
-											null,
-											location.pathname
-													+ "?instance=${instance.name}&urlfilter="
-													+ $("#urlTable").data().urlfilter
-													+ "&filter="
-													+ $("#urlTable").data().statusfilter);
+
+							// avoid problem with missing functionality in IE9
+							if (window.history.pushState) {
+								window.history
+										.pushState(
+												null,
+												null,
+												location.pathname
+														+ "?instance=${instance.name}&urlfilter="
+														+ $("#urlTable").data().urlfilter
+														+ "&filter="
+														+ $("#urlTable").data().statusfilter);
+							}
 						};
 
 						var setFilterValues = function() {
@@ -289,10 +297,9 @@
 						$("#filterUrl").on("keyup", function() {
 							setFilterValues();
 						});
-						
-				        setFilterValues();
-						
-						
+
+						setFilterValues();
+
 						$("#urlContent").css("visibility", "visible");
 						$("#loading").hide();
 
