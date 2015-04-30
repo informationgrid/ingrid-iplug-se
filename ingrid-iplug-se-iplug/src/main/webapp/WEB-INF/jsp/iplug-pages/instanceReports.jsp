@@ -203,7 +203,7 @@
 									url += "&sort=" + sort.join(',');
 								url += "&pagesize=" + this.size;
 
-								return url;
+								return encodeURI(url);
 							}
 						};
 
