@@ -177,9 +177,9 @@
 										// cells
 										rows += "<tr data-id='" + d[r].id + "'>"
 												+ "<td></td>"
-												+ "<td>"
+												+ "<td><a href=\"" + d[r].url + "\">"
 												+ d[r].url
-												+ "</td>"
+												+ "</a></td>"
 												+ "<td>"
 												+ d[r].msg.toUpperCase()
 												+ "</td>" + "</tr>";
