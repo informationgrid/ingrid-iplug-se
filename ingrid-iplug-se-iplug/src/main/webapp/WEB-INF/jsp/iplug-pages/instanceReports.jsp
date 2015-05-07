@@ -64,6 +64,7 @@
 		});
 
 		$('#configTabs').bind('easytabs:after', function() {
+			$("#filterStatus").trigger("chosen:updated");
 			getStatistic();
 		});
 
