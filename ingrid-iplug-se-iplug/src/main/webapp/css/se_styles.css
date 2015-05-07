@@ -392,3 +392,7 @@ td.tablesorter-pager {
     filter: alpha(opacity = 50);
     cursor: default;
 }
+
+#filterComment table td {
+	padding-right: 10px
+}

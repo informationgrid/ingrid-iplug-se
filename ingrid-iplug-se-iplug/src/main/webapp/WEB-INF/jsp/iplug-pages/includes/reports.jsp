@@ -90,7 +90,7 @@
 						</tr>
 						<tr>
 							<td>EXCEPTION</td>
-							<td>Es ist ein Fehler aufgetreten. (HTTP Fehlercode 50x)</td>
+							<td>Es ist ein Fehler aufgetreten. (HTTP Fehlercode 50x oder anderer Fehler, z.B. Parsefehler, ung&uuml;ltige URL)</td>
 						</tr>
 						<tr>
 							<td>GONE</td>
@@ -102,7 +102,7 @@
 						</tr>
 						<tr>
 							<td>ROBOTS_DENIED</td>
-							<td>Der Zugriff wurde für den Crawler durch robots.txt oder Meta Tags unterbunden.</td>
+							<td>Der Zugriff wurde f&uuml;r den Crawler durch robots.txt oder Meta Tags unterbunden.</td>
 						</tr>
 					</table>
 				</div>
