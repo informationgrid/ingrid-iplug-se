@@ -28,6 +28,18 @@
 		<author email="joachim@wemove.com">Joachim Müller</author>
 	</properties>
 	<body>
+    <release version="3.6.0" date="2015-06-19" description="Release 3.6.0">
+      <action type="add" dev="wemove" issue="REDMINE-51">
+        Added URL report page.
+      </action>
+      <action type="update" dev="wemove" issue="REDMINE-6">
+        Adaption to latest base-webapp, which handles elastic search.
+      </action>
+      <action type="fix" dev="wemove">
+        Several small fixes.
+      </action>
+    </release>
+
 		<release version="3.5.0" date="2015-01-30" description="Release InGrid 3.5.0">
 			<action type="add" dev="wemove" issue="REDMINE-524">
         Added license header to all source files for Open Source migration.
