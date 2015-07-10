@@ -157,7 +157,10 @@ public class ListInstancesController extends AbstractController {
             @RequestParam("instance") String name,
             @RequestParam(value = "duplicateFrom", required = false) String from) throws Exception {
         
-        if (name == null || name.isEmpty()) return AdminViews.SE_LIST_INSTANCES;
+        if (name == null || name.isEmpty()) {
+            modelMap.put( "instances", getInstances() );
+            return AdminViews.SE_LIST_INSTANCES;
+        }
 
         // convert illegal chars to "_"
         name = name.replaceAll( "[:\\\\/*?|<>\\W]", "_" );

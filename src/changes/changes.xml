@@ -28,6 +28,12 @@
 		<author email="joachim@wemove.com">Joachim Müller</author>
 	</properties>
 	<body>
+    <release version="3.6.1-SNAPSHOT" date="2015-xx-xx" description="Release 3.6.1">
+      <action type="fix" dev="wemove" issue="REDMINE-92">
+        Fixed a bug that prevented crawling when the iPlug was freshly installed and started the very first time.
+      </action>
+    </release>
+
     <release version="3.6.0" date="2015-06-19" description="Release 3.6.0">
       <action type="add" dev="wemove" issue="REDMINE-51">
         Added URL report page.
