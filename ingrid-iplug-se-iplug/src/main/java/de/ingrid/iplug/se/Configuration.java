@@ -86,6 +86,11 @@ public class Configuration implements IConfig {
     @PropertyValue("plugdescription.fields")
     @DefaultValue("")
     public List<String> fields;
+    
+    @PropertyValue("dependingFields")
+    @DefaultValue("")
+    public List<String> dependingFields;
+    
 	
 	@Override
     public void addPlugdescriptionValues( PlugdescriptionCommandObject pdObject ) {

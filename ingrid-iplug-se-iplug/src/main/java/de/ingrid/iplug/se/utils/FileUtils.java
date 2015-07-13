@@ -223,6 +223,8 @@ public class FileUtils {
             }
             metadataValues.add(metasConcat);
         }
+        
+        // TODO: add depending fields to metadata file (REDMINE-94)
 
         FileUtils.writeToFile(Paths.get(workDir, "urls", "metadata").toAbsolutePath(), "seed.txt", metadataValues);
         FileUtils.writeToFile(Paths.get(workDir, "urls", "limit").toAbsolutePath(), "seed.txt", limitUrls);
