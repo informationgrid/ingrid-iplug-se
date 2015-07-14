@@ -38,6 +38,8 @@ import org.springframework.core.io.Resource;
 import com.tngtech.configbuilder.annotation.configuration.Separator;
 import com.tngtech.configbuilder.annotation.propertyloaderconfiguration.PropertiesFiles;
 import com.tngtech.configbuilder.annotation.propertyloaderconfiguration.PropertyLocations;
+import com.tngtech.configbuilder.annotation.typetransformer.TypeTransformer;
+import com.tngtech.configbuilder.annotation.typetransformer.TypeTransformers;
 import com.tngtech.configbuilder.annotation.valueextractor.DefaultValue;
 import com.tngtech.configbuilder.annotation.valueextractor.PropertyValue;
 
@@ -53,6 +55,22 @@ public class Configuration implements IConfig {
     
     private static Logger log = Logger.getLogger(Configuration.class);
     
+    
+    public class StringToMap extends TypeTransformer<String, Map<String, String>> {
+        
+        @Override
+        public Map<String, String> transform( String input ) {
+            Map<String, String> map = new HashMap<String, String>();
+            if (!"".equals( input )) {
+                String[] entries = input.split( "," );
+                for (String entry : entries) {
+                    String[] split = entry.split( "->" );
+                    map.put( split[0], split[1] );
+                }
+            }
+            return map;
+        }
+    }
     
     
 	@Override
@@ -90,6 +108,16 @@ public class Configuration implements IConfig {
     @PropertyValue("dependingFields")
     @DefaultValue("")
     public List<String> dependingFields;
+    
+    @TypeTransformers(Configuration.StringToMap.class)
+    @PropertyValue("facetMapping")
+    @DefaultValue("air->measure:air,radiation->measure:radiation,water->measure:water,misc->measure:misc,press->service:press,publication->service:publication,event->service:event")
+    public Map<String, String> facetMap;
+    
+    @TypeTransformers(Configuration.StringToMap.class)
+    @PropertyValue("queryFieldMapping")
+    @DefaultValue("topic:air->measure:air,topic:radiation->measure:radiation,topic:water->measure:water,topic:misc->measure:misc,topic:press->service:press,topic:publication->service:publication,topic:event->service:event")
+    public Map<String, String> queryFieldMap;
     
 	
 	@Override
