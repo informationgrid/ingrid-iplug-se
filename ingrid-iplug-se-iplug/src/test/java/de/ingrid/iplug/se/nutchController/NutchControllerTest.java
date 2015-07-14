@@ -75,6 +75,7 @@ public class NutchControllerTest {
         Configuration configuration = new Configuration();
         configuration.setInstancesDir("test-instances");
         configuration.databaseID = "iplug-se-dev";
+        configuration.dependingFields = new ArrayList<String>();
         configuration.nutchCallJavaOptions = java.util.Arrays.asList("-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8");
         SEIPlug.conf = configuration;
 
@@ -136,6 +137,7 @@ public class NutchControllerTest {
         Configuration configuration = new Configuration();
         configuration.setInstancesDir("test-instances");
         configuration.databaseID = "iplug-se-dev";
+        configuration.dependingFields = new ArrayList<String>();
         configuration.nutchCallJavaOptions = java.util.Arrays.asList("-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8");
         SEIPlug.conf = configuration;
 
