@@ -76,6 +76,15 @@
   <build>
     <finalName>${project.artifactId}-${project.version}</finalName>
     <plugins>
+      <!-- "DISABLE" WAGON PLUGIN TO AVOID EMPTY UPLOAD DIRECTORIES FROM SUBMODULES -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>wagon-maven-plugin</artifactId>
+        <configuration>
+          <fromDir>NOT_EXISITING_DIRECTORY</fromDir>
+          <url>/dev/null</url>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -118,11 +127,6 @@
             <systemPath>${java.home}/../lib/tools.jar</systemPath>
           </dependency>
         </dependencies>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-changes-plugin</artifactId>
-        <inherited>false</inherited>
       </plugin>
     </plugins>
   </build>
