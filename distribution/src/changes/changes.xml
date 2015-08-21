@@ -28,6 +28,13 @@
 		<author email="joachim@wemove.com">Joachim Müller</author>
 	</properties>
 	<body>
+
+ 	<release version="3.6.1-SNAPSHOT" date="2015-xx-xx" description="Release 3.6.1">
+      <action type="fix" dev="wemove" issue="REDMINE-114">
+        Fixed a bug that prevented grouping by provider or partner if an URL has not set any.
+      </action>
+    </release>
+
     <release version="3.6.0.2" date="2015-07-14" description="Release 3.6.0.2">
       <action type="fix" dev="wemove" issue="REDMINE-94">
         Fixed wrong facet search and display in the portal.
