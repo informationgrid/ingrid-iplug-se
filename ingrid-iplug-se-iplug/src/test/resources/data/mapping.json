@@ -14,8 +14,13 @@
                 "analyzer": "german",
                 "type": "string"
             },
+            "id": {
+                "type": "string",
+                "index" : "not_analyzed"
+            },
             "url": {
-                "type": "string"
+                "type": "string",
+                "index" : "not_analyzed"
             },
             "boost": {
                 "type": "float",
