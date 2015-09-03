@@ -29,9 +29,12 @@
 	</properties>
 	<body>
 
- 	<release version="3.6.1-SNAPSHOT" date="2015-xx-xx" description="Release 3.6.1">
+    <release version="3.6.0.3" date="2015-09-11" description="Bugfix-Release 3.6.1">
       <action type="fix" dev="wemove" issue="REDMINE-114">
         Fixed a bug that prevented grouping by provider or partner if an URL has not set any.
+      </action>
+      <action type="fix" dev="wemove" issue="REDMINE-130">
+        Fixed mapping of index to handle id and url as whole, otherwise a wrong dataset could be fetched.
       </action>
     </release>
 
