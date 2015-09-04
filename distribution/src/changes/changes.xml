@@ -39,6 +39,9 @@
       <action type="fix" dev="wemove" issue="REDMINE-130">
         Fixed mapping of index to handle id and url as whole, otherwise a wrong dataset could be fetched.
       </action>
+      <action type="fix" dev="wemove" issue="REDMINE-142,REDMINE-89">
+        Fixed query generation and request of index fields.
+      </action>
     </release>
 
     <release version="3.6.0.2" date="2015-07-14" description="Release 3.6.0.2">
