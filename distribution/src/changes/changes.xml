@@ -29,12 +29,15 @@
 	</properties>
 	<body>
 
- 	<release version="3.6.1-SNAPSHOT" date="2015-xx-xx" description="Release 3.6.1">
-      <action type="fix" dev="wemove" issue="REDMINE-114">
-        Fixed a bug that prevented grouping by provider or partner if an URL has not set any.
-      </action>
+    <release version="3.6.1-SNAPSHOT" date="2015-xx-xx" description="Release 3.6.1">
       <action type="update" dev="wemove" issue="REDMINE-15">
         Remove all references to PortalU.
+      </action>
+    </release>
+    
+    <release version="3.6.0.3" date="2015-09-11" description="Bugfix-Release 3.6.0.3">
+      <action type="fix" dev="wemove" issue="REDMINE-114">
+        Fixed a bug that prevented grouping by provider or partner if an URL has not set any.
       </action>
       <action type="fix" dev="wemove" issue="REDMINE-130">
         Fixed mapping of index to handle id and url as whole, otherwise a wrong dataset could be fetched.
