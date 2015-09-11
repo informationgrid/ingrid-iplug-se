@@ -27,6 +27,8 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import java.util.ArrayList;
+
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -37,6 +39,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import de.ingrid.admin.JettyStarter;
+import de.ingrid.admin.elasticsearch.ElasticSearchUtils;
 import de.ingrid.utils.IngridHits;
 import de.ingrid.utils.query.IngridQuery;
 
@@ -48,12 +51,17 @@ public class LocationSearchTest  {
     
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
+        new JettyStarter( false );
+        JettyStarter.getInstance().config.index = "test";
+        JettyStarter.getInstance().config.indexWithAutoId = true;
+        JettyStarter.getInstance().config.indexSearchInTypes = new ArrayList<String>();
         Utils.setupES();
     }
     
     @Before
     public void initTest() throws Exception {
         Utils.initIndex( jettyStarter );
+        ElasticSearchUtils.switchAlias( Utils.elastic.getObject().client(), "test_1" );
     }
     
     @AfterClass

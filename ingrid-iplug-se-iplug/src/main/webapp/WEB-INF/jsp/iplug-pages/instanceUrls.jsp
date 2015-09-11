@@ -21,12 +21,12 @@
   **************************************************#
   --%>
 <%@ include file="/WEB-INF/jsp/base/include.jsp"%>
+<%@ page contentType="text/html; charset=UTF-8" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de">
 <head>
 <title><fmt:message key="DatabaseConfig.main.title" /> - Url-Pflege</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <meta name="description" content="" />
 <meta name="keywords" content="" />
 <meta name="author" content="wemove digital solutions" />
@@ -87,7 +87,7 @@
                         // cells
                         rows += "<tr data-id='" + d[r].id + "'>" +
                                 "<td><input type='checkbox'></td>" +
-                                "<td>" + d[r].url + " <a target='_blank' href='" + d[r].url + "' title='Link öffnen'><span class='ui-icon ui-icon-extlink' style='display:inline-block;'></span></a></td>" +
+                                "<td>" + d[r].url + " <a target='_blank' href='" + d[r].url + "' title='Link Ã¶ffnen'><span class='ui-icon ui-icon-extlink' style='display:inline-block;'></span></a></td>" +
                                 "<td>" + d[r].status + "</td>" +
                                 "<td>" + actionButtonTemplate + "</td>" +
                                 "</tr>";
@@ -121,7 +121,7 @@
                 if (sort) url += "&sort=" + sort.join(',');
                 url += "&pagesize=" + this.size;
 
-                return url;
+                return encodeURI(url);
             }
         };
 
@@ -289,16 +289,16 @@
             var button = null;
             /* switch(type) {
             case "limitUrlTable":
-                button = "<div><button class='btnUrl'>Bearbeiten</button><button class='select'>Weitere Optionen</button></div><ul style='position:absolute; padding-left: 0; min-width: 100px;''><li action='jsDeleteLimit'>Löschen</li><li>Testen</li></ul>";
+                button = "<div><button class='btnUrl'>Bearbeiten</button><button class='select'>Weitere Optionen</button></div><ul style='position:absolute; padding-left: 0; min-width: 100px;''><li action='jsDeleteLimit'>LÃ¶schen</li><li>Testen</li></ul>";
                 break;
             case "excludeUrlTable":
-                button = "<div><button class='btnUrl'>Bearbeiten</button><button class='select'>Weitere Optionen</button></div><ul style='position:absolute; padding-left: 0; min-width: 100px;''><li action='jsDeleteExclude'>Löschen</li><li>Testen</li></ul>";
+                button = "<div><button class='btnUrl'>Bearbeiten</button><button class='select'>Weitere Optionen</button></div><ul style='position:absolute; padding-left: 0; min-width: 100px;''><li action='jsDeleteExclude'>LÃ¶schen</li><li>Testen</li></ul>";
                 break;
             case "userMetadataTable":
-                button = "<div><button type='button' onclick='urlMaintenance.deleteMetadata(event)'>Löschen</button>";
+                button = "<div><button type='button' onclick='urlMaintenance.deleteMetadata(event)'>LÃ¶schen</button>";
                 break;
             } */
-            button = "<div><button type='button' onclick='urlMaintenance.deleteRow(\"" + type + "\", event)'>Löschen</button>";
+            button = "<div><button type='button' onclick='urlMaintenance.deleteRow(\"" + type + "\", event)'>LÃ¶schen</button>";
             return button;
         }
 
@@ -367,7 +367,7 @@
 
             } else {
                 $(".ui-dialog-title", dialog.parent()).text( "URL bearbeiten" );
-                $("#dialog-form").next().find("button:last .ui-button-text").text( "Ändern" );
+                $("#dialog-form").next().find("button:last .ui-button-text").text( "Ã„ndern" );
             }
 
             // reset all select boxes
@@ -474,7 +474,7 @@
                 "Abbrechen": function() {
                     $( this ).dialog( "close" );
                 },
-                "Löschen": function() {
+                "LÃ¶schen": function() {
                     var action = dialogConfirm.data("action");
                     if (action.type === "deleteSingleUrl") {
                         $.ajax({
@@ -742,12 +742,16 @@
         var chosenOptions = {
             width: "100%",
             disable_search_threshold: 5,
-            placeholder_text_multiple: "Bitte auswählen",
+            placeholder_text_multiple: "Bitte auswÃ¤hlen",
             no_results_text: "Keinen Eintrag gefunden"
         };
 
         var updateBrowserHistory = function() {
-            window.history.pushState(null, null, location.pathname + "?instance=${instance.name}&urlfilter=" + $("#urlTable").data().urlfilter + "&filter=" + $("#urlTable").data().metafilter);
+        	
+            // avoid problem with missing functionality in IE9
+            if (window.history.pushState)  {
+                window.history.pushState(null, null, location.pathname + "?instance=${instance.name}&urlfilter=" + $("#urlTable").data().urlfilter + "&filter=" + $("#urlTable").data().metafilter);
+            }
         };
 
         var setFilterValues = function() {
@@ -831,7 +835,7 @@
             //     '<button class="select">Weitere Optionen</button>' +
             // '</div>' +
             // '<ul style="position:absolute; padding-left: 0; min-width: 180px; z-index: 100; display: none;">' +
-            //     '<li action="delete">Löschen</li>' +
+            //     '<li action="delete">LÃ¶schen</li>' +
             //     '<li action="test">Testen</li>' +
             //     '<li action="createNewFromTemplate">Als Template verwenden ...</li>' +
             // '</ul>' +

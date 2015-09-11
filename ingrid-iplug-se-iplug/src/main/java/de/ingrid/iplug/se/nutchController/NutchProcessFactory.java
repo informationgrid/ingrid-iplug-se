@@ -97,6 +97,9 @@ public class NutchProcessFactory {
         }
         indexParseMdValue = StringUtils.join(metadataList, ",");
 
+        String dependingFields = StringUtils.join( SEIPlug.conf.dependingFields.toArray(), "," );
+        
+        nutchConfigTool.addOrUpdateProperty("index.dependent.fields", dependingFields, "Fields (with its values) that shall be added to every indexed document depending on a given key (and value).");
         nutchConfigTool.addOrUpdateProperty("index.parse.md", indexParseMdValue, "Generated metadata from the ingrid instance configuration.");
         nutchConfigTool.addOrUpdateProperty("hadoop.tmp.dir", Paths.get(instance.getWorkingDirectory(), "hadoop-tmp").toAbsolutePath().toString(), "Set hadoop temp directory to the instance.");
         nutchConfigTool.addOrUpdateProperty("mapred.temp.dir", Paths.get(instance.getWorkingDirectory(), "hadoop-tmp").toAbsolutePath().toString(), "Set mapred temp directory to the instance.");

@@ -32,6 +32,11 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.ingrid.admin.JettyStarter;
+import de.ingrid.admin.elasticsearch.IQueryParsers;
+import de.ingrid.admin.elasticsearch.converter.DefaultFieldsQueryConverter;
+import de.ingrid.admin.elasticsearch.converter.MatchAllQueryConverter;
+import de.ingrid.admin.elasticsearch.converter.QueryConverter;
 import de.ingrid.iplug.se.elasticsearch.Utils;
 
 public class QueryConverterTest {
@@ -40,8 +45,9 @@ public class QueryConverterTest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
+        new JettyStarter( false );
         queryConverter = new QueryConverter();
-        List<IQueryConverter> parsers = new ArrayList<IQueryConverter>();
+        List<IQueryParsers> parsers = new ArrayList<IQueryParsers>();
         parsers.add( new MatchAllQueryConverter() );
         parsers.add( new DefaultFieldsQueryConverter() );
         queryConverter.setQueryParsers( parsers );
@@ -56,31 +62,31 @@ public class QueryConverterTest {
     @Test
     public void matchTerm() {
         QueryBuilder result = queryConverter.convert( Utils.getIngridQuery( "wasser" ) );
-        assertThat( strip( result.toString() ), is("{\"bool\":{\"must\":{\"bool\":{\"should\":{\"multi_match\":{\"query\":\"wasser\",\"fields\":[\"title\",\"content\"],\"operator\":\"AND\"}}}}}}") );        
+        assertThat( strip( result.toString() ), is("{\"bool\":{\"must\":{\"bool\":{\"should\":{\"multi_match\":{\"query\":\"wasser\",\"fields\":[\"title\",\"content\"],\"type\":\"cross_fields\",\"operator\":\"AND\"}}}}}}") );        
     }
     
     @Test
     public void matchTermsAND() {
         QueryBuilder result = queryConverter.convert( Utils.getIngridQuery( "wasser wald" ) );
-        assertThat( strip( result.toString() ), is("{\"bool\":{\"must\":{\"bool\":{\"should\":{\"multi_match\":{\"query\":\"wasserwald\",\"fields\":[\"title\",\"content\"],\"operator\":\"AND\"}}}}}}") );        
+        assertThat( strip( result.toString() ), is("{\"bool\":{\"must\":{\"bool\":{\"should\":{\"multi_match\":{\"query\":\"wasserwald\",\"fields\":[\"title\",\"content\"],\"type\":\"cross_fields\",\"operator\":\"AND\"}}}}}}") );        
     }
     
     @Test
     public void matchTermsOR() {
         QueryBuilder result = queryConverter.convert( Utils.getIngridQuery( "wemove OR Deutschland" ) );
-        assertThat( strip( result.toString() ), is("{\"bool\":{\"must\":{\"bool\":{\"should\":{\"multi_match\":{\"query\":\"wemoveDeutschland\",\"fields\":[\"title\",\"content\"],\"operator\":\"OR\"}}}}}}") );
+        assertThat( strip( result.toString() ), is("{\"bool\":{\"must\":{\"bool\":{\"should\":{\"multi_match\":{\"query\":\"wemoveDeutschland\",\"fields\":[\"title\",\"content\"],\"type\":\"cross_fields\",\"operator\":\"OR\"}}}}}}") );
     }
     
     @Test
     public void matchTermsANDOR() {
         QueryBuilder result = queryConverter.convert( Utils.getIngridQuery( "boden AND wasser OR wald" ) );
-        assertThat( strip( result.toString() ), is("{\"bool\":{\"must\":{\"bool\":{\"should\":[{\"multi_match\":{\"query\":\"bodenwasser\",\"fields\":[\"title\",\"content\"],\"operator\":\"AND\"}},{\"multi_match\":{\"query\":\"wald\",\"fields\":[\"title\",\"content\"],\"operator\":\"OR\"}}]}}}}") );        
+        assertThat( strip( result.toString() ), is("{\"bool\":{\"must\":{\"bool\":{\"should\":[{\"multi_match\":{\"query\":\"bodenwasser\",\"fields\":[\"title\",\"content\"],\"type\":\"cross_fields\",\"operator\":\"AND\"}},{\"multi_match\":{\"query\":\"wald\",\"fields\":[\"title\",\"content\"],\"type\":\"cross_fields\",\"operator\":\"OR\"}}]}}}}") );        
     }
     
     @Test
     public void matchTermsANDORParentheses() {
         QueryBuilder result = queryConverter.convert( Utils.getIngridQuery( "Ausland AND (wemove OR Deutschland)" ) );
-        assertThat( strip( result.toString() ), is("{\"bool\":{\"must\":[{\"bool\":{\"must\":{\"bool\":{\"should\":{\"multi_match\":{\"query\":\"wemoveDeutschland\",\"fields\":[\"title\",\"content\"],\"operator\":\"OR\"}}}}}},{\"bool\":{\"should\":{\"multi_match\":{\"query\":\"Ausland\",\"fields\":[\"title\",\"content\"],\"operator\":\"AND\"}}}}]}}") );        
+        assertThat( strip( result.toString() ), is("{\"bool\":{\"must\":[{\"bool\":{\"must\":{\"bool\":{\"should\":{\"multi_match\":{\"query\":\"wemoveDeutschland\",\"fields\":[\"title\",\"content\"],\"type\":\"cross_fields\",\"operator\":\"OR\"}}}}}},{\"bool\":{\"should\":{\"multi_match\":{\"query\":\"Ausland\",\"fields\":[\"title\",\"content\"],\"type\":\"cross_fields\",\"operator\":\"AND\"}}}}]}}") );        
     }
 
     /**

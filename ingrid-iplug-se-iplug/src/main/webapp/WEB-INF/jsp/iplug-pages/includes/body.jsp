@@ -59,6 +59,7 @@
             <li class='tab<c:if test="${activeTab == '3'}"> active</c:if>'><a<c:if test="${activeTab != '3'}"> href="instanceScheduling.html?instance=${instance.name}"</c:if>>Zeitplanung</a></li>
             <li class='tab<c:if test="${activeTab == '4'}"> active</c:if>'><a<c:if test="${activeTab != '4'}"> href="instanceManagement.html?instance=${instance.name}"</c:if>>Management</a></li>
             <li class='tab<c:if test="${activeTab == '5'}"> active</c:if>'><a<c:if test="${activeTab != '5'}"> href="instanceSearch.html?instance=${instance.name}"</c:if>>Suche</a></li>
+            <li class='tab<c:if test="${activeTab == '6'}"> active</c:if>'><a<c:if test="${activeTab != '6'}"> href="instanceReports.html?instance=${instance.name}"</c:if>>Reports</a></li>
         </ul>
         <div class="panel-container">
             <div>
@@ -67,6 +68,7 @@
                 <c:if test="${activeTab == '3'}"><c:import url="includes/scheduling.jsp"></c:import></c:if>
                 <c:if test="${activeTab == '4'}"><c:import url="includes/management.jsp"></c:import></c:if>
                 <c:if test="${activeTab == '5'}"><c:import url="includes/search.jsp"></c:import></c:if>
+                <c:if test="${activeTab == '6'}"><c:import url="includes/reports.jsp"></c:import></c:if>
             </div>
         </div>
     </div>

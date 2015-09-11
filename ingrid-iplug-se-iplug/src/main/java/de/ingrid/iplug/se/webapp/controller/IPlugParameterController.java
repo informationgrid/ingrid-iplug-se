@@ -53,17 +53,17 @@ public class IPlugParameterController extends AbstractController {
         // write object into session
         modelMap.put("dataBasePath", SEIPlug.conf.databaseDir);
         modelMap.put("instancePath", SEIPlug.conf.getInstancesDir());
-        modelMap.put("elasticSearchPort", SEIPlug.conf.esHttpPort);
+        //modelMap.put("elasticSearchPort", SEIPlug.conf.esHttpPort);
         return AdminViews.DB_PARAMS;
     }
 
     @RequestMapping(value = "/iplug-pages/dbParams.html", method = RequestMethod.POST)
     public String post(@RequestParam("dataBasePath") String dbPath, @RequestParam("instancePath") String instancePath,
-            @RequestParam("elasticSearchPort") String elasticSearchPort, @ModelAttribute("plugDescription") final PlugdescriptionCommandObject pdCommandObject) {
+            @ModelAttribute("plugDescription") final PlugdescriptionCommandObject pdCommandObject) {
 
         SEIPlug.conf.databaseDir = dbPath;
         SEIPlug.conf.setInstancesDir( instancePath );
-        SEIPlug.conf.esHttpPort = elasticSearchPort;
+        //SEIPlug.conf.esHttpPort = elasticSearchPort;
         
         pdCommandObject.setRankinTypes(true, false, false);
         

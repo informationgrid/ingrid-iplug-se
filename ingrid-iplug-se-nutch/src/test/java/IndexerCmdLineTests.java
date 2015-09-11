@@ -206,6 +206,35 @@ public class IndexerCmdLineTests {
     }
 
     @Test
+    public void test09_2StartUrlStatusReport() throws IOException, InterruptedException {
+
+        // create statistics
+        List<String> call = new ArrayList<String>();
+        call.addAll(setUpBaseCall());
+        call.add("de.ingrid.iplug.se.nutch.statistics.StartUrlStatusReport");
+        call.add("test/crawldb");
+        call.add("src/test/resources/urls/start");
+        call.add("test");
+
+        executeCall(call);
+    }
+
+    
+    @Test
+    public void test09_3UrlErrorReport() throws IOException, InterruptedException {
+
+        // create statistics
+        List<String> call = new ArrayList<String>();
+        call.addAll(setUpBaseCall());
+        call.add("de.ingrid.iplug.se.nutch.statistics.UrlErrorReport");
+        call.add("test/crawldb");
+        call.add("test");
+
+        executeCall(call);
+    }
+    
+    
+    @Test
     public void test10WebgraphCreate() throws Exception {
 
         // get all segments

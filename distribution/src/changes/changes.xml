@@ -28,6 +28,40 @@
 		<author email="joachim@wemove.com">Joachim Müller</author>
 	</properties>
 	<body>
+
+    <release version="3.6.0.3" date="2015-09-11" description="Bugfix-Release 3.6.1">
+      <action type="fix" dev="wemove" issue="REDMINE-114">
+        Fixed a bug that prevented grouping by provider or partner if an URL has not set any.
+      </action>
+      <action type="fix" dev="wemove" issue="REDMINE-130">
+        Fixed mapping of index to handle id and url as whole, otherwise a wrong dataset could be fetched.
+      </action>
+      <action type="fix" dev="wemove" issue="REDMINE-142,REDMINE-89">
+        Fixed query generation and request of index fields.
+      </action>
+    </release>
+
+    <release version="3.6.0.2" date="2015-07-14" description="Release 3.6.0.2">
+      <action type="fix" dev="wemove" issue="REDMINE-94">
+        Fixed wrong facet search and display in the portal.
+      </action>
+      <action type="fix" dev="wemove" issue="REDMINE-92">
+        Fixed a bug that prevented crawling when the iPlug was freshly installed and started the very first time.
+      </action>
+    </release>
+
+    <release version="3.6.0" date="2015-06-19" description="Release 3.6.0">
+      <action type="add" dev="wemove" issue="REDMINE-51">
+        Added URL report page.
+      </action>
+      <action type="update" dev="wemove" issue="REDMINE-6">
+        Adaption to latest base-webapp, which handles elastic search.
+      </action>
+      <action type="fix" dev="wemove">
+        Several small fixes.
+      </action>
+    </release>
+
 		<release version="3.5.0" date="2015-01-30" description="Release InGrid 3.5.0">
 			<action type="add" dev="wemove" issue="REDMINE-524">
         Added license header to all source files for Open Source migration.

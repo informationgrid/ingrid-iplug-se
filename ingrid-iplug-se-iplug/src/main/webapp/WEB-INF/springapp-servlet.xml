@@ -56,45 +56,25 @@
 	</bean>
 
 	<!-- XML DEFINED BEANS WITH ACCORDING QUALIFIER TO BE AUTOWIRED VIA QUALIFIER ! -->
-
-	<!-- Wraps one ore more lucene index reader. The wrapper is injected via XMLconfiguredIndexWrapper into IngridIndexSearcher 
-		constructor, so it can be updated in the configure phase. -->
-
-	<bean class="de.ingrid.iplug.se.elasticsearch.converter.QueryConverter">
-		<qualifier value="XMLconfigured" />
-		<property name="queryParsers">
-			<list>
+    <bean id="queryConverter" class="de.ingrid.admin.elasticsearch.converter.QueryConverter">
+        <property name="queryParsers">
+            <list>
+                <ref bean="defaultFieldsQueryConverter" />
                 <ref bean="datatypePartnerProviderQueryConverter" />
-				<ref bean="defaultFieldsQueryConverter" />
-				<ref bean="wildcardQueryConverter" />
-				<ref bean="fuzzyQueryConverter" />
-				<ref bean="fieldQueryIGCConverter" />
-				<!-- the match all converter must be the last converter in list -->
-				<ref bean="matchAllQueryConverter" />
-			</list>
-		</property>
-	</bean>
-
-	<!-- Wraps a plugdescription object. The wrapper implements IConfigurable and will be updated every time the configure phase 
-		takes place (i.e. after changing the iplug configuration). -->
-	<bean id="plugDescriptionWrapper" class="de.ingrid.search.utils.ConfigurablePlugDescriptionWrapper" />
-
-	<bean id="plugDescriptionFacetCounter" class="de.ingrid.search.utils.facet.counter.DscPlugdescriptionFacetCounter">
-		<property name="plugDescriptionWrapper">
-			<ref bean="plugDescriptionWrapper" />
-		</property>
-		<property name="facetClassDefinitions">
-			<list>
-				<!-- Add facets for this iplug. If facet fits, all results will be added to the facet <value>type:www</value> -->
-			</list>
-		</property>
-	</bean>
+                <ref bean="fieldQueryIGCConverter" />
+                <ref bean="rangeQueryConverter" />
+                <ref bean="wildcardQueryConverter" />
+                <ref bean="wildcardFieldQueryConverter" />
+                <ref bean="matchAllQueryConverter" />
+            </list>
+        </property>
+    </bean>
 
 	<context:component-scan base-package="de.ingrid">
 		<!-- <context:exclude-filter type="regex" expression="de\.ingrid\.admin\.controller\.WorkingDirController"/> -->
 		<!-- <context:exclude-filter type="regex" expression="de.ingrid.admin.search.*Stemmer*" /> -->
-		<context:exclude-filter type="regex" expression="de.ingrid.admin.search.*" />
-		<context:exclude-filter type="regex" expression="de.ingrid.admin.controller.IndexController*" />
+		<!-- <context:exclude-filter type="regex" expression="de.ingrid.admin.search.*" />
+		<context:exclude-filter type="regex" expression="de.ingrid.admin.controller.IndexController*" /> -->
 		<context:exclude-filter type="regex" expression="de.ingrid.admin.controller.SchedulingController*" />
         <!-- exclude this injector because it overridesthe index based partner/provider detection -->
         <context:exclude-filter type="regex" expression="de.ingrid.admin.metadata.DefaultIPlugOperatorInjectorAdapter" />

@@ -22,12 +22,12 @@
   --%>
 <%@ include file="/WEB-INF/jsp/base/include.jsp"%><%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<%@page import="de.ingrid.admin.security.IngridPrincipal"%>
+<%@ page import="de.ingrid.admin.security.IngridPrincipal"%>
+<%@ page contentType="text/html; charset=UTF-8" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de">
 <head>
 <title><fmt:message key="DatabaseConfig.main.title" /> - Instanzen</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <meta name="description" content="" />
 <meta name="keywords" content="" />
 <meta name="author" content="wemove digital solutions" />
@@ -73,7 +73,7 @@
                 "Abbrechen": function() {
                     $( this ).dialog( "close" );
                 },
-                "Löschen": function() {
+                "LÃ¶schen": function() {
                     var action = dialogConfirm.data("action");
                     $.ajax({
                         type: 'DELETE',
@@ -220,9 +220,9 @@
                                         ><label for="statusOff_${instance.name}">Aus</label>
                                     </div>
                                 </td>
-                                <%-- <td><button type="button" action="delete" name="delete" data-id="${instance.name}">Löschen</button></td> --%>
+                                <%-- <td><button type="button" action="delete" name="delete" data-id="${instance.name}">LÃ¶schen</button></td> --%>
                                 <td>
-                                    <%-- <a href="listInstances.html?instance=${instance.name}&delete">Löschen</a> --%>
+                                    <%-- <a href="listInstances.html?instance=${instance.name}&delete">LÃ¶schen</a> --%>
                                     <div>
                                         <div>
                                             <button type="button" class="btnInstance" data-id="${ instance.name }">Bearbeiten</button>
@@ -230,7 +230,7 @@
                                         </div>
                                         <ul style="position:absolute; padding-left: 0; min-width: 140px; z-index: 100;">
                                             <li action="duplicate">Kopie erzeugen</li>
-                                            <li action="delete">Löschen</li>
+                                            <li action="delete">LÃ¶schen</li>
                                         </ul>
                                     </div>
                                 </td>
@@ -252,10 +252,10 @@
 
     <div id="footer" style="height: 100px; width: 90%"></div>
 
-    <div id="dialog-confirm" title="Wirklich löschen?">
+    <div id="dialog-confirm" title="Wirklich lÃ¶schen?">
         <p>
             <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-            Möchten Sie die Instanz wirklich löschen?
+            MÃ¶chten Sie die Instanz wirklich lÃ¶schen?
         </p>
     </div>
 

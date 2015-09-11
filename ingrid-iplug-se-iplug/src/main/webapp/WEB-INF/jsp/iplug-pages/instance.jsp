@@ -24,12 +24,12 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %> 
 
-<%@page import="de.ingrid.admin.security.IngridPrincipal"%>
+<%@ page import="de.ingrid.admin.security.IngridPrincipal"%>
+<%@ page contentType="text/html; charset=UTF-8" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de">
 <head>
 <title><fmt:message key="DatabaseConfig.main.title" /></title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <meta name="description" content="" />
 <meta name="keywords" content="" />
 <meta name="author" content="wemove digital solutions" />
@@ -121,7 +121,7 @@
 
 	<div id="contentBox" class="contentMiddle">
 		<h1 id="head">
-			<a href="listInstances.html">&lt;- Zurück</a> Instanz: ${instance.name}
+			<a href="listInstances.html">&lt;- ZurÃ¼ck</a> Instanz: ${instance.name}
 		</h1>
 		<div id="tab-container" class="tab-container">
 			<ul class='etabs'>
@@ -152,9 +152,9 @@
 								<tr>
 									<td>${url.url}</a></td>
 									<td>${url.status}</td>
-									<%-- <td><button type="button" action="delete" name="delete" data-id="${instance.name}">Löschen</button></td> --%>
+									<%-- <td><button type="button" action="delete" name="delete" data-id="${instance.name}">LÃ¶schen</button></td> --%>
 									<td><a href="instance.html?id=${url.id}&editUrl">Bearbeiten</a> <a
-										href="instance.html?id=${url.id}&deleteUrl">Löschen</a> <a href="instance.html?id=${url.id}&testUrl">Test</a>
+										href="instance.html?id=${url.id}&deleteUrl">LÃ¶schen</a> <a href="instance.html?id=${url.id}&testUrl">Test</a>
 									</td>
 								</tr>
 							</c:forEach>

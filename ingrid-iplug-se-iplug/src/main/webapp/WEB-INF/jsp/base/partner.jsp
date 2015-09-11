@@ -23,11 +23,10 @@
 <%@ include file="/WEB-INF/jsp/base/include.jsp" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<%@page import="de.ingrid.admin.security.IngridPrincipal"%><html xmlns="http://www.w3.org/1999/xhtml" lang="de">
+<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page import="de.ingrid.admin.security.IngridPrincipal"%><html xmlns="http://www.w3.org/1999/xhtml" lang="de">
 <head>
 <title>Portal U Administration</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <meta name="description" content="" />
 <meta name="keywords" content="" />
 <meta name="author" content="wemove digital solutions" />
@@ -56,19 +55,19 @@
 	<c:import url="subNavi.jsp"></c:import>
 	
 	<div id="contentBox" class="contentMiddle">
-		<h1 id="head">Weitere Partner hinzufügen</h1>
+		<h1 id="head">Weitere Partner hinzufÃ¼gen</h1>
 		<div class="controls">
-			<a href="#" onclick="document.location='../base/general.html';">Zurück</a>
+			<a href="#" onclick="document.location='../base/general.html';">ZurÃ¼ck</a>
 			<a href="#" onclick="document.location='../base/welcome.html';">Abbrechen</a>
 			<a href="#" onclick="document.getElementById('plugDescription').submit();">Weiter</a>
 		</div>
 		<div class="controls cBottom">
-			<a href="#" onclick="document.location='../base/general.html';">Zurück</a>
+			<a href="#" onclick="document.location='../base/general.html';">ZurÃ¼ck</a>
 			<a href="#" onclick="document.location='../base/welcome.html';">Abbrechen</a>
 			<a href="#" onclick="document.getElementById('plugDescription').submit();">Weiter</a>
 		</div>
 		<div id="content">
-			<p>Geben Sie zusätzliche Partner an, für die Daten in dieser Datenquelle abgelegt werden. Diese Einstellung steuert, ob die Datenquelle bei Anfragen angesprochen wird, die auf bestimmte Partner eingeschränkt wurden.</p>
+			<p>Geben Sie zusÃ¤tzliche Partner an, fÃ¼r die Daten in dieser Datenquelle abgelegt werden. Diese Einstellung steuert, ob die Datenquelle bei Anfragen angesprochen wird, die auf bestimmte Partner eingeschrÃ¤nkt wurden.</p>
 			<form:form method="post" action="../base/partner.html" modelAttribute="plugDescription">
 			     <input type="hidden" name="action" value="submit" />
 			     <input type="hidden" name="id" value="" />

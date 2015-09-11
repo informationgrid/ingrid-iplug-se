@@ -282,6 +282,12 @@
 		<value>localhost</value>
 	</property>
 
+	<property> 
+		<name>elastic.cluster</name>
+		<value>ingrid</value>
+		<description>The cluster name to discover. Either host and potr must be defined or cluster.</description>
+	</property>
+
 	<property>
 		<name>fetcher.parse</name>
 		<value>true</value>

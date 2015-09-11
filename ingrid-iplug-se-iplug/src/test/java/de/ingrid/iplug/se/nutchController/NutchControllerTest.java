@@ -29,105 +29,104 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.elasticsearch.common.settings.ImmutableSettings;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.node.Node;
-import org.elasticsearch.node.NodeBuilder;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
+import de.ingrid.admin.JettyStarter;
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.db.DBManager;
+import de.ingrid.iplug.se.elasticsearch.Utils;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
 
 public class NutchControllerTest {
 
+    @Before
+    public void beforeTest() throws Exception {
+        FileUtils.removeRecursive(Paths.get("test-instances"));
+        new JettyStarter( false );
+        JettyStarter.getInstance().config.index = "se-test";
+        JettyStarter.getInstance().config.indexSearchInTypes = new ArrayList<String>();
+        JettyStarter.getInstance().config.indexSearchInTypes.add( "test" );
+        Utils.setupES();
+    }
+    
+    @After
+    public void afterTest() throws Exception {
+        Utils.elastic.getObject().close();
+    }
+    
     @Test
     public void test() throws InterruptedException, IOException, JsonSyntaxException, JsonIOException, SAXException, ParserConfigurationException, TransformerException {
 
-        Node node = null;
+        Configuration configuration = new Configuration();
+        configuration.setInstancesDir("test-instances");
+        configuration.databaseID = "iplug-se-dev";
+        configuration.dependingFields = new ArrayList<String>();
+        configuration.nutchCallJavaOptions = java.util.Arrays.asList("-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8");
+        SEIPlug.conf = configuration;
 
-        try {
+        // get an entity manager instance (initializes properties in the
+        // DBManager)
+        EntityManagerFactory emf = null;
+        // for development use the settings from the persistence.xml
+        emf = Persistence.createEntityManagerFactory(configuration.databaseID);
+        DBManager.INSTANCE.intialize(emf);
 
-            FileUtils.removeRecursive(Paths.get("test-instances"));
+        Instance instance = new Instance();
+        instance.setName("test");
+        instance.setWorkingDirectory(SEIPlug.conf.getInstancesDir() + "/test");
 
-            Configuration configuration = new Configuration();
-            configuration.setInstancesDir("test-instances");
-            configuration.databaseID = "iplug-se-dev";
-            configuration.nutchCallJavaOptions = java.util.Arrays.asList("-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8");
-            SEIPlug.conf = configuration;
+        Path conf = Paths.get(SEIPlug.conf.getInstancesDir(), "test", "conf").toAbsolutePath();
+        Path urls = Paths.get(SEIPlug.conf.getInstancesDir(), "test", "urls").toAbsolutePath();
+        Path logs = Paths.get(SEIPlug.conf.getInstancesDir(), "test", "logs").toAbsolutePath();
+        Files.createDirectories(logs);
 
-            // get an entity manager instance (initializes properties in the
-            // DBManager)
-            EntityManagerFactory emf = null;
-            // for development use the settings from the persistence.xml
-            emf = Persistence.createEntityManagerFactory(configuration.databaseID);
-            DBManager.INSTANCE.intialize(emf);
+        FileUtils.copyDirectories(Paths.get("apache-nutch-runtime/runtime/local/conf").toAbsolutePath(), conf);
+        
+        NutchConfigTool nct = new NutchConfigTool(Paths.get(conf.toAbsolutePath().toString(), "nutch-site.xml"));
+        nct.addOrUpdateProperty("elastic.port", "9301", "");
+        nct.write();
+        
+        FileUtils.copyDirectories(Paths.get("../ingrid-iplug-se-nutch/src/test/resources/urls").toAbsolutePath(), urls);
+        // TODO: copy dir with metadata-mapping
 
-            Instance instance = new Instance();
-            instance.setName("test");
-            instance.setWorkingDirectory(SEIPlug.conf.getInstancesDir() + "/test");
+        IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, 2, 10, null);
 
-            Path conf = Paths.get(SEIPlug.conf.getInstancesDir(), "test", "conf").toAbsolutePath();
-            Path urls = Paths.get(SEIPlug.conf.getInstancesDir(), "test", "urls").toAbsolutePath();
-            Path logs = Paths.get(SEIPlug.conf.getInstancesDir(), "test", "logs").toAbsolutePath();
-            Files.createDirectories(logs);
+        NutchController nutchController = new NutchController();
+        nutchController.start(instance, process);
 
-            FileUtils.copyDirectories(Paths.get("apache-nutch-runtime/runtime/local/conf").toAbsolutePath(), conf);
-            
-            NutchConfigTool nct = new NutchConfigTool(Paths.get(conf.toAbsolutePath().toString(), "nutch-site.xml"));
-            nct.addOrUpdateProperty("elastic.port", "54346", "");
-            nct.write();
-            
-            FileUtils.copyDirectories(Paths.get("../ingrid-iplug-se-nutch/src/test/resources/urls").toAbsolutePath(), urls);
-            // TODO: copy dir with metadata-mapping
-
-            IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, 2, 10, null);
-
-            NutchController nutchController = new NutchController();
-            nutchController.start(instance, process);
-
-            Settings settings = ImmutableSettings.settingsBuilder().put("path.data", SEIPlug.conf.getInstancesDir() + "/test").put("transport.tcp.port", 54346).put("http.port", 54347).build();
-            NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().clusterName("elasticsearch").data(true).settings(settings);
-            nodeBuilder = nodeBuilder.local(false);
-            node = nodeBuilder.node();
-
-            long start = System.currentTimeMillis();
-            Thread.sleep(500);
-            assertEquals("Status is RUNNING", NutchProcess.STATUS.RUNNING, nutchController.getNutchProcess(instance).getStatus());
-            while ((System.currentTimeMillis() - start) < 360000) {
-                Thread.sleep(1000);
-                if (nutchController.getNutchProcess(instance).getStatus() != NutchProcess.STATUS.RUNNING) {
-                    break;
-                }
+        long start = System.currentTimeMillis();
+        Thread.sleep(500);
+        assertEquals("Status is RUNNING", NutchProcess.STATUS.RUNNING, nutchController.getNutchProcess(instance).getStatus());
+        while ((System.currentTimeMillis() - start) < 360000) {
+            Thread.sleep(1000);
+            if (nutchController.getNutchProcess(instance).getStatus() != NutchProcess.STATUS.RUNNING) {
+                break;
             }
-            if (nutchController.getNutchProcess(instance).getStatus() == NutchProcess.STATUS.RUNNING) {
-                node.close();
-                nutchController.stop(instance);
-                fail("Crawl took more than 6 min.");
-            }
-            assertEquals("Status is FINISHED", NutchProcess.STATUS.FINISHED, nutchController.getNutchProcess(instance).getStatus());
-            node.close();
-
-            System.out.println(nutchController.getNutchProcess(instance).getStatusProvider().toString());
-
-            FileUtils.removeRecursive(Paths.get("test-instances"));
-        } finally {
-            if (node != null)
-                node.close();
-
         }
+        if (nutchController.getNutchProcess(instance).getStatus() == NutchProcess.STATUS.RUNNING) {
+            nutchController.stop(instance);
+            fail("Crawl took more than 6 min.");
+        }
+        assertEquals("Status is FINISHED", NutchProcess.STATUS.FINISHED, nutchController.getNutchProcess(instance).getStatus());
+
+        System.out.println(nutchController.getNutchProcess(instance).getStatusProvider().toString());
+
+        FileUtils.removeRecursive(Paths.get("test-instances"));
     }
 
     @Test
@@ -138,6 +137,7 @@ public class NutchControllerTest {
         Configuration configuration = new Configuration();
         configuration.setInstancesDir("test-instances");
         configuration.databaseID = "iplug-se-dev";
+        configuration.dependingFields = new ArrayList<String>();
         configuration.nutchCallJavaOptions = java.util.Arrays.asList("-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8");
         SEIPlug.conf = configuration;
 

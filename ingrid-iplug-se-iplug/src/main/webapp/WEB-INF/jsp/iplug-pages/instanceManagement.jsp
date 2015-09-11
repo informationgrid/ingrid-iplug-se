@@ -21,12 +21,12 @@
   **************************************************#
   --%>
 <%@ include file="/WEB-INF/jsp/base/include.jsp"%>
+<%@ page contentType="text/html; charset=UTF-8" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de">
 <head>
 <title><fmt:message key="DatabaseConfig.main.title" /> - Management</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <meta name="description" content="" />
 <meta name="keywords" content="" />
 <meta name="author" content="wemove digital solutions" />
@@ -66,8 +66,6 @@
             }
         });
         
-        getStatistic();
-
         dialog = $("#dialog-hadoop").dialog({
             autoOpen : false,
             height : 750,
@@ -129,10 +127,10 @@
                     //$("#allInfo").hide();
                     var data = "";
                     if (jqXHR.responseText == "") {
-                        $("#crawlInfo").html( "Es läuft zur Zeit kein Crawl." );
+                        $("#crawlInfo").html( "Es lÃ¤uft zur Zeit kein Crawl." );
                         
                     } else {
-                        $("#crawlInfo").html( "Es läuft zur Zeit kein Crawl. (<a href='#' onclick='$(\"#allInfo\").toggle()'>Information zum letzten Crawl) " );
+                        $("#crawlInfo").html( "Es lÃ¤uft zur Zeit kein Crawl. (<a href='#' onclick='$(\"#allInfo\").toggle()'>Information zum letzten Crawl) " );
                         data = JSON.parse( jqXHR.responseText );
                         setLog( data );
                         // show link to request hadoop.log content
@@ -162,103 +160,7 @@
                 $("#dialog-hadoop .content").html( data.replace(/\n/g, "<br>") );
             }
         });
-    }
-    
-    function getStatistic() {
-        statisticIsUpdated = false;
-        // fill table
-        var addTableRow = function(item, biggest) {
-            var knownWidth = (item.known / biggest.known) * 100;
-            var fetchedWidth = (item.fetched / item.known) * knownWidth;
-            var toFetchWidth = knownWidth - fetchedWidth;
-            $("#statisticTable tbody").append(
-                    "<tr>" +
-                        "<td title='rot=noch nicht analysiert; grün=analysiert'><span style='display: inline-block; background-color: green; height: 3px; width: " + fetchedWidth + "px'></span><span style='display: inline-block; background-color: red; height: 3px; width: " + toFetchWidth + "px'></span></td>" +
-                        "<td>" + item.host + "</td>" +
-                        "<td>" + item.known + "</td>" +
-                        "<td>" + item.fetched + "</td>" +
-                        "<td>" + item.ratio + "</td>" +
-                    "</tr>"
-            );
-        };
-        
-        $.ajax( "../rest/status/${ instance.name }/statistic", {
-            type: "GET",
-            contentType: 'application/json',
-            success: function(data) {
-                if (!data) {
-                    $("#statisticTable").hide();
-                    $("#overallStatistic").hide();
-                    return;
-                } else {
-                    $("#statisticTable").show();
-                    $("#overallStatistic").show();
-                }
-                
-                var json = JSON.parse( data );
-                var overall = json.splice(0, 1);
-                // var labels = [], dataKnown = [], dataFetched = [];
-                
-                // determine highest known and fetched values
-                var biggest = { known: -1, fetched: -1 };
-                $.each( json, function(index, item) {
-                    if (item.known > biggest.known) biggest.known = item.known;
-                    if (item.fetched > biggest.fetched) biggest.fetched = item.fetched;
-                });
-                
-                // remove all rows first
-                $("#statisticTable tbody tr").remove();
-                $.each( json, function(index, item) {
-                    // labels.push( item.host );
-                    // dataKnown.push( item.known );
-                    // dataFetched.push( item.fetched );
-                    addTableRow( item, biggest );
-                });
-                
 
-                $("#overallStatistic .known").text( overall[0].known );
-                $("#overallStatistic .fetched").text( overall[0].fetched );
-
-                /*var ctx = document.getElementById("myChart").getContext("2d");
-                var data = {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: "Insgesamt",
-                            fillColor: "rgba(220,220,220,0.5)",
-                            strokeColor: "rgba(220,220,220,0.8)",
-                            highlightFill: "rgba(220,220,220,0.75)",
-                            highlightStroke: "rgba(220,220,220,1)",
-                            data: dataKnown
-                        },
-                        {
-                            label: "Erfasst",
-                            fillColor: "rgba(151,187,205,0.5)",
-                            strokeColor: "rgba(151,187,205,0.8)",
-                            highlightFill: "rgba(151,187,205,0.75)",
-                            highlightStroke: "rgba(151,187,205,1)",
-                            data: dataFetched
-                        }
-                    ]
-                };
-                var myBarChart = new Chart(ctx).Bar(data);*/
-                
-                $("#statisticTable").tablesorter({
-                    headers : { 0 : { sorter : false } },
-                    sortList: [[0,0]], // sort first column ascending
-                    widgets: ['zebra', 'filter'],
-                    widgetOptions: {
-                        filter_columnFilters: true,
-                        filter_hideFilters: false,
-                        // class name applied to filter row and each input
-                        filter_cssFilter  : 'filtered',
-                        pager_removeRows: false
-                    }
-                });
-            }
-        
-        });
-        
     }
     
     

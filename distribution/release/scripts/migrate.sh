@@ -31,9 +31,16 @@ done
 # restore ordinary behaviour
 unset IFS
 
+# include default options, i.e. debug, jmx and jvm options
+if [ -f $INGRID_HOME/env.user.sh ]; then
+  eval `sh $INGRID_HOME/env.user.sh`
+elif [ -f $INGRID_HOME/env.sh ]; then
+  eval `sh $INGRID_HOME/env.sh`
+fi
+
 # run it
 export CLASSPATH="$CLASSPATH"
-INGRID_OPTS="$INGRID_OPTS -Dingrid_home=$INGRID_HOME -Dfile.encoding=UTF8 -XX:+UseG1GC -XX:NewRatio=1"
+INGRID_OPTS="$INGRID_OPTS -Dingrid_home=$INGRID_HOME"
 CLASS=de.ingrid.iplug.se.migrate.Migrator
 
 
@@ -49,22 +56,5 @@ if [ "$JAVA_HOME" = "" ]; then
 fi
 
 JAVA=$JAVA_HOME/bin/java
-
-# check java version
-JAVA_VERSION=`java -version 2>&1 |awk 'NR==1{ gsub(/"/,""); print $3 }'`
-JAVA_VERSION_PART_0=`echo $JAVA_VERSION | awk '{split($0, array, "-")} END{print array[1]}'`
-JAVA_VERSION_PART_1=`echo $JAVA_VERSION_PART_0 | awk '{split($0, array, "_")} END{print array[1]}'`
-JAVA_VERSION_PART_2=`echo $JAVA_VERSION_PART_0 | awk '{split($0, array, "_")} END{print array[2]}'`
-if [ "$JAVA_VERSION_PART_1" \> "1.7.0" ]; then
-	LENGTH="${#JAVA_VERSION_PART_2}"
-	if [ "$LENGTH" \< "2" ]; then
-		JAVA_VERSION_PART_2="0"$JAVA_VERSION_PART_2
-	fi
-	if [ "$JAVA_VERSION_PART_1" \> "1.8.0" ]; then
-		INGRID_OPTS="$INGRID_OPTS -XX:+UseStringDeduplication"
-	elif [ "$JAVA_VERSION_PART_2" \> "19" ]; then
-		INGRID_OPTS="$INGRID_OPTS -XX:+UseStringDeduplication"
-	fi
-fi
 
 "$JAVA" $INGRID_OPTS $CLASS $@

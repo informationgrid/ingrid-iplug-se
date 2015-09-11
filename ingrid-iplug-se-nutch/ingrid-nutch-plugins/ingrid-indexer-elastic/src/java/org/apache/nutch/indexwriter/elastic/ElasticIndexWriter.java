@@ -18,6 +18,7 @@
 package org.apache.nutch.indexwriter.elastic;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,16 +38,18 @@ import de.ingrid.iplug.se.nutch.tools.IngridElasticSearchClient;
 /**
  */
 public class ElasticIndexWriter implements IndexWriter {
-    public static Logger LOG = LoggerFactory.getLogger(ElasticIndexWriter.class);
+    public static Logger LOG = LoggerFactory.getLogger( ElasticIndexWriter.class );
 
     private Configuration config;
 
     private IngridElasticSearchClient client = null;
 
+    private Map<String, Object> dependingFieldsMap = new HashMap<String, Object>();
+
     @Override
     public void open(JobConf job, String name) throws IOException {
 
-        client = new IngridElasticSearchClient(job);
+        client = new IngridElasticSearchClient( job );
     }
 
     @Override
@@ -77,31 +80,112 @@ public class ElasticIndexWriter implements IndexWriter {
                 requestLength += doc.getFieldValue(fieldName).toString().length();
             }
         }
+        
+        // dynamically add fields depending on other fields
+        requestLength += addDependentFields( source );
+        
+        
         request.setSource(source);
 
         // Add this indexing request to a bulk request
         client.addRequest(request, requestLength);
     }
 
+    /**
+     * Add a new field to the index depending on another given field. This is configured
+     * in the config file.
+     * key:value->otherKey:otherValue, where key and value can be "*" to be ignored
+     * @param source is the new index document which is going to be written 
+     * @return the number of additionally written bytes
+     */
+    @SuppressWarnings("unchecked")
+    private int addDependentFields(Map<String, Object> source) {
+        int requestLength = 0;
+        for (String key : dependingFieldsMap.keySet()) {
+            String[] split = key.split( ":" );
+            String val = (String) dependingFieldsMap.get( key );
+            String[] targetSplitted = val.split( ":" );
+            // if the key doesn't matter we only check for the value
+            if ("*".equals( split[0] )) {
+                // if the value also does not matter, we can add the depending value to all documents
+                if ("*".equals( split[1] )) {
+                    addToSource( source, targetSplitted[0], targetSplitted[1] );
+                    requestLength += targetSplitted[1].length();
+                } else {
+                    // otherwise we check if the value matches before we add the depending value
+                    if (source.containsValue( split[1] )) {
+                        addToSource( source, targetSplitted[0], targetSplitted[1] );
+                        requestLength += targetSplitted[1].length();
+                    }
+                }
+            } else {
+                // check if source contains the wanted key
+                if (source.containsKey( split[0] )) {
+                    // if we don't need to check for a given value, we just can write the depending value
+                    if ("*".equals( split[1] )) {
+                        addToSource( source, targetSplitted[0], targetSplitted[1] );
+                        requestLength += targetSplitted[1].length();
+                    } else {
+                        Object origValue = source.get( split[0] );
+                        boolean add = false;
+                        // otherwise we check if key AND value match, before we add the depending value
+                        // check firt if the field is a list
+                        if (origValue instanceof ArrayList) {
+                            if (((ArrayList<String>) origValue).contains( split[1] )) {
+                                add = true;
+                            }
+                        // or if it's a simple string
+                        } else if (split[1].equals( origValue ) ) {
+                            add = true;
+                        }
+                        
+                        if (add) {
+                            addToSource( source, targetSplitted[0], targetSplitted[1] );
+                            requestLength += targetSplitted[1].length();
+                        }
+                    }
+                }
+                
+            }
+        }
+        return requestLength;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void addToSource(Map<String, Object> source, String key, String value) {
+        Object sourceValue = source.get( key );
+        if (sourceValue == null) {
+            source.put( key, value );
+        } else if (sourceValue instanceof ArrayList) {
+            ((ArrayList<String>) sourceValue).add( value );
+        } else {
+            ArrayList<String> newValues = new ArrayList<String>();
+            newValues.add( (String) sourceValue );
+            newValues.add( value );
+            source.put( key, newValues );
+        }
+        
+    }
+
     @Override
     public void delete(String key) throws IOException {
         try {
-            DeleteRequestBuilder request = client.prepareDeleteRequest(key);
-            client.addRequest(request, key.length());
+            DeleteRequestBuilder request = client.prepareDeleteRequest( key );
+            client.addRequest( request, key.length() );
         } catch (ElasticsearchException e) {
-            throw makeIOException(e);
+            throw makeIOException( e );
         }
     }
 
     public static IOException makeIOException(ElasticsearchException e) {
         final IOException ioe = new IOException();
-        ioe.initCause(e);
+        ioe.initCause( e );
         return ioe;
     }
 
     @Override
     public void update(NutchDocument doc) throws IOException {
-        write(doc);
+        write( doc );
     }
 
     @Override
@@ -126,14 +210,26 @@ public class ElasticIndexWriter implements IndexWriter {
     @Override
     public void setConf(Configuration conf) {
         config = conf;
-        String cluster = conf.get(ElasticConstants.CLUSTER);
-        String host = conf.get(ElasticConstants.HOST);
+        String cluster = conf.get( ElasticConstants.CLUSTER );
+        String host = conf.get( ElasticConstants.HOST );
 
-        if (StringUtils.isBlank(cluster) && StringUtils.isBlank(host)) {
+        if (StringUtils.isBlank( cluster ) && StringUtils.isBlank( host )) {
             String message = "Missing elastic.cluster and elastic.host. At least one of them should be set in nutch-site.xml ";
             message += "\n" + describe();
-            LOG.error(message);
-            throw new RuntimeException(message);
+            LOG.error( message );
+            throw new RuntimeException( message );
+        }
+
+        String staticFields = conf.get( ElasticConstants.DEPENDING_FIELDS );
+
+        if (staticFields != null) {
+            // separate entries
+            String[] entries = staticFields.split( "," );
+            for (String entry : entries) {
+                // separate keys from values
+                String[] keyValue = entry.split( "->" );
+                dependingFieldsMap.put( keyValue[0], keyValue[1] );
+            }
         }
     }
 

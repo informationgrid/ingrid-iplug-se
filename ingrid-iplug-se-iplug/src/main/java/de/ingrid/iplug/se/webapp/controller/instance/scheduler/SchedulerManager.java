@@ -22,8 +22,6 @@
  */
 package de.ingrid.iplug.se.webapp.controller.instance.scheduler;
 
-import it.sauronsoftware.cron4j.Scheduler;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.nio.file.Files;
@@ -35,11 +33,12 @@ import org.elasticsearch.client.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.SEIPlug;
-import de.ingrid.iplug.se.elasticsearch.bean.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
 import de.ingrid.iplug.se.nutchController.NutchController;
 import de.ingrid.iplug.se.utils.ElasticSearchUtils;
+import it.sauronsoftware.cron4j.Scheduler;
 
 @Service
 public class SchedulerManager {

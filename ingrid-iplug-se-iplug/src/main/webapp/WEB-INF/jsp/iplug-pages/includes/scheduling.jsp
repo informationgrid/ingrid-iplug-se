@@ -34,7 +34,7 @@
                         <input type="hidden" name="instance" value="${instance.name}" />
                         <label> <fmt:message key="scheduling.cronPattern" /> :
                         </label> &nbsp;${savedPattern}
-                        <input type="image" src="../img/delete.png" title="Löschen" align="absmiddle">
+                        <input type="image" src="../img/delete.png" title="LÃ¶schen" align="absmiddle">
                     </form>
                 </div>
                 <div class="row">

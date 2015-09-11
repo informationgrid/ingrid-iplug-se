@@ -52,13 +52,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
 import de.ingrid.admin.controller.AbstractController;
+import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Url;
-import de.ingrid.iplug.se.elasticsearch.bean.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.nutchController.NutchController;
 import de.ingrid.iplug.se.utils.DBUtils;
 import de.ingrid.iplug.se.utils.ElasticSearchUtils;
@@ -123,7 +124,7 @@ public class ListInstancesController extends AbstractController {
         List<Instance> instances = getInstances();
 
         // check for invalid instances and remove them from the active ones
-        Iterator<String> activeInstancesIt = conf.activeInstances.iterator();
+        Iterator<String> activeInstancesIt = JettyStarter.getInstance().config.indexSearchInTypes.iterator();
         while (activeInstancesIt.hasNext()) {
             String active = activeInstancesIt.next();
 
@@ -155,6 +156,11 @@ public class ListInstancesController extends AbstractController {
     public String addInstance(final ModelMap modelMap,
             @RequestParam("instance") String name,
             @RequestParam(value = "duplicateFrom", required = false) String from) throws Exception {
+        
+        if (name == null || name.isEmpty()) {
+            modelMap.put( "instances", getInstances() );
+            return AdminViews.SE_LIST_INSTANCES;
+        }
 
         // convert illegal chars to "_"
         name = name.replaceAll( "[:\\\\/*?|<>\\W]", "_" );

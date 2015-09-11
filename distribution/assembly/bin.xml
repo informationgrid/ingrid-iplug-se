@@ -85,6 +85,11 @@
       <directory>../target/installer</directory>
       <outputDirectory>/</outputDirectory>
     </fileSet>
+	<fileSet>
+      <directory>../target/installer/resources/scripts</directory>
+      <outputDirectory>${project.build.finalName}</outputDirectory>
+	  <lineEnding>unix</lineEnding>
+    </fileSet>
     <fileSet>
       <directory>../target/site</directory>
       <outputDirectory>${project.build.finalName}/doc</outputDirectory>

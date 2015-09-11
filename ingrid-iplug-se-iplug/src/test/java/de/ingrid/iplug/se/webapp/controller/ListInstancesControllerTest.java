@@ -26,7 +26,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
 
 import org.elasticsearch.client.Client;
 import org.elasticsearch.node.internal.InternalNode;
@@ -41,9 +40,10 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.ui.ModelMap;
 
+import de.ingrid.admin.JettyStarter;
+import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
-import de.ingrid.iplug.se.elasticsearch.bean.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.utils.ElasticSearchUtils;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.controller.instance.scheduler.SchedulerManager;
@@ -60,6 +60,7 @@ public class ListInstancesControllerTest {
     
     @Before
     public void initTest() throws Exception {
+        new JettyStarter( false );
         MockitoAnnotations.initMocks( this );
         PowerMockito.mockStatic( ElasticSearchUtils.class );
         InternalNode node = new InternalNode();
@@ -74,7 +75,7 @@ public class ListInstancesControllerTest {
 
         Configuration configuration = new Configuration();
         configuration.setInstancesDir( "test-instances" );
-        configuration.activeInstances = Arrays.asList( "web" );
+        //configuration.activeInstances = Arrays.asList( "web" );
         SEIPlug.conf = configuration;
 
         ListInstancesController lic = new ListInstancesController();

@@ -39,5 +39,6 @@ public class AdminViews extends IViews {
     public static final String SE_INSTANCE_URLS = "/iplug-pages/instanceUrls";
     public static final String SE_INSTANCE_MANAGEMENT = "/iplug-pages/instanceManagement";
     public static final String SE_INSTANCE_SEARCH = "/iplug-pages/instanceSearch";
+    public static final String SE_INSTANCE_REPORTS = "/iplug-pages/instanceReports";
 
 }

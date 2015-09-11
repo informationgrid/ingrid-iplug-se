@@ -38,8 +38,8 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms.Bucket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import de.ingrid.iplug.se.SEIPlug;
-import de.ingrid.iplug.se.elasticsearch.bean.ElasticsearchNodeFactoryBean;
+import de.ingrid.admin.JettyStarter;
+import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.utils.PlugDescription;
 import de.ingrid.utils.metadata.IPlugOperatorFinder;
 
@@ -54,7 +54,7 @@ public class IPlugSeOperatorFinder implements IPlugOperatorFinder {
     public Set<String> findIndexValues(String indexFieldName) throws Exception {
 
         Client client = elasticSearch.getObject().client();
-        SearchResponse response = client.prepareSearch(SEIPlug.conf.index).setQuery(QueryBuilders.matchAllQuery()).addAggregation(AggregationBuilders.terms("TermsAggr").field(indexFieldName).size(0)).execute().actionGet();
+        SearchResponse response = client.prepareSearch(JettyStarter.getInstance().config.index).setQuery(QueryBuilders.matchAllQuery()).addAggregation(AggregationBuilders.terms("TermsAggr").field(indexFieldName).size(0)).execute().actionGet();
 
         Terms terms = response.getAggregations().get("TermsAggr");
         Collection<Bucket> buckets = terms.getBuckets();
