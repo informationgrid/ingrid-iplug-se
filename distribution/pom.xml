@@ -54,14 +54,6 @@
     <finalName>${project.artifactId}-${project.version}</finalName>
     <plugins>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>wagon-maven-plugin</artifactId>
-        <configuration>
-          <fromDir>target</fromDir>
-          <url>file:///opt/ingrid/distributions/${project.artifactId}/${project.version}</url>
-        </configuration>
-      </plugin>
-      <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.5.3</version>
         <inherited>true</inherited>
@@ -88,4 +80,51 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>wagon-maven-plugin</artifactId>
+            <configuration>
+              <fromDir>target</fromDir>
+              <url>file:///opt/ingrid/distributions/${project.artifactId}/${project.version}</url>
+            </configuration>
+            <executions>
+              <execution>
+                <id>upload-to-distributions</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>upload</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-changes-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>changes-report</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>changes-report</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>changes-announcement-mail</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>announcement-mail</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
