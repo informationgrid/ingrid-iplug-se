@@ -198,7 +198,7 @@ public class StartUrlStatusReport extends Configured implements Tool {
                 if (value.getStatus() == CrawlDatum.STATUS_DB_UNFETCHED) {
                     fetchTime = value.getFetchTime();
                 } else {
-                    fetchTime = value.getFetchTime() - value.getFetchInterval() * 1000;
+                    fetchTime = value.getFetchTime() - ((long)value.getFetchInterval()) * 1000;
                 }
                 date.setTime(fetchTime);
                 jsn.put("lastFetchTime", df.format(date));
