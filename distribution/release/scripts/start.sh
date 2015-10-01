@@ -176,6 +176,10 @@ startIplug()
   # run it
   export CLASSPATH="$CLASSPATH"
   INGRID_OPTS="$INGRID_OPTS -Dingrid_home=$INGRID_HOME"
+  # For debugging a nutch process, which ends on StatusReport add:
+  #   -DdebugNutchCall=StatusReport
+  # When using cygwin also add:
+  #   -DrunInCygwin=true
   CLASS=de.ingrid.iplug.se.SEIPlug
 
   exec nohup "$JAVA" $INGRID_OPTS $CLASS > console.log &

@@ -410,6 +410,9 @@ public class IngridCrawlNutchProcess extends NutchProcess {
 
             String options = StringUtils.join(javaOptions, " ");
             String command = StringUtils.join(commandAndOptions, " ");
+            if (debugOption != null && commandAndOptions[0].endsWith(debugOption)) {
+                options += " -agentlib:jdwp=transport=dt_socket,address=7000,server=y,suspend=y";
+            }
             // FOR DEBUGGING NUTCH
             // options +=
             // " -agentlib:jdwp=transport=dt_socket,address=7000,server=y,suspend=y";
