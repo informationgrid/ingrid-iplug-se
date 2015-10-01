@@ -148,6 +148,11 @@
       <artifactId>mysql-connector-java</artifactId>
       <version>5.1.33</version>
     </dependency>
+    <dependency>
+      <groupId>ojdbc</groupId>
+      <artifactId>ojdbc</artifactId>
+      <version>14</version>
+    </dependency>
   </dependencies>
   <build>
     <finalName>${project.parent.artifactId}-${project.version}</finalName>
