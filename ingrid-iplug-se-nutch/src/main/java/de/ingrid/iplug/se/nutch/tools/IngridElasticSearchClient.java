@@ -43,6 +43,7 @@ import org.elasticsearch.common.settings.ImmutableSettings.Builder;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.node.Node;
+import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,6 +78,7 @@ public class IngridElasticSearchClient {
         this.config = conf;
 
         clusterName = config.get(ElasticConstants.CLUSTER);
+        if (clusterName == null) LOG.warn( "No cluster name specified! If node cannot be found, then we might search in the wrong cluster." );
 
         host = config.get(ElasticConstants.HOST);
         port = config.getInt(ElasticConstants.PORT, 9300);

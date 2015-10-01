@@ -36,6 +36,9 @@
       <action type="fix" dev="wemove" issue="REDMINE-170">
         Fix showing crawl log in IE11.
       </action>
+      <action type="fix" dev="wemove" issue="REDMINE-171">
+        Prevent wrong cluster name being used in nutch processes.
+      </action>
     </release>
     
     <release version="3.6.0.3" date="2015-09-11" description="Bugfix-Release 3.6.0.3">

@@ -106,6 +106,7 @@ public class NutchProcessFactory {
         nutchConfigTool.addOrUpdateProperty("mapred.local.dir", Paths.get(instance.getWorkingDirectory(), "hadoop-tmp").toAbsolutePath().toString(), "Set mapred local directory to the instance.");
         nutchConfigTool.addOrUpdateProperty("ingrid.indexer.elastic.type", instance.getName(),
                 "Defines the index type of the indexed documents. The instance name will be used to be able to quickly manipulate all urls of an instance. This property only applies for the ingrid.indexer.elastic plugin.");
+        nutchConfigTool.addOrUpdateProperty("elastic.cluster", instance.getClusterName(), "Default index to send documents to.");
         nutchConfigTool.addOrUpdateProperty("elastic.index", instance.getIndexName(), "Default index to send documents to.");
         nutchConfigTool.addOrUpdateProperty("elastic.port", instance.getEsTransportTcpPort(), "The port to connect to using TransportClient.");
         nutchConfigTool.addOrUpdateProperty("elastic.host", instance.getEsHttpHost(), "The hostname to send documents to using TransportClient. Either host\n" + "  and port must be defined or cluster.");
