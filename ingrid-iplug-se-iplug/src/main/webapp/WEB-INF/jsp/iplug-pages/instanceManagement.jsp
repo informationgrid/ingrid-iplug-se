@@ -39,8 +39,6 @@
 <script type="text/javascript" src="../js/jquery-ui.min.js"></script>
 <script src="../js/jquery.validate.min.js"></script>
 <script src="../js/localization/messages_de.min.js"></script>
-<!--<script src="../js/chart.min.js"></script>-->
-<script type="text/javascript" src="../js/jquery.tablesorter.full.min.js"></script>
 
 <script type="text/javascript">
 
