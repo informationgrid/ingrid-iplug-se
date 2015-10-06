@@ -65,12 +65,12 @@
     <dependency>
       <groupId>de.ingrid</groupId>
       <artifactId>ingrid-base-webapp</artifactId>
-      <version>3.6.1-SNAPSHOT</version>
+      <version>3.6.0.4</version>
     </dependency>
     <dependency>
       <groupId>de.ingrid</groupId>
       <artifactId>ingrid-base-webapp</artifactId>
-      <version>3.6.1-SNAPSHOT</version>
+      <version>3.6.0.4</version>
       <classifier>res</classifier>
       <type>zip</type>
     </dependency>
