@@ -74,7 +74,7 @@ public class QueryConverterTest {
     @Test
     public void matchTermsOR() {
         QueryBuilder result = queryConverter.convert( Utils.getIngridQuery( "wemove OR Deutschland" ) );
-        assertThat( strip( result.toString() ), is("{\"bool\":{\"must\":{\"bool\":{\"should\":{\"multi_match\":{\"query\":\"wemoveDeutschland\",\"fields\":[\"title\",\"content\"],\"type\":\"cross_fields\",\"operator\":\"OR\"}}}}}}") );
+        assertThat( strip( result.toString() ), is("{\"bool\":{\"should\":{\"bool\":{\"should\":{\"multi_match\":{\"query\":\"wemoveDeutschland\",\"fields\":[\"title\",\"content\"],\"type\":\"cross_fields\",\"operator\":\"OR\"}}}}}}") );
     }
     
     @Test
@@ -86,7 +86,7 @@ public class QueryConverterTest {
     @Test
     public void matchTermsANDORParentheses() {
         QueryBuilder result = queryConverter.convert( Utils.getIngridQuery( "Ausland AND (wemove OR Deutschland)" ) );
-        assertThat( strip( result.toString() ), is("{\"bool\":{\"must\":[{\"bool\":{\"must\":{\"bool\":{\"should\":{\"multi_match\":{\"query\":\"wemoveDeutschland\",\"fields\":[\"title\",\"content\"],\"type\":\"cross_fields\",\"operator\":\"OR\"}}}}}},{\"bool\":{\"should\":{\"multi_match\":{\"query\":\"Ausland\",\"fields\":[\"title\",\"content\"],\"type\":\"cross_fields\",\"operator\":\"AND\"}}}}]}}") );        
+        assertThat( strip( result.toString() ), is("{\"bool\":{\"must\":[{\"bool\":{\"should\":{\"bool\":{\"should\":{\"multi_match\":{\"query\":\"wemoveDeutschland\",\"fields\":[\"title\",\"content\"],\"type\":\"cross_fields\",\"operator\":\"OR\"}}}}}},{\"bool\":{\"should\":{\"multi_match\":{\"query\":\"Ausland\",\"fields\":[\"title\",\"content\"],\"type\":\"cross_fields\",\"operator\":\"AND\"}}}}]}}") );        
     }
 
     /**
