@@ -51,6 +51,9 @@
       <action type="fix" dev="wemove" issue="REDMINE-176">
         Fixed query problem with wildcards.
       </action>
+      <action type="update" dev="wemove" issue="REDMINE-106">
+        Use encrypted password for web interface.
+      </action>
     </release>
     
     <release version="3.6.0.3" date="2015-09-11" description="Bugfix-Release 3.6.0.3">
