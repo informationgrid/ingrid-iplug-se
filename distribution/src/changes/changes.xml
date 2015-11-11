@@ -51,6 +51,9 @@
       <action type="fix" dev="wemove" issue="REDMINE-176">
         Fixed query problem with wildcards.
       </action>
+      <action type="fix" dev="wemove" issue="REDMINE-181">
+        Grouping of results by URL domain instead of Plug-ID.
+      </action>
       <action type="update" dev="wemove" issue="REDMINE-106">
         Use encrypted password for web interface.
       </action>

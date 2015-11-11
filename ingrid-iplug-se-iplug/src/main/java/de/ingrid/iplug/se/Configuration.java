@@ -45,6 +45,7 @@ import com.tngtech.configbuilder.annotation.valueextractor.PropertyValue;
 
 import de.ingrid.admin.IConfig;
 import de.ingrid.admin.IKeys;
+import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
 import de.ingrid.utils.PlugDescription;
 import de.ingrid.utils.query.IngridQuery;
@@ -78,6 +79,10 @@ public class Configuration implements IConfig {
 	    // disable the default index menu of the base webapp
 	    // we still have to use the option "indexing=true" to enable elastic search 
 	    System.clearProperty( IKeys.INDEXING );
+	    
+	    // the results from this iPlug have to be grouped by its' domain and not by the iPlug ID
+	    // see at IndexImpl.java in base-webapp for implementation
+	    JettyStarter.getInstance().config.groupByUrl = true;
 	}
 
 	@PropertyValue("dir.instances")
