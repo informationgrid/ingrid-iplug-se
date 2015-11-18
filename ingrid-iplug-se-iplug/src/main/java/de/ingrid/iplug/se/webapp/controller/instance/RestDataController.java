@@ -317,7 +317,8 @@ public class RestDataController extends InstanceController {
 		if (nutchProcess == null || (nutchProcess != null && nutchProcess.getState() == Thread.State.TERMINATED)) {
 			StatusProvider statusProvider = new StatusProvider(instance.getWorkingDirectory());
 			Collection<State> states = statusProvider.getStates();
-			return new ResponseEntity<Collection<State>>(states.isEmpty() ? null : states, HttpStatus.FOUND);
+			// HttpStatus needs to be 200 (OK), otherwise IE 11 won't receive any attached data!!!
+			return new ResponseEntity<Collection<State>>(states.isEmpty() ? null : states, HttpStatus.OK);
 		}
 
 		return new ResponseEntity<Collection<State>>(nutchProcess.getStatusProvider().getStates(), HttpStatus.OK);

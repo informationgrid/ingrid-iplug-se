@@ -90,7 +90,7 @@
 
 	<property>
 		<name>http.agent.url</name>
-		<value>+http://www.portalu.de</value>
+		<value>+http://www.informationgrid.eu</value>
 		<description>A URL to advertise in the User-Agent header. This will
 			appear in parenthesis after the agent name. Custom dictates that this
 			should be a URL of a page explaining the purpose and behavior of this
@@ -100,7 +100,7 @@
 
 	<property>
 		<name>http.agent.email</name>
-		<value>crawler@portalu.de</value>
+		<value>crawler@informationgrid.de</value>
 		<description>An email address to advertise in the HTTP 'From' request
 			header and User-Agent header. A good practice is to mangle this
 			address (e.g. 'info at example dot com') to avoid spamming.

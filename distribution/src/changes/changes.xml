@@ -29,7 +29,37 @@
 	</properties>
 	<body>
 
-    <release version="3.6.0.3" date="2015-09-11" description="Bugfix-Release 3.6.1">
+    <release version="3.6.1" date="2015-11-18" description="Release 3.6.1">
+      <action type="update" dev="wemove" issue="REDMINE-15">
+        Remove all references to PortalU.
+      </action>
+      <action type="fix" dev="wemove" issue="REDMINE-170">
+        Fix showing crawl log in IE11.
+      </action>
+      <action type="fix" dev="wemove" issue="REDMINE-171">
+        Prevent wrong cluster name being used in nutch processes.
+      </action>
+      <action type="fix" dev="wemove" issue="REDMINE-172">
+        Fixed wrong calculation of fetch date.
+      </action>
+      <action type="add" dev="wemove" issue="REDMINE-173">
+        Index even when no URLs were fetched to make sure an index exists afterwards.
+      </action>
+      <action type="fix" dev="wemove" issue="REDMINE-175">
+        Fixed incompatibility with IE11 when showing URL-Report.
+      </action>
+      <action type="fix" dev="wemove" issue="REDMINE-176">
+        Fixed query problem with wildcards.
+      </action>
+      <action type="fix" dev="wemove" issue="REDMINE-181">
+        Grouping of results by URL domain instead of Plug-ID.
+      </action>
+      <action type="update" dev="wemove" issue="REDMINE-106">
+        Use encrypted password for web interface.
+      </action>
+    </release>
+    
+    <release version="3.6.0.3" date="2015-09-11" description="Bugfix-Release 3.6.0.3">
       <action type="fix" dev="wemove" issue="REDMINE-114">
         Fixed a bug that prevented grouping by provider or partner if an URL has not set any.
       </action>

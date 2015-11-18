@@ -36,6 +36,7 @@ public class Instance {
     private List<Url> urls;
     private String esTransportTcpPort;
     private String esHttpHost;
+    private String clusterName;
 
     public Instance() {}
 
@@ -101,6 +102,14 @@ public class Instance {
 
     public void setEsHttpHost(String esHttpHost) {
         this.esHttpHost = esHttpHost;
+    }
+
+    public String getClusterName() {
+        return this.clusterName;
+    }
+
+    public void setClusterName(String clusterName) {
+        this.clusterName = clusterName;
     }
     
     

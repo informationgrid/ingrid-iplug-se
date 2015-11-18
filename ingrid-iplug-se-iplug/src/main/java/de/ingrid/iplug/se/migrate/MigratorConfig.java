@@ -62,7 +62,8 @@ public class MigratorConfig extends Configuration {
             System.out.println( "==================================================================================" );
             System.out.println( "The web and catalog name can be the same if the two different URL types shall be\n"
                     + "merged together into one instance. The handling of these URLs will not be changed,\n"
-                    + "so that catalog-URLs will be fetched as single pages only." );
+                    + "so that catalog-URLs will be fetched as single pages only.\n"
+                    + "When migrating from Oracle-Database, you have to activate the Oracle driver. Look at migrate.sh script." );
             System.exit( -1 );
         }
     }

@@ -113,6 +113,9 @@
             auf, um das iPlug zu starten.
 
             Log Ausgaben finden sich in log.log
+            
+            Bitte lesen Sie bzgl. der Administration die Kapitel unter
+            "http://www.ingrid-oss.eu".
         </echo>
     </target>
 

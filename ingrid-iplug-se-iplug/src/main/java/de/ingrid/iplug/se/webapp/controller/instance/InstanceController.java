@@ -39,6 +39,7 @@ public class InstanceController {
         Instance instance = new Instance();
         instance.setName( name );
         instance.setWorkingDirectory( workPath.toString() );
+        instance.setClusterName( JettyStarter.getInstance().config.cluster );
         instance.setIndexName( JettyStarter.getInstance().config.index );
         
         if (JettyStarter.getInstance().config.indexSearchInTypes.contains( name )) {

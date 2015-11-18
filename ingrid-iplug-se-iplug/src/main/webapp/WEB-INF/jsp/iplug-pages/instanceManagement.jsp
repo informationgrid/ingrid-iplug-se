@@ -39,8 +39,6 @@
 <script type="text/javascript" src="../js/jquery-ui.min.js"></script>
 <script src="../js/jquery.validate.min.js"></script>
 <script src="../js/localization/messages_de.min.js"></script>
-<!--<script src="../js/chart.min.js"></script>-->
-<script type="text/javascript" src="../js/jquery.tablesorter.full.min.js"></script>
 
 <script type="text/javascript">
 
@@ -106,6 +104,21 @@
             type: "GET",
             contentType: 'application/json',
             success: function(data) {
+                if (data == "") {
+                    $("#crawlInfo").html( "Es läuft zur Zeit kein Crawl." );
+                    setTimeout( checkState, 60000 );
+                    return;
+                } else if (data.some(function(item) { return item.key === "FINISHED" || item.key === "ERROR" || item.key === "ABORT" })) {
+                    $("#crawlInfo").html( "Es läuft zur Zeit kein Crawl. (<a href='#' onclick='$(\"#allInfo\").toggle()'>Information zum letzten Crawl) " );
+                    setLog( data );
+                    // show link to request hadoop.log content
+                    $("#moreInfo").show();
+                    $("#crawlStop").hide();
+                    $("#crawlStart").show();
+                    // repeat execution every 60s until finished
+                    setTimeout( checkState, 60000 );
+                    return;
+                }
                 $("#crawlInfo").hide();
                 $("#crawlStart").hide();
                 $("#moreInfo").hide();
@@ -120,32 +133,8 @@
             },
             error: function(jqXHR, text, error) {
                 // if it's not a real error, but just saying, that no process is running
-                if (error === "Found") {
-                    $("#crawlInfo").show();
-                    $("#crawlStart").show();
-                    $("#crawlStop").hide();
-                    //$("#allInfo").hide();
-                    var data = "";
-                    if (jqXHR.responseText == "") {
-                        $("#crawlInfo").html( "Es läuft zur Zeit kein Crawl." );
-                        
-                    } else {
-                        $("#crawlInfo").html( "Es läuft zur Zeit kein Crawl. (<a href='#' onclick='$(\"#allInfo\").toggle()'>Information zum letzten Crawl) " );
-                        data = JSON.parse( jqXHR.responseText );
-                        setLog( data );
-                        // show link to request hadoop.log content
-                        $("#moreInfo").show();
-                        if (statisticIsUpdated) getStatistic();
-                    }
-                    
-                    // repeat execution every 60s until finished
-                    setTimeout( checkState, 60000 );
-
-                // when a real error occurs
-                } else {
-                    $("#crawlInfo").html( "Es trat ein Fehler beim Laden des Logs auf. " );
-                    console.error( error, jqXHR );                  
-                }
+                $("#crawlInfo").html( "Es trat ein Fehler beim Laden des Logs auf. " );
+                console.error( error, jqXHR );                  
             }
         });
     }

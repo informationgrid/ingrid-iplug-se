@@ -172,7 +172,9 @@ public class IngridCrawlNutchProcess extends NutchProcess {
                         // TODO: check this (maybe check for multiple segments),
                         // because we cannot distinguish between zero URLs and
                         // error. :-(
-                        this.status = STATUS.INTERRUPTED;
+                        writeIndex(crawlDb, linkDb, segments);
+                        cleanupHadoop();
+                        status = STATUS.FINISHED;
                         this.statusProvider.addState(STATES.FINISHED.name(), "Finished crawl.");
                         return;
                     } else {
@@ -311,12 +313,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             logFileWatcher.close();
             this.statusProvider.appendToState(STATES.DEDUPLICATE.name(), " done.");
 
-            this.statusProvider.addState(STATES.INDEX.name(), "Create index...");
-            ret = execute("org.apache.nutch.indexer.IndexingJob", crawlDb, "-linkdb", linkDb, "-dir", segments, "-deleteGone", "-noCommit");
-            if (ret != 0) {
-                throwCrawlError("Error during Execution of: org.apache.nutch.indexer.IndexingJob");
-            }
-            this.statusProvider.appendToState(STATES.INDEX.name(), " done.");
+            writeIndex(crawlDb, linkDb, segments);
 
             this.statusProvider.addState(STATES.CLEAN_DUPLICATES.name(), "Clean up duplicates in index...");
             logFileWatcher = LogFileWatcherFactory.getCleaningJobLogfileWatcher(Paths.get(instance.getWorkingDirectory(), "logs", "hadoop.log").toFile(), statusProvider, STATES.CLEAN_DUPLICATES.name());
@@ -327,9 +324,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             logFileWatcher.close();
             this.statusProvider.appendToState(STATES.CLEAN_DUPLICATES.name(), " done.");
 
-            this.statusProvider.addState(STATES.CLEANUP_HADOOP.name(), "Clean up ...");
-            FileUtils.removeRecursive(Paths.get(workingDirectory.getAbsolutePath(), "hadoop-tmp"));
-            this.statusProvider.appendToState(STATES.CLEANUP_HADOOP.name(), " done.");
+            cleanupHadoop();
 
             if (status == STATUS.RUNNING) {
                 status = STATUS.FINISHED;
@@ -366,6 +361,21 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             }
         }
 
+    }
+    
+    private void writeIndex(String crawlDb, String linkDb, String segments) throws IOException, InterruptedException {
+        this.statusProvider.addState(STATES.INDEX.name(), "Create index...");
+        int ret = execute("org.apache.nutch.indexer.IndexingJob", crawlDb, "-linkdb", linkDb, "-dir", segments, "-deleteGone", "-noCommit");
+        if (ret != 0) {
+            throwCrawlError("Error during Execution of: org.apache.nutch.indexer.IndexingJob");
+        }
+        this.statusProvider.appendToState(STATES.INDEX.name(), " done.");
+    }
+    
+    private void cleanupHadoop() throws IOException {
+        this.statusProvider.addState(STATES.CLEANUP_HADOOP.name(), "Clean up ...");
+        FileUtils.removeRecursive(Paths.get(workingDirectory.getAbsolutePath(), "hadoop-tmp"));
+        this.statusProvider.appendToState(STATES.CLEANUP_HADOOP.name(), " done.");
     }
 
     private void throwCrawlError(String string) throws IOException {
@@ -410,6 +420,9 @@ public class IngridCrawlNutchProcess extends NutchProcess {
 
             String options = StringUtils.join(javaOptions, " ");
             String command = StringUtils.join(commandAndOptions, " ");
+            if (debugOption != null && commandAndOptions[0].endsWith(debugOption)) {
+                options += " -agentlib:jdwp=transport=dt_socket,address=7000,server=y,suspend=y";
+            }
             // FOR DEBUGGING NUTCH
             // options +=
             // " -agentlib:jdwp=transport=dt_socket,address=7000,server=y,suspend=y";

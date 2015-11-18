@@ -41,6 +41,8 @@ fi
 # run it
 export CLASSPATH="$CLASSPATH"
 INGRID_OPTS="$INGRID_OPTS -Dingrid_home=$INGRID_HOME"
+# Uncomment when migrating from Oracle Database
+#INGRID_OPTS="$INGRID_OPTS -Djdbc.drivers=oracle.jdbc.OracleDriver"
 CLASS=de.ingrid.iplug.se.migrate.Migrator
 
 
