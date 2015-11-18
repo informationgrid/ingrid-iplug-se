@@ -9,7 +9,7 @@
   <groupId>de.ingrid</groupId>
   <artifactId>ingrid-iplug-se-project</artifactId>
   <packaging>pom</packaging>
-  <version>3.6.1</version>
+  <version>3.6.2-SNAPSHOT</version>
   <name>ingrid-iplug-se-project</name>
   <scm>
     <connection>scm:git:git@github.com:informationgrid/ingrid-iplug-se.git</connection>
