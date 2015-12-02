@@ -112,6 +112,8 @@ public class SEIPlug extends HeartBeatPlug {
 
     private static NutchController nutchController;
 
+    private static EntityManager em;
+
     public SEIPlug() {
         super(30000, null, null, null, null);
     };
@@ -221,7 +223,7 @@ public class SEIPlug extends HeartBeatPlug {
             emf = Persistence.createEntityManagerFactory(conf.databaseID, properties);
         }
         DBManager.INSTANCE.intialize(emf);
-        EntityManager em = null;
+        em = null;
         try {
             em = DBManager.INSTANCE.getEntityManager();
         } catch( PersistenceException e) {
@@ -258,6 +260,7 @@ public class SEIPlug extends HeartBeatPlug {
                     for (File subDir : instancesDirs) {
                         Instance instance = InstanceController.getInstanceData( subDir.getName() );
                         nutchController.stop( instance );
+                        em.close();
                     }
                         
                 } catch (Exception e) {

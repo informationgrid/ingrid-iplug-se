@@ -214,8 +214,8 @@
             	}
             });
             
-            // if no limit url has been set, then take the start url
-            if (data.limitUrls.length === 0) {
+            // if no limit url has been set, then take the start url if it was valid(!)
+            if (valid && data.limitUrls.length === 0) {
                 data.limitUrls.push( data.url );
             }
             
