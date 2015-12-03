@@ -29,14 +29,14 @@
 	</properties>
 	<body>
 
-    <release version="3.6.1.1-SNAPSHOT" date="2015-xx-xx" description="Release 3.6.1.1">
+    <release version="3.6.1.1-SNAPSHOT" date="2015-12-03" description="Release 3.6.1.1">
       <action type="fix" dev="wemove" issue="REDMINE-229">
         Wrong validation error when saving a new URL.
       </action>
       <action type="fix" dev="wemove" issue="REDMINE-216">
         Handle corrupt status file correctly.
       </action>
-      <action type="update" dev="wemove" issue="REDMINE-118">
+      <action type="update" dev="wemove" issue="REDMINE-231">
         Update library for a more robust database and close entity manager when shutting down.
       </action>
     </release>
