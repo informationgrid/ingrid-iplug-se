@@ -351,7 +351,13 @@ public class StatusProvider {
             String xml = content.toString();
             if (xml.length() > 0) {
                 XStream xstream = new XStream();
-                this.states = (LinkedHashMap<String, State>) xstream.fromXML(xml);
+                
+                try {
+                    this.states = (LinkedHashMap<String, State>) xstream.fromXML(xml);
+                } catch (Exception ex) {
+                    LOG.warn( "XML-file could not be read ... ignoring: " + this.lastStatusFile.getAbsolutePath() );
+                    this.states = new LinkedHashMap<String, State>();
+                }
             } else {
                 this.states = new LinkedHashMap<String, State>();
             }
