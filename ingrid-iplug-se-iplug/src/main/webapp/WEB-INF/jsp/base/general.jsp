@@ -21,23 +21,64 @@
   **************************************************#
   --%>
 <%@ include file="/WEB-INF/jsp/base/include.jsp" %>
+<%@ page contentType="text/html; charset=UTF-8" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<%@ page contentType="text/html; charset=UTF-8" %>
+
 <%@ page import="de.ingrid.admin.security.IngridPrincipal"%><html xmlns="http://www.w3.org/1999/xhtml" lang="de">
 <head>
-<title>Portal U Administration sjakdhsajdhasjdakshd</title>
+<title>InGrid iPlug Administration</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="description" content="" />
 <meta name="keywords" content="" />
 <meta name="author" content="wemove digital solutions" />
 <meta name="copyright" content="wemove digital solutions GmbH" />
 <link rel="StyleSheet" href="../css/base/portal_u.css" type="text/css" media="all" />
 <script type="text/javascript" src="../js/base/jquery-1.8.0.min.js"></script>
+<script type="text/javascript">
+	var map = ${jsonMap};
 
+    $(document).ready(function() {
+                
+        $("#partners").change(function() {
+        	var select = $("#providers");
+        	select.find("option[value]").remove();
+            var partner = $(this).val();
+            // at first call it's normally empty / not selected
+            if (map[partner]) {
+                for(var i = 0; i < map[partner].length; i++) {
+                    select.append("<option value='" + map[partner][i].shortName + "'>" + map[partner][i].displayName + "</option>");
+                }
+                // use the first provider as selected in hidden field
+                $("#provider_full").val(map[partner][0].displayName);
+            }
+        }).trigger('change');
+        
+        $("#provider_full").val("${plugDescription.organisation}");
+        $("#providers").val("${plugDescription.organisationAbbr}").change(function() {
+            var provider = $(this).val();
+            var full = $(this).find("option[value='" + provider + "']").html();
+            $("#provider_full").val(full);
+        });
+        
+        $(".passwordRepeat").hide();
+    });
+
+    function submit() {
+        var pwd = $("[name=newPassword]").val();
+        var pwdRepeat = $("[name=newPasswordRepeat]").val();
+        if (pwd === pwdRepeat) {
+            document.getElementById('plugDescription').submit();
+        } else {
+            $(".passwordRepeat").show();
+            alert("Das Passwort und seine Wiederholung stimmen nicht überein.");
+        }
+    };
+</script> 
 </head>
 <body>
 	<div id="header">
-		<img src="../images/base/logo.gif" width="168" height="60" alt="Portal U" />
+		<img src="../images/base/logo.gif" alt="InGrid" />
 		<h1>Konfiguration</h1>
 		<%
 		java.security.Principal  principal = request.getUserPrincipal();
@@ -59,12 +100,12 @@
 		<div class="controls">
 			<a href="#" onclick="document.location='../base/workingDir.html';">Zur&uuml;ck</a>
 			<a href="#" onclick="document.location='../base/welcome.html';">Abbrechen</a>
-			<a href="#" onclick="document.getElementById('plugDescription').submit();">Weiter</a>
+			<a href="#" onclick="submit();">Weiter</a>
 		</div>
 		<div class="controls cBottom">
 			<a href="#" onclick="document.location='../base/workingDir.html';">Zur&uuml;ck</a>
 			<a href="#" onclick="document.location='../base/welcome.html';">Abbrechen</a>
-			<a href="#" onclick="document.getElementById('plugDescription').submit();">Weiter</a>
+			<a href="#" onclick="submit();">Weiter</a>
 		</div>
 		<div id="content">
 			<h2>Allgemeine Angaben zum Betreiber</h2>
@@ -207,9 +248,19 @@
 						<td>Administrationskennwort:</td>
 						<td>
                             <div class="input full">
-                                <input type="password" name="iplugAdminPassword" value="${plugDescription['IPLUG_ADMIN_PASSWORD']}" />
+                                <input type="password" name="newPassword" value="" />
                             </div>
-                            <span>Das Kennwort mit dessen Hilfe man sich authentifiziert.</span><form:errors path="iplugAdminPassword" cssClass="error" element="div" /></td>
+                            <span>Das Kennwort mit dessen Hilfe man sich authentifiziert.</span><form:errors path="newPassword" cssClass="error" element="div" /></td>
+					</tr>			
+					<tr>
+						<td>Kennwort-Wiederholung:</td>
+						<td>
+                            <div class="input full">
+                                <input type="password" name="newPasswordRepeat" value="" />
+                            </div>
+                            <div class="error passwordRepeat">Die Wiederholung stimmt nicht mit dem Passwort überein.</div>
+                            <span>Wiederholen Sie das Kennwort, um Fehleingaben vorzubeugen.</span>
+                        </td>
 					</tr>			
 				</table>
 			</form:form>

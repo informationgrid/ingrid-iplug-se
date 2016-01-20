@@ -28,6 +28,11 @@
 		<author email="joachim@wemove.com">Joachim Müller</author>
 	</properties>
 	<body>
+    <release version="3.6.1.2" date="2016-xx-xx" description="Release 3.6.1.2">
+      <action type="fix" dev="wemove" issue="REDMINE-256">
+        Administration cannot be finished when installed freshly.
+      </action>
+    </release>
 
     <release version="3.6.2-SNAPSHOT" date="2016-xx-xx" description="Release 3.6.2">
       <action type="fix" dev="wemove" issue="REDMINE-257">
