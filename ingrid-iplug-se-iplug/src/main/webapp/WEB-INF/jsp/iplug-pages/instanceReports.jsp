@@ -205,7 +205,7 @@
 
 						// initialize the table and its paging option
 						$("#urlTable").tablesorter({
-							delayInit : true,
+							delayInit : false,
 							headers : {
 								0 : {
 									sorter : false
