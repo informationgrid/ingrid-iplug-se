@@ -29,6 +29,12 @@
 	</properties>
 	<body>
 
+    <release version="3.6.2-SNAPSHOT" date="2016-xx-xx" description="Release 3.6.2">
+      <action type="fix" dev="wemove" issue="REDMINE-257">
+        Update tablesorter javascript component.
+      </action>
+    </release>
+
     <release version="3.6.1.1" date="2015-12-03" description="Release 3.6.1.1">
       <action type="fix" dev="wemove" issue="REDMINE-229">
         Wrong validation error when saving a new URL.
