@@ -28,6 +28,14 @@
 		<author email="joachim@wemove.com">Joachim Müller</author>
 	</properties>
 	<body>
+    <release version="3.6.1.2" date="2016-01-22" description="Release 3.6.1.2">
+      <action type="fix" dev="wemove" issue="REDMINE-256">
+        Administration cannot be finished when installed freshly.
+      </action>
+      <action type="fix" dev="wemove" issue="REDMINE-257">
+        Update tablesorter javascript component.
+      </action>
+    </release>
 
     <release version="3.6.1.1" date="2015-12-03" description="Release 3.6.1.1">
       <action type="fix" dev="wemove" issue="REDMINE-229">
