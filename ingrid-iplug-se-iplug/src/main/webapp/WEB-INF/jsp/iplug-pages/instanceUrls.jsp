@@ -800,7 +800,7 @@
                 }
             },
             sortList: [[0,0]], // sort first column ascending
-            delayInit: true,
+            delayInit: false,
             widgets: ['zebra', 'filter'],
             widgetOptions: {
                 // filter_external: '#filterUrl',
