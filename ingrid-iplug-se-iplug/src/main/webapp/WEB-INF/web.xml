@@ -47,6 +47,7 @@
         <servlet-name>springapp</servlet-name>
         <url-pattern>*.html</url-pattern>
         <url-pattern>*.json</url-pattern>
+        <url-pattern>/rest/*</url-pattern>
     </servlet-mapping>
     <servlet>
         <servlet-name>forwarding</servlet-name>
@@ -56,17 +57,9 @@
     <servlet-mapping>
         <servlet-name>forwarding</servlet-name>
         <url-pattern>*.css</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>forwarding</servlet-name>
         <url-pattern>*.jpg</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>forwarding</servlet-name>
         <url-pattern>*.gif</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>forwarding</servlet-name>
+        <url-pattern>*.ico</url-pattern>
         <url-pattern>*.js</url-pattern>
     </servlet-mapping>
     
