@@ -29,15 +29,14 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.elasticsearch.client.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
+import de.ingrid.admin.JettyStarter;
+import de.ingrid.admin.elasticsearch.IndexManager;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
 import de.ingrid.iplug.se.nutchController.NutchController;
-import de.ingrid.iplug.se.utils.ElasticSearchUtils;
 import it.sauronsoftware.cron4j.Scheduler;
 
 @Service
@@ -52,7 +51,7 @@ public class SchedulerManager {
 
     @Autowired
     private IPostCrawlProcessor[] postCrawlProcessors;
-
+    
     private class Runner {
         public Runner(Scheduler s, SchedulingRunnable sr) {
             this.scheduler = s;
@@ -66,8 +65,17 @@ public class SchedulerManager {
         public String runningId = null;
     }
 
+    /**
+     * Initialize the Schedule Manager. The index must be created here, since there are no DocumentProducers, which would have
+     * lead to index creation by IndexRunnable-class.
+     * @param patternPers
+     * @param crawlDataPers
+     * @param nutchController
+     * @param indexManager
+     * @throws Exception
+     */
     @Autowired
-    public SchedulerManager(PatternPersistence patternPers, CrawlDataPersistence crawlDataPers, NutchController nutchController, ElasticsearchNodeFactoryBean elasticSearch) throws Exception {
+    public SchedulerManager(PatternPersistence patternPers, CrawlDataPersistence crawlDataPers, NutchController nutchController, IndexManager indexManager) throws Exception {
         this.patternService = patternPers;
         this.crawlDataPers = crawlDataPers;
         this.nutchController = nutchController;
@@ -81,12 +89,11 @@ public class SchedulerManager {
             // check if elastic search index is present and create it otherwise
             // this can be missing if old database has been migrated or an
             // instance dir has been added manually
-            Client client = elasticSearch.getObject().client();
-            boolean typeExists = ElasticSearchUtils.typeExists(name, client);
-            if (!typeExists) {
-                ElasticSearchUtils.createIndexType(name, client);
-            }
-
+            String indexName = JettyStarter.getInstance().config.index;
+            
+            boolean indexExists = indexManager.indexExists( indexName );
+            if (!indexExists) indexManager.createIndex( indexName );
+            
             // if schedule pattern exists then schedule the scheduler
             schedule(name);
 

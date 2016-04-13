@@ -707,6 +707,8 @@ public class SegmentMerger extends Configured implements Mapper<Text, MetaWrappe
         }
         SegmentMerger merger = new SegmentMerger(conf);
         merger.merge(out, segs.toArray(new Path[segs.size()]), filter, normalize, sliceSize);
+        // TODO: should it be closed?
+        // merger.close();
     }
 
 }
