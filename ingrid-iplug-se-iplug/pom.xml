@@ -6,7 +6,6 @@
     <version>3.6.2-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>de.ingrid</groupId>
   <artifactId>ingrid-iplug-se-iplug</artifactId>
   <packaging>jar</packaging>
   <name>ingrid-iplug-se-iplug</name>
@@ -60,17 +59,17 @@
     <dependency>
       <groupId>de.ingrid</groupId>
       <artifactId>ingrid-utils</artifactId>
-      <version>3.6.1</version>
+      <version>3.6.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>de.ingrid</groupId>
       <artifactId>ingrid-base-webapp</artifactId>
-      <version>3.6.1</version>
+      <version>3.6.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>de.ingrid</groupId>
       <artifactId>ingrid-base-webapp</artifactId>
-      <version>3.6.1</version>
+      <version>3.6.2-SNAPSHOT</version>
       <classifier>res</classifier>
       <type>zip</type>
     </dependency>

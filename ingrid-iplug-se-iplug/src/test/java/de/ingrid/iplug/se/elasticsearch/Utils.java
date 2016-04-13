@@ -44,6 +44,7 @@ import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.elasticsearch.FacetConverter;
 import de.ingrid.admin.elasticsearch.IQueryParsers;
 import de.ingrid.admin.elasticsearch.IndexImpl;
+import de.ingrid.admin.elasticsearch.IndexManager;
 import de.ingrid.admin.elasticsearch.converter.DatatypePartnerProviderQueryConverter;
 import de.ingrid.admin.elasticsearch.converter.DefaultFieldsQueryConverter;
 import de.ingrid.admin.elasticsearch.converter.FieldQueryIGCConverter;
@@ -64,6 +65,8 @@ public class Utils {
     public static IndexImpl index = null;
 
     public static ElasticsearchNodeFactoryBean elastic;
+    
+    public static IndexManager indexManager;
 
     public static void setupES() throws Exception {
         
@@ -139,7 +142,7 @@ public class Utils {
     }
 
 
-    public static void initIndex(JettyStarter jettyStarter) {
+    public static void initIndex(JettyStarter jettyStarter) throws Exception {
         //PowerMockito.mockStatic( JettyStarter.class );
         //Mockito.when(JettyStarter.getInstance()).thenReturn( jettyStarter );
         
@@ -157,7 +160,9 @@ public class Utils {
         parsers.add( new MatchAllQueryConverter() );
         qc.setQueryParsers( parsers );
         
-        index = new IndexImpl( elastic, qc, new FacetConverter(qc) );
+        indexManager = new IndexManager( elastic );
+        
+        index = new IndexImpl( indexManager, qc, new FacetConverter(qc) );
     }
     
     public static IngridQuery getIngridQuery( String term ) {
