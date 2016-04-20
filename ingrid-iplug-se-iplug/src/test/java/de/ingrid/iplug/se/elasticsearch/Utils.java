@@ -84,6 +84,7 @@ public class Utils {
 //        configuration.esBoostMode = "sum";
 //        SEIPlug.conf = configuration;
         
+        JettyStarter.getInstance().config.docProducerIndices = new String[] {"test"};
         
         setMapping( elastic, "test_1" );
         prepareIndex( elastic );
