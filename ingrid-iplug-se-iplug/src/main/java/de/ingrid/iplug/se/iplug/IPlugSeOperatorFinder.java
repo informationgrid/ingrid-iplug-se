@@ -32,6 +32,7 @@ import org.apache.commons.logging.LogFactory;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.indices.IndexMissingException;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms.Bucket;
@@ -69,6 +70,9 @@ public class IPlugSeOperatorFinder implements IPlugOperatorFinder {
     public Set<String> findPartner() throws IOException {
         try {
             return findIndexValues("partner");
+        } catch (IndexMissingException e) {
+            LOG.warn( "Index does not exist." );
+            return new HashSet<String>();
         } catch (Exception e) {
             LOG.error("Error obtaining partners from index.", e);
             throw new IOException(e);
@@ -79,6 +83,9 @@ public class IPlugSeOperatorFinder implements IPlugOperatorFinder {
     public Set<String> findProvider() throws IOException {
         try {
             return findIndexValues("provider");
+        } catch (IndexMissingException e) {
+            LOG.warn( "Index does not exist." );
+            return new HashSet<String>();
         } catch (Exception e) {
             LOG.error("Error obtaining providers from index.", e);
             throw new IOException(e);

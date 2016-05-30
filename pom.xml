@@ -3,13 +3,12 @@
   <parent>
     <groupId>de.ingrid</groupId>
     <artifactId>ingrid-releases-pom</artifactId>
-    <version>3.6.1</version>
+    <version>3.6.2</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>de.ingrid</groupId>
   <artifactId>ingrid-iplug-se-project</artifactId>
   <packaging>pom</packaging>
-  <version>3.6.1.2</version>
+  <version>3.6.2</version>
   <name>ingrid-iplug-se-project</name>
   <scm>
     <connection>scm:git:git@github.com:informationgrid/ingrid-iplug-se.git</connection>
@@ -32,13 +31,21 @@
   </modules>
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>de.ingrid</groupId>
-        <artifactId>ingrid-version-management-pom</artifactId>
-        <version>3.6.0</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.7</version>
+        </dependency>
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+          <version>1.7.7</version>
+        </dependency>
+        <dependency>
+          <groupId>org.mortbay.jetty</groupId>
+          <artifactId>jetty</artifactId>
+          <version>6.1.26</version>
+        </dependency>
     </dependencies>
   </dependencyManagement>
   <dependencies>

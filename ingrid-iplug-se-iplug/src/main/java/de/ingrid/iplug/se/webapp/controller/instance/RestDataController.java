@@ -50,7 +50,6 @@ import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.omg.PortableInterceptor.ACTIVE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -80,7 +79,7 @@ import de.ingrid.iplug.se.utils.UrlErrorPagableFilter;
 import de.ingrid.iplug.se.webapp.container.Instance;
 
 @RestController
-@RequestMapping("/rest")
+@RequestMapping("/") // in web.xml it is dispatched from "/rest/..."!!!
 @SessionAttributes("plugDescription")
 public class RestDataController extends InstanceController {
 
@@ -243,23 +242,26 @@ public class RestDataController extends InstanceController {
 		JSONParser parser = new JSONParser();
 		Reader reader = null;
 		UrlErrorPagableFilter pager = null;
-		try {
-			reader = Files.newBufferedReader(path, Charset.forName("UTF-8"));
-			pager = new UrlErrorPagableFilter(page, pageSize, urlFilter, statusFilter);
-			parser.parse(reader, pager);
-		} catch (IOException e) {
-			LOG.error("Error open '" + path.toString() + "'.", e);
-		} catch (ParseException e) {
-			LOG.error("Error parsing JSON File '" + path.toString() + "'.", e);
-		} finally {
-			if (reader != null) {
-				try {
-					reader.close();
-				} catch (IOException e) {
-				}
-			}
+		
+		if (path.toFile().exists()) {
+    		try {
+    			reader = Files.newBufferedReader(path, Charset.forName("UTF-8"));
+    			pager = new UrlErrorPagableFilter(page, pageSize, urlFilter, statusFilter);
+    			parser.parse(reader, pager);
+    		} catch (IOException e) {
+    			LOG.error("Error open '" + path.toString() + "'.", e);
+    		} catch (ParseException e) {
+    			LOG.error("Error parsing JSON File '" + path.toString() + "'.", e);
+    		} finally {
+    			if (reader != null) {
+    				try {
+    					reader.close();
+    				} catch (IOException e) {
+    				}
+    			}
+    		}
 		}
-
+		
 		JSONObject json = new JSONObject();
 		if (pager == null) {
 			json.put("data", "");

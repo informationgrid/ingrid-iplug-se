@@ -23,11 +23,29 @@
   -->
 
 <document>
-	<properties>
-		<title>Changes Ingrid iPlug-SE</title>
-		<author email="joachim@wemove.com">Joachim Müller</author>
-	</properties>
-	<body>
+  <properties>
+	<title>Changes Ingrid iPlug-SE</title>
+	<author email="joachim@wemove.com">Joachim Müller</author>
+  </properties>
+  <body>
+    <release version="3.6.2" date="2016-05-30" description="Release 3.6.2">
+      <action type="add" dev="wemove" issue="REDMINE-309">
+        Added override mechanism for redefining beans via xml.
+      </action>
+      <action type="fix" dev="wemove" issue="REDMINE-269">
+        Fixed redirect to welcome page for a logged in user.
+      </action>
+      <action type="fix" dev="wemove" issue="REDMINE-308">
+        Fixed REST calls due to url-pattern change.
+        Catch NPE when no report has been generated yet.
+      </action>
+      <action type="fix" dev="wemove" issue="REDMINE-310">
+        Fixed error on missing index.
+        Handle mapping automatically by using default configuration.
+        Using more functions from base-webapp and clean up.
+      </action>
+    </release>
+    
     <release version="3.6.1.2" date="2016-01-22" description="Release 3.6.1.2">
       <action type="fix" dev="wemove" issue="REDMINE-256">
         Administration cannot be finished when installed freshly.
@@ -112,8 +130,8 @@
       </action>
     </release>
 
-		<release version="3.5.0" date="2015-01-30" description="Release InGrid 3.5.0">
-			<action type="add" dev="wemove" issue="REDMINE-524">
+    <release version="3.5.0" date="2015-01-30" description="Release InGrid 3.5.0">
+	  <action type="add" dev="wemove" issue="REDMINE-524">
         Added license header to all source files for Open Source migration.
       </action>
       <action type="add" dev="wemove">
@@ -122,6 +140,6 @@
       <action type="update" dev="wemove" issue="REDMINE-307">
         Updated Nutch to version 1.9.
       </action>
-		</release>
-	</body>
+	</release>
+  </body>
 </document>

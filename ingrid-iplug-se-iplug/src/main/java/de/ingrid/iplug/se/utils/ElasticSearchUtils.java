@@ -33,6 +33,7 @@ import org.springframework.core.io.ClassPathResource;
 
 import de.ingrid.admin.JettyStarter;
 
+@Deprecated
 public class ElasticSearchUtils {
 
     public static boolean typeExists(String type, Client client) {

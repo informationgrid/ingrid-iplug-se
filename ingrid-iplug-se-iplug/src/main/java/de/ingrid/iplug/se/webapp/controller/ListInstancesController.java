@@ -38,7 +38,6 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.apache.log4j.Logger;
-import org.elasticsearch.client.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
@@ -55,6 +54,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
 import de.ingrid.admin.controller.AbstractController;
+import de.ingrid.admin.elasticsearch.IndexManager;
 import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
@@ -88,6 +88,9 @@ public class ListInstancesController extends AbstractController {
 
     @Autowired
     private NutchController nutchController;
+    
+    @Autowired
+    private IndexManager indexManager;
 
     private Configuration conf;
 
@@ -99,19 +102,12 @@ public class ListInstancesController extends AbstractController {
         this.conf = conf;
     }
 
-    // @ModelAttribute("instances")
     public List<Instance> getInstances() throws Exception {
         ArrayList<Instance> list = new ArrayList<Instance>();
 
         File[] instancesDirs = FileUtils.getInstancesDirs();
         for (File subDir : instancesDirs) {
             Instance instance = InstanceController.getInstanceData( subDir.getName() );
-            Client client = elasticSearch.getObject().client();
-            boolean typeExists = ElasticSearchUtils.typeExists( subDir.getName(), client );
-            // automatically create index type
-            if (!typeExists) {
-                ElasticSearchUtils.createIndexType( subDir.getName(), client );
-            }
             list.add( instance );
         }
 
@@ -179,23 +175,11 @@ public class ListInstancesController extends AbstractController {
         }
         
         if (success) {
-
             schedulerManager.addInstance( name );
+            modelMap.put( "instances", getInstances() );
+            modelMap.put( "error", "Index already exists for instance " + name + ", which might already contain data." );
 
-            Client client = elasticSearch.getObject().client();
-            // if a type within an index already exists, then return error and
-            // ask user what to do
-            boolean typeExists = ElasticSearchUtils.typeExists( name, client );
-
-            if (typeExists) {
-                modelMap.put( "instances", getInstances() );
-                modelMap.put( "error", "Index already exists for instance " + name + ", which might already contain data." );
-
-                return AdminViews.SE_LIST_INSTANCES;
-
-            } else {
-                ElasticSearchUtils.createIndexType( name, client );
-            }
+            return AdminViews.SE_LIST_INSTANCES;
 
         } else {
             if (from == null) {

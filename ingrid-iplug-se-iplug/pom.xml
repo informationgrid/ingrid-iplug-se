@@ -3,10 +3,9 @@
   <parent>
     <groupId>de.ingrid</groupId>
     <artifactId>ingrid-iplug-se-project</artifactId>
-    <version>3.6.1.2</version>
+    <version>3.6.2</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>de.ingrid</groupId>
   <artifactId>ingrid-iplug-se-iplug</artifactId>
   <packaging>jar</packaging>
   <name>ingrid-iplug-se-iplug</name>
@@ -60,17 +59,17 @@
     <dependency>
       <groupId>de.ingrid</groupId>
       <artifactId>ingrid-utils</artifactId>
-      <version>3.6.1</version>
+      <version>3.6.2</version>
     </dependency>
     <dependency>
       <groupId>de.ingrid</groupId>
       <artifactId>ingrid-base-webapp</artifactId>
-      <version>3.6.1</version>
+      <version>3.6.2</version>
     </dependency>
     <dependency>
       <groupId>de.ingrid</groupId>
       <artifactId>ingrid-base-webapp</artifactId>
-      <version>3.6.1</version>
+      <version>3.6.2</version>
       <classifier>res</classifier>
       <type>zip</type>
     </dependency>
@@ -133,13 +132,13 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.5.6</version>
+      <!-- <version>1.5.6</version> -->
       <!-- <scope>test</scope>-->
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
-      <version>1.5.6</version>
+      <!-- <version>1.5.6</version> -->
       <!-- <scope>test</scope>-->
     </dependency>
     <!-- Library used for the migration of old database to new one -->

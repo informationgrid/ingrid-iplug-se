@@ -62,6 +62,8 @@ import de.ingrid.iplug.se.nutchController.NutchController;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
 import de.ingrid.iplug.se.webapp.controller.instance.InstanceController;
+import de.ingrid.utils.IngridCall;
+import de.ingrid.utils.IngridDocument;
 import de.ingrid.utils.IngridHit;
 import de.ingrid.utils.IngridHitDetail;
 import de.ingrid.utils.IngridHits;
@@ -372,6 +374,11 @@ public class SEIPlug extends HeartBeatPlug {
         }
         
         em.getTransaction().commit();
+    }
+
+    @Override
+    public IngridDocument call(IngridCall targetInfo) throws Exception {
+        throw new RuntimeException( "call-function not implemented in SE-iPlug" );
     }
 
 }
