@@ -28,9 +28,21 @@
 	<author email="joachim@wemove.com">Joachim Müller</author>
   </properties>
   <body>
-    <release version="3.6.2-SNAPSHOT" date="2016-xx-xx" description="Release 3.6.2">
+    <release version="3.6.2" date="2016-05-30" description="Release 3.6.2">
+      <action type="add" dev="wemove" issue="REDMINE-309">
+        Added override mechanism for redefining beans via xml.
+      </action>
       <action type="fix" dev="wemove" issue="REDMINE-269">
         Fixed redirect to welcome page for a logged in user.
+      </action>
+      <action type="fix" dev="wemove" issue="REDMINE-308">
+        Fixed REST calls due to url-pattern change.
+        Catch NPE when no report has been generated yet.
+      </action>
+      <action type="fix" dev="wemove" issue="REDMINE-310">
+        Fixed error on missing index.
+        Handle mapping automatically by using default configuration.
+        Using more functions from base-webapp and clean up.
       </action>
     </release>
     
