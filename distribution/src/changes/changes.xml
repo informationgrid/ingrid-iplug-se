@@ -28,6 +28,12 @@
 	<author email="joachim@wemove.com">Joachim Müller</author>
   </properties>
   <body>
+    <release version="4.0.0" date="2016-08-26" description="Release 4.0.0">
+      <action type="fix" dev="wemove" issue="REDMINE-394">
+        Fixed writing of datatypes to the configuration.
+      </action>
+    </release>
+    
     <release version="3.6.2" date="2016-05-30" description="Release 3.6.2">
       <action type="add" dev="wemove" issue="REDMINE-309">
         Added override mechanism for redefining beans via xml.

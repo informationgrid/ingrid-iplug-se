@@ -242,7 +242,7 @@ case "$1" in
     echo "Please restart the iPlug to read updated configuration."
     ;;
   *)
-    echo "Usage: $0 {start|stop|restart|status}"
+    echo "Usage: $0 {start|stop|restart|status|resetPassword <newPassword>}"
     exit 1
     ;;
 esac
