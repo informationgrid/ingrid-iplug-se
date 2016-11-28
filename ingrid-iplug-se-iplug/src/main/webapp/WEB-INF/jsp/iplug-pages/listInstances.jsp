@@ -77,12 +77,11 @@
                     var action = dialogConfirm.data("action");
                     $.ajax({
                         type: 'DELETE',
-                        url: "listInstances",
+                        url: "../rest/instance/" + action.id,
                         success: function() {
-                            location.reload();
+                            window.location = window.location.href
                         },
-                        data: action.id,
-                        contentType: 'application/json'
+                        contentType: 'text/plain'
                     });
                     $( this ).dialog( "close" );
                 }

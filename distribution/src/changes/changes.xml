@@ -29,9 +29,12 @@
   </properties>
   <body>
 
-    <release version="4.0.0.1-SNAPSHOT" date="2016-xx-xx" description="Release 4.0.0.1">
+    <release version="4.0.0.2-SNAPSHOT" date="2016-xx-xx" description="Release 4.0.0.2">
       <action type="fix" dev="wemove" issue="REDMINE-465">
         Fixed wrong path to save data when using cygwin.
+      </action>
+      <action type="fix" dev="wemove" issue="REDMINE-495">
+        Fixed deletion of an instance.
       </action>
     </release>
     

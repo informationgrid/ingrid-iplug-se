@@ -38,6 +38,7 @@ import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Join;
@@ -47,6 +48,7 @@ import javax.persistence.criteria.Root;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.elasticsearch.indices.TypeMissingException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -64,6 +66,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
+import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Metadata;
@@ -74,6 +77,7 @@ import de.ingrid.iplug.se.nutchController.NutchProcessFactory;
 import de.ingrid.iplug.se.nutchController.StatusProvider;
 import de.ingrid.iplug.se.nutchController.StatusProvider.State;
 import de.ingrid.iplug.se.utils.DBUtils;
+import de.ingrid.iplug.se.utils.ElasticSearchUtils;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.utils.UrlErrorPagableFilter;
 import de.ingrid.iplug.se.webapp.container.Instance;
@@ -87,6 +91,9 @@ public class RestDataController extends InstanceController {
 
     private static final String NO_RESULT_INDEX = "_noresult_";
 
+    @Autowired
+    private ElasticsearchNodeFactoryBean elasticSearch;
+    
 	@Autowired
 	private NutchController nutchController;
 
@@ -310,6 +317,49 @@ public class RestDataController extends InstanceController {
 
 		return generateOkResponse();
 	}
+	
+	@RequestMapping(value = "/instance/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteInstance(@PathVariable("id") String name) throws Exception {
+        
+        // stop all nutch processes first
+        Instance instance = InstanceController.getInstanceData( name );
+        nutchController.stop( instance );
+        
+        // remove instance directory
+        String dir = SEIPlug.conf.getInstancesDir();
+        Path directoryToDelete = Paths.get( dir, name );
+        try {
+            FileUtils.removeRecursive( directoryToDelete );
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity<String>( HttpStatus.INTERNAL_SERVER_ERROR );
+        }
+
+        // remove instance (type) from index
+        try {
+            ElasticSearchUtils.deleteType( name, elasticSearch.getObject().client() );
+        } catch (TypeMissingException ex) {
+            LOG.warn( "type could not be deleted: " + name );
+        }
+        
+        // remove url from database belonging to this instance
+        EntityManager em = DBManager.INSTANCE.getEntityManager();
+        
+        em.getTransaction().begin();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaDelete<Url> criteriaDelete = cb.createCriteriaDelete( Url.class );
+        Root<Url> urlTable = criteriaDelete.from(Url.class);
+        Predicate instanceCriteria = cb.equal( urlTable.get("instance"), name );
+        
+        criteriaDelete.from( Url.class );
+        criteriaDelete.where( instanceCriteria );
+        
+        em.createQuery( criteriaDelete ).executeUpdate();
+        em.flush();
+        em.getTransaction().commit();
+        
+        return new ResponseEntity<String>( HttpStatus.OK );
+    }
 
 	@RequestMapping(value = { "status/{instance}" }, method = RequestMethod.GET)
 	public ResponseEntity<Collection<State>> getStatus(@PathVariable("instance") String name) {
@@ -377,4 +427,8 @@ public class RestDataController extends InstanceController {
 		result.put("result", "OK");
 		return new ResponseEntity<Map<String, String>>(result, HttpStatus.OK);
 	}
+	
+	public void setElasticSearch(ElasticsearchNodeFactoryBean esBean) {
+        this.elasticSearch = esBean;
+    }
 }

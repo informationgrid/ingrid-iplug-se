@@ -31,21 +31,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaDelete;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -55,14 +46,11 @@ import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
 import de.ingrid.admin.controller.AbstractController;
 import de.ingrid.admin.elasticsearch.IndexManager;
-import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
-import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Url;
 import de.ingrid.iplug.se.nutchController.NutchController;
 import de.ingrid.iplug.se.utils.DBUtils;
-import de.ingrid.iplug.se.utils.ElasticSearchUtils;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
 import de.ingrid.iplug.se.webapp.controller.instance.InstanceController;
@@ -80,8 +68,7 @@ public class ListInstancesController extends AbstractController {
     
     private static Logger log = Logger.getLogger( ListInstancesController.class );
 
-    @Autowired
-    private ElasticsearchNodeFactoryBean elasticSearch;
+    
 
     @Autowired
     private SchedulerManager schedulerManager;
@@ -177,7 +164,7 @@ public class ListInstancesController extends AbstractController {
         if (success) {
             schedulerManager.addInstance( name );
             modelMap.put( "instances", getInstances() );
-            modelMap.put( "error", "Index already exists for instance " + name + ", which might already contain data." );
+            // modelMap.put( "error", "Index already exists for instance " + name + ", which might already contain data." );
 
             return AdminViews.SE_LIST_INSTANCES;
 
@@ -279,50 +266,10 @@ public class ListInstancesController extends AbstractController {
         return true;
     }
 
-    @RequestMapping(value = "/iplug-pages/listInstances", method = RequestMethod.DELETE)
-    public ResponseEntity<String> deleteInstance(@RequestBody String name) throws Exception {
-        
-        // stop all nutch processes first
-        Instance instance = InstanceController.getInstanceData( name );
-        nutchController.stop( instance );
-        
-        // remove instance directory
-        String dir = conf.getInstancesDir();
-        Path directoryToDelete = Paths.get( dir, name );
-        try {
-            FileUtils.removeRecursive( directoryToDelete );
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new ResponseEntity<String>( HttpStatus.INTERNAL_SERVER_ERROR );
-        }
-
-        // remove instance (type) from index
-        ElasticSearchUtils.deleteType( name, elasticSearch.getObject().client() );
-        
-        // remove url from database belonging to this instance
-        EntityManager em = DBManager.INSTANCE.getEntityManager();
-        
-        em.getTransaction().begin();
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaDelete<Url> criteriaDelete = cb.createCriteriaDelete( Url.class );
-        Root<Url> urlTable = criteriaDelete.from(Url.class);
-        Predicate instanceCriteria = cb.equal( urlTable.get("instance"), name );
-        
-        criteriaDelete.from( Url.class );
-        criteriaDelete.where( instanceCriteria );
-        
-        em.createQuery( criteriaDelete ).executeUpdate();
-        em.flush();
-        em.getTransaction().commit();
-        
-        return new ResponseEntity<String>( HttpStatus.OK );
-    }
+    
     
     public void setSchedulerManager(SchedulerManager schedulerManager) {
         this.schedulerManager = schedulerManager;
     }
 
-    public void setElasticSearch(ElasticsearchNodeFactoryBean esBean) {
-        this.elasticSearch = esBean;
-    }
 }

@@ -80,7 +80,7 @@ public class ListInstancesControllerTest {
 
         ListInstancesController lic = new ListInstancesController();
         lic.setSchedulerManager( manager );
-        lic.setElasticSearch( esBean );
+        // lic.setElasticSearch( esBean );
         lic.addInstance( new ModelMap(), "test", null );
 
         assertTrue( "Instance path was not created", Files.exists( Paths.get( "test-instances", "test" ) ) );
