@@ -48,7 +48,7 @@ import javax.persistence.criteria.Root;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.elasticsearch.indices.TypeMissingException;
+import org.elasticsearch.client.Client;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -336,10 +336,9 @@ public class RestDataController extends InstanceController {
         }
 
         // remove instance (type) from index
-        try {
-            ElasticSearchUtils.deleteType( name, elasticSearch.getObject().client() );
-        } catch (TypeMissingException ex) {
-            LOG.warn( "type could not be deleted: " + name );
+        Client client = elasticSearch.getObject().client();
+        if (ElasticSearchUtils.typeExists( name, client )) {
+            ElasticSearchUtils.deleteType( name, client );
         }
         
         // remove url from database belonging to this instance

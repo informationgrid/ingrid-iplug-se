@@ -48,6 +48,8 @@ import de.ingrid.utils.metadata.IPlugOperatorFinder;
 public class IPlugSeOperatorFinder implements IPlugOperatorFinder {
 
     private static final Log LOG = LogFactory.getLog(IPlugSeOperatorFinder.class);
+    
+    boolean missingIndexExceptionAlreadyThrown = false;
 
     @Autowired
     private ElasticsearchNodeFactoryBean elasticSearch;
@@ -63,6 +65,7 @@ public class IPlugSeOperatorFinder implements IPlugOperatorFinder {
         for (Bucket b : buckets) {
             valueSet.add(b.getKey());
         }
+        this.missingIndexExceptionAlreadyThrown = false;
         return valueSet;
     }
 
@@ -71,7 +74,10 @@ public class IPlugSeOperatorFinder implements IPlugOperatorFinder {
         try {
             return findIndexValues("partner");
         } catch (IndexMissingException e) {
-            LOG.warn( "Index does not exist." );
+            if (!this.missingIndexExceptionAlreadyThrown) {
+                this.missingIndexExceptionAlreadyThrown = true;
+                LOG.warn( "Index does not exist." );
+            }
             return new HashSet<String>();
         } catch (Exception e) {
             LOG.error("Error obtaining partners from index.", e);
@@ -84,7 +90,10 @@ public class IPlugSeOperatorFinder implements IPlugOperatorFinder {
         try {
             return findIndexValues("provider");
         } catch (IndexMissingException e) {
-            LOG.warn( "Index does not exist." );
+            if (!this.missingIndexExceptionAlreadyThrown) {
+                this.missingIndexExceptionAlreadyThrown = true;
+                LOG.warn( "Index does not exist." );
+            }
             return new HashSet<String>();
         } catch (Exception e) {
             LOG.error("Error obtaining providers from index.", e);
