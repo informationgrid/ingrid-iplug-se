@@ -2,7 +2,7 @@
   **************************************************-
   ingrid-iplug-se-iplug
   ==================================================
-  Copyright (C) 2014 - 2016 wemove digital solutions GmbH
+  Copyright (C) 2014 - 2017 wemove digital solutions GmbH
   ==================================================
   Licensed under the EUPL, Version 1.1 or – as soon they will be
   approved by the European Commission - subsequent versions of the
@@ -77,12 +77,11 @@
                     var action = dialogConfirm.data("action");
                     $.ajax({
                         type: 'DELETE',
-                        url: "listInstances",
+                        url: "../rest/instance/" + action.id,
                         success: function() {
-                            location.reload();
+                            window.location = window.location.href
                         },
-                        data: action.id,
-                        contentType: 'application/json'
+                        contentType: 'text/plain'
                     });
                     $( this ).dialog( "close" );
                 }

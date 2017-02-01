@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
- * Copyright (C) 2014 - 2016 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2017 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -80,7 +80,7 @@ public class ListInstancesControllerTest {
 
         ListInstancesController lic = new ListInstancesController();
         lic.setSchedulerManager( manager );
-        lic.setElasticSearch( esBean );
+        // lic.setElasticSearch( esBean );
         lic.addInstance( new ModelMap(), "test", null );
 
         assertTrue( "Instance path was not created", Files.exists( Paths.get( "test-instances", "test" ) ) );
