@@ -70,7 +70,7 @@ public class NutchControllerTest {
     }
     
     @Test
-    public void test() throws InterruptedException, IOException, JsonSyntaxException, JsonIOException, SAXException, ParserConfigurationException, TransformerException {
+    public void test() throws Exception {
 
         Configuration configuration = new Configuration();
         configuration.setInstancesDir("test-instances");
@@ -130,7 +130,7 @@ public class NutchControllerTest {
     }
 
     @Test
-    public void testForceStop() throws InterruptedException, IOException, JsonSyntaxException, JsonIOException, SAXException, ParserConfigurationException, TransformerException {
+    public void testForceStop() throws Exception {
 
         FileUtils.removeRecursive(Paths.get("test-instances"));
 

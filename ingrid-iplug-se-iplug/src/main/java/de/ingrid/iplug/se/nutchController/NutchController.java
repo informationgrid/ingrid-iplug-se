@@ -22,6 +22,7 @@
  */
 package de.ingrid.iplug.se.nutchController;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -73,11 +74,22 @@ public class NutchController {
      * Stops a process for the specified instance.
      * 
      * @param instance
+     * @throws Exception 
      */
-    public synchronized void stop(Instance instance) {
+    public synchronized void stop(Instance instance) throws Exception {
         NutchProcess command = instances.get(instance.getName());
         if (command != null && command.getStatus() == NutchProcess.STATUS.RUNNING) {
             command.stopExecution();
+        } else if (command == null) { 
+            // in case no command is executed at the moment
+            // see "REDMINE-569" (Cannot delete failed crawl on startup.)
+            StatusProvider sp = new StatusProvider(instance.getWorkingDirectory());
+            IngridCrawlNutchProcessCleaner ingridCrawlNutchProcessCleaner = new IngridCrawlNutchProcessCleaner(sp);
+            // cleanup crawl
+            ingridCrawlNutchProcessCleaner.cleanup(new File(instance.getWorkingDirectory()).toPath());
+            // clear previously set states
+            sp.clear();
+            sp.write();
         }
     }
 
