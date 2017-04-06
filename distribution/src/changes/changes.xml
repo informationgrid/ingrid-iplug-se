@@ -29,7 +29,16 @@
   </properties>
   <body>
 
-    <release version="4.0.1" date="2016-02-01" description="Release 4.0.1">
+    <release version="4.0.2" date="2017-04-06" description="Release 4.0.2">
+      <action type="fix" dev="wemove" issue="REDMINE-569">
+        Cannot delete failed crawl on startup.
+      </action>
+      <action type="fix" dev="wemove" issue="REDMINE-616">
+        Fixed handling of multiple values inside an index field on detail request.
+      </action>
+    </release>
+
+    <release version="4.0.1" date="2017-02-01" description="Release 4.0.1">
       <action type="fix" dev="wemove" issue="REDMINE-465">
         Fixed wrong path to save data when using cygwin.
       </action>
