@@ -46,6 +46,14 @@
         "url": {
             "type": "string",
             "index" : "not_analyzed"
+        },
+        "partner": {
+            "type": "string",
+            "index" : "not_analyzed"
+        },
+        "provider": {
+            "type": "string",
+            "index" : "not_analyzed"
         }
     }
 }
