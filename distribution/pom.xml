@@ -83,6 +83,22 @@
 
   <profiles>
     <profile>
+      <id>docker</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.spotify</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <configuration>
+              <skipDocker>false</skipDocker>
+              <dockerDirectory>distribution/src/docker</dockerDirectory>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
       <id>release</id>
       <build>
         <plugins>
