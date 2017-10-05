@@ -64,12 +64,12 @@
     <dependency>
       <groupId>de.ingrid</groupId>
       <artifactId>ingrid-base-webapp</artifactId>
-      <version>4.0.2</version>
+      <version>4.1.0</version>
     </dependency>
     <dependency>
       <groupId>de.ingrid</groupId>
       <artifactId>ingrid-base-webapp</artifactId>
-      <version>4.0.2</version>
+      <version>4.1.0</version>
       <classifier>res</classifier>
       <type>zip</type>
     </dependency>
