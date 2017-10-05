@@ -189,15 +189,22 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>license-maven-plugin</artifactId>
-            <configuration>
-              <failOnMissingHeader>true</failOnMissingHeader>
-              <failOnNotUptodateHeader>true</failOnNotUptodateHeader>
-            </configuration>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-changes-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>changes-report</id>
+                <phase>null</phase>
+              </execution>
+              <execution>
+                <id>changes-announcement-mail</id>
+                <phase>null</phase>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>
     </profile>
+
   </profiles>
 </project>
