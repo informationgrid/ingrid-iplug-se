@@ -7,7 +7,8 @@
             "type": "float"
         },
         "content": {
-            "analyzer": "german",
+            "index_analyzer": "decomp",
+            "search_analyzer": "no_decomp",
             "type": "string"
         },
         "contentLength": {
@@ -33,7 +34,8 @@
             "type": "string"
         },
         "title": {
-            "analyzer": "german",
+            "index_analyzer": "decomp",
+            "search_analyzer": "no_decomp",
             "type": "string",
             "boost": 1.1
         },

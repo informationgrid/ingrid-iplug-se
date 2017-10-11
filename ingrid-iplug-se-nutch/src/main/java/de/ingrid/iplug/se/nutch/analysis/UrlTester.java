@@ -100,7 +100,7 @@ public class UrlTester implements Tool {
         ProtocolFactory factory = new ProtocolFactory(conf);
         Protocol protocol = factory.getProtocol(url);
         Text turl = new Text(url);
-        BaseRobotRules rules = protocol.getRobotRules(turl, cd);
+        BaseRobotRules rules = protocol.getRobotRules(turl, cd, null);
         long maxCrawlDelay = conf.getInt("fetcher.max.crawl.delay", 30) * 1000;
         if (!rules.isAllowed(turl.toString())) {
             System.out.println("Denied by robots.txt.");

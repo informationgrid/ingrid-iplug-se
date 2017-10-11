@@ -43,8 +43,9 @@
     </fileset>
   </path>
 
-  <!-- the unit test classpath -->
   <dirname property="plugins.classpath.dir" file="${build.plugins}"/>
+
+  <!-- the unit test classpath -->
   <path id="test.classpath">
     <pathelement location="${test.build.classes}" />
     <pathelement location="${conf.dir}"/>
@@ -53,6 +54,9 @@
     <path refid="classpath"/>
     <pathelement location="${build.dir}/${final.name}.job" />
     <fileset dir="${build.lib.dir}">
+      <include name="*.jar" />
+    </fileset>
+    <fileset dir="${test.build.lib.dir}">
       <include name="*.jar" />
     </fileset>
   </path>
@@ -71,6 +75,7 @@
 
     <mkdir dir="${test.build.dir}"/>
     <mkdir dir="${test.build.classes}"/>
+    <mkdir dir="${test.build.lib.dir}"/>
 
     <touch datetime="01/25/1971 2:00 pm">
       <fileset dir="${conf.dir}" includes="**/*.template"/>
@@ -101,6 +106,11 @@
       <compilerarg value="-Xlint:-path"/>
       <classpath refid="classpath"/>
     </javac>    
+    <copy todir="${build.classes}">
+      <fileset dir="${src.dir}" includes="**/*.html" />
+      <fileset dir="${src.dir}" includes="**/*.css" />
+      <fileset dir="${src.dir}" includes="**/*.properties" />
+    </copy>    
   </target>
 
   <target name="compile-plugins" depends="init, resolve-default" description="--> compile plugins only">
@@ -138,6 +148,17 @@
 	<!-- build the main artifact -->
 	<jar jarfile="${maven-jar}" basedir="${build.classes}" />
   	
+    <fail message="Unsupported Java version: ${java.version}. Javadoc requires Java version 7u25 or greater. See https://issues.apache.org/jira/browse/NUTCH-1590">
+      <condition>
+          <or>
+        	<matches string="${java.version}" pattern="1.7.0_2[01234].+" casesensitive="false" /> 
+			<matches string="${java.version}" pattern="1.7.0_1.+" casesensitive="false" /> 
+            <equals arg1="${ant.java.version}" arg2="1.6" />
+			<equals arg1="${ant.java.version}" arg2="1.5" /> 
+          </or>
+      </condition>
+    </fail>
+
 	<!-- build the javadoc artifact -->
     <javadoc
       destdir="${release.dir}/javadoc"
@@ -160,10 +181,22 @@
       <packageset dir="${plugins.dir}/index-basic/src/java"/>
       <packageset dir="${plugins.dir}/index-metadata/src/java"/>
       <packageset dir="${plugins.dir}/index-more/src/java"/>
+      <packageset dir="${plugins.dir}/index-geoip/src/java"/>
+      <packageset dir="${plugins.dir}/index-replace/src/java"/>
       <packageset dir="${plugins.dir}/index-static/src/java"/>
+      <packageset dir="${plugins.dir}/index-links/src/java"/>
+      <packageset dir="${plugins.dir}/mimetype-filter/src/java"/>
+      <packageset dir="${plugins.dir}/indexer-dummy/src/java"/>
+<!-- 
+      Commented to be able to support old elasticsearch version 1.x.x
+      
+      <packageset dir="${plugins.dir}/indexer-elastic/src/java/" /> 
+-->
       <packageset dir="${plugins.dir}/indexer-solr/src/java"/>
       <packageset dir="${plugins.dir}/language-identifier/src/java"/>
+      <packageset dir="${plugins.dir}/lib-htmlunit/src/java"/>
       <packageset dir="${plugins.dir}/lib-http/src/java"/>
+<!--      <packageset dir="${plugins.dir}/lib-selenium/src/java"/> -->
       <packageset dir="${plugins.dir}/lib-regex-filter/src/java"/>
       <packageset dir="${plugins.dir}/microformats-reltag/src/java"/>
       <packageset dir="${plugins.dir}/parse-ext/src/java"/>
@@ -173,11 +206,19 @@
       <packageset dir="${plugins.dir}/parse-swf/src/java"/>
       <packageset dir="${plugins.dir}/parse-tika/src/java"/>
       <packageset dir="${plugins.dir}/parse-zip/src/java"/>
-      <packageset dir="${plugins.dir}/lib-http/src/java"/>
+      <packageset dir="${plugins.dir}/parsefilter-regex/src/java"/>
       <packageset dir="${plugins.dir}/protocol-file/src/java"/>
       <packageset dir="${plugins.dir}/protocol-ftp/src/java"/>
+<!--      <packageset dir="${plugins.dir}/protocol-htmlunit/src/java"/> -->
       <packageset dir="${plugins.dir}/protocol-http/src/java"/>
       <packageset dir="${plugins.dir}/protocol-httpclient/src/java"/>
+<!--      <packageset dir="${plugins.dir}/protocol-interactiveselenium/src/java"/> -->
+<!--      <packageset dir="${plugins.dir}/protocol-selenium/src/java"/> -->
+      <packageset dir="${plugins.dir}/publish-rabbitmq/src/java"/>
+      <packageset dir="${plugins.dir}/scoring-depth/src/java"/>
+    	<!-- Commented out to support older elasticsearch version and therefore older lucene version
+      <packageset dir="${plugins.dir}/scoring-similarity/src/java"/>
+      -->
       <packageset dir="${plugins.dir}/scoring-link/src/java"/>
       <packageset dir="${plugins.dir}/scoring-opic/src/java"/>
       <packageset dir="${plugins.dir}/subcollection/src/java"/>
@@ -187,17 +228,24 @@
       <packageset dir="${plugins.dir}/urlfilter-domainblacklist/src/java"/>
       <packageset dir="${plugins.dir}/urlfilter-prefix/src/java"/>
       <packageset dir="${plugins.dir}/urlfilter-regex/src/java"/>
-      <packageset dir="${plugins.dir}/urlfilter-prefix/src/java"/>
       <packageset dir="${plugins.dir}/urlfilter-suffix/src/java"/>
       <packageset dir="${plugins.dir}/urlfilter-validator/src/java"/>
+      <packageset dir="${plugins.dir}/urlfilter-ignoreexempt/src/java"/>
+      <packageset dir="${plugins.dir}/parsefilter-naivebayes/src/java"/>
       <packageset dir="${plugins.dir}/urlmeta/src/java"/>
       <packageset dir="${plugins.dir}/urlnormalizer-basic/src/java"/>
+      <packageset dir="${plugins.dir}/urlnormalizer-host/src/java"/>
       <packageset dir="${plugins.dir}/urlnormalizer-pass/src/java"/>
+      <packageset dir="${plugins.dir}/urlnormalizer-protocol/src/java"/>
+      <packageset dir="${plugins.dir}/urlnormalizer-querystring/src/java"/>
       <packageset dir="${plugins.dir}/urlnormalizer-regex/src/java"/>
+      <packageset dir="${plugins.dir}/urlnormalizer-slash/src/java"/>
       
       <link href="${javadoc.link.java}"/>
-      <link href="${javadoc.link.lucene}"/>
       <link href="${javadoc.link.hadoop}"/>
+      <link href="${javadoc.link.lucene.core}"/>
+      <link href="${javadoc.link.lucene.analyzers-common}"/>
+      <link href="${javadoc.link.solr-solrj}"/>
       
       <classpath refid="classpath"/>
     	<classpath>
@@ -210,8 +258,10 @@
       <group title="Plugins API" packages="${plugins.api}"/>
       <group title="Protocol Plugins" packages="${plugins.protocol}"/>
       <group title="URL Filter Plugins" packages="${plugins.urlfilter}"/>
+      <group title="URL Normalizer Plugins" packages="${plugins.urlnormalizer}"/>
       <group title="Scoring Plugins" packages="${plugins.scoring}"/>
       <group title="Parse Plugins" packages="${plugins.parse}"/>
+      <group title="Parse Filter Plugins" packages="${plugins.parsefilter}"/>
       <group title="Indexing Filter Plugins" packages="${plugins.index}"/>
       <group title="Indexer Plugins" packages="${plugins.indexer}"/>
       <group title="Misc. Plugins" packages="${plugins.misc}"/>
@@ -287,7 +337,7 @@
                   excludes="nutch-default.xml,nutch-site.xml"/>
       <zipfileset dir="${conf.dir}" excludes="*.template,hadoop*.*"/>
       <zipfileset dir="${build.lib.dir}" prefix="lib"
-                  includes="**/*.jar" excludes="hadoop-*.jar"/>
+                  includes="**/*.jar" excludes="hadoop-*.jar,slf4j*.jar,log4j*.jar"/>
       <zipfileset dir="${build.plugins}" prefix="classes/plugins"/>
     </jar>
   </target>
@@ -354,8 +404,8 @@
   <!-- Run Nutch proxy                                                    --> 
   <!-- ================================================================== -->
 
-  <target name="proxy" depends="job, compile-core-test" description="--> run nutch proxy">
-    <java classname="org.apache.nutch.tools.proxy.TestbedProxy" fork="true">
+  <target name="proxy" depends="compile-core-test, job" description="--> run nutch proxy">
+    <java classname="org.apache.nutch.tools.proxy.ProxyTestbed" fork="true">
       <classpath refid="test.classpath"/>
       <arg value="-fake"/>
 <!--
@@ -388,7 +438,7 @@
   <!-- ================================================================== -->
   <target name="test" depends="test-core, test-plugins" description="--> run JUnit tests"/>
 
-  <target name="test-core" depends="job, compile-core-test" description="--> run core JUnit tests only">
+  <target name="test-core" depends="compile-core-test, job" description="--> run core JUnit tests only">
 
     <delete dir="${test.build.data}"/>
     <mkdir dir="${test.build.data}"/>
@@ -434,7 +484,7 @@
 
   </target>   
 
-  <target name="test-plugins" depends="compile" description="--> run plugin JUnit tests only">
+  <target name="test-plugins" depends="resolve-test, compile" description="--> run plugin JUnit tests only">
     <ant dir="src/plugin" target="test" inheritAll="false"/>
   </target>
 
@@ -446,15 +496,15 @@
   <!-- ================================================================== -->
 
   <!-- target: resolve  ================================================= -->
-  <target name="resolve-default" depends="clean-lib" description="--> resolve and retrieve dependencies with ivy">
+  <target name="resolve-default" depends="clean-default-lib" description="--> resolve and retrieve dependencies with ivy">
     <ivy:resolve file="${ivy.file}" conf="default" log="download-only"/>
     <ivy:retrieve pattern="${build.lib.dir}/[artifact]-[revision].[ext]" symlink="false" log="quiet"/>
     <antcall target="copy-libs"/>
   </target>
 
-  <target name="resolve-test" depends="clean-lib" description="--> resolve and retrieve dependencies with ivy">
+  <target name="resolve-test" depends="clean-test-lib, init" description="--> resolve and retrieve dependencies with ivy">
     <ivy:resolve file="${ivy.file}" conf="test" log="download-only"/>
-    <ivy:retrieve pattern="${build.lib.dir}/[artifact]-[revision].[ext]" symlink="false" log="quiet"/>
+    <ivy:retrieve pattern="${test.build.lib.dir}/[artifact]-[revision].[ext]" symlink="false" log="quiet"/>
     <antcall target="copy-libs"/>
   </target>
 
@@ -528,6 +578,16 @@
   <!-- Documentation                                                      -->
   <!-- ================================================================== -->
   <target name="javadoc" depends="compile" description="--> generate Javadoc">
+    <fail message="Unsupported Java version: ${java.version}. Javadoc requires Java version 7u25 or greater. See https://issues.apache.org/jira/browse/NUTCH-1590">
+      <condition>
+          <or>
+        	<matches string="${java.version}" pattern="1.7.0_2[01234].+" casesensitive="false" /> 
+			<matches string="${java.version}" pattern="1.7.0_1.+" casesensitive="false" /> 
+            <equals arg1="${ant.java.version}" arg2="1.6" />
+			<equals arg1="${ant.java.version}" arg2="1.5" /> 
+          </or>
+      </condition>
+    </fail>
     <mkdir dir="${build.javadoc}"/>
     <javadoc
       overview="${src.dir}/overview.html"
@@ -548,12 +608,23 @@
       <packageset dir="${plugins.dir}/headings/src/java"/>
       <packageset dir="${plugins.dir}/index-anchor/src/java"/>
       <packageset dir="${plugins.dir}/index-basic/src/java"/>
+      <packageset dir="${plugins.dir}/index-geoip/src/java"/>
       <packageset dir="${plugins.dir}/index-metadata/src/java"/>
       <packageset dir="${plugins.dir}/index-more/src/java"/>
+      <packageset dir="${plugins.dir}/index-replace/src/java"/>
       <packageset dir="${plugins.dir}/index-static/src/java"/>
+      <packageset dir="${plugins.dir}/index-links/src/java"/>
+      <packageset dir="${plugins.dir}/mimetype-filter/src/java"/>
+      <packageset dir="${plugins.dir}/indexer-dummy/src/java"/>
+<!-- 
+	  Commented to be able to support old elasticsearch version 1.x.x
+
+      <packageset dir="${plugins.dir}/indexer-elastic/src/java/" /> -->
       <packageset dir="${plugins.dir}/indexer-solr/src/java"/>
       <packageset dir="${plugins.dir}/language-identifier/src/java"/>
+<!--      <packageset dir="${plugins.dir}/lib-htmlunit/src/java"/> -->
       <packageset dir="${plugins.dir}/lib-http/src/java"/>
+<!--      <packageset dir="${plugins.dir}/lib-selenium/src/java"/> -->
       <packageset dir="${plugins.dir}/lib-regex-filter/src/java"/>
       <packageset dir="${plugins.dir}/microformats-reltag/src/java"/>
       <packageset dir="${plugins.dir}/parse-ext/src/java"/>
@@ -562,11 +633,19 @@
       <packageset dir="${plugins.dir}/parse-metatags/src/java"/>
       <packageset dir="${plugins.dir}/parse-swf/src/java"/>
       <packageset dir="${plugins.dir}/parse-tika/src/java"/>
+      <packageset dir="${plugins.dir}/parsefilter-regex/src/java"/>
       <packageset dir="${plugins.dir}/parse-zip/src/java"/>
       <packageset dir="${plugins.dir}/protocol-file/src/java"/>
       <packageset dir="${plugins.dir}/protocol-ftp/src/java"/>
+<!--      <packageset dir="${plugins.dir}/protocol-htmlunit/src/java"/> -->
       <packageset dir="${plugins.dir}/protocol-http/src/java"/>
       <packageset dir="${plugins.dir}/protocol-httpclient/src/java"/>
+<!--      <packageset dir="${plugins.dir}/protocol-selenium/src/java"/> -->
+      <packageset dir="${plugins.dir}/publish-rabbitmq/src/java"/>
+      <packageset dir="${plugins.dir}/scoring-depth/src/java"/>
+    	<!-- Commented out to support older elasticsearch version and therefore older lucene version
+      <packageset dir="${plugins.dir}/scoring-similarity/src/java"/>
+      -->
       <packageset dir="${plugins.dir}/scoring-link/src/java"/>
       <packageset dir="${plugins.dir}/scoring-opic/src/java"/>
       <packageset dir="${plugins.dir}/subcollection/src/java"/>
@@ -578,14 +657,22 @@
       <packageset dir="${plugins.dir}/urlfilter-regex/src/java"/>
       <packageset dir="${plugins.dir}/urlfilter-suffix/src/java"/>
       <packageset dir="${plugins.dir}/urlfilter-validator/src/java"/>
+      <packageset dir="${plugins.dir}/urlfilter-ignoreexempt/src/java"/>
+      <packageset dir="${plugins.dir}/parsefilter-naivebayes/src/java"/>
       <packageset dir="${plugins.dir}/urlmeta/src/java"/>
       <packageset dir="${plugins.dir}/urlnormalizer-basic/src/java"/>
+      <packageset dir="${plugins.dir}/urlnormalizer-host/src/java"/>
       <packageset dir="${plugins.dir}/urlnormalizer-pass/src/java"/>
+      <packageset dir="${plugins.dir}/urlnormalizer-protocol/src/java"/>
+      <packageset dir="${plugins.dir}/urlnormalizer-querystring/src/java"/>
       <packageset dir="${plugins.dir}/urlnormalizer-regex/src/java"/>
+      <packageset dir="${plugins.dir}/urlnormalizer-slash/src/java"/>
       
       <link href="${javadoc.link.java}"/>
-      <link href="${javadoc.link.lucene}"/>
       <link href="${javadoc.link.hadoop}"/>
+      <link href="${javadoc.link.lucene.core}"/>
+      <link href="${javadoc.link.lucene.analyzers-common}"/>
+      <link href="${javadoc.link.solr-solrj}"/>
       
       <classpath refid="classpath"/>
     	<classpath>
@@ -598,8 +685,10 @@
       <group title="Plugins API" packages="${plugins.api}"/>
       <group title="Protocol Plugins" packages="${plugins.protocol}"/>
       <group title="URL Filter Plugins" packages="${plugins.urlfilter}"/>
+      <group title="URL Normalizer Plugins" packages="${plugins.urlnormalizer}"/>
       <group title="Scoring Plugins" packages="${plugins.scoring}"/>
       <group title="Parse Plugins" packages="${plugins.parse}"/>
+      <group title="Parse Filter Plugins" packages="${plugins.parsefilter}"/>
       <group title="Indexing Filter Plugins" packages="${plugins.index}"/>
       <group title="Indexer Plugins" packages="${plugins.indexer}"/>
       <group title="Misc. Plugins" packages="${plugins.misc}"/>
@@ -772,6 +861,9 @@
   <!-- target: clean  =================================================== -->
   <target name="clean" depends="clean-build, clean-lib, clean-dist, clean-runtime" description="--> clean the project" />
 
+  <!-- target: clean-eclipse ============================================ -->
+  <target name="clean-eclipse" depends="clean-build, clean-lib, clean-dist" description="--> cleans the eclipse project"/> 
+
   <!-- target: clean-local  ============================================= -->
   <target name="clean-local" depends="" 
                 description="--> cleans the local repository for the current module">
@@ -779,8 +871,16 @@
   </target>
 
   <!-- target: clean-lib  =============================================== -->
-  <target name="clean-lib" description="--> clean the project libraries directory (dependencies)">
+  <target name="clean-lib" depends="clean-default-lib, clean-test-lib"
+          description="--> clean the project libraries directories (dependencies: default + test)">
+  </target>
+  <!-- target: clean-default-lib  =============================================== -->
+  <target name="clean-default-lib" description="--> clean the project libraries directory (dependencies)">
     <delete includeemptydirs="true" dir="${build.lib.dir}"/>
+  </target>
+  <!-- target: clean-test-lib  =============================================== -->
+  <target name="clean-test-lib" description="--> clean the project test libraries directory (dependencies)">
+    <delete includeemptydirs="true" dir="${test.build.lib.dir}"/>
   </target>
 
   <!-- target: clean-build  ============================================= -->
@@ -861,10 +961,16 @@
       <include name="*.jar" />
       <exclude name="ant-eclipse-1.0-jvm1.2.jar" />
     </fileset>
+    <fileset dir="${build.plugins}">
+      <include name="**/*.jar" />
+    </fileset>
+    <fileset dir="${test.build.lib.dir}">
+      <include name="*.jar" />
+    </fileset>
   </path>
   
   <!-- target: ant-eclipse-download   =================================== -->
-  <target name="ant-eclipse-download" description="Downloads the ant-eclipse binary.">
+  <target name="ant-eclipse-download" description="--> downloads the ant-eclipse binary.">
     <get src="http://downloads.sourceforge.net/project/ant-eclipse/ant-eclipse/1.0/ant-eclipse-1.0.bin.tar.bz2"
          dest="${build.dir}/ant-eclipse-1.0.bin.tar.bz2" usetimestamp="false" />
 
@@ -880,8 +986,8 @@
   
   <!-- target: eclipse   ================================================ -->
   <target name="eclipse" 
-          depends="clean,init,job,ant-eclipse-download"
-          description="Create eclipse project files">
+          depends="clean-eclipse,init,resolve-test,job,ant-eclipse-download"
+          description="--> create eclipse project files">
 
 	     <pathconvert property="eclipse.project">
 	       <path path="${basedir}"/>
@@ -897,95 +1003,114 @@
         <library path="${conf.dir}" exported="false" />
         <library path="${basedir}/src/bin" exported="false" />
         <library pathref="eclipse.classpath" exported="false" />
-        <library path="${basedir}/build/plugins/urlfilter-automaton/automaton-1.11-8.jar" 
-                 exported="false" />
-        <library path="${basedir}/src/plugin/parse-swf/lib/javaswf.jar" 
-                 exported="false" />
-        <library path="${basedir}/build/plugins/feed/jdom-1.1.jar" 
-                 exported="false" />
-        <library path="${basedir}/build/plugins/feed/rome-0.9.jar" 
-                 exported="false" />
-        <library path="${basedir}/build/plugins/lib-nekohtml/nekohtml-1.9.19.jar" 
-                 exported="false" />
-        <library path="${basedir}/build/plugins/parse-html/tagsoup-1.2.1.jar" 
-                 exported="false" />
-        <library path="${basedir}/build/plugins/indexer-solr/solr-solrj-3.4.0.jar" 
-                 exported="false" />
 
         <source path="${basedir}/src/java/" />
-        <source path="${basedir}/src/test/" />
-        <source path="${basedir}/src/plugin/creativecommons/src/java/" />
-        <source path="${basedir}/src/plugin/creativecommons/src/test/" />
-        <source path="${basedir}/src/plugin/feed/src/java/" />
-        <source path="${basedir}/src/plugin/feed/src/test/" />
-        <source path="${basedir}/src/plugin/headings/src/java/" />
-        <source path="${basedir}/src/plugin/index-anchor/src/java/" />
-        <source path="${basedir}/src/plugin/index-anchor/src/test/" />
-        <source path="${basedir}/src/plugin/index-basic/src/java/" />
-        <source path="${basedir}/src/plugin/index-basic/src/test/" />
-        <source path="${basedir}/src/plugin/indexer-solr/src/java/" />
-        <source path="${basedir}/src/plugin/index-metadata/src/java/" />
-        <source path="${basedir}/src/plugin/index-more/src/java/" />
-        <source path="${basedir}/src/plugin/index-more/src/test/" />
-        <source path="${basedir}/src/plugin/index-static/src/java/" />
-        <source path="${basedir}/src/plugin/index-static/src/test/" />
-        <source path="${basedir}/src/plugin/language-identifier/src/java/" />
-        <source path="${basedir}/src/plugin/language-identifier/src/test/" />
-        <source path="${basedir}/src/plugin/lib-http/src/java/" />
-        <source path="${basedir}/src/plugin/lib-http/src/test/" />
-        <source path="${basedir}/src/plugin/lib-regex-filter/src/java/" />
-        <source path="${basedir}/src/plugin/lib-regex-filter/src/test/" />
-        <source path="${basedir}/src/plugin/microformats-reltag/src/java/" />
-        <source path="${basedir}/src/plugin/parse-ext/src/java/" />
-        <source path="${basedir}/src/plugin/parse-ext/src/test/" />
-        <source path="${basedir}/src/plugin/parse-html/src/java/" />
-        <source path="${basedir}/src/plugin/parse-html/src/test/" />
-        <source path="${basedir}/src/plugin/parse-js/src/java/" />
-        <source path="${basedir}/src/plugin/parse-metatags/src/java/" />
-        <source path="${basedir}/src/plugin/parse-metatags/src/test/" />
-        <source path="${basedir}/src/plugin/parse-swf/src/java/" />
-        <source path="${basedir}/src/plugin/parse-swf/src/test/" />
-        <source path="${basedir}/src/plugin/parse-tika/src/java/" />
-        <source path="${basedir}/src/plugin/parse-tika/src/test/" />
-        <source path="${basedir}/src/plugin/parse-zip/src/java/" />
-        <source path="${basedir}/src/plugin/parse-zip/src/test/" />
-        <source path="${basedir}/src/plugin/protocol-file/src/java/" />
-        <source path="${basedir}/src/plugin/protocol-file/src/test/" />
-        <source path="${basedir}/src/plugin/protocol-ftp/src/java/" />
-        <source path="${basedir}/src/plugin/protocol-httpclient/src/java/" />
-        <source path="${basedir}/src/plugin/protocol-httpclient/src/test/" />
-        <source path="${basedir}/src/plugin/protocol-http/src/java/" />
-        <source path="${basedir}/src/plugin/protocol-http/src/test/" />
-        <source path="${basedir}/src/plugin/scoring-depth/src/java/" />
-        <source path="${basedir}/src/plugin/scoring-link/src/java/" />
-        <source path="${basedir}/src/plugin/scoring-opic/src/java/" />
-        <source path="${basedir}/src/plugin/subcollection/src/java/" />
-        <source path="${basedir}/src/plugin/subcollection/src/test/" />
-        <source path="${basedir}/src/plugin/tld/src/java/" />
-        <source path="${basedir}/src/plugin/urlfilter-automaton/src/java/" />
-        <source path="${basedir}/src/plugin/urlfilter-automaton/src/test/" />
-        <source path="${basedir}/src/plugin/urlfilter-domainblacklist/src/java/" />
-        <source path="${basedir}/src/plugin/urlfilter-domainblacklist/src/test/" />
-        <source path="${basedir}/src/plugin/urlfilter-domain/src/java/" />
-        <source path="${basedir}/src/plugin/urlfilter-domain/src/test/" />
-        <source path="${basedir}/src/plugin/urlfilter-prefix/src/java/" />
-        <source path="${basedir}/src/plugin/urlfilter-regex/src/java/" />
-        <source path="${basedir}/src/plugin/urlfilter-regex/src/test/" />
-        <source path="${basedir}/src/plugin/urlfilter-suffix/src/java/" />
-        <source path="${basedir}/src/plugin/urlfilter-suffix/src/test/" />
-        <source path="${basedir}/src/plugin/urlfilter-validator/src/java/" />
-        <source path="${basedir}/src/plugin/urlfilter-validator/src/test/" />
-        <source path="${basedir}/src/plugin/urlmeta/src/java/" />
-        <source path="${basedir}/src/plugin/urlnormalizer-basic/src/java/" />
-        <source path="${basedir}/src/plugin/urlnormalizer-basic/src/test/" />
-        <source path="${basedir}/src/plugin/urlnormalizer-host/src/java/" />
-        <source path="${basedir}/src/plugin/urlnormalizer-host/src/test/" />
-        <source path="${basedir}/src/plugin/urlnormalizer-pass/src/java/" />
-        <source path="${basedir}/src/plugin/urlnormalizer-pass/src/test/" />
-        <source path="${basedir}/src/plugin/urlnormalizer-regex/src/java/" />
-        <source path="${basedir}/src/plugin/urlnormalizer-regex/src/test/" />
+        <source path="${basedir}/src/test/" output="build/test/classes" />
 
-        <output path="${basedir}/build/classes" />
+        <source path="${plugins.dir}/creativecommons/src/java/" />
+        <source path="${plugins.dir}/creativecommons/src/test/" />
+        <source path="${plugins.dir}/feed/src/java/" />
+        <source path="${plugins.dir}/feed/src/test/" />
+        <source path="${plugins.dir}/headings/src/java/" />
+        <source path="${plugins.dir}/index-anchor/src/java/" />
+        <source path="${plugins.dir}/index-anchor/src/test/" />
+        <source path="${plugins.dir}/index-basic/src/java/" />
+        <source path="${plugins.dir}/index-basic/src/test/" />
+        <source path="${plugins.dir}/index-geoip/src/java/" />
+        <source path="${plugins.dir}/index-links/src/java/" />
+        <source path="${plugins.dir}/index-links/src/test/" />
+        <source path="${plugins.dir}/mimetype-filter/src/java/" />
+        <source path="${plugins.dir}/mimetype-filter/src/test/" />
+        <source path="${plugins.dir}/indexer-dummy/src/java/" />
+        <source path="${plugins.dir}/indexer-solr/src/java/" />
+<!-- 
+        Commented to be able to support old elasticsearch version 1.x.x
+
+      	<source path="${plugins.dir}/indexer-elastic/src/java/" />
+        <source path="${plugins.dir}/indexer-elastic/src/test/" /> -->
+        <source path="${plugins.dir}/index-metadata/src/java/" />
+        <source path="${plugins.dir}/index-more/src/java/" />
+        <source path="${plugins.dir}/index-more/src/test/" />
+        <source path="${plugins.dir}/index-replace/src/java/" />
+        <source path="${plugins.dir}/index-replace/src/test/" />
+        <source path="${plugins.dir}/index-static/src/java/" />
+        <source path="${plugins.dir}/index-static/src/test/" />
+        <source path="${plugins.dir}/language-identifier/src/java/" />
+        <source path="${plugins.dir}/language-identifier/src/test/" />
+<!--        <source path="${plugins.dir}/lib-htmlunit/src/java/" /> -->
+        <source path="${plugins.dir}/lib-http/src/java/" />
+        <source path="${plugins.dir}/lib-http/src/test/" />
+<!--        <source path="${plugins.dir}/lib-selenium/src/java/" /> -->
+        <source path="${plugins.dir}/lib-regex-filter/src/java/" />
+        <source path="${plugins.dir}/lib-regex-filter/src/test/" />
+        <source path="${plugins.dir}/microformats-reltag/src/java/" />
+        <source path="${plugins.dir}/parse-ext/src/java/" />
+        <source path="${plugins.dir}/parse-ext/src/test/" />
+        <source path="${plugins.dir}/parse-html/src/java/" />
+        <source path="${plugins.dir}/parse-html/src/test/" />
+        <source path="${plugins.dir}/parse-js/src/java/" />
+        <source path="${plugins.dir}/parse-metatags/src/java/" />
+        <source path="${plugins.dir}/parse-metatags/src/test/" />
+        <source path="${plugins.dir}/parse-swf/src/java/" />
+        <source path="${plugins.dir}/parse-swf/src/test/" />
+        <source path="${plugins.dir}/parse-tika/src/java/" />
+        <source path="${plugins.dir}/parse-tika/src/test/" />
+        <source path="${plugins.dir}/parse-zip/src/java/" />
+        <source path="${plugins.dir}/parse-zip/src/test/" />
+        <source path="${plugins.dir}/parsefilter-regex/src/java/" />
+        <source path="${plugins.dir}/parsefilter-regex/src/test/" />    
+        <source path="${plugins.dir}/protocol-file/src/java/" />
+        <source path="${plugins.dir}/protocol-file/src/test/" />
+        <source path="${plugins.dir}/protocol-ftp/src/java/" />
+<!--        <source path="${plugins.dir}/protocol-htmlunit/src/java"/> -->
+        <source path="${plugins.dir}/protocol-httpclient/src/java/" />
+        <source path="${plugins.dir}/protocol-httpclient/src/test/" />
+        <source path="${plugins.dir}/protocol-http/src/java/" />
+        <source path="${plugins.dir}/protocol-http/src/test/" />
+<!--        <source path="${plugins.dir}/protocol-selenium/src/java"/> -->
+        <source path="${plugins.dir}/publish-rabbitmq/src/java"/>
+        <source path="${plugins.dir}/scoring-depth/src/java/" />
+      	<!-- Commented out to support older elasticsearch version and therefore older lucene version
+        <source path="${plugins.dir}/scoring-similarity/src/java/" />
+        -->
+        <source path="${plugins.dir}/scoring-link/src/java/" />
+        <source path="${plugins.dir}/scoring-opic/src/java/" />
+        <source path="${plugins.dir}/subcollection/src/java/" />
+        <source path="${plugins.dir}/subcollection/src/test/" />
+        <source path="${plugins.dir}/tld/src/java/" />
+        <source path="${plugins.dir}/urlfilter-automaton/src/java/" />
+        <source path="${plugins.dir}/urlfilter-automaton/src/test/" />
+        <source path="${plugins.dir}/urlfilter-domainblacklist/src/java/" />
+        <source path="${plugins.dir}/urlfilter-domainblacklist/src/test/" />
+        <source path="${plugins.dir}/urlfilter-domain/src/java/" />
+        <source path="${plugins.dir}/urlfilter-domain/src/test/" />
+        <source path="${plugins.dir}/urlfilter-prefix/src/java/" />
+        <source path="${plugins.dir}/urlfilter-regex/src/java/" />
+        <source path="${plugins.dir}/urlfilter-regex/src/test/" />
+        <source path="${plugins.dir}/urlfilter-suffix/src/java/" />
+        <source path="${plugins.dir}/urlfilter-suffix/src/test/" />
+        <source path="${plugins.dir}/urlfilter-validator/src/java/" />
+        <source path="${plugins.dir}/urlfilter-validator/src/test/" />
+        <source path="${plugins.dir}/urlfilter-ignoreexempt/src/java/" />
+        <source path="${plugins.dir}/urlfilter-ignoreexempt/src/test/" />
+        <source path="${plugins.dir}/parsefilter-naivebayes/src/java/" />
+        <source path="${plugins.dir}/urlmeta/src/java/" />
+        <source path="${plugins.dir}/urlnormalizer-basic/src/java/" />
+        <source path="${plugins.dir}/urlnormalizer-basic/src/test/" />
+        <source path="${plugins.dir}/urlnormalizer-host/src/java/" />
+        <source path="${plugins.dir}/urlnormalizer-host/src/test/" />
+        <source path="${plugins.dir}/urlnormalizer-pass/src/java/" />
+        <source path="${plugins.dir}/urlnormalizer-pass/src/test/" />
+        <source path="${plugins.dir}/urlnormalizer-protocol/src/java/" />
+        <source path="${plugins.dir}/urlnormalizer-protocol/src/test/" />
+        <source path="${plugins.dir}/urlnormalizer-querystring/src/java/" />
+        <source path="${plugins.dir}/urlnormalizer-querystring/src/test/" />
+        <source path="${plugins.dir}/urlnormalizer-regex/src/java/" />
+        <source path="${plugins.dir}/urlnormalizer-regex/src/test/" />
+        <source path="${plugins.dir}/urlnormalizer-slash/src/java/" />
+        <source path="${plugins.dir}/urlnormalizer-slash/src/test/" />
+
+        <output path="${build.classes}" />
       </classpath>
     </eclipse>
   </target>

@@ -386,7 +386,7 @@ public class IndexerTests {
 
     private List<String> setUpBaseCall() {
 
-        String[] classPath = new String[] { "src/test/resources/conf", "build/apache-nutch-1.9/runtime/local", "build/apache-nutch-1.9/runtime/local/lib/*" };
+        String[] classPath = new String[] { "src/test/resources/conf", "build/apache-nutch-1.13/runtime/local", "build/apache-nutch-1.13/runtime/local/lib/*" };
 
         String cp = StringUtils.join(classPath, File.pathSeparator);
 

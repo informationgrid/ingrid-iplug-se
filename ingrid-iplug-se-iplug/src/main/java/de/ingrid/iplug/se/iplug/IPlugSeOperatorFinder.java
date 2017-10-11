@@ -63,7 +63,7 @@ public class IPlugSeOperatorFinder implements IPlugOperatorFinder {
         Collection<Bucket> buckets = terms.getBuckets();
         Set<String> valueSet = new HashSet<String>();
         for (Bucket b : buckets) {
-            valueSet.add(b.getKey());
+            valueSet.add((String)b.getKey());
         }
         this.missingIndexExceptionAlreadyThrown = false;
         return valueSet;
