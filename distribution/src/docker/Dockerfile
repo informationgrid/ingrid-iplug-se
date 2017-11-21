@@ -10,7 +10,7 @@ RUN unzip ingrid-iplug-se*-installer.jar -d /tmp \
     && rm -Rf /tmp/* \
     && rm ingrid-*.jar
 
-RUN touch /opt/ingrid/ingrid-iplug-se/conf/config.override.properties
+RUN echo jetty.port=80 > /opt/ingrid/ingrid-iplug-se/conf/config.override.properties
 WORKDIR /opt/ingrid/ingrid-iplug-se
 EXPOSE 80
 
