@@ -213,7 +213,7 @@ public class SEIPlug extends HeartBeatPlug {
         // set the directory of the database to the configured one
         Map<String, String> properties = new HashMap<String, String>();
         Path dbDir = Paths.get(conf.databaseDir);
-        properties.put("javax.persistence.jdbc.url", "jdbc:h2:" + dbDir.toFile().getAbsolutePath() + "/urls;MVCC=true");
+        properties.put("javax.persistence.jdbc.url", "jdbc:h2:" + dbDir.toFile().getAbsolutePath() + "/urls;MVCC=true;AUTO_SERVER=TRUE");
 
         // get an entity manager instance (initializes properties in the
         // DBManager)
