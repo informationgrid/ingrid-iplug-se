@@ -1,4 +1,4 @@
-FROM ingrid-java
+FROM docker-registry.wemove.com/ingrid-java
 ENV INGRID_USER=root
 ENV RUN_DIRECTLY=true
 
@@ -10,6 +10,7 @@ RUN unzip ingrid-iplug-se*-installer.jar -d /tmp \
     && rm -Rf /tmp/* \
     && rm ingrid-*.jar
 
+RUN echo jetty.port=80 > /opt/ingrid/ingrid-iplug-se/conf/config.override.properties
 WORKDIR /opt/ingrid/ingrid-iplug-se
 EXPOSE 80
 
