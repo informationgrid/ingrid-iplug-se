@@ -81,6 +81,16 @@ import de.ingrid.iplug.se.db.model.Url;
  * The limit urls are set to the domain of the start url. Make sure the depth of
  * the crawl is set to 1.
  * 
+ * The excel table must have a specific layout:
+ * <ul>
+ *      <li>First line is the header line and will be ignored.</li>
+ *      <li>1. column: BLP name that appears on map popup as title.</li>
+ *      <li>2. column: LAT of map marker coordinate.</li>
+ *      <li>3. column: LON of map marker coordinate.</li>
+ *      <li>4. column: Url to BLPs in progress.</li>
+ *      <li>5. column: Url to finished BLPs.</li>
+ *      <li>6. column: BLP description that appears on map popup.</li>
+ * </ul>
  * 
  * @author joachim@wemove.com
  */
@@ -104,7 +114,7 @@ public class UVPDataImporter {
         Option instanceOption = OptionBuilder.withArgName( "instance name" ).hasArg().withDescription( "an existing instance name" ).create( "instance" );
         options.addOption( instanceOption );
         @SuppressWarnings("static-access")
-        Option excelfileOption = OptionBuilder.withArgName( "excel file name" ).hasArg().withDescription( "path tp excel file" ).create( "excelfile" );
+        Option excelfileOption = OptionBuilder.withArgName( "excel file name" ).hasArg().withDescription( "path to excel file with columns: BLP name; LAT; LON; Url to BLPs in progress; Url to finished BLPs; BLP description (first header line is ignored)" ).create( "excelfile" );
         options.addOption( excelfileOption );
         @SuppressWarnings("static-access")
         Option partnerOption = OptionBuilder.withArgName( "partner short cut" ).hasArg().withDescription( "a partner shortcut. i.e. ni" ).create( "partner" );
@@ -206,12 +216,14 @@ public class UVPDataImporter {
 
                 System.out.println( "Add entry '" + bm.name + "'." );
                 if (bm.urlInProgress != null && bm.urlInProgress.length() > 0) {
+                    // add BLP meta data
                     Url url = createUrl( instance, partner, bm.urlInProgress, bm, pushBlpDataToIndex );
                     pushBlpDataToIndex = false;
                     em.persist( url );
                     cntUrls++;
                 }
                 if (bm.urlFinished != null && bm.urlFinished.length() > 0 && bm.urlFinished != bm.urlInProgress) {
+                    // add BLP meta data, if not already set, since we only need the meta data once.
                     Url url = createUrl( instance, partner, bm.urlFinished, bm, pushBlpDataToIndex );
                     em.persist( url );
                     cntUrls++;
@@ -245,7 +257,7 @@ public class UVPDataImporter {
     }
 
     /**
-     * Scan Excel file and gathe alle infos.
+     * Scan Excel file and gather all infos. Requires a specific excel table layout
      * 
      * @param excelFile
      * @return
@@ -271,7 +283,7 @@ public class UVPDataImporter {
             Sheet sheet = workbook.getSheetAt( 0 );
             Iterator<Row> it = sheet.iterator();
             if (it.hasNext()) {
-                // skip first row
+                // skip first row (header)
                 it.next();
                 while (it.hasNext()) {
                     Iterator<Cell> ci = it.next().cellIterator();
@@ -326,6 +338,17 @@ public class UVPDataImporter {
 
     }
 
+    /**
+     * Create an Url Entry. Add BLP (Bauleitplanung) meta data (like bounding box, BLP name, BLP description, etc.) if pushBlpDataToIndex == true
+     * 
+     * @param instance
+     * @param partner
+     * @param urlStr
+     * @param bm
+     * @param pushBlpDataToIndex
+     * @return
+     * @throws MalformedURLException
+     */
     private static Url createUrl(String instance, String partner, String urlStr, BlpModel bm, boolean pushBlpDataToIndex) throws MalformedURLException {
         Url idxUrl = new Url( instance );
 
@@ -349,6 +372,16 @@ public class UVPDataImporter {
         metadata.add( md );
 
         md = new Metadata();
+        md.setMetaKey( "datatype" );
+        md.setMetaValue( "default" );
+        metadata.add( md );
+
+        md = new Metadata();
+        md.setMetaKey( "datatype" );
+        md.setMetaValue( "www" );
+        metadata.add( md );
+        
+        md = new Metadata();
         md.setMetaKey( "partner" );
         md.setMetaValue( partner );
         metadata.add( md );
@@ -359,20 +392,26 @@ public class UVPDataImporter {
             md.setMetaValue( bm.name );
             metadata.add( md );
 
-            md = new Metadata();
-            md.setMetaKey( "blp_description" );
-            md.setMetaValue( bm.descr );
-            metadata.add( md );
+            if (bm.descr != null && !bm.descr.isEmpty()) {
+                md = new Metadata();
+                md.setMetaKey( "blp_description" );
+                md.setMetaValue( bm.descr );
+                metadata.add( md );
+            }
 
-            md = new Metadata();
-            md.setMetaKey( "blp_url_finished" );
-            md.setMetaValue( bm.urlFinished );
-            metadata.add( md );
+            if (bm.urlFinished != null && !bm.urlFinished.isEmpty()) {
+                md = new Metadata();
+                md.setMetaKey( "blp_url_finished" );
+                md.setMetaValue( bm.urlFinished );
+                metadata.add( md );
+            }
 
-            md = new Metadata();
-            md.setMetaKey( "blp_url_in_progress" );
-            md.setMetaValue( bm.urlInProgress );
-            metadata.add( md );
+            if (bm.urlInProgress != null && !bm.urlInProgress.isEmpty()) {
+                md = new Metadata();
+                md.setMetaKey( "blp_url_in_progress" );
+                md.setMetaValue( bm.urlInProgress );
+                metadata.add( md );
+            }
 
             md = new Metadata();
             md.setMetaKey( "x1" );
