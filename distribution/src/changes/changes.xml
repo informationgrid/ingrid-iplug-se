@@ -30,7 +30,9 @@
   <body>
     <release version="4.2.1-SNAPSHOT" date="2018-xx-xx" description="Release 4.2.0">
       <action type="add" dev="wemove" issue="REDMINE-856">
-        New import script for importing BLP excel data into the url database of the iplug.
+        New import script for importing BLP excel data into the url database of the iplug. This also adds 
+        BLP data as url meta data to generate the BLP markers from the SE index instead from the JSOn file.
+        This makes the separate nodejs script obsolete that generated the marker data from the excel file.
       </action>
     </release>
 
