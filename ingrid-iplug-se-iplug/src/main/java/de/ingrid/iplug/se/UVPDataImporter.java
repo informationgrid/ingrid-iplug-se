@@ -83,13 +83,13 @@ import de.ingrid.iplug.se.db.model.Url;
  * 
  * The excel table must have a specific layout:
  * <ul>
- *      <li>First line is the header line and will be ignored.</li>
- *      <li>1. column: BLP name that appears on map popup as title.</li>
- *      <li>2. column: LAT of map marker coordinate.</li>
- *      <li>3. column: LON of map marker coordinate.</li>
- *      <li>4. column: Url to BLPs in progress.</li>
- *      <li>5. column: Url to finished BLPs.</li>
- *      <li>6. column: BLP description that appears on map popup.</li>
+ * <li>First line is the header line and will be ignored.</li>
+ * <li>1. column: BLP name that appears on map popup as title.</li>
+ * <li>2. column: LAT of map marker coordinate.</li>
+ * <li>3. column: LON of map marker coordinate.</li>
+ * <li>4. column: Url to BLPs in progress.</li>
+ * <li>5. column: Url to finished BLPs.</li>
+ * <li>6. column: BLP description that appears on map popup.</li>
  * </ul>
  * 
  * @author joachim@wemove.com
@@ -114,7 +114,12 @@ public class UVPDataImporter {
         Option instanceOption = OptionBuilder.withArgName( "instance name" ).hasArg().withDescription( "an existing instance name" ).create( "instance" );
         options.addOption( instanceOption );
         @SuppressWarnings("static-access")
-        Option excelfileOption = OptionBuilder.withArgName( "excel file name" ).hasArg().withDescription( "path to excel file with columns: BLP name; LAT; LON; Url to BLPs in progress; Url to finished BLPs; BLP description (first header line is ignored)" ).create( "excelfile" );
+        Option excelfileOption = OptionBuilder
+                .withArgName( "excel file name" )
+                .hasArg()
+                .withDescription(
+                        "path to excel file with columns: BLP name; LAT; LON; Url to BLPs in progress; Url to finished BLPs; BLP description (first header line is ignored)" )
+                .create( "excelfile" );
         options.addOption( excelfileOption );
         @SuppressWarnings("static-access")
         Option partnerOption = OptionBuilder.withArgName( "partner short cut" ).hasArg().withDescription( "a partner shortcut. i.e. ni" ).create( "partner" );
@@ -223,7 +228,8 @@ public class UVPDataImporter {
                     cntUrls++;
                 }
                 if (bm.urlFinished != null && bm.urlFinished.length() > 0 && bm.urlFinished != bm.urlInProgress) {
-                    // add BLP meta data, if not already set, since we only need the meta data once.
+                    // add BLP meta data, if not already set, since we only need
+                    // the meta data once.
                     Url url = createUrl( instance, partner, bm.urlFinished, bm, pushBlpDataToIndex );
                     em.persist( url );
                     cntUrls++;
@@ -257,7 +263,8 @@ public class UVPDataImporter {
     }
 
     /**
-     * Scan Excel file and gather all infos. Requires a specific excel table layout
+     * Scan Excel file and gather all infos. Requires a specific excel table
+     * layout
      * 
      * @param excelFile
      * @return
@@ -265,8 +272,6 @@ public class UVPDataImporter {
      */
     public static List<BlpModel> readData(String excelFile) throws IOException {
         List<BlpModel> blpModels = new ArrayList<BlpModel>();
-
-        boolean hasErrors = false;
 
         FileInputStream inputStream = new FileInputStream( new File( excelFile ) );
         Workbook workbook = null;
@@ -314,9 +319,15 @@ public class UVPDataImporter {
                         }
                     }
 
+                    System.out.print( "." );
+
                     if (bm.name != null && bm.name.length() > 0) {
-                        hasErrors = hasErrors | !validate( bm );
-                        blpModels.add( bm );
+                        boolean isValid = validate( bm );
+                        if (isValid) {
+                            blpModels.add( bm );
+                        } else {
+                            System.out.println( "Ignoring Entry!" );
+                        }
                     }
                 }
             }
@@ -329,17 +340,13 @@ public class UVPDataImporter {
             }
         }
 
-        if (hasErrors) {
-            System.out.println( "Excel data has errors. Please correct!" );
-            System.exit( 0 );
-        }
-
         return blpModels;
 
     }
 
     /**
-     * Create an Url Entry. Add BLP (Bauleitplanung) meta data (like bounding box, BLP name, BLP description, etc.) if pushBlpDataToIndex == true
+     * Create an Url Entry. Add BLP (Bauleitplanung) meta data (like bounding
+     * box, BLP name, BLP description, etc.) if pushBlpDataToIndex == true
      * 
      * @param instance
      * @param partner
@@ -380,7 +387,7 @@ public class UVPDataImporter {
         md.setMetaKey( "datatype" );
         md.setMetaValue( "www" );
         metadata.add( md );
-        
+
         md = new Metadata();
         md.setMetaKey( "partner" );
         md.setMetaValue( partner );
@@ -438,22 +445,28 @@ public class UVPDataImporter {
 
     }
 
+    /**
+     * Validates a BLP model entry.
+     * 
+     * @param bm
+     * @return True if BLP model is valid. False if not.
+     */
     private static boolean validate(BlpModel bm) {
         boolean isValid = true;
 
         if (bm.name == null || bm.name.length() <= 3) {
             isValid = false;
-            System.out.println( "Name is null or too short." + bm );
+            System.out.println( "\nName is null or too short." + bm );
         }
 
         if (bm.lat < 47 || bm.lat > 56) {
             isValid = false;
-            System.out.println( "Lat not between 47 and 56." + bm );
+            System.out.println( "\nLat not between 47 and 56." + bm );
         }
 
         if (bm.lon < 5 || bm.lon > 15) {
             isValid = false;
-            System.out.println( "Lon not between 5 and 15." + bm );
+            System.out.println( "\nLon not between 5 and 15." + bm );
         }
 
         String url = bm.urlInProgress;
@@ -463,7 +476,7 @@ public class UVPDataImporter {
                 conn.connect();
             } catch (Exception e) {
                 isValid = false;
-                System.out.println( "Problems accessing '" + url + "'. " + bm + ": " + e );
+                System.out.println( "\nProblems accessing '" + url + "'. " + bm + ": " + e );
             }
         }
 
@@ -474,7 +487,7 @@ public class UVPDataImporter {
                 conn.connect();
             } catch (Exception e) {
                 isValid = false;
-                System.out.println( "Problems accessing '" + url + "'. " + bm + ": " + e );
+                System.out.println( "\nProblems accessing '" + url + "'. " + bm + ": " + e );
             }
         }
 
