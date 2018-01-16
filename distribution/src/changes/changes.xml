@@ -28,12 +28,18 @@
 	<author email="joachim@wemove.com">Joachim Müller</author>
   </properties>
   <body>
-    <release version="4.2.0-SNAPSHOT" date="2017-xx-xx" description="Release 4.2.0">
+    <release version="4.2.1-SNAPSHOT" date="2018-xx-xx" description="Release 4.2.0">
       <action type="add" dev="wemove" issue="REDMINE-856">
         New import script for importing BLP excel data into the url database of the iplug.
       </action>
     </release>
 
+    <release version="4.2.0" date="2018-01-05" description="Release 4.2.0">
+      <action type="add" dev="wemove">
+        Added docker integration.
+      </action>
+    </release>
+    
     <release version="4.1.0" date="2017-10-05" description="Release 4.1.0">
       <action type="add" dev="wemove" issue="REDMINE-789">
         Add x1, y1, x2 and y2 to default-mapping.json.
