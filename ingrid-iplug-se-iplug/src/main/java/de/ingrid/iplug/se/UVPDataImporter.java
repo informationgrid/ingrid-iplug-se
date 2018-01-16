@@ -205,6 +205,7 @@ public class UVPDataImporter {
 
             System.out.println( "Parsing and validating data from '" + excelfile + "'..." );
             List<BlpModel> blpModels = readData( excelfile );
+            System.out.println( "" );
 
             for (Url url : existingUrls) {
                 em.remove( url );
@@ -393,7 +394,31 @@ public class UVPDataImporter {
         md.setMetaValue( partner );
         metadata.add( md );
 
+        md = new Metadata();
+        md.setMetaKey( "x1" );
+        md.setMetaValue( bm.lon.toString() );
+        metadata.add( md );
+        md = new Metadata();
+        md.setMetaKey( "x2" );
+        md.setMetaValue( bm.lon.toString() );
+        metadata.add( md );
+
+        md = new Metadata();
+        md.setMetaKey( "y1" );
+        md.setMetaValue( bm.lat.toString() );
+        metadata.add( md );
+        md = new Metadata();
+        md.setMetaKey( "y2" );
+        md.setMetaValue( bm.lat.toString() );
+        metadata.add( md );
+        
         if (pushBlpDataToIndex) {
+
+            md = new Metadata();
+            md.setMetaKey( "blp_marker" );
+            md.setMetaValue( "true" );
+            metadata.add( md );
+            
             md = new Metadata();
             md.setMetaKey( "blp_name" );
             md.setMetaValue( bm.name );
@@ -420,23 +445,6 @@ public class UVPDataImporter {
                 metadata.add( md );
             }
 
-            md = new Metadata();
-            md.setMetaKey( "x1" );
-            md.setMetaValue( bm.lon.toString() );
-            metadata.add( md );
-            md = new Metadata();
-            md.setMetaKey( "x2" );
-            md.setMetaValue( bm.lon.toString() );
-            metadata.add( md );
-
-            md = new Metadata();
-            md.setMetaKey( "y1" );
-            md.setMetaValue( bm.lat.toString() );
-            metadata.add( md );
-            md = new Metadata();
-            md.setMetaKey( "y2" );
-            md.setMetaValue( bm.lat.toString() );
-            metadata.add( md );
         }
 
         idxUrl.setMetadata( metadata );
