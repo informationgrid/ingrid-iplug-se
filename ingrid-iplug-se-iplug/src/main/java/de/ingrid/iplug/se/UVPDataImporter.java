@@ -416,7 +416,7 @@ public class UVPDataImporter {
 
             md = new Metadata();
             md.setMetaKey( "blp_marker" );
-            md.setMetaValue( "true" );
+            md.setMetaValue( "blp_marker" );
             metadata.add( md );
             
             md = new Metadata();
