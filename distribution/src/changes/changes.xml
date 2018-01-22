@@ -28,6 +28,16 @@
 	<author email="joachim@wemove.com">Joachim Müller</author>
   </properties>
   <body>
+    <release version="4.2.1" date="2018-01-22" description="Release 4.2.1">
+      <action type="add" dev="wemove" issue="REDMINE-942">
+        Restrict hadoop.log files per instance to 30 x 10MB.
+      </action>
+      <action type="add" dev="wemove" issue="REDMINE-856">
+        New import script for importing BLP excel data into the url database of the iplug. This also adds 
+        BLP data as url meta data to generate the BLP markers from the SE index instead from the JSOn file.
+        This makes the separate nodejs script obsolete that generated the marker data from the excel file.
+      </action>
+    </release>
 
     <release version="4.2.0" date="2018-01-05" description="Release 4.2.0">
       <action type="add" dev="wemove">
