@@ -106,18 +106,8 @@
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>wagon-maven-plugin</artifactId>
             <configuration>
-              <fromDir>target</fromDir>
-              <url>file:///opt/ingrid/distributions/${project.artifactId}/${project.version}</url>
+              <skip>false</skip>
             </configuration>
-            <executions>
-              <execution>
-                <id>upload-to-distributions</id>
-                <phase>deploy</phase>
-                <goals>
-                  <goal>upload</goal>
-                </goals>
-              </execution>
-            </executions>
           </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
