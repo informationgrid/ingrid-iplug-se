@@ -4,6 +4,7 @@ pipeline {
     options {
         // each branch has 1 job running at a time, since tests conflict with elasticsearch port otherwise
         disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '5'))
     }
 
     environment {
