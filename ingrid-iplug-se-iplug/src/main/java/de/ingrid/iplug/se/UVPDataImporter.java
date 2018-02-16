@@ -79,7 +79,7 @@ import de.ingrid.iplug.se.db.model.Url;
  * All urls from instance are deleted.
  * 
  * The limit urls are set to the domain of the start url. Make sure the depth of
- * the crawl is set to 1.
+ * the crawl is set to 1 and no outlinks should be extracted.
  * 
  * The excel table must have a specific layout:
  * <ul>
@@ -262,6 +262,39 @@ public class UVPDataImporter {
         String host = url.getHost();
         return urlStr.substring( 0, urlStr.indexOf( host ) + host.length() ) + "/";
     }
+    
+    /**
+     * Derive limit urls from an url. It extracts the domain and adds limit urls 
+     * for http/https or "www." prefixes.
+     * 
+     * @param urlStr
+     * @return
+     * @throws MalformedURLException
+     */
+    public static List<String> getLimitUrls (String urlStr) throws MalformedURLException {
+        List<String> result = new ArrayList<String>();
+        String domain = getDomain(urlStr);
+        result.add(domain);
+
+        // add www. prefix if missing or r
+        if (domain.contains( "://www." )) {
+            result.add(domain.replace( "://www.", "://" ));
+        } else {
+            result.add(domain.replace( "://", "://www." ));
+        }
+        
+        // insert https/http as Limit URLs
+        for (String url : new ArrayList<String>(result)) {
+            if (url.startsWith( "http://" )) {
+                result.add(url.replace( "http://", "https://" ));
+            } else if (url.startsWith( "https://" )) {
+                result.add(url.replace( "https://", "http://" ));
+            }
+        }
+        
+        return result;
+        
+    }
 
     /**
      * Scan Excel file and gather all infos. Requires a specific excel table
@@ -363,9 +396,7 @@ public class UVPDataImporter {
         idxUrl.setStatus( "200" );
         idxUrl.setUrl( urlStr );
 
-        String lUrl = getDomain( urlStr );
-        List<String> limitUrls = new ArrayList<String>();
-        limitUrls.add( lUrl );
+        List<String> limitUrls = getLimitUrls( urlStr );
         idxUrl.setLimitUrls( limitUrls );
 
         List<Metadata> metadata = new ArrayList<Metadata>();
