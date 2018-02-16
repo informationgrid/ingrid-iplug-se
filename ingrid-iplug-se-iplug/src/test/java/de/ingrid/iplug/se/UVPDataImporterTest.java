@@ -23,6 +23,7 @@
 package de.ingrid.iplug.se;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
@@ -36,25 +37,60 @@ public class UVPDataImporterTest {
 
     @Test
     public void testGetDomain() throws MalformedURLException {
-        
+
         assertEquals( "http://www.testdomain.net/", UVPDataImporter.getDomain( "http://www.testdomain.net/somePath?someParameter=1" ) );
         assertEquals( "http://www.testdomain.net/", UVPDataImporter.getDomain( "http://www.testdomain.net" ) );
         try {
-            String d = UVPDataImporter.getDomain( "://www.testdomain" ) ;
+            String d = UVPDataImporter.getDomain( "://www.testdomain" );
             fail( "Invalid URL should raise exception but deliveres instead: " + d );
         } catch (Exception e) {
-            
+
+        }
+    }
+
+    @Test
+    public void testGetLimitUrls() throws MalformedURLException {
+
+        List<String> result = UVPDataImporter.getLimitUrls( "http://www.testdomain.net/somePath?someParameter=1" );
+        assertTrue( result.contains( "http://www.testdomain.net/" ) );
+        assertTrue( result.contains( "https://www.testdomain.net/" ) );
+        assertTrue( result.contains( "https://testdomain.net/" ) );
+        assertTrue( result.contains( "http://testdomain.net/" ) );
+
+        try {
+            String d = UVPDataImporter.getDomain( "://www.testdomain" );
+            fail( "Invalid URL should raise exception but deliveres instead: " + d );
+        } catch (Exception e) {
+
         }
     }
 
     @Test
     public void testReadData() throws IOException {
-        
+
         ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("blp-urls-test.xlsx").getFile());
-        
+        File file = new File( classLoader.getResource( "blp-urls-test.xlsx" ).getFile() );
+
         List<UVPDataImporter.BlpModel> l = UVPDataImporter.readData( file.getAbsolutePath() );
-        assertEquals( true , l.size() > 0 );
+        assertEquals( true, l.size() > 0 );
+
+        for (UVPDataImporter.BlpModel m : l) {
+            try {
+                if (m.urlFinished != null) {
+                    UVPDataImporter.getLimitUrls( m.urlFinished );
+                }
+            } catch (Exception e) {
+                fail( "Invalid LIMIT URL extracted from: " + m.urlFinished );
+            }
+            try {
+                if (m.urlInProgress != null) {
+                    UVPDataImporter.getLimitUrls( m.urlInProgress );
+                }
+            } catch (Exception e) {
+                fail( "Invalid LIMIT URL extracted from: " + m.urlInProgress );
+            }
+        }
+
     }
 
 }
