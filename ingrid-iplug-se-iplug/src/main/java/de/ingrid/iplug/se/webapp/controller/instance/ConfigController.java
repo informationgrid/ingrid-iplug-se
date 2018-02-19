@@ -24,15 +24,11 @@ package de.ingrid.iplug.se.webapp.controller.instance;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 import javax.xml.parsers.DocumentBuilder;
@@ -51,7 +47,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -246,33 +241,6 @@ public class ConfigController extends InstanceController {
 
         // return "redirect:/index.hmtl";
         return new ResponseEntity<String>("Config Updated", HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "/rest/updateMetadata", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, String>> updateMetadataConfig(@RequestParam("instance") String name, @RequestBody String json) throws IOException {
-        String confFile = SEIPlug.conf.getInstancesDir() + "/" + name + "/conf/urlMaintenance.json";
-
-        // check if json can be converted correctly
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        UrlMaintenanceSettings settings = gson.fromJson(json, UrlMaintenanceSettings.class);
-
-        Map<String, String> result = new HashMap<String, String>();
-        // only write then json content to file
-        if (settings != null) {
-            // File fos = new File( SEIPlug.conf.getInstancesDir() + "/" + name
-            // + "/conf/urlMaintenance.json" );
-            // BufferedWriter writer = new BufferedWriter( new FileWriter( fos )
-            // );
-            // writer.write( json );
-            // writer.close();
-            Writer out = new FileWriter(confFile);
-            gson.toJson(settings, out);
-            out.close();
-            result.put("result", "OK");
-            return new ResponseEntity<Map<String, String>>(result, HttpStatus.OK);
-        }
-        result.put("result", "Error");
-        return new ResponseEntity<Map<String, String>>(result, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }

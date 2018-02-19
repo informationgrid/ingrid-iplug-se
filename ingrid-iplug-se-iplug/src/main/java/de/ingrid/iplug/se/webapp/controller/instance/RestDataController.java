@@ -7,12 +7,12 @@
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
  * EUPL (the "Licence");
- * 
+ *
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl5
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,8 +22,10 @@
  */
 package de.ingrid.iplug.se.webapp.controller.instance;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -64,10 +66,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
 import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.SEIPlug;
+import de.ingrid.iplug.se.conf.UrlMaintenanceSettings;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Metadata;
 import de.ingrid.iplug.se.db.model.Url;
@@ -93,7 +99,7 @@ public class RestDataController extends InstanceController {
 
     @Autowired
     private ElasticsearchNodeFactoryBean elasticSearch;
-    
+
 	@Autowired
 	private NutchController nutchController;
 
@@ -249,7 +255,7 @@ public class RestDataController extends InstanceController {
 		JSONParser parser = new JSONParser();
 		Reader reader = null;
 		UrlErrorPagableFilter pager = null;
-		
+
 		if (path.toFile().exists()) {
     		try {
     			reader = Files.newBufferedReader(path, Charset.forName("UTF-8"));
@@ -268,7 +274,7 @@ public class RestDataController extends InstanceController {
     			}
     		}
 		}
-		
+
 		JSONObject json = new JSONObject();
 		if (pager == null) {
 			json.put("data", "");
@@ -296,17 +302,17 @@ public class RestDataController extends InstanceController {
 	        @ModelAttribute("plugDescription") final PlugdescriptionCommandObject pdCommandObject,
 	        @PathVariable("name") String name, @PathVariable("value") String value) {
 
-	    
+
 		List<String> activeInstances = JettyStarter.getInstance().config.indexSearchInTypes;
 		// always remove type that leads to no result (in case it was set)
 		activeInstances.remove( NO_RESULT_INDEX );
-		
+
 		if ("on".equals(value)) {
 			activeInstances.add(name);
 		} else {
 			activeInstances.remove(name);
 		}
-		
+
 		// add a type which returns no result, if no instance is activated
 		if (activeInstances.size() == 0) {
 		    activeInstances.add( NO_RESULT_INDEX );
@@ -317,14 +323,14 @@ public class RestDataController extends InstanceController {
 
 		return generateOkResponse();
 	}
-	
+
 	@RequestMapping(value = "/instance/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteInstance(@PathVariable("id") String name) throws Exception {
-        
+
         // stop all nutch processes first
         Instance instance = InstanceController.getInstanceData( name );
         nutchController.stop( instance );
-        
+
         // remove instance directory
         String dir = SEIPlug.conf.getInstancesDir();
         Path directoryToDelete = Paths.get( dir, name );
@@ -340,23 +346,23 @@ public class RestDataController extends InstanceController {
         if (ElasticSearchUtils.typeExists( name, client )) {
             ElasticSearchUtils.deleteType( name, client );
         }
-        
+
         // remove url from database belonging to this instance
         EntityManager em = DBManager.INSTANCE.getEntityManager();
-        
+
         em.getTransaction().begin();
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaDelete<Url> criteriaDelete = cb.createCriteriaDelete( Url.class );
         Root<Url> urlTable = criteriaDelete.from(Url.class);
         Predicate instanceCriteria = cb.equal( urlTable.get("instance"), name );
-        
+
         criteriaDelete.from( Url.class );
         criteriaDelete.where( instanceCriteria );
-        
+
         em.createQuery( criteriaDelete ).executeUpdate();
         em.flush();
         em.getTransaction().commit();
-        
+
         return new ResponseEntity<String>( HttpStatus.OK );
     }
 
@@ -426,8 +432,35 @@ public class RestDataController extends InstanceController {
 		result.put("result", "OK");
 		return new ResponseEntity<Map<String, String>>(result, HttpStatus.OK);
 	}
-	
+
 	public void setElasticSearch(ElasticsearchNodeFactoryBean esBean) {
         this.elasticSearch = esBean;
     }
+
+  @RequestMapping(value = "/updateMetadata", method = RequestMethod.POST)
+  public ResponseEntity<Map<String, String>> updateMetadataConfig(@RequestParam("instance") String name, @RequestBody String json) throws IOException {
+      String confFile = SEIPlug.conf.getInstancesDir() + "/" + name + "/conf/urlMaintenance.json";
+
+      // check if json can be converted correctly
+      Gson gson = new GsonBuilder().setPrettyPrinting().create();
+      UrlMaintenanceSettings settings = gson.fromJson(json, UrlMaintenanceSettings.class);
+
+      Map<String, String> result = new HashMap<String, String>();
+      // only write then json content to file
+      if (settings != null) {
+          // File fos = new File( SEIPlug.conf.getInstancesDir() + "/" + name
+          // + "/conf/urlMaintenance.json" );
+          // BufferedWriter writer = new BufferedWriter( new FileWriter( fos )
+          // );
+          // writer.write( json );
+          // writer.close();
+          Writer out = new FileWriter(confFile);
+          gson.toJson(settings, out);
+          out.close();
+          result.put("result", "OK");
+          return new ResponseEntity<Map<String, String>>(result, HttpStatus.OK);
+      }
+      result.put("result", "Error");
+      return new ResponseEntity<Map<String, String>>(result, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
 }
