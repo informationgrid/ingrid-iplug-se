@@ -22,8 +22,10 @@
  */
 package de.ingrid.iplug.se.webapp.controller.instance;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -64,10 +66,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
 import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.SEIPlug;
+import de.ingrid.iplug.se.conf.UrlMaintenanceSettings;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Metadata;
 import de.ingrid.iplug.se.db.model.Url;
@@ -430,4 +436,31 @@ public class RestDataController extends InstanceController {
 	public void setElasticSearch(ElasticsearchNodeFactoryBean esBean) {
         this.elasticSearch = esBean;
     }
+
+  @RequestMapping(value = "/updateMetadata", method = RequestMethod.POST)
+  public ResponseEntity<Map<String, String>> updateMetadataConfig(@RequestParam("instance") String name, @RequestBody String json) throws IOException {
+      String confFile = SEIPlug.conf.getInstancesDir() + "/" + name + "/conf/urlMaintenance.json";
+
+      // check if json can be converted correctly
+      Gson gson = new GsonBuilder().setPrettyPrinting().create();
+      UrlMaintenanceSettings settings = gson.fromJson(json, UrlMaintenanceSettings.class);
+
+      Map<String, String> result = new HashMap<String, String>();
+      // only write then json content to file
+      if (settings != null) {
+          // File fos = new File( SEIPlug.conf.getInstancesDir() + "/" + name
+          // + "/conf/urlMaintenance.json" );
+          // BufferedWriter writer = new BufferedWriter( new FileWriter( fos )
+          // );
+          // writer.write( json );
+          // writer.close();
+          Writer out = new FileWriter(confFile);
+          gson.toJson(settings, out);
+          out.close();
+          result.put("result", "OK");
+          return new ResponseEntity<Map<String, String>>(result, HttpStatus.OK);
+      }
+      result.put("result", "Error");
+      return new ResponseEntity<Map<String, String>>(result, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
 }
