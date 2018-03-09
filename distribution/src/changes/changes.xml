@@ -28,6 +28,11 @@
 	<author email="joachim@wemove.com">Joachim Müller</author>
   </properties>
   <body>
+    <release version="4.2.2" date="2018-03-09" description="Release 4.2.2">
+      <action type="fix" dev="wemove" issue="REDMINE-972">
+        Fix meta data saving.
+      </action>
+    </release>
     <release version="4.2.1" date="2018-01-22" description="Release 4.2.1">
       <action type="add" dev="wemove" issue="REDMINE-942">
         Restrict hadoop.log files per instance to 30 x 10MB.
