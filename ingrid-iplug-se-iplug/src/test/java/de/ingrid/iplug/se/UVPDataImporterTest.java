@@ -38,8 +38,8 @@ public class UVPDataImporterTest {
     @Test
     public void testGetDomain() throws MalformedURLException {
 
-        assertEquals( "http://www.testdomain.net/", UVPDataImporter.getDomain( "http://www.testdomain.net/somePath?someParameter=1" ) );
-        assertEquals( "http://www.testdomain.net/", UVPDataImporter.getDomain( "http://www.testdomain.net" ) );
+        assertEquals( "http://www.testdomain.net", UVPDataImporter.getDomain( "http://www.testdomain.net/somePath?someParameter=1" ) );
+        assertEquals( "http://www.testdomain.net", UVPDataImporter.getDomain( "http://www.testdomain.net" ) );
         try {
             String d = UVPDataImporter.getDomain( "://www.testdomain" );
             fail( "Invalid URL should raise exception but deliveres instead: " + d );
@@ -56,6 +56,10 @@ public class UVPDataImporterTest {
         assertTrue( result.contains( "https://www.testdomain.net/" ) );
         assertTrue( result.contains( "https://testdomain.net/" ) );
         assertTrue( result.contains( "http://testdomain.net/" ) );
+        assertTrue( result.contains( "http://www.testdomain.net/somePath?someParameter=1" ) );
+        assertTrue( result.contains( "http://testdomain.net/somePath?someParameter=1" ) );
+        assertTrue( result.contains( "https://www.testdomain.net/somePath?someParameter=1" ) );
+        assertTrue( result.contains( "https://testdomain.net/somePath?someParameter=1" ) );
 
         try {
             String d = UVPDataImporter.getDomain( "://www.testdomain" );
@@ -69,10 +73,12 @@ public class UVPDataImporterTest {
     public void testReadData() throws IOException {
 
         ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File( classLoader.getResource( "blp-urls-test.xlsx" ).getFile() );
+        File file = new File( classLoader.getResource( "BLP-URLs.xlsx" ).getFile() );
 
         List<UVPDataImporter.BlpModel> l = UVPDataImporter.readData( file.getAbsolutePath() );
         assertEquals( true, l.size() > 0 );
+        
+        String actualUrl = null;
 
         for (UVPDataImporter.BlpModel m : l) {
             try {
@@ -83,14 +89,36 @@ public class UVPDataImporterTest {
                 fail( "Invalid LIMIT URL extracted from: " + m.urlFinished );
             }
             try {
+                if (m.urlFinished != null) {
+                    actualUrl = UVPDataImporter.getActualUrl( m.urlFinished );
+                }
+            } catch (Exception e) {
+                System.out.println( "\nInvalid actual URL extracted from: " + m.urlFinished );
+            }
+            try {
                 if (m.urlInProgress != null) {
                     UVPDataImporter.getLimitUrls( m.urlInProgress );
                 }
             } catch (Exception e) {
                 fail( "Invalid LIMIT URL extracted from: " + m.urlInProgress );
             }
+            try {
+                if (m.urlInProgress != null) {
+                    actualUrl = UVPDataImporter.getActualUrl( m.urlInProgress );
+                }
+            } catch (Exception e) {
+                System.out.println( "\nInvalid actual URL extracted from: " + m.urlInProgress );
+            }
+            
         }
-
     }
-
+    
+    @Test
+    public void testGetActualUrl() throws Exception {
+        
+        assertEquals( "http://www.wemove.com/website/de/", UVPDataImporter.getActualUrl( "http://wemove.com" ) );
+        
+    }
+    
+    
 }
