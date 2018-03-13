@@ -25,9 +25,12 @@
  */
 package de.ingrid.iplug.se;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -212,6 +215,7 @@ public class UVPDataImporter {
             }
 
             int cntUrls = 0;
+            int cntMarker = 0;
 
             for (BlpModel bm : blpModels) {
 
@@ -223,20 +227,37 @@ public class UVPDataImporter {
                 System.out.println( "Add entry '" + bm.name + "'." );
                 if (bm.urlInProgress != null && bm.urlInProgress.length() > 0) {
                     // add BLP meta data
-                    Url url = createUrl( instance, partner, bm.urlInProgress, bm, pushBlpDataToIndex );
-                    pushBlpDataToIndex = false;
-                    em.persist( url );
-                    cntUrls++;
+                    Url url = null;
+                    try {
+                        url = createUrl( instance, partner, bm.urlInProgress, bm, pushBlpDataToIndex );
+                        pushBlpDataToIndex = false;
+                        em.persist( url );
+                        cntUrls++;
+                        cntMarker++;
+                    } catch (Exception e) {
+                        System.out.println( "Problems handling '" + bm.urlInProgress + "' (origin: '" + bm.urlInProgress + "'). " + bm + ": " + e );
+                        System.out.println( "Ignoring Entry!" );
+                    }
                 }
                 if (bm.urlFinished != null && bm.urlFinished.length() > 0 && bm.urlFinished != bm.urlInProgress) {
                     // add BLP meta data, if not already set, since we only need
                     // the meta data once.
-                    Url url = createUrl( instance, partner, bm.urlFinished, bm, pushBlpDataToIndex );
-                    em.persist( url );
-                    cntUrls++;
+                    Url url = null;
+                    try {
+                        url = createUrl( instance, partner, bm.urlFinished, bm, pushBlpDataToIndex );
+                        em.persist( url );
+                        cntUrls++;
+                        if (pushBlpDataToIndex) {
+                            cntMarker++;
+                        }
+                    } catch (Exception e) {
+                        System.out.println( "Problems handling '" + bm.urlFinished + "' (origin: '" + bm.urlFinished + "'). " + bm + ": " + e );
+                        System.out.println( "Ignoring Entry!" );
+
+                    }
                 }
             }
-            System.out.println( "Finish. Added  " + cntUrls + " urls to instance '" + instance + "'." );
+            System.out.println( "Finish. Added  " + cntUrls + " urls to instance '" + instance + "', mark " + cntMarker + " records as marker to be displayed on map." );
 
             tx.commit();
         } catch (Exception e) {
@@ -260,40 +281,43 @@ public class UVPDataImporter {
     public static String getDomain(String urlStr) throws MalformedURLException {
         URL url = new URL( urlStr );
         String host = url.getHost();
-        return urlStr.substring( 0, urlStr.indexOf( host ) + host.length() ) + "/";
+        return urlStr.substring( 0, urlStr.indexOf( host ) + host.length() );
     }
-    
+
     /**
-     * Derive limit urls from an url. It extracts the domain and adds limit urls 
+     * Derive limit urls from an url. It extracts the domain and adds limit urls
      * for http/https or "www." prefixes.
      * 
      * @param urlStr
      * @return
      * @throws MalformedURLException
      */
-    public static List<String> getLimitUrls (String urlStr) throws MalformedURLException {
+    public static List<String> getLimitUrls(String urlStr) throws MalformedURLException {
         List<String> result = new ArrayList<String>();
-        String domain = getDomain(urlStr);
-        result.add(domain);
+        result.add( urlStr );
+        String domain = getDomain( urlStr ) + "/";
+        result.add( domain );
 
         // add www. prefix if missing or r
         if (domain.contains( "://www." )) {
-            result.add(domain.replace( "://www.", "://" ));
+            result.add( domain.replace( "://www.", "://" ) );
+            result.add( urlStr.replace( "://www.", "://" ) );
         } else {
-            result.add(domain.replace( "://", "://www." ));
+            result.add( domain.replace( "://", "://www." ) );
+            result.add( urlStr.replace( "://", "://www." ) );
         }
-        
+
         // insert https/http as Limit URLs
-        for (String url : new ArrayList<String>(result)) {
+        for (String url : new ArrayList<String>( result )) {
             if (url.startsWith( "http://" )) {
-                result.add(url.replace( "http://", "https://" ));
+                result.add( url.replace( "http://", "https://" ) );
             } else if (url.startsWith( "https://" )) {
-                result.add(url.replace( "https://", "http://" ));
+                result.add( url.replace( "https://", "http://" ) );
             }
         }
-        
+
         return result;
-        
+
     }
 
     /**
@@ -385,18 +409,23 @@ public class UVPDataImporter {
      * @param instance
      * @param partner
      * @param urlStr
+     *            The given URL ist checked for redirects. Redirects are
+     *            resolved.
      * @param bm
      * @param pushBlpDataToIndex
      * @return
-     * @throws MalformedURLException
+     * @throws Exception
      */
-    private static Url createUrl(String instance, String partner, String urlStr, BlpModel bm, boolean pushBlpDataToIndex) throws MalformedURLException {
+    public static Url createUrl(String instance, String partner, String urlStr, BlpModel bm, boolean pushBlpDataToIndex) throws Exception {
         Url idxUrl = new Url( instance );
 
         idxUrl.setStatus( "200" );
-        idxUrl.setUrl( urlStr );
 
-        List<String> limitUrls = getLimitUrls( urlStr );
+        String actualUrl = getActualUrl( urlStr );
+
+        idxUrl.setUrl( actualUrl );
+
+        List<String> limitUrls = getLimitUrls( actualUrl );
         idxUrl.setLimitUrls( limitUrls );
 
         List<Metadata> metadata = new ArrayList<Metadata>();
@@ -442,14 +471,14 @@ public class UVPDataImporter {
         md.setMetaKey( "y2" );
         md.setMetaValue( bm.lat.toString() );
         metadata.add( md );
-        
+
         if (pushBlpDataToIndex) {
 
             md = new Metadata();
             md.setMetaKey( "blp_marker" );
             md.setMetaValue( "blp_marker" );
             metadata.add( md );
-            
+
             md = new Metadata();
             md.setMetaKey( "blp_name" );
             md.setMetaValue( bm.name );
@@ -529,8 +558,111 @@ public class UVPDataImporter {
                 System.out.println( "\nProblems accessing '" + url + "'. " + bm + ": " + e );
             }
         }
+        if ((bm.urlInProgress == null || bm.urlInProgress.length() == 0) && (bm.urlFinished == null || bm.urlFinished.length() == 0)) {
+            isValid = false;
+            System.out.println( "\nNo url set in 'progress' or 'finished'. " + bm );
+        }
 
         return isValid;
+    }
+
+    public static String getActualUrl(String url) throws Exception {
+
+        int termination = 10;
+        while (termination-- > 0) {
+            String actualUrl = null;
+            try {
+                actualUrl = getRedirect( url );
+            } catch (Exception e) {
+                throw e;
+            }
+            if (actualUrl.equals( url )) {
+                return url;
+            }
+            System.out.println( "WARN Redirect detected: '" + url + "' -> '" + actualUrl + "'. " );
+            if (actualUrl.startsWith( "/" )) {
+                url = getDomain( url ).concat( actualUrl );
+            } else {
+                url = actualUrl;
+            }
+        }
+        throw new Exception( "Too many Redirects: 10" );
+    }
+
+    private static String getRedirect(String urlstring) throws IOException {
+        HttpURLConnection con = null;
+
+        try {
+
+            con = (HttpURLConnection) (new URL( urlstring ).openConnection());
+            con.setRequestProperty( "User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0" );
+            con.setInstanceFollowRedirects( false );
+            con.connect();
+            int responseCode = con.getResponseCode();
+            if (300 <= responseCode && responseCode <= 308) {
+                Map<String, List<String>> headers = con.getHeaderFields();
+                for (String header : headers.keySet()) {
+                    if (header != null && header.equalsIgnoreCase( "location" )) {
+                        return con.getHeaderField( header );
+                    }
+                }
+            } else {
+                String metaURL = getMetaRedirectURL( con );
+                if (metaURL != null) {
+                    if (!metaURL.startsWith( "http" )) {
+                        URL u = new URL( new URL( urlstring ), metaURL );
+                        return u.toString();
+                    }
+                    return metaURL;
+                }
+            }
+
+        } catch (Exception e) {
+            if (con != null) {
+                con.disconnect();
+            }
+            
+            throw e;
+        }
+        return urlstring;
+
+    }
+
+    private static String getMetaRedirectURL(HttpURLConnection con) throws IOException {
+        StringBuilder sb = new StringBuilder();
+
+        try (BufferedReader reader = new BufferedReader( new InputStreamReader( con.getInputStream() ) )) {
+
+            String content = null;
+            while ((content = reader.readLine()) != null) {
+                sb.append( content );
+            }
+            String html = sb.toString();
+            html = html.replace( "\n", "" );
+            if (html.length() == 0)
+                return null;
+            int indexHttpEquiv = html.toLowerCase().indexOf( "http-equiv=\"refresh\"" );
+            if (indexHttpEquiv < 0) {
+                return null;
+            }
+            html = html.substring( indexHttpEquiv );
+            int indexContent = html.toLowerCase().indexOf( "content=" );
+            if (indexContent < 0) {
+                return null;
+            }
+            html = html.substring( indexContent );
+            int indexURLStart = html.toLowerCase().indexOf( ";url=" );
+            if (indexURLStart < 0) {
+                return null;
+            }
+            html = html.substring( indexURLStart + 5 );
+            int indexURLEnd = html.toLowerCase().indexOf( "\"" );
+            if (indexURLEnd < 0) {
+                return null;
+            }
+            return html.substring( 0, indexURLEnd );
+        }
+
     }
 
     class BlpModel {
