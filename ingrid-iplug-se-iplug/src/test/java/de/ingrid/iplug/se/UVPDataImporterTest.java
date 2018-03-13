@@ -73,7 +73,7 @@ public class UVPDataImporterTest {
     public void testReadData() throws IOException {
 
         ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File( classLoader.getResource( "BLP-URLs.xlsx" ).getFile() );
+        File file = new File( classLoader.getResource( "blp-urls-test.xlsx" ).getFile() );
 
         List<UVPDataImporter.BlpModel> l = UVPDataImporter.readData( file.getAbsolutePath() );
         assertEquals( true, l.size() > 0 );
@@ -112,13 +112,5 @@ public class UVPDataImporterTest {
             
         }
     }
-    
-    @Test
-    public void testGetActualUrl() throws Exception {
-        
-        assertEquals( "http://www.wemove.com/website/de/", UVPDataImporter.getActualUrl( "http://wemove.com" ) );
-        
-    }
-    
     
 }
