@@ -585,12 +585,28 @@ public class UVPDataImporter {
             addLog( bm.name, "Redirect detected: '" + url + "' -> '" + actualUrl + "'.", "REDIRECTS" );
             if (actualUrl.startsWith( "/" )) {
                 url = getDomain( url ).concat( actualUrl );
+            } else if (actualUrl.startsWith( "../" )) {
+                while (actualUrl.startsWith( "../" )) {
+                    url = stripLastPath(url);
+                    actualUrl = actualUrl.substring( 3 );
+                }
+                url = url.concat( actualUrl );
             } else {
                 url = actualUrl;
             }
         }
         addLog( bm.name, "Too many redirects.", "IGNORED" );
         throw new Exception( "Too many Redirects: 10" );
+    }
+    
+    static String stripLastPath(String urlString) throws MalformedURLException {
+        String domain = getDomain( urlString );
+        String part = urlString.substring( 0, urlString.lastIndexOf( "/" ) );
+        if (part.equals( domain )) {
+            return domain.concat( "/" );
+        } else {
+            return urlString.substring( 0, urlString.lastIndexOf( "/", urlString.lastIndexOf( "/" ) - 1 ) ).concat( "/" );
+        }
     }
 
     private static String getRedirect(String urlstring, BlpModel bm) throws Exception {
