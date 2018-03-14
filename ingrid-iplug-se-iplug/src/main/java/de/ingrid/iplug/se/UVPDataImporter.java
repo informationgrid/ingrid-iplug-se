@@ -663,6 +663,9 @@ public class UVPDataImporter {
             String content = null;
             while ((content = reader.readLine()) != null) {
                 sb.append( content );
+                if (content.toLowerCase().contains( "</head" )) {
+                    break;
+                }
             }
             String html = sb.toString();
             html = html.replace( "\n", "" );
@@ -678,11 +681,11 @@ public class UVPDataImporter {
                 return null;
             }
             html = html.substring( indexContent );
-            int indexURLStart = html.toLowerCase().indexOf( ";url=" );
+            int indexURLStart = html.toLowerCase().indexOf( "url=" );
             if (indexURLStart < 0) {
                 return null;
             }
-            html = html.substring( indexURLStart + 5 );
+            html = html.substring( indexURLStart + 4 );
             int indexURLEnd = html.toLowerCase().indexOf( "\"" );
             if (indexURLEnd < 0) {
                 return null;
