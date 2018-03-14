@@ -75,6 +75,7 @@ import com.tngtech.configbuilder.ConfigBuilder;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Metadata;
 import de.ingrid.iplug.se.db.model.Url;
+import de.ingrid.iplug.se.utils.TrustModifier;
 
 /**
  * UVP data importer. Imports data from an excel file directly into the url
@@ -557,6 +558,7 @@ public class UVPDataImporter {
         if (url != null && url.length() > 0) {
             try {
                 URLConnection conn = new URL( url ).openConnection();
+                TrustModifier.relaxHostChecking((HttpURLConnection) conn);
                 conn.connect();
             } catch (Exception e) {
                 isValid = false;
@@ -598,6 +600,7 @@ public class UVPDataImporter {
         try {
 
             con = (HttpURLConnection) (new URL( urlstring ).openConnection());
+            TrustModifier.relaxHostChecking(con);
             con.setRequestProperty( "User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0" );
             con.setInstanceFollowRedirects( false );
             con.connect();
@@ -620,8 +623,12 @@ public class UVPDataImporter {
                 }
             }
 
-        } catch (Exception e) {
-            addLog( bm.name, "Problems accessing '" + urlstring + " (HTTP_ERROR: " + responseCode + ")", "IGNORED" );
+        } catch (Throwable e) {
+            if (responseCode == -1) {
+                addLog( bm.name, "Problems accessing '" + urlstring + " (HTTP_ERROR: " + responseCode + ") (" + e + ")", "IGNORED" );
+            } else {
+                addLog( bm.name, "Problems accessing '" + urlstring + " (HTTP_ERROR: " + responseCode + ")", "IGNORED" );
+            }
             throw e;
         } finally {
             if (con != null) {
