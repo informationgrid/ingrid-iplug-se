@@ -40,6 +40,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -108,6 +109,8 @@ public class UVPDataImporter {
     public static Configuration conf;
 
     private static EntityManager em;
+
+    private static Map<String, List<StatusEntry>> status = new LinkedHashMap<String, List<StatusEntry>>();
 
     public static void main(String[] args) throws Exception {
 
@@ -214,10 +217,24 @@ public class UVPDataImporter {
                 em.remove( url );
             }
 
+            int cntRecords = 0;
+
+            // initialize with ignored records
+            for (String key : status.keySet()) {
+                for (StatusEntry entry : status.get( key )) {
+                    if (entry.type.equals( "IGNORED" )) {
+                        cntRecords++;
+                    }
+                }
+            }
+
+            int cntIgnoredRecords = 0;
             int cntUrls = 0;
             int cntMarker = 0;
 
             for (BlpModel bm : blpModels) {
+
+                cntRecords++;
 
                 // for display in map we need ONE marker per blp dataset
                 // therefore the map marker data is pushed to index only for one
@@ -235,8 +252,7 @@ public class UVPDataImporter {
                         cntUrls++;
                         cntMarker++;
                     } catch (Exception e) {
-                        System.out.println( "Problems handling '" + bm.urlInProgress + "' (origin: '" + bm.urlInProgress + "'). " + bm + ": " + e );
-                        System.out.println( "Ignoring Entry!" );
+                        // ignore record
                     }
                 }
                 if (bm.urlFinished != null && bm.urlFinished.length() > 0 && bm.urlFinished != bm.urlInProgress) {
@@ -251,13 +267,24 @@ public class UVPDataImporter {
                             cntMarker++;
                         }
                     } catch (Exception e) {
-                        System.out.println( "Problems handling '" + bm.urlFinished + "' (origin: '" + bm.urlFinished + "'). " + bm + ": " + e );
-                        System.out.println( "Ignoring Entry!" );
-
+                        // ignore record
                     }
                 }
             }
-            System.out.println( "Finish. Added  " + cntUrls + " urls to instance '" + instance + "', mark " + cntMarker + " records as marker to be displayed on map." );
+            System.out.println( "\n\nIgnored Entries by name:\n" );
+
+            for (String k : status.keySet()) {
+
+                if (status.get( k ).stream().filter( entry -> entry.type.equals( "IGNORED" ) ).count() > 0) {
+                    cntIgnoredRecords++;
+                    System.out.println( k );
+                    for (StatusEntry entry : status.get( k )) {
+                        System.out.println( "  " + entry.message );
+                    }
+                }
+            }
+            System.out.println( "\nFinish. Records: " + cntRecords + ", Ignored records or Urls: " + cntIgnoredRecords + ", Urls added: " + cntUrls + " urls to instance '" + instance + "', mark "
+                    + cntMarker + " records as marker to be displayed on map." );
 
             tx.commit();
         } catch (Exception e) {
@@ -285,8 +312,8 @@ public class UVPDataImporter {
     }
 
     /**
-     * Derive limit urls from an url. It extracts the domain and adds limit urls
-     * for http/https or "www." prefixes.
+     * Derive limit urls from an url. Currently only the original URL is
+     * returned because all redirects are already resolved before.
      * 
      * @param urlStr
      * @return
@@ -295,26 +322,6 @@ public class UVPDataImporter {
     public static List<String> getLimitUrls(String urlStr) throws MalformedURLException {
         List<String> result = new ArrayList<String>();
         result.add( urlStr );
-        String domain = getDomain( urlStr ) + "/";
-        result.add( domain );
-
-        // add www. prefix if missing or r
-        if (domain.contains( "://www." )) {
-            result.add( domain.replace( "://www.", "://" ) );
-            result.add( urlStr.replace( "://www.", "://" ) );
-        } else {
-            result.add( domain.replace( "://", "://www." ) );
-            result.add( urlStr.replace( "://", "://www." ) );
-        }
-
-        // insert https/http as Limit URLs
-        for (String url : new ArrayList<String>( result )) {
-            if (url.startsWith( "http://" )) {
-                result.add( url.replace( "http://", "https://" ) );
-            } else if (url.startsWith( "https://" )) {
-                result.add( url.replace( "https://", "http://" ) );
-            }
-        }
 
         return result;
 
@@ -383,8 +390,6 @@ public class UVPDataImporter {
                         boolean isValid = validate( bm );
                         if (isValid) {
                             blpModels.add( bm );
-                        } else {
-                            System.out.println( "Ignoring Entry!" );
                         }
                     }
                 }
@@ -421,7 +426,7 @@ public class UVPDataImporter {
 
         idxUrl.setStatus( "200" );
 
-        String actualUrl = getActualUrl( urlStr );
+        String actualUrl = getActualUrl( urlStr, bm );
 
         idxUrl.setUrl( actualUrl );
 
@@ -524,17 +529,17 @@ public class UVPDataImporter {
 
         if (bm.name == null || bm.name.length() <= 3) {
             isValid = false;
-            System.out.println( "\nName is null or too short." + bm );
+            addLog( bm.name, "Name is null or too short.", "IGNORED" );
         }
 
         if (bm.lat < 47 || bm.lat > 56) {
             isValid = false;
-            System.out.println( "\nLat not between 47 and 56." + bm );
+            addLog( bm.name, "Lat not between 47 and 56.", "IGNORED" );
         }
 
         if (bm.lon < 5 || bm.lon > 15) {
             isValid = false;
-            System.out.println( "\nLon not between 5 and 15." + bm );
+            addLog( bm.name, "Lon not between 5 and 15.", "IGNORED" );
         }
 
         String url = bm.urlInProgress;
@@ -544,7 +549,7 @@ public class UVPDataImporter {
                 conn.connect();
             } catch (Exception e) {
                 isValid = false;
-                System.out.println( "\nProblems accessing '" + url + "'. " + bm + ": " + e );
+                addLog( bm.name, "Problems accessing '" + url, "IGNORED" );
             }
         }
 
@@ -555,50 +560,48 @@ public class UVPDataImporter {
                 conn.connect();
             } catch (Exception e) {
                 isValid = false;
-                System.out.println( "\nProblems accessing '" + url + "'. " + bm + ": " + e );
+                addLog( bm.name, "Problems accessing '" + url, "IGNORED" );
             }
         }
         if ((bm.urlInProgress == null || bm.urlInProgress.length() == 0) && (bm.urlFinished == null || bm.urlFinished.length() == 0)) {
             isValid = false;
-            System.out.println( "\nNo url set in 'progress' or 'finished'. " + bm );
+            addLog( bm.name, "No url set in 'progress' or 'finished'.", "IGNORED" );
         }
 
         return isValid;
     }
 
-    public static String getActualUrl(String url) throws Exception {
+    public static String getActualUrl(String url, BlpModel bm) throws Exception {
 
         int termination = 10;
         while (termination-- > 0) {
             String actualUrl = null;
-            try {
-                actualUrl = getRedirect( url );
-            } catch (Exception e) {
-                throw e;
-            }
+            actualUrl = getRedirect( url, bm );
             if (actualUrl.equals( url )) {
                 return url;
             }
-            System.out.println( "WARN Redirect detected: '" + url + "' -> '" + actualUrl + "'. " );
+            addLog( bm.name, "Redirect detected: '" + url + "' -> '" + actualUrl + "'.", "REDIRECTS" );
             if (actualUrl.startsWith( "/" )) {
                 url = getDomain( url ).concat( actualUrl );
             } else {
                 url = actualUrl;
             }
         }
+        addLog( bm.name, "Too many redirects.", "IGNORED" );
         throw new Exception( "Too many Redirects: 10" );
     }
 
-    private static String getRedirect(String urlstring) throws IOException {
+    private static String getRedirect(String urlstring, BlpModel bm) throws Exception {
         HttpURLConnection con = null;
 
+        int responseCode = -1;
         try {
 
             con = (HttpURLConnection) (new URL( urlstring ).openConnection());
             con.setRequestProperty( "User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0" );
             con.setInstanceFollowRedirects( false );
             con.connect();
-            int responseCode = con.getResponseCode();
+            responseCode = con.getResponseCode();
             if (300 <= responseCode && responseCode <= 308) {
                 Map<String, List<String>> headers = con.getHeaderFields();
                 for (String header : headers.keySet()) {
@@ -618,11 +621,12 @@ public class UVPDataImporter {
             }
 
         } catch (Exception e) {
+            addLog( bm.name, "Problems accessing '" + urlstring + " (HTTP_ERROR: " + responseCode + ")", "IGNORED" );
+            throw e;
+        } finally {
             if (con != null) {
                 con.disconnect();
             }
-            
-            throw e;
         }
         return urlstring;
 
@@ -661,6 +665,26 @@ public class UVPDataImporter {
                 return null;
             }
             return html.substring( 0, indexURLEnd );
+        }
+
+    }
+
+    private static void addLog(String key, String message, String type) {
+        if (!status.containsKey( key )) {
+            status.put( key, new ArrayList<StatusEntry>() );
+        }
+        status.get( key ).add( new UVPDataImporter().new StatusEntry( message, type ) );
+
+    }
+
+    class StatusEntry {
+        String message;
+        String type;
+
+        StatusEntry(String message, String type) {
+            super();
+            this.message = message;
+            this.type = type;
         }
 
     }
