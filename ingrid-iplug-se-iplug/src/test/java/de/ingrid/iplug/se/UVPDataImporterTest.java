@@ -103,5 +103,13 @@ public class UVPDataImporterTest {
 
         }
     }
+    
+    @Test
+    public void testStripLastPath() throws MalformedURLException {
+        assertEquals( "http://test.domain.de/",  UVPDataImporter.stripLastPath( "http://test.domain.de/" ));
+        assertEquals( "http://test.domain.de/path1/path2/",  UVPDataImporter.stripLastPath( "http://test.domain.de/path1/path2/path3/" ));
+        assertEquals( "http://test.domain.de/",  UVPDataImporter.stripLastPath( "http://test.domain.de/path1/" ));
+        assertEquals( "http://test.domain.de/",  UVPDataImporter.stripLastPath( "http://test.domain.de/index.html" ));
+    }
 
 }
