@@ -52,14 +52,7 @@ public class UVPDataImporterTest {
     public void testGetLimitUrls() throws MalformedURLException {
 
         List<String> result = UVPDataImporter.getLimitUrls( "http://www.testdomain.net/somePath?someParameter=1" );
-        assertTrue( result.contains( "http://www.testdomain.net/" ) );
-        assertTrue( result.contains( "https://www.testdomain.net/" ) );
-        assertTrue( result.contains( "https://testdomain.net/" ) );
-        assertTrue( result.contains( "http://testdomain.net/" ) );
         assertTrue( result.contains( "http://www.testdomain.net/somePath?someParameter=1" ) );
-        assertTrue( result.contains( "http://testdomain.net/somePath?someParameter=1" ) );
-        assertTrue( result.contains( "https://www.testdomain.net/somePath?someParameter=1" ) );
-        assertTrue( result.contains( "https://testdomain.net/somePath?someParameter=1" ) );
 
         try {
             String d = UVPDataImporter.getDomain( "://www.testdomain" );
@@ -77,8 +70,6 @@ public class UVPDataImporterTest {
 
         List<UVPDataImporter.BlpModel> l = UVPDataImporter.readData( file.getAbsolutePath() );
         assertEquals( true, l.size() > 0 );
-        
-        String actualUrl = null;
 
         for (UVPDataImporter.BlpModel m : l) {
             try {
@@ -90,7 +81,7 @@ public class UVPDataImporterTest {
             }
             try {
                 if (m.urlFinished != null) {
-                    actualUrl = UVPDataImporter.getActualUrl( m.urlFinished );
+                    UVPDataImporter.getActualUrl( m.urlFinished, m );
                 }
             } catch (Exception e) {
                 System.out.println( "\nInvalid actual URL extracted from: " + m.urlFinished );
@@ -104,13 +95,13 @@ public class UVPDataImporterTest {
             }
             try {
                 if (m.urlInProgress != null) {
-                    actualUrl = UVPDataImporter.getActualUrl( m.urlInProgress );
+                    UVPDataImporter.getActualUrl( m.urlInProgress, m );
                 }
             } catch (Exception e) {
                 System.out.println( "\nInvalid actual URL extracted from: " + m.urlInProgress );
             }
-            
+
         }
     }
-    
+
 }
