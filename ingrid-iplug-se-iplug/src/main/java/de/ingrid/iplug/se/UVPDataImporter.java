@@ -663,7 +663,7 @@ public class UVPDataImporter {
             String content = null;
             while ((content = reader.readLine()) != null) {
                 sb.append( content );
-                if (content.toLowerCase().contains( "</head" )) {
+                if (content.toLowerCase().contains( "</head" ) || content.matches( "(?i)<meta.*?http-equiv=.*?refresh.*?>" )) {
                     break;
                 }
             }
