@@ -28,7 +28,7 @@
 	<author email="joachim@wemove.com">Joachim Müller</author>
   </properties>
   <body>
-    <release version="4.2.3" date="2018-xx-xx" description="Release 4.2.3">
+    <release version="4.2.3" date="2018-03-17" description="Release 4.2.3">
       <action type="fix" dev="wemove" issue="REDMINE-994">
         Improve Import of BLP Data: Resolve Redirects.
       </action>
