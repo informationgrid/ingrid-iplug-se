@@ -86,16 +86,18 @@ import de.ingrid.iplug.se.utils.TrustModifier;
  * The limit urls are set to the domain of the start url. Make sure the depth of
  * the crawl is set to 1 and no outlinks should be extracted.
  * 
- * The excel table must have a specific layout:
+ * The excel table must have a specific layout. The first row must contain the column names.
+ * 
  * <ul>
- * <li>First line is the header line and will be ignored.</li>
- * <li>1. column: BLP name that appears on map popup as title.</li>
- * <li>2. column: LAT of map marker coordinate.</li>
- * <li>3. column: LON of map marker coordinate.</li>
- * <li>4. column: Url to BLPs in progress.</li>
- * <li>5. column: Url to finished BLPs.</li>
- * <li>6. column: BLP description that appears on map popup.</li>
+ * <li>NAME: BLP name that appears on map popup as title.</li>
+ * <li>LAT: LAT of map marker coordinate.</li>
+ * <li>LON: LON of map marker coordinate.</li>
+ * <li>URL_VERFAHREN_OFFEN: Url to BLPs in progress.</li>
+ * <li>URL_VERFAHREN_ABGESCHLOSSEN: Url to finished BLPs.</li>
+ * <li>MITGLIEDSGEMEINDEN: BLP description that appears on map popup.</li>
  * </ul>
+ * 
+ * Columns can be mixed. The excel file can contain other columns, as long as the specified columns exist.
  * 
  * @author joachim@wemove.com
  */
@@ -125,7 +127,7 @@ public class UVPDataImporter {
                 .withArgName( "excel file name" )
                 .hasArg()
                 .withDescription(
-                        "path to excel file with columns: BLP name; LAT; LON; Url to BLPs in progress; Url to finished BLPs; BLP description (first header line is ignored)" )
+                        "path to excel file with columns: NAME; LAT; LON; URL_VERFAHREN_OFFEN; URL_VERFAHREN_ABGESCHLOSSEN; MITGLIEDSGEMEINDEN (column names in first row)" )
                 .create( "excelfile" );
         options.addOption( excelfileOption );
         @SuppressWarnings("static-access")
@@ -353,44 +355,60 @@ public class UVPDataImporter {
             }
             Sheet sheet = workbook.getSheetAt( 0 );
             Iterator<Row> it = sheet.iterator();
+            boolean gotHeader = false;
+            Map<Integer, String> columnNames = new HashMap<Integer, String>();
             if (it.hasNext()) {
-                // skip first row (header)
-                it.next();
+                
                 while (it.hasNext()) {
                     Iterator<Cell> ci = it.next().cellIterator();
-                    BlpModel bm = new UVPDataImporter().new BlpModel();
-                    while (ci.hasNext()) {
-                        Cell cell = ci.next();
-                        int columnIndex = cell.getColumnIndex();
-
-                        switch (columnIndex) {
-                        case 1:
-                            bm.name = cell.getStringCellValue();
-                            break;
-                        case 2:
-                            bm.lat = cell.getNumericCellValue();
-                            break;
-                        case 3:
-                            bm.lon = cell.getNumericCellValue();
-                            break;
-                        case 4:
-                            bm.urlInProgress = cell.getStringCellValue();
-                            break;
-                        case 5:
-                            bm.urlFinished = cell.getStringCellValue();
-                            break;
-                        case 6:
-                            bm.descr = cell.getStringCellValue();
-                            break;
+                    // handle header
+                    if (!gotHeader) {
+                        while (ci.hasNext()) {
+                            Cell cell = ci.next();
+                            int columnIndex = cell.getColumnIndex();
+                            String columnName = cell.getStringCellValue();
+                            if (columnName == null || columnName.length() == 0) {
+                                throw new IllegalArgumentException( "No column name specified for column " + columnIndex + "." );
+                            }
+                            columnNames.put( columnIndex, columnName );
                         }
-                    }
+                        gotHeader = true;
+                    } else { 
 
-                    System.out.print( "." );
-
-                    if (bm.name != null && bm.name.length() > 0) {
-                        boolean isValid = validate( bm );
-                        if (isValid) {
-                            blpModels.add( bm );
+                        BlpModel bm = new UVPDataImporter().new BlpModel();
+                        while (ci.hasNext()) {
+                            Cell cell = ci.next();
+                            int columnIndex = cell.getColumnIndex();
+    
+                            switch (columnNames.get( columnIndex )) {
+                            case "NAME":
+                                bm.name = cell.getStringCellValue();
+                                break;
+                            case "LAT":
+                                bm.lat = cell.getNumericCellValue();
+                                break;
+                            case "LON":
+                                bm.lon = cell.getNumericCellValue();
+                                break;
+                            case "URL_VERFAHREN_OFFEN":
+                                bm.urlInProgress = cell.getStringCellValue();
+                                break;
+                            case "URL_VERFAHREN_ABGESCHLOSSEN":
+                                bm.urlFinished = cell.getStringCellValue();
+                                break;
+                            case "MITGLIEDSGEMEINDEN":
+                                bm.descr = cell.getStringCellValue();
+                                break;
+                            }
+                        }
+    
+                        System.out.print( "." );
+    
+                        if (bm.name != null && bm.name.length() > 0) {
+                            boolean isValid = validate( bm );
+                            if (isValid) {
+                                blpModels.add( bm );
+                            }
                         }
                     }
                 }
