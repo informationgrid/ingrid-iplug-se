@@ -61,6 +61,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -86,7 +87,8 @@ import de.ingrid.iplug.se.utils.TrustModifier;
  * The limit urls are set to the domain of the start url. Make sure the depth of
  * the crawl is set to 1 and no outlinks should be extracted.
  * 
- * The excel table must have a specific layout. The first row must contain the column names.
+ * The excel table must have a specific layout. The first row must contain the
+ * column names.
  * 
  * <ul>
  * <li>NAME: BLP name that appears on map popup as title.</li>
@@ -97,7 +99,8 @@ import de.ingrid.iplug.se.utils.TrustModifier;
  * <li>MITGLIEDSGEMEINDEN: BLP description that appears on map popup.</li>
  * </ul>
  * 
- * Columns can be mixed. The excel file can contain other columns, as long as the specified columns exist.
+ * Columns can be mixed. The excel file can contain other columns, as long as
+ * the specified columns exist.
  * 
  * @author joachim@wemove.com
  */
@@ -286,8 +289,8 @@ public class UVPDataImporter {
                     }
                 }
             }
-            System.out.println( "\nFinish. Records: " + cntRecords + ", Ignored records or Urls: " + cntIgnoredRecords + ", Urls added: " + cntUrls + " urls to instance '" + instance + "', mark "
-                    + cntMarker + " records as marker to be displayed on map." );
+            System.out.println( "\nFinish. Records: " + cntRecords + ", Ignored records or Urls: " + cntIgnoredRecords + ", Urls added: " + cntUrls + " urls to instance '"
+                    + instance + "', mark " + cntMarker + " records as marker to be displayed on map." );
 
             tx.commit();
         } catch (Exception e) {
@@ -312,6 +315,31 @@ public class UVPDataImporter {
         URL url = new URL( urlStr );
         String host = url.getHost();
         return urlStr.substring( 0, urlStr.indexOf( host ) + host.length() );
+    }
+
+    /**
+     * Get the parent of the given URL. If the URL contains only of an domain,
+     * return the domain.
+     * 
+     * <p>
+     * http://test.domain.de/ -> http://test.domain.de<br>
+     * http://test.domain.de -> http://test.domain.de<br>
+     * http://test.domain.de/a -> http://test.domain.de<br>
+     * http://test.domain.de/a/ -> http://test.domain.de/a<br>
+     * http://test.domain.de/a/b.de -> http://test.domain.de/a<br>
+     * </p>
+     * 
+     * @param urlStr
+     * @return
+     * @throws MalformedURLException
+     */
+    public static String getParent(String urlStr) throws MalformedURLException {
+        String d = getDomain( urlStr );
+        if (urlStr.equals( d ) || urlStr.equals( d.concat( "/" ) )) {
+            return d;
+        } else {
+            return FilenameUtils.getPath( urlStr ).substring( 0, FilenameUtils.getPath( urlStr ).length() - 1 );
+        }
     }
 
     /**
@@ -358,7 +386,7 @@ public class UVPDataImporter {
             boolean gotHeader = false;
             Map<Integer, String> columnNames = new HashMap<Integer, String>();
             if (it.hasNext()) {
-                
+
                 while (it.hasNext()) {
                     Iterator<Cell> ci = it.next().cellIterator();
                     // handle header
@@ -373,13 +401,13 @@ public class UVPDataImporter {
                             columnNames.put( columnIndex, columnName );
                         }
                         gotHeader = true;
-                    } else { 
+                    } else {
 
                         BlpModel bm = new UVPDataImporter().new BlpModel();
                         while (ci.hasNext()) {
                             Cell cell = ci.next();
                             int columnIndex = cell.getColumnIndex();
-    
+
                             switch (columnNames.get( columnIndex )) {
                             case "NAME":
                                 bm.name = cell.getStringCellValue();
@@ -401,9 +429,9 @@ public class UVPDataImporter {
                                 break;
                             }
                         }
-    
+
                         System.out.print( "." );
-    
+
                         if (bm.name != null && bm.name.length() > 0) {
                             boolean isValid = validate( bm );
                             if (isValid) {
@@ -576,7 +604,7 @@ public class UVPDataImporter {
         if (url != null && url.length() > 0) {
             try {
                 URLConnection conn = new URL( url ).openConnection();
-                TrustModifier.relaxHostChecking((HttpURLConnection) conn);
+                TrustModifier.relaxHostChecking( (HttpURLConnection) conn );
                 conn.connect();
             } catch (Exception e) {
                 isValid = false;
@@ -602,10 +630,15 @@ public class UVPDataImporter {
             }
             addLog( bm.name, "Redirect detected: '" + url + "' -> '" + actualUrl + "'.", "REDIRECTS" );
             if (actualUrl.startsWith( "/" )) {
+                // redirect to local absolute url
                 url = getDomain( url ).concat( actualUrl );
+            } else if (actualUrl.indexOf( "://" ) < 0 || actualUrl.indexOf( "://" ) > 10) {
+                // redirect to local relative url
+                url = getParent( url ).concat( "/" ).concat( actualUrl );
             } else if (actualUrl.startsWith( "../" )) {
+                // redirect to local parent directory based url
                 while (actualUrl.startsWith( "../" )) {
-                    url = stripLastPath(url);
+                    url = stripLastPath( url );
                     actualUrl = actualUrl.substring( 3 );
                 }
                 url = url.concat( actualUrl );
@@ -616,7 +649,7 @@ public class UVPDataImporter {
         addLog( bm.name, "Too many redirects.", "IGNORED" );
         throw new Exception( "Too many Redirects: 10" );
     }
-    
+
     static String stripLastPath(String urlString) throws MalformedURLException {
         String domain = getDomain( urlString );
         String part = urlString.substring( 0, urlString.lastIndexOf( "/" ) );
@@ -632,9 +665,8 @@ public class UVPDataImporter {
 
         int responseCode = -1;
         try {
-
             con = (HttpURLConnection) (new URL( urlstring ).openConnection());
-            TrustModifier.relaxHostChecking(con);
+            TrustModifier.relaxHostChecking( con );
             con.setRequestProperty( "User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0" );
             con.setInstanceFollowRedirects( false );
             con.connect();

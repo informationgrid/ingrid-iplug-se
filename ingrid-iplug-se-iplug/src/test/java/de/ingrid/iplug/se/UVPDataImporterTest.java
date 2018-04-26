@@ -33,6 +33,8 @@ import java.util.List;
 
 import org.junit.Test;
 
+import de.ingrid.iplug.se.UVPDataImporter.BlpModel;
+
 public class UVPDataImporterTest {
 
     @Test
@@ -103,13 +105,32 @@ public class UVPDataImporterTest {
 
         }
     }
-    
+
     @Test
     public void testStripLastPath() throws MalformedURLException {
-        assertEquals( "http://test.domain.de/",  UVPDataImporter.stripLastPath( "http://test.domain.de/" ));
-        assertEquals( "http://test.domain.de/path1/path2/",  UVPDataImporter.stripLastPath( "http://test.domain.de/path1/path2/path3/" ));
-        assertEquals( "http://test.domain.de/",  UVPDataImporter.stripLastPath( "http://test.domain.de/path1/" ));
-        assertEquals( "http://test.domain.de/",  UVPDataImporter.stripLastPath( "http://test.domain.de/index.html" ));
+        assertEquals( "http://test.domain.de/", UVPDataImporter.stripLastPath( "http://test.domain.de/" ) );
+        assertEquals( "http://test.domain.de/path1/path2/", UVPDataImporter.stripLastPath( "http://test.domain.de/path1/path2/path3/" ) );
+        assertEquals( "http://test.domain.de/", UVPDataImporter.stripLastPath( "http://test.domain.de/path1/" ) );
+        assertEquals( "http://test.domain.de/", UVPDataImporter.stripLastPath( "http://test.domain.de/index.html" ) );
+    }
+
+    @Test
+    public void testGetParent() throws MalformedURLException {
+        assertEquals( "http://test.domain.de", UVPDataImporter.getParent( "http://test.domain.de/" ) );
+        assertEquals( "http://test.domain.de", UVPDataImporter.getParent( "http://test.domain.de" ) );
+        assertEquals( "http://test.domain.de", UVPDataImporter.getParent( "http://test.domain.de/a" ) );
+        assertEquals( "http://test.domain.de/a", UVPDataImporter.getParent( "http://test.domain.de/a/" ) );
+        assertEquals( "http://test.domain.de/a", UVPDataImporter.getParent( "http://test.domain.de/a/b.de" ) );
+    }
+
+    // @Test // activate as needed
+    public void testGetActualUrl() throws Exception {
+
+        BlpModel bm = new UVPDataImporter().new BlpModel();
+        bm.name = "test";
+
+        assertEquals( "http://www.merchweiler.de/p/dlhome.asp?artikel_id=&liste=491&tmpl_typ=Liste&lp=3691&area=100",
+                UVPDataImporter.getActualUrl( "http://www.merchweiler.de/", bm ) );
     }
 
 }
