@@ -613,7 +613,7 @@ public class UVPDataImporter {
         }
         if ((bm.urlInProgress == null || bm.urlInProgress.length() == 0) && (bm.urlFinished == null || bm.urlFinished.length() == 0)) {
             isValid = false;
-            addLog( bm.name, "No url set in 'progress' or 'finished'.", "IGNORED" );
+            addLog( bm.name, "No url set in 'URL_VERFAHREN_OFFEN' or 'URL_VERFAHREN_ABGESCHLOSSEN'.", "IGNORED" );
         }
 
         return isValid;
