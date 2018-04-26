@@ -386,7 +386,6 @@ public class UVPDataImporter {
             boolean gotHeader = false;
             Map<Integer, String> columnNames = new HashMap<Integer, String>();
             if (it.hasNext()) {
-
                 while (it.hasNext()) {
                     Iterator<Cell> ci = it.next().cellIterator();
                     // handle header
@@ -408,26 +407,28 @@ public class UVPDataImporter {
                             Cell cell = ci.next();
                             int columnIndex = cell.getColumnIndex();
 
-                            switch (columnNames.get( columnIndex )) {
-                            case "NAME":
-                                bm.name = cell.getStringCellValue();
-                                break;
-                            case "LAT":
-                                bm.lat = cell.getNumericCellValue();
-                                break;
-                            case "LON":
-                                bm.lon = cell.getNumericCellValue();
-                                break;
-                            case "URL_VERFAHREN_OFFEN":
-                                bm.urlInProgress = cell.getStringCellValue();
-                                break;
-                            case "URL_VERFAHREN_ABGESCHLOSSEN":
-                                bm.urlFinished = cell.getStringCellValue();
-                                break;
-                            case "MITGLIEDSGEMEINDEN":
-                                bm.descr = cell.getStringCellValue();
-                                break;
-                            }
+                                if (columnIndex < columnNames.size()) {
+                                    switch (columnNames.get( columnIndex )) {
+                                    case "NAME":
+                                        bm.name = cell.getStringCellValue();
+                                        break;
+                                    case "LAT":
+                                        bm.lat = cell.getNumericCellValue();
+                                        break;
+                                    case "LON":
+                                        bm.lon = cell.getNumericCellValue();
+                                        break;
+                                    case "URL_VERFAHREN_OFFEN":
+                                        bm.urlInProgress = cell.getStringCellValue();
+                                        break;
+                                    case "URL_VERFAHREN_ABGESCHLOSSEN":
+                                        bm.urlFinished = cell.getStringCellValue();
+                                        break;
+                                    case "MITGLIEDSGEMEINDEN":
+                                        bm.descr = cell.getStringCellValue();
+                                        break;
+                                    }
+                                }
                         }
 
                         System.out.print( "." );
@@ -579,12 +580,12 @@ public class UVPDataImporter {
             addLog( bm.name, "Name is null or too short.", "IGNORED" );
         }
 
-        if (bm.lat < 47 || bm.lat > 56) {
+        if (bm.lat == null || bm.lat < 47 || bm.lat > 56) {
             isValid = false;
             addLog( bm.name, "Lat not between 47 and 56.", "IGNORED" );
         }
 
-        if (bm.lon < 5 || bm.lon > 15) {
+        if (bm.lon == null || bm.lon < 5 || bm.lon > 15) {
             isValid = false;
             addLog( bm.name, "Lon not between 5 and 15.", "IGNORED" );
         }

@@ -68,7 +68,7 @@ public class UVPDataImporterTest {
     public void testReadData() throws IOException {
 
         ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File( classLoader.getResource( "blp-urls-test.xlsx" ).getFile() );
+        File file = new File( classLoader.getResource( "180417_blp_daten_BB.xlsx" ).getFile() );
 
         List<UVPDataImporter.BlpModel> l = UVPDataImporter.readData( file.getAbsolutePath() );
         assertEquals( true, l.size() > 0 );
@@ -79,28 +79,28 @@ public class UVPDataImporterTest {
                     UVPDataImporter.getLimitUrls( m.urlFinished );
                 }
             } catch (Exception e) {
-                fail( "Invalid LIMIT URL extracted from: " + m.urlFinished );
+                fail( "Invalid LIMIT URL extracted from: " + m.urlFinished + " in " + m.name  );
             }
             try {
                 if (m.urlFinished != null) {
                     UVPDataImporter.getActualUrl( m.urlFinished, m );
                 }
             } catch (Exception e) {
-                System.out.println( "\nInvalid actual URL extracted from: " + m.urlFinished );
+                System.out.println( "\nInvalid actual URL extracted from: " + m.urlFinished + " in " + m.name  );
             }
             try {
                 if (m.urlInProgress != null) {
                     UVPDataImporter.getLimitUrls( m.urlInProgress );
                 }
             } catch (Exception e) {
-                fail( "Invalid LIMIT URL extracted from: " + m.urlInProgress );
+                fail( "Invalid LIMIT URL extracted from: " + m.urlInProgress + " in " + m.name  );
             }
             try {
                 if (m.urlInProgress != null) {
                     UVPDataImporter.getActualUrl( m.urlInProgress, m );
                 }
             } catch (Exception e) {
-                System.out.println( "\nInvalid actual URL extracted from: " + m.urlInProgress );
+                System.out.println( "\nInvalid actual URL extracted from: " + m.urlInProgress + " in " + m.name  );
             }
 
         }
