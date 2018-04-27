@@ -253,7 +253,7 @@ public class UVPDataImporter {
                     // do not add BLP marker metadata, if the other url starts with this url
                     // since the crawler will generate 2 marker (The metadata of url A will be applied to
                     // all urls by the crawler that match the url A.). 
-                    if (bm.urlFinished != null && bm.urlFinished.startsWith( bm.urlInProgress )) {
+                    if (bm.urlFinished != null && !bm.urlFinished.equals( bm.urlInProgress) && bm.urlFinished.startsWith( bm.urlInProgress )) {
                         pushBlpDataToIndex = false;
                     }
                     
@@ -276,7 +276,7 @@ public class UVPDataImporter {
                         // ignore record
                     }
                 }
-                if (bm.urlFinished != null && bm.urlFinished.length() > 0 && bm.urlFinished != bm.urlInProgress) {
+                if (bm.urlFinished != null && bm.urlFinished.length() > 0 && !bm.urlFinished.equals( bm.urlInProgress)) {
                     
 
                     // add BLP meta data, if not already set, since we only need
