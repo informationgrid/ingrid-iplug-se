@@ -249,11 +249,26 @@ public class UVPDataImporter {
 
                 System.out.println( "Add entry '" + bm.name + "'." );
                 if (bm.urlInProgress != null && bm.urlInProgress.length() > 0) {
+                    
+                    // do not add BLP marker metadata, if the other url starts with this url
+                    // since the crawler will generate 2 marker (The metadata of url A will be applied to
+                    // all urls by the crawler that match the url A.). 
+                    if (bm.urlFinished != null && bm.urlFinished.startsWith( bm.urlInProgress )) {
+                        pushBlpDataToIndex = false;
+                    }
+                    
                     // add BLP meta data
                     Url url = null;
                     try {
                         url = createUrl( instance, partner, bm.urlInProgress, bm, pushBlpDataToIndex );
-                        pushBlpDataToIndex = false;
+                        
+                        // make sure that the next url will be marked as a map marker
+                        // in case the other url starts with this url
+                        // see comment above for an explanation
+                        if (!pushBlpDataToIndex) {
+                            pushBlpDataToIndex = true;
+                        }
+                        
                         em.persist( url );
                         cntUrls++;
                         cntMarker++;
@@ -262,6 +277,8 @@ public class UVPDataImporter {
                     }
                 }
                 if (bm.urlFinished != null && bm.urlFinished.length() > 0 && bm.urlFinished != bm.urlInProgress) {
+                    
+
                     // add BLP meta data, if not already set, since we only need
                     // the meta data once.
                     Url url = null;
