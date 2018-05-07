@@ -250,10 +250,10 @@ public class UVPDataImporter {
                 System.out.println( "Add entry '" + bm.name + "'." );
                 if (bm.urlInProgress != null && bm.urlInProgress.length() > 0) {
                     
-                    // do not add BLP marker metadata, if the other url starts with this url
+                    // do add the marker meta data only to the longer url of FINISHED or IN_PROGRESS
                     // since the crawler will generate 2 marker (The metadata of url A will be applied to
                     // all urls by the crawler that match the url A.). 
-                    if (bm.urlFinished != null && !bm.urlFinished.equals( bm.urlInProgress) && bm.urlFinished.startsWith( bm.urlInProgress )) {
+                    if (isFinishedUrlLongerThanInProgressUrl(bm)) {
                         pushBlpDataToIndex = false;
                     }
                     
@@ -267,11 +267,12 @@ public class UVPDataImporter {
                         // see comment above for an explanation
                         if (!pushBlpDataToIndex) {
                             pushBlpDataToIndex = true;
+                        } else {
+                            cntMarker++;
                         }
                         
                         em.persist( url );
                         cntUrls++;
-                        cntMarker++;
                     } catch (Exception e) {
                         // ignore record
                     }
@@ -635,6 +636,30 @@ public class UVPDataImporter {
         }
 
         return isValid;
+    }
+    
+    /**
+     * Checks if the FINISH url is longer than the IN_PROGRESS url. Ignores the protocol.
+     * 
+     * @param bm
+     * @return True if FINISH url is longer than the IN_PROGRESS url. False otherwise (FINISH=NULL; FINISH == IN_PROGRESS)
+     * @throws MalformedURLException
+     */
+    public static boolean isFinishedUrlLongerThanInProgressUrl(BlpModel bm) throws MalformedURLException {
+        if (bm.urlFinished== null || bm.urlInProgress == null) {
+            return false;
+        }
+        
+        URL urlFinished = new URL( bm.urlFinished );
+        String finished = bm.urlFinished.substring( bm.urlFinished.indexOf( urlFinished.getProtocol() ) + urlFinished.getProtocol().length(), bm.urlFinished.length() );
+        URL urlInProgress = new URL( bm.urlInProgress );
+        String inProgress = bm.urlInProgress.substring( bm.urlInProgress.indexOf( urlInProgress.getProtocol() ) + urlInProgress.getProtocol().length(), bm.urlInProgress.length() );
+        
+        if (!finished.equals( inProgress) && finished.startsWith( inProgress )) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public static String getActualUrl(String url, BlpModel bm) throws Exception {

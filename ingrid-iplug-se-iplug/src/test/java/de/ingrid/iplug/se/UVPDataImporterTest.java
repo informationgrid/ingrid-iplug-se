@@ -122,6 +122,33 @@ public class UVPDataImporterTest {
         assertEquals( "http://test.domain.de/a", UVPDataImporter.getParent( "http://test.domain.de/a/" ) );
         assertEquals( "http://test.domain.de/a", UVPDataImporter.getParent( "http://test.domain.de/a/b.de" ) );
     }
+    
+    @Test
+    public void testIsFinishedUrlLongerThanInProgressUrl() throws MalformedURLException {
+        BlpModel bm = new UVPDataImporter().new BlpModel();
+        bm.urlFinished = "http://test.domain.de";
+        bm.urlInProgress = "http://test.domain.de/path/";
+        assertTrue(!UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
+        bm.urlFinished = "http://test.domain.de/path";
+        bm.urlInProgress = "http://test.domain.de/";
+        assertTrue(UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
+        bm.urlFinished = "http://test.domain.de/path/";
+        bm.urlInProgress = "http://test.domain.de/path/";
+        assertTrue(!UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
+        bm.urlFinished = null;
+        bm.urlInProgress = "http://test.domain.de/path/";
+        assertTrue(!UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
+        bm.urlFinished = "http://test.domain.de/path/";
+        bm.urlInProgress = null;
+        assertTrue(!UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
+        bm.urlFinished = "https://test.domain.de/path/";
+        bm.urlInProgress = "http://test.domain.de/";
+        assertTrue(UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
+        bm.urlFinished = "http://test.domain.de/path/";
+        bm.urlInProgress = "https://test.domain.de/";
+        assertTrue(UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
+    }
+    
 
     // @Test // activate as needed
     public void testGetActualUrl() throws Exception {
