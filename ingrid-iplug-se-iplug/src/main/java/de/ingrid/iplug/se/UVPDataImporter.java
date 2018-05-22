@@ -250,16 +250,16 @@ public class UVPDataImporter {
                 System.out.println( "Add entry '" + bm.name + "'." );
                 if (bm.urlInProgress != null && bm.urlInProgress.length() > 0) {
                     
-                    // do add the marker meta data only to the longer url of FINISHED or IN_PROGRESS
-                    // since the crawler will generate 2 marker (The metadata of url A will be applied to
-                    // all urls by the crawler that match the url A.). 
-                    if (isFinishedUrlLongerThanInProgressUrl(bm)) {
-                        pushBlpDataToIndex = false;
-                    }
-                    
                     // add BLP meta data
                     Url url = null;
                     try {
+                        // do add the marker meta data only to the longer url of FINISHED or IN_PROGRESS
+                        // since the crawler will generate 2 marker (The metadata of url A will be applied to
+                        // all urls by the crawler that match the url A.). 
+                        if (isFinishedUrlLongerThanInProgressUrl(bm)) {
+                            pushBlpDataToIndex = false;
+                        }
+
                         url = createUrl( instance, partner, bm.urlInProgress, bm, pushBlpDataToIndex );
                         
                         // make sure that the next url will be marked as a map marker
@@ -646,7 +646,7 @@ public class UVPDataImporter {
      * @throws MalformedURLException
      */
     public static boolean isFinishedUrlLongerThanInProgressUrl(BlpModel bm) throws MalformedURLException {
-        if (bm.urlFinished== null || bm.urlInProgress == null) {
+        if (bm.urlFinished == null || bm.urlFinished.trim().length() == 0 || bm.urlInProgress == null || bm.urlInProgress.trim().length() == 0) {
             return false;
         }
         
