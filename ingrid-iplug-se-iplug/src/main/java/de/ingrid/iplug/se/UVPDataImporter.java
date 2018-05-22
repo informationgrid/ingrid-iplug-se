@@ -268,6 +268,7 @@ public class UVPDataImporter {
                         if (!pushBlpDataToIndex) {
                             pushBlpDataToIndex = true;
                         } else {
+                            pushBlpDataToIndex = false;
                             cntMarker++;
                         }
                         
