@@ -115,7 +115,7 @@ public class NutchConfigTool {
         if (doc == null) {
             openNutchConfig();
         }
-        return xpath.getString(doc, "//value[text()='" + property + "']/following-sibling::value");
+        return xpath.getString(doc, "//name[text()='" + property + "']/following-sibling::value");
     }
 
     /**

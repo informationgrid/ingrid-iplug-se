@@ -353,4 +353,10 @@
         <description>If true the bw filter mechanism makes no difference between http and https URLs.</description>
     </property>
 
+    <property>
+        <name>ingrid.delete.before.crawl</name>
+        <value>false</value>
+        <description>If true all data is removed before each crawl. This should only be used if single URLs are crawled and all URLs should be fetched for every crawl.</description>
+    </property>
+
 </configuration>

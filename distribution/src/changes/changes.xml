@@ -28,7 +28,10 @@
 	<author email="joachim@wemove.com">Joachim Müller</author>
   </properties>
   <body>
-    <release version="4.3.0-SNAPSHOT" date="2018-xx-xx" description="Release 4.3.0">
+    <release version="4.4.0-SNAPSHOT" date="2018-xx-xx" description="Release 4.4.0">
+      <action type="fix" dev="wemove" issue="REDMINE-1093">
+        Introduce new property 'ingrid.delete.before.crawl' to make the UVP BLP crawl more robust.
+      </action>
       <action type="fix" dev="wemove" issue="REDMINE-994">
         Improve Import of BLP Data: Resolve Redirects.
       </action>

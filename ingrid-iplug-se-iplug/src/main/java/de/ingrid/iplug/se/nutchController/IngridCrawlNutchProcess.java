@@ -60,7 +60,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
     private static Logger log = Logger.getLogger(IngridCrawlNutchProcess.class);
 
     public static enum STATES {
-        START, INJECT_START, INJECT_BW, CLEANUP_HADOOP, FINISHED, DEDUPLICATE, INDEX, FILTER_LINKDB, UPDATE_LINKDB, FILTER_WEBGRAPH, UPDATE_WEBGRAPH, FILTER_SEGMENT, MERGE_SEGMENT, INJECT_META, FILTER_CRAWLDB, GENERATE, FETCH, UPDATE_CRAWLDB, UPDATE_MD, CREATE_HOST_STATISTICS, GENERATE_ZERO_URLS, CRAWL_CLEANUP, CLEAN_DUPLICATES, CREATE_STARTURL_REPORT, CREATE_URL_ERROR_REPORT;
+        START, DELETE_BEFORE_CRAWL, INJECT_START, INJECT_BW, CLEANUP_HADOOP, FINISHED, DEDUPLICATE, INDEX, FILTER_LINKDB, UPDATE_LINKDB, FILTER_WEBGRAPH, UPDATE_WEBGRAPH, FILTER_SEGMENT, MERGE_SEGMENT, INJECT_META, FILTER_CRAWLDB, GENERATE, FETCH, UPDATE_CRAWLDB, UPDATE_MD, CREATE_HOST_STATISTICS, GENERATE_ZERO_URLS, CRAWL_CLEANUP, CLEAN_DUPLICATES, CREATE_STARTURL_REPORT, CREATE_URL_ERROR_REPORT;
     };
 
     public Integer depth = 1;
@@ -103,6 +103,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             String mddb = fs.getPath(workingDirectory.getAbsolutePath(), "mddb").toString();
             String webgraph = fs.getPath(workingDirectory.getAbsolutePath(), "webgraph").toString();
             String linkDb = fs.getPath(workingDirectory.getAbsolutePath(), "linkdb").toString();
+            String statistic = fs.getPath(workingDirectory.getAbsolutePath(), "statistic").toString();
 
             String startUrls = fs.getPath(workingDirectory.getAbsolutePath(), "urls", "start").toString();
             String metadata = fs.getPath(workingDirectory.getAbsolutePath(), "urls", "metadata").toString();
@@ -112,6 +113,21 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             String segments = fs.getPath(workingDirectory.getAbsolutePath(), "segments").toString();
             String mergedSegments = fs.getPath(workingDirectory.getAbsolutePath(), "segments_merged").toString();
             String filteredSegments = fs.getPath(workingDirectory.getAbsolutePath(), "segments_filtered").toString();
+            
+            NutchConfigTool nutchConfigTool = new NutchConfigTool(Paths.get(instance.getWorkingDirectory(), "conf", "nutch-site.xml"));
+            if ("true".equals( nutchConfigTool.getPropertyValue( "ingrid.delete.before.crawl" ) )) {
+                this.statusProvider.addState(STATES.DELETE_BEFORE_CRAWL.name(), "Delete instance crawl data...");
+                FileUtils.removeRecursive(fs.getPath( crawlDb ));
+                FileUtils.removeRecursive(fs.getPath( bwDb ));
+                FileUtils.removeRecursive(fs.getPath( mddb ));
+                FileUtils.removeRecursive(fs.getPath( webgraph ));
+                FileUtils.removeRecursive(fs.getPath( linkDb ));
+                FileUtils.removeRecursive(fs.getPath( segments ));
+                FileUtils.removeRecursive(fs.getPath( mergedSegments ));
+                FileUtils.removeRecursive(fs.getPath( filteredSegments ));
+                FileUtils.removeRecursive(fs.getPath( statistic ));
+                this.statusProvider.appendToState(STATES.DELETE_BEFORE_CRAWL.name(), " done.");
+            }
 
             this.statusProvider.addState(STATES.INJECT_START.name(), "Inject start urls...");
             int ret = execute("org.apache.nutch.crawl.Injector", crawlDb, startUrls);
