@@ -359,4 +359,10 @@
         <description>If true all data is removed before each crawl. This should only be used if single URLs are crawled and all URLs should be fetched for every crawl.</description>
     </property>
 
+    <property>
+        <name>ingrid.index.no.deduplication</name>
+        <value>false</value>
+        <description>If true duplicates will not ne removed from index.</description>
+    </property>
+
 </configuration>

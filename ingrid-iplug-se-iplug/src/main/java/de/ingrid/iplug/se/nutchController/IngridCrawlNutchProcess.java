@@ -329,14 +329,16 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             }
             this.statusProvider.appendToState(STATES.UPDATE_LINKDB.name(), " done.");
 
-            this.statusProvider.addState(STATES.DEDUPLICATE.name(), "Deduplication...");
-            logFileWatcher = LogFileWatcherFactory.getDeduplicationLogfileWatcher(Paths.get(instance.getWorkingDirectory(), "logs", "hadoop.log").toFile(), statusProvider, STATES.DEDUPLICATE.name());
-            ret = execute("org.apache.nutch.crawl.DeduplicationJob", crawlDb);
-            if (ret != 0) {
-                throwCrawlError("Error during Execution of: org.apache.nutch.crawl.DeduplicationJob");
+            if (!("true".equals( nutchConfigTool.getPropertyValue( "ingrid.index.no.deduplication" ) ))) {
+                this.statusProvider.addState(STATES.DEDUPLICATE.name(), "Deduplication...");
+                logFileWatcher = LogFileWatcherFactory.getDeduplicationLogfileWatcher(Paths.get(instance.getWorkingDirectory(), "logs", "hadoop.log").toFile(), statusProvider, STATES.DEDUPLICATE.name());
+                ret = execute("org.apache.nutch.crawl.DeduplicationJob", crawlDb);
+                if (ret != 0) {
+                    throwCrawlError("Error during Execution of: org.apache.nutch.crawl.DeduplicationJob");
+                }
+                logFileWatcher.close();
+                this.statusProvider.appendToState(STATES.DEDUPLICATE.name(), " done.");
             }
-            logFileWatcher.close();
-            this.statusProvider.appendToState(STATES.DEDUPLICATE.name(), " done.");
 
             if ("true".equals( nutchConfigTool.getPropertyValue( "ingrid.delete.before.crawl" ) )) {
                 // remove instance (type) from index
@@ -347,14 +349,16 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             }
             writeIndex(crawlDb, linkDb, segments);
 
-            this.statusProvider.addState(STATES.CLEAN_DUPLICATES.name(), "Clean up duplicates in index...");
-            logFileWatcher = LogFileWatcherFactory.getCleaningJobLogfileWatcher(Paths.get(instance.getWorkingDirectory(), "logs", "hadoop.log").toFile(), statusProvider, STATES.CLEAN_DUPLICATES.name());
-            ret = execute("org.apache.nutch.indexer.CleaningJob", crawlDb);
-            if (ret != 0) {
-                throwCrawlError("Error during Execution of: org.apache.nutch.indexer.CleaningJob");
+            if (!("true".equals( nutchConfigTool.getPropertyValue( "ingrid.index.no.deduplication" ) ))) {
+                this.statusProvider.addState(STATES.CLEAN_DUPLICATES.name(), "Clean up duplicates in index...");
+                logFileWatcher = LogFileWatcherFactory.getCleaningJobLogfileWatcher(Paths.get(instance.getWorkingDirectory(), "logs", "hadoop.log").toFile(), statusProvider, STATES.CLEAN_DUPLICATES.name());
+                ret = execute("org.apache.nutch.indexer.CleaningJob", crawlDb);
+                if (ret != 0) {
+                    throwCrawlError("Error during Execution of: org.apache.nutch.indexer.CleaningJob");
+                }
+                logFileWatcher.close();
+                this.statusProvider.appendToState(STATES.CLEAN_DUPLICATES.name(), " done.");
             }
-            logFileWatcher.close();
-            this.statusProvider.appendToState(STATES.CLEAN_DUPLICATES.name(), " done.");
 
             cleanupHadoop();
 
