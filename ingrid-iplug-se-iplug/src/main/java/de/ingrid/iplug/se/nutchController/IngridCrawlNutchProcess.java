@@ -39,14 +39,18 @@ import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.elasticsearch.client.Client;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.springframework.stereotype.Service;
 
+import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
 import de.ingrid.iplug.se.nutchController.StatusProvider.Classification;
 import de.ingrid.iplug.se.utils.DBUtils;
+import de.ingrid.iplug.se.utils.ElasticSearchUtils;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
 
@@ -55,6 +59,7 @@ import de.ingrid.iplug.se.webapp.container.Instance;
  * execute this with a {@link GenericNutchProcess}.
  * 
  */
+@Service
 public class IngridCrawlNutchProcess extends NutchProcess {
 
     private static Logger log = Logger.getLogger(IngridCrawlNutchProcess.class);
@@ -72,6 +77,9 @@ public class IngridCrawlNutchProcess extends NutchProcess {
     Instance instance;
     
     LogFileWatcher logFileWatcher = null;
+    
+    private ElasticsearchNodeFactoryBean elasticSearch;
+    
 
     @Override
     public void run() {
@@ -126,6 +134,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
                 FileUtils.removeRecursive(fs.getPath( mergedSegments ));
                 FileUtils.removeRecursive(fs.getPath( filteredSegments ));
                 FileUtils.removeRecursive(fs.getPath( statistic ));
+                
                 this.statusProvider.appendToState(STATES.DELETE_BEFORE_CRAWL.name(), " done.");
             }
 
@@ -329,6 +338,13 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             logFileWatcher.close();
             this.statusProvider.appendToState(STATES.DEDUPLICATE.name(), " done.");
 
+            if ("true".equals( nutchConfigTool.getPropertyValue( "ingrid.delete.before.crawl" ) )) {
+                // remove instance (type) from index
+                Client client = elasticSearch.getObject().client();
+                if (ElasticSearchUtils.typeExists( instance.getName(), client )) {
+                    ElasticSearchUtils.deleteType( instance.getName(), client );
+                }
+            }
             writeIndex(crawlDb, linkDb, segments);
 
             this.statusProvider.addState(STATES.CLEAN_DUPLICATES.name(), "Clean up duplicates in index...");
@@ -500,4 +516,8 @@ public class IngridCrawlNutchProcess extends NutchProcess {
         this.instance = instance;
     }
 
+    public void setElasticSearch(ElasticsearchNodeFactoryBean esBean) {
+        this.elasticSearch = esBean;
+    }
+    
 }

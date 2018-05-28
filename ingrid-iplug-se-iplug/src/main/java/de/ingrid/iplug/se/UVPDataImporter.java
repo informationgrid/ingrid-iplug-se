@@ -117,6 +117,8 @@ public class UVPDataImporter {
     private static EntityManager em;
 
     private static Map<String, List<StatusEntry>> status = new LinkedHashMap<String, List<StatusEntry>>();
+    
+    private static List<String>  markerUrls = new ArrayList<String>();
 
     public static void main(String[] args) throws Exception {
 
@@ -237,6 +239,7 @@ public class UVPDataImporter {
             int cntIgnoredRecords = 0;
             int cntUrls = 0;
             int cntMarker = 0;
+            
 
             for (BlpModel bm : blpModels) {
 
@@ -245,7 +248,7 @@ public class UVPDataImporter {
                 // for display in map we need ONE marker per blp dataset
                 // therefore the map marker data is pushed to index only for one
                 // of the URLs
-                boolean pushBlpDataToIndex = true;
+                boolean pushMarkerDataToIndex = true;
 
                 System.out.println( "Add entry '" + bm.name + "'." );
                 if (bm.urlInProgress != null && bm.urlInProgress.length() > 0) {
@@ -256,19 +259,23 @@ public class UVPDataImporter {
                         // do add the marker meta data only to the longer url of FINISHED or IN_PROGRESS
                         // since the crawler will generate 2 marker (The metadata of url A will be applied to
                         // all urls by the crawler that match the url A.). 
-                        if (isFinishedUrlLongerThanInProgressUrl(bm)) {
-                            pushBlpDataToIndex = false;
+                        //
+                        // Also check if the URL has already marker data. Do not add marker data if the 
+                        // url has already been used.
+                        if (isFinishedUrlLongerThanInProgressUrl(bm) || markerUrls.contains( bm.urlInProgress ) || hasInvalidMarkerUrlIntersection(bm.urlInProgress)) {
+                            pushMarkerDataToIndex = false;
                         }
 
-                        url = createUrl( instance, partner, bm.urlInProgress, bm, pushBlpDataToIndex );
+                        url = createUrl( instance, partner, bm.urlInProgress, bm, pushMarkerDataToIndex );
                         
                         // make sure that the next url will be marked as a map marker
                         // in case the other url starts with this url
                         // see comment above for an explanation
-                        if (!pushBlpDataToIndex) {
-                            pushBlpDataToIndex = true;
+                        if (!pushMarkerDataToIndex) {
+                            pushMarkerDataToIndex = true;
                         } else {
-                            pushBlpDataToIndex = false;
+                            markerUrls.add( bm.urlInProgress );
+                            pushMarkerDataToIndex = false;
                             cntMarker++;
                         }
                         
@@ -281,14 +288,20 @@ public class UVPDataImporter {
                 if (bm.urlFinished != null && bm.urlFinished.length() > 0 && !bm.urlFinished.equals( bm.urlInProgress)) {
                     
 
+                    if (pushMarkerDataToIndex && hasInvalidMarkerUrlIntersection(bm.urlFinished)) {
+                        addLog( bm.name, "Invalid marker url intersection: " + bm.urlFinished, "IGNORED" );
+                        // do not import this marker URL
+                        continue;
+                    }
                     // add BLP meta data, if not already set, since we only need
                     // the meta data once.
                     Url url = null;
                     try {
-                        url = createUrl( instance, partner, bm.urlFinished, bm, pushBlpDataToIndex );
+                        url = createUrl( instance, partner, bm.urlFinished, bm, pushMarkerDataToIndex );
                         em.persist( url );
                         cntUrls++;
-                        if (pushBlpDataToIndex) {
+                        if (pushMarkerDataToIndex) {
+                            markerUrls.add( bm.urlFinished );
                             cntMarker++;
                         }
                     } catch (Exception e) {
@@ -322,6 +335,23 @@ public class UVPDataImporter {
         }
 
     }
+    
+    private static boolean hasInvalidMarkerUrlIntersection(String url) {
+        long entriesContainedInUrl = markerUrls.stream().filter( entry -> url.startsWith( entry ) ).count();
+        if (entriesContainedInUrl > 0) {
+            System.out.println("One of the marker urls is contained in " + url + ".");
+        }
+        
+        long entriesContainingUrl = markerUrls.stream().filter( entry -> entry.contains( url ) ).count();
+        if (entriesContainingUrl > 0) {
+            System.out.println("The url is contained in at least one marker url " + url + ".");
+        }
+        
+        return (entriesContainedInUrl > 0 || entriesContainingUrl > 0);
+    }
+    
+    
+    
 
     /**
      * Get Limit URL from URL.

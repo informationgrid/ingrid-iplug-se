@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import de.ingrid.admin.controller.AbstractController;
+import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
 import de.ingrid.iplug.se.nutchController.IngridCrawlNutchProcess;
 import de.ingrid.iplug.se.nutchController.NutchController;
@@ -52,6 +53,10 @@ public class ManagementController extends AbstractController {
     private NutchController nutchController;
     
     private IPostCrawlProcessor[] postCrawlProcessors;
+    
+    @Autowired
+    private ElasticsearchNodeFactoryBean elasticSearch;
+    
 
     @Autowired
     public ManagementController(NutchController nutchController, IPostCrawlProcessor[] postCrawlProcessors) {
@@ -79,6 +84,7 @@ public class ManagementController extends AbstractController {
         Instance instance = InstanceController.getInstanceData( name );
 
         IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, depth, numUrls, postCrawlProcessors);
+        process.setElasticSearch( elasticSearch );
 
         // run crawl process
         nutchController.start(instance, process);
