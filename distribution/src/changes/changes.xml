@@ -28,7 +28,7 @@
 	<author email="joachim@wemove.com">Joachim Müller</author>
   </properties>
   <body>
-    <release version="4.2.5-SNAPSHOT" date="2018-xx-xx" description="Release 4.2.5">
+    <release version="4.2.5" date="2018-06-07" description="Release 4.2.5">
       <action type="fix" dev="wemove" issue="REDMINE-1093">
         Introduce new property 'ingrid.delete.before.crawl' and 'ingrid.index.no.deduplication' to make the UVP BLP crawl more robust.
       </action>
