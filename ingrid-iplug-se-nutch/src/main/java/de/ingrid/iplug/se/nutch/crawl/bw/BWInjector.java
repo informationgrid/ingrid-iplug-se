@@ -206,7 +206,6 @@ public class BWInjector extends Configured implements Tool {
         sortJob.setMapperClass(BWInjectMapper.class);
 
         sortJob.setBoolean(PROHIBITED, prohibited);
-        sortJob.setBoolean(NORMALIZE, false);
 
         FileOutputFormat.setOutputPath(sortJob, tempDir);
         sortJob.setOutputFormat(SequenceFileOutputFormat.class);

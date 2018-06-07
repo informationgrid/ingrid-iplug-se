@@ -68,7 +68,10 @@ public class IngridCrawlNutchProcessCleaner {
             int i = states.length - 1;
             State lastState = states[i];
             while (lastState.key.equals(NutchProcess.STATES.ERROR.name()) || lastState.key.equals(NutchProcess.STATES.ABORT.name()) || i == 0) {
-                lastState = states[--i];
+                i--;
+                if (i > 0) {
+                    lastState = states[i];
+                }
             }
             LOG.info("Last state '" + lastState.getKey() + "' detected.");
             

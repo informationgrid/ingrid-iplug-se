@@ -33,6 +33,8 @@ import java.util.List;
 
 import org.junit.Test;
 
+import de.ingrid.iplug.se.UVPDataImporter.BlpModel;
+
 public class UVPDataImporterTest {
 
     @Test
@@ -77,39 +79,85 @@ public class UVPDataImporterTest {
                     UVPDataImporter.getLimitUrls( m.urlFinished );
                 }
             } catch (Exception e) {
-                fail( "Invalid LIMIT URL extracted from: " + m.urlFinished );
+                fail( "Invalid LIMIT URL extracted from: " + m.urlFinished + " in " + m.name  );
             }
             try {
                 if (m.urlFinished != null) {
                     UVPDataImporter.getActualUrl( m.urlFinished, m );
                 }
             } catch (Exception e) {
-                System.out.println( "\nInvalid actual URL extracted from: " + m.urlFinished );
+                System.out.println( "\nInvalid actual URL extracted from: " + m.urlFinished + " in " + m.name  );
             }
             try {
                 if (m.urlInProgress != null) {
                     UVPDataImporter.getLimitUrls( m.urlInProgress );
                 }
             } catch (Exception e) {
-                fail( "Invalid LIMIT URL extracted from: " + m.urlInProgress );
+                fail( "Invalid LIMIT URL extracted from: " + m.urlInProgress + " in " + m.name  );
             }
             try {
                 if (m.urlInProgress != null) {
                     UVPDataImporter.getActualUrl( m.urlInProgress, m );
                 }
             } catch (Exception e) {
-                System.out.println( "\nInvalid actual URL extracted from: " + m.urlInProgress );
+                System.out.println( "\nInvalid actual URL extracted from: " + m.urlInProgress + " in " + m.name  );
             }
 
         }
     }
-    
+
     @Test
     public void testStripLastPath() throws MalformedURLException {
-        assertEquals( "http://test.domain.de/",  UVPDataImporter.stripLastPath( "http://test.domain.de/" ));
-        assertEquals( "http://test.domain.de/path1/path2/",  UVPDataImporter.stripLastPath( "http://test.domain.de/path1/path2/path3/" ));
-        assertEquals( "http://test.domain.de/",  UVPDataImporter.stripLastPath( "http://test.domain.de/path1/" ));
-        assertEquals( "http://test.domain.de/",  UVPDataImporter.stripLastPath( "http://test.domain.de/index.html" ));
+        assertEquals( "http://test.domain.de/", UVPDataImporter.stripLastPath( "http://test.domain.de/" ) );
+        assertEquals( "http://test.domain.de/path1/path2/", UVPDataImporter.stripLastPath( "http://test.domain.de/path1/path2/path3/" ) );
+        assertEquals( "http://test.domain.de/", UVPDataImporter.stripLastPath( "http://test.domain.de/path1/" ) );
+        assertEquals( "http://test.domain.de/", UVPDataImporter.stripLastPath( "http://test.domain.de/index.html" ) );
+    }
+
+    @Test
+    public void testGetParent() throws MalformedURLException {
+        assertEquals( "http://test.domain.de", UVPDataImporter.getParent( "http://test.domain.de/" ) );
+        assertEquals( "http://test.domain.de", UVPDataImporter.getParent( "http://test.domain.de" ) );
+        assertEquals( "http://test.domain.de", UVPDataImporter.getParent( "http://test.domain.de/a" ) );
+        assertEquals( "http://test.domain.de/a", UVPDataImporter.getParent( "http://test.domain.de/a/" ) );
+        assertEquals( "http://test.domain.de/a", UVPDataImporter.getParent( "http://test.domain.de/a/b.de" ) );
+    }
+    
+    @Test
+    public void testIsFinishedUrlLongerThanInProgressUrl() throws MalformedURLException {
+        BlpModel bm = new UVPDataImporter().new BlpModel();
+        bm.urlFinished = "http://test.domain.de";
+        bm.urlInProgress = "http://test.domain.de/path/";
+        assertTrue(!UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
+        bm.urlFinished = "http://test.domain.de/path";
+        bm.urlInProgress = "http://test.domain.de/";
+        assertTrue(UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
+        bm.urlFinished = "http://test.domain.de/path/";
+        bm.urlInProgress = "http://test.domain.de/path/";
+        assertTrue(!UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
+        bm.urlFinished = null;
+        bm.urlInProgress = "http://test.domain.de/path/";
+        assertTrue(!UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
+        bm.urlFinished = "http://test.domain.de/path/";
+        bm.urlInProgress = null;
+        assertTrue(!UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
+        bm.urlFinished = "https://test.domain.de/path/";
+        bm.urlInProgress = "http://test.domain.de/";
+        assertTrue(UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
+        bm.urlFinished = "http://test.domain.de/path/";
+        bm.urlInProgress = "https://test.domain.de/";
+        assertTrue(UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
+    }
+    
+
+    // @Test // activate as needed
+    public void testGetActualUrl() throws Exception {
+
+        BlpModel bm = new UVPDataImporter().new BlpModel();
+        bm.name = "test";
+
+        assertEquals( "http://www.merchweiler.de/p/dlhome.asp?artikel_id=&liste=491&tmpl_typ=Liste&lp=3691&area=100",
+                UVPDataImporter.getActualUrl( "http://www.merchweiler.de/", bm ) );
     }
 
 }

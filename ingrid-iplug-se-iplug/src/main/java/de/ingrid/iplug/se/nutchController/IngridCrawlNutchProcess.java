@@ -39,14 +39,18 @@ import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.elasticsearch.client.Client;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.springframework.stereotype.Service;
 
+import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
 import de.ingrid.iplug.se.nutchController.StatusProvider.Classification;
 import de.ingrid.iplug.se.utils.DBUtils;
+import de.ingrid.iplug.se.utils.ElasticSearchUtils;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
 
@@ -55,12 +59,13 @@ import de.ingrid.iplug.se.webapp.container.Instance;
  * execute this with a {@link GenericNutchProcess}.
  * 
  */
+@Service
 public class IngridCrawlNutchProcess extends NutchProcess {
 
     private static Logger log = Logger.getLogger(IngridCrawlNutchProcess.class);
 
     public static enum STATES {
-        START, INJECT_START, INJECT_BW, CLEANUP_HADOOP, FINISHED, DEDUPLICATE, INDEX, FILTER_LINKDB, UPDATE_LINKDB, FILTER_WEBGRAPH, UPDATE_WEBGRAPH, FILTER_SEGMENT, MERGE_SEGMENT, INJECT_META, FILTER_CRAWLDB, GENERATE, FETCH, UPDATE_CRAWLDB, UPDATE_MD, CREATE_HOST_STATISTICS, GENERATE_ZERO_URLS, CRAWL_CLEANUP, CLEAN_DUPLICATES, CREATE_STARTURL_REPORT, CREATE_URL_ERROR_REPORT;
+        START, DELETE_BEFORE_CRAWL, INJECT_START, INJECT_BW, CLEANUP_HADOOP, FINISHED, DEDUPLICATE, INDEX, FILTER_LINKDB, UPDATE_LINKDB, FILTER_WEBGRAPH, UPDATE_WEBGRAPH, FILTER_SEGMENT, MERGE_SEGMENT, INJECT_META, FILTER_CRAWLDB, GENERATE, FETCH, UPDATE_CRAWLDB, UPDATE_MD, CREATE_HOST_STATISTICS, GENERATE_ZERO_URLS, CRAWL_CLEANUP, CLEAN_DUPLICATES, CREATE_STARTURL_REPORT, CREATE_URL_ERROR_REPORT;
     };
 
     public Integer depth = 1;
@@ -72,6 +77,9 @@ public class IngridCrawlNutchProcess extends NutchProcess {
     Instance instance;
     
     LogFileWatcher logFileWatcher = null;
+    
+    private ElasticsearchNodeFactoryBean elasticSearch;
+    
 
     @Override
     public void run() {
@@ -103,6 +111,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             String mddb = fs.getPath(workingDirectory.getAbsolutePath(), "mddb").toString();
             String webgraph = fs.getPath(workingDirectory.getAbsolutePath(), "webgraph").toString();
             String linkDb = fs.getPath(workingDirectory.getAbsolutePath(), "linkdb").toString();
+            String statistic = fs.getPath(workingDirectory.getAbsolutePath(), "statistic").toString();
 
             String startUrls = fs.getPath(workingDirectory.getAbsolutePath(), "urls", "start").toString();
             String metadata = fs.getPath(workingDirectory.getAbsolutePath(), "urls", "metadata").toString();
@@ -112,6 +121,22 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             String segments = fs.getPath(workingDirectory.getAbsolutePath(), "segments").toString();
             String mergedSegments = fs.getPath(workingDirectory.getAbsolutePath(), "segments_merged").toString();
             String filteredSegments = fs.getPath(workingDirectory.getAbsolutePath(), "segments_filtered").toString();
+            
+            NutchConfigTool nutchConfigTool = new NutchConfigTool(Paths.get(instance.getWorkingDirectory(), "conf", "nutch-site.xml"));
+            if ("true".equals( nutchConfigTool.getPropertyValue( "ingrid.delete.before.crawl" ) )) {
+                this.statusProvider.addState(STATES.DELETE_BEFORE_CRAWL.name(), "Delete instance crawl data...");
+                FileUtils.removeRecursive(fs.getPath( crawlDb ));
+                FileUtils.removeRecursive(fs.getPath( bwDb ));
+                FileUtils.removeRecursive(fs.getPath( mddb ));
+                FileUtils.removeRecursive(fs.getPath( webgraph ));
+                FileUtils.removeRecursive(fs.getPath( linkDb ));
+                FileUtils.removeRecursive(fs.getPath( segments ));
+                FileUtils.removeRecursive(fs.getPath( mergedSegments ));
+                FileUtils.removeRecursive(fs.getPath( filteredSegments ));
+                FileUtils.removeRecursive(fs.getPath( statistic ));
+                
+                this.statusProvider.appendToState(STATES.DELETE_BEFORE_CRAWL.name(), " done.");
+            }
 
             this.statusProvider.addState(STATES.INJECT_START.name(), "Inject start urls...");
             int ret = execute("org.apache.nutch.crawl.Injector", crawlDb, startUrls);
@@ -304,25 +329,36 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             }
             this.statusProvider.appendToState(STATES.UPDATE_LINKDB.name(), " done.");
 
-            this.statusProvider.addState(STATES.DEDUPLICATE.name(), "Deduplication...");
-            logFileWatcher = LogFileWatcherFactory.getDeduplicationLogfileWatcher(Paths.get(instance.getWorkingDirectory(), "logs", "hadoop.log").toFile(), statusProvider, STATES.DEDUPLICATE.name());
-            ret = execute("org.apache.nutch.crawl.DeduplicationJob", crawlDb);
-            if (ret != 0) {
-                throwCrawlError("Error during Execution of: org.apache.nutch.crawl.DeduplicationJob");
+            if (!("true".equals( nutchConfigTool.getPropertyValue( "ingrid.index.no.deduplication" ) ))) {
+                this.statusProvider.addState(STATES.DEDUPLICATE.name(), "Deduplication...");
+                logFileWatcher = LogFileWatcherFactory.getDeduplicationLogfileWatcher(Paths.get(instance.getWorkingDirectory(), "logs", "hadoop.log").toFile(), statusProvider, STATES.DEDUPLICATE.name());
+                ret = execute("org.apache.nutch.crawl.DeduplicationJob", crawlDb);
+                if (ret != 0) {
+                    throwCrawlError("Error during Execution of: org.apache.nutch.crawl.DeduplicationJob");
+                }
+                logFileWatcher.close();
+                this.statusProvider.appendToState(STATES.DEDUPLICATE.name(), " done.");
             }
-            logFileWatcher.close();
-            this.statusProvider.appendToState(STATES.DEDUPLICATE.name(), " done.");
 
+            if ("true".equals( nutchConfigTool.getPropertyValue( "ingrid.delete.before.crawl" ) )) {
+                // remove instance (type) from index
+                Client client = elasticSearch.getObject().client();
+                if (ElasticSearchUtils.typeExists( instance.getName(), client )) {
+                    ElasticSearchUtils.deleteType( instance.getName(), client );
+                }
+            }
             writeIndex(crawlDb, linkDb, segments);
 
-            this.statusProvider.addState(STATES.CLEAN_DUPLICATES.name(), "Clean up duplicates in index...");
-            logFileWatcher = LogFileWatcherFactory.getCleaningJobLogfileWatcher(Paths.get(instance.getWorkingDirectory(), "logs", "hadoop.log").toFile(), statusProvider, STATES.CLEAN_DUPLICATES.name());
-            ret = execute("org.apache.nutch.indexer.CleaningJob", crawlDb);
-            if (ret != 0) {
-                throwCrawlError("Error during Execution of: org.apache.nutch.indexer.CleaningJob");
+            if (!("true".equals( nutchConfigTool.getPropertyValue( "ingrid.index.no.deduplication" ) ))) {
+                this.statusProvider.addState(STATES.CLEAN_DUPLICATES.name(), "Clean up duplicates in index...");
+                logFileWatcher = LogFileWatcherFactory.getCleaningJobLogfileWatcher(Paths.get(instance.getWorkingDirectory(), "logs", "hadoop.log").toFile(), statusProvider, STATES.CLEAN_DUPLICATES.name());
+                ret = execute("org.apache.nutch.indexer.CleaningJob", crawlDb);
+                if (ret != 0) {
+                    throwCrawlError("Error during Execution of: org.apache.nutch.indexer.CleaningJob");
+                }
+                logFileWatcher.close();
+                this.statusProvider.appendToState(STATES.CLEAN_DUPLICATES.name(), " done.");
             }
-            logFileWatcher.close();
-            this.statusProvider.appendToState(STATES.CLEAN_DUPLICATES.name(), " done.");
 
             cleanupHadoop();
 
@@ -484,4 +520,8 @@ public class IngridCrawlNutchProcess extends NutchProcess {
         this.instance = instance;
     }
 
+    public void setElasticSearch(ElasticsearchNodeFactoryBean esBean) {
+        this.elasticSearch = esBean;
+    }
+    
 }

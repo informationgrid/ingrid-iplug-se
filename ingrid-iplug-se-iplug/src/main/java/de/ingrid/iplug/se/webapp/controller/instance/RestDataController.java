@@ -7,12 +7,12 @@
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
  * EUPL (the "Licence");
- * 
+ *
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl5
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -99,7 +99,7 @@ public class RestDataController extends InstanceController {
 
     @Autowired
     private ElasticsearchNodeFactoryBean elasticSearch;
-    
+
 	@Autowired
 	private NutchController nutchController;
 
@@ -255,7 +255,7 @@ public class RestDataController extends InstanceController {
 		JSONParser parser = new JSONParser();
 		Reader reader = null;
 		UrlErrorPagableFilter pager = null;
-		
+
 		if (path.toFile().exists()) {
     		try {
     			reader = Files.newBufferedReader(path, Charset.forName("UTF-8"));
@@ -274,7 +274,7 @@ public class RestDataController extends InstanceController {
     			}
     		}
 		}
-		
+
 		JSONObject json = new JSONObject();
 		if (pager == null) {
 			json.put("data", "");
@@ -302,17 +302,17 @@ public class RestDataController extends InstanceController {
 	        @ModelAttribute("plugDescription") final PlugdescriptionCommandObject pdCommandObject,
 	        @PathVariable("name") String name, @PathVariable("value") String value) {
 
-	    
+
 		List<String> activeInstances = JettyStarter.getInstance().config.indexSearchInTypes;
 		// always remove type that leads to no result (in case it was set)
 		activeInstances.remove( NO_RESULT_INDEX );
-		
+
 		if ("on".equals(value)) {
 			activeInstances.add(name);
 		} else {
 			activeInstances.remove(name);
 		}
-		
+
 		// add a type which returns no result, if no instance is activated
 		if (activeInstances.size() == 0) {
 		    activeInstances.add( NO_RESULT_INDEX );
@@ -323,14 +323,14 @@ public class RestDataController extends InstanceController {
 
 		return generateOkResponse();
 	}
-	
+
 	@RequestMapping(value = "/instance/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteInstance(@PathVariable("id") String name) throws Exception {
-        
+
         // stop all nutch processes first
         Instance instance = InstanceController.getInstanceData( name );
         nutchController.stop( instance );
-        
+
         // remove instance directory
         String dir = SEIPlug.conf.getInstancesDir();
         Path directoryToDelete = Paths.get( dir, name );
@@ -346,23 +346,23 @@ public class RestDataController extends InstanceController {
         if (ElasticSearchUtils.typeExists( name, client )) {
             ElasticSearchUtils.deleteType( name, client );
         }
-        
+
         // remove url from database belonging to this instance
         EntityManager em = DBManager.INSTANCE.getEntityManager();
-        
+
         em.getTransaction().begin();
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaDelete<Url> criteriaDelete = cb.createCriteriaDelete( Url.class );
         Root<Url> urlTable = criteriaDelete.from(Url.class);
         Predicate instanceCriteria = cb.equal( urlTable.get("instance"), name );
-        
+
         criteriaDelete.from( Url.class );
         criteriaDelete.where( instanceCriteria );
-        
+
         em.createQuery( criteriaDelete ).executeUpdate();
         em.flush();
         em.getTransaction().commit();
-        
+
         return new ResponseEntity<String>( HttpStatus.OK );
     }
 
@@ -432,7 +432,7 @@ public class RestDataController extends InstanceController {
 		result.put("result", "OK");
 		return new ResponseEntity<Map<String, String>>(result, HttpStatus.OK);
 	}
-	
+
 	public void setElasticSearch(ElasticsearchNodeFactoryBean esBean) {
         this.elasticSearch = esBean;
     }

@@ -28,6 +28,11 @@
 	<author email="joachim@wemove.com">Joachim Müller</author>
   </properties>
   <body>
+    <release version="4.2.5-SNAPSHOT" date="2018-xx-xx" description="Release 4.2.5">
+      <action type="fix" dev="wemove" issue="REDMINE-1093">
+        Introduce new property 'ingrid.delete.before.crawl' and 'ingrid.index.no.deduplication' to make the UVP BLP crawl more robust.
+      </action>
+    </release>
     <release version="4.2.3" date="2018-03-17" description="Release 4.2.3">
       <action type="fix" dev="wemove" issue="REDMINE-994">
         Improve Import of BLP Data: Resolve Redirects.
@@ -43,7 +48,7 @@
         Restrict hadoop.log files per instance to 30 x 10MB.
       </action>
       <action type="add" dev="wemove" issue="REDMINE-856">
-        New import script for importing BLP excel data into the url database of the iplug. This also adds 
+        New import script for importing BLP excel data into the url database of the iplug. This also adds
         BLP data as url meta data to generate the BLP markers from the SE index instead from the JSOn file.
         This makes the separate nodejs script obsolete that generated the marker data from the excel file.
       </action>
@@ -54,7 +59,7 @@
         Added docker integration.
       </action>
     </release>
-    
+
     <release version="4.1.0" date="2017-10-05" description="Release 4.1.0">
       <action type="add" dev="wemove" issue="REDMINE-789">
         Add x1, y1, x2 and y2 to default-mapping.json.
@@ -78,13 +83,13 @@
         Fixed deletion of an instance.
       </action>
     </release>
-    
+
     <release version="4.0.0" date="2016-08-26" description="Release 4.0.0">
       <action type="fix" dev="wemove" issue="REDMINE-394">
         Fixed writing of datatypes to the configuration.
       </action>
     </release>
-    
+
     <release version="3.6.2" date="2016-05-30" description="Release 3.6.2">
       <action type="add" dev="wemove" issue="REDMINE-309">
         Added override mechanism for redefining beans via xml.
@@ -102,7 +107,7 @@
         Using more functions from base-webapp and clean up.
       </action>
     </release>
-    
+
     <release version="3.6.1.2" date="2016-01-22" description="Release 3.6.1.2">
       <action type="fix" dev="wemove" issue="REDMINE-256">
         Administration cannot be finished when installed freshly.
@@ -123,7 +128,7 @@
         Update library for a more robust database and close entity manager when shutting down.
       </action>
     </release>
-    
+
     <release version="3.6.1" date="2015-11-18" description="Release 3.6.1">
       <action type="update" dev="wemove" issue="REDMINE-15">
         Remove all references to PortalU.
@@ -153,7 +158,7 @@
         Use encrypted password for web interface.
       </action>
     </release>
-    
+
     <release version="3.6.0.3" date="2015-09-11" description="Bugfix-Release 3.6.0.3">
       <action type="fix" dev="wemove" issue="REDMINE-114">
         Fixed a bug that prevented grouping by provider or partner if an URL has not set any.

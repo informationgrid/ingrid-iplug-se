@@ -61,6 +61,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -86,16 +87,20 @@ import de.ingrid.iplug.se.utils.TrustModifier;
  * The limit urls are set to the domain of the start url. Make sure the depth of
  * the crawl is set to 1 and no outlinks should be extracted.
  * 
- * The excel table must have a specific layout:
+ * The excel table must have a specific layout. The first row must contain the
+ * column names.
+ * 
  * <ul>
- * <li>First line is the header line and will be ignored.</li>
- * <li>1. column: BLP name that appears on map popup as title.</li>
- * <li>2. column: LAT of map marker coordinate.</li>
- * <li>3. column: LON of map marker coordinate.</li>
- * <li>4. column: Url to BLPs in progress.</li>
- * <li>5. column: Url to finished BLPs.</li>
- * <li>6. column: BLP description that appears on map popup.</li>
+ * <li>NAME: BLP name that appears on map popup as title.</li>
+ * <li>LAT: LAT of map marker coordinate.</li>
+ * <li>LON: LON of map marker coordinate.</li>
+ * <li>URL_VERFAHREN_OFFEN: Url to BLPs in progress.</li>
+ * <li>URL_VERFAHREN_ABGESCHLOSSEN: Url to finished BLPs.</li>
+ * <li>MITGLIEDSGEMEINDEN: BLP description that appears on map popup.</li>
  * </ul>
+ * 
+ * Columns can be mixed. The excel file can contain other columns, as long as
+ * the specified columns exist.
  * 
  * @author joachim@wemove.com
  */
@@ -112,6 +117,8 @@ public class UVPDataImporter {
     private static EntityManager em;
 
     private static Map<String, List<StatusEntry>> status = new LinkedHashMap<String, List<StatusEntry>>();
+    
+    private static List<String>  markerUrls = new ArrayList<String>();
 
     public static void main(String[] args) throws Exception {
 
@@ -125,7 +132,7 @@ public class UVPDataImporter {
                 .withArgName( "excel file name" )
                 .hasArg()
                 .withDescription(
-                        "path to excel file with columns: BLP name; LAT; LON; Url to BLPs in progress; Url to finished BLPs; BLP description (first header line is ignored)" )
+                        "path to excel file with columns: NAME; LAT; LON; URL_VERFAHREN_OFFEN; URL_VERFAHREN_ABGESCHLOSSEN; MITGLIEDSGEMEINDEN (column names in first row)" )
                 .create( "excelfile" );
         options.addOption( excelfileOption );
         @SuppressWarnings("static-access")
@@ -232,6 +239,7 @@ public class UVPDataImporter {
             int cntIgnoredRecords = 0;
             int cntUrls = 0;
             int cntMarker = 0;
+            
 
             for (BlpModel bm : blpModels) {
 
@@ -240,31 +248,60 @@ public class UVPDataImporter {
                 // for display in map we need ONE marker per blp dataset
                 // therefore the map marker data is pushed to index only for one
                 // of the URLs
-                boolean pushBlpDataToIndex = true;
+                boolean pushMarkerDataToIndex = true;
 
                 System.out.println( "Add entry '" + bm.name + "'." );
                 if (bm.urlInProgress != null && bm.urlInProgress.length() > 0) {
+                    
                     // add BLP meta data
                     Url url = null;
                     try {
-                        url = createUrl( instance, partner, bm.urlInProgress, bm, pushBlpDataToIndex );
-                        pushBlpDataToIndex = false;
+                        // do add the marker meta data only to the longer url of FINISHED or IN_PROGRESS
+                        // since the crawler will generate 2 marker (The metadata of url A will be applied to
+                        // all urls by the crawler that match the url A.). 
+                        //
+                        // Also check if the URL has already marker data. Do not add marker data if the 
+                        // url has already been used.
+                        if (isFinishedUrlLongerThanInProgressUrl(bm) || markerUrls.contains( bm.urlInProgress ) || hasInvalidMarkerUrlIntersection(bm.urlInProgress)) {
+                            pushMarkerDataToIndex = false;
+                        }
+
+                        url = createUrl( instance, partner, bm.urlInProgress, bm, pushMarkerDataToIndex );
+                        
+                        // make sure that the next url will be marked as a map marker
+                        // in case the other url starts with this url
+                        // see comment above for an explanation
+                        if (!pushMarkerDataToIndex) {
+                            pushMarkerDataToIndex = true;
+                        } else {
+                            markerUrls.add( bm.urlInProgress );
+                            pushMarkerDataToIndex = false;
+                            cntMarker++;
+                        }
+                        
                         em.persist( url );
                         cntUrls++;
-                        cntMarker++;
                     } catch (Exception e) {
                         // ignore record
                     }
                 }
-                if (bm.urlFinished != null && bm.urlFinished.length() > 0 && bm.urlFinished != bm.urlInProgress) {
+                if (bm.urlFinished != null && bm.urlFinished.length() > 0 && !bm.urlFinished.equals( bm.urlInProgress)) {
+                    
+
+                    if (pushMarkerDataToIndex && hasInvalidMarkerUrlIntersection(bm.urlFinished)) {
+                        addLog( bm.name, "Invalid marker url intersection: " + bm.urlFinished, "IGNORED" );
+                        // do not import this marker URL
+                        continue;
+                    }
                     // add BLP meta data, if not already set, since we only need
                     // the meta data once.
                     Url url = null;
                     try {
-                        url = createUrl( instance, partner, bm.urlFinished, bm, pushBlpDataToIndex );
+                        url = createUrl( instance, partner, bm.urlFinished, bm, pushMarkerDataToIndex );
                         em.persist( url );
                         cntUrls++;
-                        if (pushBlpDataToIndex) {
+                        if (pushMarkerDataToIndex) {
+                            markerUrls.add( bm.urlFinished );
                             cntMarker++;
                         }
                     } catch (Exception e) {
@@ -284,8 +321,8 @@ public class UVPDataImporter {
                     }
                 }
             }
-            System.out.println( "\nFinish. Records: " + cntRecords + ", Ignored records or Urls: " + cntIgnoredRecords + ", Urls added: " + cntUrls + " urls to instance '" + instance + "', mark "
-                    + cntMarker + " records as marker to be displayed on map." );
+            System.out.println( "\nFinish. Records: " + cntRecords + ", Ignored records or Urls: " + cntIgnoredRecords + ", Urls added: " + cntUrls + " urls to instance '"
+                    + instance + "', mark " + cntMarker + " records as marker to be displayed on map." );
 
             tx.commit();
         } catch (Exception e) {
@@ -298,6 +335,23 @@ public class UVPDataImporter {
         }
 
     }
+    
+    private static boolean hasInvalidMarkerUrlIntersection(String url) {
+        long entriesContainedInUrl = markerUrls.stream().filter( entry -> url.startsWith( entry ) ).count();
+        if (entriesContainedInUrl > 0) {
+            System.out.println("One of the marker urls is contained in " + url + ".");
+        }
+        
+        long entriesContainingUrl = markerUrls.stream().filter( entry -> entry.contains( url ) ).count();
+        if (entriesContainingUrl > 0) {
+            System.out.println("The url is contained in at least one marker url " + url + ".");
+        }
+        
+        return (entriesContainedInUrl > 0 || entriesContainingUrl > 0);
+    }
+    
+    
+    
 
     /**
      * Get Limit URL from URL.
@@ -310,6 +364,31 @@ public class UVPDataImporter {
         URL url = new URL( urlStr );
         String host = url.getHost();
         return urlStr.substring( 0, urlStr.indexOf( host ) + host.length() );
+    }
+
+    /**
+     * Get the parent of the given URL. If the URL contains only of an domain,
+     * return the domain.
+     * 
+     * <p>
+     * http://test.domain.de/ -> http://test.domain.de<br>
+     * http://test.domain.de -> http://test.domain.de<br>
+     * http://test.domain.de/a -> http://test.domain.de<br>
+     * http://test.domain.de/a/ -> http://test.domain.de/a<br>
+     * http://test.domain.de/a/b.de -> http://test.domain.de/a<br>
+     * </p>
+     * 
+     * @param urlStr
+     * @return
+     * @throws MalformedURLException
+     */
+    public static String getParent(String urlStr) throws MalformedURLException {
+        String d = getDomain( urlStr );
+        if (urlStr.equals( d ) || urlStr.equals( d.concat( "/" ) )) {
+            return d;
+        } else {
+            return FilenameUtils.getPath( urlStr ).substring( 0, FilenameUtils.getPath( urlStr ).length() - 1 );
+        }
     }
 
     /**
@@ -353,44 +432,61 @@ public class UVPDataImporter {
             }
             Sheet sheet = workbook.getSheetAt( 0 );
             Iterator<Row> it = sheet.iterator();
+            boolean gotHeader = false;
+            Map<Integer, String> columnNames = new HashMap<Integer, String>();
             if (it.hasNext()) {
-                // skip first row (header)
-                it.next();
                 while (it.hasNext()) {
                     Iterator<Cell> ci = it.next().cellIterator();
-                    BlpModel bm = new UVPDataImporter().new BlpModel();
-                    while (ci.hasNext()) {
-                        Cell cell = ci.next();
-                        int columnIndex = cell.getColumnIndex();
-
-                        switch (columnIndex) {
-                        case 1:
-                            bm.name = cell.getStringCellValue();
-                            break;
-                        case 2:
-                            bm.lat = cell.getNumericCellValue();
-                            break;
-                        case 3:
-                            bm.lon = cell.getNumericCellValue();
-                            break;
-                        case 4:
-                            bm.urlInProgress = cell.getStringCellValue();
-                            break;
-                        case 5:
-                            bm.urlFinished = cell.getStringCellValue();
-                            break;
-                        case 6:
-                            bm.descr = cell.getStringCellValue();
-                            break;
+                    // handle header
+                    if (!gotHeader) {
+                        while (ci.hasNext()) {
+                            Cell cell = ci.next();
+                            int columnIndex = cell.getColumnIndex();
+                            String columnName = cell.getStringCellValue();
+                            if (columnName == null || columnName.length() == 0) {
+                                throw new IllegalArgumentException( "No column name specified for column " + columnIndex + "." );
+                            }
+                            columnNames.put( columnIndex, columnName );
                         }
-                    }
+                        gotHeader = true;
+                    } else {
 
-                    System.out.print( "." );
+                        BlpModel bm = new UVPDataImporter().new BlpModel();
+                        while (ci.hasNext()) {
+                            Cell cell = ci.next();
+                            int columnIndex = cell.getColumnIndex();
 
-                    if (bm.name != null && bm.name.length() > 0) {
-                        boolean isValid = validate( bm );
-                        if (isValid) {
-                            blpModels.add( bm );
+                                if (columnIndex < columnNames.size()) {
+                                    switch (columnNames.get( columnIndex )) {
+                                    case "NAME":
+                                        bm.name = cell.getStringCellValue();
+                                        break;
+                                    case "LAT":
+                                        bm.lat = cell.getNumericCellValue();
+                                        break;
+                                    case "LON":
+                                        bm.lon = cell.getNumericCellValue();
+                                        break;
+                                    case "URL_VERFAHREN_OFFEN":
+                                        bm.urlInProgress = cell.getStringCellValue();
+                                        break;
+                                    case "URL_VERFAHREN_ABGESCHLOSSEN":
+                                        bm.urlFinished = cell.getStringCellValue();
+                                        break;
+                                    case "MITGLIEDSGEMEINDEN":
+                                        bm.descr = cell.getStringCellValue();
+                                        break;
+                                    }
+                                }
+                        }
+
+                        System.out.print( "." );
+
+                        if (bm.name != null && bm.name.length() > 0) {
+                            boolean isValid = validate( bm );
+                            if (isValid) {
+                                blpModels.add( bm );
+                            }
                         }
                     }
                 }
@@ -533,12 +629,12 @@ public class UVPDataImporter {
             addLog( bm.name, "Name is null or too short.", "IGNORED" );
         }
 
-        if (bm.lat < 47 || bm.lat > 56) {
+        if (bm.lat == null || bm.lat < 47 || bm.lat > 56) {
             isValid = false;
             addLog( bm.name, "Lat not between 47 and 56.", "IGNORED" );
         }
 
-        if (bm.lon < 5 || bm.lon > 15) {
+        if (bm.lon == null || bm.lon < 5 || bm.lon > 15) {
             isValid = false;
             addLog( bm.name, "Lon not between 5 and 15.", "IGNORED" );
         }
@@ -558,7 +654,7 @@ public class UVPDataImporter {
         if (url != null && url.length() > 0) {
             try {
                 URLConnection conn = new URL( url ).openConnection();
-                TrustModifier.relaxHostChecking((HttpURLConnection) conn);
+                TrustModifier.relaxHostChecking( (HttpURLConnection) conn );
                 conn.connect();
             } catch (Exception e) {
                 isValid = false;
@@ -567,10 +663,34 @@ public class UVPDataImporter {
         }
         if ((bm.urlInProgress == null || bm.urlInProgress.length() == 0) && (bm.urlFinished == null || bm.urlFinished.length() == 0)) {
             isValid = false;
-            addLog( bm.name, "No url set in 'progress' or 'finished'.", "IGNORED" );
+            addLog( bm.name, "No url set in 'URL_VERFAHREN_OFFEN' or 'URL_VERFAHREN_ABGESCHLOSSEN'.", "IGNORED" );
         }
 
         return isValid;
+    }
+    
+    /**
+     * Checks if the FINISH url is longer than the IN_PROGRESS url. Ignores the protocol.
+     * 
+     * @param bm
+     * @return True if FINISH url is longer than the IN_PROGRESS url. False otherwise (FINISH=NULL; FINISH == IN_PROGRESS)
+     * @throws MalformedURLException
+     */
+    public static boolean isFinishedUrlLongerThanInProgressUrl(BlpModel bm) throws MalformedURLException {
+        if (bm.urlFinished == null || bm.urlFinished.trim().length() == 0 || bm.urlInProgress == null || bm.urlInProgress.trim().length() == 0) {
+            return false;
+        }
+        
+        URL urlFinished = new URL( bm.urlFinished );
+        String finished = bm.urlFinished.substring( bm.urlFinished.indexOf( urlFinished.getProtocol() ) + urlFinished.getProtocol().length(), bm.urlFinished.length() );
+        URL urlInProgress = new URL( bm.urlInProgress );
+        String inProgress = bm.urlInProgress.substring( bm.urlInProgress.indexOf( urlInProgress.getProtocol() ) + urlInProgress.getProtocol().length(), bm.urlInProgress.length() );
+        
+        if (!finished.equals( inProgress) && finished.startsWith( inProgress )) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public static String getActualUrl(String url, BlpModel bm) throws Exception {
@@ -584,10 +704,15 @@ public class UVPDataImporter {
             }
             addLog( bm.name, "Redirect detected: '" + url + "' -> '" + actualUrl + "'.", "REDIRECTS" );
             if (actualUrl.startsWith( "/" )) {
+                // redirect to local absolute url
                 url = getDomain( url ).concat( actualUrl );
+            } else if (actualUrl.indexOf( "://" ) < 0 || actualUrl.indexOf( "://" ) > 10) {
+                // redirect to local relative url
+                url = getParent( url ).concat( "/" ).concat( actualUrl );
             } else if (actualUrl.startsWith( "../" )) {
+                // redirect to local parent directory based url
                 while (actualUrl.startsWith( "../" )) {
-                    url = stripLastPath(url);
+                    url = stripLastPath( url );
                     actualUrl = actualUrl.substring( 3 );
                 }
                 url = url.concat( actualUrl );
@@ -598,7 +723,7 @@ public class UVPDataImporter {
         addLog( bm.name, "Too many redirects.", "IGNORED" );
         throw new Exception( "Too many Redirects: 10" );
     }
-    
+
     static String stripLastPath(String urlString) throws MalformedURLException {
         String domain = getDomain( urlString );
         String part = urlString.substring( 0, urlString.lastIndexOf( "/" ) );
@@ -614,9 +739,8 @@ public class UVPDataImporter {
 
         int responseCode = -1;
         try {
-
             con = (HttpURLConnection) (new URL( urlstring ).openConnection());
-            TrustModifier.relaxHostChecking(con);
+            TrustModifier.relaxHostChecking( con );
             con.setRequestProperty( "User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0" );
             con.setInstanceFollowRedirects( false );
             con.connect();
