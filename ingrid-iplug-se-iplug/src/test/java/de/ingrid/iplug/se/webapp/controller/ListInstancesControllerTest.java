@@ -26,6 +26,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.Principal;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.elasticsearch.client.Client;
 import org.elasticsearch.node.internal.InternalNode;
@@ -50,7 +54,7 @@ import de.ingrid.iplug.se.webapp.controller.instance.scheduler.SchedulerManager;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ElasticSearchUtils.class)
-public class ListInstancesControllerTest {
+public class ListInstancesControllerTest extends Mockito {
 
     @Mock
     SchedulerManager manager;
@@ -81,7 +85,13 @@ public class ListInstancesControllerTest {
         ListInstancesController lic = new ListInstancesController();
         lic.setSchedulerManager( manager );
         // lic.setElasticSearch( esBean );
-        lic.addInstance( new ModelMap(), "test", null );
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+        Principal principal = mock(Principal.class);
+        Mockito.when( principal.getName() ).thenReturn( "admin" );
+        Mockito.when( httpRequest.getUserPrincipal() ).thenReturn( principal );
+        Mockito.when( httpRequest.isUserInRole( Mockito.anyString() ) ).thenReturn( false );
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+        lic.addInstance( new ModelMap(), "test", null, httpRequest, httpResponse );
 
         assertTrue( "Instance path was not created", Files.exists( Paths.get( "test-instances", "test" ) ) );
         assertTrue( "Instance configuration path was not created", Files.exists( Paths.get( "test-instances", "test", "conf" ) ) );

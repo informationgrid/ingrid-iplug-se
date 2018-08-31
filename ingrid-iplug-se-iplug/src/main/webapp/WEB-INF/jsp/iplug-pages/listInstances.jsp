@@ -182,6 +182,7 @@
     <div id="contentBox" class="contentMiddle">
         <h1 id="head">SE - Instanzen</h1>
 
+<% if (request.isUserInRole( "admin" )) { %>
         <div class="controls">
             <a href="../base/extras.html">Zur&uuml;ck</a>
             <a href="../base/welcome.html">Abbrechen</a>
@@ -192,6 +193,7 @@
             <a href="../base/welcome.html">Abbrechen</a>
             <a href="#" onclick="document.getElementById('formInstances').submit();">Weiter</a>
         </div>
+<% } %>
 
         <form:form id="formInstances" method="post" action="../iplug-pages/listInstances.html">
             <input type="hidden" name="action" value="submit" />
@@ -225,18 +227,23 @@
                                     <div>
                                         <div>
                                             <button type="button" class="btnInstance" data-id="${ instance.name }">Bearbeiten</button>
+<% if (request.isUserInRole( "admin" )) { %>
                                             <button class="select">Weitere Optionen</button>
+<% } %>                
                                         </div>
+<% if (request.isUserInRole( "admin" )) { %>
                                         <ul style="position:absolute; padding-left: 0; min-width: 140px; z-index: 100;">
                                             <li action="duplicate">Kopie erzeugen</li>
                                             <li action="delete">Löschen</li>
                                         </ul>
+<% } %>                
                                     </div>
                                 </td>
                             </tr>
                         </c:forEach>
                     </tbody>
                 </table>
+<% if (request.isUserInRole( "admin" )) { %>
                 <div class="input inline">
                     <input type="text" name="instance" style="width: 200px;"></input>
                 </div>
@@ -244,6 +251,7 @@
                 <c:if test="${not empty error}">
                     <p class="error">${error}</p>
                 </c:if>
+<% } %>                
             </div>
         </form:form>
 

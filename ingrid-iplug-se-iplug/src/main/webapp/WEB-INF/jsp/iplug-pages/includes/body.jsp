@@ -55,11 +55,16 @@
     <div id="tab-container" class="tab-container">
         <ul class='etabs'>
             <li class='tab<c:if test="${activeTab == '2'}"> active</c:if>'><a<c:if test="${activeTab != '2'}"> href="instanceUrls.html?instance=${instance.name}"</c:if>>URL-Pflege</a></li>
+<% if (request.isUserInRole( "admin" )) { %>
             <li class='tab<c:if test="${activeTab == '1'}"> active</c:if>'><a<c:if test="${activeTab != '1'}"> href="instanceConfig.html?instance=${instance.name}"</c:if>>Konfiguration</a></li>
+<% } %>
             <li class='tab<c:if test="${activeTab == '3'}"> active</c:if>'><a<c:if test="${activeTab != '3'}"> href="instanceScheduling.html?instance=${instance.name}"</c:if>>Zeitplanung</a></li>
             <li class='tab<c:if test="${activeTab == '4'}"> active</c:if>'><a<c:if test="${activeTab != '4'}"> href="instanceManagement.html?instance=${instance.name}"</c:if>>Management</a></li>
             <li class='tab<c:if test="${activeTab == '5'}"> active</c:if>'><a<c:if test="${activeTab != '5'}"> href="instanceSearch.html?instance=${instance.name}"</c:if>>Suche</a></li>
             <li class='tab<c:if test="${activeTab == '6'}"> active</c:if>'><a<c:if test="${activeTab != '6'}"> href="instanceReports.html?instance=${instance.name}"</c:if>>Reports</a></li>
+<% if (request.isUserInRole( "admin" )) { %>
+            <li class='tab<c:if test="${activeTab == '7'}"> active</c:if>'><a<c:if test="${activeTab != '7'}"> href="instanceAdmins.html?instance=${instance.name}"</c:if>>Administratoren</a></li>
+<% } %>
         </ul>
         <div class="panel-container">
             <div>
@@ -69,6 +74,7 @@
                 <c:if test="${activeTab == '4'}"><c:import url="includes/management.jsp"></c:import></c:if>
                 <c:if test="${activeTab == '5'}"><c:import url="includes/search.jsp"></c:import></c:if>
                 <c:if test="${activeTab == '6'}"><c:import url="includes/reports.jsp"></c:import></c:if>
+                <c:if test="${activeTab == '7'}"><c:import url="includes/admins.jsp"></c:import></c:if>
             </div>
         </div>
     </div>

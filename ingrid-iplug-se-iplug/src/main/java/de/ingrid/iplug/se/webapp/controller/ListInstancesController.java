@@ -31,9 +31,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -44,7 +48,6 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
-import de.ingrid.admin.controller.AbstractController;
 import de.ingrid.admin.elasticsearch.IndexManager;
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
@@ -64,7 +67,7 @@ import de.ingrid.iplug.se.webapp.controller.instance.scheduler.SchedulerManager;
  */
 @Controller
 @SessionAttributes("plugDescription")
-public class ListInstancesController extends AbstractController {
+public class ListInstancesController extends InstanceController {
     
     private static Logger log = Logger.getLogger( ListInstancesController.class );
 
@@ -102,8 +105,8 @@ public class ListInstancesController extends AbstractController {
     }
 
     @RequestMapping(value = { "/iplug-pages/listInstances.html" }, method = RequestMethod.GET)
-    public String getParameters(final ModelMap modelMap) throws Exception {
-
+    public String getParameters(final ModelMap modelMap, HttpServletRequest request) throws Exception {
+        
         List<Instance> instances = getInstances();
 
         // check for invalid instances and remove them from the active ones
@@ -118,12 +121,17 @@ public class ListInstancesController extends AbstractController {
                     break;
                 }
             }
-
+            
             if (!found) {
                 activeInstancesIt.remove();
             }
         }
-
+        
+        if (request.isUserInRole( "instanceAdmin" )) {
+            String user = request.getUserPrincipal().getName();
+            instances.removeIf(instance -> !DBUtils.isAdminForInstance( user, instance.getName() ));
+        }
+        
         modelMap.put( "instances", instances );
         return AdminViews.SE_LIST_INSTANCES;
     }
@@ -138,7 +146,12 @@ public class ListInstancesController extends AbstractController {
     @RequestMapping(value = "/iplug-pages/listInstances.html", method = RequestMethod.POST, params = "add")
     public String addInstance(final ModelMap modelMap,
             @RequestParam("instance") String name,
-            @RequestParam(value = "duplicateFrom", required = false) String from) throws Exception {
+            @RequestParam(value = "duplicateFrom", required = false) String from, HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+        if (request.isUserInRole( "instanceAdmin" )) {
+            response.sendError(HttpStatus.FORBIDDEN.value());
+            return null;
+        }
         
         if (name == null || name.isEmpty()) {
             modelMap.put( "instances", getInstances() );

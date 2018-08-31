@@ -47,6 +47,8 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -75,6 +77,7 @@ import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.conf.UrlMaintenanceSettings;
 import de.ingrid.iplug.se.db.DBManager;
+import de.ingrid.iplug.se.db.model.InstanceAdmin;
 import de.ingrid.iplug.se.db.model.Metadata;
 import de.ingrid.iplug.se.db.model.Url;
 import de.ingrid.iplug.se.nutchController.NutchController;
@@ -108,8 +111,98 @@ public class RestDataController extends InstanceController {
 		return "OK";
 	}
 
-	@RequestMapping(value = { "url/{id}" }, method = RequestMethod.GET, produces = "application/json")
-	public ResponseEntity<Url> getUrl(@PathVariable("id") Long id) {
+
+    @RequestMapping(value = { "admin/{id}" }, method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<InstanceAdmin> getInstanceAdmin(@PathVariable("id") Long id) {
+        EntityManager em = DBManager.INSTANCE.getEntityManager();
+        InstanceAdmin admin = em.find(InstanceAdmin.class, id);
+
+        return new ResponseEntity<InstanceAdmin>(admin, admin != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    }
+	
+    @RequestMapping(value = { "admin/{instance}" }, method = RequestMethod.POST)
+    public ResponseEntity<?> addAdmin(@PathVariable("instance") String name, @RequestBody InstanceAdmin admin, HttpServletRequest request, HttpServletResponse response) {
+        DBUtils.addAdmin(admin);
+        return new ResponseEntity<InstanceAdmin>(admin, HttpStatus.OK);
+    }
+    
+    @RequestMapping(value = { "isduplicateadmin/{instance}/{login}" }, method = RequestMethod.GET)
+    public ResponseEntity<String> isDuplicateAdmin(@PathVariable("instance") String name, @PathVariable("login") String login) {
+        if (DBUtils.isAdminForInstance(login, name)) {
+            return new ResponseEntity<String>("true", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<String>("false", HttpStatus.OK);
+        }
+    }
+
+    @RequestMapping(value = { "admin/{id}" }, method = RequestMethod.DELETE)
+    public ResponseEntity<Map<String, String>> deleteAdmin(@PathVariable("id") Long id) {
+        return deleteAdmins(new Long[] { id });
+    }
+
+    @RequestMapping(value = { "admins" }, method = RequestMethod.DELETE)
+    public ResponseEntity<Map<String, String>> deleteAdmins(@RequestBody Long[] ids) {
+        DBUtils.deleteAdmins(ids);
+        Map<String, String> result = new HashMap<String, String>();
+        result.put("result", "OK");
+        return new ResponseEntity<Map<String, String>>(result, HttpStatus.OK);
+    }	
+	
+    @SuppressWarnings("unchecked")
+    @RequestMapping(value = { "admins/{instance}" }, method = RequestMethod.GET)
+    public JSONObject getAdmins(@PathVariable("instance") String name,
+            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(value = "pagesize", required = false, defaultValue = "10") int pageSize,
+            @RequestParam(value = "sort", required = false, defaultValue = "") int[] sort, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // @RequestParam(value = "column[]", required = false, defaultValue =
+        // "") List<String> sortColumn) {
+        if (hasNoAccessToInstance(name, request, response)) {
+            response.sendError(HttpStatus.FORBIDDEN.value());
+            return null;
+        }
+        EntityManager em = DBManager.INSTANCE.getEntityManager();
+
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<InstanceAdmin> createQuery = criteriaBuilder.createQuery(InstanceAdmin.class);
+        Root<InstanceAdmin> adminTable = createQuery.from(InstanceAdmin.class);
+
+        CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
+
+        List<Predicate> criteria = new ArrayList<Predicate>();
+
+        // filter by instance
+        criteria.add(criteriaBuilder.equal(adminTable.<String> get("instance"), name));
+
+        countQuery.select(criteriaBuilder.count(adminTable)).where(
+                criteriaBuilder.and(criteria.toArray(new Predicate[0])));
+        Long count = em.createQuery(countQuery).getSingleResult();
+
+        createQuery.select(adminTable).where(criteriaBuilder.and(criteria.toArray(new Predicate[0])));
+
+        // sort if necessary
+        if (sort.length == 2) {
+            Expression<?> column = getColumnForSortAdminTable(adminTable, sort[0]);
+            if (column != null) {
+                if (sort[1] == 0) {
+                    createQuery.orderBy(criteriaBuilder.desc(column));
+                } else {
+                    createQuery.orderBy(criteriaBuilder.asc(column));
+                }
+            }
+        }
+
+        List<InstanceAdmin> resultList = em.createQuery(createQuery).setFirstResult(page * pageSize).setMaxResults(pageSize)
+                .getResultList();
+
+        JSONObject json = new JSONObject();
+        json.put("data", resultList);
+        json.put("totalAdmins", count);
+
+        return json;
+    }	
+	
+    @RequestMapping(value = { "url/{id}" }, method = RequestMethod.GET, produces = "application/json")
+	public ResponseEntity<Url> getUrl(@PathVariable("id") Long id, HttpServletRequest request, HttpServletResponse response) {
 		EntityManager em = DBManager.INSTANCE.getEntityManager();
 		Url url = em.find(Url.class, id);
 
@@ -161,7 +254,7 @@ public class RestDataController extends InstanceController {
 	}
 
 	@RequestMapping(value = { "url/{id}" }, method = RequestMethod.DELETE)
-	public ResponseEntity<Map<String, String>> deleteUrl(@PathVariable("id") Long id) {
+	public ResponseEntity<Map<String, String>> deleteUrl(@PathVariable("id") Long id, HttpServletRequest request, HttpServletResponse response) {
 		return deleteUrls(new Long[] { id });
 	}
 
@@ -180,10 +273,15 @@ public class RestDataController extends InstanceController {
 	        @RequestParam(value = "pagesize", required = false, defaultValue = "10") int pageSize,
 	        @RequestParam(value = "urlfilter", required = false, defaultValue = "") String urlFilter,
 	        @RequestParam(value = "metafilter", required = false, defaultValue = "") String[] metaOptions,
-	        @RequestParam(value = "sort", required = false, defaultValue = "") int[] sort) {
+	        @RequestParam(value = "sort", required = false, defaultValue = "") int[] sort, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		// @RequestParam(value = "column[]", required = false, defaultValue =
 		// "") List<String> sortColumn) {
-		EntityManager em = DBManager.INSTANCE.getEntityManager();
+        if (hasNoAccessToInstance(name, request, response)) {
+            response.sendError(HttpStatus.FORBIDDEN.value());
+            return null;
+        }
+
+        EntityManager em = DBManager.INSTANCE.getEntityManager();
 
 		CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
 		CriteriaQuery<Url> createQuery = criteriaBuilder.createQuery(Url.class);
@@ -246,10 +344,14 @@ public class RestDataController extends InstanceController {
 	        @RequestParam(value = "pagesize", required = false, defaultValue = "10") int pageSize,
 	        @RequestParam(value = "urlfilter", required = false, defaultValue = "") String urlFilter,
 	        @RequestParam(value = "statusfilter", required = false, defaultValue = "") String[] statusFilter,
-	        @RequestParam(value = "sort", required = false, defaultValue = "") int[] sort) {
+	        @RequestParam(value = "sort", required = false, defaultValue = "") int[] sort, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		// @RequestParam(value = "column[]", required = false, defaultValue =
 		// "") List<String> sortColumn) {
 
+        if (hasNoAccessToInstance(name, request, response)) {
+            response.sendError(HttpStatus.FORBIDDEN.value());
+            return null;
+        }
 		Path path = Paths.get(SEIPlug.conf.getInstancesDir(), name, "statistic", "url_error_report", "data.json");
 
 		JSONParser parser = new JSONParser();
@@ -297,11 +399,23 @@ public class RestDataController extends InstanceController {
 		return null;
 	}
 
+    private Expression<?> getColumnForSortAdminTable(Root<InstanceAdmin> adminTable, int columnPos) {
+        switch (columnPos) {
+        case 1:
+            return adminTable.get("login");
+        }
+        return null;
+    }
+
 	@RequestMapping(value = { "instance/{name}/{value}" }, method = RequestMethod.POST)
 	public ResponseEntity<Map<String, String>> toggleInstanceActive(
 	        @ModelAttribute("plugDescription") final PlugdescriptionCommandObject pdCommandObject,
-	        @PathVariable("name") String name, @PathVariable("value") String value) {
+	        @PathVariable("name") String name, @PathVariable("value") String value, HttpServletRequest request, HttpServletResponse response) throws IOException {
 
+        if (hasNoAccessToInstance(name, request, response)) {
+            response.sendError(HttpStatus.FORBIDDEN.value());
+            return null;
+        }
 
 		List<String> activeInstances = JettyStarter.getInstance().config.indexSearchInTypes;
 		// always remove type that leads to no result (in case it was set)
@@ -325,7 +439,12 @@ public class RestDataController extends InstanceController {
 	}
 
 	@RequestMapping(value = "/instance/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<String> deleteInstance(@PathVariable("id") String name) throws Exception {
+    public ResponseEntity<String> deleteInstance(@PathVariable("id") String name, HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+        if (hasNoAccessToInstance(name, request, response)) {
+            response.sendError(HttpStatus.FORBIDDEN.value());
+            return null;
+        }
 
         // stop all nutch processes first
         Instance instance = InstanceController.getInstanceData( name );
@@ -352,14 +471,24 @@ public class RestDataController extends InstanceController {
 
         em.getTransaction().begin();
         CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaDelete<Url> criteriaDelete = cb.createCriteriaDelete( Url.class );
-        Root<Url> urlTable = criteriaDelete.from(Url.class);
+        CriteriaDelete<Url> criteriaDeleteUrls = cb.createCriteriaDelete( Url.class );
+        Root<Url> urlTable = criteriaDeleteUrls.from(Url.class);
         Predicate instanceCriteria = cb.equal( urlTable.get("instance"), name );
 
-        criteriaDelete.from( Url.class );
-        criteriaDelete.where( instanceCriteria );
+        criteriaDeleteUrls.from( Url.class );
+        criteriaDeleteUrls.where( instanceCriteria );
 
-        em.createQuery( criteriaDelete ).executeUpdate();
+        em.createQuery( criteriaDeleteUrls ).executeUpdate();
+
+        CriteriaDelete<InstanceAdmin> criteriaDeleteInstanceAdmins = cb.createCriteriaDelete( InstanceAdmin.class );
+        Root<InstanceAdmin> adminTable = criteriaDeleteInstanceAdmins.from(InstanceAdmin.class);
+        instanceCriteria = cb.equal( urlTable.get("instance"), name );
+
+        criteriaDeleteInstanceAdmins.from( InstanceAdmin.class );
+        criteriaDeleteInstanceAdmins.where( instanceCriteria );
+
+        em.createQuery( criteriaDeleteInstanceAdmins ).executeUpdate();
+        
         em.flush();
         em.getTransaction().commit();
 
@@ -367,8 +496,14 @@ public class RestDataController extends InstanceController {
     }
 
 	@RequestMapping(value = { "status/{instance}" }, method = RequestMethod.GET)
-	public ResponseEntity<Collection<State>> getStatus(@PathVariable("instance") String name) {
-		Instance instance = getInstanceData(name);
+	public ResponseEntity<Collection<State>> getStatus(@PathVariable("instance") String name, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        
+	    if (hasNoAccessToInstance(name, request, response)) {
+            response.sendError(HttpStatus.FORBIDDEN.value());
+            return null;
+        }
+
+        Instance instance = getInstanceData(name);
 		NutchProcess nutchProcess = nutchController.getNutchProcess(instance);
 
 		if (nutchProcess == null || (nutchProcess != null && nutchProcess.getState() == Thread.State.TERMINATED)) {
@@ -382,8 +517,12 @@ public class RestDataController extends InstanceController {
 	}
 
 	@RequestMapping(value = { "status/{instance}/statistic" }, method = RequestMethod.GET)
-	public ResponseEntity<String> getStatistic(@PathVariable("instance") String name) throws IOException {
+	public ResponseEntity<String> getStatistic(@PathVariable("instance") String name, HttpServletRequest request, HttpServletResponse response) throws IOException {
 
+        if (hasNoAccessToInstance(name, request, response)) {
+            response.sendError(HttpStatus.FORBIDDEN.value());
+            return null;
+        }
 		Path path = Paths.get(SEIPlug.conf.getInstancesDir(), name, "statistic", "host", "crawldb");
 		String content = FileUtils.readFile(path);
 
@@ -391,8 +530,12 @@ public class RestDataController extends InstanceController {
 	}
 
 	@RequestMapping(value = { "status/{instance}/hadoop" }, method = RequestMethod.GET)
-	public ResponseEntity<String> getHadoopLog(@PathVariable("instance") String name) throws IOException {
+	public ResponseEntity<String> getHadoopLog(@PathVariable("instance") String name, HttpServletRequest request, HttpServletResponse response) throws IOException {
 
+        if (hasNoAccessToInstance(name, request, response)) {
+            response.sendError(HttpStatus.FORBIDDEN.value());
+            return null;
+        }
 		Path path = Paths.get(SEIPlug.conf.getInstancesDir(), name, "logs", "hadoop.log");
 		String content = FileUtils.tail(path.toFile(), 1000);
 
@@ -400,9 +543,14 @@ public class RestDataController extends InstanceController {
 	}
 
 	@RequestMapping(value = { "url/{instance}/check" }, method = RequestMethod.POST)
-	public ResponseEntity<String> checkUrl(@PathVariable("instance") String instanceName, @RequestBody String urlString)
+	public ResponseEntity<String> checkUrl(@PathVariable("instance") String instanceName, @RequestBody String urlString, HttpServletRequest request, HttpServletResponse response)
 	        throws IOException, InterruptedException {
-		Instance instance = getInstanceData(instanceName);
+        if (hasNoAccessToInstance(instanceName, request, response)) {
+            response.sendError(HttpStatus.FORBIDDEN.value());
+            return null;
+        }
+
+        Instance instance = getInstanceData(instanceName);
 
 		NutchProcess process = NutchProcessFactory.getUrlTesterProcess(instance, urlString);
 		process.start();
@@ -438,7 +586,11 @@ public class RestDataController extends InstanceController {
     }
 
   @RequestMapping(value = "/updateMetadata", method = RequestMethod.POST)
-  public ResponseEntity<Map<String, String>> updateMetadataConfig(@RequestParam("instance") String name, @RequestBody String json) throws IOException {
+  public ResponseEntity<Map<String, String>> updateMetadataConfig(@RequestParam("instance") String name, @RequestBody String json, HttpServletRequest request, HttpServletResponse response) throws IOException {
+      if (hasNoAccessToInstance(name, request, response)) {
+          response.sendError(HttpStatus.FORBIDDEN.value());
+          return null;
+      }
       String confFile = SEIPlug.conf.getInstancesDir() + "/" + name + "/conf/urlMaintenance.json";
 
       // check if json can be converted correctly
