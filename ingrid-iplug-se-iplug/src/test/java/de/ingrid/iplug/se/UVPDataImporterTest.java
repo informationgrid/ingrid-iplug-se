@@ -68,7 +68,7 @@ public class UVPDataImporterTest {
     public void testReadData() throws IOException {
 
         ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File( classLoader.getResource( "180417_blp_daten_BB.xlsx" ).getFile() );
+        File file = new File( classLoader.getResource( "blp-urls-test.xlsx" ).getFile() );
 
         List<UVPDataImporter.BlpModel> l = UVPDataImporter.readData( file.getAbsolutePath() );
         assertEquals( true, l.size() > 0 );
