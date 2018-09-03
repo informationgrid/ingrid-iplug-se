@@ -49,6 +49,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
 import de.ingrid.admin.elasticsearch.IndexManager;
+import de.ingrid.admin.security.IngridPrincipal;
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.db.model.Url;
@@ -127,7 +128,7 @@ public class ListInstancesController extends InstanceController {
             }
         }
         
-        if (request.isUserInRole( "instanceAdmin" )) {
+        if (!(request.getUserPrincipal() instanceof IngridPrincipal.SuperAdmin) && request.isUserInRole( "instanceAdmin" )) {
             String user = request.getUserPrincipal().getName();
             instances.removeIf(instance -> !DBUtils.isAdminForInstance( user, instance.getName() ));
         }
@@ -148,7 +149,7 @@ public class ListInstancesController extends InstanceController {
             @RequestParam("instance") String name,
             @RequestParam(value = "duplicateFrom", required = false) String from, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        if (request.isUserInRole( "instanceAdmin" )) {
+        if (!(request.getUserPrincipal() instanceof IngridPrincipal.SuperAdmin) && request.isUserInRole( "instanceAdmin" )) {
             response.sendError(HttpStatus.FORBIDDEN.value());
             return null;
         }
