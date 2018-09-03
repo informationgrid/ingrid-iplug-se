@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.controller.AbstractController;
+import de.ingrid.admin.security.IngridPrincipal;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.utils.DBUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
@@ -70,7 +71,7 @@ public class InstanceController extends AbstractController {
      */
     public boolean hasNoAccessToInstance(String instanceName, HttpServletRequest request, HttpServletResponse response) {
         String user = request.getUserPrincipal().getName();
-        if (request.isUserInRole( "instanceAdmin" ) && !DBUtils.isAdminForInstance( user, instanceName )) {
+        if (!(request.getUserPrincipal() instanceof IngridPrincipal.SuperAdmin) && request.isUserInRole( "instanceAdmin" ) && !DBUtils.isAdminForInstance( user, instanceName )) {
             return true;
         } else {
             return false;

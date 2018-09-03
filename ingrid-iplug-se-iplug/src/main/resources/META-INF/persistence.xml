@@ -27,6 +27,7 @@
         <exclude-unlisted-classes>false</exclude-unlisted-classes>
         <class>de.ingrid.iplug.se.db.model.Url</class>
         <class>de.ingrid.iplug.se.db.model.Metadata</class>
+        <class>de.ingrid.iplug.se.db.model.InstanceAdmin</class>
         <properties>
             <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform" />
             <property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
@@ -42,6 +43,7 @@
         <exclude-unlisted-classes>false</exclude-unlisted-classes>
         <class>de.ingrid.iplug.se.db.model.Url</class>
         <class>de.ingrid.iplug.se.db.model.Metadata</class>
+        <class>de.ingrid.iplug.se.db.model.InstanceAdmin</class>
         <properties>
             <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform" />
             <property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
