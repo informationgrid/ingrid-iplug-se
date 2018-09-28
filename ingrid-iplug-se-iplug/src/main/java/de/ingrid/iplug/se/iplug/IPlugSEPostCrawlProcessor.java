@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.elasticsearch.client.Client;
@@ -38,8 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.ingrid.admin.JettyStarter;
-import de.ingrid.admin.elasticsearch.IndexManager;
-import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
+import de.ingrid.elasticsearch.IndexManager;
 import de.ingrid.admin.service.PlugDescriptionService;
 import de.ingrid.utils.PlugDescription;
 
@@ -69,9 +69,9 @@ public class IPlugSEPostCrawlProcessor implements IPostCrawlProcessor {
         try {
             PlugDescription pd = plugDescriptionService.getPlugDescription();
 
-            Client client = elasticSearch.getObject().client();
+            Client client = elasticSearch.getClient();
             ClusterState clusterState = client.admin().cluster().prepareState().execute().actionGet().getState();
-            String realIndexName = indexManager.getIndexNameFromAliasName( JettyStarter.getInstance().config.index );
+            String realIndexName = indexManager.getIndexNameFromAliasName( JettyStarter.getInstance().config.index, null );
             IndexMetaData inMetaData = clusterState.getMetaData().index( realIndexName );
             
             ImmutableOpenMap<String, MappingMetaData> metad = inMetaData.getMappings();

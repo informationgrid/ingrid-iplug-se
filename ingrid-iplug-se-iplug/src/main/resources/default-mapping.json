@@ -8,7 +8,7 @@
         },
         "content": {
             "analyzer": "german",
-            "type": "string"
+            "type": "text"
         },
         "contentLength": {
             "type": "long"
@@ -17,42 +17,42 @@
             "type": "date"
         },
         "digest": {
-            "type": "string"
+            "type": "text"
         },
         "host": {
-            "type": "string"
+            "type": "text"
         },
         "id": {
-            "type": "string",
+            "type": "text",
             "index" : "not_analyzed"
         },
         "lang": {
-            "type": "string"
+            "type": "text"
         },
         "segment": {
-            "type": "string"
+            "type": "text"
         },
         "title": {
             "analyzer": "german",
-            "type": "string",
+            "type": "text",
             "boost": 1.1
         },
         "tstamp": {
             "type": "date"
         },
         "type": {
-            "type": "string"
+            "type": "text"
         },
         "url": {
-            "type": "string",
+            "type": "text",
             "index" : "not_analyzed"
         },
         "partner": {
-            "type": "string",
+            "type": "text",
             "index" : "not_analyzed"
         },
         "provider": {
-            "type": "string",
+            "type": "text",
             "index" : "not_analyzed"
         },
         "x1": {

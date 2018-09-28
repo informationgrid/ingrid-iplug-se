@@ -34,10 +34,11 @@ import java.nio.file.Paths;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import org.elasticsearch.common.settings.ImmutableSettings;
+import javafx.scene.NodeBuilder;
+import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
-import org.elasticsearch.node.NodeBuilder;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -151,10 +152,14 @@ public class NutchProcessTest {
             p.setStatusProvider(new StatusProvider(workingDir.toString()));
             p.start();
 
-            Settings settings = ImmutableSettings.settingsBuilder().put("path.data", SEIPlug.conf.getInstancesDir() + "/test").put("transport.tcp.port", 54346).put("http.port", 54347).build();
-            NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().clusterName("elasticsearch").data(true).settings(settings);
-            nodeBuilder = nodeBuilder.local(false);
-            node = nodeBuilder.node();
+            Settings settings = Settings.builder()
+                    .put("path.data", SEIPlug.conf.getInstancesDir() + "/test")
+                    .put("transport.tcp.port", 54346)
+                    .put("http.port", 54347).build();
+//            NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().clusterName("elasticsearch").data(true).settings(settings);
+//            nodeBuilder = nodeBuilder.local(false);
+//            node = nodeBuilder.node();
+            TransportClient transportClient = new PreBuiltTransportClient(settings);
 
             long start = System.currentTimeMillis();
             Thread.sleep(500);

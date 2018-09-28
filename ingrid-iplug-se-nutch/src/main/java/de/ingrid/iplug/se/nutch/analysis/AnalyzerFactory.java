@@ -20,7 +20,7 @@
  * limitations under the Licence.
  * **************************************************#
  */
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -39,12 +39,12 @@
 package de.ingrid.iplug.se.nutch.analysis;
 
 // Commons Logging imports
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.util.Version;
 import org.apache.nutch.plugin.Extension;
 import org.apache.nutch.plugin.ExtensionPoint;
 import org.apache.nutch.plugin.PluginRepository;
@@ -70,7 +70,7 @@ public class AnalyzerFactory {
     private Configuration conf;
 
     public AnalyzerFactory(Configuration conf) {
-        DEFAULT_ANALYZER = new StandardAnalyzer(Version.LUCENE_43);
+        DEFAULT_ANALYZER = new StandardAnalyzer();
         this.conf = conf;
         this.extensionPoint = PluginRepository.get(conf).getExtensionPoint(NutchAnalyzer.X_POINT_ID);
         if (this.extensionPoint == null) {
@@ -95,7 +95,6 @@ public class AnalyzerFactory {
      * <p>
      * Analyzer extensions should define the attribute "lang". The first plugin
      * found whose "lang" attribute equals the specified lang parameter is used.
-     * If none match, then the {@link NutchDocumentAnalyzer} is used.
      */
     public Analyzer get(String lang) {
 
@@ -130,9 +129,9 @@ public class AnalyzerFactory {
 
         if (lang != null) {
             Extension[] extensions = this.extensionPoint.getExtensions();
-            for (int i = 0; i < extensions.length; i++) {
-                if (lang.equals(extensions[i].getAttribute("lang"))) {
-                    return extensions[i];
+            for (Extension extension : extensions) {
+                if (lang.equals(extension.getAttribute("lang"))) {
+                    return extension;
                 }
             }
         }

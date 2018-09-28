@@ -60,7 +60,7 @@ public class LocationSearchTest  {
     @Before
     public void initTest() throws Exception {
         Utils.initIndex( jettyStarter );
-        Utils.indexManager.switchAlias( JettyStarter.getInstance().config.index, "test_1" );
+        Utils.indexManager.switchAlias( "ingrid_test", JettyStarter.getInstance().config.index, "test_1" );
     }
     
     @AfterClass

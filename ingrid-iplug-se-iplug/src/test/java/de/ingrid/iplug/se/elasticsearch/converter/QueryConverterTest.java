@@ -28,15 +28,15 @@ import static org.junit.Assert.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.ingrid.elasticsearch.search.IQueryParsers;
+import de.ingrid.elasticsearch.search.converter.DefaultFieldsQueryConverter;
+import de.ingrid.elasticsearch.search.converter.MatchAllQueryConverter;
+import de.ingrid.elasticsearch.search.converter.QueryConverter;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.ingrid.admin.JettyStarter;
-import de.ingrid.admin.elasticsearch.IQueryParsers;
-import de.ingrid.admin.elasticsearch.converter.DefaultFieldsQueryConverter;
-import de.ingrid.admin.elasticsearch.converter.MatchAllQueryConverter;
-import de.ingrid.admin.elasticsearch.converter.QueryConverter;
 import de.ingrid.iplug.se.elasticsearch.Utils;
 
 public class QueryConverterTest {
@@ -49,7 +49,7 @@ public class QueryConverterTest {
         queryConverter = new QueryConverter();
         List<IQueryParsers> parsers = new ArrayList<IQueryParsers>();
         parsers.add( new MatchAllQueryConverter() );
-        parsers.add( new DefaultFieldsQueryConverter() );
+        parsers.add( new DefaultFieldsQueryConverter(null) );
         queryConverter.setQueryParsers( parsers );
     }
 

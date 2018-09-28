@@ -36,9 +36,9 @@
 
 	<!-- the application context definition for the springapp DispatcherServlet -->
 	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"></property>
-		<property name="prefix" value="/WEB-INF/jsp/"></property>
-		<property name="suffix" value=".jsp"></property>
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+		<property name="prefix" value="/WEB-INF/jsp/"/>
+		<property name="suffix" value=".jsp"/>
 	</bean>
 
 	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
@@ -56,7 +56,7 @@
 	</bean>
 
 	<!-- XML DEFINED BEANS WITH ACCORDING QUALIFIER TO BE AUTOWIRED VIA QUALIFIER ! -->
-    <bean id="queryConverter" class="de.ingrid.admin.elasticsearch.converter.QueryConverter">
+    <bean id="queryConverter" class="de.ingrid.elasticsearch.search.converter.QueryConverter">
         <property name="queryParsers">
             <list>
                 <ref bean="defaultFieldsQueryConverter" />
@@ -69,6 +69,8 @@
             </list>
         </property>
    </bean>
+
+
 
 	<context:component-scan base-package="de.ingrid">
 		<!-- <context:exclude-filter type="regex" expression="de\.ingrid\.admin\.controller\.WorkingDirController"/> -->
@@ -83,8 +85,8 @@
 	</context:component-scan>
 
     <mvc:annotation-driven/>
-    <mvc:resources mapping="/css/**" location="/css/" />
-    <mvc:resources mapping="/img/**" location="/img/" />
+    <mvc:resources mapping="/css/**" location="css" />
+    <mvc:resources mapping="/img/**" location="img" />
     <!-- <mvc:default-servlet-handler/> -->
 
 	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">

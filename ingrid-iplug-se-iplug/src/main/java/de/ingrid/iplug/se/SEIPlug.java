@@ -42,6 +42,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
 import org.apache.log4j.Logger;
 import org.flywaydb.core.Flyway;
 import org.h2.tools.Recover;
@@ -51,8 +52,7 @@ import org.springframework.stereotype.Service;
 import com.tngtech.configbuilder.ConfigBuilder;
 
 import de.ingrid.admin.JettyStarter;
-import de.ingrid.admin.elasticsearch.IndexImpl;
-import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
+import de.ingrid.elasticsearch.search.IndexImpl;
 import de.ingrid.iplug.HeartBeatPlug;
 import de.ingrid.iplug.PlugDescriptionFieldFilters;
 import de.ingrid.iplug.se.db.DBManager;

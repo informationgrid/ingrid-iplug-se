@@ -65,10 +65,10 @@ public class ElasticSearchUtils {
     }
 
     public static void deleteType(String name, Client client) {
-        client.admin().indices().prepareDeleteMapping( JettyStarter.getInstance().config.index )
+        /*client.admin().indices().prepareDeleteMapping( JettyStarter.getInstance().config.index )
             .setType( name )
             .execute()
-            .actionGet();
+            .actionGet();*/
         
     }
     

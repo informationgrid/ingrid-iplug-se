@@ -3,16 +3,12 @@
   <parent>
     <groupId>de.ingrid</groupId>
     <artifactId>ingrid-iplug-se-project</artifactId>
-    <version>4.5.0-SNAPSHOT</version>
+    <version>5.0.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>de.ingrid</groupId>
   <artifactId>ingrid-iplug-se-nutch</artifactId>
   <packaging>jar</packaging>
   <name>ingrid-iplug-se-nutch</name>
-  <properties>
-    <apache-nutch-version>apache-nutch-1.9</apache-nutch-version>
-  </properties>
   <repositories>
     <!-- Repo of parent pom needed, parent pom may not be installed locally
       yet -->
@@ -53,7 +49,13 @@
     <dependency>
       <groupId>org.elasticsearch</groupId>
       <artifactId>elasticsearch</artifactId>
-      <version>1.1.0</version>
+      <version>${elasticsearch.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.elasticsearch.client</groupId>
+      <artifactId>transport</artifactId>
+      <version>${elasticsearch.version}</version>
       <optional>true</optional>
     </dependency>
     <!-- nutch dependencies -->

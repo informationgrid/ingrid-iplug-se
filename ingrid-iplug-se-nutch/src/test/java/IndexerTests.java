@@ -44,10 +44,8 @@ import org.apache.nutch.scoring.webgraph.LinkRank;
 import org.apache.nutch.scoring.webgraph.ScoreUpdater;
 import org.apache.nutch.scoring.webgraph.WebGraph;
 import org.apache.nutch.util.NutchConfiguration;
-import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
-import org.elasticsearch.node.NodeBuilder;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -100,14 +98,18 @@ public class IndexerTests {
     @Test
     public void test04FilterCrawlDB() throws Exception {
 
-        Settings settings = ImmutableSettings.settingsBuilder().put("path.data", "test").put("transport.tcp.port", 54346).put("http.port", 54347).build();
-        NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().clusterName("elasticsearch").data(true).settings(settings);
+        Settings settings = Settings.builder()
+                .put("path.data", "test")
+                .put("transport.tcp.port", 54346)
+                .put("http.port", 54347)
+                .build();
+        /*NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().clusterName("elasticsearch").data(true).settings(settings);
         nodeBuilder = nodeBuilder.local(false);
-        Node node = nodeBuilder.node();
+        Node node = nodeBuilder.node();*/
 
         ToolRunner.run(NutchConfiguration.create(), new BWCrawlDbFilter(), new String[] { "test/crawldb", "test/bwdb", "false", "false", "true" });
 
-        node.close();
+//        node.close();
     }
 
     @Test
@@ -316,14 +318,18 @@ public class IndexerTests {
     @Test
     public void test18Index() throws Exception {
 
-        Settings settings = ImmutableSettings.settingsBuilder().put("path.data", "test").put("transport.tcp.port", 54346).put("http.port", 54347).build();
-        NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().clusterName("elasticsearch").data(true).settings(settings);
+        Settings settings = Settings.builder()
+                .put("path.data", "test")
+                .put("transport.tcp.port", 54346)
+                .put("http.port", 54347)
+                .build();
+        /*NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().clusterName("elasticsearch").data(true).settings(settings);
         nodeBuilder = nodeBuilder.local(false);
-        Node node = nodeBuilder.node();
+        Node node = nodeBuilder.node();*/
 
         ToolRunner.run(NutchConfiguration.create(), new IndexingJob(), new String[] { "test/crawldb", "-linkdb", "test/linkdb", "-dir", "test/segments", "-deleteGone" });
 
-        node.close();
+//        node.close();
     }
 
     /*

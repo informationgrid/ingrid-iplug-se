@@ -48,7 +48,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
-import de.ingrid.admin.elasticsearch.IndexManager;
+import de.ingrid.elasticsearch.IndexManager;
 import de.ingrid.admin.security.IngridPrincipal;
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;

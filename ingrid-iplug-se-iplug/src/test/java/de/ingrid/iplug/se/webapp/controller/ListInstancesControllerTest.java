@@ -31,8 +31,12 @@ import java.security.Principal;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.node.internal.InternalNode;
+import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.node.Node;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,7 +49,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.ui.ModelMap;
 
 import de.ingrid.admin.JettyStarter;
-import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.utils.ElasticSearchUtils;
@@ -59,7 +62,7 @@ public class ListInstancesControllerTest extends Mockito {
     @Mock
     SchedulerManager manager;
     
-    @Mock 
+    @Mock
     ElasticsearchNodeFactoryBean esBean;
     
     @Before
@@ -67,8 +70,10 @@ public class ListInstancesControllerTest extends Mockito {
         new JettyStarter( false );
         MockitoAnnotations.initMocks( this );
         PowerMockito.mockStatic( ElasticSearchUtils.class );
-        InternalNode node = new InternalNode();
-        Mockito.when( esBean.getObject() ).thenReturn( node );
+        // InternalNode node = new InternalNode();
+        Settings.Builder builder = Settings.builder();
+        TransportClient transportClient = new PreBuiltTransportClient(builder.build());
+        Mockito.when( esBean.getClient() ).thenReturn( transportClient );
         Mockito.when( ElasticSearchUtils.typeExists( Mockito.anyString(), (Client) Mockito.anyObject() ) ).thenReturn( false );
     }
 

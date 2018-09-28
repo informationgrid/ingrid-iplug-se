@@ -35,24 +35,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
+import de.ingrid.elasticsearch.IndexManager;
+import de.ingrid.elasticsearch.search.FacetConverter;
+import de.ingrid.elasticsearch.search.IQueryParsers;
+import de.ingrid.elasticsearch.search.IndexImpl;
+import de.ingrid.elasticsearch.search.converter.*;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.springframework.core.io.ClassPathResource;
 
 import de.ingrid.admin.JettyStarter;
-import de.ingrid.admin.elasticsearch.FacetConverter;
-import de.ingrid.admin.elasticsearch.IQueryParsers;
-import de.ingrid.admin.elasticsearch.IndexImpl;
-import de.ingrid.admin.elasticsearch.IndexManager;
-import de.ingrid.admin.elasticsearch.converter.DatatypePartnerProviderQueryConverter;
-import de.ingrid.admin.elasticsearch.converter.DefaultFieldsQueryConverter;
-import de.ingrid.admin.elasticsearch.converter.FieldQueryIGCConverter;
-import de.ingrid.admin.elasticsearch.converter.FuzzyQueryConverter;
-import de.ingrid.admin.elasticsearch.converter.MatchAllQueryConverter;
-import de.ingrid.admin.elasticsearch.converter.QueryConverter;
-import de.ingrid.admin.elasticsearch.converter.WildcardQueryConverter;
-import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.utils.IngridDocument;
 import de.ingrid.utils.IngridHit;
 import de.ingrid.utils.query.IngridQuery;
@@ -91,12 +86,12 @@ public class Utils {
     }
     
     public static void prepareIndex(ElasticsearchNodeFactoryBean elastic, String fileData, String index) throws ElasticsearchException, Exception {
-        Client client = elastic.getObject().client();
+        Client client = elastic.getClient();
         ClassPathResource resource = new ClassPathResource( fileData );
 
         byte[] urlsData = Files.readAllBytes( Paths.get( resource.getURI() ) );
 
-        client.prepareBulk().add( urlsData, 0, urlsData.length, true )
+        client.prepareBulk().add( urlsData, 0, urlsData.length, XContentType.JSON )
                 .execute()
                 .actionGet();
 
@@ -112,7 +107,7 @@ public class Utils {
     public static void setMapping(ElasticsearchNodeFactoryBean elastic, String index) {
         String mappingSource = "";
         try {
-            Client client = elastic.getObject().client();
+            Client client = elastic.getClient();
             ClassPathResource resource = new ClassPathResource( "data/mapping.json" );
 
             List<String> urlsData = Files.readAllLines( Paths.get( resource.getURI() ), Charset.defaultCharset() );
@@ -153,7 +148,7 @@ public class Utils {
         
         QueryConverter qc = new QueryConverter();
         List<IQueryParsers> parsers = new ArrayList<IQueryParsers>();
-        parsers.add( new DefaultFieldsQueryConverter() );
+        parsers.add( new DefaultFieldsQueryConverter(null) );
         parsers.add( new WildcardQueryConverter() );
         parsers.add( new FuzzyQueryConverter() );
         parsers.add( new FieldQueryIGCConverter() );
@@ -161,9 +156,9 @@ public class Utils {
         parsers.add( new MatchAllQueryConverter() );
         qc.setQueryParsers( parsers );
         
-        indexManager = new IndexManager( elastic );
+        indexManager = new IndexManager( elastic, null );
         
-        index = new IndexImpl( indexManager, qc, new FacetConverter(qc) );
+        index = new IndexImpl( null, indexManager, qc, new FacetConverter(qc) );
     }
     
     public static IngridQuery getIngridQuery( String term ) {

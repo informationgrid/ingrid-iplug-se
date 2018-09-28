@@ -66,7 +66,7 @@ public class NutchControllerTest {
     
     @After
     public void afterTest() throws Exception {
-        Utils.elastic.getObject().close();
+        Utils.elastic.getClient().close();
     }
     
     @Test

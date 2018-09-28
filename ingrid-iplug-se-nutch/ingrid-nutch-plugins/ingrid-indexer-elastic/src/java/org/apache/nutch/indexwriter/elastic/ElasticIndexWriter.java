@@ -44,7 +44,7 @@ public class ElasticIndexWriter implements IndexWriter {
 
     private IngridElasticSearchClient client = null;
 
-    private Map<String, Object> dependingFieldsMap = new HashMap<String, Object>();
+    private Map<String, Object> dependingFieldsMap = new HashMap<>();
 
     @Override
     public void open(JobConf job, String name) throws IOException {
@@ -57,7 +57,7 @@ public class ElasticIndexWriter implements IndexWriter {
         String id = (String) doc.getFieldValue("id");
         IndexRequestBuilder request = client.prepareIndexRequest(id);
 
-        Map<String, Object> source = new HashMap<String, Object>();
+        Map<String, Object> source = new HashMap<>();
         int requestLength = 0;
 
         // Loop through all fields of this doc
@@ -159,7 +159,7 @@ public class ElasticIndexWriter implements IndexWriter {
         } else if (sourceValue instanceof ArrayList) {
             ((ArrayList<String>) sourceValue).add( value );
         } else {
-            ArrayList<String> newValues = new ArrayList<String>();
+            ArrayList<String> newValues = new ArrayList<>();
             newValues.add( (String) sourceValue );
             newValues.add( value );
             source.put( key, newValues );

@@ -7,19 +7,19 @@
             },
             "title": {
                 "analyzer": "german",
-                "type": "string",
+                "type": "text",
                 "boost": 1.1
             },
             "content": {
                 "analyzer": "german",
-                "type": "string"
+                "type": "text"
             },
             "id": {
-                "type": "string",
+                "type": "text",
                 "index" : "not_analyzed"
             },
             "url": {
-                "type": "string",
+                "type": "text",
                 "index" : "not_analyzed"
             },
             "boost": {

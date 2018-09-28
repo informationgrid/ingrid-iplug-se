@@ -400,7 +400,7 @@
 
                 var data = dialog.data("urlDataObject");
                 if (data) {
-                    $("#startUrl").val( data.url ? data.url : "http://" );
+                    $("#startUrl").val( data.url ? data.url : "https://" );
                     $.each( data.limitUrls, function(index, url) {
                         addUrlRowTo("limitUrlTable", url, index);
                     });

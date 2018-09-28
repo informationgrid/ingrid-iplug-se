@@ -50,6 +50,7 @@ import javax.persistence.criteria.Root;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.elasticsearch.client.Client;
@@ -73,7 +74,6 @@ import com.google.gson.GsonBuilder;
 
 import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
-import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.conf.UrlMaintenanceSettings;
 import de.ingrid.iplug.se.db.DBManager;
@@ -461,7 +461,7 @@ public class RestDataController extends InstanceController {
         }
 
         // remove instance (type) from index
-        Client client = elasticSearch.getObject().client();
+        Client client = elasticSearch.getClient();
         if (ElasticSearchUtils.typeExists( name, client )) {
             ElasticSearchUtils.deleteType( name, client );
         }

@@ -19,7 +19,6 @@ package org.apache.nutch.analysis.fr;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.AnalyzerWrapper;
-import org.apache.lucene.util.Version;
 
 /**
  * A simple French Analyzer that wraps the Lucene one.
@@ -28,10 +27,11 @@ import org.apache.lucene.util.Version;
  */
 public class FrenchAnalyzer extends AnalyzerWrapper {
 
-    private final static Analyzer ANALYZER = new org.apache.lucene.analysis.fr.FrenchAnalyzer(Version.LUCENE_43);
+    private final static Analyzer ANALYZER = new org.apache.lucene.analysis.fr.FrenchAnalyzer();
 
     /** Creates a new instance of FrenchAnalyzer */
     public FrenchAnalyzer() {
+        super(Analyzer.GLOBAL_REUSE_STRATEGY);
     }
 
     @Override

@@ -33,6 +33,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 
+import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
@@ -45,7 +46,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.stereotype.Service;
 
-import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
 import de.ingrid.iplug.se.nutchController.StatusProvider.Classification;
@@ -342,7 +342,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
 
             if ("true".equals( nutchConfigTool.getPropertyValue( "ingrid.delete.before.crawl" ) )) {
                 // remove instance (type) from index
-                Client client = elasticSearch.getObject().client();
+                Client client = elasticSearch.getClient();
                 if (ElasticSearchUtils.typeExists( instance.getName(), client )) {
                     ElasticSearchUtils.deleteType( instance.getName(), client );
                 }
