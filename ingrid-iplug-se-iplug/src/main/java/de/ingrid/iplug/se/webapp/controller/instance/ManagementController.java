@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
+import de.ingrid.elasticsearch.IndexManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -58,18 +59,21 @@ public class ManagementController extends InstanceController {
     
     private IPostCrawlProcessor[] postCrawlProcessors;
     
-    @Autowired
-    private ElasticsearchNodeFactoryBean elasticSearch;
+    private final ElasticsearchNodeFactoryBean elasticSearch;
+
+    private final IndexManager indexManager;
     
 
     @Autowired
-    public ManagementController(NutchController nutchController, IPostCrawlProcessor[] postCrawlProcessors) {
+    public ManagementController(NutchController nutchController, IPostCrawlProcessor[] postCrawlProcessors, ElasticsearchNodeFactoryBean elasticSearch, IndexManager indexManager) {
         this.nutchController = nutchController;
         this.postCrawlProcessors = postCrawlProcessors;
+        this.elasticSearch = elasticSearch;
+        this.indexManager = indexManager;
     }
 
     @RequestMapping(value = { "/iplug-pages/instanceManagement.html" }, method = RequestMethod.GET)
-    public String showManagement(final ModelMap modelMap, @RequestParam("instance") String name, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public String showManagement(final ModelMap modelMap, @RequestParam("instance") String name, HttpServletRequest request, HttpServletResponse response) {
         Instance instance = InstanceController.getInstanceData(name);
 
         if (instance == null) {
@@ -95,7 +99,7 @@ public class ManagementController extends InstanceController {
         // configure crawl process        
         Instance instance = InstanceController.getInstanceData( name );
 
-        IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, depth, numUrls, postCrawlProcessors);
+        IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, depth, numUrls, postCrawlProcessors, indexManager);
         process.setElasticSearch( elasticSearch );
 
         // run crawl process

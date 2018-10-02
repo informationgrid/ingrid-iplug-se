@@ -73,7 +73,8 @@ public class IPlugSEPostCrawlProcessor implements IPostCrawlProcessor {
             ClusterState clusterState = client.admin().cluster().prepareState().execute().actionGet().getState();
             String realIndexName = indexManager.getIndexNameFromAliasName( JettyStarter.getInstance().config.index, null );
             IndexMetaData inMetaData = clusterState.getMetaData().index( realIndexName );
-            
+
+            // FIXME: NPE "inMetaData"
             ImmutableOpenMap<String, MappingMetaData> metad = inMetaData.getMappings();
             List<Object> fields = pd.getArrayList(PlugDescription.FIELDS);
             if (fields == null) {

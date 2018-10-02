@@ -8,10 +8,16 @@
         },
         "content": {
             "analyzer": "german",
-            "type": "text"
+            "type": "text",
+            "store": true
         },
         "contentLength": {
             "type": "long"
+        },
+        "dataSourceName": {
+            "type": "string",
+            "index": "not_analyzed",
+            "store": true
         },
         "date": {
             "type": "date"
@@ -35,7 +41,8 @@
         "title": {
             "analyzer": "german",
             "type": "text",
-            "boost": 1.1
+            "boost": 1.1,
+            "store": true
         },
         "tstamp": {
             "type": "date"
@@ -45,7 +52,8 @@
         },
         "url": {
             "type": "text",
-            "index" : "not_analyzed"
+            "index" : "not_analyzed",
+            "store": true
         },
         "partner": {
             "type": "text",

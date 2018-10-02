@@ -210,7 +210,6 @@ public class ListInstancesController extends InstanceController {
             DBUtils.addUrls( fromUrls );
         } catch (Exception e) { 
             log.error( "Error during duplication of URLs", e );
-            e.printStackTrace();
             return false;
         }
         
@@ -232,9 +231,7 @@ public class ListInstancesController extends InstanceController {
             try {
                 FileUtils.copyDirectories( sourceDir, destDir );
             } catch (IOException e) {
-                e.printStackTrace();
-                // modelMap.put( "error",
-                // "Default configuration could not be copied to: " + destDir );
+                log.error("Error copying apache-nutch-runtime directory", e);
             }
 
             // copy default configuration
@@ -245,18 +242,12 @@ public class ListInstancesController extends InstanceController {
             try {
                 FileUtils.copyDirectories( sourceDir, destDir );
             } catch (IOException e) {
-                e.printStackTrace();
-                // modelMap.put( "error",
-                // "Default configuration could not be copied to: " + destDir );
+                log.error("Problem copying directories during instance init.", e);
             }
 
             result = true;
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error("Problem initializing instance directory", e);
         }
 
         return result;
@@ -274,7 +265,7 @@ public class ListInstancesController extends InstanceController {
             
             FileUtils.copyDirectories( sourceDir, destDir );
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error when copying instance dir", e);
             return false;
         }
         return true;

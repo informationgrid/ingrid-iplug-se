@@ -80,6 +80,9 @@ public class ElasticIndexWriter implements IndexWriter {
                 requestLength += doc.getFieldValue(fieldName).toString().length();
             }
         }
+
+        // add basic information to dataset to identify source for central index
+        source.put("dataSourceName", config.get("iplug.datasource.name", "unknown iPlug"));
         
         // dynamically add fields depending on other fields
         requestLength += addDependentFields( source );

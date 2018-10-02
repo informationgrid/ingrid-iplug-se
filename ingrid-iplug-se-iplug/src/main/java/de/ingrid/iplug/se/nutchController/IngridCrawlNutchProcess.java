@@ -22,18 +22,17 @@
  */
 package de.ingrid.iplug.se.nutchController;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
-
+import de.ingrid.admin.Config;
+import de.ingrid.admin.JettyStarter;
 import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
+import de.ingrid.elasticsearch.IndexInfo;
+import de.ingrid.elasticsearch.IndexManager;
+import de.ingrid.iplug.se.SEIPlug;
+import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
+import de.ingrid.iplug.se.nutchController.StatusProvider.Classification;
+import de.ingrid.iplug.se.utils.DBUtils;
+import de.ingrid.iplug.se.utils.FileUtils;
+import de.ingrid.iplug.se.webapp.container.Instance;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
@@ -41,25 +40,25 @@ import org.apache.commons.exec.Executor;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.xcontent.XContentFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import de.ingrid.iplug.se.SEIPlug;
-import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
-import de.ingrid.iplug.se.nutchController.StatusProvider.Classification;
-import de.ingrid.iplug.se.utils.DBUtils;
-import de.ingrid.iplug.se.utils.ElasticSearchUtils;
-import de.ingrid.iplug.se.utils.FileUtils;
-import de.ingrid.iplug.se.webapp.container.Instance;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.nio.file.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Wrapper for a ingrid specific nutch process execution. This is too complex to
  * execute this with a {@link GenericNutchProcess}.
  * 
  */
-@Service
 public class IngridCrawlNutchProcess extends NutchProcess {
 
     private static Logger log = Logger.getLogger(IngridCrawlNutchProcess.class);
@@ -75,11 +74,18 @@ public class IngridCrawlNutchProcess extends NutchProcess {
     IPostCrawlProcessor[] postCrawlProcessors;
 
     Instance instance;
-    
+
     LogFileWatcher logFileWatcher = null;
-    
+
     private ElasticsearchNodeFactoryBean elasticSearch;
-    
+
+    final IndexManager indexManager;
+
+
+    @Autowired
+    public IngridCrawlNutchProcess(IndexManager indexManager) {
+        this.indexManager = indexManager;
+    }
 
     @Override
     public void run() {
@@ -343,8 +349,9 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             if ("true".equals( nutchConfigTool.getPropertyValue( "ingrid.delete.before.crawl" ) )) {
                 // remove instance (type) from index
                 Client client = elasticSearch.getClient();
-                if (ElasticSearchUtils.typeExists( instance.getName(), client )) {
-                    ElasticSearchUtils.deleteType( instance.getName(), client );
+                String instanceIndexName = instance.getIndexName() + "_" + instance.getName();
+                if (indexManager.indexExists( instanceIndexName )) {
+                    indexManager.deleteIndex( instanceIndexName );
                 }
             }
             writeIndex(crawlDb, linkDb, segments);
@@ -399,13 +406,53 @@ public class IngridCrawlNutchProcess extends NutchProcess {
 
     }
     
-    private void writeIndex(String crawlDb, String linkDb, String segments) throws IOException, InterruptedException {
+    private void writeIndex(String crawlDb, String linkDb, String segments) throws IOException, InterruptedException, ExecutionException {
         this.statusProvider.addState(STATES.INDEX.name(), "Create index...");
+
+        String instanceIndexName = instance.getIndexName() + "_" + instance.getName();
+        if (!this.indexManager.indexExists(instanceIndexName)) {
+            this.indexManager.createIndex(instanceIndexName);
+        }
+
         int ret = execute("org.apache.nutch.indexer.IndexingJob", crawlDb, "-linkdb", linkDb, "-dir", segments, "-deleteGone", "-noCommit");
         if (ret != 0) {
             throwCrawlError("Error during Execution of: org.apache.nutch.indexer.IndexingJob");
         }
+
+        Config config = JettyStarter.getInstance().config;
+
+        // update central index with iPlug information
+        if (config.esRemoteNode) {
+            IndexInfo info = new IndexInfo();
+            info.setComponentIdentifier(config.communicationProxyUrl);
+            info.setToAlias(instanceIndexName);
+            info.setToType("default");
+            String plugIdInfo = this.indexManager.getIndexTypeIdentifier(info);
+            this.indexManager.updateIPlugInformation( plugIdInfo, getIPlugInfo( plugIdInfo, instanceIndexName, false, null, null ) );
+        }
+
         this.statusProvider.appendToState(STATES.INDEX.name(), " done.");
+    }
+
+    private String getIPlugInfo(String infoId, String indexName, boolean running, Integer count, Integer totalCount) throws IOException {
+        Config _config = JettyStarter.getInstance().config;
+
+        return XContentFactory.jsonBuilder().startObject()
+                .field( "plugId", _config.communicationProxyUrl )
+                .field( "indexId", infoId )
+                .field( "iPlugName", _config.datasourceName )
+                .field( "linkedIndex", indexName )
+                .field( "linkedType", "default" )
+                .field( "adminUrl", _config.guiUrl )
+                .field( "lastHeartbeat", new Date() )
+                .field( "lastIndexed", new Date() )
+                .startObject( "indexingState" )
+                .field( "numProcessed", count )
+                .field( "totalDocs", totalCount )
+                .field( "running", running )
+                .endObject()
+                .endObject()
+                .string();
     }
     
     private void cleanupHadoop() throws IOException {

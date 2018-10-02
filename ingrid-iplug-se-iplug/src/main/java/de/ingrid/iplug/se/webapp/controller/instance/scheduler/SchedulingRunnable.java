@@ -40,6 +40,7 @@ package de.ingrid.iplug.se.webapp.controller.instance.scheduler;
 
 import java.io.IOException;
 
+import de.ingrid.elasticsearch.IndexManager;
 import org.apache.log4j.Logger;
 
 import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
@@ -59,17 +60,20 @@ public class SchedulingRunnable implements Runnable {
 
     private final String _instanceName;
 
+    private final IndexManager indexManager;
+
     private NutchController _nutchController;
 
     private IngridCrawlNutchProcess _process = null;
 
     private IPostCrawlProcessor[] postCrawlProcessors;
 
-    public SchedulingRunnable(String instanceName, CrawlDataPersistence crawlDataPersistence, NutchController nutchController, IPostCrawlProcessor[] postCrawlProcessors) {
+    public SchedulingRunnable(String instanceName, CrawlDataPersistence crawlDataPersistence, NutchController nutchController, IPostCrawlProcessor[] postCrawlProcessors, IndexManager indexManager) {
         this._crawlDataPersistence = crawlDataPersistence;
         this._instanceName = instanceName;
         this._nutchController = nutchController;
         this.postCrawlProcessors = postCrawlProcessors;
+        this.indexManager = indexManager;
     }
 
     @Override
@@ -98,7 +102,7 @@ public class SchedulingRunnable implements Runnable {
             }
 
             Instance instanceData = InstanceController.getInstanceData(_instanceName);
-            _process = NutchProcessFactory.getIngridCrawlNutchProcess(instanceData, crawlData.getDepth(), crawlData.getTopn(), postCrawlProcessors);
+            _process = NutchProcessFactory.getIngridCrawlNutchProcess(instanceData, crawlData.getDepth(), crawlData.getTopn(), postCrawlProcessors, indexManager);
 
             // run crawl process
             _nutchController.start(instanceData, _process);

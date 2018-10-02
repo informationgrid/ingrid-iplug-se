@@ -135,7 +135,7 @@ public class NutchProcessTest {
             
             FileUtils.copyDirectories(fs.getPath("../ingrid-iplug-se-nutch/src/test/resources/urls").toAbsolutePath(), urls);
 
-            IngridCrawlNutchProcess p = new IngridCrawlNutchProcess();
+            IngridCrawlNutchProcess p = new IngridCrawlNutchProcess(null);
             p.setWorkingDirectory(workingDir.toString());
 
             Instance instance = new Instance();

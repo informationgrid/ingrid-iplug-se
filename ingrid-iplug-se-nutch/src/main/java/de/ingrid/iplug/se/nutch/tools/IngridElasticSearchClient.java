@@ -51,7 +51,6 @@ public class IngridElasticSearchClient {
     private static final int DEFAULT_MAX_BULK_LENGTH = 2500500;
 
     private Client client;
-    private Node node;
     private String instanceIndex;
 
     private Configuration config;
@@ -184,9 +183,6 @@ public class IngridElasticSearchClient {
 
         // Close
         client.close();
-        if (node != null) {
-            node.close();
-        }
     }
 
     private void checkNewBulk() throws IOException {
