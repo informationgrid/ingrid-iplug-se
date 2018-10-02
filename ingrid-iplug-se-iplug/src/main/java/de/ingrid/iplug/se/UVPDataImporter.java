@@ -29,6 +29,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -406,7 +407,7 @@ public class UVPDataImporter {
         return result;
 
     }
-
+    
     /**
      * Scan Excel file and gather all infos. Requires a specific excel table
      * layout
@@ -416,16 +417,27 @@ public class UVPDataImporter {
      * @throws IOException
      */
     public static List<BlpModel> readData(String excelFile) throws IOException {
-        List<BlpModel> blpModels = new ArrayList<BlpModel>();
-
         FileInputStream inputStream = new FileInputStream( new File( excelFile ) );
+        return readData( inputStream, excelFile );
+    }
+
+    /**
+     * Scan Excel workbook and gather all infos. Requires a specific excel table
+     * layout
+     * 
+     * @param workbook
+     * @return
+     * @throws IOException
+     */
+    public static List<BlpModel> readData(InputStream inputStream, String excelFileName) throws IOException {
+        List<BlpModel> blpModels = new ArrayList<BlpModel>();
         Workbook workbook = null;
 
         try {
 
-            if (excelFile.endsWith( "xlsx" )) {
+            if (excelFileName.endsWith( "xlsx" )) {
                 workbook = new XSSFWorkbook( inputStream );
-            } else if (excelFile.endsWith( "xls" )) {
+            } else if (excelFileName.endsWith( "xls" )) {
                 workbook = new HSSFWorkbook( inputStream );
             } else {
                 throw new IllegalArgumentException( "The specified file is not Excel file" );
@@ -839,7 +851,7 @@ public class UVPDataImporter {
 
     }
 
-    class BlpModel {
+    public class BlpModel {
 
         String name;
         Double lat;
