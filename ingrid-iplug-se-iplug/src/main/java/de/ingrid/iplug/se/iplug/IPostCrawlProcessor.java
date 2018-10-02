@@ -22,6 +22,8 @@
  */
 package de.ingrid.iplug.se.iplug;
 
+import de.ingrid.iplug.se.webapp.container.Instance;
+
 /**
  * Processors implementing this interface will be executed after the successful crawl process. 
  * 
@@ -34,8 +36,9 @@ public interface IPostCrawlProcessor {
     
     /**
      * Executed after the crawl process.
-     * 
+     *
+     * @param instance
      */
-    public void execute();
+    public void execute(Instance instance);
 
 }

@@ -123,8 +123,7 @@
   <!-- ====================================================== -->
   <target name="compile" depends="init,deps-jar, resolve-default">
     <echo message="Compiling plugin: ${name}"/>
-    <echo message="Classpath: ${toString:classpath}"/>
-    <javac 
+    <javac
      encoding="${build.encoding}" 
      srcdir="${src.dir}"
      includes="**/*.java"

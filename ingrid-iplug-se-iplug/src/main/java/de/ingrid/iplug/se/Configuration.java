@@ -61,7 +61,7 @@ public class Configuration implements IConfig {
         
         @Override
         public Map<String, String> transform( String input ) {
-            Map<String, String> map = new HashMap<String, String>();
+            Map<String, String> map = new HashMap<>();
             if (!"".equals( input )) {
                 String[] entries = input.split( "," );
                 for (String entry : entries) {
@@ -169,9 +169,10 @@ public class Configuration implements IConfig {
         props.setProperty( "dir.instances", this.dirInstances );
         
         // write elastic search properties to separate configuration
-        // TODO: refactor this code to make an easy function, by putting it into
+        // HINT: refactor this code to make an easy function, by putting it into
         // the base-webapp!
-        Properties p = new Properties();
+        // -> skip since no settings to override yet!
+        /*Properties p = new Properties();
         try {
             // check for elastic search settings in classpath, which works
             // during development
@@ -190,7 +191,7 @@ public class Configuration implements IConfig {
             os.close();
         } catch (IOException e) {
             log.error("Error setting properties from plugdescription", e);
-        }
+        }*/
     }
 
     public String getInstancesDir() {
@@ -200,11 +201,5 @@ public class Configuration implements IConfig {
     public void setInstancesDir(String dir) {
         this.dirInstances = dir;
     }
-    
-    public Map<String, String> getElasticSearchSettings() {
-        Map<String,String> map = new HashMap<String, String>();
-        //map.put( "", "" )
-        return map;
-    }
-    
+
 }

@@ -349,9 +349,8 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             if ("true".equals( nutchConfigTool.getPropertyValue( "ingrid.delete.before.crawl" ) )) {
                 // remove instance (type) from index
                 Client client = elasticSearch.getClient();
-                String instanceIndexName = instance.getIndexName() + "_" + instance.getName();
-                if (indexManager.indexExists( instanceIndexName )) {
-                    indexManager.deleteIndex( instanceIndexName );
+                if (indexManager.indexExists( instance.getInstanceIndexName() )) {
+                    indexManager.deleteIndex( instance.getInstanceIndexName() );
                 }
             }
             writeIndex(crawlDb, linkDb, segments);
@@ -375,7 +374,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
 
                 if (postCrawlProcessors != null) {
                     for (IPostCrawlProcessor postCrawlProcessor : postCrawlProcessors) {
-                        postCrawlProcessor.execute();
+                        postCrawlProcessor.execute(instance);
                     }
                 }
             }
@@ -428,7 +427,9 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             info.setToAlias(instanceIndexName);
             info.setToType("default");
             String plugIdInfo = this.indexManager.getIndexTypeIdentifier(info);
-            this.indexManager.updateIPlugInformation( plugIdInfo, getIPlugInfo( plugIdInfo, instanceIndexName, false, null, null ) );
+            this.indexManager.updateIPlugInformation(
+                    JettyStarter.getInstance().config.communicationProxyUrl,
+                    getIPlugInfo( plugIdInfo, instanceIndexName, false, null, null ) );
         }
 
         this.statusProvider.appendToState(STATES.INDEX.name(), " done.");

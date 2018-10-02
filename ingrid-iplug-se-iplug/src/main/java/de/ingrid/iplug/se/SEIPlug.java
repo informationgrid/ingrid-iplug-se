@@ -75,7 +75,7 @@ import de.ingrid.utils.query.IngridQuery;
 import de.ingrid.utils.tool.QueryUtil;
 
 /**
- * TODO Describe your created type (class, etc.) here.
+ * The Search Engine iPlug to crawl websites and prepare for InGrid Portal.
  * 
  * @author joachim@wemove.com
  */
@@ -148,10 +148,7 @@ public class SEIPlug extends HeartBeatPlug {
     /**
      * @see de.ingrid.utils.IPlug#close()
      */
-    public void close() throws Exception {
-        // TODO Auto-generated method stub
-
-    }
+    public void close() {}
 
     /**
      * @see de.ingrid.utils.ISearcher#search(de.ingrid.utils.query.IngridQuery,
@@ -159,7 +156,7 @@ public class SEIPlug extends HeartBeatPlug {
      */
     public IngridHits search(IngridQuery query, int start, int length) throws Exception {
         if (log.isDebugEnabled()) {
-            log.debug("incomming query : " + query.toString());
+            log.debug("incoming query : " + query.toString());
         }
 
         // check if query is rejected and return 0 hits instead of search within

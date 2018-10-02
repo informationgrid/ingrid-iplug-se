@@ -37,6 +37,7 @@ public class Instance {
     private String esTransportTcpPort;
     private String esHttpHost;
     private String clusterName;
+    private String instanceIndexName;
 
     public Instance() {}
 
@@ -111,8 +112,8 @@ public class Instance {
     public void setClusterName(String clusterName) {
         this.clusterName = clusterName;
     }
-    
-    
-    
-    
+
+    public String getInstanceIndexName() {
+        return indexName + "_" + name;
+    }
 }
