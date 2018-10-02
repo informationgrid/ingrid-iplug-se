@@ -27,6 +27,8 @@ import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
 import de.ingrid.iplug.se.nutchController.NutchController;
 import it.sauronsoftware.cron4j.Scheduler;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +41,9 @@ import java.util.Map;
 
 @Service
 public class SchedulerManager {
+
+    private static Log log = LogFactory.getLog(SchedulerManager.class);
+
     private Map<String, Runner> scheduler = new HashMap<>();
 
     private final PatternPersistence patternService;
@@ -133,7 +138,7 @@ public class SchedulerManager {
         try {
             pattern = patternService.loadPattern(instanceName);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error setting schedule pattern", e);
             return;
         }
 

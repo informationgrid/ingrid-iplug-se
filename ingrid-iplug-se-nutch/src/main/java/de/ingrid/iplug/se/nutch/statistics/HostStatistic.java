@@ -240,7 +240,6 @@ public class HostStatistic extends Configured implements Tool {
             br.write(array.toString());
         } catch (JSONException e) {
             LOG.error("Error creating JSON from statistics", e);
-            e.printStackTrace();
         } finally {
             if (reader != null) {
                 reader.close();

@@ -210,7 +210,6 @@ public class StartUrlStatusReport extends Configured implements Tool {
             br.write(array.toString());
         } catch (Exception e) {
             LOG.error("Error creating JSON from start url report", e);
-            e.printStackTrace();
         } finally {
             if (reader != null) {
                 reader.close();

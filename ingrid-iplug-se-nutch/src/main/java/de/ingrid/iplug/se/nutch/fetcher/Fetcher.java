@@ -162,7 +162,7 @@ public class Fetcher extends Configured implements Tool,
   FetchItemQueues fetchQueues;
   QueueFeeder feeder;
 
-  LinkedList<FetcherThread> fetcherThreads = new LinkedList<FetcherThread>();
+  LinkedList<FetcherThread> fetcherThreads = new LinkedList<>();
 
   /**
    * This class described the item to be fetched.
@@ -256,7 +256,7 @@ public class Fetcher extends Configured implements Tool,
    * progress and elapsed time between requests.
    */
   private static class FetchItemQueue {
-    List<FetchItem> queue = Collections.synchronizedList(new LinkedList<FetchItem>());
+    List<FetchItem> queue = Collections.synchronizedList(new LinkedList<>());
     AtomicInteger  inProgress = new AtomicInteger();
     AtomicLong nextFetchTime = new AtomicLong();
     AtomicInteger exceptionCounter = new AtomicInteger();
@@ -355,7 +355,7 @@ public class Fetcher extends Configured implements Tool,
    */
   private static class FetchItemQueues {
     public static final String DEFAULT_ID = "default";
-    Map<String, FetchItemQueue> queues = new HashMap<String, FetchItemQueue>();
+    Map<String, FetchItemQueue> queues = new HashMap<>();
     AtomicInteger totalSize = new AtomicInteger(0);
     int maxThreads;
     long crawlDelay;
@@ -901,7 +901,7 @@ public class Fetcher extends Configured implements Tool,
           try {
             scfilters.initialScore(url, newDatum);
           } catch (ScoringFilterException e) {
-            e.printStackTrace();
+            LOG.error("Error setting score", e);
           }
           if (reprUrl != null) {
             newDatum.getMetaData().put(Nutch.WRITABLE_REPR_URL_KEY,
@@ -1063,8 +1063,8 @@ public class Fetcher extends Configured implements Tool,
             int validCount = 0;
 
             // Process all outlinks, normalize, filter and deduplicate
-            List<Outlink> outlinkList = new ArrayList<Outlink>(outlinksToStore);
-            HashSet<String> outlinks = new HashSet<String>(outlinksToStore);
+            List<Outlink> outlinkList = new ArrayList<>(outlinksToStore);
+            HashSet<String> outlinks = new HashSet<>(outlinksToStore);
             for (int i = 0; i < links.length && validCount < outlinksToStore; i++) {
               String toUrl = links[i].getToUrl();
 

@@ -189,7 +189,7 @@ public class Configuration implements IConfig {
             p.store( os, "Override configuration written by the application" );
             os.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error setting properties from plugdescription", e);
         }
     }
 

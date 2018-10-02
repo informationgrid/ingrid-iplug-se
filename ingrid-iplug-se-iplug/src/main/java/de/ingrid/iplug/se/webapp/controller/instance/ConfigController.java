@@ -44,6 +44,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -79,6 +81,8 @@ import de.ingrid.iplug.se.webapp.controller.ConfigurationCommand;
 @Controller
 @SessionAttributes("plugDescription")
 public class ConfigController extends InstanceController {
+
+    private static Log log = LogFactory.getLog(ConfigController.class);
 
     @RequestMapping(value = { "/iplug-pages/instanceConfig.html" }, method = RequestMethod.GET)
     public String getParameters(final ModelMap modelMap, @ModelAttribute("plugDescription") final PlugdescriptionCommandObject commandObject, @RequestParam("instance") String name, HttpServletRequest request, HttpServletResponse response) {
@@ -177,10 +181,10 @@ public class ConfigController extends InstanceController {
                 list.add(configurationCommand);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error loading configuration command", e);
             list = null;
         } catch (SAXException e) {
-            e.printStackTrace();
+            log.error("Error loading configuration command", e);
             list = null;
         }
         return list;

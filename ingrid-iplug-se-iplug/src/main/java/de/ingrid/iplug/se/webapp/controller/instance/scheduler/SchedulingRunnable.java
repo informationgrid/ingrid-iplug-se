@@ -96,8 +96,7 @@ public class SchedulingRunnable implements Runnable {
             try {
                 FileUtils.prepareCrawl(this._instanceName);
             } catch (IOException e) {
-                LOG.error("Files could not be prepared for the crawl!");
-                e.printStackTrace();
+                LOG.error("Files could not be prepared for the crawl!", e);
                 return;
             }
 

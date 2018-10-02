@@ -266,7 +266,7 @@ public class SEIPlug extends HeartBeatPlug {
                     }
                         
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error("Error shutting down", e);
                 }
             }
         });
