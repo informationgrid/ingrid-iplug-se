@@ -58,7 +58,8 @@ public class NutchUrlTesterTest {
 
         FileUtils.copyDirectories(Paths.get("apache-nutch-runtime/runtime/local/conf").toAbsolutePath(), conf);
 
-        NutchProcess process = NutchProcessFactory.getUrlTesterProcess(instance, "http://www.google.de");
+        NutchProcessFactory npf = new NutchProcessFactory();
+        NutchProcess process = npf.getUrlTesterProcess(instance, "http://www.google.de");
 
         process.start();
 

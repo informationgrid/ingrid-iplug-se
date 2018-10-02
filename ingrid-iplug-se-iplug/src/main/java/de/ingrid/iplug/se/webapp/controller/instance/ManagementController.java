@@ -61,6 +61,9 @@ public class ManagementController extends InstanceController {
     @Autowired
     private ElasticsearchNodeFactoryBean elasticSearch;
     
+    @Autowired
+    private NutchProcessFactory nutchProcessFactory;
+    
 
     @Autowired
     public ManagementController(NutchController nutchController, IPostCrawlProcessor[] postCrawlProcessors) {
@@ -95,7 +98,7 @@ public class ManagementController extends InstanceController {
         // configure crawl process        
         Instance instance = InstanceController.getInstanceData( name );
 
-        IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, depth, numUrls, postCrawlProcessors);
+        IngridCrawlNutchProcess process = nutchProcessFactory.getIngridCrawlNutchProcess(instance, depth, numUrls, postCrawlProcessors);
         process.setElasticSearch( elasticSearch );
 
         // run crawl process

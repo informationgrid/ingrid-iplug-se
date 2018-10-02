@@ -34,8 +34,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import de.ingrid.iplug.se.SEIPlug;
+import de.ingrid.iplug.se.StatusProviderService;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
 import de.ingrid.iplug.se.webapp.container.Instance;
@@ -47,11 +50,15 @@ import edu.emory.mathcs.backport.java.util.Arrays;
  * @author joachim
  * 
  */
+@Service
 public class NutchProcessFactory {
 
     // private final static Log log =
     // LogFactory.getLog(NutchProcessFactory.class);
-
+    
+    
+    private StatusProviderService statusProviderService;
+    
     /**
      * @param instance
      * @param depth
@@ -60,7 +67,7 @@ public class NutchProcessFactory {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static IngridCrawlNutchProcess getIngridCrawlNutchProcess(Instance instance, int depth, int noUrls, IPostCrawlProcessor[] postCrawlProcessors) {
+    public IngridCrawlNutchProcess getIngridCrawlNutchProcess(Instance instance, int depth, int noUrls, IPostCrawlProcessor[] postCrawlProcessors) {
         IngridCrawlNutchProcess process = new IngridCrawlNutchProcess();
         
         process.setInstance(instance);
@@ -68,7 +75,7 @@ public class NutchProcessFactory {
         process.setPostCrawlProcessors(postCrawlProcessors);
         process.setDepth(depth);
         process.setNoUrls(noUrls);
-
+        
         process.setWorkingDirectory(instance.getWorkingDirectory());
         process.addClassPath(Paths.get(instance.getWorkingDirectory(), "conf").toAbsolutePath().toString());
         // add default properties
@@ -76,7 +83,7 @@ public class NutchProcessFactory {
         process.addJavaOptions(SEIPlug.conf.nutchCallJavaOptions.toArray(new String[] {}));
         process.addClassPath(Paths.get("apache-nutch-runtime/runtime/local").toAbsolutePath().toString());
         process.addClassPath(Paths.get("apache-nutch-runtime", "runtime", "local", "lib").toAbsolutePath().toString().concat(File.separator).concat("*"));
-        process.setStatusProvider(new StatusProvider(instance.getWorkingDirectory()));
+        process.setStatusProvider( statusProviderService.getStatusProvider( instance.getWorkingDirectory() ) );
 
         NutchConfigTool nutchConfigTool = new NutchConfigTool(Paths.get(instance.getWorkingDirectory(), "conf", "nutch-site.xml"));
 
@@ -117,7 +124,7 @@ public class NutchProcessFactory {
 
     }
     
-    public static NutchProcess getUrlTesterProcess(Instance instance, String url) { 
+    public NutchProcess getUrlTesterProcess(Instance instance, String url) { 
         GenericNutchProcess process = new GenericNutchProcess();
 
         process.setWorkingDirectory(instance.getWorkingDirectory());
@@ -132,4 +139,13 @@ public class NutchProcessFactory {
         return process;        
     }
 
+    public StatusProviderService getStatusProviderService() {
+        return statusProviderService;
+    }
+
+    @Autowired
+    public void setStatusProviderService(StatusProviderService statusProviderService) {
+        this.statusProviderService = statusProviderService;
+    }
+    
 }

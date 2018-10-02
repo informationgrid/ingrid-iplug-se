@@ -101,6 +101,9 @@ public class RestDataController extends InstanceController {
     private static final String NO_RESULT_INDEX = "_noresult_";
 
     @Autowired
+    private NutchProcessFactory nutchProcessFactory;
+
+    @Autowired
     private ElasticsearchNodeFactoryBean elasticSearch;
 
 	@Autowired
@@ -552,7 +555,7 @@ public class RestDataController extends InstanceController {
 
         Instance instance = getInstanceData(instanceName);
 
-		NutchProcess process = NutchProcessFactory.getUrlTesterProcess(instance, urlString);
+		NutchProcess process = nutchProcessFactory.getUrlTesterProcess(instance, urlString);
 		process.start();
 
 		long start = System.currentTimeMillis();
