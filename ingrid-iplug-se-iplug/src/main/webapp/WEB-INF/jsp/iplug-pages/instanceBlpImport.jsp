@@ -44,7 +44,65 @@
     <script type="text/javascript">
       $(document).ready(function () {
         //$("#statusContainer").hide();
+        checkState();
       });
+
+      function checkState() {
+          $.ajax( "../rest/status/${ instance.name }/blpimport", {
+              type: "GET",
+              contentType: 'application/json',
+              success: function(data) {
+            	  console.log(data);
+                  if (data == "") {
+                      $("#crawlInfo").html( "Es läuft zur Zeit kein Crawl." );
+                      setTimeout( checkState, 60000 );
+                      return;
+                  } else if (data.some(function(item) { return item.key === "FINISHED" || item.key === "ERROR" || item.key === "ABORT" })) {
+                      $("#crawlInfo").html( "Es läuft zur Zeit kein Crawl. (<a href='#' onclick='$(\"#allInfo\").toggle()'>Information zum letzten Crawl) " );
+                      setLog( data );
+                      // show link to request hadoop.log content
+                      $("#moreInfo").show();
+                      $("#crawlStop").hide();
+                      $("#crawlStart").show();
+                      // repeat execution every 60s until finished
+                      setTimeout( checkState, 60000 );
+                      return;
+                  }
+
+                  setLog( data );
+
+                  // repeat execution every 5s until finished
+                  setTimeout( checkState, 5000 );
+              },
+              error: function(jqXHR, text, error) {
+                  // if it's not a real error, but just saying, that no process is running
+                  $("#statusContent").html( "Es trat ein Fehler beim Laden des Logs auf. " );
+                  console.error( error, jqXHR );
+              }
+          });
+
+          function setLog(data) {
+              var formatTime = function(ts) {
+                  var date = new Date(ts);
+                  var d = date.getDate();
+                  var m = date.getMonth() + 1;
+                  var y = date.getFullYear();
+                  var time = date.toTimeString().substring(0, 8);
+                  return '' + y + '-' + (m<=9 ? '0' + m : m) + '-' + (d <= 9 ? '0' + d : d) + ' ' + time;
+              };
+
+              // fill div with data from content
+              var content = "";
+              for (var i=0; i < data.length; i++) {
+                  var row = data[i];
+                  if (row.value) {
+                      content += "<div class='" + row.classification.toLowerCase() + "'>" + formatTime(row.time) + " - [" + row.classification + "] " + row.value + "</div>";
+                  }
+              }
+
+              $("#statusContent").html( content );
+          }
+      }
     </script>
 
   </head>

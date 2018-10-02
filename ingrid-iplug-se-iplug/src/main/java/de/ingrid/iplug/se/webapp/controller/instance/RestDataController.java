@@ -75,6 +75,7 @@ import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
 import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.SEIPlug;
+import de.ingrid.iplug.se.StatusProviderService;
 import de.ingrid.iplug.se.conf.UrlMaintenanceSettings;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.InstanceAdmin;
@@ -108,6 +109,9 @@ public class RestDataController extends InstanceController {
 
 	@Autowired
 	private NutchController nutchController;
+
+	@Autowired
+    private StatusProviderService statusProviderService;
 
 	@RequestMapping(value = { "/test" }, method = RequestMethod.GET)
 	public String test() {
@@ -516,7 +520,7 @@ public class RestDataController extends InstanceController {
 			return new ResponseEntity<Collection<State>>(states.isEmpty() ? null : states, HttpStatus.OK);
 		}
 
-		return new ResponseEntity<Collection<State>>(nutchProcess.getStatusProvider().getStates(), HttpStatus.OK);
+		return new ResponseEntity<Collection<State>>(statusProviderService.getStatusProvider(instance.getWorkingDirectory()).getStates(), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = { "status/{instance}/statistic" }, method = RequestMethod.GET)
@@ -544,6 +548,21 @@ public class RestDataController extends InstanceController {
 
 		return new ResponseEntity<String>(content, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = { "status/{instance}/blpimport" }, method = RequestMethod.GET)
+    public ResponseEntity<Collection<State>> getStatusBlpImport(@PathVariable("instance") String name, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        
+        if (hasNoAccessToInstance(name, request, response)) {
+            response.sendError(HttpStatus.FORBIDDEN.value());
+            return null;
+        }
+
+        Instance instance = getInstanceData(name);
+
+        List<State> states = statusProviderService.getStatusProvider(instance.getWorkingDirectory()).getStates();
+
+        return new ResponseEntity<Collection<State>>(states, HttpStatus.OK);
+    }
 
 	@RequestMapping(value = { "url/{instance}/check" }, method = RequestMethod.POST)
 	public ResponseEntity<String> checkUrl(@PathVariable("instance") String instanceName, @RequestBody String urlString, HttpServletRequest request, HttpServletResponse response)

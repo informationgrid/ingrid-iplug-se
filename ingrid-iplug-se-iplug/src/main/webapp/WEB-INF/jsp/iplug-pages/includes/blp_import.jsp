@@ -33,15 +33,14 @@
       <form:form action="../iplug-pages/instanceBlpImport.html" enctype="multipart/form-data" modelAttribute="uploadBean">
               <div class="input full">
                 <input type="file" name="file"/> <form:errors path="file" cssClass="error" element="div" />
-                <input type="hidden" name="instance" value="<%= request.getParameter("instance") %>"/> 
+                <input type="hidden" name="instance" value="<%= request.getParameter("instance") %>"/>
               </div>
       </form:form>
     </div>
 </fieldset>
 <fieldset id="statusContainer">
   <legend>Status</legend>
-    <div id="content">
-      <p>test</p>
-      <p>test</p>
+    <div id="statusContent">
+      <p>Kein Import gestartet</p>
     </div>
 </fieldset>
