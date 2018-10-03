@@ -68,41 +68,55 @@ public class UVPDataImporterTest {
     public void testReadData() throws IOException {
 
         ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File( classLoader.getResource( "blp-urls-test.xlsx" ).getFile() );
+        File file = new File( classLoader.getResource( "blp_daten_template.xlsx" ).getFile() );
 
         List<UVPDataImporter.BlpModel> l = UVPDataImporter.readData( file.getAbsolutePath() );
         assertEquals( true, l.size() > 0 );
 
         for (UVPDataImporter.BlpModel m : l) {
-            try {
-                if (m.urlFinished != null) {
-                    UVPDataImporter.getLimitUrls( m.urlFinished );
+                try {
+                    UVPDataImporter.getLimitUrls( m.urlBlpFinished );
+                    UVPDataImporter.getActualUrl( m.urlBlpFinished, m );
+                } catch (Exception e) {
+                    fail( "Invalid LIMIT or ACTUAL URL  extracted from: " + m.urlBlpFinished + " in " + m.name  );
                 }
-            } catch (Exception e) {
-                fail( "Invalid LIMIT URL extracted from: " + m.urlFinished + " in " + m.name  );
-            }
-            try {
-                if (m.urlFinished != null) {
-                    UVPDataImporter.getActualUrl( m.urlFinished, m );
+            
+                try {
+                    UVPDataImporter.getLimitUrls( m.urlBlpInProgress );
+                    UVPDataImporter.getActualUrl( m.urlBlpInProgress, m );
+                } catch (Exception e) {
+                    fail( "Invalid LIMIT or ACTUAL URL  extracted from: " + m.urlBlpInProgress + " in " + m.name  );
                 }
-            } catch (Exception e) {
-                System.out.println( "\nInvalid actual URL extracted from: " + m.urlFinished + " in " + m.name  );
-            }
-            try {
-                if (m.urlInProgress != null) {
-                    UVPDataImporter.getLimitUrls( m.urlInProgress );
+            
+                try {
+                    UVPDataImporter.getLimitUrls( m.urlFnpInProgress );
+                    UVPDataImporter.getActualUrl( m.urlFnpInProgress, m );
+                } catch (Exception e) {
+                    fail( "Invalid LIMIT or ACTUAL URL  extracted from: " + m.urlFnpInProgress + " in " + m.name  );
                 }
-            } catch (Exception e) {
-                fail( "Invalid LIMIT URL extracted from: " + m.urlInProgress + " in " + m.name  );
-            }
-            try {
-                if (m.urlInProgress != null) {
-                    UVPDataImporter.getActualUrl( m.urlInProgress, m );
-                }
-            } catch (Exception e) {
-                System.out.println( "\nInvalid actual URL extracted from: " + m.urlInProgress + " in " + m.name  );
-            }
 
+                try {
+                    UVPDataImporter.getLimitUrls( m.urlFnpFinished );
+                    UVPDataImporter.getActualUrl( m.urlFnpFinished, m );
+                } catch (Exception e) {
+                    fail( "Invalid LIMIT or ACTUAL URL  extracted from: " + m.urlFnpFinished + " in " + m.name  );
+                }
+
+                try {
+                    UVPDataImporter.getLimitUrls( m.urlBpFinished );
+                    UVPDataImporter.getActualUrl( m.urlBpFinished, m );
+                } catch (Exception e) {
+                    fail( "Invalid LIMIT or ACTUAL URL  extracted from: " + m.urlBpFinished + " in " + m.name  );
+                }
+
+                try {
+                    UVPDataImporter.getLimitUrls( m.urlBpInProgress );
+                    UVPDataImporter.getActualUrl( m.urlBpInProgress, m );
+                } catch (Exception e) {
+                    fail( "Invalid LIMIT or ACTUAL URL  extracted from: " + m.urlBpInProgress + " in " + m.name  );
+                }
+                
+                assertTrue(m.descr != null && m.descr.length() > 0); 
         }
     }
 
@@ -124,29 +138,15 @@ public class UVPDataImporterTest {
     }
     
     @Test
-    public void testIsFinishedUrlLongerThanInProgressUrl() throws MalformedURLException {
-        BlpModel bm = new UVPDataImporter().new BlpModel();
-        bm.urlFinished = "http://test.domain.de";
-        bm.urlInProgress = "http://test.domain.de/path/";
-        assertTrue(!UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
-        bm.urlFinished = "http://test.domain.de/path";
-        bm.urlInProgress = "http://test.domain.de/";
-        assertTrue(UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
-        bm.urlFinished = "http://test.domain.de/path/";
-        bm.urlInProgress = "http://test.domain.de/path/";
-        assertTrue(!UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
-        bm.urlFinished = null;
-        bm.urlInProgress = "http://test.domain.de/path/";
-        assertTrue(!UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
-        bm.urlFinished = "http://test.domain.de/path/";
-        bm.urlInProgress = null;
-        assertTrue(!UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
-        bm.urlFinished = "https://test.domain.de/path/";
-        bm.urlInProgress = "http://test.domain.de/";
-        assertTrue(UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
-        bm.urlFinished = "http://test.domain.de/path/";
-        bm.urlInProgress = "https://test.domain.de/";
-        assertTrue(UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
+    public void testIsUrlShorterThan() throws MalformedURLException {
+        assertTrue(UVPDataImporter.isUrlShorterThan( "http://test.domain.de", "http://test.domain.de/path/" ));
+        assertTrue(!UVPDataImporter.isUrlShorterThan( "http://test.domain.de/path", "http://test.domain.de/" ));
+        assertTrue(!UVPDataImporter.isUrlShorterThan( "http://test.domain.de/path/", "http://test.domain.de/path/" ));
+        assertTrue(!UVPDataImporter.isUrlShorterThan( null, "http://test.domain.de/path/" ));
+        assertTrue(!UVPDataImporter.isUrlShorterThan( "http://test.domain.de/path/", null ));
+        assertTrue(!UVPDataImporter.isUrlShorterThan( "https://test.domain.de/path/", "http://test.domain.de/" ));
+        assertTrue(!UVPDataImporter.isUrlShorterThan( "http://test.domain.de/path/", "https://test.domain.de/" ));
+        assertTrue(!UVPDataImporter.isUrlShorterThan( "http://test.domain.de/path/", "https://test.domain.de/path/" ));
     }
     
 
