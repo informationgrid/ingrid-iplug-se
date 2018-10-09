@@ -15,7 +15,7 @@
             "type": "long"
         },
         "dataSourceName": {
-            "type": "string",
+            "type": "text",
             "index": "not_analyzed",
             "store": true
         },
@@ -56,11 +56,11 @@
             "store": true
         },
         "partner": {
-            "type": "text",
+            "type": "keyword",
             "index" : "not_analyzed"
         },
         "provider": {
-            "type": "text",
+            "type": "keyword",
             "index" : "not_analyzed"
         },
         "x1": {

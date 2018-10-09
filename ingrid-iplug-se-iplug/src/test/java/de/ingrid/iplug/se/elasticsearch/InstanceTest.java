@@ -29,6 +29,7 @@ import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 
+import de.ingrid.elasticsearch.IndexInfo;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -52,16 +53,16 @@ public class InstanceTest {
         new JettyStarter( false );
         JettyStarter.getInstance().config.index = "test";
         JettyStarter.getInstance().config.indexWithAutoId = true;
-        JettyStarter.getInstance().config.indexSearchInTypes = new ArrayList<String>();
+        JettyStarter.getInstance().config.indexSearchInTypes = new ArrayList<>();
         Utils.setupES();
-    }    
-    
+    }
+
     @Before
     public void initTest() throws Exception {
         Utils.initIndex( jettyStarter );
         Utils.indexManager.switchAlias( "ingrid_test", JettyStarter.getInstance().config.index, "test_1" );
     }
-    
+
     @AfterClass
     public static void tearDown() throws Exception {
         Utils.index.close();
@@ -74,24 +75,25 @@ public class InstanceTest {
      */
     @Test
     public void searchForAll() throws Exception {
-        Utils.prepareIndex( Utils.elastic, "data/webUrls1_b.json", "test_1" );
-        
-        assertThat( JettyStarter.getInstance().config.indexSearchInTypes.size(), is( 0 ) );
-       
+        Utils.prepareIndex( Utils.elastic, "data/webUrls1_b.json", "test_catalog" );
+
+        // assertThat( JettyStarter.getInstance().config.indexSearchInTypes.size(), is( 0 ) );
+        IndexInfo indexInfo = new IndexInfo();
+        indexInfo.setToIndex("test_1");
+        IndexInfo indexInfo2 = new IndexInfo();
+        indexInfo2.setToIndex("test_catalog");
+
+        Utils.elasticConfig.activeIndices = new IndexInfo[] { indexInfo, indexInfo2 };
         IngridQuery q = Utils.getIngridQuery( "" );
         IngridHits search = Utils.index.search( q, 0, 10 );
         assertThat( search, not( is( nullValue() ) ) );
         assertThat( search.length(), is( Long.valueOf( Utils.MAX_RESULTS + 2 ) ) );
-        
-        JettyStarter.getInstance().config.indexSearchInTypes.add( "web" );
+
+        Utils.elasticConfig.activeIndices = new IndexInfo[] { indexInfo };
         search = Utils.index.search( q, 0, 10 );
         assertThat( search.length(), is( Long.valueOf( Utils.MAX_RESULTS ) ) );
-        
-        JettyStarter.getInstance().config.indexSearchInTypes.add( "catalog" );
-        search = Utils.index.search( q, 0, 10 );
-        assertThat( search.length(), is( Long.valueOf( Utils.MAX_RESULTS + 2 ) ) );
-        
-        JettyStarter.getInstance().config.indexSearchInTypes.remove( 0 );
+
+        Utils.elasticConfig.activeIndices = new IndexInfo[] { indexInfo2 };
         search = Utils.index.search( q, 0, 10 );
         assertThat( search.length(), is( Long.valueOf( 2 ) ) );
         

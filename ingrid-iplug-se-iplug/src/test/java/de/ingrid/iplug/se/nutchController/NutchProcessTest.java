@@ -22,6 +22,8 @@
  */
 package de.ingrid.iplug.se.nutchController;
 
+import static de.ingrid.iplug.se.elasticsearch.Utils.elastic;
+import static de.ingrid.iplug.se.elasticsearch.Utils.elasticConfig;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -34,7 +36,7 @@ import java.nio.file.Paths;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import javafx.scene.NodeBuilder;
+import de.ingrid.elasticsearch.IndexManager;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
@@ -135,7 +137,7 @@ public class NutchProcessTest {
             
             FileUtils.copyDirectories(fs.getPath("../ingrid-iplug-se-nutch/src/test/resources/urls").toAbsolutePath(), urls);
 
-            IngridCrawlNutchProcess p = new IngridCrawlNutchProcess(null);
+            IngridCrawlNutchProcess p = new IngridCrawlNutchProcess(new IndexManager(elastic, elasticConfig));
             p.setWorkingDirectory(workingDir.toString());
 
             Instance instance = new Instance();

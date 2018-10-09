@@ -35,8 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
-import de.ingrid.elasticsearch.IndexManager;
+import de.ingrid.elasticsearch.*;
 import de.ingrid.elasticsearch.search.FacetConverter;
 import de.ingrid.elasticsearch.search.IQueryParsers;
 import de.ingrid.elasticsearch.search.IndexImpl;
@@ -62,10 +61,23 @@ public class Utils {
     public static ElasticsearchNodeFactoryBean elastic;
     
     public static IndexManager indexManager;
+    public static ElasticConfig elasticConfig;
 
     public static void setupES() throws Exception {
-        
-        elastic = new ElasticsearchNodeFactoryBean();
+
+        elasticConfig = new ElasticConfig();
+        elasticConfig.isEnabled = true;
+        elasticConfig.isRemote = true;
+        elasticConfig.indexSearchDefaultFields = new String[]{"title", "content"};
+        elasticConfig.additionalSearchDetailFields = new String[0];
+        elasticConfig.remoteHosts = new String[] {"localhost:9300"};
+        IndexInfo indexInfo = new IndexInfo();
+        indexInfo.setToIndex("test_1");
+        indexInfo.setToAlias("ingrid_test");
+        elasticConfig.activeIndices = new IndexInfo[1];
+        elasticConfig.activeIndices[0] = indexInfo;
+
+        elastic = new ElasticsearchNodeFactoryBean(elasticConfig);
         elastic.afterPropertiesSet();
         
         // set necessary configurations for startup
@@ -85,7 +97,7 @@ public class Utils {
         prepareIndex( elastic );
     }
     
-    public static void prepareIndex(ElasticsearchNodeFactoryBean elastic, String fileData, String index) throws ElasticsearchException, Exception {
+    public static void prepareIndex(ElasticsearchNodeFactoryBean elastic, String fileData, String index) throws Exception {
         Client client = elastic.getClient();
         ClassPathResource resource = new ClassPathResource( fileData );
 
@@ -114,6 +126,8 @@ public class Utils {
             for (String line : urlsData) {
                 mappingSource += line;
             }
+
+            System.out.println(mappingSource);
             
             if (client.admin().indices().prepareExists(index).execute().actionGet().isExists()) {
                 client.admin().indices().prepareDelete(index).execute().actionGet();
@@ -122,7 +136,7 @@ public class Utils {
             
             client.admin().indices().preparePutMapping().setIndices( index )
                     .setType("web")
-                    .setSource( mappingSource )
+                    .setSource( mappingSource, XContentType.JSON )
                     .execute()
                     .actionGet();
             
@@ -147,8 +161,8 @@ public class Utils {
 //        jettyStarter.config = config;
         
         QueryConverter qc = new QueryConverter();
-        List<IQueryParsers> parsers = new ArrayList<IQueryParsers>();
-        parsers.add( new DefaultFieldsQueryConverter(null) );
+        List<IQueryParsers> parsers = new ArrayList<>();
+        parsers.add( new DefaultFieldsQueryConverter(elasticConfig) );
         parsers.add( new WildcardQueryConverter() );
         parsers.add( new FuzzyQueryConverter() );
         parsers.add( new FieldQueryIGCConverter() );
@@ -156,9 +170,9 @@ public class Utils {
         parsers.add( new MatchAllQueryConverter() );
         qc.setQueryParsers( parsers );
         
-        indexManager = new IndexManager( elastic, null );
+        indexManager = new IndexManager( elastic, elasticConfig );
         
-        index = new IndexImpl( null, indexManager, qc, new FacetConverter(qc) );
+        index = new IndexImpl( elasticConfig, indexManager, qc, new FacetConverter(qc), new QueryBuilderService());
     }
     
     public static IngridQuery getIngridQuery( String term ) {
@@ -190,14 +204,14 @@ public class Utils {
 
         IngridDocument f2 = new IngridDocument();
         f2.put("id", "after");
-        Map<String, String> classes = new HashMap<String, String>();
+        Map<String, String> classes = new HashMap<>();
         classes.put("id", "April2014");
         classes.put("query", "t1:2014-05-01 t2:2014-09-01");
         f2.put("classes", Arrays.asList(new Object[] { classes }));
 
         IngridDocument f3 = new IngridDocument();
         f3.put("id", "datatype");
-        Map<String, String> classes2 = new HashMap<String, String>();
+        Map<String, String> classes2 = new HashMap<>();
         classes2.put("id", "bundPDFs");
         classes2.put("query", "partner:bund datatype:pdf");
         f3.put("classes", Arrays.asList(new Object[] { classes2 }));

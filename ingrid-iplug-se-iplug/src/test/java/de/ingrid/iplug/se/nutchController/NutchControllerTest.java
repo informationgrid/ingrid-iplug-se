@@ -22,6 +22,8 @@
  */
 package de.ingrid.iplug.se.nutchController;
 
+import static de.ingrid.iplug.se.elasticsearch.Utils.elastic;
+import static de.ingrid.iplug.se.elasticsearch.Utils.elasticConfig;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -36,6 +38,7 @@ import javax.persistence.Persistence;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import de.ingrid.elasticsearch.IndexManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -66,7 +69,7 @@ public class NutchControllerTest {
     
     @After
     public void afterTest() throws Exception {
-        Utils.elastic.getClient().close();
+        elastic.getClient().close();
     }
     
     @Test
@@ -98,13 +101,13 @@ public class NutchControllerTest {
         FileUtils.copyDirectories(Paths.get("apache-nutch-runtime/runtime/local/conf").toAbsolutePath(), conf);
         
         NutchConfigTool nct = new NutchConfigTool(Paths.get(conf.toAbsolutePath().toString(), "nutch-site.xml"));
-        nct.addOrUpdateProperty("elastic.port", "9301", "");
+        nct.addOrUpdateProperty("elastic.port", "9300", "");
         nct.write();
         
         FileUtils.copyDirectories(Paths.get("../ingrid-iplug-se-nutch/src/test/resources/urls").toAbsolutePath(), urls);
         // TODO: copy dir with metadata-mapping
 
-        IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, 2, 10, null, null);
+        IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, 2, 10, null, new IndexManager(elastic, elasticConfig));
 
         NutchController nutchController = new NutchController();
         nutchController.start(instance, process);

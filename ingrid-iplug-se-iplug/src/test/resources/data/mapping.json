@@ -25,6 +25,14 @@
             "boost": {
                 "type": "float",
                 "null_value" : "0.0"
+            },
+            "partner": {
+                "type": "keyword",
+                "index" : "not_analyzed"
+            },
+            "provider": {
+                "type": "keyword",
+                "index" : "not_analyzed"
             }
         }
     }
