@@ -65,7 +65,7 @@
     <dependency>
       <groupId>de.ingrid</groupId>
       <artifactId>ingrid-base-webapp</artifactId>
-      <version>4.5.0-SNAPSHOT</version>
+      <version>4.5.0</version>
       <exclusions>
         <exclusion>
           <groupId>xerces</groupId>
@@ -76,7 +76,7 @@
     <dependency>
       <groupId>de.ingrid</groupId>
       <artifactId>ingrid-base-webapp</artifactId>
-      <version>4.5.0-SNAPSHOT</version>
+      <version>4.5.0</version>
       <classifier>res</classifier>
       <type>zip</type>
     </dependency>
