@@ -31,5 +31,7 @@
 </div>
 <ul>
 	
+<% if (request.getUserPrincipal() == null || request.isUserInRole( "admin" )) { %>
 	<menutaglib:MenuTag text="DB - Einstellungen" url="../iplug-pages/dbParams.html" ></menutaglib:MenuTag>
+<% } %>
 	<menutaglib:MenuTag text="SE - Instanzen" url="../iplug-pages/listInstances.html" ></menutaglib:MenuTag>

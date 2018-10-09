@@ -31,6 +31,11 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -45,7 +50,6 @@ import com.google.gson.JsonSyntaxException;
 
 import de.ingrid.admin.Utils;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
-import de.ingrid.admin.controller.AbstractController;
 import de.ingrid.admin.object.Partner;
 import de.ingrid.admin.object.Provider;
 import de.ingrid.admin.service.CommunicationService;
@@ -64,9 +68,11 @@ import edu.emory.mathcs.backport.java.util.Collections;
  */
 @Controller
 @SessionAttributes("plugDescription")
-public class UrlController extends AbstractController {
+public class UrlController extends InstanceController {
 
     private CommunicationService _communicationInterface;
+
+    private static final Log LOG = LogFactory.getLog(UrlController.class.getName());
     
     @Autowired
     public UrlController(final CommunicationService communicationInterface) throws Exception {
@@ -74,8 +80,11 @@ public class UrlController extends AbstractController {
     }
 
     @RequestMapping(value = { "/iplug-pages/instanceUrls.html" }, method = RequestMethod.GET)
-    public String getParameters(final ModelMap modelMap, @ModelAttribute("plugDescription") final PlugdescriptionCommandObject commandObject, @RequestParam("instance") String name) {
+    public String getParameters(final ModelMap modelMap, @ModelAttribute("plugDescription") final PlugdescriptionCommandObject commandObject, @RequestParam("instance") String name, HttpServletRequest request, HttpServletResponse response) {
 
+        if (hasNoAccessToInstance(name, request, response)) {
+            return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );
+        }
         String dir = SEIPlug.conf.getInstancesDir();
         File instanceFolder = new File(dir, name);
         if (!instanceFolder.exists())
@@ -161,8 +170,7 @@ public class UrlController extends AbstractController {
                     }
                 }
             } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                LOG.error( "Error getting meta data from instance.", e );
             }
         }
         
@@ -170,7 +178,10 @@ public class UrlController extends AbstractController {
     }
     
     @RequestMapping(value = { "/iplug-pages/instanceUrls.html" }, method = RequestMethod.POST, params = "testUrl")
-    public String testUrl(@RequestParam("instance") String name, @RequestParam("id") Long id) {
+    public String testUrl(@RequestParam("instance") String name, @RequestParam("id") Long id, HttpServletRequest request, HttpServletResponse response) {
+        if (hasNoAccessToInstance(name, request, response)) {
+            return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );
+        }
 
         return redirect(AdminViews.SE_INSTANCE_URLS + ".html?instance=" + name);
     }

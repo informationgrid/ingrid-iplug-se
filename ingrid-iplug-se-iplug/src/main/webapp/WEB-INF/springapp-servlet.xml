@@ -68,7 +68,7 @@
                 <ref bean="matchAllQueryConverter" />
             </list>
         </property>
-    </bean>
+   </bean>
 
 	<context:component-scan base-package="de.ingrid">
 		<!-- <context:exclude-filter type="regex" expression="de\.ingrid\.admin\.controller\.WorkingDirController"/> -->
@@ -78,6 +78,8 @@
 		<context:exclude-filter type="regex" expression="de.ingrid.admin.controller.SchedulingController*" />
         <!-- exclude this injector because it overridesthe index based partner/provider detection -->
         <context:exclude-filter type="regex" expression="de.ingrid.admin.metadata.DefaultIPlugOperatorInjectorAdapter" />
+        <context:exclude-filter type="regex" expression="de.ingrid.admin.object.DefaultDataType"/>
+        <context:exclude-filter type="regex" expression="de.ingrid.admin.object.BasePlug"/>
 	</context:component-scan>
 
     <mvc:annotation-driven/>

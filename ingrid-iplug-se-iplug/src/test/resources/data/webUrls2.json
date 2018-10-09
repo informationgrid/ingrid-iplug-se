@@ -1,6 +1,6 @@
 { "index" : { "_index" : "test2_1", "_type" : "web", "_id" : "1" } }
-{ "url" : "http://www.wemoveX.com", "title": "Physics", "partner": "bund", "datatype": "pdf", "content": "Welcome to the world of physics!", "boost": "0.3", "fetched": "2014-06-03", "t0": "2014-06-03" }
+{ "url" : "http://www.wemoveX.com", "title": "Physics", "partner": "bund", "datatype": "pdf", "content": "Welcome to the world of physics!", "doc_boost": "0.3", "fetched": "2014-06-03", "t0": "2014-06-03" }
 { "index" : { "_index" : "test2_1", "_type" : "web", "_id" : "2" } }
-{ "url" : "http://www.heiseX.de", "title": "Quantum", "partner": "bund", "datatype": "www", "content": "This is not about James Bond", "boost": "0.0", "fetched": "2014-04-13", "t1": "2014-04-01", "t2": "2014-04-15", "x1": 9.89, "y1": 51.89, "x2": 11.15, "y2": 52.70  }
+{ "url" : "http://www.heiseX.de", "title": "Quantum", "partner": "bund", "datatype": "www", "content": "This is not about James Bond", "doc_boost": "0.0", "fetched": "2014-04-13", "t1": "2014-04-01", "t2": "2014-04-15", "x1": 9.89, "y1": 51.89, "x2": 11.15, "y2": 52.70  }
 { "index" : { "_index" : "test2_1", "_type" : "web", "_id" : "3" } }
-{ "url" : "http://www.spiegelX.de", "title": "Black holes", "partner": "bw", "datatype": "www", "content": "Everything you wanted to know about Black holes", "boost": "0.0", "fetched": "2014-05-22", "t0": "2014-08-11" }
+{ "url" : "http://www.spiegelX.de", "title": "Black holes", "partner": "bw", "datatype": "www", "content": "Everything you wanted to know about Black holes", "doc_boost": "0.0", "fetched": "2014-05-22", "t0": "2014-08-11" }

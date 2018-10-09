@@ -1,4 +1,4 @@
 { "index" : { "_index" : "test_1", "_type" : "catalog", "_id" : "1" } }
-{ "url" : "http://www.abc.com", "title": "The ABC page", "partner": "bund", "content": "The ABC of the books.", "boost": "0.0", "fetched": "2014-06-03" }
+{ "url" : "http://www.abc.com", "title": "The ABC page", "partner": "bund", "content": "The ABC of the books.", "doc_boost": "0.0", "fetched": "2014-06-03" }
 { "index" : { "_index" : "test_1", "_type" : "catalog", "_id" : "2" } }
-{ "url" : "http://www.def.de", "title": "The DEF page", "partner": "bund", "content": "The second part of the ABC", "boost": "0.0", "fetched": "2014-04-13" }
+{ "url" : "http://www.def.de", "title": "The DEF page", "partner": "bund", "content": "The second part of the ABC", "doc_boost": "0.0", "fetched": "2014-04-13" }

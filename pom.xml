@@ -3,12 +3,12 @@
   <parent>
     <groupId>de.ingrid</groupId>
     <artifactId>ingrid-releases-pom</artifactId>
-    <version>4.2.1</version>
+    <version>4.2.2</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>ingrid-iplug-se-project</artifactId>
   <packaging>pom</packaging>
-  <version>4.2.1</version>
+  <version>4.5.0</version>
   <name>ingrid-iplug-se-project</name>
   <description>This iPlug indexes documents from websites and can be queried by the iBus.</description>
   <scm>
@@ -105,8 +105,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.1</version>
         <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
       <plugin>
@@ -121,7 +121,7 @@
           <dependency>
             <groupId>com.sun</groupId>
             <artifactId>tools</artifactId>
-            <version>1.7</version>
+            <version>1.8</version>
             <scope>system</scope>
             <systemPath>${java.home}/../lib/tools.jar</systemPath>
           </dependency>
@@ -201,6 +201,13 @@
                 <phase>null</phase>
               </execution>
             </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>wagon-maven-plugin</artifactId>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
           </plugin>
         </plugins>
       </build>

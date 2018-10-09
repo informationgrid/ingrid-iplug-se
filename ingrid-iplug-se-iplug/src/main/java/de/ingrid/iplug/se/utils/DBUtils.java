@@ -23,6 +23,7 @@
 package de.ingrid.iplug.se.utils;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -34,6 +35,7 @@ import javax.persistence.criteria.Root;
 import org.apache.log4j.Logger;
 
 import de.ingrid.iplug.se.db.DBManager;
+import de.ingrid.iplug.se.db.model.InstanceAdmin;
 import de.ingrid.iplug.se.db.model.Url;
 import de.ingrid.iplug.se.webapp.container.Instance;
 
@@ -64,6 +66,15 @@ public class DBUtils {
             em.merge( url );            
         }
     }
+
+    private static void persistAdmin(EntityManager em, InstanceAdmin admin) {
+        if (admin.getId() == null) {
+            em.persist( admin );
+            
+        } else {
+            em.merge( admin );            
+        }
+    }
     
     public static void addUrl(Url url) {
         EntityManager em = DBManager.INSTANCE.getEntityManager();
@@ -77,6 +88,38 @@ public class DBUtils {
         }
     }
 
+    public static void addAdmin(InstanceAdmin admin) {
+        EntityManager em = DBManager.INSTANCE.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            persistAdmin( em, admin );
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            log.error("Error add admin: " + admin.getLogin(), e);
+            em.getTransaction().rollback();
+        }
+    }
+
+    public static boolean isAdminForInstance(String login, String instance) {
+        EntityManager em = DBManager.INSTANCE.getEntityManager();
+
+        try {
+            CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+            CriteriaQuery<InstanceAdmin> createQuery = criteriaBuilder.createQuery( InstanceAdmin.class );
+            Root<InstanceAdmin> adminTable = createQuery.from( InstanceAdmin.class );
+            List<Predicate> criteria = new ArrayList<Predicate>();
+            criteria.add( criteriaBuilder.equal( adminTable.get( "login" ), login ) );
+            criteria.add( criteriaBuilder.equal( adminTable.get( "instance" ), instance ) );
+            createQuery.select( adminTable ).where( criteriaBuilder.and( criteria.toArray( new Predicate[0] ) ) );
+    
+            List<InstanceAdmin> resultList = em.createQuery( createQuery ).getResultList();
+            return !resultList.isEmpty();
+        } catch (Exception e) {
+            log.error("Error lookup instance admin by login and instance", e);
+            return false;
+        }
+    }
+    
     public static void addUrls(List<Url> fromUrls) {
         EntityManager em = DBManager.INSTANCE.getEntityManager();
         em.getTransaction().begin();
@@ -107,6 +150,22 @@ public class DBUtils {
             em.getTransaction().rollback();
         }
     }
+    
+    public static void deleteAdmins(Long[] ids) {
+        EntityManager em = DBManager.INSTANCE.getEntityManager();
+        em.getTransaction().begin();
+        try {
+            for (Long id : ids) {
+                InstanceAdmin admin = em.find( InstanceAdmin.class, id );
+                em.remove( admin );
+            }
+            em.flush();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            log.error("Error deleting admins.", e);
+            em.getTransaction().rollback();
+        }
+    }       
     
     public static void setStatus(Instance instance, String srcUrl, String status) {
         EntityManager em = DBManager.INSTANCE.getEntityManager();

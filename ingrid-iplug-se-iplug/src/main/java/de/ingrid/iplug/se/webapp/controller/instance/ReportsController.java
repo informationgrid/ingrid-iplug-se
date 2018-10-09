@@ -22,10 +22,15 @@
  */
 package de.ingrid.iplug.se.webapp.controller.instance;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -35,8 +40,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import de.ingrid.admin.controller.AbstractController;
+import de.ingrid.admin.security.IngridPrincipal;
 import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
 import de.ingrid.iplug.se.nutchController.NutchController;
+import de.ingrid.iplug.se.utils.DBUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
 import de.ingrid.iplug.se.webapp.controller.AdminViews;
 
@@ -54,8 +61,14 @@ public class ReportsController extends AbstractController {
 	public ReportsController(NutchController nutchController, IPostCrawlProcessor[] postCrawlProcessors) {}
 
 	@RequestMapping(value = { "/iplug-pages/instanceReports.html" }, method = RequestMethod.GET)
-	public String showReports(final ModelMap modelMap, @RequestParam("instance") String name) {
-		Instance instance = InstanceController.getInstanceData(name);
+	public String showReports(final ModelMap modelMap, @RequestParam("instance") String name, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String user = request.getUserPrincipal().getName();
+        if (!(request.getUserPrincipal() instanceof IngridPrincipal.SuperAdmin) && request.isUserInRole( "instanceAdmin" ) && !DBUtils.isAdminForInstance( user, name )) {
+            response.sendError(HttpStatus.FORBIDDEN.value());
+            return null;
+        }
+
+        Instance instance = InstanceController.getInstanceData(name);
 
 		if (instance == null) {
 			return redirect(AdminViews.SE_LIST_INSTANCES + ".html");

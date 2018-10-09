@@ -22,6 +22,11 @@
  */
 package de.ingrid.iplug.se.webapp.controller.instance;
 
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -30,7 +35,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import de.ingrid.admin.controller.AbstractController;
+import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
 import de.ingrid.iplug.se.nutchController.IngridCrawlNutchProcess;
 import de.ingrid.iplug.se.nutchController.NutchController;
@@ -47,11 +52,15 @@ import de.ingrid.iplug.se.webapp.controller.AdminViews;
  */
 @Controller
 @SessionAttributes("plugDescription")
-public class ManagementController extends AbstractController {
+public class ManagementController extends InstanceController {
 
     private NutchController nutchController;
     
     private IPostCrawlProcessor[] postCrawlProcessors;
+    
+    @Autowired
+    private ElasticsearchNodeFactoryBean elasticSearch;
+    
 
     @Autowired
     public ManagementController(NutchController nutchController, IPostCrawlProcessor[] postCrawlProcessors) {
@@ -60,25 +69,34 @@ public class ManagementController extends AbstractController {
     }
 
     @RequestMapping(value = { "/iplug-pages/instanceManagement.html" }, method = RequestMethod.GET)
-    public String showManagement(final ModelMap modelMap, @RequestParam("instance") String name) {
+    public String showManagement(final ModelMap modelMap, @RequestParam("instance") String name, HttpServletRequest request, HttpServletResponse response) throws IOException {
         Instance instance = InstanceController.getInstanceData(name);
-        
+
         if (instance == null) {
             return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );
         } else {
+            if (hasNoAccessToInstance(name, request, response)) {
+                return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );
+            }
             modelMap.put("instance", instance );
             return AdminViews.SE_INSTANCE_MANAGEMENT;
         }
     }
 
     @RequestMapping(value = { "/iplug-pages/instanceManagement.html" }, method = RequestMethod.POST, params = "start")
-    public String startCrawl(@RequestParam("instance") String name, @RequestParam("depth") int depth, @RequestParam("num") int numUrls) throws Exception {
+    public String startCrawl(@RequestParam("instance") String name, @RequestParam("depth") int depth, @RequestParam("num") int numUrls, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        
+        if (hasNoAccessToInstance(name, request, response)) {
+            return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );
+        }
+
         FileUtils.prepareCrawl( name );
         
         // configure crawl process        
         Instance instance = InstanceController.getInstanceData( name );
 
         IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, depth, numUrls, postCrawlProcessors);
+        process.setElasticSearch( elasticSearch );
 
         // run crawl process
         nutchController.start(instance, process);
@@ -86,7 +104,10 @@ public class ManagementController extends AbstractController {
     }
     
     @RequestMapping(value = { "/iplug-pages/instanceManagement.html" }, method = RequestMethod.POST, params = "stop")
-    public String stopCrawl(@RequestParam("instance") String name) throws Exception {
+    public String stopCrawl(@RequestParam("instance") String name, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        if (hasNoAccessToInstance(name, request, response)) {
+            return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );
+        }
         
         Instance instance = InstanceController.getInstanceData( name );
         nutchController.stop( instance );

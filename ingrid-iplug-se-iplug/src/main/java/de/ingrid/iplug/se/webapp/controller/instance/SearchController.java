@@ -25,6 +25,9 @@ package de.ingrid.iplug.se.webapp.controller.instance;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -33,7 +36,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import de.ingrid.admin.controller.AbstractController;
 import de.ingrid.iplug.HeartBeatPlug;
 import de.ingrid.iplug.se.webapp.container.Instance;
 import de.ingrid.iplug.se.webapp.controller.AdminViews;
@@ -53,7 +55,7 @@ import de.ingrid.utils.queryparser.TokenMgrError;
  */
 @Controller
 @SessionAttributes("plugDescription")
-public class SearchController extends AbstractController {
+public class SearchController extends InstanceController {
 
     private final HeartBeatPlug _plug;
 
@@ -63,7 +65,11 @@ public class SearchController extends AbstractController {
     }
 
     @RequestMapping(value = { "/iplug-pages/instanceSearch.html" }, method = RequestMethod.GET)
-    public String showSearch(final ModelMap modelMap, @RequestParam(value = "instance", required = false) String name) {
+    public String showSearch(final ModelMap modelMap, @RequestParam(value = "instance", required = false) String name, HttpServletRequest request, HttpServletResponse response) {
+
+        if (hasNoAccessToInstance(name, request, response)) {
+            return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );
+        }
 
         Instance instance = null;
         // if no instance name was found or no belonging directory then show the instance list page
@@ -78,7 +84,11 @@ public class SearchController extends AbstractController {
     @RequestMapping(value = { "/iplug-pages/instanceSearch.html" }, method = RequestMethod.POST)
     public String doQuery(final ModelMap modelMap,
             @RequestParam(value = "query", required = false) final String queryString,
-            @RequestParam("instance") String instance) throws Exception {
+            @RequestParam("instance") String instance, HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+        if (hasNoAccessToInstance(instance, request, response)) {
+            return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );
+        }
 
         modelMap.addAttribute( "instance", InstanceController.getInstanceData( instance ) );
         

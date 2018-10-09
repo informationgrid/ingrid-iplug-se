@@ -28,6 +28,10 @@
     color: #ff0000;
 }
 
+.fieldhint {
+    color: #444;
+}
+
 .hint {
 	padding-top: 5px;
 	cursor: pointer;
@@ -40,7 +44,9 @@
 }
 
 .comment {
-	color: #AAA;
+	color: #444;
+	font-size: 11px;
+	padding: 15px
 }
 
 #waitScreen .blocker {
@@ -152,6 +158,7 @@ label input {
 .ui-buttonset {
     padding-bottom: 4px;
     text-align: center;
+    margin-top: 7px;
 }
 
 /* #dialog-form input[type=text], #dialog-form select, #dialog-form .chosen-container

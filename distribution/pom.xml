@@ -3,7 +3,7 @@
   <parent>
     <groupId>de.ingrid</groupId>
     <artifactId>ingrid-iplug-se-project</artifactId>
-    <version>4.2.1</version>
+    <version>4.5.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>ingrid-iplug-se</artifactId>
@@ -106,18 +106,8 @@
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>wagon-maven-plugin</artifactId>
             <configuration>
-              <fromDir>target</fromDir>
-              <url>file:///opt/ingrid/distributions/${project.artifactId}/${project.version}</url>
+              <skip>false</skip>
             </configuration>
-            <executions>
-              <execution>
-                <id>upload-to-distributions</id>
-                <phase>deploy</phase>
-                <goals>
-                  <goal>upload</goal>
-                </goals>
-              </execution>
-            </executions>
           </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>

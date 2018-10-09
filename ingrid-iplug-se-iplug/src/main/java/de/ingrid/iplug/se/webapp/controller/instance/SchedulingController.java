@@ -26,6 +26,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -76,7 +79,11 @@ public class SchedulingController extends InstanceController {
     @RequestMapping(value = { "/iplug-pages/instanceScheduling.html" }, method = RequestMethod.GET)
     public String getParameters(final ModelMap modelMap,
             @ModelAttribute("plugDescription") final PlugdescriptionCommandObject commandObject,
-            @RequestParam("instance") String name) {
+            @RequestParam("instance") String name, HttpServletRequest request, HttpServletResponse response) {
+
+        if (hasNoAccessToInstance(name, request, response)) {
+            return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );
+        }
 
         String dir = SEIPlug.conf.getInstancesDir();
         File instanceFolder = new File( dir, name );
@@ -167,8 +174,11 @@ public class SchedulingController extends InstanceController {
     }
 
     @RequestMapping(value = "/iplug-pages/daily.html", method = RequestMethod.POST)
-    public String postDaily(@ModelAttribute("clockCommand") ClockCommand clockCommand, Errors errors, @RequestParam("instance") String name, final ModelMap map)
+    public String postDaily(@ModelAttribute("clockCommand") ClockCommand clockCommand, Errors errors, @RequestParam("instance") String name, final ModelMap map, HttpServletRequest request, HttpServletResponse response)
             throws IOException {
+        if (hasNoAccessToInstance(name, request, response)) {
+            return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );
+        }
 
         // validate and return to page on error
         validate( errors, clockCommand );
@@ -189,9 +199,12 @@ public class SchedulingController extends InstanceController {
     }
 
     @RequestMapping(value = "/iplug-pages/weekly.html", method = RequestMethod.POST)
-    public String postWeekly(@ModelAttribute("weeklyCommand") WeeklyCommand weeklyCommand, Errors errors, @RequestParam("instance") String name, final ModelMap map)
+    public String postWeekly(@ModelAttribute("weeklyCommand") WeeklyCommand weeklyCommand, Errors errors, @RequestParam("instance") String name, final ModelMap map, HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
+        if (hasNoAccessToInstance(name, request, response)) {
+            return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );
+        }
         String tabId = "#tab2";
         map.put( "selectedTab", tabId );
         // validate and return to page on error
@@ -224,9 +237,12 @@ public class SchedulingController extends InstanceController {
     }
 
     @RequestMapping(value = "/iplug-pages/monthly.html", method = RequestMethod.POST)
-    public String postMonthly(@ModelAttribute("monthlyCommand") MonthlyCommand monthlyCommand, Errors errors, @RequestParam("instance") String name, final ModelMap map)
+    public String postMonthly(@ModelAttribute("monthlyCommand") MonthlyCommand monthlyCommand, Errors errors, @RequestParam("instance") String name, final ModelMap map, HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
+        if (hasNoAccessToInstance(name, request, response)) {
+            return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );
+        }
         String tabId = "#tab3";
         map.put( "instance", getInstanceData( name ) );
         map.put( "selectedTab", tabId );
@@ -259,8 +275,11 @@ public class SchedulingController extends InstanceController {
     }
 
     @RequestMapping(value = "/iplug-pages/advanced.html", method = RequestMethod.POST)
-    public String postAdvanced(@ModelAttribute("advancedCommand") AdvancedCommand advancedCommand, Errors errors, @RequestParam("instance") String name, final ModelMap map)
+    public String postAdvanced(@ModelAttribute("advancedCommand") AdvancedCommand advancedCommand, Errors errors, @RequestParam("instance") String name, final ModelMap map, HttpServletRequest request, HttpServletResponse response)
             throws IOException {
+        if (hasNoAccessToInstance(name, request, response)) {
+            return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );
+        }
         String tabId = "#tab4";
         map.put( "instance", getInstanceData( name ) );
         map.put( "selectedTab", tabId );
@@ -277,7 +296,10 @@ public class SchedulingController extends InstanceController {
     }
 
     @RequestMapping(value = "/iplug-pages/delete.html", method = RequestMethod.POST)
-    public String delete(@RequestParam("instance") String name) throws IOException {
+    public String delete(@RequestParam("instance") String name, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if (hasNoAccessToInstance(name, request, response)) {
+            return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );
+        }
         _patternPersistence.deletePattern(name);
         _crawlDataPersistence.deleteCrawlData(name);
         _schedulerManager.deschedule( name );

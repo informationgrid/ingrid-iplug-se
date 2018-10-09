@@ -25,11 +25,17 @@ package de.ingrid.iplug.se.webapp.controller.instance;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import de.ingrid.admin.JettyStarter;
+import de.ingrid.admin.controller.AbstractController;
+import de.ingrid.admin.security.IngridPrincipal;
 import de.ingrid.iplug.se.SEIPlug;
+import de.ingrid.iplug.se.utils.DBUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
 
-public class InstanceController {
+public class InstanceController extends AbstractController {
 
     public static Instance getInstanceData(String name) {
         // first check if the path really exists, in case we called an URL with a wrong parameter
@@ -54,4 +60,23 @@ public class InstanceController {
     
         return instance;
     }
+    
+    /**
+     * Returns true if the user has role 'instanceAdmin' and has NO ACCESS to the given instance.
+     * 
+     * @param instanceName
+     * @param request
+     * @param response
+     * @return
+     */
+    public boolean hasNoAccessToInstance(String instanceName, HttpServletRequest request, HttpServletResponse response) {
+        String user = request.getUserPrincipal().getName();
+        if (!(request.getUserPrincipal() instanceof IngridPrincipal.SuperAdmin) && request.isUserInRole( "instanceAdmin" ) && !DBUtils.isAdminForInstance( user, instanceName )) {
+            return true;
+        } else {
+            return false;
+        }
+        
+    }
+
 }

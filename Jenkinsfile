@@ -1,6 +1,12 @@
 pipeline {
     agent any
 
+    options {
+        // each branch has 1 job running at a time, since tests conflict with elasticsearch port otherwise
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '5'))
+    }
+
     environment {
         VERSION = readMavenPom().getVersion()
     }
