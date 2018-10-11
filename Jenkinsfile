@@ -1,5 +1,9 @@
 pipeline {
-    agent any
+    agent {
+        docker { 
+            image 'docker.elastic.co/elasticsearch/elasticsearch:5.6.12'
+        }
+    }
 
     options {
         // each branch has 1 job running at a time, since tests conflict with elasticsearch port otherwise
