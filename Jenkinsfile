@@ -39,7 +39,7 @@ pipeline {
                     echo "Project version: $VERSION"
 
                     // Run the maven build
-                    sh 'mvn clean deploy -PrequireSnapshotVersion,docker,docker-$GIT_BRANCH -Dmaven.test.failure.ignore=true'
+                    sh '$MVN_CMD clean deploy -PrequireSnapshotVersion,docker,docker-$GIT_BRANCH -Dmaven.test.failure.ignore=true'
 
                 } // withMaven will discover the generated Maven artifacts, JUnit Surefire & FailSafe & FindBugs reports...
             }
@@ -60,7 +60,7 @@ pipeline {
                     // check is release version
                     // deploy to distribution
                     // send release email
-                    sh 'mvn clean deploy -Pdocker,release'
+                    sh '$MVN_CMD clean deploy -Pdocker,release'
                 }
             }
         }
@@ -71,7 +71,7 @@ pipeline {
                     mavenSettingsConfig: '2529f595-4ac5-44c6-8b4f-f79b5c3f4bae'
                 ) {
                     withSonarQubeEnv('Wemove SonarQube') {
-                        sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.4.0.905:sonar'
+                        sh '$MVN_CMD org.sonarsource.scanner.maven:sonar-maven-plugin:3.4.0.905:sonar'
                     }
                 }
             }
