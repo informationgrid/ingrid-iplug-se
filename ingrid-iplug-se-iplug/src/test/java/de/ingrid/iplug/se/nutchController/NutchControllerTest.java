@@ -102,6 +102,7 @@ public class NutchControllerTest {
         
         NutchConfigTool nct = new NutchConfigTool(Paths.get(conf.toAbsolutePath().toString(), "nutch-site.xml"));
         nct.addOrUpdateProperty("elastic.port", "9300", "");
+        nct.addOrUpdateProperty("elastic.cluster", "ingrid", "");
         nct.write();
         
         FileUtils.copyDirectories(Paths.get("../ingrid-iplug-se-nutch/src/test/resources/urls").toAbsolutePath(), urls);

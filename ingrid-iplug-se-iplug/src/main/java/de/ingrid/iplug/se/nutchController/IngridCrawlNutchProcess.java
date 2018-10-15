@@ -144,6 +144,11 @@ public class IngridCrawlNutchProcess extends NutchProcess {
                 this.statusProvider.appendToState(STATES.DELETE_BEFORE_CRAWL.name(), " done.");
             }
 
+            // prepare (central) index for iPlug information
+            if (JettyStarter.getInstance().config.esRemoteNode) {
+                this.indexManager.checkAndCreateInformationIndex();
+            }
+
             this.statusProvider.addState(STATES.INJECT_START.name(), "Inject start urls...");
             int ret = execute("org.apache.nutch.crawl.Injector", crawlDb, startUrls);
             if (ret != 0) {

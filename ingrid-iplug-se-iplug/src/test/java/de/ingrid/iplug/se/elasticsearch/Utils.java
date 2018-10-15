@@ -22,8 +22,22 @@
  */
 package de.ingrid.iplug.se.elasticsearch;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import de.ingrid.admin.JettyStarter;
+import de.ingrid.elasticsearch.*;
+import de.ingrid.elasticsearch.search.FacetConverter;
+import de.ingrid.elasticsearch.search.IQueryParsers;
+import de.ingrid.elasticsearch.search.IndexImpl;
+import de.ingrid.elasticsearch.search.converter.*;
+import de.ingrid.utils.IngridDocument;
+import de.ingrid.utils.IngridHit;
+import de.ingrid.utils.query.IngridQuery;
+import de.ingrid.utils.queryparser.ParseException;
+import de.ingrid.utils.queryparser.QueryStringParser;
+import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
+import org.elasticsearch.client.Client;
+import org.elasticsearch.common.xcontent.XContentType;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -31,24 +45,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
-import de.ingrid.elasticsearch.*;
-import de.ingrid.elasticsearch.search.FacetConverter;
-import de.ingrid.elasticsearch.search.IQueryParsers;
-import de.ingrid.elasticsearch.search.IndexImpl;
-import de.ingrid.elasticsearch.search.converter.*;
-import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.common.xcontent.XContentType;
-import org.springframework.core.io.ClassPathResource;
-
-import de.ingrid.admin.JettyStarter;
-import de.ingrid.utils.IngridDocument;
-import de.ingrid.utils.IngridHit;
-import de.ingrid.utils.query.IngridQuery;
-import de.ingrid.utils.queryparser.ParseException;
-import de.ingrid.utils.queryparser.QueryStringParser;
-import org.springframework.core.io.Resource;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 public class Utils {
     public static final long MAX_RESULTS = 11;

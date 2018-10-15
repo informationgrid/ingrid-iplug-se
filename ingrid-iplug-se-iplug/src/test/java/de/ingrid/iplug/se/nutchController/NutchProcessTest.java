@@ -32,15 +32,19 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import de.ingrid.admin.JettyStarter;
 import de.ingrid.elasticsearch.IndexManager;
+import de.ingrid.iplug.se.elasticsearch.Utils;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -56,6 +60,15 @@ import de.ingrid.iplug.se.webapp.container.Instance;
 public class NutchProcessTest {
 
     // @Mock JettyStarter jettyStarter;
+
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+        new JettyStarter( false );
+        JettyStarter.getInstance().config.index = "test";
+        JettyStarter.getInstance().config.indexWithAutoId = true;
+        JettyStarter.getInstance().config.indexSearchInTypes = new ArrayList<>();
+        Utils.setupES();
+    }
 
     @Test
     public void testGenericNutchProcessor() throws Exception {
@@ -132,7 +145,8 @@ public class NutchProcessTest {
             FileUtils.copyDirectories(fs.getPath("../ingrid-iplug-se-nutch/src/test/resources/conf").toAbsolutePath(), conf);
 
             NutchConfigTool nct = new NutchConfigTool(Paths.get(conf.toAbsolutePath().toString(), "nutch-site.xml"));
-            nct.addOrUpdateProperty("elastic.port", "54346", "");
+            nct.addOrUpdateProperty("elastic.port", "9300", "");
+            nct.addOrUpdateProperty("elastic.cluster", "ingrid", "");
             nct.write();
             
             FileUtils.copyDirectories(fs.getPath("../ingrid-iplug-se-nutch/src/test/resources/urls").toAbsolutePath(), urls);
@@ -156,8 +170,9 @@ public class NutchProcessTest {
 
             Settings settings = Settings.builder()
                     .put("path.data", SEIPlug.conf.getInstancesDir() + "/test")
-                    .put("transport.tcp.port", 54346)
-                    .put("http.port", 54347).build();
+                    .put("transport.tcp.port", 9300)
+                    .put("cluster.name", "ingrid")
+                    .put("http.port", 9200).build();
 //            NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().clusterName("elasticsearch").data(true).settings(settings);
 //            nodeBuilder = nodeBuilder.local(false);
 //            node = nodeBuilder.node();
