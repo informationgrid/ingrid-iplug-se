@@ -29,11 +29,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import de.ingrid.elasticsearch.*;
 import de.ingrid.elasticsearch.search.FacetConverter;
@@ -52,6 +48,7 @@ import de.ingrid.utils.IngridHit;
 import de.ingrid.utils.query.IngridQuery;
 import de.ingrid.utils.queryparser.ParseException;
 import de.ingrid.utils.queryparser.QueryStringParser;
+import org.springframework.core.io.Resource;
 
 public class Utils {
     public static final long MAX_RESULTS = 11;
@@ -65,12 +62,14 @@ public class Utils {
 
     public static void setupES() throws Exception {
 
+        Properties elasticProperties = getElasticProperties();
+
         elasticConfig = new ElasticConfig();
         elasticConfig.isEnabled = true;
         elasticConfig.isRemote = true;
         elasticConfig.indexSearchDefaultFields = new String[]{"title", "content"};
         elasticConfig.additionalSearchDetailFields = new String[0];
-        elasticConfig.remoteHosts = new String[] {"localhost:9300"};
+        elasticConfig.remoteHosts = new String[] { elasticProperties.get("network.host") + ":9300"};
         IndexInfo indexInfo = new IndexInfo();
         indexInfo.setToIndex("test_1");
         indexInfo.setToAlias("ingrid_test");
@@ -95,6 +94,22 @@ public class Utils {
         
         setMapping( elastic, "test_1" );
         prepareIndex( elastic );
+    }
+
+    private static Properties getElasticProperties() {
+        Properties p = new Properties();
+        try {
+            // check for elastic search settings in classpath, which works
+            // during development
+            // and production
+            Resource resource = new ClassPathResource("/elasticsearch.properties");
+            if (resource.exists()) {
+                p.load(resource.getInputStream());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return p;
     }
     
     public static void prepareIndex(ElasticsearchNodeFactoryBean elastic, String fileData, String index) throws Exception {
