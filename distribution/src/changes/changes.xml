@@ -28,6 +28,11 @@
 	<author email="joachim@wemove.com">Joachim Müller</author>
   </properties>
   <body>
+    <release version="4.2.6" date="2018-10-16" description="Release 4.2.6">
+      <action type="add" dev="wemove" issue="REDMINE-1189">
+        Change logic of BLP data import according to NRW rules.
+      </action>
+    </release>
     <release version="4.2.5" date="2018-06-07" description="Release 4.2.5">
       <action type="fix" dev="wemove" issue="REDMINE-1093">
         Introduce new property 'ingrid.delete.before.crawl' and 'ingrid.index.no.deduplication' to make the UVP BLP crawl more robust.
