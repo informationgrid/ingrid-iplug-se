@@ -32,6 +32,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -81,6 +82,8 @@ public class NutchControllerTest {
         configuration.dependingFields = new ArrayList<String>();
         configuration.nutchCallJavaOptions = java.util.Arrays.asList("-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8");
         SEIPlug.conf = configuration;
+        Properties elasticProperties = Utils.getElasticProperties();
+        String elasticNetworkHost = (String) elasticProperties.get("network.host");
 
         // get an entity manager instance (initializes properties in the
         // DBManager)
@@ -101,6 +104,7 @@ public class NutchControllerTest {
         FileUtils.copyDirectories(Paths.get("apache-nutch-runtime/runtime/local/conf").toAbsolutePath(), conf);
         
         NutchConfigTool nct = new NutchConfigTool(Paths.get(conf.toAbsolutePath().toString(), "nutch-site.xml"));
+        nct.addOrUpdateProperty("elastic.host", elasticNetworkHost,"");
         nct.addOrUpdateProperty("elastic.port", "9300", "");
         nct.addOrUpdateProperty("elastic.cluster", "ingrid", "");
         nct.write();
