@@ -64,16 +64,27 @@ pipeline {
                 expression { return !VERSION.endsWith("-SNAPSHOT") }
             }
             steps {
-                withMaven(
-                    maven: 'Maven3',
-                    mavenSettingsConfig: '2529f595-4ac5-44c6-8b4f-f79b5c3f4bae'
-                ) {
-                    echo "Release: $VERSION"
-                    // check license
-                    // check is release version
-                    // deploy to distribution
-                    // send release email
-                    sh './mvnw clean deploy -Pdocker,release'
+                script {
+                    /*
+                        Start an elasticsearch cluster in a docker container
+                        Attention: we need to assign the correct network where jenkins was created in
+                                   we also should use the IP mask for the port mapping to only allow
+                                   access to the right containers
+                    */
+                    docker.image('docker.elastic.co/elasticsearch/elasticsearch:5.6.12').withRun('--name "elasticsearch" -e "cluster.name=ingrid" -e "http.host=0.0.0.0" -e "transport.host=0.0.0.0" -e "xpack.security.enabled=false" -e "xpack.monitoring.enabled=false" -e "xpack.ml.enabled=false" --network jenkinsnexussonar_devnet -p 172.20.0.0:9300:9300 -p 172.20.0.0:9200:9200') { c ->
+
+                        withMaven(
+                            maven: 'Maven3',
+                            mavenSettingsConfig: '2529f595-4ac5-44c6-8b4f-f79b5c3f4bae'
+                        ) {
+                            echo "Release: $VERSION"
+                            // check license
+                            // check is release version
+                            // deploy to distribution
+                            // send release email
+                            sh 'mvn clean deploy -Pdocker,release'
+                        }
+                    }
                 }
             }
         }
@@ -84,7 +95,7 @@ pipeline {
                     mavenSettingsConfig: '2529f595-4ac5-44c6-8b4f-f79b5c3f4bae'
                 ) {
                     withSonarQubeEnv('Wemove SonarQube') {
-                        sh './mvnw org.sonarsource.scanner.maven:sonar-maven-plugin:3.4.0.905:sonar'
+                        sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.4.0.905:sonar'
                     }
                 }
             }

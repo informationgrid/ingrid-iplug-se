@@ -33,6 +33,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -134,6 +135,8 @@ public class NutchProcessTest {
             configuration.databaseID = "iplug-se-dev";
             configuration.nutchCallJavaOptions = java.util.Arrays.asList("-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8");
             SEIPlug.conf = configuration;
+            Properties elasticProperties = Utils.getElasticProperties();
+            String elasticNetworkHost = (String) elasticProperties.get("network.host");
 
             // get an entity manager instance (initializes properties in the
             // DBManager)
@@ -145,10 +148,11 @@ public class NutchProcessTest {
             FileUtils.copyDirectories(fs.getPath("../ingrid-iplug-se-nutch/src/test/resources/conf").toAbsolutePath(), conf);
 
             NutchConfigTool nct = new NutchConfigTool(Paths.get(conf.toAbsolutePath().toString(), "nutch-site.xml"));
+            nct.addOrUpdateProperty("elastic.host", elasticNetworkHost,"");
             nct.addOrUpdateProperty("elastic.port", "9300", "");
             nct.addOrUpdateProperty("elastic.cluster", "ingrid", "");
             nct.write();
-            
+
             FileUtils.copyDirectories(fs.getPath("../ingrid-iplug-se-nutch/src/test/resources/urls").toAbsolutePath(), urls);
 
             IngridCrawlNutchProcess p = new IngridCrawlNutchProcess(new IndexManager(elastic, elasticConfig));
@@ -168,14 +172,13 @@ public class NutchProcessTest {
             p.setStatusProvider(new StatusProvider(workingDir.toString()));
             p.start();
 
+
             Settings settings = Settings.builder()
                     .put("path.data", SEIPlug.conf.getInstancesDir() + "/test")
                     .put("transport.tcp.port", 9300)
                     .put("cluster.name", "ingrid")
+                    .put("network.host", elasticNetworkHost)
                     .put("http.port", 9200).build();
-//            NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().clusterName("elasticsearch").data(true).settings(settings);
-//            nodeBuilder = nodeBuilder.local(false);
-//            node = nodeBuilder.node();
             TransportClient transportClient = new PreBuiltTransportClient(settings);
 
             long start = System.currentTimeMillis();

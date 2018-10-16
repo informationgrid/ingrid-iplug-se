@@ -94,7 +94,7 @@ public class Utils {
         prepareIndex( elastic );
     }
 
-    private static Properties getElasticProperties() {
+    public static Properties getElasticProperties() {
         Properties p = new Properties();
         try {
             // check for elastic search settings in classpath, which works
