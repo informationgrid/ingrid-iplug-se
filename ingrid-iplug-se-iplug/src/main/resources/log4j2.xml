@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN" monitorInterval="5">
+<Configuration status="WARN" monitorInterval="30">
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%-5p [%d{yyyy-MM-dd HH:mm:ss}] (%F:%L) - %m%n" />
+            <PatternLayout pattern="%5p [%d{yyyy-MM-dd HH:mm:ss}] (%F:%L) - %m%n" />
         </Console>
         <RollingFile name="LogFile" fileName="logs/log.log" filePattern="logs/log.log.%i">
             <PatternLayout pattern="%5p [%d{yyyy-MM-dd HH:mm:ss}] (%F:%L) - %m%n" />
@@ -13,14 +13,16 @@
         </RollingFile>
     </Appenders>
     <Loggers>
-        <Logger name="de.ingrid" level="debug" additivity="false">
+        <Logger name="de.ingrid" level="info" additivity="false">
             <AppenderRef ref="LogFile" />
         </Logger>
-        <Logger name="org.elasticsearch" level="info" additivity="false">
-            <AppenderRef ref="Console" />
+        <Logger name="org" level="warn" additivity="false">
+            <AppenderRef ref="LogFile" />
         </Logger>
-        <Logger name="de.ingrid.iplug.se.migrate" level="warn" additivity="false">
-            <AppenderRef ref="Console" />
+        <Logger name="net.meta" level="info" additivity="false">
+            <AppenderRef ref="LogFile" />
+        </Logger>
+        <Logger name="com" level="warn" additivity="false">
             <AppenderRef ref="LogFile" />
         </Logger>
         <Root level="warn">

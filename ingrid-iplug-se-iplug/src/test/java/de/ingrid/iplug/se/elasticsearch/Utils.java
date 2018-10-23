@@ -74,7 +74,8 @@ public class Utils {
         elasticConfig.activeIndices = new IndexInfo[1];
         elasticConfig.activeIndices[0] = indexInfo;
 
-        elastic = new ElasticsearchNodeFactoryBean(elasticConfig);
+        elastic = new ElasticsearchNodeFactoryBean();
+        elastic.init(elasticConfig);
         elastic.afterPropertiesSet();
         
         // set necessary configurations for startup
@@ -100,7 +101,7 @@ public class Utils {
             // check for elastic search settings in classpath, which works
             // during development
             // and production
-            Resource resource = new ClassPathResource("/elasticsearch.properties");
+            Resource resource = new ClassPathResource("/src/develop/resources/elasticsearch.properties");
             if (resource.exists()) {
                 p.load(resource.getInputStream());
             }

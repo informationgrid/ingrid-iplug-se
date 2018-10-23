@@ -63,26 +63,25 @@ public class IngridCrawlNutchProcess extends NutchProcess {
 
     private static Logger log = Logger.getLogger(IngridCrawlNutchProcess.class);
 
-    public static enum STATES {
-        START, DELETE_BEFORE_CRAWL, INJECT_START, INJECT_BW, CLEANUP_HADOOP, FINISHED, DEDUPLICATE, INDEX, FILTER_LINKDB, UPDATE_LINKDB, FILTER_WEBGRAPH, UPDATE_WEBGRAPH, FILTER_SEGMENT, MERGE_SEGMENT, INJECT_META, FILTER_CRAWLDB, GENERATE, FETCH, UPDATE_CRAWLDB, UPDATE_MD, CREATE_HOST_STATISTICS, GENERATE_ZERO_URLS, CRAWL_CLEANUP, CLEAN_DUPLICATES, CREATE_STARTURL_REPORT, CREATE_URL_ERROR_REPORT;
+    public enum STATES {
+        START, DELETE_BEFORE_CRAWL, INJECT_START, INJECT_BW, CLEANUP_HADOOP, FINISHED, DEDUPLICATE, INDEX, FILTER_LINKDB, UPDATE_LINKDB, FILTER_WEBGRAPH, UPDATE_WEBGRAPH, FILTER_SEGMENT, MERGE_SEGMENT, INJECT_META, FILTER_CRAWLDB, GENERATE, FETCH, UPDATE_CRAWLDB, UPDATE_MD, CREATE_HOST_STATISTICS, GENERATE_ZERO_URLS, CRAWL_CLEANUP, CLEAN_DUPLICATES, CREATE_STARTURL_REPORT, CREATE_URL_ERROR_REPORT
     };
 
     public Integer depth = 1;
 
-    Integer noUrls = 1;
+    private Integer noUrls = 1;
 
-    IPostCrawlProcessor[] postCrawlProcessors;
+    private IPostCrawlProcessor[] postCrawlProcessors;
 
-    Instance instance;
+    private Instance instance;
 
-    LogFileWatcher logFileWatcher = null;
+    private LogFileWatcher logFileWatcher = null;
 
     private ElasticsearchNodeFactoryBean elasticSearch;
 
-    final IndexManager indexManager;
+    private final IndexManager indexManager;
 
 
-    @Autowired
     public IngridCrawlNutchProcess(IndexManager indexManager) {
         this.indexManager = indexManager;
     }
@@ -145,9 +144,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             }
 
             // prepare (central) index for iPlug information
-            if (JettyStarter.getInstance().config.esRemoteNode) {
-                this.indexManager.checkAndCreateInformationIndex();
-            }
+            this.indexManager.checkAndCreateInformationIndex();
 
             this.statusProvider.addState(STATES.INJECT_START.name(), "Inject start urls...");
             int ret = execute("org.apache.nutch.crawl.Injector", crawlDb, startUrls);
@@ -353,7 +350,6 @@ public class IngridCrawlNutchProcess extends NutchProcess {
 
             if ("true".equals( nutchConfigTool.getPropertyValue( "ingrid.delete.before.crawl" ) )) {
                 // remove instance (type) from index
-                Client client = elasticSearch.getClient();
                 if (indexManager.indexExists( instance.getInstanceIndexName() )) {
                     indexManager.deleteIndex( instance.getInstanceIndexName() );
                 }
@@ -391,12 +387,9 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             } else {
                 log.error("Process was unexpectably killed.", e);
             }
-        } catch (IOException e) {
+        } catch (Throwable e) {
             status = STATUS.INTERRUPTED;
             log.error("Process exited with errors.", e);
-        } catch (Throwable t) {
-            status = STATUS.INTERRUPTED;
-            log.error("Process exited with errors.", t);
         } finally {
             if (logFileWatcher != null) {
                 logFileWatcher.close();
@@ -426,16 +419,14 @@ public class IngridCrawlNutchProcess extends NutchProcess {
         Config config = JettyStarter.getInstance().config;
 
         // update central index with iPlug information
-        if (config.esRemoteNode) {
-            IndexInfo info = new IndexInfo();
-            info.setComponentIdentifier(config.communicationProxyUrl);
-            info.setToAlias(instanceIndexName);
-            info.setToType("default");
-            String plugIdInfo = this.indexManager.getIndexTypeIdentifier(info);
-            this.indexManager.updateIPlugInformation(
-                    JettyStarter.getInstance().config.communicationProxyUrl,
-                    getIPlugInfo( plugIdInfo, instanceIndexName, false, null, null ) );
-        }
+        IndexInfo info = new IndexInfo();
+        info.setComponentIdentifier(config.communicationProxyUrl);
+        info.setToAlias(instanceIndexName);
+        info.setToType("default");
+        String plugIdInfo = this.indexManager.getIndexTypeIdentifier(info);
+        this.indexManager.updateIPlugInformation(
+                JettyStarter.getInstance().config.communicationProxyUrl,
+                getIPlugInfo( plugIdInfo, instanceIndexName, false, null, null ) );
 
         this.statusProvider.appendToState(STATES.INDEX.name(), " done.");
     }
@@ -500,7 +491,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             log.debug("Call: " + StringUtils.join(cmdLine.toStrings(), " "));
         }
 
-        /**
+        /*
          * FOR WINDOWS DEVELOPMENT TO RUN IN CYGWIN
          */
         if (System.getProperty("runInCygwin") != null) {
@@ -520,7 +511,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             call = call.replaceAll("\\\\", "/");
             cmdLine.addArgument(call);
         }
-        /**
+        /*
          * END
          */
 

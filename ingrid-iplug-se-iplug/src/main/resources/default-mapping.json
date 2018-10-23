@@ -1,79 +1,81 @@
 {
-    "properties": {
-        "boost": {
-            "type": "float"
-        },
-        "doc_boost": {
-            "type": "float"
-        },
-        "content": {
-            "analyzer": "german",
-            "type": "text",
-            "store": true
-        },
-        "contentLength": {
-            "type": "long"
-        },
-        "dataSourceName": {
-            "type": "text",
-            "index": "not_analyzed",
-            "store": true
-        },
-        "date": {
-            "type": "date"
-        },
-        "digest": {
-            "type": "text"
-        },
-        "host": {
-            "type": "text"
-        },
-        "id": {
-            "type": "text",
-            "index" : "not_analyzed"
-        },
-        "lang": {
-            "type": "text"
-        },
-        "segment": {
-            "type": "text"
-        },
-        "title": {
-            "analyzer": "german",
-            "type": "text",
-            "boost": 1.1,
-            "store": true
-        },
-        "tstamp": {
-            "type": "date"
-        },
-        "type": {
-            "type": "text"
-        },
-        "url": {
-            "type": "text",
-            "index" : "not_analyzed",
-            "store": true
-        },
-        "partner": {
-            "type": "keyword",
-            "index" : "not_analyzed"
-        },
-        "provider": {
-            "type": "keyword",
-            "index" : "not_analyzed"
-        },
-        "x1": {
-            "type": "double"
-        },
-        "x2": {
-            "type": "double"
-        },
-        "y1": {
-            "type": "double"
-        },
-        "y2": {
-            "type": "double"
+    "_default_": {
+        "properties": {
+            "boost": {
+                "type": "float"
+            },
+            "doc_boost": {
+                "type": "float"
+            },
+            "content": {
+                "analyzer": "german",
+                "type": "text",
+                "store": true
+            },
+            "contentLength": {
+                "type": "long"
+            },
+            "dataSourceName": {
+                "type": "text",
+                "index": "not_analyzed",
+                "store": true
+            },
+            "date": {
+                "type": "date"
+            },
+            "digest": {
+                "type": "text"
+            },
+            "host": {
+                "type": "text"
+            },
+            "id": {
+                "type": "text",
+                "index": "not_analyzed"
+            },
+            "lang": {
+                "type": "text"
+            },
+            "segment": {
+                "type": "text"
+            },
+            "title": {
+                "analyzer": "german",
+                "type": "text",
+                "boost": 1.1,
+                "store": true
+            },
+            "tstamp": {
+                "type": "date"
+            },
+            "type": {
+                "type": "text"
+            },
+            "url": {
+                "type": "text",
+                "index": "not_analyzed",
+                "store": true
+            },
+            "partner": {
+                "type": "keyword",
+                "index": "not_analyzed"
+            },
+            "provider": {
+                "type": "keyword",
+                "index": "not_analyzed"
+            },
+            "x1": {
+                "type": "double"
+            },
+            "x2": {
+                "type": "double"
+            },
+            "y1": {
+                "type": "double"
+            },
+            "y2": {
+                "type": "double"
+            }
         }
     }
 }

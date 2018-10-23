@@ -1,4 +1,0 @@
-IngridLogin {
-   de.ingrid.admin.security.PlugdescriptionLoginModule sufficient;
-   de.ingrid.iplug.se.security.InstanceAdminLoginModule sufficient;
-};
