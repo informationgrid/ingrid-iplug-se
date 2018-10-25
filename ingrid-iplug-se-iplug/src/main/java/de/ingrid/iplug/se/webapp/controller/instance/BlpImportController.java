@@ -23,6 +23,10 @@
 package de.ingrid.iplug.se.webapp.controller.instance;
 
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,8 +41,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
+import de.ingrid.iplug.se.BlpImportBean;
+import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.UVPDataImporter;
-import de.ingrid.iplug.se.UploadBean;
+import de.ingrid.iplug.se.conf.UrlMaintenanceSettings.MetaElement;
+import de.ingrid.iplug.se.conf.UrlMaintenanceSettings.Metadata;
+import de.ingrid.iplug.se.utils.InstanceConfigurationTool;
 import de.ingrid.iplug.se.webapp.container.Instance;
 import de.ingrid.iplug.se.webapp.controller.AdminViews;
 
@@ -51,9 +59,40 @@ import de.ingrid.iplug.se.webapp.controller.AdminViews;
 @Controller
 @SessionAttributes("plugDescription")
 public class BlpImportController extends InstanceController {
+    
+    @ModelAttribute("partners")
+    public Map<String,String> partners(@RequestParam("instance") String name) {
+
+        InstanceConfigurationTool instanceConfig = null;
+        try {
+            instanceConfig = new InstanceConfigurationTool( Paths.get( SEIPlug.conf.getInstancesDir(), name, "conf", "urlMaintenance.json" ) );
+        } catch (RuntimeException e) {
+            return null;
+        }
+        // get partner metadata
+        List<MetaElement> metadata = instanceConfig.getMetadata();
+        MetaElement partnerMetadata = null;
+        for (MetaElement me : metadata) {
+            if (me.getLabel().equals( "Partner" )) {
+                partnerMetadata = me;
+                break;
+            }
+        }
+        if (partnerMetadata == null) {
+            // no Partner element found  
+            return null;
+        }
+        
+        HashMap<String, String> partners = new HashMap<>();
+        for (Metadata partner : partnerMetadata.getChildren()) {
+            partners.put( partner.getId(), partner.getLabel() );
+        }
+        return partners;
+    }
+    
 
     @RequestMapping(value = { "/iplug-pages/instanceBlpImport.html" }, method = RequestMethod.GET)
-    public String showBlpImport(final ModelMap modelMap, @RequestParam("instance") String name, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public String showBlpImport(@ModelAttribute("blpImportBean") final BlpImportBean blpImportBean, final ModelMap modelMap, @RequestParam("instance") String name, HttpServletRequest request, HttpServletResponse response) throws Exception {
         Instance instance = InstanceController.getInstanceData( name );
 
         if (instance == null) {
@@ -76,20 +115,15 @@ public class BlpImportController extends InstanceController {
      * @throws IOException
      */
     @RequestMapping(method = RequestMethod.POST)
-    public String upload(@ModelAttribute("uploadBean") final UploadBean uploadBean, final Model model, @RequestParam("instance") String name) throws IOException {
+    public String upload(@ModelAttribute("blpImportBean") final BlpImportBean blpImportBean, final Model model, @RequestParam("instance") String name) throws IOException {
 
-        
-        Instance instance = getInstanceData(name);
+        Instance instance = getInstanceData( name );
 
-        MultipartFile file = uploadBean.getFile();
-//        List<UVPDataImporter.BlpModel> l = UVPDataImporter.readData( file.getInputStream(), file.getOriginalFilename() );
-//        for (UVPDataImporter.BlpModel e : l) {
-//            System.out.println( e );
-//        }
-        
+        MultipartFile file = blpImportBean.getFile();
+
         UVPDataImporter importer = new UVPDataImporter();
         importer.setInstance( instance );
-        importer.setPartner( "ni" );
+        importer.setPartner( blpImportBean.getPartner() );
         importer.setExcelFileInputStream( file.getInputStream() );
         importer.setExcelFileName( file.getOriginalFilename() );
         importer.start();

@@ -1,6 +1,6 @@
 /*
  * **************************************************-
- * ingrid-iplug-excel
+ * ingrid-iplug-se
  * ==================================================
  * Copyright (C) 2014 - 2018 wemove digital solutions GmbH
  * ==================================================
@@ -24,26 +24,36 @@ package de.ingrid.iplug.se;
 
 import org.springframework.web.multipart.MultipartFile;
 
-public class UploadBean {
+public class BlpImportBean {
 
-	private MultipartFile _multipartFile;
+    private MultipartFile _multipartFile;
+    public String partner;
 
-	/**
-	 * Get file for upload.
-	 * 
-	 * @return 
-	 * 		A multipart file.
-	 */
-	public MultipartFile getFile() {
-		return _multipartFile;
-	}
+    /**
+     * Get file for upload.
+     * 
+     * @return
+     *         A multipart file.
+     */
+    public MultipartFile getFile() {
+        return _multipartFile;
+    }
 
-	/** Set file for upload.
-	 * 
-	 * @param multipartFile
-	 */
-	public void setFile(MultipartFile multipartFile) {
-		_multipartFile = multipartFile;
-	}
+    /**
+     * Set file for upload.
+     * 
+     * @param multipartFile
+     */
+    public void setFile(MultipartFile multipartFile) {
+        _multipartFile = multipartFile;
+    }
+
+    public String getPartner() {
+        return this.partner;
+    }
+
+    public void setPartner(String partner) {
+        this.partner = partner;
+    }
 
 }
