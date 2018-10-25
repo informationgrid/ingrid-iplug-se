@@ -23,7 +23,6 @@
 package de.ingrid.iplug.se.webapp.controller.instance;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -79,11 +78,21 @@ public class BlpImportController extends InstanceController {
     @RequestMapping(method = RequestMethod.POST)
     public String upload(@ModelAttribute("uploadBean") final UploadBean uploadBean, final Model model, @RequestParam("instance") String name) throws IOException {
 
+        
+        Instance instance = getInstanceData(name);
+
         MultipartFile file = uploadBean.getFile();
-        List<UVPDataImporter.BlpModel> l = UVPDataImporter.readData( file.getInputStream(), file.getOriginalFilename() );
-        for (UVPDataImporter.BlpModel e : l) {
-            System.out.println( e );
-        }
+//        List<UVPDataImporter.BlpModel> l = UVPDataImporter.readData( file.getInputStream(), file.getOriginalFilename() );
+//        for (UVPDataImporter.BlpModel e : l) {
+//            System.out.println( e );
+//        }
+        
+        UVPDataImporter importer = new UVPDataImporter();
+        importer.setInstance( instance );
+        importer.setPartner( "ni" );
+        importer.setExcelFileInputStream( file.getInputStream() );
+        importer.setExcelFileName( file.getOriginalFilename() );
+        importer.start();
         return redirect( AdminViews.SE_INSTANCE_BLP_IMPORT + ".html?instance=" + name );
     }
 

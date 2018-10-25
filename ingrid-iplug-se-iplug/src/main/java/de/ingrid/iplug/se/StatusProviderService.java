@@ -12,13 +12,17 @@ public class StatusProviderService {
     private ConcurrentHashMap<String, StatusProvider> statusProviders;
 
     public StatusProvider getStatusProvider(String logdir) {
+        return getStatusProvider(logdir, "last_status.xml");
+    }
+    public StatusProvider getStatusProvider(String logdir, String statusFilename) {
         if (statusProviders == null) {
             statusProviders = new ConcurrentHashMap<>();
         }
-        if (!statusProviders.containsKey( logdir )) {
-            statusProviders.put( logdir, new StatusProvider( logdir ) );
+        String mapKey = logdir + statusFilename;
+        if (!statusProviders.containsKey( mapKey )) {
+            statusProviders.put( mapKey, new StatusProvider( logdir, statusFilename ) );
         }
-        return statusProviders.get( logdir );
+        return statusProviders.get( mapKey );
     }
 
 }

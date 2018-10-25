@@ -69,10 +69,14 @@ public class StatusProvider {
     private File lastStatusFile = null;
 
     public StatusProvider(String logDir) {
+        this( logDir, "last_status.xml" );
+    }
+
+    public StatusProvider(String logDir, String statusFilename) {
 
         if (this.lastStatusFile == null) {
 
-            this.lastStatusFile = new File( logDir, "last_status.xml" );
+            this.lastStatusFile = new File( logDir, statusFilename );
             try {
                 this.load();
             } catch (IOException e) {
@@ -365,8 +369,7 @@ public class StatusProvider {
             if (input != null) {
                 try {
                     input.close();
-                } catch (IOException e) {
-                }
+                } catch (IOException e) {}
             }
         }
     }

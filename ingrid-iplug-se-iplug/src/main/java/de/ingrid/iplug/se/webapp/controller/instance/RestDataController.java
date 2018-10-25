@@ -559,7 +559,7 @@ public class RestDataController extends InstanceController {
 
         Instance instance = getInstanceData(name);
 
-        List<State> states = statusProviderService.getStatusProvider(instance.getWorkingDirectory()).getStates();
+        List<State> states = statusProviderService.getStatusProvider(instance.getWorkingDirectory(), "import_status.xml").getStates();
 
         return new ResponseEntity<Collection<State>>(states, HttpStatus.OK);
     }

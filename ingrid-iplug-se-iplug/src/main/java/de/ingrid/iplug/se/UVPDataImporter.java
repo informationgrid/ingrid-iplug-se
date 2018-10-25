@@ -28,6 +28,7 @@ package de.ingrid.iplug.se;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -70,6 +71,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.tngtech.configbuilder.ConfigBuilder;
@@ -77,7 +79,10 @@ import com.tngtech.configbuilder.ConfigBuilder;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Metadata;
 import de.ingrid.iplug.se.db.model.Url;
+import de.ingrid.iplug.se.nutchController.StatusProvider;
+import de.ingrid.iplug.se.nutchController.StatusProvider.Classification;
 import de.ingrid.iplug.se.utils.TrustModifier;
+import de.ingrid.iplug.se.webapp.container.Instance;
 
 /**
  * UVP data importer. Imports data from an excel file directly into the url
@@ -106,7 +111,7 @@ import de.ingrid.iplug.se.utils.TrustModifier;
  * @author joachim@wemove.com
  */
 @Service
-public class UVPDataImporter {
+public class UVPDataImporter extends Thread {
 
     /**
      * The logging object
@@ -118,8 +123,198 @@ public class UVPDataImporter {
     private static EntityManager em;
 
     private static Map<String, List<StatusEntry>> status = new LinkedHashMap<String, List<StatusEntry>>();
-    
-    private static List<String>  markerUrls = new ArrayList<String>();
+
+    private static List<String> markerUrls = new ArrayList<String>();
+
+    private static StatusProviderService sps;
+
+    private String statusFilename;
+    private String logdir;
+    private String partner;
+    private Instance instance;
+    private String excelFileName;
+    private InputStream excelFileInputStream;
+
+    @Override
+    public void run() {
+        try {
+            this.startImport();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public void startImport() throws Exception {
+        StatusProvider sp = sps.getStatusProvider( logdir, statusFilename );
+        sp.clear();
+
+        String partner = this.partner;
+
+        conf = new ConfigBuilder<Configuration>( Configuration.class ).build();
+
+        Path instancePath = Paths.get( instance.getWorkingDirectory() );
+
+        if (!Files.exists( instancePath )) {
+            log.error( "Instance '" + instance.getName() + "' does not exist. Please create and configure instance for use for UVP BLP data." );
+            throw new FileNotFoundException();
+        }
+
+        // set the directory of the database to the configured one
+        Map<String, String> properties = new HashMap<String, String>();
+        Path dbDir = Paths.get( conf.databaseDir );
+        properties.put( "javax.persistence.jdbc.url", "jdbc:h2:" + dbDir.toFile().getAbsolutePath() + "/urls;MVCC=true;AUTO_SERVER=TRUE" );
+
+        em = null;
+        try {
+            em = DBManager.INSTANCE.getEntityManager();
+        } catch (PersistenceException e) {
+            log.error( "Database seems to be corrupt." );
+            sp.addState( "PersistenceException", "Database seems to be corrupt.", Classification.ERROR );
+            throw e;
+        }
+
+        EntityTransaction tx = null;
+        CriteriaBuilder cb = null;
+        CriteriaQuery<Url> criteria = null;
+        Root<Url> urlTable = null;
+        try {
+            tx = em.getTransaction();
+            tx.begin();
+
+            // remove existing URLs
+            cb = em.getCriteriaBuilder();
+            criteria = cb.createQuery( Url.class );
+            urlTable = criteria.from( Url.class );
+            Predicate instanceCriteria = cb.equal( urlTable.get( "instance" ), instance.getName() );
+
+            criteria.from( Url.class );
+            criteria.where( instanceCriteria );
+
+            List<Url> existingUrls = em.createQuery( criteria ).getResultList();
+
+            sp.addState( "ParsingData", "Parsing and validating data from '" + excelFileName + "'..." );
+            List<BlpModel> blpModels = readData( excelFileInputStream, excelFileName );
+
+            for (int i = 0; i < existingUrls.size(); i++) {
+                Url url = existingUrls.get( i );
+                sp.addState( "DeleteExisting", "Deleting existing urls [" + (i + 1) + "/" + existingUrls.size() + "]" );
+                em.remove( url );
+            }
+
+            int cntRecords = 0;
+
+            // initialize with ignored records
+            for (String key : status.keySet()) {
+                for (StatusEntry entry : status.get( key )) {
+                    if (entry.type.equals( "IGNORED" )) {
+                        cntRecords++;
+                    }
+                }
+            }
+
+            int cntIgnoredRecords = 0;
+            int cntUrls = 0;
+            int cntMarker = 0;
+
+            sp.addState( "AddEntries", "Adding entries" );
+            for (int i = 0; i < blpModels.size(); i++) {
+                BlpModel bm = blpModels.get( i );
+
+                cntRecords++;
+
+                // for display in map we need ONE marker per blp dataset
+                // therefore the map marker data is pushed to index only for one
+                // of the URLs
+                boolean pushMarkerDataToIndex = true;
+
+                System.out.println( "Add entry '" + bm.name + "'." );
+                sp.addState( "AddEntries", "Adding entries [" + (i + 1) + "/" + blpModels.size() + "]" );
+                if (bm.urlInProgress != null && bm.urlInProgress.length() > 0) {
+
+                    // add BLP meta data
+                    Url url = null;
+                    try {
+                        // do add the marker meta data only to the longer url of FINISHED or IN_PROGRESS
+                        // since the crawler will generate 2 marker (The metadata of url A will be applied to
+                        // all urls by the crawler that match the url A.).
+                        //
+                        // Also check if the URL has already marker data. Do not add marker data if the
+                        // url has already been used.
+                        if (isFinishedUrlLongerThanInProgressUrl( bm ) || markerUrls.contains( bm.urlInProgress ) || hasInvalidMarkerUrlIntersection( bm.urlInProgress )) {
+                            pushMarkerDataToIndex = false;
+                        }
+
+                        url = createUrl( instance.getName(), partner, bm.urlInProgress, bm, pushMarkerDataToIndex );
+
+                        // make sure that the next url will be marked as a map marker
+                        // in case the other url starts with this url
+                        // see comment above for an explanation
+                        if (!pushMarkerDataToIndex) {
+                            pushMarkerDataToIndex = true;
+                        } else {
+                            markerUrls.add( bm.urlInProgress );
+                            pushMarkerDataToIndex = false;
+                            cntMarker++;
+                        }
+
+                        em.persist( url );
+                        cntUrls++;
+                    } catch (Exception e) {
+                        // ignore record
+                    }
+                }
+                if (bm.urlFinished != null && bm.urlFinished.length() > 0 && !bm.urlFinished.equals( bm.urlInProgress )) {
+
+                    if (pushMarkerDataToIndex && hasInvalidMarkerUrlIntersection( bm.urlFinished )) {
+                        addLog( bm.name, "Invalid marker url intersection: " + bm.urlFinished, "IGNORED" );
+                        // do not import this marker URL
+                        continue;
+                    }
+                    // add BLP meta data, if not already set, since we only need
+                    // the meta data once.
+                    Url url = null;
+                    try {
+                        url = createUrl( instance.getWorkingDirectory(), partner, bm.urlFinished, bm, pushMarkerDataToIndex );
+                        em.persist( url );
+                        cntUrls++;
+                        if (pushMarkerDataToIndex) {
+                            markerUrls.add( bm.urlFinished );
+                            cntMarker++;
+                        }
+                    } catch (Exception e) {
+                        // ignore record
+                    }
+                }
+            }
+            System.out.println( "\n\nIgnored Entries by name:\n" );
+
+            for (String k : status.keySet()) {
+
+                if (status.get( k ).stream().filter( entry -> entry.type.equals( "IGNORED" ) ).count() > 0) {
+                    cntIgnoredRecords++;
+                    System.out.println( k );
+                    for (StatusEntry entry : status.get( k )) {
+                        System.out.println( "  " + entry.message );
+                    }
+                }
+            }
+            System.out.println( "\nFinish. Records: " + cntRecords + ", Ignored records or Urls: " + cntIgnoredRecords + ", Urls added: " + cntUrls + " urls to instance '" + instance.getName() + "', mark "
+                    + cntMarker + " records as marker to be displayed on map." );
+            sp.addState( "FinishedImport", "\nFinished importing. Records: " + cntRecords + ", Ignored records or Urls: " + cntIgnoredRecords + ", Urls added: " + cntUrls + " urls to instance '" + instance.getName() + "', mark "
+                    + cntMarker + " records as marker to be displayed on map." );
+
+            tx.commit();
+        } catch (Exception e) {
+            System.out.println( "Error: '" + e.getMessage() + "'." );
+            if (tx != null && tx.isActive())
+                tx.rollback();
+            throw e; // or display error message
+        } finally {
+            em.close();
+        }
+
+    }
 
     public static void main(String[] args) throws Exception {
 
@@ -129,11 +324,9 @@ public class UVPDataImporter {
         Option instanceOption = OptionBuilder.withArgName( "instance name" ).hasArg().withDescription( "an existing instance name" ).create( "instance" );
         options.addOption( instanceOption );
         @SuppressWarnings("static-access")
-        Option excelfileOption = OptionBuilder
-                .withArgName( "excel file name" )
+        Option excelfileOption = OptionBuilder.withArgName( "excel file name" )
                 .hasArg()
-                .withDescription(
-                        "path to excel file with columns: NAME; LAT; LON; URL_VERFAHREN_OFFEN; URL_VERFAHREN_ABGESCHLOSSEN; MITGLIEDSGEMEINDEN (column names in first row)" )
+                .withDescription( "path to excel file with columns: NAME; LAT; LON; URL_VERFAHREN_OFFEN; URL_VERFAHREN_ABGESCHLOSSEN; MITGLIEDSGEMEINDEN (column names in first row)" )
                 .create( "excelfile" );
         options.addOption( excelfileOption );
         @SuppressWarnings("static-access")
@@ -240,7 +433,6 @@ public class UVPDataImporter {
             int cntIgnoredRecords = 0;
             int cntUrls = 0;
             int cntMarker = 0;
-            
 
             for (BlpModel bm : blpModels) {
 
@@ -253,22 +445,22 @@ public class UVPDataImporter {
 
                 System.out.println( "Add entry '" + bm.name + "'." );
                 if (bm.urlInProgress != null && bm.urlInProgress.length() > 0) {
-                    
+
                     // add BLP meta data
                     Url url = null;
                     try {
                         // do add the marker meta data only to the longer url of FINISHED or IN_PROGRESS
                         // since the crawler will generate 2 marker (The metadata of url A will be applied to
-                        // all urls by the crawler that match the url A.). 
+                        // all urls by the crawler that match the url A.).
                         //
-                        // Also check if the URL has already marker data. Do not add marker data if the 
+                        // Also check if the URL has already marker data. Do not add marker data if the
                         // url has already been used.
-                        if (isFinishedUrlLongerThanInProgressUrl(bm) || markerUrls.contains( bm.urlInProgress ) || hasInvalidMarkerUrlIntersection(bm.urlInProgress)) {
+                        if (isFinishedUrlLongerThanInProgressUrl( bm ) || markerUrls.contains( bm.urlInProgress ) || hasInvalidMarkerUrlIntersection( bm.urlInProgress )) {
                             pushMarkerDataToIndex = false;
                         }
 
                         url = createUrl( instance, partner, bm.urlInProgress, bm, pushMarkerDataToIndex );
-                        
+
                         // make sure that the next url will be marked as a map marker
                         // in case the other url starts with this url
                         // see comment above for an explanation
@@ -279,17 +471,16 @@ public class UVPDataImporter {
                             pushMarkerDataToIndex = false;
                             cntMarker++;
                         }
-                        
+
                         em.persist( url );
                         cntUrls++;
                     } catch (Exception e) {
                         // ignore record
                     }
                 }
-                if (bm.urlFinished != null && bm.urlFinished.length() > 0 && !bm.urlFinished.equals( bm.urlInProgress)) {
-                    
+                if (bm.urlFinished != null && bm.urlFinished.length() > 0 && !bm.urlFinished.equals( bm.urlInProgress )) {
 
-                    if (pushMarkerDataToIndex && hasInvalidMarkerUrlIntersection(bm.urlFinished)) {
+                    if (pushMarkerDataToIndex && hasInvalidMarkerUrlIntersection( bm.urlFinished )) {
                         addLog( bm.name, "Invalid marker url intersection: " + bm.urlFinished, "IGNORED" );
                         // do not import this marker URL
                         continue;
@@ -322,8 +513,8 @@ public class UVPDataImporter {
                     }
                 }
             }
-            System.out.println( "\nFinish. Records: " + cntRecords + ", Ignored records or Urls: " + cntIgnoredRecords + ", Urls added: " + cntUrls + " urls to instance '"
-                    + instance + "', mark " + cntMarker + " records as marker to be displayed on map." );
+            System.out.println( "\nFinish. Records: " + cntRecords + ", Ignored records or Urls: " + cntIgnoredRecords + ", Urls added: " + cntUrls + " urls to instance '" + instance + "', mark "
+                    + cntMarker + " records as marker to be displayed on map." );
 
             tx.commit();
         } catch (Exception e) {
@@ -336,23 +527,20 @@ public class UVPDataImporter {
         }
 
     }
-    
+
     private static boolean hasInvalidMarkerUrlIntersection(String url) {
         long entriesContainedInUrl = markerUrls.stream().filter( entry -> url.startsWith( entry ) ).count();
         if (entriesContainedInUrl > 0) {
-            System.out.println("One of the marker urls is contained in " + url + ".");
+            System.out.println( "One of the marker urls is contained in " + url + "." );
         }
-        
+
         long entriesContainingUrl = markerUrls.stream().filter( entry -> entry.contains( url ) ).count();
         if (entriesContainingUrl > 0) {
-            System.out.println("The url is contained in at least one marker url " + url + ".");
+            System.out.println( "The url is contained in at least one marker url " + url + "." );
         }
-        
+
         return (entriesContainedInUrl > 0 || entriesContainingUrl > 0);
     }
-    
-    
-    
 
     /**
      * Get Limit URL from URL.
@@ -407,7 +595,7 @@ public class UVPDataImporter {
         return result;
 
     }
-    
+
     /**
      * Scan Excel file and gather all infos. Requires a specific excel table
      * layout
@@ -468,28 +656,28 @@ public class UVPDataImporter {
                             Cell cell = ci.next();
                             int columnIndex = cell.getColumnIndex();
 
-                                if (columnIndex < columnNames.size()) {
-                                    switch (columnNames.get( columnIndex )) {
-                                    case "NAME":
-                                        bm.name = cell.getStringCellValue();
-                                        break;
-                                    case "LAT":
-                                        bm.lat = cell.getNumericCellValue();
-                                        break;
-                                    case "LON":
-                                        bm.lon = cell.getNumericCellValue();
-                                        break;
-                                    case "URL_VERFAHREN_OFFEN":
-                                        bm.urlInProgress = cell.getStringCellValue();
-                                        break;
-                                    case "URL_VERFAHREN_ABGESCHLOSSEN":
-                                        bm.urlFinished = cell.getStringCellValue();
-                                        break;
-                                    case "MITGLIEDSGEMEINDEN":
-                                        bm.descr = cell.getStringCellValue();
-                                        break;
-                                    }
+                            if (columnIndex < columnNames.size()) {
+                                switch (columnNames.get( columnIndex )) {
+                                case "NAME":
+                                    bm.name = cell.getStringCellValue();
+                                    break;
+                                case "LAT":
+                                    bm.lat = cell.getNumericCellValue();
+                                    break;
+                                case "LON":
+                                    bm.lon = cell.getNumericCellValue();
+                                    break;
+                                case "URL_VERFAHREN_OFFEN":
+                                    bm.urlInProgress = cell.getStringCellValue();
+                                    break;
+                                case "URL_VERFAHREN_ABGESCHLOSSEN":
+                                    bm.urlFinished = cell.getStringCellValue();
+                                    break;
+                                case "MITGLIEDSGEMEINDEN":
+                                    bm.descr = cell.getStringCellValue();
+                                    break;
                                 }
+                            }
                         }
 
                         System.out.print( "." );
@@ -680,7 +868,7 @@ public class UVPDataImporter {
 
         return isValid;
     }
-    
+
     /**
      * Checks if the FINISH url is longer than the IN_PROGRESS url. Ignores the protocol.
      * 
@@ -692,13 +880,13 @@ public class UVPDataImporter {
         if (bm.urlFinished == null || bm.urlFinished.trim().length() == 0 || bm.urlInProgress == null || bm.urlInProgress.trim().length() == 0) {
             return false;
         }
-        
+
         URL urlFinished = new URL( bm.urlFinished );
         String finished = bm.urlFinished.substring( bm.urlFinished.indexOf( urlFinished.getProtocol() ) + urlFinished.getProtocol().length(), bm.urlFinished.length() );
         URL urlInProgress = new URL( bm.urlInProgress );
         String inProgress = bm.urlInProgress.substring( bm.urlInProgress.indexOf( urlInProgress.getProtocol() ) + urlInProgress.getProtocol().length(), bm.urlInProgress.length() );
-        
-        if (!finished.equals( inProgress) && finished.startsWith( inProgress )) {
+
+        if (!finished.equals( inProgress ) && finished.startsWith( inProgress )) {
             return true;
         } else {
             return false;
@@ -865,6 +1053,49 @@ public class UVPDataImporter {
             return "[name: " + name + "; lat:" + lat + "; lon:" + lon + "; urlInProgress:" + urlInProgress + "; urlFinished:" + urlFinished + "; descr:" + descr + "]";
         }
 
+    }
+
+    public StatusProviderService getStatusProviderService() {
+        return sps;
+    }
+
+    @Autowired
+    public void setStatusProviderService(StatusProviderService statusProviderService) {
+        UVPDataImporter.sps = statusProviderService;
+    }
+
+    public String getPartner() {
+        return partner;
+    }
+
+    public void setPartner(String partner) {
+        this.partner = partner;
+    }
+
+    public Instance getInstance() {
+        return instance;
+    }
+
+    public void setInstance(Instance instance) {
+        this.instance = instance;
+        this.logdir = instance.getWorkingDirectory();
+        this.statusFilename = "import_status.xml";
+    }
+
+    public String getExcelFileName() {
+        return excelFileName;
+    }
+
+    public void setExcelFileName(String excelFileName) {
+        this.excelFileName = excelFileName;
+    }
+
+    public InputStream getExcelFileInputStream() {
+        return excelFileInputStream;
+    }
+
+    public void setExcelFileInputStream(InputStream excelFileInputStream) {
+        this.excelFileInputStream = excelFileInputStream;
     }
 
 }
