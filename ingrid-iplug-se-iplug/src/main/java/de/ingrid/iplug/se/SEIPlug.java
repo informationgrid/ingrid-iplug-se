@@ -47,6 +47,7 @@ import org.apache.log4j.Logger;
 import org.flywaydb.core.Flyway;
 import org.h2.tools.Recover;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 import com.tngtech.configbuilder.ConfigBuilder;
@@ -79,6 +80,8 @@ import de.ingrid.utils.tool.QueryUtil;
  * 
  * @author joachim@wemove.com
  */
+@org.springframework.context.annotation.Configuration
+@PropertySource(value = {"classpath:config.properties", "classpath:config.override.properties"})
 @Service
 public class SEIPlug extends HeartBeatPlug {
 
