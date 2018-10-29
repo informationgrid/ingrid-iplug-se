@@ -80,8 +80,10 @@ public class InstanceTest {
         // assertThat( JettyStarter.getInstance().config.indexSearchInTypes.size(), is( 0 ) );
         IndexInfo indexInfo = new IndexInfo();
         indexInfo.setToIndex("test_1");
+        indexInfo.setToType("web");
         IndexInfo indexInfo2 = new IndexInfo();
         indexInfo2.setToIndex("test_catalog");
+        indexInfo2.setToType("default");
 
         Utils.elasticConfig.activeIndices = new IndexInfo[] { indexInfo, indexInfo2 };
         IngridQuery q = Utils.getIngridQuery( "" );
