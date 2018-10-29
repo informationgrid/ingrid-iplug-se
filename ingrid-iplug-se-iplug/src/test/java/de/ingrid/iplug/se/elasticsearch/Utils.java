@@ -69,6 +69,7 @@ public class Utils {
         elasticConfig.remoteHosts = new String[] { elasticProperties.get("network.host") + ":9300"};
         IndexInfo indexInfo = new IndexInfo();
         indexInfo.setToIndex("test_1");
+        indexInfo.setToType("web");
         indexInfo.setToAlias("ingrid_test");
         elasticConfig.activeIndices = new IndexInfo[1];
         elasticConfig.activeIndices[0] = indexInfo;
@@ -100,7 +101,7 @@ public class Utils {
             // check for elastic search settings in classpath, which works
             // during development
             // and production
-            Resource resource = new ClassPathResource("/src/develop/resources/elasticsearch.properties");
+            Resource resource = new ClassPathResource("/elasticsearch.properties");
             if (resource.exists()) {
                 p.load(resource.getInputStream());
             }
