@@ -22,25 +22,23 @@
  */
 package de.ingrid.iplug.se.elasticsearch.converter;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import de.ingrid.admin.JettyStarter;
 import de.ingrid.elasticsearch.ElasticConfig;
 import de.ingrid.elasticsearch.IndexInfo;
 import de.ingrid.elasticsearch.search.IQueryParsers;
 import de.ingrid.elasticsearch.search.converter.DefaultFieldsQueryConverter;
 import de.ingrid.elasticsearch.search.converter.MatchAllQueryConverter;
 import de.ingrid.elasticsearch.search.converter.QueryConverter;
+import de.ingrid.iplug.se.elasticsearch.Utils;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.ingrid.admin.JettyStarter;
-import de.ingrid.iplug.se.elasticsearch.Utils;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertThat;
 
 public class QueryConverterTest {
 
@@ -55,7 +53,6 @@ public class QueryConverterTest {
 
         ElasticConfig elasticConfig = new ElasticConfig();
         elasticConfig.isEnabled = true;
-        elasticConfig.isRemote = true;
         elasticConfig.indexSearchDefaultFields = new String[]{"title", "content"};
         elasticConfig.additionalSearchDetailFields = new String[0];
         elasticConfig.remoteHosts = new String[] {"localhost:9300"};
@@ -116,8 +113,6 @@ public class QueryConverterTest {
 
     /**
      * Remove all new lines and spaces for easier matching.
-     * @param result
-     * @return
      */
     private String strip(String result) {
         return result.replaceAll( "[\r|\n| ]", "" );
