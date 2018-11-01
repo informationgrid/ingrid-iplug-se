@@ -195,7 +195,12 @@ public class UVPDataImporter extends Thread {
             List<Url> existingUrls = em.createQuery( criteria ).getResultList();
 
             sp.addState( "ParsingData", "Parsing and validating data from '" + excelFileName + "'..." );
-            List<BlpModel> blpModels = readData( excelFileInputStream, excelFileName );
+            List<BlpModel> blpModels;
+            if (excelFileInputStream != null) {
+                blpModels = readData( excelFileInputStream, excelFileName );
+            }else {
+                blpModels = readData( excelFileName );
+            }
 
             for (int i = 0; i < existingUrls.size(); i++) {
                 Url url = existingUrls.get( i );
@@ -319,8 +324,11 @@ public class UVPDataImporter extends Thread {
 
     }
 
-    public void main(String[] args) throws Exception {
-        
+    public static void main(String[] args) throws Exception {
+        UVPDataImporter uvpDataImporter = new UVPDataImporter();
+        StatusProviderService sps = new StatusProviderService();
+        uvpDataImporter.setStatusProviderService( sps );
+
         CommandLineParser parser = new BasicParser();
         Options options = new Options();
         @SuppressWarnings("static-access")
@@ -338,32 +346,30 @@ public class UVPDataImporter extends Thread {
 
         CommandLine cmd = parser.parse( options, args );
 
-        String instance = null;
+        String instanceName = null;
         if (cmd.hasOption( "instance" )) {
-            instance = cmd.getOptionValue( "instance" );
+            instanceName = cmd.getOptionValue( "instance" );
         } else {
-            System.out.println( "Missing patameter 'instance'." );
+            System.out.println( "Missing parameter 'instance'." );
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp( "UVPDataImporter", options );
 
             System.exit( 0 );
         }
 
-        String excelfile = null;
         if (cmd.hasOption( "excelfile" )) {
-            excelfile = cmd.getOptionValue( "excelfile" );
+            uvpDataImporter.excelFileName = cmd.getOptionValue( "excelfile" );
         } else {
-            System.out.println( "Missing patameter 'excelfile'." );
+            System.out.println( "Missing parameter 'excelfile'." );
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp( "UVPDataImporter", options );
             System.exit( 0 );
         }
 
-        String partner = null;
         if (cmd.hasOption( "partner" )) {
-            partner = cmd.getOptionValue( "partner" );
+            uvpDataImporter.partner = cmd.getOptionValue( "partner" );
         } else {
-            System.out.println( "Missing patameter 'partner'." );
+            System.out.println( "Missing parameter 'partner'." );
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp( "UVPDataImporter", options );
             System.exit( 0 );
@@ -371,11 +377,16 @@ public class UVPDataImporter extends Thread {
 
         conf = new ConfigBuilder<Configuration>( Configuration.class ).build();
 
-        instance = instance.replaceAll( "[:\\\\/*?|<>\\W]", "_" );
-        Path instancePath = Paths.get( conf.getInstancesDir() + "/" + instance );
+        instanceName = instanceName.replaceAll( "[:\\\\/*?|<>\\W]", "_" );
+        Path instancePath = Paths.get( conf.getInstancesDir() + "/" + instanceName );
+
+        Instance instance = new Instance();
+        instance.setName( instanceName );
+        instance.setWorkingDirectory( instancePath.toString() );
+        uvpDataImporter.setInstance( instance );
 
         if (!Files.exists( instancePath )) {
-            System.out.println( "Instance '" + instance + "' does not exist. Please create and configure instance for use for UVP BLP data." );
+            System.out.println( "Instance '" + instancePath + "' does not exist. Please create and configure instance for use for UVP BLP data." );
             System.exit( 0 );
         }
 
@@ -390,145 +401,7 @@ public class UVPDataImporter extends Thread {
 
         DBManager.INSTANCE.intialize( emf );
 
-        em = null;
-        try {
-            em = DBManager.INSTANCE.getEntityManager();
-        } catch (PersistenceException e) {
-            log.error( "Database seems to be corrupt." );
-            System.exit( -1 );
-        }
-
-        EntityTransaction tx = null;
-        try {
-            tx = em.getTransaction();
-            tx.begin();
-
-            // remove existing URLs
-            CriteriaBuilder cb = em.getCriteriaBuilder();
-            CriteriaQuery<Url> criteria = cb.createQuery( Url.class );
-            Root<Url> urlTable = criteria.from( Url.class );
-            Predicate instanceCriteria = cb.equal( urlTable.get( "instance" ), instance );
-
-            criteria.from( Url.class );
-            criteria.where( instanceCriteria );
-
-            List<Url> existingUrls = em.createQuery( criteria ).getResultList();
-
-            System.out.println( "Parsing and validating data from '" + excelfile + "'..." );
-            List<BlpModel> blpModels = readData( excelfile );
-            System.out.println( "" );
-
-            for (Url url : existingUrls) {
-                em.remove( url );
-            }
-
-            int cntRecords = 0;
-
-            // initialize with ignored records
-            for (String key : status.keySet()) {
-                for (StatusEntry entry : status.get( key )) {
-                    if (entry.type.equals( "IGNORED" )) {
-                        cntRecords++;
-                    }
-                }
-            }
-
-            int cntIgnoredRecords = 0;
-            int cntUrls = 0;
-            int cntMarker = 0;
-
-            for (BlpModel bm : blpModels) {
-
-                cntRecords++;
-
-                // for display in map we need ONE marker per blp dataset
-                // therefore the map marker data is pushed to index only for one
-                // of the URLs
-                boolean pushMarkerDataToIndex = true;
-
-                System.out.println( "Add entry '" + bm.name + "'." );
-                if (bm.urlInProgress != null && bm.urlInProgress.length() > 0) {
-
-                    // add BLP meta data
-                    Url url = null;
-                    try {
-                        // do add the marker meta data only to the longer url of FINISHED or IN_PROGRESS
-                        // since the crawler will generate 2 marker (The metadata of url A will be applied to
-                        // all urls by the crawler that match the url A.).
-                        //
-                        // Also check if the URL has already marker data. Do not add marker data if the
-                        // url has already been used.
-                        if (isFinishedUrlLongerThanInProgressUrl( bm ) || markerUrls.contains( bm.urlInProgress ) || hasInvalidMarkerUrlIntersection( bm.urlInProgress )) {
-                            pushMarkerDataToIndex = false;
-                        }
-
-                        url = createUrl( instance, partner, bm.urlInProgress, bm, pushMarkerDataToIndex );
-
-                        // make sure that the next url will be marked as a map marker
-                        // in case the other url starts with this url
-                        // see comment above for an explanation
-                        if (!pushMarkerDataToIndex) {
-                            pushMarkerDataToIndex = true;
-                        } else {
-                            markerUrls.add( bm.urlInProgress );
-                            pushMarkerDataToIndex = false;
-                            cntMarker++;
-                        }
-
-                        em.persist( url );
-                        cntUrls++;
-                    } catch (Exception e) {
-                        // ignore record
-                    }
-                }
-                if (bm.urlFinished != null && bm.urlFinished.length() > 0 && !bm.urlFinished.equals( bm.urlInProgress )) {
-
-                    if (pushMarkerDataToIndex && hasInvalidMarkerUrlIntersection( bm.urlFinished )) {
-                        addLog( bm.name, "Invalid marker url intersection: " + bm.urlFinished, "IGNORED" );
-                        // do not import this marker URL
-                        continue;
-                    }
-                    // add BLP meta data, if not already set, since we only need
-                    // the meta data once.
-                    Url url = null;
-                    try {
-                        url = createUrl( instance, partner, bm.urlFinished, bm, pushMarkerDataToIndex );
-                        em.persist( url );
-                        cntUrls++;
-                        if (pushMarkerDataToIndex) {
-                            markerUrls.add( bm.urlFinished );
-                            cntMarker++;
-                        }
-                    } catch (Exception e) {
-                        // ignore record
-                    }
-                }
-            }
-            System.out.println( "\n\nIgnored Entries by name:\n" );
-
-            for (String k : status.keySet()) {
-
-                if (status.get( k ).stream().filter( entry -> entry.type.equals( "IGNORED" ) ).count() > 0) {
-                    cntIgnoredRecords++;
-                    System.out.println( k );
-                    for (StatusEntry entry : status.get( k )) {
-                        System.out.println( "  " + entry.message );
-                    }
-                }
-            }
-            System.out.println( "\nFinish. Records: " + cntRecords + ", Ignored records or Urls: " + cntIgnoredRecords + ", Urls added: " + cntUrls + " urls to instance '" + instance + "', mark "
-                    + cntMarker + " records as marker to be displayed on map." );
-
-            tx.commit();
-        } catch (Exception e) {
-            System.out.println( "Error: '" + e.getMessage() + "'." );
-            if (tx != null && tx.isActive())
-                tx.rollback();
-            throw e; // or display error message
-        } finally {
-            em.close();
-        }
-
+        uvpDataImporter.startImport();
     }
 
     private static boolean hasInvalidMarkerUrlIntersection(String url) {
