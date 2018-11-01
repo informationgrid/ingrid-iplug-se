@@ -43,7 +43,7 @@
 
     <script type="text/javascript">
       $(document).ready(function () {
-        //$("#statusContainer").hide();
+        $("#statusContent").hide();
         checkState();
       });
 
@@ -52,24 +52,22 @@
               type: "GET",
               contentType: 'application/json',
               success: function(data) {
-            	  console.log(data);
                   if (data == "") {
-                      $("#crawlInfo").html( "Es läuft zur Zeit kein Crawl." );
+                      $("#importInfo").html( "Es läuft zur Zeit kein Import." );
                       setTimeout( checkState, 60000 );
                       return;
                   } else if (data.some(function(item) { return item.key === "FINISHED" || item.key === "ERROR" || item.key === "ABORT" })) {
-                      $("#crawlInfo").html( "Es läuft zur Zeit kein Crawl. (<a href='#' onclick='$(\"#allInfo\").toggle()'>Information zum letzten Crawl) " );
+                      var lastTime = formatTime(data[data.length-1].time);
+                      $("#importInfo").html( "Es läuft zur Zeit kein Import.</br>Letzter Import: "+ lastTime +"  (<a href='#' onclick='$(\"#statusContent\").toggle()'>Informationen) " );
                       setLog( data );
-                      // show link to request hadoop.log content
-                      $("#moreInfo").show();
-                      $("#crawlStop").hide();
-                      $("#crawlStart").show();
                       // repeat execution every 60s until finished
                       setTimeout( checkState, 60000 );
                       return;
                   }
-
                   setLog( data );
+                  $("#statusContent").show();
+                  $("#importInfo").hide();
+
 
                   // repeat execution every 5s until finished
                   setTimeout( checkState, 5000 );
@@ -80,28 +78,29 @@
                   console.error( error, jqXHR );
               }
           });
+      }
 
-          function setLog(data) {
-              var formatTime = function(ts) {
-                  var date = new Date(ts);
-                  var d = date.getDate();
-                  var m = date.getMonth() + 1;
-                  var y = date.getFullYear();
-                  var time = date.toTimeString().substring(0, 8);
-                  return '' + y + '-' + (m<=9 ? '0' + m : m) + '-' + (d <= 9 ? '0' + d : d) + ' ' + time;
-              };
+      var formatTime = function(ts) {
+        var date = new Date(ts);
+        var d = date.getDate();
+        var m = date.getMonth() + 1;
+        var y = date.getFullYear();
+        var time = date.toTimeString().substring(0, 8);
+        return '' + y + '-' + (m<=9 ? '0' + m : m) + '-' + (d <= 9 ? '0' + d : d) + ' ' + time;
+      };
 
-              // fill div with data from content
-              var content = "";
-              for (var i=0; i < data.length; i++) {
-                  var row = data[i];
-                  if (row.value) {
-                      content += "<div class='" + row.classification.toLowerCase() + "'>" + formatTime(row.time) + " - [" + row.classification + "] " + row.value + "</div>";
-                  }
-              }
+      function setLog(data) {
 
-              $("#statusContent").html( content );
+        // fill div with data from content
+        var content = "";
+        for (var i=0; i < data.length; i++) {
+          var row = data[i];
+          if (row.value) {
+            content += "<div class='" + row.classification.toLowerCase() + "'>" + formatTime(row.time) + " - [" + row.classification + "] " + row.value + "</div>";
           }
+        }
+
+        $("#statusContent").html( content );
       }
     </script>
 

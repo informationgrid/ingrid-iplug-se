@@ -24,9 +24,7 @@
     <%@ page contentType="text/html; charset=UTF-8" %>
 
       <fieldset>
-        <legend>
-          <fmt:message key="scheduling.crawlParams"/>
-        </legend>
+        <legend>Import Parameter</legend>
         <div id="content">
           <form:form action="../iplug-pages/instanceBlpImport.html" enctype="multipart/form-data" modelAttribute="blpImportBean">
 
@@ -72,6 +70,7 @@
       </div>
       <fieldset id="statusContainer">
         <legend>Status</legend>
+        <div id="importInfo" class="space"></div>
         <div id="statusContent">
           <p>Kein Import gestartet</p>
         </div>

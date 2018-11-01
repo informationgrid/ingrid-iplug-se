@@ -134,6 +134,7 @@ public class UVPDataImporter extends Thread {
     private Instance instance;
     private String excelFileName;
     private InputStream excelFileInputStream;
+    StatusProvider sp;
 
     @Override
     public void run() {
@@ -146,7 +147,7 @@ public class UVPDataImporter extends Thread {
     }
 
     public void startImport() throws Exception {
-        StatusProvider sp = sps.getStatusProvider( logdir, statusFilename );
+        sp = sps.getStatusProvider( logdir, statusFilename );
         sp.clear();
 
         String partner = this.partner;
@@ -299,14 +300,16 @@ public class UVPDataImporter extends Thread {
                     }
                 }
             }
-            System.out.println( "\nFinish. Records: " + cntRecords + ", Ignored records or Urls: " + cntIgnoredRecords + ", Urls added: " + cntUrls + " urls to instance '" + instance.getName() + "', mark "
-                    + cntMarker + " records as marker to be displayed on map." );
-            sp.addState( "FinishedImport", "\nFinished importing. Records: " + cntRecords + ", Ignored records or Urls: " + cntIgnoredRecords + ", Urls added: " + cntUrls + " urls to instance '" + instance.getName() + "', mark "
-                    + cntMarker + " records as marker to be displayed on map." );
+            System.out.println( "\nFinish. Records: " + cntRecords + ", Ignored records or Urls: " + cntIgnoredRecords + ", Urls added: " + cntUrls + " urls to instance '" + instance.getName()
+                    + "', mark " + cntMarker + " records as marker to be displayed on map." );
+            sp.addState( "FINISHED", "\nFinished importing. Records: " + cntRecords + ", Ignored records or Urls: " + cntIgnoredRecords + ", Urls added: " + cntUrls + " urls to instance '"
+                    + instance.getName() + "', mark " + cntMarker + " records as marker to be displayed on map." );
 
             tx.commit();
         } catch (Exception e) {
             System.out.println( "Error: '" + e.getMessage() + "'." );
+            if (sp != null)
+                sp.addState( "ERROR", "Error: '" + e.getMessage() + "'.", Classification.ERROR );
             if (tx != null && tx.isActive())
                 tx.rollback();
             throw e; // or display error message
@@ -316,8 +319,8 @@ public class UVPDataImporter extends Thread {
 
     }
 
-    public static void main(String[] args) throws Exception {
-
+    public void main(String[] args) throws Exception {
+        
         CommandLineParser parser = new BasicParser();
         Options options = new Options();
         @SuppressWarnings("static-access")
@@ -604,7 +607,7 @@ public class UVPDataImporter extends Thread {
      * @return
      * @throws IOException
      */
-    public static List<BlpModel> readData(String excelFile) throws IOException {
+    public List<BlpModel> readData(String excelFile) throws IOException {
         FileInputStream inputStream = new FileInputStream( new File( excelFile ) );
         return readData( inputStream, excelFile );
     }
@@ -617,7 +620,7 @@ public class UVPDataImporter extends Thread {
      * @return
      * @throws IOException
      */
-    public static List<BlpModel> readData(InputStream inputStream, String excelFileName) throws IOException {
+    public List<BlpModel> readData(InputStream inputStream, String excelFileName) throws IOException {
         List<BlpModel> blpModels = new ArrayList<BlpModel>();
         Workbook workbook = null;
 
@@ -628,7 +631,7 @@ public class UVPDataImporter extends Thread {
             } else if (excelFileName.endsWith( "xls" )) {
                 workbook = new HSSFWorkbook( inputStream );
             } else {
-                throw new IllegalArgumentException( "The specified file is not Excel file" );
+                throw new IllegalArgumentException( "The specified file is not an Excel file" );
             }
             Sheet sheet = workbook.getSheetAt( 0 );
             Iterator<Row> it = sheet.iterator();
@@ -718,7 +721,7 @@ public class UVPDataImporter extends Thread {
      * @return
      * @throws Exception
      */
-    public static Url createUrl(String instance, String partner, String urlStr, BlpModel bm, boolean pushBlpDataToIndex) throws Exception {
+    public Url createUrl(String instance, String partner, String urlStr, BlpModel bm, boolean pushBlpDataToIndex) throws Exception {
         Url idxUrl = new Url( instance );
 
         idxUrl.setStatus( "200" );
@@ -821,7 +824,7 @@ public class UVPDataImporter extends Thread {
      * @param bm
      * @return True if BLP model is valid. False if not.
      */
-    private static boolean validate(BlpModel bm) {
+    private boolean validate(BlpModel bm) {
         boolean isValid = true;
 
         if (bm.name == null || bm.name.length() <= 3) {
@@ -893,7 +896,7 @@ public class UVPDataImporter extends Thread {
         }
     }
 
-    public static String getActualUrl(String url, BlpModel bm) throws Exception {
+    public String getActualUrl(String url, BlpModel bm) throws Exception {
 
         int termination = 10;
         while (termination-- > 0) {
@@ -934,7 +937,7 @@ public class UVPDataImporter extends Thread {
         }
     }
 
-    private static String getRedirect(String urlstring, BlpModel bm) throws Exception {
+    private String getRedirect(String urlstring, BlpModel bm) throws Exception {
         HttpURLConnection con = null;
 
         int responseCode = -1;
@@ -1019,11 +1022,14 @@ public class UVPDataImporter extends Thread {
 
     }
 
-    private static void addLog(String key, String message, String type) {
+    private void addLog(String key, String message, String type) {
         if (!status.containsKey( key )) {
             status.put( key, new ArrayList<StatusEntry>() );
         }
         status.get( key ).add( new UVPDataImporter().new StatusEntry( message, type ) );
+        if (this.sp != null) {
+            sp.addState( key, key + ":  " + type + " " + message, StatusProvider.Classification.WARN );
+        }
 
     }
 

@@ -69,8 +69,9 @@ public class UVPDataImporterTest {
 
         ClassLoader classLoader = getClass().getClassLoader();
         File file = new File( classLoader.getResource( "blp-urls-test.xlsx" ).getFile() );
-
-        List<UVPDataImporter.BlpModel> l = UVPDataImporter.readData( file.getAbsolutePath() );
+        
+        UVPDataImporter uvpDataImporter = new UVPDataImporter();
+        List<UVPDataImporter.BlpModel> l = uvpDataImporter.readData( file.getAbsolutePath() );
         assertEquals( true, l.size() > 0 );
 
         for (UVPDataImporter.BlpModel m : l) {
@@ -83,7 +84,7 @@ public class UVPDataImporterTest {
             }
             try {
                 if (m.urlFinished != null) {
-                    UVPDataImporter.getActualUrl( m.urlFinished, m );
+                    uvpDataImporter.getActualUrl( m.urlFinished, m );
                 }
             } catch (Exception e) {
                 System.out.println( "\nInvalid actual URL extracted from: " + m.urlFinished + " in " + m.name  );
@@ -97,7 +98,7 @@ public class UVPDataImporterTest {
             }
             try {
                 if (m.urlInProgress != null) {
-                    UVPDataImporter.getActualUrl( m.urlInProgress, m );
+                    uvpDataImporter.getActualUrl( m.urlInProgress, m );
                 }
             } catch (Exception e) {
                 System.out.println( "\nInvalid actual URL extracted from: " + m.urlInProgress + " in " + m.name  );
@@ -152,12 +153,12 @@ public class UVPDataImporterTest {
 
     // @Test // activate as needed
     public void testGetActualUrl() throws Exception {
-
-        BlpModel bm = new UVPDataImporter().new BlpModel();
+        UVPDataImporter uvpDataImporter = new UVPDataImporter();
+        BlpModel bm = uvpDataImporter.new BlpModel();
         bm.name = "test";
 
         assertEquals( "http://www.merchweiler.de/p/dlhome.asp?artikel_id=&liste=491&tmpl_typ=Liste&lp=3691&area=100",
-                UVPDataImporter.getActualUrl( "http://www.merchweiler.de/", bm ) );
+                uvpDataImporter.getActualUrl( "http://www.merchweiler.de/", bm ) );
     }
 
 }
