@@ -31,6 +31,7 @@ import java.security.Principal;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import de.ingrid.admin.Config;
 import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
@@ -67,7 +68,7 @@ public class ListInstancesControllerTest extends Mockito {
     
     @Before
     public void initTest() throws Exception {
-        new JettyStarter( false );
+        JettyStarter.baseConfig = new Config();
         MockitoAnnotations.initMocks( this );
         PowerMockito.mockStatic( ElasticSearchUtils.class );
         // InternalNode node = new InternalNode();

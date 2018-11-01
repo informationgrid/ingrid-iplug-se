@@ -29,6 +29,7 @@ import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 
+import de.ingrid.admin.Config;
 import de.ingrid.elasticsearch.ElasticConfig;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -55,7 +56,7 @@ public class DateSearchTest  {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        new JettyStarter( false );
+        JettyStarter.baseConfig = new Config();
         JettyStarter.baseConfig.index = "test";
         JettyStarter.baseConfig.indexWithAutoId = true;
         JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<>();

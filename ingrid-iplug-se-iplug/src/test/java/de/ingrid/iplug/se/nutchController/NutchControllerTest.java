@@ -39,6 +39,7 @@ import javax.persistence.Persistence;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import de.ingrid.admin.Config;
 import de.ingrid.elasticsearch.IndexManager;
 import org.junit.After;
 import org.junit.Before;
@@ -61,7 +62,7 @@ public class NutchControllerTest {
     @Before
     public void beforeTest() throws Exception {
         FileUtils.removeRecursive(Paths.get("test-instances"));
-        new JettyStarter( false );
+        JettyStarter.baseConfig = new Config();
         JettyStarter.baseConfig.index = "se-test";
         JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<String>();
         JettyStarter.baseConfig.indexSearchInTypes.add( "test" );
