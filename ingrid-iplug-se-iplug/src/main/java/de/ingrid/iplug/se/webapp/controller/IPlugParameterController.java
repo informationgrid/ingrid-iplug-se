@@ -22,17 +22,13 @@
  */
 package de.ingrid.iplug.se.webapp.controller;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
-
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
 import de.ingrid.admin.controller.AbstractController;
-import de.ingrid.iplug.se.SEIPlug;
+import de.ingrid.iplug.se.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Control the database parameter page.
@@ -44,6 +40,9 @@ import de.ingrid.iplug.se.SEIPlug;
 @SessionAttributes("plugDescription")
 public class IPlugParameterController extends AbstractController {
 
+    @Autowired
+    private Configuration seConfig;
+
     @RequestMapping(value = { "/iplug-pages/welcome.html",
             "/iplug-pages/dbParams.html" }, method = RequestMethod.GET)
     public String getParameters(
@@ -51,9 +50,9 @@ public class IPlugParameterController extends AbstractController {
             @ModelAttribute("plugDescription") final PlugdescriptionCommandObject commandObject) {
 
         // write object into session
-        modelMap.put("dataBasePath", SEIPlug.conf.databaseDir);
-        modelMap.put("instancePath", SEIPlug.conf.getInstancesDir());
-        //modelMap.put("elasticSearchPort", SEIPlug.conf.esHttpPort);
+        modelMap.put("dataBasePath", seConfig.databaseDir);
+        modelMap.put("instancePath", seConfig.getInstancesDir());
+        //modelMap.put("elasticSearchPort", seConfig.esHttpPort);
         return AdminViews.DB_PARAMS;
     }
 
@@ -61,9 +60,9 @@ public class IPlugParameterController extends AbstractController {
     public String post(@RequestParam("dataBasePath") String dbPath, @RequestParam("instancePath") String instancePath,
             @ModelAttribute("plugDescription") final PlugdescriptionCommandObject pdCommandObject) {
 
-        SEIPlug.conf.databaseDir = dbPath;
-        SEIPlug.conf.setInstancesDir( instancePath );
-        //SEIPlug.conf.esHttpPort = elasticSearchPort;
+        seConfig.databaseDir = dbPath;
+        seConfig.setInstancesDir( instancePath );
+        //seConfig.esHttpPort = elasticSearchPort;
         
         pdCommandObject.setRankinTypes(true, false, false);
         

@@ -62,9 +62,9 @@ public class NutchControllerTest {
     public void beforeTest() throws Exception {
         FileUtils.removeRecursive(Paths.get("test-instances"));
         new JettyStarter( false );
-        JettyStarter.getInstance().config.index = "se-test";
-        JettyStarter.getInstance().config.indexSearchInTypes = new ArrayList<String>();
-        JettyStarter.getInstance().config.indexSearchInTypes.add( "test" );
+        JettyStarter.baseConfig.index = "se-test";
+        JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<String>();
+        JettyStarter.baseConfig.indexSearchInTypes.add( "test" );
         Utils.setupES();
     }
     

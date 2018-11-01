@@ -49,10 +49,8 @@
 			</list>
 		</property>
 		<property name="cacheSeconds" value="0" />
-		<property name="fallbackToSystemLocale" value="false"></property>
-		<property name="defaultEncoding">
-			<value>UTF-8</value>
-		</property>
+		<property name="fallbackToSystemLocale" value="false"/>
+		<property name="defaultEncoding" value="UTF-8"/>
 	</bean>
 
 	<!-- XML DEFINED BEANS WITH ACCORDING QUALIFIER TO BE AUTOWIRED VIA QUALIFIER ! -->

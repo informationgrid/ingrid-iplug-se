@@ -22,34 +22,27 @@
  */
 package de.ingrid.iplug.se.migrate;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-
-import org.apache.log4j.Logger;
-import org.flywaydb.core.Flyway;
-
-import com.tngtech.configbuilder.ConfigBuilder;
-
+import de.ingrid.admin.Config;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Metadata;
 import de.ingrid.iplug.se.db.model.Url;
 import de.ingrid.iplug.se.webapp.controller.ListInstancesController;
+import org.apache.log4j.Logger;
+import org.flywaydb.core.Flyway;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Migrator {
     private static Logger log = Logger.getLogger( Migrator.class.getName() );
@@ -62,8 +55,8 @@ public class Migrator {
     static Connection con = null;
     static Statement st = null;
 
-    private static MigratorConfig conf;
-    
+    private static MigratorConfig migratorConfig;
+
     private static Url convertBasicUrl( ResultSet rs ) throws SQLException, MalformedURLException {
         Url u = new Url();
         String urlStr = rs.getString( URL );
@@ -114,8 +107,8 @@ public class Migrator {
                 continue;
             } 
             
-            u.setInstance( conf.webInstance );
-            
+            u.setInstance( migratorConfig.webInstance );
+
             // LIMIT-Urls
             PreparedStatement stmt = con.prepareStatement( "SELECT * FROM url WHERE startUrl_fk=? AND type='LIMIT' AND deleted IS NULL" );
             stmt.setInt( 1, rs.getInt( ID ) );
@@ -210,7 +203,7 @@ public class Migrator {
                 continue;
             } 
             
-            u.setInstance( conf.catalogInstance );
+            u.setInstance( migratorConfig.catalogInstance );
             
             // get metadata
             PreparedStatement stmt = con.prepareStatement( "SELECT * FROM url_metadata um, metadata m WHERE um.metadatas__id=m.id AND um.url__id=?" );
@@ -258,32 +251,32 @@ public class Migrator {
         return catalogUrls;
     }
     
-    public static void main(String[] args) throws Exception {
-        
-//        if (args.length != 3) {
-//            System.out.println("Usage: Migrator.java <db-path> <username> <password>");
-//            System.exit( -1 );
-//        }
+    public static void main(String[] args) {
 
-        conf = new ConfigBuilder<MigratorConfig>(MigratorConfig.class).withCommandLineArgs(args).build();
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+        ctx.register(Config.class);
+        ctx.register(MigratorConfig.class);
+        ctx.refresh();
+        migratorConfig = ctx.getBean(MigratorConfig.class);
+
+        // check if arguments are correct and exit application if not
+        migratorConfig.validate();
         
         ResultSet rs = null;
 
-        //String url = "jdbc:mysql://localhost:3306/iplugse_ni";
-        
         List<Url> webUrls = null;
         List<Url> catalogUrls = null;
 
         try {
-            con = DriverManager.getConnection( conf.dbPath, conf.username, conf.password );
+            con = DriverManager.getConnection( migratorConfig.dbPath, migratorConfig.username, migratorConfig.password );
             st = con.createStatement();
             
             // get all start Urls
             log.info( "Fetch all web urls ..." );
-            if (conf.partner == null || conf.partner.isEmpty()) {
+            if (migratorConfig.partner == null || migratorConfig.partner.isEmpty()) {
                 rs = st.executeQuery( "SELECT * FROM url WHERE type='START' AND deleted IS NULL" );
             } else {
-                rs = st.executeQuery( "SELECT u.* FROM url u, provider pr, partner pa WHERE type='START' AND deleted IS NULL AND u.provider_fk=pr.ID AND pr.partner_fk=pa.ID AND pa.SHORTNAME='" + conf.partner + "'" );
+                rs = st.executeQuery( "SELECT u.* FROM url u, provider pr, partner pa WHERE type='START' AND deleted IS NULL AND u.provider_fk=pr.ID AND pr.partner_fk=pa.ID AND pa.SHORTNAME='" + migratorConfig.partner + "'" );
             }
             webUrls = convertToWebUrls( rs );
             rs.close();
@@ -291,23 +284,23 @@ public class Migrator {
             // get all catalog Urls
             st = con.createStatement();
             log.info( "Fetch all catalog urls ..." );
-            if (conf.partner == null || conf.partner.isEmpty()) {
+            if (migratorConfig.partner == null || migratorConfig.partner.isEmpty()) {
                 rs = st.executeQuery( "SELECT * FROM url WHERE type='CATALOG' AND deleted IS NULL" );
             } else {
-                rs = st.executeQuery( "SELECT u.* FROM url u, provider pr, partner pa WHERE type='CATALOG' AND deleted IS NULL AND u.provider_fk=pr.ID AND pr.partner_fk=pa.ID AND pa.SHORTNAME='" + conf.partner + "'" );
+                rs = st.executeQuery( "SELECT u.* FROM url u, provider pr, partner pa WHERE type='CATALOG' AND deleted IS NULL AND u.provider_fk=pr.ID AND pr.partner_fk=pa.ID AND pa.SHORTNAME='" + migratorConfig.partner + "'" );
             }
             catalogUrls = convertToCatalogUrls( rs );
             rs.close();
 
             // add urls to h2 database
             Map<String, String> properties = new HashMap<String, String>();
-            Path dbDir = Paths.get( conf.databaseDir );
+            Path dbDir = Paths.get( migratorConfig.databaseDir );
             properties.put("javax.persistence.jdbc.url", "jdbc:h2:" + dbDir.toFile().getAbsolutePath() + "/urls;MVCC=true");
             EntityManagerFactory emf = null;
-            if ( "iplug-se-dev".equals( conf.databaseID ) ) {
-                emf = Persistence.createEntityManagerFactory(conf.databaseID);
+            if ( "iplug-se-dev".equals( migratorConfig.databaseID ) ) {
+                emf = Persistence.createEntityManagerFactory(migratorConfig.databaseID);
             } else {
-                emf = Persistence.createEntityManagerFactory(conf.databaseID, properties);
+                emf = Persistence.createEntityManagerFactory(migratorConfig.databaseID, properties);
                 // do database migrations
                 Flyway flyway = new Flyway();
                 String dbUrl = "jdbc:h2:" + dbDir.toFile().getAbsolutePath() + "/urls;MVCC=true";
@@ -319,12 +312,12 @@ public class Migrator {
             
             log.info( "Create instance directories." );
             // create directory for web instance
-            boolean webInstanceDir = ListInstancesController.initializeInstanceDir( conf.getInstancesDir() + "/" + conf.webInstance );
+            boolean webInstanceDir = ListInstancesController.initializeInstanceDir( migratorConfig.getInstancesDir() + "/" + migratorConfig.webInstance );
             boolean catalogInstanceDir = false;
             
             // only create instance dir of catalog if it's a different directory
-            if (!conf.webInstance.equals( conf.catalogInstance )) {
-                catalogInstanceDir = ListInstancesController.initializeInstanceDir( conf.getInstancesDir() + "/" + conf.catalogInstance );
+            if (!migratorConfig.webInstance.equals( migratorConfig.catalogInstance )) {
+                catalogInstanceDir = ListInstancesController.initializeInstanceDir( migratorConfig.getInstancesDir() + "/" + migratorConfig.catalogInstance );
             }
             
             log.info( "Created web instance dir: " + webInstanceDir );

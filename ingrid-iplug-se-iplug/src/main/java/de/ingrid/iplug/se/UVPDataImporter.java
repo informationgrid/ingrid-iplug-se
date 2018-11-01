@@ -69,9 +69,9 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Service;
-
-import com.tngtech.configbuilder.ConfigBuilder;
 
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.Metadata;
@@ -112,13 +112,13 @@ public class UVPDataImporter {
      */
     private static Logger log = Logger.getLogger( UVPDataImporter.class );
 
-    public static Configuration conf;
-
     private static EntityManager em;
 
     private static Map<String, List<StatusEntry>> status = new LinkedHashMap<String, List<StatusEntry>>();
     
     private static List<String>  markerUrls = new ArrayList<String>();
+
+    private static Configuration seConfig;
 
     public static void main(String[] args) throws Exception {
 
@@ -172,10 +172,13 @@ public class UVPDataImporter {
             System.exit( 0 );
         }
 
-        conf = new ConfigBuilder<Configuration>( Configuration.class ).build();
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+        ctx.register(Configuration.class);
+        ctx.refresh();
+        seConfig = ctx.getBean(Configuration.class);
 
         instance = instance.replaceAll( "[:\\\\/*?|<>\\W]", "_" );
-        Path instancePath = Paths.get( conf.getInstancesDir() + "/" + instance );
+        Path instancePath = Paths.get( seConfig.getInstancesDir() + "/" + instance );
 
         if (!Files.exists( instancePath )) {
             System.out.println( "Instance '" + instance + "' does not exist. Please create and configure instance for use for UVP BLP data." );
@@ -184,12 +187,12 @@ public class UVPDataImporter {
 
         // set the directory of the database to the configured one
         Map<String, String> properties = new HashMap<String, String>();
-        Path dbDir = Paths.get( conf.databaseDir );
+        Path dbDir = Paths.get( seConfig.databaseDir );
         properties.put( "javax.persistence.jdbc.url", "jdbc:h2:" + dbDir.toFile().getAbsolutePath() + "/urls;MVCC=true;AUTO_SERVER=TRUE" );
 
         // get an entity manager instance (initializes properties in the
         // DBManager)
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory( conf.databaseID, properties );
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory( seConfig.databaseID, properties );
 
         DBManager.INSTANCE.intialize( emf );
 

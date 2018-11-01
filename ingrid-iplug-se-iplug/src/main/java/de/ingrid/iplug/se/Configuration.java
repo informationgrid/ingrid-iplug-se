@@ -22,114 +22,66 @@
  */
 package de.ingrid.iplug.se;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import de.ingrid.admin.IConfig;
+import de.ingrid.admin.IKeys;
+import de.ingrid.admin.command.PlugdescriptionCommandObject;
+import de.ingrid.utils.PlugDescription;
+import de.ingrid.utils.query.IngridQuery;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-
-import com.tngtech.configbuilder.annotation.configuration.Separator;
-import com.tngtech.configbuilder.annotation.propertyloaderconfiguration.PropertiesFiles;
-import com.tngtech.configbuilder.annotation.propertyloaderconfiguration.PropertyLocations;
-import com.tngtech.configbuilder.annotation.typetransformer.TypeTransformer;
-import com.tngtech.configbuilder.annotation.typetransformer.TypeTransformers;
-import com.tngtech.configbuilder.annotation.valueextractor.DefaultValue;
-import com.tngtech.configbuilder.annotation.valueextractor.PropertyValue;
-
-import de.ingrid.admin.IConfig;
-import de.ingrid.admin.IKeys;
-import de.ingrid.admin.JettyStarter;
-import de.ingrid.admin.command.PlugdescriptionCommandObject;
-import de.ingrid.utils.PlugDescription;
-import de.ingrid.utils.query.IngridQuery;
-
-@PropertiesFiles( {"config", "elasticsearch"} )
-@PropertyLocations(directories = {"conf"}, fromClassLoader = true)
+@org.springframework.context.annotation.Configuration
 public class Configuration implements IConfig {
-    
-    private static Logger log = Logger.getLogger(Configuration.class);
-    
-    
-    public class StringToMap extends TypeTransformer<String, Map<String, String>> {
-        
-        @Override
-        public Map<String, String> transform( String input ) {
-            Map<String, String> map = new HashMap<>();
-            if (!"".equals( input )) {
-                String[] entries = input.split( "," );
-                for (String entry : entries) {
-                    String[] split = entry.split( "->" );
-                    map.put( split[0], split[1] );
-                }
-            }
-            return map;
-        }
-    }
-    
-    
-	@Override
-	public void initialize() {
-	    // disable the default index menu of the base webapp
-	    // we still have to use the option "indexing=true" to enable elastic search 
-	    System.clearProperty( IKeys.INDEXING );
-	    
-	    // the results from this iPlug have to be grouped by its' domain and not by the iPlug ID
-	    // see at IndexImpl.java in base-webapp for implementation
-	    JettyStarter.getInstance().config.groupByUrl = true;
-	}
 
-	@PropertyValue("dir.instances")
-	@DefaultValue("instances")
+    private static Logger log = Logger.getLogger(Configuration.class);
+
+    @Override
+    public void initialize() {
+        // disable the default index menu of the base webapp
+        // we still have to use the option "indexing=true" to enable elastic search
+        System.clearProperty(IKeys.INDEXING);
+
+        // the results from this iPlug have to be grouped by its' domain and not by the iPlug ID
+        // see at IndexImpl.java in base-webapp for implementation
+        // TODO: baseConfig.groupByUrl = true;
+    }
+
+    @Value("${dir.instances:instances}")
     private String dirInstances;
 
-	@PropertyValue("db.id")
-    @DefaultValue("iplug-se")
+    @Value("${db.id:iplug-se}")
     public String databaseID;
-	
-	@PropertyValue("db.dir")
-	@DefaultValue("database")
-	public String databaseDir;
-	
-	@PropertyValue("transport.tcp.port")
-    @DefaultValue("9300")
+
+    @Value("${db.dir:database}")
+    public String databaseDir;
+
+    @Value("${transport.tcp.port:9300}")
     public String esTransportTcpPort;
-	
-    @PropertyValue("nutch.call.java.options")
-    @DefaultValue("-Dhadoop.log.file=hadoop.log -Dfile.encoding=UTF-8")
-    @Separator(" ")
+
+    @Value("#{'${nutch.call.java.options:-Dhadoop.log.file=hadoop.log -Dfile.encoding=UTF-8}'.split(' ')}")
     public List<String> nutchCallJavaOptions;
 
-    @PropertyValue("plugdescription.fields")
-    @DefaultValue("")
+    @Value("${plugdescription.fields:}")
     public List<String> fields;
-    
-    @PropertyValue("dependingFields")
-    @DefaultValue("")
+
+    @Value("${dependingFields:}")
     public List<String> dependingFields;
-    
-    @TypeTransformers(Configuration.StringToMap.class)
-    @PropertyValue("facetMapping")
-    @DefaultValue("air->measure:air,radiation->measure:radiation,water->measure:water,misc->measure:misc,press->service:press,publication->service:publication,event->service:event")
+
     public Map<String, String> facetMap;
-    
-    @TypeTransformers(Configuration.StringToMap.class)
-    @PropertyValue("queryFieldMapping")
-    @DefaultValue("topic:air->measure:air,topic:radiation->measure:radiation,topic:water->measure:water,topic:misc->measure:misc,topic:press->service:press,topic:publication->service:publication,topic:event->service:event")
+
     public Map<String, String> queryFieldMap;
-    
-	
-	@Override
-    public void addPlugdescriptionValues( PlugdescriptionCommandObject pdObject ) {
+
+
+    @Override
+    public void addPlugdescriptionValues(PlugdescriptionCommandObject pdObject) {
         log.info("Add iPlug specific properties into plugdescription.");
-	    
-	    pdObject.put( "iPlugClass", "de.ingrid.iplug.se.SEIPlug" );
+
+        pdObject.put("iPlugClass", "de.ingrid.iplug.se.SEIPlug");
 
         // make sure only partner=all is communicated to iBus
         List<Object> partners = pdObject.getArrayList(PlugDescription.PARTNER);
@@ -149,57 +101,54 @@ public class Configuration implements IConfig {
             providers.clear();
             providers.add("all");
         }
-        
+
         if (!pdObject.containsRankingType(IngridQuery.SCORE_RANKED)) {
             pdObject.addToList(IngridQuery.RANKED, IngridQuery.SCORE_RANKED);
         }
-        
+
         // add fields
         List<Object> pdFields = pdObject.getArrayList(PlugDescription.FIELDS);
         for (String field : fields) {
             if (field != null && !field.isEmpty() && !pdFields.contains(field)) {
-                pdObject.addField( field );
+                pdObject.addField(field);
             }
         }
     }
 
     @Override
-    public void setPropertiesFromPlugdescription( Properties props, PlugdescriptionCommandObject pd ) {
-        props.setProperty( "db.dir", this.databaseDir );
-        props.setProperty( "dir.instances", this.dirInstances );
-        
-        // write elastic search properties to separate configuration
-        // HINT: refactor this code to make an easy function, by putting it into
-        // the base-webapp!
-        // -> skip since no settings to override yet!
-        /*Properties p = new Properties();
-        try {
-            // check for elastic search settings in classpath, which works
-            // during development
-            // and production
-            Resource resource = new ClassPathResource( "/elasticsearch.properties" );
-            if (resource.exists()) {
-                p.load( resource.getInputStream() );
-            } else {
-                // create file if it does not exist yet
-                // use the location of the production environment!
-                resource = new FileSystemResource( "conf/elasticsearch.properties" );
-            }
-            //p.put( "http.port", esHttpPort );
-            OutputStream os = new FileOutputStream( resource.getFile() ); 
-            p.store( os, "Override configuration written by the application" );
-            os.close();
-        } catch (IOException e) {
-            log.error("Error setting properties from plugdescription", e);
-        }*/
+    public void setPropertiesFromPlugdescription(Properties props, PlugdescriptionCommandObject pd) {
+        props.setProperty("db.dir", this.databaseDir);
+        props.setProperty("dir.instances", this.dirInstances);
     }
 
     public String getInstancesDir() {
         return dirInstances;
     }
-    
+
     public void setInstancesDir(String dir) {
         this.dirInstances = dir;
+    }
+
+    @Value("${facetMapping:air->measure:air,radiation->measure:radiation,water->measure:water,misc->measure:misc,press->service:press,publication->service:publication,event->service:event}")
+    private void setFacetMap(String input) {
+        this.facetMap = getMapFromInput(input);
+    }
+
+    @Value("${queryFieldMapping:topic:air->measure:air,topic:radiation->measure:radiation,topic:water->measure:water,topic:misc->measure:misc,topic:press->service:press,topic:publication->service:publication,topic:event->service:event}")
+    private void setQueryFieldMap(String input) {
+        this.queryFieldMap = getMapFromInput(input);
+    }
+
+    private Map<String, String> getMapFromInput(String input) {
+        Map<String, String> map = new HashMap<>();
+        if (!"".equals(input)) {
+            String[] entries = input.split(",");
+            for (String entry : entries) {
+                String[] split = entry.split("->");
+                map.put(split[0], split[1]);
+            }
+        }
+        return map;
     }
 
 }

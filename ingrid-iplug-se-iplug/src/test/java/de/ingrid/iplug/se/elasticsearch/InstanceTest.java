@@ -51,16 +51,16 @@ public class InstanceTest {
     @BeforeClass
     public static void setUp() throws Exception {
         new JettyStarter( false );
-        JettyStarter.getInstance().config.index = "test";
-        JettyStarter.getInstance().config.indexWithAutoId = true;
-        JettyStarter.getInstance().config.indexSearchInTypes = new ArrayList<>();
+        JettyStarter.baseConfig.index = "test";
+        JettyStarter.baseConfig.indexWithAutoId = true;
+        JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<>();
         Utils.setupES();
     }
 
     @Before
     public void initTest() throws Exception {
         Utils.initIndex( jettyStarter );
-        Utils.indexManager.switchAlias( "ingrid_test", JettyStarter.getInstance().config.index, "test_1" );
+        Utils.indexManager.switchAlias( "ingrid_test", JettyStarter.baseConfig.index, "test_1" );
     }
 
     @AfterClass
@@ -77,7 +77,7 @@ public class InstanceTest {
     public void searchForAll() throws Exception {
         Utils.prepareIndex( Utils.elastic, "data/webUrls1_b.json", "test_catalog" );
 
-        // assertThat( JettyStarter.getInstance().config.indexSearchInTypes.size(), is( 0 ) );
+        // assertThat( baseConfig.indexSearchInTypes.size(), is( 0 ) );
         IndexInfo indexInfo = new IndexInfo();
         indexInfo.setToIndex("test_1");
         indexInfo.setToType("web");

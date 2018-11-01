@@ -23,7 +23,7 @@
 package de.ingrid.iplug.se.webapp.controller.instance.scheduler;
 
 import de.ingrid.elasticsearch.IndexManager;
-import de.ingrid.iplug.se.SEIPlug;
+import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
 import de.ingrid.iplug.se.nutchController.NutchController;
 import it.sauronsoftware.cron4j.Scheduler;
@@ -56,6 +56,8 @@ public class SchedulerManager {
 
     @Autowired
     private IPostCrawlProcessor[] postCrawlProcessors;
+
+    private final Configuration seConfig;
     
     private class Runner {
         public Runner(Scheduler s, SchedulingRunnable sr) {
@@ -80,11 +82,12 @@ public class SchedulerManager {
      * @throws Exception
      */
     @Autowired
-    public SchedulerManager(PatternPersistence patternPers, CrawlDataPersistence crawlDataPers, NutchController nutchController, IndexManager indexManager) {
+    public SchedulerManager(PatternPersistence patternPers, CrawlDataPersistence crawlDataPers, NutchController nutchController, IndexManager indexManager, Configuration seConfig) {
         this.patternService = patternPers;
         this.crawlDataPers = crawlDataPers;
         this.nutchController = nutchController;
         this.indexManager = indexManager;
+        this.seConfig = seConfig;
 
         // create for each instance a scheduler
         for (File instance : getInstances()) {
@@ -101,7 +104,7 @@ public class SchedulerManager {
     private File[] getInstances() {
         File[] instanceDirs = null;
 
-        String dir = SEIPlug.conf.getInstancesDir();
+        String dir = seConfig.getInstancesDir();
         if (Files.isDirectory(Paths.get(dir))) {
             FileFilter directoryFilter = new FileFilter() {
                 public boolean accept(File file) {

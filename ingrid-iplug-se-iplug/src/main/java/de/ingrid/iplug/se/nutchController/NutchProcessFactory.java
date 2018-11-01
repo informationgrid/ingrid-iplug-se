@@ -20,9 +20,6 @@
  * limitations under the Licence.
  * **************************************************#
  */
-/**
- * 
- */
 package de.ingrid.iplug.se.nutchController;
 
 import de.ingrid.admin.JettyStarter;
@@ -110,7 +107,7 @@ public class NutchProcessFactory {
         nutchConfigTool.addOrUpdateProperty("elastic.index", instance.getIndexName() + "_" + instance.getName(), "Default index to send documents to.");
         nutchConfigTool.addOrUpdateProperty("elastic.port", instance.getEsTransportTcpPort(), "The port to connect to using TransportClient.");
         nutchConfigTool.addOrUpdateProperty("elastic.host", instance.getEsHttpHost(), "The hostname to send documents to using TransportClient. Either host\n" + "  and port must be defined or cluster.");
-        nutchConfigTool.addOrUpdateProperty("iplug.datasource.name", JettyStarter.getInstance().config.datasourceName, "The name of the iPlug which will be added to each indexed document.");
+        nutchConfigTool.addOrUpdateProperty("iplug.datasource.name", JettyStarter.baseConfig.datasourceName, "The name of the iPlug which will be added to each indexed document.");
 
         nutchConfigTool.write();
 

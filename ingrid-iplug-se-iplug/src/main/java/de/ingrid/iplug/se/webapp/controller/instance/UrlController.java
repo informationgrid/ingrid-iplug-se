@@ -22,6 +22,28 @@
  */
 package de.ingrid.iplug.se.webapp.controller.instance;
 
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
+import de.ingrid.admin.Utils;
+import de.ingrid.admin.command.PlugdescriptionCommandObject;
+import de.ingrid.admin.object.Partner;
+import de.ingrid.admin.object.Provider;
+import de.ingrid.admin.service.CommunicationService;
+import de.ingrid.iplug.se.Configuration;
+import de.ingrid.iplug.se.conf.UrlMaintenanceSettings;
+import de.ingrid.iplug.se.conf.UrlMaintenanceSettings.MetaElement;
+import de.ingrid.iplug.se.utils.InstanceConfigurationTool;
+import de.ingrid.iplug.se.webapp.controller.AdminViews;
+import edu.emory.mathcs.backport.java.util.Collections;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
@@ -30,35 +52,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
-
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonSyntaxException;
-
-import de.ingrid.admin.Utils;
-import de.ingrid.admin.command.PlugdescriptionCommandObject;
-import de.ingrid.admin.object.Partner;
-import de.ingrid.admin.object.Provider;
-import de.ingrid.admin.service.CommunicationService;
-import de.ingrid.iplug.se.SEIPlug;
-import de.ingrid.iplug.se.conf.UrlMaintenanceSettings;
-import de.ingrid.iplug.se.conf.UrlMaintenanceSettings.MetaElement;
-import de.ingrid.iplug.se.utils.InstanceConfigurationTool;
-import de.ingrid.iplug.se.webapp.controller.AdminViews;
-import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * Control the database parameter page.
@@ -73,6 +66,9 @@ public class UrlController extends InstanceController {
     private CommunicationService _communicationInterface;
 
     private static final Log LOG = LogFactory.getLog(UrlController.class.getName());
+
+    @Autowired
+    private Configuration seConfig;
     
     @Autowired
     public UrlController(final CommunicationService communicationInterface) throws Exception {
@@ -85,7 +81,7 @@ public class UrlController extends InstanceController {
         if (hasNoAccessToInstance(name, request, response)) {
             return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );
         }
-        String dir = SEIPlug.conf.getInstancesDir();
+        String dir = seConfig.getInstancesDir();
         File instanceFolder = new File(dir, name);
         if (!instanceFolder.exists())
             return "redirect:" + AdminViews.SE_LIST_INSTANCES + ".html";
@@ -111,7 +107,7 @@ public class UrlController extends InstanceController {
 
         InstanceConfigurationTool instanceConfig = null;
         try {
-            instanceConfig = new InstanceConfigurationTool(Paths.get(SEIPlug.conf.getInstancesDir(), name, "conf", "urlMaintenance.json"));
+            instanceConfig = new InstanceConfigurationTool(Paths.get(seConfig.getInstancesDir(), name, "conf", "urlMaintenance.json"));
         } catch (RuntimeException e) {
             return null;
         }

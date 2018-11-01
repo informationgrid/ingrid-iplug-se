@@ -22,6 +22,28 @@
  */
 package de.ingrid.iplug.se.webapp.controller;
 
+import de.ingrid.admin.Config;
+import de.ingrid.admin.command.PlugdescriptionCommandObject;
+import de.ingrid.admin.security.IngridPrincipal;
+import de.ingrid.elasticsearch.IndexManager;
+import de.ingrid.iplug.se.Configuration;
+import de.ingrid.iplug.se.db.model.Url;
+import de.ingrid.iplug.se.nutchController.NutchController;
+import de.ingrid.iplug.se.utils.DBUtils;
+import de.ingrid.iplug.se.utils.FileUtils;
+import de.ingrid.iplug.se.webapp.container.Instance;
+import de.ingrid.iplug.se.webapp.controller.instance.InstanceController;
+import de.ingrid.iplug.se.webapp.controller.instance.scheduler.SchedulerManager;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,35 +52,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
-
-import de.ingrid.admin.JettyStarter;
-import de.ingrid.admin.command.PlugdescriptionCommandObject;
-import de.ingrid.elasticsearch.IndexManager;
-import de.ingrid.admin.security.IngridPrincipal;
-import de.ingrid.iplug.se.Configuration;
-import de.ingrid.iplug.se.SEIPlug;
-import de.ingrid.iplug.se.db.model.Url;
-import de.ingrid.iplug.se.nutchController.NutchController;
-import de.ingrid.iplug.se.utils.DBUtils;
-import de.ingrid.iplug.se.utils.FileUtils;
-import de.ingrid.iplug.se.webapp.container.Instance;
-import de.ingrid.iplug.se.webapp.controller.instance.InstanceController;
-import de.ingrid.iplug.se.webapp.controller.instance.scheduler.SchedulerManager;
 
 /**
  * Control the database parameter page.
@@ -72,7 +65,7 @@ public class ListInstancesController extends InstanceController {
     
     private static Logger log = Logger.getLogger( ListInstancesController.class );
 
-    
+    private Configuration seConfig;
 
     @Autowired
     private SchedulerManager schedulerManager;
@@ -83,14 +76,14 @@ public class ListInstancesController extends InstanceController {
     @Autowired
     private IndexManager indexManager;
 
-    private Configuration conf;
+    @Autowired
+    private Config baseConfig;
 
-    public ListInstancesController() {
-        this.conf = SEIPlug.conf;
-    }
+    public ListInstancesController() {}
 
-    public ListInstancesController(Configuration conf) {
-        this.conf = conf;
+    @Autowired
+    public ListInstancesController(Configuration seConfig) {
+        this.seConfig = seConfig;
     }
 
     public List<Instance> getInstances() throws Exception {
@@ -111,7 +104,7 @@ public class ListInstancesController extends InstanceController {
         List<Instance> instances = getInstances();
 
         // check for invalid instances and remove them from the active ones
-        Iterator<String> activeInstancesIt = JettyStarter.getInstance().config.indexSearchInTypes.iterator();
+        Iterator<String> activeInstancesIt = baseConfig.indexSearchInTypes.iterator();
         while (activeInstancesIt.hasNext()) {
             String active = activeInstancesIt.next();
 
@@ -161,7 +154,7 @@ public class ListInstancesController extends InstanceController {
 
         // convert illegal chars to "_"
         name = name.replaceAll( "[:\\\\/*?|<>\\W]", "_" );
-        String dir = conf.getInstancesDir();
+        String dir = seConfig.getInstancesDir();
 
         // convert illegal chars to "_"
         name = name.replaceAll( "[:\\\\/*?|<>\\W]", "_" );

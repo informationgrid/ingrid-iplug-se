@@ -25,6 +25,8 @@ package de.ingrid.iplug.se.preprocessors;
 import java.util.List;
 import java.util.Map;
 
+import de.ingrid.iplug.se.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.ingrid.iplug.se.SEIPlug;
@@ -36,11 +38,14 @@ import de.ingrid.utils.query.IngridQuery;
 @Service
 public class TopicsPreprocessor implements IPreProcessor {
 
+    @Autowired
+    private Configuration seConfig;
+
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public void process(IngridQuery query) throws Exception {
-        Map<String, String> facetMap = SEIPlug.conf.facetMap;
-        Map<String, String> queryMap = SEIPlug.conf.queryFieldMap;
+        Map<String, String> facetMap = seConfig.facetMap;
+        Map<String, String> queryMap = seConfig.queryFieldMap;
 
         List<Map<String, Object>> facets = (List<Map<String, Object>>) query.get( "FACETS" );
         // iterate over all facets

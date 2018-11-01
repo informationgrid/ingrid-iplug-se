@@ -39,12 +39,12 @@ import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.elasticsearch.client.Client;
+import org.elasticsearch.common.Strings;
+import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -416,7 +416,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             throwCrawlError("Error during Execution of: org.apache.nutch.indexer.IndexingJob");
         }
 
-        Config config = JettyStarter.getInstance().config;
+        Config config = JettyStarter.baseConfig;
 
         // update central index with iPlug information
         IndexInfo info = new IndexInfo();
@@ -425,31 +425,32 @@ public class IngridCrawlNutchProcess extends NutchProcess {
         info.setToType("default");
         String plugIdInfo = this.indexManager.getIndexTypeIdentifier(info);
         this.indexManager.updateIPlugInformation(
-                JettyStarter.getInstance().config.communicationProxyUrl,
+                config.communicationProxyUrl,
                 getIPlugInfo( plugIdInfo, instanceIndexName, false, null, null ) );
 
         this.statusProvider.appendToState(STATES.INDEX.name(), " done.");
     }
 
     private String getIPlugInfo(String infoId, String indexName, boolean running, Integer count, Integer totalCount) throws IOException {
-        Config _config = JettyStarter.getInstance().config;
+        Config _config = JettyStarter.baseConfig;
 
-        return XContentFactory.jsonBuilder().startObject()
-                .field( "plugId", _config.communicationProxyUrl )
-                .field( "indexId", infoId )
-                .field( "iPlugName", _config.datasourceName )
-                .field( "linkedIndex", indexName )
-                .field( "linkedType", "default" )
-                .field( "adminUrl", _config.guiUrl )
-                .field( "lastHeartbeat", new Date() )
-                .field( "lastIndexed", new Date() )
-                .startObject( "indexingState" )
-                .field( "numProcessed", count )
-                .field( "totalDocs", totalCount )
-                .field( "running", running )
+        XContentBuilder xContentBuilder = XContentFactory.jsonBuilder().startObject()
+                .field("plugId", _config.communicationProxyUrl)
+                .field("indexId", infoId)
+                .field("iPlugName", _config.datasourceName)
+                .field("linkedIndex", indexName)
+                .field("linkedType", "default")
+                .field("adminUrl", _config.guiUrl)
+                .field("lastHeartbeat", new Date())
+                .field("lastIndexed", new Date())
+                .startObject("indexingState")
+                .field("numProcessed", count)
+                .field("totalDocs", totalCount)
+                .field("running", running)
                 .endObject()
-                .endObject()
-                .string();
+                .endObject();
+
+        return Strings.toString(xContentBuilder);
     }
     
     private void cleanupHadoop() throws IOException {

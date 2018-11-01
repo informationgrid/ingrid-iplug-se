@@ -24,10 +24,12 @@ package de.ingrid.iplug.se.webapp.controller.instance;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import de.ingrid.admin.Config;
 import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
 import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
 import de.ingrid.elasticsearch.IndexManager;
+import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.conf.UrlMaintenanceSettings;
 import de.ingrid.iplug.se.db.DBManager;
@@ -49,6 +51,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -86,6 +89,12 @@ public class RestDataController extends InstanceController {
 
 	@Autowired
 	private IndexManager indexManager;
+
+	@Autowired
+	private Config baseConfig;
+
+	@Autowired
+	private Configuration seConfig;
 
 	@RequestMapping(value = { "/test" }, method = RequestMethod.GET)
 	public String test() {
@@ -333,7 +342,7 @@ public class RestDataController extends InstanceController {
             response.sendError(HttpStatus.FORBIDDEN.value());
             return null;
         }
-		Path path = Paths.get(SEIPlug.conf.getInstancesDir(), name, "statistic", "url_error_report", "data.json");
+		Path path = Paths.get(seConfig.getInstancesDir(), name, "statistic", "url_error_report", "data.json");
 
 		JSONParser parser = new JSONParser();
 		Reader reader = null;
@@ -398,7 +407,7 @@ public class RestDataController extends InstanceController {
             return null;
         }
 
-		List<String> activeInstances = JettyStarter.getInstance().config.indexSearchInTypes;
+		List<String> activeInstances = baseConfig.indexSearchInTypes;
 		// always remove type that leads to no result (in case it was set)
 		activeInstances.remove( NO_RESULT_INDEX );
 
@@ -414,7 +423,7 @@ public class RestDataController extends InstanceController {
 		}
 
 		// write immediately configuration
-		JettyStarter.getInstance().config.writePlugdescriptionToProperties(pdCommandObject);
+		baseConfig.writePlugdescriptionToProperties(pdCommandObject);
 
 		return generateOkResponse();
 	}
@@ -432,7 +441,7 @@ public class RestDataController extends InstanceController {
         nutchController.stop( instance );
 
         // remove instance directory
-        String dir = SEIPlug.conf.getInstancesDir();
+        String dir = seConfig.getInstancesDir();
         Path directoryToDelete = Paths.get( dir, name );
         try {
             FileUtils.removeRecursive( directoryToDelete );
@@ -442,7 +451,7 @@ public class RestDataController extends InstanceController {
         }
 
         // remove instance index
-		String indexName = JettyStarter.getInstance().config.index + "_" + name;
+		String indexName = baseConfig.index + "_" + name;
 		if (indexManager.indexExists( indexName )) {
             indexManager.deleteIndex( indexName );
         }
@@ -504,7 +513,7 @@ public class RestDataController extends InstanceController {
             response.sendError(HttpStatus.FORBIDDEN.value());
             return null;
         }
-		Path path = Paths.get(SEIPlug.conf.getInstancesDir(), name, "statistic", "host", "crawldb");
+		Path path = Paths.get(seConfig.getInstancesDir(), name, "statistic", "host", "crawldb");
 		String content = FileUtils.readFile(path);
 
 		return new ResponseEntity<>(content, HttpStatus.OK);
@@ -517,7 +526,7 @@ public class RestDataController extends InstanceController {
             response.sendError(HttpStatus.FORBIDDEN.value());
             return null;
         }
-		Path path = Paths.get(SEIPlug.conf.getInstancesDir(), name, "logs", "hadoop.log");
+		Path path = Paths.get(seConfig.getInstancesDir(), name, "logs", "hadoop.log");
 		String content = FileUtils.tail(path.toFile(), 1000);
 
 		return new ResponseEntity<>(content, HttpStatus.OK);
@@ -572,7 +581,7 @@ public class RestDataController extends InstanceController {
           response.sendError(HttpStatus.FORBIDDEN.value());
           return null;
       }
-      String confFile = SEIPlug.conf.getInstancesDir() + "/" + name + "/conf/urlMaintenance.json";
+      String confFile = seConfig.getInstancesDir() + "/" + name + "/conf/urlMaintenance.json";
 
       // check if json can be converted correctly
       Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -581,7 +590,7 @@ public class RestDataController extends InstanceController {
       Map<String, String> result = new HashMap<>();
       // only write then json content to file
       if (settings != null) {
-          // File fos = new File( SEIPlug.conf.getInstancesDir() + "/" + name
+          // File fos = new File( seConfig.getInstancesDir() + "/" + name
           // + "/conf/urlMaintenance.json" );
           // BufferedWriter writer = new BufferedWriter( new FileWriter( fos )
           // );

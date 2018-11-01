@@ -16,8 +16,7 @@
                 "type": "long"
             },
             "dataSourceName": {
-                "type": "text",
-                "index": "not_analyzed",
+                "type": "keyword",
                 "store": true
             },
             "date": {
@@ -30,8 +29,7 @@
                 "type": "text"
             },
             "id": {
-                "type": "text",
-                "index": "not_analyzed"
+                "type": "keyword"
             },
             "lang": {
                 "type": "text"
@@ -52,17 +50,14 @@
                 "type": "text"
             },
             "url": {
-                "type": "text",
-                "index": "not_analyzed",
+                "type": "keyword",
                 "store": true
             },
             "partner": {
-                "type": "keyword",
-                "index": "not_analyzed"
+                "type": "keyword"
             },
             "provider": {
-                "type": "keyword",
-                "index": "not_analyzed"
+                "type": "keyword"
             },
             "x1": {
                 "type": "double"

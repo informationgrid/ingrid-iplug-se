@@ -65,9 +65,9 @@ public class NutchProcessTest {
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         new JettyStarter( false );
-        JettyStarter.getInstance().config.index = "test";
-        JettyStarter.getInstance().config.indexWithAutoId = true;
-        JettyStarter.getInstance().config.indexSearchInTypes = new ArrayList<>();
+        JettyStarter.baseConfig.index = "test";
+        JettyStarter.baseConfig.indexWithAutoId = true;
+        JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<>();
         Utils.setupES();
     }
 

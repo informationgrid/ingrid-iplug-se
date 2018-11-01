@@ -51,16 +51,16 @@ public class LocationSearchTest  {
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         new JettyStarter( false );
-        JettyStarter.getInstance().config.index = "test";
-        JettyStarter.getInstance().config.indexWithAutoId = true;
-        JettyStarter.getInstance().config.indexSearchInTypes = new ArrayList<String>();
+        JettyStarter.baseConfig.index = "test";
+        JettyStarter.baseConfig.indexWithAutoId = true;
+        JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<String>();
         Utils.setupES();
     }
     
     @Before
     public void initTest() throws Exception {
         Utils.initIndex( jettyStarter );
-        Utils.indexManager.switchAlias( "ingrid_test", JettyStarter.getInstance().config.index, "test_1" );
+        Utils.indexManager.switchAlias( "ingrid_test", JettyStarter.baseConfig.index, "test_1" );
     }
     
     @AfterClass

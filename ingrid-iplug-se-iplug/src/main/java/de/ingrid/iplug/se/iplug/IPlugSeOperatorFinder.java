@@ -22,10 +22,10 @@
  */
 package de.ingrid.iplug.se.iplug;
 
-import java.io.IOException;
-import java.util.*;
-
+import de.ingrid.admin.Config;
 import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
+import de.ingrid.utils.PlugDescription;
+import de.ingrid.utils.metadata.IPlugOperatorFinder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.elasticsearch.action.search.SearchResponse;
@@ -38,9 +38,10 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms.Bucket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import de.ingrid.admin.JettyStarter;
-import de.ingrid.utils.PlugDescription;
-import de.ingrid.utils.metadata.IPlugOperatorFinder;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class IPlugSeOperatorFinder implements IPlugOperatorFinder {
@@ -52,10 +53,13 @@ public class IPlugSeOperatorFinder implements IPlugOperatorFinder {
     @Autowired
     private ElasticsearchNodeFactoryBean elasticSearch;
 
+    @Autowired
+    private Config baseConfig;
+
     public Set<String> findIndexValues(String indexFieldName) throws Exception {
 
         Client client = elasticSearch.getClient();
-        SearchResponse response = client.prepareSearch(JettyStarter.getInstance().config.index).setQuery(QueryBuilders.matchAllQuery()).addAggregation(AggregationBuilders.terms("TermsAggr").field(indexFieldName).size(0)).execute().actionGet();
+        SearchResponse response = client.prepareSearch(baseConfig.index).setQuery(QueryBuilders.matchAllQuery()).addAggregation(AggregationBuilders.terms("TermsAggr").field(indexFieldName).size(0)).execute().actionGet();
 
         Terms terms = response.getAggregations().get("TermsAggr");
         List<? extends Bucket> buckets = terms.getBuckets();

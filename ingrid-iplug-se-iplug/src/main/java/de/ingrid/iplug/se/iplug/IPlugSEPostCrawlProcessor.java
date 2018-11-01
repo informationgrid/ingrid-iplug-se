@@ -22,7 +22,7 @@
  */
 package de.ingrid.iplug.se.iplug;
 
-import de.ingrid.admin.JettyStarter;
+import de.ingrid.admin.Config;
 import de.ingrid.admin.service.PlugDescriptionService;
 import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.webapp.container.Instance;
@@ -58,6 +58,9 @@ public class IPlugSEPostCrawlProcessor implements IPostCrawlProcessor {
 
     @Autowired
     private PlugDescriptionService plugDescriptionService;
+
+    @Autowired
+    private Config baseConfig;
     
     @Override
     public void execute(Instance instance) {
@@ -91,7 +94,7 @@ public class IPlugSEPostCrawlProcessor implements IPostCrawlProcessor {
             }
 
             plugDescriptionService.savePlugDescription(pd);
-            JettyStarter.getInstance().config.writePlugdescriptionToProperties(plugDescriptionService.getCommandObect());
+            baseConfig.writePlugdescriptionToProperties(plugDescriptionService.getCommandObect());
 
         } catch (Exception e) {
             LOG.error("Error adding index fields to plugdescription.", e);

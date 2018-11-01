@@ -22,40 +22,42 @@
  */
 package de.ingrid.iplug.se.webapp.controller.instance;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import de.ingrid.admin.Config;
 import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.controller.AbstractController;
 import de.ingrid.admin.security.IngridPrincipal;
+import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.utils.DBUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class InstanceController extends AbstractController {
 
     public static Instance getInstanceData(String name) {
         // first check if the path really exists, in case we called an URL with a wrong parameter
-        Path workPath = Paths.get( SEIPlug.conf.getInstancesDir(), name );
+        Path workPath = Paths.get(SEIPlug.conf.getInstancesDir(), name );
         if (!workPath.toFile().exists()) return null;
         
         Instance instance = new Instance();
         instance.setName( name );
         instance.setWorkingDirectory( workPath.toString() );
-        instance.setClusterName( JettyStarter.getInstance().config.cluster );
-        instance.setIndexName( JettyStarter.getInstance().config.index );
+        instance.setClusterName( JettyStarter.baseConfig.cluster );
+        instance.setIndexName( JettyStarter.baseConfig.index );
         
-        if (JettyStarter.getInstance().config.indexSearchInTypes.contains( name )) {
+        if (JettyStarter.baseConfig.indexSearchInTypes.contains( name )) {
             instance.setIsActive( true );
             
         } else {
             instance.setIsActive( false );            
         }
         instance.setEsTransportTcpPort(SEIPlug.conf.esTransportTcpPort);
-        //instance.setEsHttpHost(SEIPlug.conf.esHttpHost);
+        //instance.setEsHttpHost(seConfig.esHttpHost);
         
     
         return instance;
