@@ -127,7 +127,7 @@
               type: "GET",
               contentType: 'application/json',
               success: function(data) {
-                  $("#dialog-detailed .content").html( data.replace(/\n/g, "<br>") );
+                  $("#dialog-detailed .content").html( data.replace(/\n/g, "<br>").replace(/<br>  */g,"<br>&nbsp&nbsp&nbsp&nbsp;") );
               }
           });
 

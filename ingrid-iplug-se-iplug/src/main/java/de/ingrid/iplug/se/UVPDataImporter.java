@@ -32,6 +32,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -148,6 +149,8 @@ public class UVPDataImporter extends Thread {
     private InputStream excelFileInputStream;
     private StatusProvider sp;
 
+    private PrintWriter logfileWriter;
+
     @Override
     public void run() {
         try {
@@ -181,6 +184,7 @@ public class UVPDataImporter extends Thread {
             System.exit( -1 );
         }
 
+        logfileWriter = new PrintWriter( Paths.get( instance.getWorkingDirectory(), "logs", "import.log" ).toString() );
         EntityTransaction tx = null;
         try {
             tx = em.getTransaction();
@@ -197,7 +201,7 @@ public class UVPDataImporter extends Thread {
 
             List<Url> existingUrls = em.createQuery( criteria ).getResultList();
 
-            System.out.println( "Parsing and validating data from '" + excelFileName + "'..." );
+            logAndPrint( "Parsing and validating data from '" + excelFileName + "'..." );
             sp.addState( "ParsingData", "Parsing and validating data from '" + excelFileName + "'..." );
             List<BlpModel> blpModels;
             if (excelFileInputStream != null) {
@@ -205,7 +209,7 @@ public class UVPDataImporter extends Thread {
             } else {
                 blpModels = readData( excelFileName );
             }
-            System.out.println( "" );
+            logAndPrint( "" );
 
             for (int i = 0; i < existingUrls.size(); i++) {
                 Url url = existingUrls.get( i );
@@ -218,7 +222,7 @@ public class UVPDataImporter extends Thread {
             int cntUrls = 0;
             int cntMarker = 0;
 
-            System.out.println( "\nParsing and validating records ..." );
+            logAndPrint( "\nParsing and validating records ..." );
             sp.addState( "AddEntries", "Adding entries" );
             for (int i = 0; i < blpModels.size(); i++) {
                 BlpModel bm = blpModels.get( i );
@@ -319,15 +323,15 @@ public class UVPDataImporter extends Thread {
             long noMarkersAdded = blpModels.stream().filter( bm -> !bm.hasMarker ).count();
             if (noMarkersAdded > 0) {
 
-                System.out.println( "\n\nNO MARKER IMPORTED:\n" );
+                logAndPrint( "\n\nNO MARKER IMPORTED:\n" );
                 sp.addState( "NO_MARKERS", "No marker set for " + noMarkersAdded + " records!", Classification.WARN );
 
                 for (BlpModel bm : blpModels) {
                     if (!bm.hasMarker) {
-                        System.out.println( "Entry '" + bm.name + "'." );
+                        logAndPrint( "Entry '" + bm.name + "'." );
                         sp.appendToState( "NOMARKERS", "Entry '" + bm.name + "'." );
                         for (StatusEntry se : bm.errors) {
-                            System.out.println( "  " + se.message );
+                            logAndPrint( "  " + se.message );
                         }
                     }
                 }
@@ -337,33 +341,40 @@ public class UVPDataImporter extends Thread {
             if (partialURLErrors > 0) {
 
                 sp.addState( "PARTIAL_URLS", "Partial URL errors found: " + partialURLErrors + "", Classification.WARN );
-                System.out.println( "\n\nPARTIAL URL ERRORS:\n" );
+                logAndPrint( "\n\nPARTIAL URL ERRORS:\n" );
 
                 for (BlpModel bm : blpModels) {
                     if (bm.hasMarker && !bm.errors.isEmpty()) {
-                        System.out.println( "Entry '" + bm.name + "'." );
+                        logAndPrint( "Entry '" + bm.name + "'." );
                         for (StatusEntry se : bm.errors) {
-                            System.out.println( "  " + se.message );
+                            logAndPrint( "  " + se.message );
                         }
                     }
                 }
             }
 
-            System.out.println( "\nFinish. Records: " + cntRecords + ", Urls added: " + cntUrls + " urls to instance '" + instance.getName() + "', mark " + cntMarker
+            logAndPrint( "\nFinish. Records: " + cntRecords + ", Urls added: " + cntUrls + " urls to instance '" + instance.getName() + "', mark " + cntMarker
                     + " records as marker to be displayed on map." );
             sp.addState( "FINISHED", "\nFinished importing. Records: " + cntRecords + ", Urls added: " + cntUrls + " urls to instance '" + instance.getName() + "', mark " + cntMarker
                     + " records as marker to be displayed on map." );
+
             tx.commit();
         } catch (Exception e) {
-            System.out.println( "Error: '" + e.getMessage() + "'." );
-            sp.addState( "ERROR", e.getMessage(), Classification.ERROR);
+            logAndPrint( "Error: '" + e.getMessage() + "'." );
+            sp.addState( "ERROR", e.getMessage(), Classification.ERROR );
             if (tx != null && tx.isActive())
                 tx.rollback();
             throw e; // or display error message
         } finally {
             em.close();
+            logfileWriter.close();
         }
 
+    }
+
+    private void logAndPrint(String message) {
+        System.out.println( message );
+        logfileWriter.println( message );
     }
 
     /**
