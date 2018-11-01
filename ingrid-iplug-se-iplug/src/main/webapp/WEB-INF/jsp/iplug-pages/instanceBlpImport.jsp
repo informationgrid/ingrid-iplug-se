@@ -42,8 +42,22 @@
     <script src="../js/localization/messages_de.min.js"></script>
 
     <script type="text/javascript">
+      var dialog;
+
       $(document).ready(function () {
-        $("#statusContent").hide();
+        $("#allInfo").hide();
+        dialog = $("#dialog-detailed").dialog({
+            autoOpen : false,
+            height : 750,
+            width : 770,
+            modal : true,
+            buttons : {
+                "Schliessen" : function() {
+                    dialog.dialog("close");
+                }
+            }
+        });
+
         checkState();
       });
 
@@ -58,8 +72,9 @@
                       return;
                   } else if (data.some(function(item) { return item.key === "FINISHED" || item.key === "ERROR" || item.key === "ABORT" })) {
                       var lastTime = formatTime(data[data.length-1].time);
-                      $("#importInfo").html( "Es läuft zur Zeit kein Import.</br>Letzter Import: "+ lastTime +"  (<a href='#' onclick='$(\"#statusContent\").toggle()'>Informationen) " );
+                      $("#importInfo").html( "Es läuft zur Zeit kein Import.</br>Letzter Import: "+ lastTime +"  (<a href='#' onclick='$(\"#allInfo\").toggle()'>Informationen) " );
                       setLog( data );
+                      $("#moreInfo").show();
                       // repeat execution every 60s until finished
                       setTimeout( checkState, 60000 );
                       return;
@@ -67,6 +82,8 @@
                   setLog( data );
                   $("#statusContent").show();
                   $("#importInfo").hide();
+                  $("#moreInfo").hide();
+                  $("#allInfo").show();
 
 
                   // repeat execution every 5s until finished
@@ -101,6 +118,19 @@
         }
 
         $("#statusContent").html( content );
+      }
+
+      function showDetailedImportLog() {
+          dialog.dialog("open");
+          $("#dialog-detailed .content").html( "wird geladen ..." );
+          $.ajax( "../rest/status/${ instance.name }/import_log", {
+              type: "GET",
+              contentType: 'application/json',
+              success: function(data) {
+                  $("#dialog-detailed .content").html( data.replace(/\n/g, "<br>") );
+              }
+          });
+
       }
     </script>
 

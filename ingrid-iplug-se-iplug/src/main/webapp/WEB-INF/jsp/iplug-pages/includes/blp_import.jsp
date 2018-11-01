@@ -71,7 +71,14 @@
       <fieldset id="statusContainer">
         <legend>Status</legend>
         <div id="importInfo" class="space"></div>
-        <div id="statusContent">
-          <p>Kein Import gestartet</p>
+        <div id="allInfo">
+            <div id="statusContent">
+              <p>Kein Import gestartet</p>
+            </div>
+            <div id="moreInfo" style="padding-top: 10px;">weitere Informationen: <a href='#' onclick='showDetailedImportLog()'>import.log</a></div>
         </div>
       </fieldset>
+
+      <div id="dialog-detailed" title="Import Log">
+          <div class="content"></div>
+      </div>
