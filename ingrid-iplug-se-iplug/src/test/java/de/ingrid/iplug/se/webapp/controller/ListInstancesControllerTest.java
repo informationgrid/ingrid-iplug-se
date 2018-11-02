@@ -27,6 +27,7 @@ import static org.junit.Assert.assertTrue;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.Principal;
+import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -69,6 +70,7 @@ public class ListInstancesControllerTest extends Mockito {
     @Before
     public void initTest() throws Exception {
         JettyStarter.baseConfig = new Config();
+        JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<>();
         MockitoAnnotations.initMocks( this );
         PowerMockito.mockStatic( ElasticSearchUtils.class );
         // InternalNode node = new InternalNode();
@@ -88,7 +90,7 @@ public class ListInstancesControllerTest extends Mockito {
         //configuration.activeInstances = Arrays.asList( "web" );
         SEIPlug.conf = configuration;
 
-        ListInstancesController lic = new ListInstancesController();
+        ListInstancesController lic = new ListInstancesController(configuration);
         lic.setSchedulerManager( manager );
         // lic.setElasticSearch( esBean );
         HttpServletRequest httpRequest = mock(HttpServletRequest.class);

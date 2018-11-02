@@ -64,6 +64,7 @@ public class Utils {
 
         elasticConfig = new ElasticConfig();
         elasticConfig.isEnabled = true;
+        elasticConfig.communicationProxyUrl = "/ingrid-group:unit-tests";
         elasticConfig.indexSearchDefaultFields = new String[]{"title", "content"};
         elasticConfig.additionalSearchDetailFields = new String[0];
         elasticConfig.remoteHosts = new String[] { elasticProperties.get("network.host") + ":9300"};

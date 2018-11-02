@@ -79,8 +79,6 @@ public class ListInstancesController extends InstanceController {
     @Autowired
     private Config baseConfig;
 
-    public ListInstancesController() {}
-
     @Autowired
     public ListInstancesController(Configuration seConfig) {
         this.seConfig = seConfig;

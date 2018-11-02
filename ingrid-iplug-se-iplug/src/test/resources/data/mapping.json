@@ -15,24 +15,20 @@
                 "type": "text"
             },
             "id": {
-                "type": "text",
-                "index" : "not_analyzed"
+                "type": "keyword"
             },
             "url": {
-                "type": "text",
-                "index" : "not_analyzed"
+                "type": "keyword"
             },
             "boost": {
                 "type": "float",
                 "null_value" : "0.0"
             },
             "partner": {
-                "type": "keyword",
-                "index" : "not_analyzed"
+                "type": "keyword"
             },
             "provider": {
-                "type": "keyword",
-                "index" : "not_analyzed"
+                "type": "keyword"
             }
         }
     }
