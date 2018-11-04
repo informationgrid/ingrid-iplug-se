@@ -247,7 +247,7 @@ public class SEIPlug extends HeartBeatPlug {
     }
 
     public static void main(String[] args) throws Exception {
-        new JettyStarter();
+        new JettyStarter(Configuration.class);
 
         // normally shutdown the elastic search node and stop all running
         // nutch processes
