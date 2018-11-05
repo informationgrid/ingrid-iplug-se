@@ -57,7 +57,7 @@ public class InstanceController extends AbstractController {
             instance.setIsActive( false );            
         }
         instance.setEsTransportTcpPort(SEIPlug.conf.esTransportTcpPort);
-        //instance.setEsHttpHost(seConfig.esHttpHost);
+        instance.setEsHttpHost(SEIPlug.conf.esHttpHost);
         
     
         return instance;

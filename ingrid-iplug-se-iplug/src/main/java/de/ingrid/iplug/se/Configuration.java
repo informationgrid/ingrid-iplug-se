@@ -29,6 +29,7 @@ import de.ingrid.utils.PlugDescription;
 import de.ingrid.utils.query.IngridQuery;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +37,9 @@ import java.util.Map;
 import java.util.Properties;
 
 @org.springframework.context.annotation.Configuration
+@PropertySource(
+        value = {"classpath:elasticsearch.properties", "classpath:elasticsearch.override.properties"},
+        ignoreResourceNotFound = true)
 public class Configuration implements IConfig {
 
     private static Logger log = Logger.getLogger(Configuration.class);
@@ -62,6 +66,9 @@ public class Configuration implements IConfig {
 
     @Value("${transport.tcp.port:9300}")
     public String esTransportTcpPort;
+
+    @Value("${network.host:localhost}")
+    public String esHttpHost;
 
     @Value("#{'${nutch.call.java.options:-Dhadoop.log.file=hadoop.log -Dfile.encoding=UTF-8}'.split(' ')}")
     public List<String> nutchCallJavaOptions;
