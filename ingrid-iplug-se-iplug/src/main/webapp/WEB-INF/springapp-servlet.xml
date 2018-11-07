@@ -57,6 +57,7 @@
     <bean id="queryConverter" class="de.ingrid.elasticsearch.search.converter.QueryConverter">
         <property name="queryParsers">
             <list>
+								<ref bean="IPlugIdQueryConverter"/>
                 <ref bean="defaultFieldsQueryConverter" />
                 <ref bean="datatypePartnerProviderQueryConverter" />
                 <ref bean="fieldQueryIGCConverter" />
