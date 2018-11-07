@@ -1,6 +1,10 @@
 {
     "web": {
         "properties": {
+            "iPlugId": {
+                "type": "keyword",
+                "store": true
+            },
             "fetched": {
                 "format": "dateOptionalTime",
                 "type": "date"

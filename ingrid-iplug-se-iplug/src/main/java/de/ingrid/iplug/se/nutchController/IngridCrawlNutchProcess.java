@@ -425,7 +425,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
         info.setToType("default");
         String plugIdInfo = this.indexManager.getIndexTypeIdentifier(info);
         this.indexManager.updateIPlugInformation(
-                config.communicationProxyUrl,
+                plugIdInfo,
                 getIPlugInfo( plugIdInfo, instanceIndexName, false, null, null ) );
 
         this.statusProvider.appendToState(STATES.INDEX.name(), " done.");
@@ -434,6 +434,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
     private String getIPlugInfo(String infoId, String indexName, boolean running, Integer count, Integer totalCount) throws IOException {
         Config _config = JettyStarter.baseConfig;
 
+        // @formatter:off
         XContentBuilder xContentBuilder = XContentFactory.jsonBuilder().startObject()
                 .field("plugId", _config.communicationProxyUrl)
                 .field("indexId", infoId)
@@ -443,12 +444,15 @@ public class IngridCrawlNutchProcess extends NutchProcess {
                 .field("adminUrl", _config.guiUrl)
                 .field("lastHeartbeat", new Date())
                 .field("lastIndexed", new Date())
+// TODO:                .field("datatypes", this._plugDescription.getDataTypes())
+// TODO:                .field("fields", this._plugDescription.getFields())
                 .startObject("indexingState")
-                .field("numProcessed", count)
-                .field("totalDocs", totalCount)
-                .field("running", running)
-                .endObject()
+                    .field("numProcessed", count)
+                    .field("totalDocs", totalCount)
+                    .field("running", running)
+                    .endObject()
                 .endObject();
+        // @formatter:on
 
         return Strings.toString(xContentBuilder);
     }
