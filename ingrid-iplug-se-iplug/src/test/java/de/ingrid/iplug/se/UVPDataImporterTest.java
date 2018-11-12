@@ -23,6 +23,7 @@
 package de.ingrid.iplug.se;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -31,6 +32,13 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 
+import org.apache.commons.cli.BasicParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.junit.Test;
 
 import de.ingrid.iplug.se.UVPDataImporter.BlpModel;
@@ -158,6 +166,27 @@ public class UVPDataImporterTest {
 
         assertEquals( "http://www.merchweiler.de/p/dlhome.asp?artikel_id=&liste=491&tmpl_typ=Liste&lp=3691&area=100",
                 UVPDataImporter.getActualUrl( "http://www.merchweiler.de/", bm ) );
+    }
+    
+    @Test
+    public void testExcludeUrlParsing() throws ParseException {
+        CommandLineParser parser = new BasicParser();
+        Options options = new Options();
+        @SuppressWarnings("static-access")
+        Option exludeMarkerUrlsOption = OptionBuilder.withArgName( "exclude urls from marker urls" ).hasArgs().withDescription( "list of url regex patterns that define urls that should be excluded from possible marker urls." ).create( "exludeMarkerUrls" );
+        exludeMarkerUrlsOption.setValueSeparator( '|' );
+        options.addOption( exludeMarkerUrlsOption );
+        CommandLine cmd = parser.parse( options, new String[] {"", "-exludeMarkerUrls", ".*minden-luebbecke.de/atlasfx/js/.*|.*wemove.com.*"} );
+
+        String[] exludeMarkerUrls = null;
+        if (cmd.hasOption( "exludeMarkerUrls" )) {
+            exludeMarkerUrls = cmd.getOptionValues( exludeMarkerUrlsOption.getOpt() );
+        }
+        
+        assertNotNull( exludeMarkerUrls );
+        assertEquals( exludeMarkerUrls[0], ".*minden-luebbecke.de/atlasfx/js/.*" );
+        assertEquals( exludeMarkerUrls[1], ".*wemove.com.*" );
+        
     }
 
 }
