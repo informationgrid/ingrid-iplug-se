@@ -32,14 +32,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -168,9 +166,9 @@ public class UVPDataImporter {
         Option partnerOption = OptionBuilder.withArgName( "partner short cut" ).hasArg().withDescription( "a partner shortcut. i.e. ni" ).create( "partner" );
         options.addOption( partnerOption );
         @SuppressWarnings("static-access")
-        Option exludeMarkerUrlsOption = OptionBuilder.withArgName( "exclude urls from marker urls" ).hasArgs().withDescription( "list of url regex patterns that define urls that should be excluded from possible marker urls, separated by '|'." ).create( "exludeMarkerUrls" );
-        exludeMarkerUrlsOption.setValueSeparator( '|' );
-        options.addOption( exludeMarkerUrlsOption );
+        Option excludeMarkerUrlsOption = OptionBuilder.withArgName( "exclude urls from marker urls" ).hasArgs().withDescription( "list of url regex patterns that define urls that should be excluded from possible marker urls, separated by '|'." ).create( "excludeMarkerUrls" );
+        excludeMarkerUrlsOption.setValueSeparator( '|' );
+        options.addOption( excludeMarkerUrlsOption );
 
         CommandLine cmd = parser.parse( options, args );
 
@@ -205,9 +203,9 @@ public class UVPDataImporter {
             System.exit( 0 );
         }
 
-        String[] exludeMarkerUrls = null;
-        if (cmd.hasOption( "exludeMarkerUrls" )) {
-            exludeMarkerUrls = cmd.getOptionValues( exludeMarkerUrlsOption.getOpt() );
+        String[] excludeMarkerUrls = null;
+        if (cmd.hasOption( "excludeMarkerUrls" )) {
+            excludeMarkerUrls = cmd.getOptionValues( "excludeMarkerUrls" );
         }
         
         
@@ -295,26 +293,26 @@ public class UVPDataImporter {
                     blpUrls = blpUrls.stream().filter( Objects::nonNull ).distinct().sorted(Comparator.<String>comparingInt(s -> getUrlWithoutParameters( s ).length()).reversed()).collect(Collectors.toList());
                     List<String> ignoredBlpUrls = new ArrayList<>();
                     
-                    String longestUrlOfBlp = blpUrls.get( 0 );
-                    
                     for (String blpUrl : blpUrls) {
                         if (blpUrl != null && blpUrl.length() > 0) {
 
-                            if (exludeMarkerUrls != null) {
-                                for (String regexp:exludeMarkerUrls) {
+                            if (excludeMarkerUrls != null) {
+                                for (String regexp:excludeMarkerUrls) {
                                     if (blpUrl.matches(regexp)) {
                                         bm.errors.add( new UVPDataImporter().new StatusEntry( "Url explicitly excluded: " + blpUrl, "URL_IGNORED" ) );
                                         ignoredBlpUrls.add( blpUrl );
-                                        // recalculate longest string
-                                        longestUrlOfBlp = getLongestString(blpUrls, ignoredBlpUrls);
                                         // do not import this URL
-                                        continue;
+                                        break;
                                     }
+                                }
+                                if (ignoredBlpUrls.contains( blpUrl )) {
+                                    // do not import this URL
+                                    continue;
                                 }
                             }
                             
-                            long entriesContainedInUrl = markerUrls.stream().filter( entry -> blpUrl.startsWith( entry ) ).count();
-                            long entriesContainingUrl = markerUrls.stream().filter( entry -> entry.contains( blpUrl ) ).count();
+                            long entriesContainedInUrl = markerUrls.stream().filter( entry -> getUrlWithoutParameters(blpUrl).startsWith( entry ) ).count();
+                            long entriesContainingUrl = markerUrls.stream().filter( entry -> entry.contains( getUrlWithoutParameters(blpUrl) ) ).count();
 
                             boolean hasInvalidMarkerUrlIntersection = (entriesContainedInUrl > 0 || entriesContainingUrl > 0);
 
@@ -327,20 +325,15 @@ public class UVPDataImporter {
                                 // - this meta data to a marker url, if a marker
                                 // url contains this url
 
-                                //
-//                                if (!markerUrls.contains( getUrlWithoutParameters(blpUrl) )) {
-                                    bm.errors.add( new UVPDataImporter().new StatusEntry( "Invalid marker url intersection: " + blpUrl, "URL_IGNORED" ) );
-//                                }
+                                bm.errors.add( new UVPDataImporter().new StatusEntry( "Invalid url intersection: " + blpUrl, "URL_IGNORED" ) );
                                 ignoredBlpUrls.add( blpUrl );
-                                // recalculate longest string
-                                longestUrlOfBlp = getLongestString(blpUrls, ignoredBlpUrls);
                                 // do not import this URL
                                 continue;
                             }
 
                             boolean pushMarker = false;
                             try {
-                                if (!hasInvalidMarkerUrlIntersection && !markerAlreadyPushed) {
+                                if (!markerAlreadyPushed) {
                                     pushMarker = true;
                                 }
                                 Url url = createUrl( instance, partner, blpUrl, bm, pushMarker );
@@ -357,8 +350,6 @@ public class UVPDataImporter {
                                     bm.hasMarker = false;
 
                                     ignoredBlpUrls.add( blpUrl );
-                                    // recalculate longest string
-                                    longestUrlOfBlp = getLongestString(blpUrls, ignoredBlpUrls);
                                 }
                                 
                                 bm.errors.add( new UVPDataImporter().new StatusEntry( e.getMessage(), "URL_IGNORED" ) );

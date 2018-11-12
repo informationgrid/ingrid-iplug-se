@@ -173,19 +173,19 @@ public class UVPDataImporterTest {
         CommandLineParser parser = new BasicParser();
         Options options = new Options();
         @SuppressWarnings("static-access")
-        Option exludeMarkerUrlsOption = OptionBuilder.withArgName( "exclude urls from marker urls" ).hasArgs().withDescription( "list of url regex patterns that define urls that should be excluded from possible marker urls." ).create( "exludeMarkerUrls" );
-        exludeMarkerUrlsOption.setValueSeparator( '|' );
-        options.addOption( exludeMarkerUrlsOption );
+        Option excludeMarkerUrlsOption = OptionBuilder.withArgName( "exclude urls from marker urls" ).hasArgs().withDescription( "list of url regex patterns that define urls that should be excluded from possible marker urls." ).create( "excludeMarkerUrls" );
+        excludeMarkerUrlsOption.setValueSeparator( '|' );
+        options.addOption( excludeMarkerUrlsOption );
         CommandLine cmd = parser.parse( options, new String[] {"", "-exludeMarkerUrls", ".*minden-luebbecke.de/atlasfx/js/.*|.*wemove.com.*"} );
 
-        String[] exludeMarkerUrls = null;
-        if (cmd.hasOption( "exludeMarkerUrls" )) {
-            exludeMarkerUrls = cmd.getOptionValues( exludeMarkerUrlsOption.getOpt() );
+        String[] excludeMarkerUrls = null;
+        if (cmd.hasOption( "excludeMarkerUrls" )) {
+            excludeMarkerUrls = cmd.getOptionValues( excludeMarkerUrlsOption.getOpt() );
         }
         
-        assertNotNull( exludeMarkerUrls );
-        assertEquals( exludeMarkerUrls[0], ".*minden-luebbecke.de/atlasfx/js/.*" );
-        assertEquals( exludeMarkerUrls[1], ".*wemove.com.*" );
+        assertNotNull( excludeMarkerUrls );
+        assertEquals( excludeMarkerUrls[0], ".*minden-luebbecke.de/atlasfx/js/.*" );
+        assertEquals( excludeMarkerUrls[1], ".*wemove.com.*" );
         
     }
 
