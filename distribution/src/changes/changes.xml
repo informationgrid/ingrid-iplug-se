@@ -31,6 +31,9 @@
 
     <release version="4.6.0" date="2019-xx-xx" description="Release 4.6.0">
       <action type="add" dev="wemove" issue="REDMINE-1189">
+        Add new option to exclude urls from import by pattern. Improve import overall.
+      </action>
+      <action type="add" dev="wemove" issue="REDMINE-1189">
         Change logic of BLP data import according to NRW rules.
       </action>
     </release>
