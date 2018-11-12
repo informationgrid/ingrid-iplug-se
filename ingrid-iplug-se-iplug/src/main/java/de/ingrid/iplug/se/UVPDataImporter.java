@@ -41,10 +41,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -134,11 +137,11 @@ public class UVPDataImporter extends Thread {
      */
     private static Logger log = Logger.getLogger( UVPDataImporter.class );
 
-    public static Configuration conf;
+    public Configuration conf;
 
-    private static EntityManager em;
+    private EntityManager em;
 
-    private static List<String> markerUrls = new ArrayList<String>();
+    private List<String> markerUrls = new ArrayList<String>();
 
     private static StatusProviderService sps;
     private String statusFilename;
@@ -150,6 +153,8 @@ public class UVPDataImporter extends Thread {
     private StatusProvider sp;
 
     private PrintWriter logfileWriter;
+
+    private String[] excludeMarkerUrls;
 
     @Override
     public void run() {
@@ -184,7 +189,9 @@ public class UVPDataImporter extends Thread {
             System.exit( -1 );
         }
 
-        logfileWriter = new PrintWriter( Paths.get( instance.getWorkingDirectory(), "logs", "import.log" ).toString() );
+        Path importLogPath = Paths.get( instance.getWorkingDirectory(), "logs", "import.log" );
+        Files.createDirectories( importLogPath.getParent() );
+        logfileWriter = new PrintWriter( importLogPath.toString() );
         EntityTransaction tx = null;
         try {
             tx = em.getTransaction();
@@ -209,13 +216,15 @@ public class UVPDataImporter extends Thread {
             } else {
                 blpModels = readData( excelFileName );
             }
+            sp.addState( "ParsingData", "Parsing and validating data from '" + excelFileName + "'... done." );
             logAndPrint( "" );
 
+            sp.addState( "DeleteExisting", "Deleting existing urls..." );
             for (int i = 0; i < existingUrls.size(); i++) {
                 Url url = existingUrls.get( i );
-                sp.addState( "DeleteExisting", "Deleting existing urls [" + (i + 1) + "/" + existingUrls.size() + "]" );
                 em.remove( url );
             }
+            sp.addState( "DeleteExisting", "Deleting existing urls... done." );
 
             int cntRecords = blpModels.size();
 
@@ -223,7 +232,7 @@ public class UVPDataImporter extends Thread {
             int cntMarker = 0;
 
             logAndPrint( "\nParsing and validating records ..." );
-            sp.addState( "AddEntries", "Adding entries" );
+            sp.addState( "AddEntries", "Adding excel records" );
             for (int i = 0; i < blpModels.size(); i++) {
                 BlpModel bm = blpModels.get( i );
                 System.out.print( "." );
@@ -247,18 +256,30 @@ public class UVPDataImporter extends Thread {
                      */
 
                     List<String> blpUrls = Arrays.asList( new String[] { bm.urlBlpInProgress, bm.urlBlpFinished, bm.urlFnpInProgress, bm.urlFnpFinished, bm.urlBpInProgress, bm.urlBpFinished } );
-                    String longestUrlOfBlp = "";
-                    for (String blpUrl : blpUrls) {
-                        if (blpUrl != null && blpUrl.length() > longestUrlOfBlp.length()) {
-                            longestUrlOfBlp = blpUrl;
-                        }
-                    }
+                    blpUrls = blpUrls.stream().filter( Objects::nonNull ).distinct().sorted( Comparator.<String> comparingInt( s -> getUrlWithoutParameters( s ).length() ).reversed() ).collect(
+                            Collectors.toList() );
+                    List<String> ignoredBlpUrls = new ArrayList<>();
 
                     for (String blpUrl : blpUrls) {
                         if (blpUrl != null && blpUrl.length() > 0) {
 
-                            long entriesContainedInUrl = markerUrls.stream().filter( entry -> blpUrl.startsWith( entry ) ).count();
-                            long entriesContainingUrl = markerUrls.stream().filter( entry -> entry.contains( blpUrl ) ).count();
+                            if (excludeMarkerUrls != null) {
+                                for (String regexp : excludeMarkerUrls) {
+                                    if (blpUrl.matches( regexp )) {
+                                        bm.errors.add( new UVPDataImporter().new StatusEntry( "Url explicitly excluded: " + blpUrl, "URL_IGNORED" ) );
+                                        ignoredBlpUrls.add( blpUrl );
+                                        // do not import this URL
+                                        break;
+                                    }
+                                }
+                                if (ignoredBlpUrls.contains( blpUrl )) {
+                                    // do not import this URL
+                                    continue;
+                                }
+                            }
+
+                            long entriesContainedInUrl = markerUrls.stream().filter( entry -> getUrlWithoutParameters( blpUrl ).startsWith( entry ) ).count();
+                            long entriesContainingUrl = markerUrls.stream().filter( entry -> entry.contains( getUrlWithoutParameters( blpUrl ) ) ).count();
 
                             boolean hasInvalidMarkerUrlIntersection = (entriesContainedInUrl > 0 || entriesContainingUrl > 0);
 
@@ -271,17 +292,15 @@ public class UVPDataImporter extends Thread {
                                 // - this meta data to a marker url, if a marker
                                 // url contains this url
 
-                                //
-                                if (!markerUrls.contains( blpUrl )) {
-                                    bm.errors.add( new UVPDataImporter().new StatusEntry( "Invalid marker url intersection: " + blpUrl, "URL_IGNORED" ) );
-                                }
+                                bm.errors.add( new UVPDataImporter().new StatusEntry( "Invalid url intersection: " + blpUrl, "URL_IGNORED" ) );
+                                ignoredBlpUrls.add( blpUrl );
                                 // do not import this URL
                                 continue;
                             }
 
                             boolean pushMarker = false;
                             try {
-                                if (!hasInvalidMarkerUrlIntersection && !isUrlShorterThan( blpUrl, longestUrlOfBlp ) && !markerAlreadyPushed) {
+                                if (!markerAlreadyPushed) {
                                     pushMarker = true;
                                 }
                                 Url url = createUrl( instance.getName(), partner, blpUrl, bm, pushMarker );
@@ -290,20 +309,14 @@ public class UVPDataImporter extends Thread {
                                     cntMarker++;
                                     bm.hasMarker = true;
                                     markerAlreadyPushed = true;
-                                    markerUrls.add( blpUrl );
+                                    markerUrls.add( getUrlWithoutParameters( blpUrl ) );
                                 }
                             } catch (Exception e) {
                                 // ignore URL
                                 if (pushMarker) {
                                     bm.hasMarker = false;
 
-                                    // get the next longest url as new prospect for marker url
-                                    longestUrlOfBlp = "";
-                                    for (String url : blpUrls) {
-                                        if (url != null && !url.equals( blpUrl ) && url.length() > longestUrlOfBlp.length()) {
-                                            longestUrlOfBlp = url;
-                                        }
-                                    }
+                                    ignoredBlpUrls.add( blpUrl );
                                 }
 
                                 bm.errors.add( new UVPDataImporter().new StatusEntry( e.getMessage(), "URL_IGNORED" ) );
@@ -341,7 +354,7 @@ public class UVPDataImporter extends Thread {
             if (partialURLErrors > 0) {
 
                 sp.addState( "PARTIAL_URLS", "Partial URL errors found: " + partialURLErrors + "", Classification.WARN );
-                logAndPrint( "\n\nPARTIAL URL ERRORS:\n" );
+                logAndPrint( "\n\nPARTIAL URL ERRORS/PROBLEMS:\n" );
 
                 for (BlpModel bm : blpModels) {
                     if (bm.hasMarker && !bm.errors.isEmpty()) {
@@ -353,9 +366,9 @@ public class UVPDataImporter extends Thread {
                 }
             }
 
-            logAndPrint( "\nFinish. Records: " + cntRecords + ", Urls added: " + cntUrls + " urls to instance '" + instance.getName() + "', mark " + cntMarker
+            logAndPrint( "\nFinish. Excel Records: " + cntRecords + ", Urls added: " + cntUrls + " urls to instance '" + instance.getName() + "', mark " + cntMarker
                     + " records as marker to be displayed on map." );
-            sp.addState( "FINISHED", "\nFinished importing. Records: " + cntRecords + ", Urls added: " + cntUrls + " urls to instance '" + instance.getName() + "', mark " + cntMarker
+            sp.addState( "FINISHED", "\nFinished importing. Excel Records: " + cntRecords + ", Urls added: " + cntUrls + " urls to instance '" + instance.getName() + "', mark " + cntMarker
                     + " records as marker to be displayed on map." );
 
             tx.commit();
@@ -409,6 +422,13 @@ public class UVPDataImporter extends Thread {
         @SuppressWarnings("static-access")
         Option partnerOption = OptionBuilder.withArgName( "partner short cut" ).hasArg().withDescription( "a partner shortcut. i.e. ni" ).create( "partner" );
         options.addOption( partnerOption );
+        @SuppressWarnings("static-access")
+        Option excludeMarkerUrlsOption = OptionBuilder.withArgName( "exclude urls from marker urls" )
+                .hasArgs()
+                .withDescription( "list of url regex patterns that define urls that should be excluded from possible marker urls, separated by '|'." )
+                .create( "excludeMarkerUrls" );
+        excludeMarkerUrlsOption.setValueSeparator( '|' );
+        options.addOption( excludeMarkerUrlsOption );
 
         CommandLine cmd = parser.parse( options, args );
 
@@ -441,10 +461,14 @@ public class UVPDataImporter extends Thread {
             System.exit( 0 );
         }
 
-        conf = new ConfigBuilder<Configuration>( Configuration.class ).build();
+        if (cmd.hasOption( "excludeMarkerUrls" )) {
+            uvpDataImporter.excludeMarkerUrls = cmd.getOptionValues( "excludeMarkerUrls" );
+        }
+
+        uvpDataImporter.conf = new ConfigBuilder<Configuration>( Configuration.class ).build();
 
         instanceName = instanceName.replaceAll( "[:\\\\/*?|<>\\W]", "_" );
-        Path instancePath = Paths.get( conf.getInstancesDir() + "/" + instanceName );
+        Path instancePath = Paths.get( uvpDataImporter.conf.getInstancesDir() + "/" + instanceName );
 
         Instance instance = new Instance();
         instance.setName( instanceName );
@@ -458,12 +482,12 @@ public class UVPDataImporter extends Thread {
 
         // set the directory of the database to the configured one
         Map<String, String> properties = new HashMap<String, String>();
-        Path dbDir = Paths.get( conf.databaseDir );
+        Path dbDir = Paths.get( uvpDataImporter.conf.databaseDir );
         properties.put( "javax.persistence.jdbc.url", "jdbc:h2:" + dbDir.toFile().getAbsolutePath() + "/urls;MVCC=true;AUTO_SERVER=TRUE" );
 
         // get an entity manager instance (initializes properties in the
         // DBManager)
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory( conf.databaseID, properties );
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory( uvpDataImporter.conf.databaseID, properties );
 
         DBManager.INSTANCE.intialize( emf );
 
@@ -481,6 +505,10 @@ public class UVPDataImporter extends Thread {
         URL url = new URL( urlStr );
         String host = url.getHost();
         return urlStr.substring( 0, urlStr.indexOf( host ) + host.length() );
+    }
+
+    private static String getUrlWithoutParameters(String url) {
+        return url.split( "\\?" )[0];
     }
 
     /**
@@ -564,10 +592,12 @@ public class UVPDataImporter extends Thread {
             boolean gotHeader = false;
             Map<Integer, String> columnNames = new HashMap<Integer, String>();
             if (it.hasNext()) {
+                // iterate over all rows
                 while (it.hasNext()) {
                     Iterator<Cell> ci = it.next().cellIterator();
                     // handle header
                     if (!gotHeader) {
+                        // iterate over all columns
                         while (ci.hasNext()) {
                             Cell cell = ci.next();
                             int columnIndex = cell.getColumnIndex();
@@ -577,6 +607,7 @@ public class UVPDataImporter extends Thread {
                             }
                             columnNames.put( columnIndex, columnName );
                         }
+                        validateColumnNames( columnNames );
                         gotHeader = true;
                     } else {
 
@@ -839,6 +870,26 @@ public class UVPDataImporter extends Thread {
     }
 
     /**
+     * Validates the excel header.
+     *
+     * @param columnNames
+     * @throws IllegalArgumentException
+     */
+    private static void validateColumnNames(Map<Integer, String> columnNames) throws IllegalArgumentException {
+
+        if (!columnNames.containsValue( "NAME" ) && !columnNames.containsValue( "STADT/GEMEINDE" )) {
+            throw new IllegalArgumentException( "Required elective column header \"NAME\" or \"STADT/GEMEINDE\" not specified in excel file." );
+        }
+        if (!columnNames.containsValue( "LON" )) {
+            throw new IllegalArgumentException( "Required column header \"LON\" not specified in excel file." );
+        }
+        if (!columnNames.containsValue( "LAT" )) {
+            throw new IllegalArgumentException( "Required column header \"LAT\" not specified in excel file." );
+        }
+
+    }
+
+    /**
      * Checks if a given URL is shorter than another URL. Ignores the protocol.
      *
      * @param bm
@@ -915,6 +966,7 @@ public class UVPDataImporter extends Thread {
             con.setInstanceFollowRedirects( false );
             con.setRequestMethod( "HEAD" );
             con.setConnectTimeout( 5000 );
+            con.setReadTimeout( 5000 );
             con.connect();
             responseCode = con.getResponseCode();
             if (300 <= responseCode && responseCode <= 308) {
