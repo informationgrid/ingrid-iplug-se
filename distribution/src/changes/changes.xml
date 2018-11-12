@@ -28,6 +28,11 @@
 	<author email="joachim@wemove.com">Joachim Müller</author>
   </properties>
   <body>
+    <release version="4.2.7" date="2018-11-13" description="Release 4.2.7">
+      <action type="add" dev="wemove" issue="REDMINE-1189">
+        Add new option to exclude urls from import by pattern. Improve import overall.
+      </action>
+    </release>
     <release version="4.2.6" date="2018-10-16" description="Release 4.2.6">
       <action type="add" dev="wemove" issue="REDMINE-1189">
         Change logic of BLP data import according to NRW rules.
