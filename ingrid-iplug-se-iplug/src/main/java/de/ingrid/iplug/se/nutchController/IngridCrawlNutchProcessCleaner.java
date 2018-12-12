@@ -71,6 +71,8 @@ public class IngridCrawlNutchProcessCleaner {
                 i--;
                 if (i > 0) {
                     lastState = states[i];
+                } else if (i < 0) {
+                    break;
                 }
             }
             LOG.info("Last state '" + lastState.getKey() + "' detected.");

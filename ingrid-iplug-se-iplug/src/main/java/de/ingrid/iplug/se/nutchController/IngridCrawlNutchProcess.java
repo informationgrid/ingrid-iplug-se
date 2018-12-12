@@ -39,6 +39,7 @@ import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
@@ -144,7 +145,13 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             }
 
             // prepare (central) index for iPlug information
-            this.indexManager.checkAndCreateInformationIndex();
+            try {
+                this.indexManager.checkAndCreateInformationIndex();
+            } catch (NoNodeAvailableException e) {
+                log.error(e);
+                this.statusProvider.addState(NutchProcess.STATES.ERROR.name(), e.getMessage(), Classification.ERROR);
+                throw new IOException(e.getMessage());
+            }
 
             this.statusProvider.addState(STATES.INJECT_START.name(), "Inject start urls...");
             int ret = execute("org.apache.nutch.crawl.Injector", crawlDb, startUrls);
