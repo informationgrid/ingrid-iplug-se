@@ -67,7 +67,7 @@
         <include>elasticsearch.properties</include>
         <include>ingrid.auth</include>
         <include>log4j2.xml</include>
-        <include>instance-data</include>
+        <include>instance-data/urlMaintenance.json</include>
       </includes>
     </fileSet>
     <fileSet>
