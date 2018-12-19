@@ -83,7 +83,8 @@ public class ElasticIndexWriter implements IndexWriter {
 
         // add basic information to dataset to identify source for central index
         source.put("dataSourceName", config.get("iplug.datasource.name", "unknown iPlug"));
-        
+        source.put("iPlugId", config.get("iplug.id", "unknown"));
+
         // dynamically add fields depending on other fields
         requestLength += addDependentFields( source );
         
