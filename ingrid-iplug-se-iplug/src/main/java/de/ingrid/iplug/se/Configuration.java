@@ -116,7 +116,7 @@ public class Configuration implements IConfig {
         // add fields
         List<Object> pdFields = pdObject.getArrayList(PlugDescription.FIELDS);
         for (String field : fields) {
-            if (field != null && !field.isEmpty() && !pdFields.contains(field)) {
+            if (field != null && !field.isEmpty() && pdFields != null && !pdFields.contains(field)) {
                 pdObject.addField(field);
             }
         }
