@@ -48,11 +48,12 @@ public class AdminsController extends InstanceController {
     @Autowired
     private Configuration seConfig;
 
-    private CommunicationService _communicationInterface;
+    // private CommunicationService _communicationInterface;
     
     @Autowired
     public AdminsController(final CommunicationService communicationInterface) throws Exception {
-        _communicationInterface = communicationInterface;
+        // _communicationInterface = communicationInterface;
+        setiBus(communicationInterface.getIBus());
     }
 
     @RequestMapping(value = { AdminViews.SE_INSTANCE_ADMINS }, method = RequestMethod.GET)

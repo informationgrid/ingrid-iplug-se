@@ -27,10 +27,10 @@ import com.google.gson.GsonBuilder;
 import de.ingrid.admin.Config;
 import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
+import de.ingrid.admin.service.CommunicationService;
 import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
 import de.ingrid.elasticsearch.IndexManager;
 import de.ingrid.iplug.se.Configuration;
-import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.conf.UrlMaintenanceSettings;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.InstanceAdmin;
@@ -45,13 +45,13 @@ import de.ingrid.iplug.se.utils.DBUtils;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.utils.UrlErrorPagableFilter;
 import de.ingrid.iplug.se.webapp.container.Instance;
+import de.ingrid.utils.IngridCall;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -95,6 +95,9 @@ public class RestDataController extends InstanceController {
 
 	@Autowired
 	private Configuration seConfig;
+
+	@Autowired
+	private CommunicationService _communicationInterface;
 
 	@RequestMapping(value = { "/test" }, method = RequestMethod.GET)
 	public String test() {
@@ -400,32 +403,30 @@ public class RestDataController extends InstanceController {
 	@RequestMapping(value = { "instance/{name}/{value}" }, method = RequestMethod.POST)
 	public ResponseEntity<Map<String, String>> toggleInstanceActive(
 	        @ModelAttribute("plugDescription") final PlugdescriptionCommandObject pdCommandObject,
-	        @PathVariable("name") String name, @PathVariable("value") String value, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	        @PathVariable("name") String name, @PathVariable("value") String value, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         if (hasNoAccessToInstance(name, request, response)) {
             response.sendError(HttpStatus.FORBIDDEN.value());
             return null;
         }
 
-		List<String> activeInstances = baseConfig.indexSearchInTypes;
-		// always remove type that leads to no result (in case it was set)
-		activeInstances.remove( NO_RESULT_INDEX );
-
-		if ("on".equals(value)) {
-			activeInstances.add(name);
-		} else {
-			activeInstances.remove(name);
-		}
-
-		// add a type which returns no result, if no instance is activated
-		if (activeInstances.size() == 0) {
-		    activeInstances.add( NO_RESULT_INDEX );
-		}
-
-		// write immediately configuration
-		baseConfig.writePlugdescriptionToProperties(pdCommandObject);
+        // activate/deactivate instance via iBus
+		toggleIndexInIBus(name, "on".equals(value));
 
 		return generateOkResponse();
+	}
+
+	private void toggleIndexInIBus(String name, boolean activate) throws Exception {
+		IngridCall ingridCall = new IngridCall();
+		ingridCall.setTarget("iBus");
+		ingridCall.setParameter(JettyStarter.baseConfig.uuid + "=>" + JettyStarter.baseConfig.index + "_" + name + ":default");
+
+		if (activate) {
+			ingridCall.setMethod("activateIndex");
+		} else {
+			ingridCall.setMethod("deactivateIndex");
+		}
+		_communicationInterface.getIBus().call(ingridCall);
 	}
 
 	@RequestMapping(value = "/instance/{id}", method = RequestMethod.DELETE)
@@ -486,7 +487,7 @@ public class RestDataController extends InstanceController {
     }
 
 	@RequestMapping(value = { "status/{instance}" }, method = RequestMethod.GET)
-	public ResponseEntity<Collection<State>> getStatus(@PathVariable("instance") String name, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public ResponseEntity<Collection<State>> getStatus(@PathVariable("instance") String name, HttpServletRequest request, HttpServletResponse response) throws Exception {
         
 	    if (hasNoAccessToInstance(name, request, response)) {
             response.sendError(HttpStatus.FORBIDDEN.value());
@@ -534,7 +535,7 @@ public class RestDataController extends InstanceController {
 
 	@RequestMapping(value = { "url/{instance}/check" }, method = RequestMethod.POST)
 	public ResponseEntity<String> checkUrl(@PathVariable("instance") String instanceName, @RequestBody String urlString, HttpServletRequest request, HttpServletResponse response)
-	        throws IOException, InterruptedException {
+			throws Exception {
         if (hasNoAccessToInstance(instanceName, request, response)) {
             response.sendError(HttpStatus.FORBIDDEN.value());
             return null;
