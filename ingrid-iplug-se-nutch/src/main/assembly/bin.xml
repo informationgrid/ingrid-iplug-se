@@ -41,6 +41,7 @@
       </includes>
       <excludes>
         <exclude>**/apache-nutch-*.job</exclude>
+        <exclude>**/log4j-1.2.15.jar</exclude>
       </excludes>
     </fileSet>
   </fileSets>

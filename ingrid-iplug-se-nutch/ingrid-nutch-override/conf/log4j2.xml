@@ -13,104 +13,137 @@
     </RollingFile>
   </Appenders>
   <Loggers>
-    <Logger name="de.ingrid" level="debug" additivity="false">
+    <Logger name="de.ingrid" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.crawl.Crawl" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.crawl.Injector" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.crawl.Generator" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.fetcher.Fetcher" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.parse.ParseSegment" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.crawl.CrawlDbReader" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.crawl.CrawlDbMerger" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.crawl.LinkDbReader" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.segment.SegmentReader" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.segment.SegmentMerger" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.crawl.CrawlDb" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.crawl.LinkDb" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.crawl.LinkDbMerger" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.indexer.IndexingJob" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.indexer.solr.SolrIndexer" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.indexer.solr.SolrWriter" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.indexer.solr.SolrDeleteDuplicates" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.indexer.solr.SolrClean" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.scoring.webgraph.WebGraph" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.scoring.webgraph.LinkRank" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.scoring.webgraph.Loops" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.scoring.webgraph.ScoreUpdater" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.util.hostdb.HostDb" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.util.hostdb.DumpHostDb" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.parse.ParserChecker" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.indexer.IndexingFiltersChecker" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.tools.FreeGenerator" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.util.domain.DomainStatistics" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.tools.CrawlDBScanner" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch.plugin.PluginRepository" level="warn" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.nutch" level="info" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Logger name="org.apache.hadoop" level="warn" additivity="false">
       <AppenderRef ref="Console" />
+      <AppenderRef ref="LogFile" />
     </Logger>
     <Root level="info">
       <AppenderRef ref="Console" />
