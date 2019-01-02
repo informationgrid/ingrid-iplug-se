@@ -45,15 +45,12 @@ import java.io.File;
 @SessionAttributes("plugDescription")
 public class AdminsController extends InstanceController {
 
-    @Autowired
-    private Configuration seConfig;
+    private final Configuration seConfig;
 
-    // private CommunicationService _communicationInterface;
-    
     @Autowired
-    public AdminsController(final CommunicationService communicationInterface) throws Exception {
-        // _communicationInterface = communicationInterface;
-        setiBus(communicationInterface.getIBus());
+    public AdminsController(final CommunicationService communicationInterface, Configuration seConfig) {
+        setCommunicationInterface(communicationInterface);
+        this.seConfig = seConfig;
     }
 
     @RequestMapping(value = { AdminViews.SE_INSTANCE_ADMINS }, method = RequestMethod.GET)

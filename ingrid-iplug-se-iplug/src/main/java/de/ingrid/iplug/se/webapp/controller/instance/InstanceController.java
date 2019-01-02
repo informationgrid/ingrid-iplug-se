@@ -25,6 +25,7 @@ package de.ingrid.iplug.se.webapp.controller.instance;
 import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.controller.AbstractController;
 import de.ingrid.admin.security.IngridPrincipal;
+import de.ingrid.admin.service.CommunicationService;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.utils.DBUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
@@ -39,13 +40,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
-import java.util.List;
 
 public class InstanceController extends AbstractController {
 
     private static Logger log = LogManager.getLogger(InstanceController.class);
 
-    private static IBus iBus;
+    private static CommunicationService communicationInterface;
 
     public static Instance getInstanceData(String name) {
         // first check if the path really exists, in case we called an URL with a wrong parameter
@@ -79,6 +79,9 @@ public class InstanceController extends AbstractController {
 
     private static HashSet<String> getActiveIndices() {
 
+        // always get iBus from communicationInterface in case it has been changed
+        IBus iBus = communicationInterface.getIBus();
+
         IngridCall call = new IngridCall();
         call.setTarget("iBus");
         call.setMethod("getActiveIndices");
@@ -111,7 +114,7 @@ public class InstanceController extends AbstractController {
         
     }
 
-    public void setiBus(IBus iBus) {
-        this.iBus = iBus;
+    public static void setCommunicationInterface(CommunicationService communicationInterface) {
+        InstanceController.communicationInterface = communicationInterface;
     }
 }
