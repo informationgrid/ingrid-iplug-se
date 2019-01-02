@@ -59,7 +59,7 @@ public class DateSearchTest  {
         JettyStarter.baseConfig = new Config();
         JettyStarter.baseConfig.index = "test";
         JettyStarter.baseConfig.indexWithAutoId = true;
-        JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<>();
+        // JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<>();
         Utils.setupES();
     }
     

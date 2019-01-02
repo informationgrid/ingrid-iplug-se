@@ -54,7 +54,7 @@ public class LocationSearchTest  {
         JettyStarter.baseConfig = new Config();
         JettyStarter.baseConfig.index = "test";
         JettyStarter.baseConfig.indexWithAutoId = true;
-        JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<String>();
+        // JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<String>();
         Utils.setupES();
     }
     

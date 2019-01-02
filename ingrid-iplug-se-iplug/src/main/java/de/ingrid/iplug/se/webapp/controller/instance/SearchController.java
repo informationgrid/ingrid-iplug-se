@@ -28,6 +28,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import de.ingrid.admin.JettyStarter;
+import de.ingrid.elasticsearch.ElasticConfig;
+import de.ingrid.elasticsearch.IndexInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -58,6 +61,9 @@ import de.ingrid.utils.queryparser.TokenMgrError;
 public class SearchController extends InstanceController {
 
     private final HeartBeatPlug _plug;
+
+    @Autowired
+    private ElasticConfig elasticConfig;
 
     @Autowired
     public SearchController(final HeartBeatPlug plug) throws Exception {
@@ -103,7 +109,12 @@ public class SearchController extends InstanceController {
 
             // add instance information into query which is understood by this
             // iPlug
-            query.put( "searchInInstances", new String[] { instance } );
+            IndexInfo indexInfo = new IndexInfo();
+            indexInfo.setToAlias(JettyStarter.baseConfig.index + "_" + instance);
+            indexInfo.setToIndex(JettyStarter.baseConfig.index + "_" + instance);
+            indexInfo.setToType("default");
+            elasticConfig.activeIndices = new IndexInfo[] {indexInfo};
+
             final IngridHits results = _plug.search( query, 0, 20 );
             modelMap.addAttribute( "totalHitCount", results.length() );
 

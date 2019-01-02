@@ -68,7 +68,7 @@ public class NutchProcessTest {
         JettyStarter.baseConfig = new Config();
         JettyStarter.baseConfig.index = "test";
         JettyStarter.baseConfig.indexWithAutoId = true;
-        JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<>();
+        // JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<>();
         JettyStarter.baseConfig.communicationProxyUrl = "/ingrid-group:unit-tests";
         Utils.setupES();
     }

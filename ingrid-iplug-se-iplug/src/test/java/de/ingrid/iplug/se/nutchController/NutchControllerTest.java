@@ -64,8 +64,8 @@ public class NutchControllerTest {
         FileUtils.removeRecursive(Paths.get("test-instances"));
         JettyStarter.baseConfig = new Config();
         JettyStarter.baseConfig.index = "se-test";
-        JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<String>();
-        JettyStarter.baseConfig.indexSearchInTypes.add( "test" );
+        // JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<String>();
+        // JettyStarter.baseConfig.indexSearchInTypes.add( "test" );
         // Attention: this config property is used in ElasticConfig and Config!
         // During runtime both classes will read the config file and be initialized correctly
         JettyStarter.baseConfig.communicationProxyUrl = "/ingrid-group:unit-tests";

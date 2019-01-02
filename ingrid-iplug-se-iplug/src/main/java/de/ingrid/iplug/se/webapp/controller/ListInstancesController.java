@@ -50,7 +50,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -102,7 +101,7 @@ public class ListInstancesController extends InstanceController {
         List<Instance> instances = getInstances();
 
         // check for invalid instances and remove them from the active ones
-        Iterator<String> activeInstancesIt = baseConfig.indexSearchInTypes.iterator();
+        /*Iterator<String> activeInstancesIt = baseConfig.indexSearchInTypes.iterator();
         while (activeInstancesIt.hasNext()) {
             String active = activeInstancesIt.next();
 
@@ -117,7 +116,7 @@ public class ListInstancesController extends InstanceController {
             if (!found) {
                 activeInstancesIt.remove();
             }
-        }
+        }*/
         
         if (!(request.getUserPrincipal() instanceof IngridPrincipal.SuperAdmin) && request.isUserInRole( "instanceAdmin" )) {
             String user = request.getUserPrincipal().getName();

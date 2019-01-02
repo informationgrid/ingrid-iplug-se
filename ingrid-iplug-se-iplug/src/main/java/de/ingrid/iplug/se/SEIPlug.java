@@ -26,7 +26,9 @@
 package de.ingrid.iplug.se;
 
 import de.ingrid.admin.JettyStarter;
+import de.ingrid.elasticsearch.ElasticConfig;
 import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
+import de.ingrid.elasticsearch.IndexInfo;
 import de.ingrid.elasticsearch.search.IndexImpl;
 import de.ingrid.iplug.HeartBeatPlug;
 import de.ingrid.iplug.PlugDescriptionFieldFilters;
@@ -102,6 +104,9 @@ public class SEIPlug extends HeartBeatPlug {
 
     @Autowired
     private IndexImpl index;
+
+    @Autowired
+    private ElasticConfig elasticConfig;
 
     private Configuration seConfig;
 
@@ -213,6 +218,12 @@ public class SEIPlug extends HeartBeatPlug {
         QueryUtil.removeFieldFromQuery(query, QueryUtil.FIELDNAME_INCL_META);
         
         preProcess(query);
+
+        IndexInfo indexInfo = new IndexInfo();
+        indexInfo.setToAlias(JettyStarter.baseConfig.index + "_*");
+        indexInfo.setToIndex(JettyStarter.baseConfig.index + "_*");
+        indexInfo.setToType("default");
+        elasticConfig.activeIndices = new IndexInfo[] {indexInfo};
 
         return index.search(query, start, length);
 

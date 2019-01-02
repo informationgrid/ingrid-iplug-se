@@ -70,7 +70,7 @@ public class ListInstancesControllerTest extends Mockito {
     @Before
     public void initTest() throws Exception {
         JettyStarter.baseConfig = new Config();
-        JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<>();
+        // JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<>();
         MockitoAnnotations.initMocks( this );
         PowerMockito.mockStatic( ElasticSearchUtils.class );
         // InternalNode node = new InternalNode();
