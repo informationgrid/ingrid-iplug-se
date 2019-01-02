@@ -40,6 +40,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import de.ingrid.admin.Config;
+import de.ingrid.admin.service.PlugDescriptionService;
 import de.ingrid.elasticsearch.IndexManager;
 import org.junit.After;
 import org.junit.Before;
@@ -116,7 +117,7 @@ public class NutchControllerTest {
         FileUtils.copyDirectories(Paths.get("../ingrid-iplug-se-nutch/src/test/resources/urls").toAbsolutePath(), urls);
         // TODO: copy dir with metadata-mapping
 
-        IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, 2, 10, null, new IndexManager(elastic, elasticConfig));
+        IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, 2, 10, null, new IndexManager(elastic, elasticConfig), new PlugDescriptionService(new Config()));
 
         NutchController nutchController = new NutchController();
         nutchController.start(instance, process);
@@ -173,7 +174,7 @@ public class NutchControllerTest {
         FileUtils.copyDirectories(Paths.get("../ingrid-iplug-se-nutch/src/test/resources/urls").toAbsolutePath(), urls);
         // TODO: copy dir with metadata-mapping
 
-        IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, 1, 100, null, new IndexManager(elastic, elasticConfig));
+        IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, 1, 100, null, new IndexManager(elastic, elasticConfig), new PlugDescriptionService(new Config()));
 
         NutchController nutchController = new NutchController();
         nutchController.start(instance, process);

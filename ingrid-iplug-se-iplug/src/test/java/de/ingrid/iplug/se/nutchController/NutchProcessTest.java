@@ -32,7 +32,6 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Properties;
 
 import javax.persistence.EntityManagerFactory;
@@ -40,6 +39,7 @@ import javax.persistence.Persistence;
 
 import de.ingrid.admin.Config;
 import de.ingrid.admin.JettyStarter;
+import de.ingrid.admin.service.PlugDescriptionService;
 import de.ingrid.elasticsearch.IndexManager;
 import de.ingrid.iplug.se.elasticsearch.Utils;
 import org.elasticsearch.client.transport.TransportClient;
@@ -157,7 +157,7 @@ public class NutchProcessTest {
 
             FileUtils.copyDirectories(fs.getPath("../ingrid-iplug-se-nutch/src/test/resources/urls").toAbsolutePath(), urls);
 
-            IngridCrawlNutchProcess p = new IngridCrawlNutchProcess(new IndexManager(elastic, elasticConfig));
+            IngridCrawlNutchProcess p = new IngridCrawlNutchProcess(new IndexManager(elastic, elasticConfig), new PlugDescriptionService(new Config()));
             p.setWorkingDirectory(workingDir.toString());
 
             Instance instance = new Instance();

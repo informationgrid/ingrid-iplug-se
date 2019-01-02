@@ -24,6 +24,7 @@ package de.ingrid.iplug.se.nutchController;
 
 import de.ingrid.admin.Config;
 import de.ingrid.admin.JettyStarter;
+import de.ingrid.admin.service.PlugDescriptionService;
 import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
 import de.ingrid.elasticsearch.IndexInfo;
 import de.ingrid.elasticsearch.IndexManager;
@@ -33,6 +34,7 @@ import de.ingrid.iplug.se.nutchController.StatusProvider.Classification;
 import de.ingrid.iplug.se.utils.DBUtils;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
+import de.ingrid.utils.PlugDescription;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
@@ -82,9 +84,12 @@ public class IngridCrawlNutchProcess extends NutchProcess {
 
     private final IndexManager indexManager;
 
+    private PlugDescriptionService plugDescriptionService;
 
-    public IngridCrawlNutchProcess(IndexManager indexManager) {
+
+    public IngridCrawlNutchProcess(IndexManager indexManager, PlugDescriptionService pds) {
         this.indexManager = indexManager;
+        this.plugDescriptionService = pds;
     }
 
     @Override
@@ -442,6 +447,8 @@ public class IngridCrawlNutchProcess extends NutchProcess {
     private String getIPlugInfo(String infoId, String indexName, boolean running, Integer count, Integer totalCount) throws IOException {
         Config _config = JettyStarter.baseConfig;
 
+        PlugDescription plugDescription = this.plugDescriptionService.getPlugDescription();
+
         // @formatter:off
         XContentBuilder xContentBuilder = XContentFactory.jsonBuilder().startObject()
                 .field("plugId", _config.communicationProxyUrl)
@@ -454,6 +461,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
                 .field("lastIndexed", new Date())
 // TODO:                .field("datatypes", this._plugDescription.getDataTypes())
 // TODO:                .field("fields", this._plugDescription.getFields())
+                .field("plugdescription", plugDescription)
                 .startObject("indexingState")
                     .field("numProcessed", count)
                     .field("totalDocs", totalCount)

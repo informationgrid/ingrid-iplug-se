@@ -22,6 +22,7 @@
  */
 package de.ingrid.iplug.se.webapp.controller.instance.scheduler;
 
+import de.ingrid.admin.service.PlugDescriptionService;
 import de.ingrid.elasticsearch.IndexManager;
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
@@ -53,6 +54,9 @@ public class SchedulerManager {
     private NutchController nutchController;
 
     private final IndexManager indexManager;
+
+    @Autowired
+    private PlugDescriptionService plugDescriptionService;
 
     @Autowired
     private IPostCrawlProcessor[] postCrawlProcessors;
@@ -122,7 +126,7 @@ public class SchedulerManager {
     }
 
     public void addInstance(String name) {
-        SchedulingRunnable schedulerRun = new SchedulingRunnable(name, crawlDataPers, nutchController, postCrawlProcessors, indexManager);
+        SchedulingRunnable schedulerRun = new SchedulingRunnable(name, crawlDataPers, nutchController, postCrawlProcessors, indexManager,plugDescriptionService);
         Scheduler schedulerClass = new Scheduler();
 
         Runner runner = new Runner(schedulerClass, schedulerRun);

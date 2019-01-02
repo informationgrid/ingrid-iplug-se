@@ -23,6 +23,7 @@
 package de.ingrid.iplug.se.nutchController;
 
 import de.ingrid.admin.JettyStarter;
+import de.ingrid.admin.service.PlugDescriptionService;
 import de.ingrid.elasticsearch.IndexManager;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.db.DBManager;
@@ -56,8 +57,8 @@ public class NutchProcessFactory {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static IngridCrawlNutchProcess getIngridCrawlNutchProcess(Instance instance, int depth, int noUrls, IPostCrawlProcessor[] postCrawlProcessors, IndexManager indexManager) {
-        IngridCrawlNutchProcess process = new IngridCrawlNutchProcess(indexManager);
+    public static IngridCrawlNutchProcess getIngridCrawlNutchProcess(Instance instance, int depth, int noUrls, IPostCrawlProcessor[] postCrawlProcessors, IndexManager indexManager, PlugDescriptionService pds) {
+        IngridCrawlNutchProcess process = new IngridCrawlNutchProcess(indexManager, pds);
         
         process.setInstance(instance);
 

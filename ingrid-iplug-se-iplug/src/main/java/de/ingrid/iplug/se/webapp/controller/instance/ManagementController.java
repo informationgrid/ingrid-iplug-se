@@ -27,6 +27,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import de.ingrid.admin.service.PlugDescriptionService;
 import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
 import de.ingrid.elasticsearch.IndexManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,20 +57,22 @@ import de.ingrid.iplug.se.webapp.controller.AdminViews;
 public class ManagementController extends InstanceController {
 
     private NutchController nutchController;
-    
+
     private IPostCrawlProcessor[] postCrawlProcessors;
-    
+
     private final ElasticsearchNodeFactoryBean elasticSearch;
 
     private final IndexManager indexManager;
-    
+
+    private PlugDescriptionService plugDescriptionService;
 
     @Autowired
-    public ManagementController(NutchController nutchController, IPostCrawlProcessor[] postCrawlProcessors, ElasticsearchNodeFactoryBean elasticSearch, IndexManager indexManager) {
+    public ManagementController(NutchController nutchController, IPostCrawlProcessor[] postCrawlProcessors, ElasticsearchNodeFactoryBean elasticSearch, IndexManager indexManager, PlugDescriptionService pds) {
         this.nutchController = nutchController;
         this.postCrawlProcessors = postCrawlProcessors;
         this.elasticSearch = elasticSearch;
         this.indexManager = indexManager;
+        this.plugDescriptionService = pds;
     }
 
     @RequestMapping(value = { "/iplug-pages/instanceManagement.html" }, method = RequestMethod.GET)
@@ -99,7 +102,7 @@ public class ManagementController extends InstanceController {
         // configure crawl process        
         Instance instance = InstanceController.getInstanceData( name );
 
-        IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, depth, numUrls, postCrawlProcessors, indexManager);
+        IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, depth, numUrls, postCrawlProcessors, indexManager, plugDescriptionService);
         process.setElasticSearch( elasticSearch );
 
         // run crawl process
