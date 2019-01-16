@@ -3,7 +3,7 @@
   <parent>
     <groupId>de.ingrid</groupId>
     <artifactId>ingrid-iplug-se-project</artifactId>
-    <version>4.5.0</version>
+    <version>4.6.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>ingrid-iplug-se-iplug</artifactId>
@@ -38,8 +38,8 @@
     </dependencies>
   </dependencyManagement>
   <dependencies>
-  
-    <!-- needed for Java8 compatibility with PowerMock --> 
+
+    <!-- needed for Java8 compatibility with PowerMock -->
     <dependency>
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>

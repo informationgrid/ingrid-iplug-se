@@ -37,6 +37,7 @@ import de.ingrid.admin.elasticsearch.IndexManager;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
 import de.ingrid.iplug.se.nutchController.NutchController;
+import de.ingrid.iplug.se.nutchController.NutchProcessFactory;
 import it.sauronsoftware.cron4j.Scheduler;
 
 @Service
@@ -51,6 +52,9 @@ public class SchedulerManager {
 
     @Autowired
     private IPostCrawlProcessor[] postCrawlProcessors;
+    
+    @Autowired
+    private NutchProcessFactory nutchProcessFactory;
     
     private class Runner {
         public Runner(Scheduler s, SchedulingRunnable sr) {
@@ -121,7 +125,7 @@ public class SchedulerManager {
     }
 
     public void addInstance(String name) {
-        SchedulingRunnable schedulerRun = new SchedulingRunnable(name, crawlDataPers, nutchController, postCrawlProcessors);
+        SchedulingRunnable schedulerRun = new SchedulingRunnable(name, crawlDataPers, nutchController, postCrawlProcessors, nutchProcessFactory);
         Scheduler schedulerClass = new Scheduler();
 
         Runner runner = new Runner(schedulerClass, schedulerRun);

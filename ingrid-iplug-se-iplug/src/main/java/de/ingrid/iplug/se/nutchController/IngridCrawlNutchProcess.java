@@ -43,7 +43,6 @@ import org.elasticsearch.client.Client;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.springframework.stereotype.Service;
 
 import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.SEIPlug;
@@ -59,7 +58,6 @@ import de.ingrid.iplug.se.webapp.container.Instance;
  * execute this with a {@link GenericNutchProcess}.
  * 
  */
-@Service
 public class IngridCrawlNutchProcess extends NutchProcess {
 
     private static Logger log = Logger.getLogger(IngridCrawlNutchProcess.class);
@@ -79,7 +77,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
     LogFileWatcher logFileWatcher = null;
     
     private ElasticsearchNodeFactoryBean elasticSearch;
-    
+      
 
     @Override
     public void run() {

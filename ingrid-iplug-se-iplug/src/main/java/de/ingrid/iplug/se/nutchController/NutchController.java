@@ -26,67 +26,74 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.ingrid.iplug.se.StatusProviderService;
 import de.ingrid.iplug.se.webapp.container.Instance;
 
 @Service
 public class NutchController {
+
+    @Autowired
+    private StatusProviderService statusProviderService;
 
     Map<String, NutchProcess> instances = new HashMap<String, NutchProcess>();
 
     /**
      * Start a process.
      * 
-     * @param instance The instance the process should execute in.
-     * @param process The {@link NutchProcess} to start.
+     * @param instance
+     *            The instance the process should execute in.
+     * @param process
+     *            The {@link NutchProcess} to start.
      * @throws Exception
      */
     public synchronized void start(Instance instance, NutchProcess process) {
 
-        if (instances.containsKey(instance.getName())) {
-            NutchProcess p = instances.get(instance.getName());
+        if (instances.containsKey( instance.getName() )) {
+            NutchProcess p = instances.get( instance.getName() );
             if (p.getStatus() == NutchProcess.STATUS.RUNNING) {
                 return;
             }
         }
 
-        instances.put(instance.getName(), process);
+        instances.put( instance.getName(), process );
         process.start();
     }
 
     /**
      * Returns the nutch process for this instance if any.
      * 
-     * @param instance The instance or null if not found.
+     * @param instance
+     *            The instance or null if not found.
      * @return
      */
     public synchronized NutchProcess getNutchProcess(Instance instance) {
-        if (instances.containsKey(instance.getName())) {
-            NutchProcess process = instances.get(instance.getName());
+        if (instances.containsKey( instance.getName() )) {
+            NutchProcess process = instances.get( instance.getName() );
             return process;
         }
         return null;
     }
-    
 
     /**
      * Stops a process for the specified instance.
      * 
      * @param instance
-     * @throws Exception 
+     * @throws Exception
      */
     public synchronized void stop(Instance instance) throws Exception {
-        NutchProcess command = instances.get(instance.getName());
+        NutchProcess command = instances.get( instance.getName() );
         if (command != null && command.getStatus() == NutchProcess.STATUS.RUNNING) {
             command.stopExecution();
-        } else if (command == null) { 
+        } else if (command == null) {
             // in case no command is executed at the moment
             // see "REDMINE-569" (Cannot delete failed crawl on startup.)
-            StatusProvider sp = new StatusProvider(instance.getWorkingDirectory());
-            IngridCrawlNutchProcessCleaner ingridCrawlNutchProcessCleaner = new IngridCrawlNutchProcessCleaner(sp);
+            StatusProvider sp = statusProviderService.getStatusProvider( instance.getWorkingDirectory() );
+            IngridCrawlNutchProcessCleaner ingridCrawlNutchProcessCleaner = new IngridCrawlNutchProcessCleaner( sp );
             // cleanup crawl
-            ingridCrawlNutchProcessCleaner.cleanup(new File(instance.getWorkingDirectory()).toPath());
+            ingridCrawlNutchProcessCleaner.cleanup( new File( instance.getWorkingDirectory() ).toPath() );
             // clear previously set states
             sp.clear();
             sp.write();

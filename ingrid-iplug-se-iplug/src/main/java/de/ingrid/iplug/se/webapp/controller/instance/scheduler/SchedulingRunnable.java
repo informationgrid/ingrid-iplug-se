@@ -64,12 +64,15 @@ public class SchedulingRunnable implements Runnable {
     private IngridCrawlNutchProcess _process = null;
 
     private IPostCrawlProcessor[] postCrawlProcessors;
+    
+    private NutchProcessFactory nutchProcessFactory;
 
-    public SchedulingRunnable(String instanceName, CrawlDataPersistence crawlDataPersistence, NutchController nutchController, IPostCrawlProcessor[] postCrawlProcessors) {
+    public SchedulingRunnable(String instanceName, CrawlDataPersistence crawlDataPersistence, NutchController nutchController, IPostCrawlProcessor[] postCrawlProcessors, NutchProcessFactory nutchProcessFactory) {
         this._crawlDataPersistence = crawlDataPersistence;
         this._instanceName = instanceName;
         this._nutchController = nutchController;
         this.postCrawlProcessors = postCrawlProcessors;
+        this.nutchProcessFactory = nutchProcessFactory;
     }
 
     @Override
@@ -98,7 +101,7 @@ public class SchedulingRunnable implements Runnable {
             }
 
             Instance instanceData = InstanceController.getInstanceData(_instanceName);
-            _process = NutchProcessFactory.getIngridCrawlNutchProcess(instanceData, crawlData.getDepth(), crawlData.getTopn(), postCrawlProcessors);
+            _process = nutchProcessFactory.getIngridCrawlNutchProcess(instanceData, crawlData.getDepth(), crawlData.getTopn(), postCrawlProcessors);
 
             // run crawl process
             _nutchController.start(instanceData, _process);
