@@ -1,6 +1,6 @@
 /*
  * **************************************************-
- * ingrid-iplug-se-iplug
+ * ingrid-iplug-se
  * ==================================================
  * Copyright (C) 2014 - 2019 wemove digital solutions GmbH
  * ==================================================
@@ -20,18 +20,40 @@
  * limitations under the Licence.
  * **************************************************#
  */
-package de.ingrid.iplug.se.webapp.datatype;
+package de.ingrid.iplug.se;
 
-import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import de.ingrid.admin.object.AbstractDataType;
+public class BlpImportBean {
 
-@Service
-public class ServiceDataType extends AbstractDataType {
+    private MultipartFile _multipartFile;
+    public String partner;
 
-    public ServiceDataType() {
-        super("service");
-        //setForceActive(true);
+    /**
+     * Get file for upload.
+     * 
+     * @return
+     *         A multipart file.
+     */
+    public MultipartFile getFile() {
+        return _multipartFile;
+    }
+
+    /**
+     * Set file for upload.
+     * 
+     * @param multipartFile
+     */
+    public void setFile(MultipartFile multipartFile) {
+        _multipartFile = multipartFile;
+    }
+
+    public String getPartner() {
+        return this.partner;
+    }
+
+    public void setPartner(String partner) {
+        this.partner = partner;
     }
 
 }

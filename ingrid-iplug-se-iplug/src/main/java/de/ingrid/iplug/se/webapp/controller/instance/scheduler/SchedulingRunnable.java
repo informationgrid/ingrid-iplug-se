@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
- * Copyright (C) 2014 - 2018 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2019 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -69,15 +69,18 @@ public class SchedulingRunnable implements Runnable {
 
     private IPostCrawlProcessor[] postCrawlProcessors;
 
+    private NutchProcessFactory nutchProcessFactory;
+
     private PlugDescriptionService plugDescriptionService;
 
-    public SchedulingRunnable(String instanceName, CrawlDataPersistence crawlDataPersistence, NutchController nutchController, IPostCrawlProcessor[] postCrawlProcessors, IndexManager indexManager, PlugDescriptionService pds) {
+    public SchedulingRunnable(String instanceName, CrawlDataPersistence crawlDataPersistence, NutchController nutchController, IPostCrawlProcessor[] postCrawlProcessors, NutchProcessFactory nutchProcessFactory, IndexManager indexManager, PlugDescriptionService pds) {
         this._crawlDataPersistence = crawlDataPersistence;
         this._instanceName = instanceName;
         this._nutchController = nutchController;
         this.postCrawlProcessors = postCrawlProcessors;
         this.indexManager = indexManager;
         this.plugDescriptionService = pds;
+        this.nutchProcessFactory = nutchProcessFactory;
     }
 
     @Override
@@ -105,7 +108,7 @@ public class SchedulingRunnable implements Runnable {
             }
 
             Instance instanceData = InstanceController.getInstanceData(_instanceName);
-            _process = NutchProcessFactory.getIngridCrawlNutchProcess(instanceData, crawlData.getDepth(), crawlData.getTopn(), postCrawlProcessors, indexManager, plugDescriptionService);
+            _process = nutchProcessFactory.getIngridCrawlNutchProcess(instanceData, crawlData.getDepth(), crawlData.getTopn(), postCrawlProcessors, indexManager, plugDescriptionService);
 
             // run crawl process
             _nutchController.start(instanceData, _process);

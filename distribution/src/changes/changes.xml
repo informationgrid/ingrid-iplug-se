@@ -28,7 +28,26 @@
 	<author email="joachim@wemove.com">Joachim Müller</author>
   </properties>
   <body>
-    <release version="4.4.0-SNAPSHOT" date="2018-xx-xx" description="Release 4.4.0">
+
+    <release version="4.6.0" date="2019-01-16" description="Release 4.6.0">
+      <action type="add" dev="wemove" issue="REDMINE-1189">
+        Add new option to exclude urls from import by pattern. Improve import overall.
+      </action>
+      <action type="add" dev="wemove" issue="REDMINE-1189">
+        Change logic of BLP data import according to NRW rules.
+      </action>
+      <action type="add" dev="wemove" issue="REDMINE-979">
+        Add administrators for instances
+      </action>
+      <action type="add" dev="wemove" issue="REDMINE-914">
+        Upload BLP Excel files for import
+      </action>
+    </release>
+
+    <release version="4.5.0" date="2018-10-09" description="Release 4.5.0">
+      <action type="update" dev="wemove">
+        Updated dependencies (admin-gui).
+      </action>
       <action type="fix" dev="wemove" issue="REDMINE-1093">
         Introduce new property 'ingrid.delete.before.crawl' and 'ingrid.index.no.deduplication' to make the UVP BLP crawl more robust.
       </action>

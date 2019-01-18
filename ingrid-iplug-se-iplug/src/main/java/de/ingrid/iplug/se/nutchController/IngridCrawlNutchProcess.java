@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
- * Copyright (C) 2014 - 2018 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2019 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -472,7 +472,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
 
         return Strings.toString(xContentBuilder);
     }
-    
+
     private void cleanupHadoop() throws IOException {
         this.statusProvider.addState(STATES.CLEANUP_HADOOP.name(), "Clean up ...");
         FileUtils.removeRecursive(Paths.get(workingDirectory.getAbsolutePath(), "hadoop-tmp"));

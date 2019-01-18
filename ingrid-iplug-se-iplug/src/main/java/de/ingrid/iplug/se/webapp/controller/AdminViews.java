@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
- * Copyright (C) 2014 - 2018 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2019 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -41,5 +41,6 @@ public class AdminViews extends IViews {
     public static final String SE_INSTANCE_SEARCH = "/iplug-pages/instanceSearch";
     public static final String SE_INSTANCE_REPORTS = "/iplug-pages/instanceReports";
     public static final String SE_INSTANCE_ADMINS = "/iplug-pages/instanceAdmins";
+    public static final String SE_INSTANCE_BLP_IMPORT = "/iplug-pages/instanceBlpImport";
 
 }

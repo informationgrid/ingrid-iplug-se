@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
- * Copyright (C) 2014 - 2018 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2019 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -27,6 +27,7 @@ import de.ingrid.elasticsearch.IndexManager;
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
 import de.ingrid.iplug.se.nutchController.NutchController;
+import de.ingrid.iplug.se.nutchController.NutchProcessFactory;
 import it.sauronsoftware.cron4j.Scheduler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -62,7 +63,10 @@ public class SchedulerManager {
     private IPostCrawlProcessor[] postCrawlProcessors;
 
     private final Configuration seConfig;
-    
+
+    @Autowired
+    private NutchProcessFactory nutchProcessFactory;
+
     private class Runner {
         public Runner(Scheduler s, SchedulingRunnable sr) {
             this.scheduler = s;
@@ -126,7 +130,7 @@ public class SchedulerManager {
     }
 
     public void addInstance(String name) {
-        SchedulingRunnable schedulerRun = new SchedulingRunnable(name, crawlDataPers, nutchController, postCrawlProcessors, indexManager,plugDescriptionService);
+        SchedulingRunnable schedulerRun = new SchedulingRunnable(name, crawlDataPers, nutchController, postCrawlProcessors, nutchProcessFactory, indexManager,plugDescriptionService);
         Scheduler schedulerClass = new Scheduler();
 
         Runner runner = new Runner(schedulerClass, schedulerRun);

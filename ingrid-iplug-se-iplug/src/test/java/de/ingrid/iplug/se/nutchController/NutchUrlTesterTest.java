@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
- * Copyright (C) 2014 - 2018 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2019 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -58,7 +58,8 @@ public class NutchUrlTesterTest {
 
         FileUtils.copyDirectories(Paths.get("apache-nutch-runtime/runtime/local/conf").toAbsolutePath(), conf);
 
-        NutchProcess process = NutchProcessFactory.getUrlTesterProcess(instance, "http://www.google.de");
+        NutchProcessFactory npf = new NutchProcessFactory();
+        NutchProcess process = npf.getUrlTesterProcess(instance, "http://www.google.de");
 
         process.start();
 

@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
- * Copyright (C) 2014 - 2018 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2019 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -26,11 +26,15 @@ import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.service.PlugDescriptionService;
 import de.ingrid.elasticsearch.IndexManager;
 import de.ingrid.iplug.se.SEIPlug;
+import de.ingrid.iplug.se.StatusProviderService;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
 import de.ingrid.iplug.se.webapp.container.Instance;
 import edu.emory.mathcs.backport.java.util.Arrays;
 import org.apache.commons.lang.StringUtils;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -45,10 +49,15 @@ import java.util.List;
  * @author joachim
  * 
  */
+@Service
 public class NutchProcessFactory {
 
     // private final static Log log =
     // LogFactory.getLog(NutchProcessFactory.class);
+
+
+    private StatusProviderService statusProviderService;
+
     /**
      * @param instance
      * @param depth
@@ -57,7 +66,7 @@ public class NutchProcessFactory {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static IngridCrawlNutchProcess getIngridCrawlNutchProcess(Instance instance, int depth, int noUrls, IPostCrawlProcessor[] postCrawlProcessors, IndexManager indexManager, PlugDescriptionService pds) {
+    public IngridCrawlNutchProcess getIngridCrawlNutchProcess(Instance instance, int depth, int noUrls, IPostCrawlProcessor[] postCrawlProcessors, IndexManager indexManager, PlugDescriptionService pds) {
         IngridCrawlNutchProcess process = new IngridCrawlNutchProcess(indexManager, pds);
         
         process.setInstance(instance);
@@ -73,7 +82,7 @@ public class NutchProcessFactory {
         process.addJavaOptions(SEIPlug.conf.nutchCallJavaOptions.toArray(new String[] {}));
         process.addClassPath(Paths.get("apache-nutch-runtime/runtime/local").toAbsolutePath().toString());
         process.addClassPath(Paths.get("apache-nutch-runtime", "runtime", "local", "lib").toAbsolutePath().toString().concat(File.separator).concat("*"));
-        process.setStatusProvider(new StatusProvider(instance.getWorkingDirectory()));
+        process.setStatusProvider( statusProviderService.getStatusProvider( instance.getWorkingDirectory() ) );
 
         NutchConfigTool nutchConfigTool = new NutchConfigTool(Paths.get(instance.getWorkingDirectory(), "conf", "nutch-site.xml"));
 
@@ -117,7 +126,7 @@ public class NutchProcessFactory {
 
     }
     
-    public static NutchProcess getUrlTesterProcess(Instance instance, String url) { 
+    public NutchProcess getUrlTesterProcess(Instance instance, String url) {
         GenericNutchProcess process = new GenericNutchProcess();
 
         process.setWorkingDirectory(instance.getWorkingDirectory());
@@ -130,6 +139,15 @@ public class NutchProcessFactory {
         process.addCommand("de.ingrid.iplug.se.nutch.analysis.UrlTester", url);
         
         return process;        
+    }
+
+    public StatusProviderService getStatusProviderService() {
+        return statusProviderService;
+    }
+
+    @Autowired
+    public void setStatusProviderService(StatusProviderService statusProviderService) {
+        this.statusProviderService = statusProviderService;
     }
 
 }

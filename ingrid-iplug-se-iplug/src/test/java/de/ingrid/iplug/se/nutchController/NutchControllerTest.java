@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
- * Copyright (C) 2014 - 2018 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2019 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -27,7 +27,6 @@ import static de.ingrid.iplug.se.elasticsearch.Utils.elasticConfig;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -36,8 +35,6 @@ import java.util.Properties;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import de.ingrid.admin.Config;
 import de.ingrid.admin.service.PlugDescriptionService;
@@ -45,14 +42,11 @@ import de.ingrid.elasticsearch.IndexManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.xml.sax.SAXException;
-
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonSyntaxException;
 
 import de.ingrid.admin.JettyStarter;
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
+import de.ingrid.iplug.se.StatusProviderService;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.elasticsearch.Utils;
 import de.ingrid.iplug.se.utils.FileUtils;
@@ -72,20 +66,20 @@ public class NutchControllerTest {
         JettyStarter.baseConfig.communicationProxyUrl = "/ingrid-group:unit-tests";
         Utils.setupES();
     }
-    
+
     @After
     public void afterTest() throws Exception {
         elastic.getClient().close();
     }
-    
+
     @Test
     public void test() throws Exception {
 
         Configuration configuration = new Configuration();
-        configuration.setInstancesDir("test-instances");
+        configuration.setInstancesDir( "test-instances" );
         configuration.databaseID = "iplug-se-dev";
         configuration.dependingFields = new ArrayList<String>();
-        configuration.nutchCallJavaOptions = java.util.Arrays.asList("-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8");
+        configuration.nutchCallJavaOptions = java.util.Arrays.asList( "-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8" );
         SEIPlug.conf = configuration;
         Properties elasticProperties = Utils.getElasticProperties();
         String elasticNetworkHost = (String) elasticProperties.get("network.host");
@@ -94,17 +88,17 @@ public class NutchControllerTest {
         // DBManager)
         EntityManagerFactory emf = null;
         // for development use the settings from the persistence.xml
-        emf = Persistence.createEntityManagerFactory(configuration.databaseID);
-        DBManager.INSTANCE.intialize(emf);
+        emf = Persistence.createEntityManagerFactory( configuration.databaseID );
+        DBManager.INSTANCE.intialize( emf );
 
         Instance instance = new Instance();
-        instance.setName("test");
-        instance.setWorkingDirectory(SEIPlug.conf.getInstancesDir() + "/test");
+        instance.setName( "test" );
+        instance.setWorkingDirectory( SEIPlug.conf.getInstancesDir() + "/test" );
 
-        Path conf = Paths.get(SEIPlug.conf.getInstancesDir(), "test", "conf").toAbsolutePath();
-        Path urls = Paths.get(SEIPlug.conf.getInstancesDir(), "test", "urls").toAbsolutePath();
-        Path logs = Paths.get(SEIPlug.conf.getInstancesDir(), "test", "logs").toAbsolutePath();
-        Files.createDirectories(logs);
+        Path conf = Paths.get( SEIPlug.conf.getInstancesDir(), "test", "conf" ).toAbsolutePath();
+        Path urls = Paths.get( SEIPlug.conf.getInstancesDir(), "test", "urls" ).toAbsolutePath();
+        Path logs = Paths.get( SEIPlug.conf.getInstancesDir(), "test", "logs" ).toAbsolutePath();
+        Files.createDirectories( logs );
 
         FileUtils.copyDirectories(Paths.get("apache-nutch-runtime/runtime/local/conf").toAbsolutePath(), conf);
         
@@ -113,81 +107,86 @@ public class NutchControllerTest {
         nct.addOrUpdateProperty("elastic.port", "9300", "");
         nct.addOrUpdateProperty("elastic.cluster", "ingrid", "");
         nct.write();
-        
-        FileUtils.copyDirectories(Paths.get("../ingrid-iplug-se-nutch/src/test/resources/urls").toAbsolutePath(), urls);
+
+        FileUtils.copyDirectories( Paths.get( "../ingrid-iplug-se-nutch/src/test/resources/urls" ).toAbsolutePath(), urls );
         // TODO: copy dir with metadata-mapping
 
-        IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, 2, 10, null, new IndexManager(elastic, elasticConfig), new PlugDescriptionService(new Config()));
+        NutchProcessFactory npf = new NutchProcessFactory();
+        npf.setStatusProviderService( new StatusProviderService() );
+
+        IngridCrawlNutchProcess process = npf.getIngridCrawlNutchProcess(instance, 2, 10, null, new IndexManager(elastic, elasticConfig), new PlugDescriptionService(new Config()));
 
         NutchController nutchController = new NutchController();
-        nutchController.start(instance, process);
+        nutchController.start( instance, process );
 
         long start = System.currentTimeMillis();
-        Thread.sleep(500);
-        assertEquals("Status is RUNNING", NutchProcess.STATUS.RUNNING, nutchController.getNutchProcess(instance).getStatus());
+        Thread.sleep( 500 );
+        assertEquals( "Status is RUNNING", NutchProcess.STATUS.RUNNING, nutchController.getNutchProcess( instance ).getStatus() );
         while ((System.currentTimeMillis() - start) < 360000) {
-            Thread.sleep(1000);
-            if (nutchController.getNutchProcess(instance).getStatus() != NutchProcess.STATUS.RUNNING) {
+            Thread.sleep( 1000 );
+            if (nutchController.getNutchProcess( instance ).getStatus() != NutchProcess.STATUS.RUNNING) {
                 break;
             }
         }
-        if (nutchController.getNutchProcess(instance).getStatus() == NutchProcess.STATUS.RUNNING) {
-            nutchController.stop(instance);
-            fail("Crawl took more than 6 min.");
+        if (nutchController.getNutchProcess( instance ).getStatus() == NutchProcess.STATUS.RUNNING) {
+            nutchController.stop( instance );
+            fail( "Crawl took more than 6 min." );
         }
-        assertEquals("Status is FINISHED", NutchProcess.STATUS.FINISHED, nutchController.getNutchProcess(instance).getStatus());
+        assertEquals( "Status is FINISHED", NutchProcess.STATUS.FINISHED, nutchController.getNutchProcess( instance ).getStatus() );
 
-        System.out.println(nutchController.getNutchProcess(instance).getStatusProvider().toString());
+        System.out.println( nutchController.getNutchProcess( instance ).getStatusProvider().toString() );
 
-        FileUtils.removeRecursive(Paths.get("test-instances"));
+        FileUtils.removeRecursive( Paths.get( "test-instances" ) );
     }
 
     @Test
     public void testForceStop() throws Exception {
 
-        FileUtils.removeRecursive(Paths.get("test-instances"));
+        FileUtils.removeRecursive( Paths.get( "test-instances" ) );
 
         Configuration configuration = new Configuration();
-        configuration.setInstancesDir("test-instances");
+        configuration.setInstancesDir( "test-instances" );
         configuration.databaseID = "iplug-se-dev";
         configuration.dependingFields = new ArrayList<String>();
-        configuration.nutchCallJavaOptions = java.util.Arrays.asList("-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8");
+        configuration.nutchCallJavaOptions = java.util.Arrays.asList( "-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8" );
         SEIPlug.conf = configuration;
 
         Instance instance = new Instance();
-        instance.setName("test");
-        instance.setWorkingDirectory(SEIPlug.conf.getInstancesDir() + "/test");
+        instance.setName( "test" );
+        instance.setWorkingDirectory( SEIPlug.conf.getInstancesDir() + "/test" );
 
         // get an entity manager instance (initializes properties in the
         // DBManager)
         EntityManagerFactory emf = null;
         // for development use the settings from the persistence.xml
-        emf = Persistence.createEntityManagerFactory(configuration.databaseID);
-        DBManager.INSTANCE.intialize(emf);
+        emf = Persistence.createEntityManagerFactory( configuration.databaseID );
+        DBManager.INSTANCE.intialize( emf );
 
-        Path conf = Paths.get(SEIPlug.conf.getInstancesDir(), "test", "conf").toAbsolutePath();
-        Path urls = Paths.get(SEIPlug.conf.getInstancesDir(), "test", "urls").toAbsolutePath();
-        Path logs = Paths.get(SEIPlug.conf.getInstancesDir(), "test", "logs").toAbsolutePath();
-        Files.createDirectories(logs);
+        Path conf = Paths.get( SEIPlug.conf.getInstancesDir(), "test", "conf" ).toAbsolutePath();
+        Path urls = Paths.get( SEIPlug.conf.getInstancesDir(), "test", "urls" ).toAbsolutePath();
+        Path logs = Paths.get( SEIPlug.conf.getInstancesDir(), "test", "logs" ).toAbsolutePath();
+        Files.createDirectories( logs );
 
-        FileUtils.copyDirectories(Paths.get("apache-nutch-runtime/runtime/local/conf").toAbsolutePath(), conf);
-        FileUtils.copyDirectories(Paths.get("../ingrid-iplug-se-nutch/src/test/resources/urls").toAbsolutePath(), urls);
+        FileUtils.copyDirectories( Paths.get( "apache-nutch-runtime/runtime/local/conf" ).toAbsolutePath(), conf );
+        FileUtils.copyDirectories( Paths.get( "../ingrid-iplug-se-nutch/src/test/resources/urls" ).toAbsolutePath(), urls );
         // TODO: copy dir with metadata-mapping
 
-        IngridCrawlNutchProcess process = NutchProcessFactory.getIngridCrawlNutchProcess(instance, 1, 100, null, new IndexManager(elastic, elasticConfig), new PlugDescriptionService(new Config()));
+        NutchProcessFactory npf = new NutchProcessFactory();
+        npf.setStatusProviderService( new StatusProviderService() );
+        IngridCrawlNutchProcess process = npf.getIngridCrawlNutchProcess(instance, 1, 100, null, new IndexManager(elastic, elasticConfig), new PlugDescriptionService(new Config()));
 
         NutchController nutchController = new NutchController();
-        nutchController.start(instance, process);
+        nutchController.start( instance, process );
 
-        Thread.sleep(5000);
-        assertEquals("Status is RUNNING", NutchProcess.STATUS.RUNNING, nutchController.getNutchProcess(instance).getStatus());
-        nutchController.stop(instance);
-        Thread.sleep(500);
-        assertEquals("Status is CANCELLED", NutchProcess.STATUS.INTERRUPTED, nutchController.getNutchProcess(instance).getStatus());
+        Thread.sleep( 5000 );
+        assertEquals( "Status is RUNNING", NutchProcess.STATUS.RUNNING, nutchController.getNutchProcess( instance ).getStatus() );
+        nutchController.stop( instance );
+        Thread.sleep( 500 );
+        assertEquals( "Status is CANCELLED", NutchProcess.STATUS.INTERRUPTED, nutchController.getNutchProcess( instance ).getStatus() );
 
-        System.out.println(nutchController.getNutchProcess(instance).getStatusProvider().toString());
+        System.out.println( nutchController.getNutchProcess( instance ).getStatusProvider().toString() );
 
-        FileUtils.removeRecursive(Paths.get("test-instances"));
+        FileUtils.removeRecursive( Paths.get( "test-instances" ) );
     }
 
 }

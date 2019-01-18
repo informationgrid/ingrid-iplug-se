@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
- * Copyright (C) 2014 - 2018 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2019 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -23,6 +23,7 @@
 package de.ingrid.iplug.se;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -31,6 +32,13 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 
+import org.apache.commons.cli.BasicParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.junit.Test;
 
 import de.ingrid.iplug.se.UVPDataImporter.BlpModel;
@@ -66,43 +74,58 @@ public class UVPDataImporterTest {
 
     @Test
     public void testReadData() throws IOException {
+        UVPDataImporter uvpDataImporter = new UVPDataImporter();
 
         ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File( classLoader.getResource( "blp-urls-test.xlsx" ).getFile() );
+        File file = new File( classLoader.getResource( "blp_daten_template.xlsx" ).getFile() );
 
-        List<UVPDataImporter.BlpModel> l = UVPDataImporter.readData( file.getAbsolutePath() );
+        List<UVPDataImporter.BlpModel> l = uvpDataImporter.readData( file.getAbsolutePath() );
         assertEquals( true, l.size() > 0 );
 
         for (UVPDataImporter.BlpModel m : l) {
-            try {
-                if (m.urlFinished != null) {
-                    UVPDataImporter.getLimitUrls( m.urlFinished );
+                try {
+                    UVPDataImporter.getLimitUrls( m.urlBlpFinished );
+                    UVPDataImporter.getActualUrl( m.urlBlpFinished, m );
+                } catch (Exception e) {
+                    fail( "Invalid LIMIT or ACTUAL URL  extracted from: " + m.urlBlpFinished + " in " + m.name  );
                 }
-            } catch (Exception e) {
-                fail( "Invalid LIMIT URL extracted from: " + m.urlFinished + " in " + m.name  );
-            }
-            try {
-                if (m.urlFinished != null) {
-                    UVPDataImporter.getActualUrl( m.urlFinished, m );
+            
+                try {
+                    UVPDataImporter.getLimitUrls( m.urlBlpInProgress );
+                    UVPDataImporter.getActualUrl( m.urlBlpInProgress, m );
+                } catch (Exception e) {
+                    fail( "Invalid LIMIT or ACTUAL URL  extracted from: " + m.urlBlpInProgress + " in " + m.name  );
                 }
-            } catch (Exception e) {
-                System.out.println( "\nInvalid actual URL extracted from: " + m.urlFinished + " in " + m.name  );
-            }
-            try {
-                if (m.urlInProgress != null) {
-                    UVPDataImporter.getLimitUrls( m.urlInProgress );
+            
+                try {
+                    UVPDataImporter.getLimitUrls( m.urlFnpInProgress );
+                    UVPDataImporter.getActualUrl( m.urlFnpInProgress, m );
+                } catch (Exception e) {
+                    fail( "Invalid LIMIT or ACTUAL URL  extracted from: " + m.urlFnpInProgress + " in " + m.name  );
                 }
-            } catch (Exception e) {
-                fail( "Invalid LIMIT URL extracted from: " + m.urlInProgress + " in " + m.name  );
-            }
-            try {
-                if (m.urlInProgress != null) {
-                    UVPDataImporter.getActualUrl( m.urlInProgress, m );
-                }
-            } catch (Exception e) {
-                System.out.println( "\nInvalid actual URL extracted from: " + m.urlInProgress + " in " + m.name  );
-            }
 
+                try {
+                    UVPDataImporter.getLimitUrls( m.urlFnpFinished );
+                    UVPDataImporter.getActualUrl( m.urlFnpFinished, m );
+                } catch (Exception e) {
+                    fail( "Invalid LIMIT or ACTUAL URL  extracted from: " + m.urlFnpFinished + " in " + m.name  );
+                }
+
+                try {
+                    UVPDataImporter.getLimitUrls( m.urlBpFinished );
+                    UVPDataImporter.getActualUrl( m.urlBpFinished, m );
+                } catch (Exception e) {
+                    fail( "Invalid LIMIT or ACTUAL URL  extracted from: " + m.urlBpFinished + " in " + m.name  );
+                }
+
+                try {
+                    UVPDataImporter.getLimitUrls( m.urlBpInProgress );
+                    UVPDataImporter.getActualUrl( m.urlBpInProgress, m );
+                } catch (Exception e) {
+                    fail( "Invalid LIMIT or ACTUAL URL  extracted from: " + m.urlBpInProgress + " in " + m.name  );
+                }
+                
+                assertTrue(m.descr != null && m.descr.length() > 0); 
         }
     }
 
@@ -124,29 +147,15 @@ public class UVPDataImporterTest {
     }
     
     @Test
-    public void testIsFinishedUrlLongerThanInProgressUrl() throws MalformedURLException {
-        BlpModel bm = new UVPDataImporter().new BlpModel();
-        bm.urlFinished = "http://test.domain.de";
-        bm.urlInProgress = "http://test.domain.de/path/";
-        assertTrue(!UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
-        bm.urlFinished = "http://test.domain.de/path";
-        bm.urlInProgress = "http://test.domain.de/";
-        assertTrue(UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
-        bm.urlFinished = "http://test.domain.de/path/";
-        bm.urlInProgress = "http://test.domain.de/path/";
-        assertTrue(!UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
-        bm.urlFinished = null;
-        bm.urlInProgress = "http://test.domain.de/path/";
-        assertTrue(!UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
-        bm.urlFinished = "http://test.domain.de/path/";
-        bm.urlInProgress = null;
-        assertTrue(!UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
-        bm.urlFinished = "https://test.domain.de/path/";
-        bm.urlInProgress = "http://test.domain.de/";
-        assertTrue(UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
-        bm.urlFinished = "http://test.domain.de/path/";
-        bm.urlInProgress = "https://test.domain.de/";
-        assertTrue(UVPDataImporter.isFinishedUrlLongerThanInProgressUrl( bm ));
+    public void testIsUrlShorterThan() throws MalformedURLException {
+        assertTrue(UVPDataImporter.isUrlShorterThan( "http://test.domain.de", "http://test.domain.de/path/" ));
+        assertTrue(!UVPDataImporter.isUrlShorterThan( "http://test.domain.de/path", "http://test.domain.de/" ));
+        assertTrue(!UVPDataImporter.isUrlShorterThan( "http://test.domain.de/path/", "http://test.domain.de/path/" ));
+        assertTrue(!UVPDataImporter.isUrlShorterThan( null, "http://test.domain.de/path/" ));
+        assertTrue(!UVPDataImporter.isUrlShorterThan( "http://test.domain.de/path/", null ));
+        assertTrue(!UVPDataImporter.isUrlShorterThan( "https://test.domain.de/path/", "http://test.domain.de/" ));
+        assertTrue(!UVPDataImporter.isUrlShorterThan( "http://test.domain.de/path/", "https://test.domain.de/" ));
+        assertTrue(!UVPDataImporter.isUrlShorterThan( "http://test.domain.de/path/", "https://test.domain.de/path/" ));
     }
     
 
@@ -159,5 +168,25 @@ public class UVPDataImporterTest {
         assertEquals( "http://www.merchweiler.de/p/dlhome.asp?artikel_id=&liste=491&tmpl_typ=Liste&lp=3691&area=100",
                 UVPDataImporter.getActualUrl( "http://www.merchweiler.de/", bm ) );
     }
+    
+    @Test
+    public void testExcludeUrlParsing() throws ParseException {
+        CommandLineParser parser = new BasicParser();
+        Options options = new Options();
+        @SuppressWarnings("static-access")
+        Option exludeMarkerUrlsOption = OptionBuilder.withArgName( "exclude urls from marker urls" ).hasArgs().withDescription( "list of url regex patterns that define urls that should be excluded from possible marker urls." ).create( "exludeMarkerUrls" );
+        exludeMarkerUrlsOption.setValueSeparator( '|' );
+        options.addOption( exludeMarkerUrlsOption );
+        CommandLine cmd = parser.parse( options, new String[] {"", "-exludeMarkerUrls", ".*minden-luebbecke.de/atlasfx/js/.*|.*wemove.com.*"} );
 
+        String[] exludeMarkerUrls = null;
+        if (cmd.hasOption( "exludeMarkerUrls" )) {
+            exludeMarkerUrls = cmd.getOptionValues( exludeMarkerUrlsOption.getOpt() );
+        }
+        
+        assertNotNull( exludeMarkerUrls );
+        assertEquals( exludeMarkerUrls[0], ".*minden-luebbecke.de/atlasfx/js/.*" );
+        assertEquals( exludeMarkerUrls[1], ".*wemove.com.*" );
+        
+    }
 }

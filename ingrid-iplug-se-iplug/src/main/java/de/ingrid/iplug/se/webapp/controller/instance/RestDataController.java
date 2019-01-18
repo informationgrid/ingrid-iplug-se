@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
- * Copyright (C) 2014 - 2018 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2019 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -31,6 +31,8 @@ import de.ingrid.admin.service.CommunicationService;
 import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
 import de.ingrid.elasticsearch.IndexManager;
 import de.ingrid.iplug.se.Configuration;
+import de.ingrid.iplug.se.SEIPlug;
+import de.ingrid.iplug.se.StatusProviderService;
 import de.ingrid.iplug.se.conf.UrlMaintenanceSettings;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.InstanceAdmin;
@@ -82,6 +84,9 @@ public class RestDataController extends InstanceController {
     private static final String NO_RESULT_INDEX = "_noresult_";
 
     @Autowired
+    private NutchProcessFactory nutchProcessFactory;
+
+    @Autowired
     private ElasticsearchNodeFactoryBean elasticSearch;
 
 	@Autowired
@@ -99,6 +104,9 @@ public class RestDataController extends InstanceController {
 	@Autowired
 	private CommunicationService _communicationInterface;
 
+	@Autowired
+    private StatusProviderService statusProviderService;
+
 	@RequestMapping(value = { "/test" }, method = RequestMethod.GET)
 	public String test() {
 		return "OK";
@@ -112,13 +120,13 @@ public class RestDataController extends InstanceController {
 
         return new ResponseEntity<>(admin, admin != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
-	
+
     @RequestMapping(value = { "admin/{instance}" }, method = RequestMethod.POST)
     public ResponseEntity<?> addAdmin(@PathVariable("instance") String name, @RequestBody InstanceAdmin admin, HttpServletRequest request, HttpServletResponse response) {
         DBUtils.addAdmin(admin);
         return new ResponseEntity<>(admin, HttpStatus.OK);
     }
-    
+
     @RequestMapping(value = { "isduplicateadmin/{instance}/{login}" }, method = RequestMethod.GET)
     public ResponseEntity<String> isDuplicateAdmin(@PathVariable("instance") String name, @PathVariable("login") String login) {
         if (DBUtils.isAdminForInstance(login, name)) {
@@ -192,8 +200,8 @@ public class RestDataController extends InstanceController {
         json.put("totalAdmins", count);
 
         return json;
-    }	
-	
+    }
+
     @RequestMapping(value = { "url/{id}" }, method = RequestMethod.GET, produces = "application/json")
 	public ResponseEntity<Url> getUrl(@PathVariable("id") Long id, HttpServletRequest request, HttpServletResponse response) {
 		EntityManager em = DBManager.INSTANCE.getEntityManager();
@@ -479,7 +487,7 @@ public class RestDataController extends InstanceController {
         criteriaDeleteInstanceAdmins.where( instanceCriteria );
 
         em.createQuery( criteriaDeleteInstanceAdmins ).executeUpdate();
-        
+
         em.flush();
         em.getTransaction().commit();
 
@@ -533,6 +541,34 @@ public class RestDataController extends InstanceController {
 		return new ResponseEntity<>(content, HttpStatus.OK);
 	}
 
+	@RequestMapping(value = { "status/{instance}/import_log" }, method = RequestMethod.GET)
+	public ResponseEntity<String> getImportLog(@PathVariable("instance") String name, HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        if (hasNoAccessToInstance(name, request, response)) {
+            response.sendError(HttpStatus.FORBIDDEN.value());
+            return null;
+        }
+		Path path = Paths.get(SEIPlug.conf.getInstancesDir(), name, "logs", "import.log");
+		String content = FileUtils.tail(path.toFile(), 1000);
+
+		return new ResponseEntity<String>(content, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = { "status/{instance}/blpimport" }, method = RequestMethod.GET)
+    public ResponseEntity<Collection<State>> getStatusBlpImport(@PathVariable("instance") String name, HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        if (hasNoAccessToInstance(name, request, response)) {
+            response.sendError(HttpStatus.FORBIDDEN.value());
+            return null;
+        }
+
+        Instance instance = getInstanceData(name);
+
+        List<State> states = statusProviderService.getStatusProvider(instance.getWorkingDirectory(), "import_status.xml").getStates();
+
+        return new ResponseEntity<Collection<State>>(states, HttpStatus.OK);
+    }
+
 	@RequestMapping(value = { "url/{instance}/check" }, method = RequestMethod.POST)
 	public ResponseEntity<String> checkUrl(@PathVariable("instance") String instanceName, @RequestBody String urlString, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -543,7 +579,7 @@ public class RestDataController extends InstanceController {
 
         Instance instance = getInstanceData(instanceName);
 
-		NutchProcess process = NutchProcessFactory.getUrlTesterProcess(instance, urlString);
+		NutchProcess process = nutchProcessFactory.getUrlTesterProcess(instance, urlString);
 		process.start();
 
 		long start = System.currentTimeMillis();

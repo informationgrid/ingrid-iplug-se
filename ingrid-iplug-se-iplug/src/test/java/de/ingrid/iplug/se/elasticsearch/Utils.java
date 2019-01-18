@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
- * Copyright (C) 2014 - 2018 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2019 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -111,7 +111,7 @@ public class Utils {
         }
         return p;
     }
-    
+
     public static void prepareIndex(ElasticsearchNodeFactoryBean elastic, String fileData, String index) throws Exception {
         Client client = elastic.getClient();
         ClassPathResource resource = new ClassPathResource( fileData );
@@ -143,7 +143,7 @@ public class Utils {
             }
 
             System.out.println(mappingSource);
-            
+
             if (client.admin().indices().prepareExists(index).execute().actionGet().isExists()) {
                 client.admin().indices().prepareDelete(index).execute().actionGet();
             }

@@ -1,4 +1,4 @@
-/*
+/*-
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
@@ -20,18 +20,31 @@
  * limitations under the Licence.
  * **************************************************#
  */
-package de.ingrid.iplug.se.webapp.datatype;
+package de.ingrid.iplug.se;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Service;
 
-import de.ingrid.admin.object.AbstractDataType;
+import de.ingrid.iplug.se.nutchController.StatusProvider;
 
 @Service
-public class ServiceDataType extends AbstractDataType {
+public class StatusProviderService {
 
-    public ServiceDataType() {
-        super("service");
-        //setForceActive(true);
+    private ConcurrentHashMap<String, StatusProvider> statusProviders;
+
+    public StatusProvider getStatusProvider(String logdir) {
+        return getStatusProvider(logdir, "last_status.xml");
+    }
+    public StatusProvider getStatusProvider(String logdir, String statusFilename) {
+        if (statusProviders == null) {
+            statusProviders = new ConcurrentHashMap<>();
+        }
+        String mapKey = logdir + statusFilename;
+        if (!statusProviders.containsKey( mapKey )) {
+            statusProviders.put( mapKey, new StatusProvider( logdir, statusFilename ) );
+        }
+        return statusProviders.get( mapKey );
     }
 
 }
