@@ -149,15 +149,13 @@ public class ListInstancesController extends InstanceController {
             return AdminViews.SE_LIST_INSTANCES;
         }
 
-        // convert illegal chars to "_"
-        name = name.replaceAll( "[:\\\\/*?|<>\\W]", "_" );
         String dir = seConfig.getInstancesDir();
 
         // convert illegal chars to "_"
-        name = name.replaceAll( "[:\\\\/*?|<>\\W]", "_" );
+        name = name.toLowerCase().replaceAll( "[:\\\\/*?|<>\\W]", "_" );
+
         // create directory and copy necessary configuration files
         boolean success = true;
-        
         if (from == null) {
             success = initializeInstanceDir( dir + "/" + name );
             
