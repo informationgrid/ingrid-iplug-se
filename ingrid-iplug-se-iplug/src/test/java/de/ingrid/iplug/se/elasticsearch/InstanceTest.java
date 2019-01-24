@@ -76,7 +76,7 @@ public class InstanceTest {
      */
     @Test
     public void searchForAll() throws Exception {
-        Utils.prepareIndex( Utils.elastic, "data/webUrls1_b.json", "test_catalog" );
+        Utils.prepareIndex( Utils.elastic, "data/webUrls1_b.json", "test_catalog", "default" );
 
         // assertThat( baseConfig.indexSearchInTypes.size(), is( 0 ) );
         IndexInfo indexInfo = new IndexInfo();

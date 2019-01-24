@@ -114,7 +114,11 @@ public class NutchControllerTest {
         NutchProcessFactory npf = new NutchProcessFactory();
         npf.setStatusProviderService( new StatusProviderService() );
 
-        IngridCrawlNutchProcess process = npf.getIngridCrawlNutchProcess(instance, 2, 10, null, new IndexManager(elastic, elasticConfig), new PlugDescriptionService(new Config()));
+        Config config = new Config();
+        config.plugdescriptionLocation = "conf/plugdescription.xml";
+        IndexManager indexManager = new IndexManager(elastic, elasticConfig);
+        indexManager.postConstruct();
+        IngridCrawlNutchProcess process = npf.getIngridCrawlNutchProcess(instance, 2, 10, null, indexManager, new PlugDescriptionService(config));
 
         NutchController nutchController = new NutchController();
         nutchController.start( instance, process );
@@ -173,7 +177,11 @@ public class NutchControllerTest {
 
         NutchProcessFactory npf = new NutchProcessFactory();
         npf.setStatusProviderService( new StatusProviderService() );
-        IngridCrawlNutchProcess process = npf.getIngridCrawlNutchProcess(instance, 1, 100, null, new IndexManager(elastic, elasticConfig), new PlugDescriptionService(new Config()));
+        Config config = new Config();
+        config.plugdescriptionLocation = "conf/plugdescription.xml";
+        IndexManager indexManager = new IndexManager(elastic, elasticConfig);
+        indexManager.postConstruct();
+        IngridCrawlNutchProcess process = npf.getIngridCrawlNutchProcess(instance, 1, 100, null, indexManager, new PlugDescriptionService(config));
 
         NutchController nutchController = new NutchController();
         nutchController.start( instance, process );

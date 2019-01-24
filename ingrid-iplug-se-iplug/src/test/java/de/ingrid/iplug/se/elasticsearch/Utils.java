@@ -92,7 +92,7 @@ public class Utils {
 
         JettyStarter.baseConfig.docProducerIndices = new String[] {"test"};
         
-        setMapping( elastic, "test_1" );
+        // setMapping( elastic, "test_1","web" );
         prepareIndex( elastic );
     }
 
@@ -112,9 +112,11 @@ public class Utils {
         return p;
     }
 
-    public static void prepareIndex(ElasticsearchNodeFactoryBean elastic, String fileData, String index) throws Exception {
+    public static void prepareIndex(ElasticsearchNodeFactoryBean elastic, String fileData, String index, String type) throws Exception {
         Client client = elastic.getClient();
         ClassPathResource resource = new ClassPathResource( fileData );
+
+        setMapping(elastic, index, type);
 
         byte[] urlsData = Files.readAllBytes( Paths.get( resource.getURI() ) );
 
@@ -128,10 +130,10 @@ public class Utils {
     }
     
     static void prepareIndex(ElasticsearchNodeFactoryBean elastic) throws Exception {
-        prepareIndex( elastic, "data/webUrls.json", "test_1" );
+        prepareIndex( elastic, "data/webUrls.json", "test_1", "web" );
     }
 
-    public static void setMapping(ElasticsearchNodeFactoryBean elastic, String index) {
+    public static void setMapping(ElasticsearchNodeFactoryBean elastic, String index, String type) {
         String mappingSource = "";
         try {
             Client client = elastic.getClient();
@@ -143,6 +145,7 @@ public class Utils {
             }
 
             System.out.println(mappingSource);
+            mappingSource = mappingSource.replace("\"web\"", "\"" + type + "\"");
 
             if (client.admin().indices().prepareExists(index).execute().actionGet().isExists()) {
                 client.admin().indices().prepareDelete(index).execute().actionGet();
@@ -150,20 +153,16 @@ public class Utils {
             client.admin().indices().prepareCreate(index).execute().actionGet();
             
             client.admin().indices().preparePutMapping().setIndices( index )
-                    .setType("web")
+                    .setType(type)
                     .setSource( mappingSource, XContentType.JSON )
                     .execute()
                     .actionGet();
             
             
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
+
     }
 
 

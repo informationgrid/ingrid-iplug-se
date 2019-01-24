@@ -27,17 +27,20 @@ import static org.junit.Assert.assertTrue;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.Principal;
-import java.util.ArrayList;
+import java.util.HashSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import de.ingrid.admin.Config;
+import de.ingrid.admin.service.CommunicationService;
 import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
+import de.ingrid.iplug.se.webapp.controller.instance.InstanceController;
+import de.ingrid.utils.IBus;
+import de.ingrid.utils.IngridDocument;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.node.Node;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,6 +49,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.ui.ModelMap;
@@ -59,6 +63,7 @@ import de.ingrid.iplug.se.webapp.controller.instance.scheduler.SchedulerManager;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ElasticSearchUtils.class)
+@PowerMockIgnore("javax.management.*")
 public class ListInstancesControllerTest extends Mockito {
 
     @Mock
@@ -66,6 +71,12 @@ public class ListInstancesControllerTest extends Mockito {
     
     @Mock
     ElasticsearchNodeFactoryBean esBean;
+
+    @Mock
+    CommunicationService commInterfaceMock;
+
+    @Mock
+    IBus iBusMock;
     
     @Before
     public void initTest() throws Exception {
@@ -78,6 +89,12 @@ public class ListInstancesControllerTest extends Mockito {
         TransportClient transportClient = new PreBuiltTransportClient(builder.build());
         Mockito.when( esBean.getClient() ).thenReturn( transportClient );
         Mockito.when( ElasticSearchUtils.typeExists( Mockito.anyString(), (Client) Mockito.anyObject() ) ).thenReturn( false );
+
+        InstanceController.setCommunicationInterface(commInterfaceMock);
+        when(commInterfaceMock.getIBus()).thenReturn(iBusMock);
+        IngridDocument activeIndices = new IngridDocument();
+        activeIndices.put("result", new HashSet<>());
+        when(iBusMock.call(any())).thenReturn(activeIndices);
     }
 
     @Test
