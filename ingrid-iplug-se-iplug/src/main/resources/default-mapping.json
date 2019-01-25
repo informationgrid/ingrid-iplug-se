@@ -47,6 +47,10 @@
                 "boost": 1.1,
                 "store": true
             },
+            "topic": {
+                "type": "keyword",
+                "store": true
+            },
             "tstamp": {
                 "type": "date"
             },
