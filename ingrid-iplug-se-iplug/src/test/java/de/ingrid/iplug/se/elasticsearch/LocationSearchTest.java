@@ -53,7 +53,7 @@ public class LocationSearchTest  {
     public static void setUpBeforeClass() throws Exception {
         JettyStarter.baseConfig = new Config();
         JettyStarter.baseConfig.index = "test";
-        JettyStarter.baseConfig.indexWithAutoId = true;
+//        JettyStarter.baseConfig.indexWithAutoId = true;
         // JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<String>();
         Utils.setupES();
     }

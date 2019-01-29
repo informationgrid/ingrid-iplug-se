@@ -53,7 +53,7 @@ public class InstanceTest {
     public static void setUp() throws Exception {
         JettyStarter.baseConfig = new Config();
         JettyStarter.baseConfig.index = "test";
-        JettyStarter.baseConfig.indexWithAutoId = true;
+        // JettyStarter.baseConfig.indexWithAutoId = true;
         // JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<>();
         Utils.setupES();
     }

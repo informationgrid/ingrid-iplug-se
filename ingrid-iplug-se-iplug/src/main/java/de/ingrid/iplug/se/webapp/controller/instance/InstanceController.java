@@ -55,7 +55,7 @@ public class InstanceController extends AbstractController {
         Instance instance = new Instance();
         instance.setName( name );
         instance.setWorkingDirectory( workPath.toString() );
-        instance.setClusterName( JettyStarter.baseConfig.cluster );
+        instance.setClusterName( SEIPlug.conf.clusterName );
         instance.setIndexName( JettyStarter.baseConfig.index );
 
         HashSet<String> activeIndices = getActiveIndices();

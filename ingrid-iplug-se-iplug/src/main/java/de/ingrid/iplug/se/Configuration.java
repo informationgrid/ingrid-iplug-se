@@ -70,6 +70,9 @@ public class Configuration implements IConfig {
     @Value("${network.host:localhost}")
     public String esHttpHost;
 
+    @Value("${cluster.name:ingrid}")
+    public String clusterName;
+
     @Value("#{'${nutch.call.java.options:-Dhadoop.log.file=hadoop.log -Dfile.encoding=UTF-8}'.split(' ')}")
     public List<String> nutchCallJavaOptions;
 
