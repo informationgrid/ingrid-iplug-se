@@ -38,7 +38,6 @@ THIS="$0"
 THIS_DIR=`dirname "$THIS"`
 INGRID_HOME=`cd "$THIS_DIR" ; pwd`
 PID=$INGRID_HOME/ingrid.pid
-INGRID_OPTS=
 
 #create directories
 if [ ! -e $INGRID_HOME/logs ]; then

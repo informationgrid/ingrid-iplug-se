@@ -14,4 +14,4 @@ RUN echo jetty.port=80 > /opt/ingrid/ingrid-iplug-se/conf/config.override.proper
 WORKDIR /opt/ingrid/ingrid-iplug-se
 EXPOSE 80
 
-CMD /bin/sh start.sh start && tail -f /dev/null
+CMD /bin/sh start.sh start
