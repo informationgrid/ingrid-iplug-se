@@ -19,6 +19,16 @@
   --%>
   <%@ include file="/WEB-INF/jsp/base/include.jsp"%>
     <%@ page contentType="text/html; charset=UTF-8" %>
+      <div class="hint" onclick="$('#filterComment').toggle()"><span class="ui-icon ui-icon-arrow-1-e"></span>Hinweise</div>
+      <div id="filterComment" class="comment" style="display: none;">
+        <ul>
+          <li>Alle bestehenden URLs der Instanz werden bei einem Import gelöscht.</li>
+          <li>Sollte es Fehler während des Imports geben, werden diese im Import log angezeigt, sodass das Excelfile entsprechend korrigiert werden kann.</li>
+          <li>Nach dem erfolgreichen Import, muss im 'Management' Tab ein Crawl angestoßen werden. (Empfohlene Parameter: Tiefe: 1, Anzahl der URLs: 10.000)</li>
+          <li>Anschließend finden sich im Tab 'Reports' Informationen zu Problemen beim Crawlen der URLs. Fehler könnten hier Auswirkungen auf die Darstellung der Marker haben.</li>
+          <li>Enthält die fehlerhafte URL in der URL Pflege Marker Informationen (Eigenschaft: blp_marker:blp_marker), wird kein Marker dargestellt.</li>
+        </ul>
+      </div>
 
       <fieldset>
         <legend>Import Parameter</legend>
