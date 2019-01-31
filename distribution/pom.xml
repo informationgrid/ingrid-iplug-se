@@ -3,7 +3,7 @@
   <parent>
     <groupId>de.ingrid</groupId>
     <artifactId>ingrid-iplug-se-project</artifactId>
-    <version>4.6.0</version>
+    <version>4.6.1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>ingrid-iplug-se</artifactId>
@@ -22,7 +22,7 @@
       <url>https://dev.informationgrid.eu/archiva/repository/ingrid-all</url>
     </repository>
   </repositories>
-  <!-- Dependency Management must be the same as in iplug-module, otherwise the wrong version of 
+  <!-- Dependency Management must be the same as in iplug-module, otherwise the wrong version of
          dependencies will be loaded! -->
   <dependencyManagement>
     <dependencies>
