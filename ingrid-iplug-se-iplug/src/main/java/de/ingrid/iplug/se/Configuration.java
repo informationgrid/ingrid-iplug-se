@@ -96,6 +96,10 @@ public class Configuration implements IConfig {
 	@PropertyValue("db.dir")
 	@DefaultValue("database")
 	public String databaseDir;
+
+	@PropertyValue("enable.blpImport")
+	@DefaultValue("false")
+	public String enableBlpImport;
 	
 	@PropertyValue("transport.tcp.port")
     @DefaultValue("9300")
@@ -167,6 +171,7 @@ public class Configuration implements IConfig {
     public void setPropertiesFromPlugdescription( Properties props, PlugdescriptionCommandObject pd ) {
         props.setProperty( "db.dir", this.databaseDir );
         props.setProperty( "dir.instances", this.dirInstances );
+        props.setProperty( "enable.blpImport", this.enableBlpImport );
         
         // write elastic search properties to separate configuration
         // TODO: refactor this code to make an easy function, by putting it into
@@ -199,6 +204,10 @@ public class Configuration implements IConfig {
     
     public void setInstancesDir(String dir) {
         this.dirInstances = dir;
+    }
+    
+    public boolean isBlpImportEnabled() {
+        return !this.enableBlpImport.toLowerCase().equals( "false" );
     }
     
     public Map<String, String> getElasticSearchSettings() {
