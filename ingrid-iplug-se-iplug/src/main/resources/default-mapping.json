@@ -1,84 +1,82 @@
 {
-    "_default_": {
-        "properties": {
-            "iPlugId": {
-                "type": "keyword",
-                "store": true
-            },
-            "boost": {
-                "type": "float"
-            },
-            "doc_boost": {
-                "type": "float"
-            },
-            "content": {
-                "analyzer": "german",
-                "type": "text",
-                "store": true
-            },
-            "contentLength": {
-                "type": "long"
-            },
-            "dataSourceName": {
-                "type": "keyword",
-                "store": true
-            },
-            "date": {
-                "type": "date"
-            },
-            "digest": {
-                "type": "text"
-            },
-            "host": {
-                "type": "text"
-            },
-            "id": {
-                "type": "keyword"
-            },
-            "lang": {
-                "type": "text"
-            },
-            "segment": {
-                "type": "text"
-            },
-            "title": {
-                "analyzer": "german",
-                "type": "text",
-                "boost": 1.1,
-                "store": true
-            },
-            "topic": {
-                "type": "keyword",
-                "store": true
-            },
-            "tstamp": {
-                "type": "date"
-            },
-            "type": {
-                "type": "text"
-            },
-            "url": {
-                "type": "keyword",
-                "store": true
-            },
-            "partner": {
-                "type": "keyword"
-            },
-            "provider": {
-                "type": "keyword"
-            },
-            "x1": {
-                "type": "double"
-            },
-            "x2": {
-                "type": "double"
-            },
-            "y1": {
-                "type": "double"
-            },
-            "y2": {
-                "type": "double"
-            }
-        }
+  "properties": {
+    "iPlugId": {
+      "type": "keyword",
+      "store": true
+    },
+    "boost": {
+      "type": "float"
+    },
+    "doc_boost": {
+      "type": "float"
+    },
+    "content": {
+      "analyzer": "german",
+      "type": "text",
+      "store": true
+    },
+    "contentLength": {
+      "type": "long"
+    },
+    "dataSourceName": {
+      "type": "keyword",
+      "store": true
+    },
+    "date": {
+      "type": "date"
+    },
+    "digest": {
+      "type": "text"
+    },
+    "host": {
+      "type": "text"
+    },
+    "id": {
+      "type": "keyword"
+    },
+    "lang": {
+      "type": "text"
+    },
+    "segment": {
+      "type": "text"
+    },
+    "title": {
+      "analyzer": "german",
+      "type": "text",
+      "boost": 1.1,
+      "store": true
+    },
+    "topic": {
+      "type": "keyword",
+      "store": true
+    },
+    "tstamp": {
+      "type": "date"
+    },
+    "type": {
+      "type": "text"
+    },
+    "url": {
+      "type": "keyword",
+      "store": true
+    },
+    "partner": {
+      "type": "keyword"
+    },
+    "provider": {
+      "type": "keyword"
+    },
+    "x1": {
+      "type": "double"
+    },
+    "x2": {
+      "type": "double"
+    },
+    "y1": {
+      "type": "double"
+    },
+    "y2": {
+      "type": "double"
     }
+  }
 }
