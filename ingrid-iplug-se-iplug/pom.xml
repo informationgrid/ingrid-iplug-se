@@ -11,17 +11,6 @@
   <packaging>jar</packaging>
   <name>ingrid-iplug-se-iplug</name>
 
-  <!-- ==================== REPOSITORIES ==================== -->
-  <repositories>
-    <!-- Repo of parent pom needed, parent pom may not be installed locally
-            yet -->
-    <repository>
-      <id>de.ingrid.all</id>
-      <name>Maven Repo InGrid</name>
-      <url>https://dev.informationgrid.eu/archiva/repository/ingrid-all</url>
-    </repository>
-  </repositories>
-
   <!-- ==================== DEPENDENCY MANAGEMENT ==================== -->
   <dependencyManagement>
     <dependencies>

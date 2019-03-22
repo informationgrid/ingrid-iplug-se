@@ -18,16 +18,6 @@
     <tag>HEAD</tag>
   </scm>
 
-  <!-- ==================== REPOSITORIES ==================== -->
-  <repositories>
-    <!-- Repo of parent pom needed, parent pom may not be installed locally yet -->
-    <repository>
-      <id>de.ingrid.all</id>
-      <name>Maven Repo InGrid</name>
-      <url>https://dev.informationgrid.eu/archiva/repository/ingrid-all</url>
-    </repository>
-  </repositories>
-
   <!-- ==================== DEPENDENCY MANAGEMENT ==================== -->
   <!--
     Dependency Management must be the same as in iplug-module, otherwise the wrong version of
