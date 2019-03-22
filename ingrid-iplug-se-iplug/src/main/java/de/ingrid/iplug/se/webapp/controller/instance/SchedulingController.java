@@ -22,36 +22,23 @@
  */
 package de.ingrid.iplug.se.webapp.controller.instance;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import de.ingrid.admin.command.PlugdescriptionCommandObject;
+import de.ingrid.iplug.se.Configuration;
+import de.ingrid.iplug.se.webapp.controller.AdminViews;
+import de.ingrid.iplug.se.webapp.controller.instance.scheduler.*;
+import de.ingrid.iplug.se.webapp.controller.instance.scheduler.ClockCommand.Period;
+import de.ingrid.iplug.se.webapp.controller.instance.scheduler.WeeklyCommand.Day;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.annotation.*;
 
-import de.ingrid.admin.command.PlugdescriptionCommandObject;
-import de.ingrid.iplug.se.SEIPlug;
-import de.ingrid.iplug.se.webapp.controller.AdminViews;
-import de.ingrid.iplug.se.webapp.controller.instance.scheduler.AdvancedCommand;
-import de.ingrid.iplug.se.webapp.controller.instance.scheduler.ClockCommand;
-import de.ingrid.iplug.se.webapp.controller.instance.scheduler.ClockCommand.Period;
-import de.ingrid.iplug.se.webapp.controller.instance.scheduler.CrawlCommand;
-import de.ingrid.iplug.se.webapp.controller.instance.scheduler.CrawlDataPersistence;
-import de.ingrid.iplug.se.webapp.controller.instance.scheduler.MonthlyCommand;
-import de.ingrid.iplug.se.webapp.controller.instance.scheduler.PatternPersistence;
-import de.ingrid.iplug.se.webapp.controller.instance.scheduler.SchedulerManager;
-import de.ingrid.iplug.se.webapp.controller.instance.scheduler.WeeklyCommand;
-import de.ingrid.iplug.se.webapp.controller.instance.scheduler.WeeklyCommand.Day;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Control the database parameter page.
@@ -70,6 +57,9 @@ public class SchedulingController extends InstanceController {
     private SchedulerManager _schedulerManager;
 
     @Autowired
+    private Configuration seConfig;
+
+    @Autowired
     public SchedulingController(PatternPersistence patternPersistence,
         CrawlDataPersistence crawlDataPersistence) {
       _patternPersistence = patternPersistence;
@@ -85,7 +75,7 @@ public class SchedulingController extends InstanceController {
             return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );
         }
 
-        String dir = SEIPlug.conf.getInstancesDir();
+        String dir = seConfig.getInstancesDir();
         File instanceFolder = new File( dir, name );
         if (!instanceFolder.exists())
             return "redirect:" + AdminViews.SE_LIST_INSTANCES + ".html";

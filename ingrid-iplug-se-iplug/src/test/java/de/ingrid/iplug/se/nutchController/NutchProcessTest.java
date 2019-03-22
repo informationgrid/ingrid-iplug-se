@@ -22,6 +22,8 @@
  */
 package de.ingrid.iplug.se.nutchController;
 
+import static de.ingrid.iplug.se.elasticsearch.Utils.elastic;
+import static de.ingrid.iplug.se.elasticsearch.Utils.elasticConfig;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -30,14 +32,21 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Properties;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import org.elasticsearch.common.settings.ImmutableSettings;
+import de.ingrid.admin.Config;
+import de.ingrid.admin.JettyStarter;
+import de.ingrid.admin.service.PlugDescriptionService;
+import de.ingrid.elasticsearch.IndexManager;
+import de.ingrid.iplug.se.elasticsearch.Utils;
+import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
-import org.elasticsearch.node.NodeBuilder;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -53,6 +62,16 @@ import de.ingrid.iplug.se.webapp.container.Instance;
 public class NutchProcessTest {
 
     // @Mock JettyStarter jettyStarter;
+
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+        JettyStarter.baseConfig = new Config();
+        JettyStarter.baseConfig.index = "test";
+//        JettyStarter.baseConfig.indexWithAutoId = true;
+        // JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<>();
+        JettyStarter.baseConfig.communicationProxyUrl = "/ingrid-group:unit-tests";
+        Utils.setupES();
+    }
 
     @Test
     public void testGenericNutchProcessor() throws Exception {
@@ -118,6 +137,8 @@ public class NutchProcessTest {
             configuration.databaseID = "iplug-se-dev";
             configuration.nutchCallJavaOptions = java.util.Arrays.asList("-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8");
             SEIPlug.conf = configuration;
+            Properties elasticProperties = Utils.getElasticProperties();
+            String elasticNetworkHost = (String) elasticProperties.get("network.host");
 
             // get an entity manager instance (initializes properties in the
             // DBManager)
@@ -129,12 +150,16 @@ public class NutchProcessTest {
             FileUtils.copyDirectories(fs.getPath("../ingrid-iplug-se-nutch/src/test/resources/conf").toAbsolutePath(), conf);
 
             NutchConfigTool nct = new NutchConfigTool(Paths.get(conf.toAbsolutePath().toString(), "nutch-site.xml"));
-            nct.addOrUpdateProperty("elastic.port", "54346", "");
+            nct.addOrUpdateProperty("elastic.host", elasticNetworkHost,"");
+            nct.addOrUpdateProperty("elastic.port", "9300", "");
+            nct.addOrUpdateProperty("elastic.cluster", "ingrid", "");
             nct.write();
-            
+
             FileUtils.copyDirectories(fs.getPath("../ingrid-iplug-se-nutch/src/test/resources/urls").toAbsolutePath(), urls);
 
-            IngridCrawlNutchProcess p = new IngridCrawlNutchProcess();
+            Config config = new Config();
+            config.plugdescriptionLocation = "conf/plugdescription.xml";
+            IngridCrawlNutchProcess p = new IngridCrawlNutchProcess(new IndexManager(elastic, elasticConfig), new PlugDescriptionService(config));
             p.setWorkingDirectory(workingDir.toString());
 
             Instance instance = new Instance();
@@ -151,10 +176,14 @@ public class NutchProcessTest {
             p.setStatusProvider(new StatusProvider(workingDir.toString()));
             p.start();
 
-            Settings settings = ImmutableSettings.settingsBuilder().put("path.data", SEIPlug.conf.getInstancesDir() + "/test").put("transport.tcp.port", 54346).put("http.port", 54347).build();
-            NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().clusterName("elasticsearch").data(true).settings(settings);
-            nodeBuilder = nodeBuilder.local(false);
-            node = nodeBuilder.node();
+
+            Settings settings = Settings.builder()
+                    .put("path.data", SEIPlug.conf.getInstancesDir() + "/test")
+                    .put("transport.tcp.port", 9300)
+                    .put("cluster.name", "ingrid")
+                    .put("network.host", elasticNetworkHost)
+                    .put("http.port", 9200).build();
+            TransportClient transportClient = new PreBuiltTransportClient(settings);
 
             long start = System.currentTimeMillis();
             Thread.sleep(500);

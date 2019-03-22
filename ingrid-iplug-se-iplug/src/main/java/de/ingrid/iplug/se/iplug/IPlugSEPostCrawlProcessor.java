@@ -22,11 +22,11 @@
  */
 package de.ingrid.iplug.se.iplug;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import de.ingrid.admin.Config;
+import de.ingrid.admin.service.PlugDescriptionService;
+import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
+import de.ingrid.iplug.se.webapp.container.Instance;
+import de.ingrid.utils.PlugDescription;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.elasticsearch.client.Client;
@@ -37,11 +37,10 @@ import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import de.ingrid.admin.JettyStarter;
-import de.ingrid.admin.elasticsearch.IndexManager;
-import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
-import de.ingrid.admin.service.PlugDescriptionService;
-import de.ingrid.utils.PlugDescription;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Adds all fields in the index to the plugdescription AND configuration.
@@ -59,25 +58,24 @@ public class IPlugSEPostCrawlProcessor implements IPostCrawlProcessor {
 
     @Autowired
     private PlugDescriptionService plugDescriptionService;
-    
-    @Autowired
-    private IndexManager indexManager;
 
+    @Autowired
+    private Config baseConfig;
+    
     @Override
-    public void execute() {
+    public void execute(Instance instance) {
 
         try {
             PlugDescription pd = plugDescriptionService.getPlugDescription();
 
-            Client client = elasticSearch.getObject().client();
+            Client client = elasticSearch.getClient();
             ClusterState clusterState = client.admin().cluster().prepareState().execute().actionGet().getState();
-            String realIndexName = indexManager.getIndexNameFromAliasName( JettyStarter.getInstance().config.index );
-            IndexMetaData inMetaData = clusterState.getMetaData().index( realIndexName );
-            
+            IndexMetaData inMetaData = clusterState.getMetaData().index( instance.getInstanceIndexName() );
+
             ImmutableOpenMap<String, MappingMetaData> metad = inMetaData.getMappings();
             List<Object> fields = pd.getArrayList(PlugDescription.FIELDS);
             if (fields == null) {
-                fields = new ArrayList<Object>();
+                fields = new ArrayList<>();
                 pd.put(PlugDescription.FIELDS, fields);
             }
 
@@ -96,7 +94,7 @@ public class IPlugSEPostCrawlProcessor implements IPostCrawlProcessor {
             }
 
             plugDescriptionService.savePlugDescription(pd);
-            JettyStarter.getInstance().config.writePlugdescriptionToProperties(plugDescriptionService.getCommandObect());
+            baseConfig.writePlugdescriptionToProperties(plugDescriptionService.getCommandObect());
 
         } catch (Exception e) {
             LOG.error("Error adding index fields to plugdescription.", e);

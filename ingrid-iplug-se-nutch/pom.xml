@@ -1,27 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <groupId>de.ingrid</groupId>
     <artifactId>ingrid-iplug-se-project</artifactId>
-    <version>4.7.0-SNAPSHOT</version>
+    <version>5.0.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>de.ingrid</groupId>
   <artifactId>ingrid-iplug-se-nutch</artifactId>
   <packaging>jar</packaging>
   <name>ingrid-iplug-se-nutch</name>
-  <properties>
-    <apache-nutch-version>apache-nutch-1.9</apache-nutch-version>
-  </properties>
-  <repositories>
-    <!-- Repo of parent pom needed, parent pom may not be installed locally
-      yet -->
-    <repository>
-      <id>de.ingrid.all</id>
-      <name>Maven Repo InGrid</name>
-      <url>https://dev.informationgrid.eu/archiva/repository/ingrid-all</url>
-    </repository>
-  </repositories>
+
+  <!-- ==================== DEPENDENCY MANAGEMENT ==================== -->
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -42,6 +32,8 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <!-- ==================== DEPENDENCIES ==================== -->
   <dependencies>
     <dependency>
       <groupId>org.apache.nutch</groupId>
@@ -53,23 +45,16 @@
     <dependency>
       <groupId>org.elasticsearch</groupId>
       <artifactId>elasticsearch</artifactId>
-      <version>1.1.0</version>
+      <version>${elasticsearch.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.elasticsearch.client</groupId>
+      <artifactId>transport</artifactId>
+      <version>${elasticsearch.version}</version>
       <optional>true</optional>
     </dependency>
     <!-- nutch dependencies -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.6.1</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.6.1</version>
-      <optional>true</optional>
-    </dependency>
-    <!-- PROVIDED BY INGRID, see below <dependency><groupId>log4j</groupId><artifactId>log4j</artifactId><version>1.2.15</version><optional>true</optional></dependency>-->
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
@@ -108,7 +93,7 @@
           <artifactId>servlet-api</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>javax.xml.stream:</groupId>
+          <groupId>javax.xml.stream</groupId>
           <artifactId>stax-api</artifactId>
         </exclusion>
       </exclusions>
@@ -186,28 +171,34 @@
       <version>6.1.22</version>
       <optional>true</optional>
     </dependency>
+
+    <!-- backward compatible -->
     <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.15</version>
-      <optional>true</optional>
-      <exclusions>
-        <!-- exclude since not in maven repo by default -->
-        <exclusion>
-          <groupId>com.sun.jdmk</groupId>
-          <artifactId>jmxtools</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.sun.jmx</groupId>
-          <artifactId>jmxri</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>javax.jms</groupId>
-          <artifactId>jms</artifactId>
-        </exclusion>
-      </exclusions>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-1.2-api</artifactId>
+      <version>${log4j2.version}</version>
     </dependency>
+    <!-- end -->
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>${log4j2.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>${log4j2.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-jcl</artifactId>
+      <version>${log4j2.version}</version>
+    </dependency>
+
+
   </dependencies>
+
+  <!-- ==================== Build Configuration ==================== -->
   <build>
     <plugins>
       <plugin>
@@ -248,15 +239,15 @@
             <phase>compile</phase>
             <configuration>
               <tasks>
-                <echo message="Executing original ant build script '${basedir}/build.xml' target=dist." />
+                <echo message="Executing original ant build script '${basedir}/build.xml' target=dist."/>
                 <ant antfile="${basedir}/build.xml" inheritRefs="true">
-                  <property name="maven.version" value="${project.version}" />
-                  <property name="maven.buildNumber" value="${buildNumber}" />
-                  <property name="maven.timestamp" value="${timestamp}" />
-                  <property name="maven.iplugType" value="IPLUG_SE" />
-                  <property name="apache-nutch-version" value="${apache-nutch-version}" />
-                  <property name="ingrid-base-webapp.version" value="${ingrid-base-webapp.version}" />
-                  <target name="dist" />
+                  <property name="maven.version" value="${project.version}"/>
+                  <property name="maven.buildNumber" value="${buildNumber}"/>
+                  <property name="maven.timestamp" value="${timestamp}"/>
+                  <property name="maven.iplugType" value="IPLUG_SE"/>
+                  <property name="apache-nutch-version" value="${apache-nutch-version}"/>
+                  <property name="ingrid-base-webapp.version" value="${ingrid-base-webapp.version}"/>
+                  <target name="dist"/>
                 </ant>
               </tasks>
             </configuration>

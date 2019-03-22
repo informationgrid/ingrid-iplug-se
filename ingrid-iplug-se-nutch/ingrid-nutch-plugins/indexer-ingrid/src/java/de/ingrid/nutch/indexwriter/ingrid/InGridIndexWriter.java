@@ -3,14 +3,9 @@
  */
 package de.ingrid.nutch.indexwriter.ingrid;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-
+import de.ingrid.iplug.se.nutch.analysis.AnalyzerFactory;
+import de.ingrid.iplug.se.nutch.indexer.IndexerConstants;
+import de.ingrid.iplug.se.nutch.indexer.lucene.LuceneConstants;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -18,25 +13,30 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.FileOutputFormat;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StringField;
+import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.IndexableFieldType;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.Version;
 import org.apache.nutch.indexer.NutchDocument;
 import org.apache.nutch.indexer.NutchField;
 import org.apache.nutch.metadata.Metadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.ingrid.iplug.se.nutch.analysis.AnalyzerFactory;
-import de.ingrid.iplug.se.nutch.analysis.NutchAnalyzer;
-import de.ingrid.iplug.se.nutch.indexer.IndexerConstants;
-import de.ingrid.iplug.se.nutch.indexer.lucene.LuceneConstants;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
 
 /**
  * Writes the Ingrid specific local index.
@@ -72,16 +72,10 @@ public class InGridIndexWriter implements org.apache.nutch.indexer.IndexWriter {
 
     private final Map<String, Field.Store> fieldStore;
 
-    private final Map<String, Field.Index> fieldIndex;
-
-    private final Map<String, Field.TermVector> fieldVector;
-
     private Configuration config;
 
     public InGridIndexWriter() {
         fieldStore = new HashMap<String, Field.Store>();
-        fieldIndex = new HashMap<String, Field.Index>();
-        fieldVector = new HashMap<String, Field.TermVector>();
     }
 
     /*
@@ -172,9 +166,8 @@ public class InGridIndexWriter implements org.apache.nutch.indexer.IndexWriter {
             create = false;
         }
 
-        Directory dir = FSDirectory.open(indexDirFile);
-        Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_43);
-        IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_43, analyzer);
+        Directory dir = FSDirectory.open(Paths.get(indexDirFile.toURI()));
+        IndexWriterConfig iwc = new IndexWriterConfig();
 
         // TODO: Migrate indexer properties
         /*
@@ -230,7 +223,7 @@ public class InGridIndexWriter implements org.apache.nutch.indexer.IndexWriter {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Indexing [" + luceneDoc.get("url") + "] with analyzer " + analyzer + " (" + luceneDoc.get("lang") + ")");
         }
-        writer.addDocument(luceneDoc, analyzer);
+        writer.addDocument(luceneDoc);
     }
 
     private Document createLuceneDoc(NutchDocument doc) {
@@ -241,21 +234,21 @@ public class InGridIndexWriter implements org.apache.nutch.indexer.IndexWriter {
             final String fieldName = entry.getKey();
 
             Field.Store store = fieldStore.get(fieldName);
-            Field.Index index = fieldIndex.get(fieldName);
-            Field.TermVector vector = fieldVector.get(fieldName);
+//            Field.Index index = fieldIndex.get(fieldName);
+//            Field.TermVector vector = fieldVector.get(fieldName);
 
             // default values
             if (store == null) {
                 store = Field.Store.NO;
             }
 
-            if (index == null) {
+            /*if (index == null) {
                 index = Field.Index.NO;
             }
 
             if (vector == null) {
                 vector = Field.TermVector.NO;
-            }
+            }*/
 
             // read document-level field information
             final String[] fieldMetas = documentMeta.getValues(LuceneConstants.FIELD_PREFIX + fieldName);
@@ -266,30 +259,31 @@ public class InGridIndexWriter implements org.apache.nutch.indexer.IndexWriter {
                     } else if (LuceneConstants.STORE_NO.equals(val)) {
                         store = Field.Store.NO;
                     } else if (LuceneConstants.INDEX_TOKENIZED.equals(val)) {
-                        index = Field.Index.ANALYZED;
+//                        index = Field..ANALYZED;
                     } else if (LuceneConstants.INDEX_NO.equals(val)) {
-                        index = Field.Index.NO;
+//                        index = Field.Index.NO;
                     } else if (LuceneConstants.INDEX_UNTOKENIZED.equals(val)) {
-                        index = Field.Index.NOT_ANALYZED;
+//                        index = Field.Index.NOT_ANALYZED;
                     } else if (LuceneConstants.INDEX_NO_NORMS.equals(val)) {
-                        index = Field.Index.ANALYZED_NO_NORMS;
+//                        index = Field.Index.ANALYZED_NO_NORMS;
                     } else if (LuceneConstants.VECTOR_NO.equals(val)) {
-                        vector = Field.TermVector.NO;
+//                        vector = Field.TermVector.NO;
                     } else if (LuceneConstants.VECTOR_YES.equals(val)) {
-                        vector = Field.TermVector.YES;
+//                        vector = Field.TermVector.YES;
                     } else if (LuceneConstants.VECTOR_POS.equals(val)) {
-                        vector = Field.TermVector.WITH_POSITIONS;
+//                        vector = Field.TermVector.WITH_POSITIONS;
                     } else if (LuceneConstants.VECTOR_POS_OFFSET.equals(val)) {
-                        vector = Field.TermVector.WITH_POSITIONS_OFFSETS;
+//                        vector = Field.TermVector.WITH_POSITIONS_OFFSETS;
                     } else if (LuceneConstants.VECTOR_OFFSET.equals(val)) {
-                        vector = Field.TermVector.WITH_OFFSETS;
+//                        vector = Field.TermVector.WITH_OFFSETS;
                     }
                 }
             }
 
             for (final Object fieldValue : entry.getValue().getValues()) {
-                Field f = new Field(fieldName, fieldValue.toString(), store, index, vector);
-                f.setBoost(entry.getValue().getWeight());
+                Field f = new StringField(fieldName, fieldValue.toString(), store);
+                // TODO: setting of boost not supported anymore
+                //       f.setBoost(entry.getValue().getWeight()); // http://lucene.apache.org/core/7_0_0/MIGRATE.html
                 out.add(f);
             }
         }
@@ -321,7 +315,8 @@ public class InGridIndexWriter implements org.apache.nutch.indexer.IndexWriter {
             } else if (key.startsWith(LuceneConstants.FIELD_INDEX_PREFIX)) {
                 final String field = key.substring(LuceneConstants.FIELD_INDEX_PREFIX.length());
                 final LuceneConstants.INDEX index = LuceneConstants.INDEX.valueOf(conf.get(key));
-                switch (index) {
+                LOG.warn("FieldIndex is not getting additional information ... needs migration?");
+                /*switch (index) {
                 case NO:
                     fieldIndex.put(field, Field.Index.NO);
                     break;
@@ -334,11 +329,12 @@ public class InGridIndexWriter implements org.apache.nutch.indexer.IndexWriter {
                 case UNTOKENIZED:
                     fieldIndex.put(field, Field.Index.NOT_ANALYZED);
                     break;
-                }
+                }*/
             } else if (key.startsWith(LuceneConstants.FIELD_VECTOR_PREFIX)) {
                 final String field = key.substring(LuceneConstants.FIELD_VECTOR_PREFIX.length());
                 final LuceneConstants.VECTOR vector = LuceneConstants.VECTOR.valueOf(conf.get(key));
-                switch (vector) {
+                LOG.warn("FieldVector is not getting additional information ... needs migration?");
+                /*switch (vector) {
                 case NO:
                     fieldVector.put(field, Field.TermVector.NO);
                     break;
@@ -354,7 +350,7 @@ public class InGridIndexWriter implements org.apache.nutch.indexer.IndexWriter {
                 case YES:
                     fieldVector.put(field, Field.TermVector.YES);
                     break;
-                }
+                }*/
             }
         }
     }

@@ -312,7 +312,7 @@
       <fileset dir="lib/native"/>
     </copy>
     <copy todir="${runtime.local}/conf">
-      <fileset dir="${conf.dir}" excludes="*.template"/>
+      <fileset dir="${conf.dir}" excludes="*.template,log4j2.xml"/>
     </copy>
     <copy todir="${runtime.local}/bin">
       <fileset dir="src/bin"/>
@@ -328,6 +328,9 @@
     </copy>
     <copy todir="${runtime.local}/test">
       <fileset dir="${build.dir}/test"/>
+    </copy>
+    <copy todir="${runtime.local}">
+      <fileset dir="${conf.dir}" includes="log4j2.xml" />
     </copy>
   </target>
 

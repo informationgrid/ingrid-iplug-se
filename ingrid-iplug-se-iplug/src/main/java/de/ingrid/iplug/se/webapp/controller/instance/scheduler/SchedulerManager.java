@@ -22,6 +22,18 @@
  */
 package de.ingrid.iplug.se.webapp.controller.instance.scheduler;
 
+import de.ingrid.admin.service.PlugDescriptionService;
+import de.ingrid.elasticsearch.IndexManager;
+import de.ingrid.iplug.se.Configuration;
+import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
+import de.ingrid.iplug.se.nutchController.NutchController;
+import de.ingrid.iplug.se.nutchController.NutchProcessFactory;
+import it.sauronsoftware.cron4j.Scheduler;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.nio.file.Files;
@@ -29,20 +41,12 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import de.ingrid.admin.JettyStarter;
-import de.ingrid.admin.elasticsearch.IndexManager;
-import de.ingrid.iplug.se.SEIPlug;
-import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
-import de.ingrid.iplug.se.nutchController.NutchController;
-import de.ingrid.iplug.se.nutchController.NutchProcessFactory;
-import it.sauronsoftware.cron4j.Scheduler;
-
 @Service
 public class SchedulerManager {
-    private Map<String, Runner> scheduler = new HashMap<String, Runner>();
+
+    private static Log log = LogFactory.getLog(SchedulerManager.class);
+
+    private Map<String, Runner> scheduler = new HashMap<>();
 
     private final PatternPersistence patternService;
 
@@ -50,12 +54,19 @@ public class SchedulerManager {
 
     private NutchController nutchController;
 
+    private final IndexManager indexManager;
+
+    @Autowired
+    private PlugDescriptionService plugDescriptionService;
+
     @Autowired
     private IPostCrawlProcessor[] postCrawlProcessors;
-    
+
+    private final Configuration seConfig;
+
     @Autowired
     private NutchProcessFactory nutchProcessFactory;
-    
+
     private class Runner {
         public Runner(Scheduler s, SchedulingRunnable sr) {
             this.scheduler = s;
@@ -79,10 +90,12 @@ public class SchedulerManager {
      * @throws Exception
      */
     @Autowired
-    public SchedulerManager(PatternPersistence patternPers, CrawlDataPersistence crawlDataPers, NutchController nutchController, IndexManager indexManager) throws Exception {
+    public SchedulerManager(PatternPersistence patternPers, CrawlDataPersistence crawlDataPers, NutchController nutchController, IndexManager indexManager, Configuration seConfig) {
         this.patternService = patternPers;
         this.crawlDataPers = crawlDataPers;
         this.nutchController = nutchController;
+        this.indexManager = indexManager;
+        this.seConfig = seConfig;
 
         // create for each instance a scheduler
         for (File instance : getInstances()) {
@@ -90,14 +103,6 @@ public class SchedulerManager {
 
             addInstance(name);
 
-            // check if elastic search index is present and create it otherwise
-            // this can be missing if old database has been migrated or an
-            // instance dir has been added manually
-            String indexName = JettyStarter.getInstance().config.index;
-            
-            boolean indexExists = indexManager.indexExists( indexName );
-            if (!indexExists) indexManager.createIndex( indexName );
-            
             // if schedule pattern exists then schedule the scheduler
             schedule(name);
 
@@ -107,7 +112,7 @@ public class SchedulerManager {
     private File[] getInstances() {
         File[] instanceDirs = null;
 
-        String dir = SEIPlug.conf.getInstancesDir();
+        String dir = seConfig.getInstancesDir();
         if (Files.isDirectory(Paths.get(dir))) {
             FileFilter directoryFilter = new FileFilter() {
                 public boolean accept(File file) {
@@ -125,7 +130,7 @@ public class SchedulerManager {
     }
 
     public void addInstance(String name) {
-        SchedulingRunnable schedulerRun = new SchedulingRunnable(name, crawlDataPers, nutchController, postCrawlProcessors, nutchProcessFactory);
+        SchedulingRunnable schedulerRun = new SchedulingRunnable(name, crawlDataPers, nutchController, postCrawlProcessors, nutchProcessFactory, indexManager,plugDescriptionService);
         Scheduler schedulerClass = new Scheduler();
 
         Runner runner = new Runner(schedulerClass, schedulerRun);
@@ -144,7 +149,7 @@ public class SchedulerManager {
         try {
             pattern = patternService.loadPattern(instanceName);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error setting schedule pattern", e);
             return;
         }
 

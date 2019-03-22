@@ -22,30 +22,26 @@
  */
 package de.ingrid.iplug.se.nutch.tools;
 
-import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
-import org.elasticsearch.action.ListenableActionFuture;
+import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.Nullable;
-import org.elasticsearch.common.settings.ImmutableSettings;
-import org.elasticsearch.common.settings.ImmutableSettings.Builder;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.node.Node;
-import org.mortbay.log.Log;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.net.InetAddress;
 
 public class IngridElasticSearchClient {
 
@@ -55,13 +51,12 @@ public class IngridElasticSearchClient {
     private static final int DEFAULT_MAX_BULK_LENGTH = 2500500;
 
     private Client client;
-    private Node node;
-    private String defaultIndex;
+    private String instanceIndex;
 
     private Configuration config;
 
     private BulkRequestBuilder bulk;
-    private ListenableActionFuture<BulkResponse> execute = null;
+    private ActionFuture<BulkResponse> execute = null;
     private int port = -1;
     private String host = null;
     private String clusterName = null;
@@ -83,9 +78,9 @@ public class IngridElasticSearchClient {
         host = config.get(ElasticConstants.HOST);
         port = config.getInt(ElasticConstants.PORT, 9300);
 
-        type = config.get(ElasticConstants.TYPE, "default");
+//        type = config.get(ElasticConstants.TYPE, "default");
 
-        Builder settingsBuilder = ImmutableSettings.settingsBuilder().classLoader(Settings.class.getClassLoader());
+        Settings.Builder settingsBuilder = Settings.builder(); // .loadFromPath()classLoader(Settings.class.getClassLoader());
 
         BufferedReader reader = new BufferedReader(config.getConfResourceAsReader("elasticsearch.conf"));
         String line;
@@ -110,14 +105,15 @@ public class IngridElasticSearchClient {
 
         // Prefer TransportClient
         if (host != null && port > 1) {
-            client = new TransportClient(settings).addTransportAddress(new InetSocketTransportAddress(host, port));
+            client = new PreBuiltTransportClient(settings)
+                    .addTransportAddress(new TransportAddress(  InetAddress.getByName( host ), port) );
+
         } else if (clusterName != null) {
-            node = nodeBuilder().settings(settings).client(true).node();
-            client = node.client();
+            throw new RuntimeException("TransportClient not created since host and/or port not defined.");
         }
 
         bulk = client.prepareBulk();
-        defaultIndex = config.get(ElasticConstants.INDEX, "nutch");
+        instanceIndex = config.get(ElasticConstants.INDEX, "nutch");
         maxBulkDocs = config.getInt(ElasticConstants.MAX_BULK_DOCS, DEFAULT_MAX_BULK_DOCS);
         maxBulkLength = config.getInt(ElasticConstants.MAX_BULK_LENGTH, DEFAULT_MAX_BULK_LENGTH);
     }
@@ -137,11 +133,11 @@ public class IngridElasticSearchClient {
     }
 
     public IndexRequestBuilder prepareIndexRequest(@Nullable String id) {
-        return client.prepareIndex(defaultIndex, type, id);
+        return client.prepareIndex(instanceIndex, type, id);
     }
 
     public DeleteRequestBuilder prepareDeleteRequest(@Nullable String id) {
-        return client.prepareDelete(defaultIndex, type, id);
+        return client.prepareDelete(instanceIndex, type, id);
     }
 
     public void commit() throws IOException {
@@ -157,7 +153,7 @@ public class IngridElasticSearchClient {
                 }
             }
             long msWaited = System.currentTimeMillis() - beforeWait;
-            LOG.info("Previous took in ms " + actionGet.getTookInMillis() + ", including wait " + msWaited);
+            LOG.info("Previous took in ms " + actionGet.getTook().getMillis() + ", including wait " + msWaited);
             execute = null;
         }
         if (bulk != null) {
@@ -187,9 +183,6 @@ public class IngridElasticSearchClient {
 
         // Close
         client.close();
-        if (node != null) {
-            node.close();
-        }
     }
 
     private void checkNewBulk() throws IOException {
@@ -208,7 +201,7 @@ public class IngridElasticSearchClient {
         sb.append("\t").append(ElasticConstants.CLUSTER).append(" : elastic prefix cluster\n");
         sb.append("\t").append(ElasticConstants.HOST).append(" : " + host + "\n");
         sb.append("\t").append(ElasticConstants.PORT).append(" : " + port + "\n");
-        sb.append("\t").append(ElasticConstants.INDEX).append(" : " + defaultIndex + "\n");
+        sb.append("\t").append(ElasticConstants.INDEX).append(" : " + instanceIndex + "\n");
         sb.append("\t").append(ElasticConstants.MAX_BULK_DOCS).append(" : " + maxBulkDocs + " (default 250) \n");
         sb.append("\t").append(ElasticConstants.MAX_BULK_LENGTH).append(" : " + maxBulkLength + " (default 2500500 ~2.5MB)\n");
         return sb.toString();

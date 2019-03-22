@@ -22,45 +22,80 @@
  */
 package de.ingrid.iplug.se.webapp.controller.instance;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.controller.AbstractController;
 import de.ingrid.admin.security.IngridPrincipal;
+import de.ingrid.admin.service.CommunicationService;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.utils.DBUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
+import de.ingrid.utils.IBus;
+import de.ingrid.utils.IngridCall;
+import de.ingrid.utils.IngridDocument;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
 
 public class InstanceController extends AbstractController {
 
+    private static Logger log = LogManager.getLogger(InstanceController.class);
+
+    private static CommunicationService communicationInterface;
+
     public static Instance getInstanceData(String name) {
         // first check if the path really exists, in case we called an URL with a wrong parameter
-        Path workPath = Paths.get( SEIPlug.conf.getInstancesDir(), name );
+        Path workPath = Paths.get(SEIPlug.conf.getInstancesDir(), name );
         if (!workPath.toFile().exists()) return null;
         
         Instance instance = new Instance();
         instance.setName( name );
         instance.setWorkingDirectory( workPath.toString() );
-        instance.setClusterName( JettyStarter.getInstance().config.cluster );
-        instance.setIndexName( JettyStarter.getInstance().config.index );
-        
-        if (JettyStarter.getInstance().config.indexSearchInTypes.contains( name )) {
-            instance.setIsActive( true );
-            
-        } else {
-            instance.setIsActive( false );            
+        instance.setClusterName( SEIPlug.conf.clusterName );
+        instance.setIndexName( JettyStarter.baseConfig.index );
+
+        HashSet<String> activeIndices = getActiveIndices();
+
+        if (activeIndices != null) {
+            String iBusIndexId = JettyStarter.baseConfig.uuid + "=>" + instance.getInstanceIndexName() + ":default";
+            if (activeIndices.contains(iBusIndexId)) {
+                instance.setIsActive(true);
+
+            } else {
+                instance.setIsActive(false);
+            }
         }
+
         instance.setEsTransportTcpPort(SEIPlug.conf.esTransportTcpPort);
-        //instance.setEsHttpHost(SEIPlug.conf.esHttpHost);
+        instance.setEsHttpHost(SEIPlug.conf.esHttpHost);
         
     
         return instance;
     }
-    
+
+    private static HashSet<String> getActiveIndices() {
+
+        // always get iBus from communicationInterface in case it has been changed
+        IBus iBus = communicationInterface.getIBus();
+
+        IngridCall call = new IngridCall();
+        call.setTarget("iBus");
+        call.setMethod("getActiveIndices");
+        IngridDocument result = null;
+        try {
+            result = iBus.call(call);
+        } catch (Exception e) {
+            log.error("Could not get indices from iBus", e);
+            return null;
+        }
+
+        return (HashSet<String>) result.get("result");
+    }
+
     /**
      * Returns true if the user has role 'instanceAdmin' and has NO ACCESS to the given instance.
      * 
@@ -79,4 +114,7 @@ public class InstanceController extends AbstractController {
         
     }
 
+    public static void setCommunicationInterface(CommunicationService communicationInterface) {
+        InstanceController.communicationInterface = communicationInterface;
+    }
 }

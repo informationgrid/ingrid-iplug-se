@@ -29,6 +29,7 @@ import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 
+import de.ingrid.admin.Config;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -51,17 +52,17 @@ public class FacetSearchTest  {
     
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        new JettyStarter( false );
-        JettyStarter.getInstance().config.index = "test";
-        JettyStarter.getInstance().config.indexWithAutoId = true;
-        JettyStarter.getInstance().config.indexSearchInTypes = new ArrayList<String>();
+        JettyStarter.baseConfig = new Config();
+        JettyStarter.baseConfig.index = "test";
+//        JettyStarter.baseConfig.indexWithAutoId = true;
+        // JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<String>();
         Utils.setupES();
     }
     
     @Before
     public void initTest() throws Exception {
         Utils.initIndex( jettyStarter );
-        Utils.indexManager.switchAlias( JettyStarter.getInstance().config.index, "test_1" );
+        Utils.indexManager.switchAlias( "ingrid_test", JettyStarter.baseConfig.index, "test_1" );
     }
     
     @AfterClass

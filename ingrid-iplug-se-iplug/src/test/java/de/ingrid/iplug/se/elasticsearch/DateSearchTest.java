@@ -29,12 +29,15 @@ import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 
+import de.ingrid.admin.Config;
+import de.ingrid.elasticsearch.ElasticConfig;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -43,24 +46,27 @@ import de.ingrid.utils.IngridHits;
 import de.ingrid.utils.query.IngridQuery;
 
 @RunWith(PowerMockRunner.class)
+@PowerMockIgnore("javax.management.*")
 @PrepareForTest(JettyStarter.class)
 public class DateSearchTest  {
 
     @Mock JettyStarter jettyStarter;
-    
+
+    @Mock ElasticConfig elasticConfig;
+
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        new JettyStarter( false );
-        JettyStarter.getInstance().config.index = "test";
-        JettyStarter.getInstance().config.indexWithAutoId = true;
-        JettyStarter.getInstance().config.indexSearchInTypes = new ArrayList<String>();
+        JettyStarter.baseConfig = new Config();
+        JettyStarter.baseConfig.index = "test";
+//        JettyStarter.baseConfig.indexWithAutoId = true;
+        // JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<>();
         Utils.setupES();
     }
     
     @Before
     public void initTest() throws Exception {
         Utils.initIndex( jettyStarter );
-        Utils.indexManager.switchAlias( JettyStarter.getInstance().config.index, "test_1" );
+        Utils.indexManager.switchAlias( "ingrid_test", JettyStarter.baseConfig.index, "test_1" );
     }
     
     @AfterClass

@@ -37,13 +37,13 @@ import de.ingrid.admin.JettyStarter;
 public class ElasticSearchUtils {
 
     public static boolean typeExists(String type, Client client) {
-        TypesExistsRequest typeRequest = new TypesExistsRequest( new String[]{ JettyStarter.getInstance().config.index }, type );
+        TypesExistsRequest typeRequest = new TypesExistsRequest( new String[]{ JettyStarter.baseConfig.index }, type );
         boolean typeExists = client.admin().indices().typesExists( typeRequest ).actionGet().isExists();
         return typeExists;
     }
     
     public static void createIndexType(String type, Client client) throws Exception {
-        String indexName = JettyStarter.getInstance().config.index;
+        String indexName = JettyStarter.baseConfig.index;
         client.admin().indices().preparePutMapping().setIndices( indexName )
             .setType( type )
             .setSource( getMappingSource() )
@@ -65,10 +65,10 @@ public class ElasticSearchUtils {
     }
 
     public static void deleteType(String name, Client client) {
-        client.admin().indices().prepareDeleteMapping( JettyStarter.getInstance().config.index )
+        /*client.admin().indices().prepareDeleteMapping( baseConfig.index )
             .setType( name )
             .execute()
-            .actionGet();
+            .actionGet();*/
         
     }
     

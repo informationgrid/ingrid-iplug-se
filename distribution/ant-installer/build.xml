@@ -78,6 +78,9 @@
         <delete>
             <fileset dir="${installDir}/webapp/WEB-INF/work" includes="**/*"/>
         </delete>
+        <delete>
+            <fileset dir="${installDir}/apache-nutch-runtime" includes="**/*"/>
+        </delete>
 
         <move toDir="${installDir}">
             <fileset dir="./${iPlugName}"/>

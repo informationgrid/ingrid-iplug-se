@@ -20,31 +20,16 @@
  * limitations under the Licence.
  * **************************************************#
  */
-/**
- * 
- */
 package de.ingrid.iplug.se.nutchController;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.thoughtworks.xstream.XStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.google.common.io.Files;
-import com.thoughtworks.xstream.XStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
  * Manages status messages. Messages added are sorted chronological.
@@ -307,7 +292,7 @@ public class StatusProvider {
 
         // move the temporary file to the configuration file
         this.lastStatusFile.delete();
-        Files.move( tmpFile, this.lastStatusFile );
+        Files.move(Paths.get(tmpFile.toURI()), Paths.get(this.lastStatusFile.toURI()));
     }
 
     /**
