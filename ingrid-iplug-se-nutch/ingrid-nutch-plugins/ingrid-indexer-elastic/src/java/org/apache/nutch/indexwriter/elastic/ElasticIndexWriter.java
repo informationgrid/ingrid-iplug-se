@@ -66,7 +66,17 @@ public class ElasticIndexWriter implements IndexWriter {
                 if (fieldName.equalsIgnoreCase("boost")) {
                     source.put("doc_boost", doc.getField(fieldName).getValues());
                 }
+
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Adding field: " + fieldName + " with value: " + doc.getField(fieldName).getValues());
+                }
                 source.put(fieldName, doc.getField(fieldName).getValues());
+
+                // also add mapped index field for topics (used for facets in central index)
+                if (fieldName.equals("measure") || fieldName.equals("service")) {
+                    source.put("topic", doc.getField(fieldName).getValues());
+                }
+
                 // Loop through the values to keep track of the size of this
                 // document
                 for (Object value : doc.getField(fieldName).getValues()) {
