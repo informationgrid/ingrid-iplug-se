@@ -34,7 +34,6 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.TransportAddress;
-import org.elasticsearch.node.Node;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,7 +139,7 @@ public class IngridElasticSearchClient {
         return client.prepareDelete(instanceIndex, type, id);
     }
 
-    public void commit() throws IOException {
+    public void commit() {
         if (execute != null) {
             // wait for previous to finish
             long beforeWait = System.currentTimeMillis();
@@ -171,7 +170,7 @@ public class IngridElasticSearchClient {
         }
     }
 
-    public void close() throws IOException {
+    public void close() {
         // Flush pending requests
         LOG.info("Processing remaining requests [docs = " + bulkDocs + ", length = " + bulkLength + ", total docs = " + indexedDocs + "]");
         createNewBulk = false;

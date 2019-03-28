@@ -103,7 +103,6 @@ public class ManagementController extends InstanceController {
         Instance instance = InstanceController.getInstanceData( name );
 
         IngridCrawlNutchProcess process = nutchProcessFactory.getIngridCrawlNutchProcess(instance, depth, numUrls, postCrawlProcessors, indexManager, plugDescriptionService);
-        process.setElasticSearch( elasticSearch );
 
         // run crawl process
         nutchController.start(instance, process);

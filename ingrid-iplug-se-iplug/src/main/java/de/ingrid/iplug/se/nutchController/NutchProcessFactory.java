@@ -24,6 +24,8 @@ package de.ingrid.iplug.se.nutchController;
 
 import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.service.PlugDescriptionService;
+import de.ingrid.elasticsearch.ElasticConfig;
+import de.ingrid.elasticsearch.IBusIndexManager;
 import de.ingrid.elasticsearch.IndexManager;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.StatusProviderService;
@@ -34,6 +36,7 @@ import edu.emory.mathcs.backport.java.util.Arrays;
 import org.apache.commons.lang.StringUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
@@ -55,6 +58,11 @@ public class NutchProcessFactory {
     // private final static Log log =
     // LogFactory.getLog(NutchProcessFactory.class);
 
+    @Autowired
+    private ElasticConfig elasticConfig;
+
+    @Autowired
+    private IBusIndexManager iBusIndexManager;
 
     private StatusProviderService statusProviderService;
 
@@ -67,8 +75,11 @@ public class NutchProcessFactory {
      */
     @SuppressWarnings("unchecked")
     public IngridCrawlNutchProcess getIngridCrawlNutchProcess(Instance instance, int depth, int noUrls, IPostCrawlProcessor[] postCrawlProcessors, IndexManager indexManager, PlugDescriptionService pds) {
-        IngridCrawlNutchProcess process = new IngridCrawlNutchProcess(indexManager, pds);
-        
+
+        IngridCrawlNutchProcess process = new IngridCrawlNutchProcess(
+                elasticConfig.esCommunicationThroughIBus ? iBusIndexManager : indexManager,
+                pds);
+
         process.setInstance(instance);
 
         process.setPostCrawlProcessors(postCrawlProcessors);
@@ -119,6 +130,8 @@ public class NutchProcessFactory {
         nutchConfigTool.addOrUpdateProperty("elastic.host", instance.getEsHttpHost(), "The hostname to send documents to using TransportClient. Either host\n" + "  and port must be defined or cluster.");
         nutchConfigTool.addOrUpdateProperty("iplug.datasource.name", JettyStarter.baseConfig.datasourceName, "The name of the iPlug which will be added to each indexed document.");
         nutchConfigTool.addOrUpdateProperty("iplug.id", JettyStarter.baseConfig.communicationProxyUrl, "The id of the iPlug which will be added to each indexed document.");
+        nutchConfigTool.addOrUpdateProperty("use.elastic.with.ibus", String.valueOf(elasticConfig.esCommunicationThroughIBus), "Whether to use iBus for communication to Elasticsearch.");
+        nutchConfigTool.addOrUpdateProperty("communication.file", new File(JettyStarter.baseConfig.communicationLocation).getAbsolutePath(), "");
 
         nutchConfigTool.write();
 

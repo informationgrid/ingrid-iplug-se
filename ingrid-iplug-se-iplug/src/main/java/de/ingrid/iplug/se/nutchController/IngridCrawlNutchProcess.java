@@ -26,6 +26,7 @@ import de.ingrid.admin.Config;
 import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.service.PlugDescriptionService;
 import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
+import de.ingrid.elasticsearch.IIndexManager;
 import de.ingrid.elasticsearch.IndexInfo;
 import de.ingrid.elasticsearch.IndexManager;
 import de.ingrid.iplug.se.SEIPlug;
@@ -80,14 +81,12 @@ public class IngridCrawlNutchProcess extends NutchProcess {
 
     private LogFileWatcher logFileWatcher = null;
 
-    private ElasticsearchNodeFactoryBean elasticSearch;
-
-    private final IndexManager indexManager;
+    private final IIndexManager indexManager;
 
     private PlugDescriptionService plugDescriptionService;
 
 
-    public IngridCrawlNutchProcess(IndexManager indexManager, PlugDescriptionService pds) {
+    public IngridCrawlNutchProcess(IIndexManager indexManager, PlugDescriptionService pds) {
         this.indexManager = indexManager;
         this.plugDescriptionService = pds;
     }
@@ -420,7 +419,9 @@ public class IngridCrawlNutchProcess extends NutchProcess {
 
         String instanceIndexName = instance.getIndexName() + "_" + instance.getName();
         if (!this.indexManager.indexExists(instanceIndexName)) {
-            this.indexManager.createIndex(instanceIndexName);
+            String esMapping = indexManager.getDefaultMapping();
+            String esSettings = indexManager.getDefaultSettings();
+            this.indexManager.createIndex(instanceIndexName, "default", esMapping, esSettings);
         }
 
         int ret = execute("org.apache.nutch.indexer.IndexingJob", crawlDb, "-linkdb", linkDb, "-dir", segments, "-deleteGone", "-noCommit");
@@ -585,8 +586,4 @@ public class IngridCrawlNutchProcess extends NutchProcess {
         this.instance = instance;
     }
 
-    public void setElasticSearch(ElasticsearchNodeFactoryBean esBean) {
-        this.elasticSearch = esBean;
-    }
-    
 }

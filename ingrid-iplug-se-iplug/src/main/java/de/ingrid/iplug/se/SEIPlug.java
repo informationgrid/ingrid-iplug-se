@@ -28,6 +28,7 @@ package de.ingrid.iplug.se;
 import de.ingrid.admin.JettyStarter;
 import de.ingrid.elasticsearch.ElasticConfig;
 import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
+import de.ingrid.elasticsearch.IBusIndexManager;
 import de.ingrid.elasticsearch.IndexInfo;
 import de.ingrid.elasticsearch.search.IndexImpl;
 import de.ingrid.iplug.HeartBeatPlug;
@@ -43,6 +44,8 @@ import de.ingrid.utils.*;
 import de.ingrid.utils.metadata.IMetadataInjector;
 import de.ingrid.utils.processor.IPostProcessor;
 import de.ingrid.utils.processor.IPreProcessor;
+import de.ingrid.utils.query.ClauseQuery;
+import de.ingrid.utils.query.FieldQuery;
 import de.ingrid.utils.query.IngridQuery;
 import de.ingrid.utils.tool.QueryUtil;
 import org.apache.log4j.Logger;
@@ -107,6 +110,9 @@ public class SEIPlug extends HeartBeatPlug {
 
     @Autowired
     private ElasticConfig elasticConfig;
+
+    @Autowired
+    private IBusIndexManager iBusIndexManager;
 
     private Configuration seConfig;
 
@@ -216,6 +222,18 @@ public class SEIPlug extends HeartBeatPlug {
         // remove "meta" field from query so search works !
         QueryUtil.removeFieldFromQuery(query, QueryUtil.FIELDNAME_METAINFO);
         QueryUtil.removeFieldFromQuery(query, QueryUtil.FIELDNAME_INCL_META);
+
+        // request iBus directly to get search results from within this iPlug
+        // adapt query to only get results coming from this iPlug and activated in iBus
+        // But when not connected to an iBus then use direct connection to Elasticsearch
+        if (elasticConfig.esCommunicationThroughIBus) {
+
+            ClauseQuery cq = new ClauseQuery(true, false);
+            cq.addField(new FieldQuery(true, false, "iPlugId", elasticConfig.communicationProxyUrl));
+            query.addClause(cq);
+            return this.iBusIndexManager.search(query, start, length);
+        }
+
         
         preProcess(query);
 
@@ -236,7 +254,14 @@ public class SEIPlug extends HeartBeatPlug {
     public IngridHitDetail getDetail(IngridHit hit, IngridQuery query, String[] requestedFields) throws Exception {
         
         preProcess(query);
-        
+
+        // request iBus directly to get search results from within this iPlug
+        // adapt query to only get results coming from this iPlug and activated in iBus
+        // But when not connected to an iBus then use direct connection to Elasticsearch
+        if (elasticConfig.esCommunicationThroughIBus) {
+            return this.iBusIndexManager.getDetail(hit, query, requestedFields);
+        }
+
         return index.getDetail(hit, query, requestedFields);
     }
 
