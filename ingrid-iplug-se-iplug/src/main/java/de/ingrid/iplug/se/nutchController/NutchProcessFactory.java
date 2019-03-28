@@ -163,4 +163,7 @@ public class NutchProcessFactory {
         this.statusProviderService = statusProviderService;
     }
 
+    public void setElasticConfig(ElasticConfig elasticConfig) {
+        this.elasticConfig = elasticConfig;
+    }
 }

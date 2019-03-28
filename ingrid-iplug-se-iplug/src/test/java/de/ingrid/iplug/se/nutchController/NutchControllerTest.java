@@ -22,28 +22,10 @@
  */
 package de.ingrid.iplug.se.nutchController;
 
-import static de.ingrid.iplug.se.elasticsearch.Utils.elastic;
-import static de.ingrid.iplug.se.elasticsearch.Utils.elasticConfig;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Properties;
-
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-
 import de.ingrid.admin.Config;
+import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.service.PlugDescriptionService;
 import de.ingrid.elasticsearch.IndexManager;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import de.ingrid.admin.JettyStarter;
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.StatusProviderService;
@@ -51,6 +33,22 @@ import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.elasticsearch.Utils;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Properties;
+
+import static de.ingrid.iplug.se.elasticsearch.Utils.elastic;
+import static de.ingrid.iplug.se.elasticsearch.Utils.elasticConfig;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class NutchControllerTest {
 
@@ -64,6 +62,7 @@ public class NutchControllerTest {
         // Attention: this config property is used in ElasticConfig and Config!
         // During runtime both classes will read the config file and be initialized correctly
         JettyStarter.baseConfig.communicationProxyUrl = "/ingrid-group:unit-tests";
+        JettyStarter.baseConfig.communicationLocation = "conf/communication.xml";
         Utils.setupES();
     }
 
@@ -113,6 +112,7 @@ public class NutchControllerTest {
 
         NutchProcessFactory npf = new NutchProcessFactory();
         npf.setStatusProviderService( new StatusProviderService() );
+        npf.setElasticConfig( elasticConfig );
 
         Config config = new Config();
         config.plugdescriptionLocation = "conf/plugdescription.xml";
@@ -177,6 +177,8 @@ public class NutchControllerTest {
 
         NutchProcessFactory npf = new NutchProcessFactory();
         npf.setStatusProviderService( new StatusProviderService() );
+        npf.setElasticConfig( elasticConfig );
+
         Config config = new Config();
         config.plugdescriptionLocation = "conf/plugdescription.xml";
         IndexManager indexManager = new IndexManager(elastic, elasticConfig);

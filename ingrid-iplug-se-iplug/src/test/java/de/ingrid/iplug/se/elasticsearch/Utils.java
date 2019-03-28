@@ -74,6 +74,7 @@ public class Utils {
         indexInfo.setToAlias("ingrid_test");
         elasticConfig.activeIndices = new IndexInfo[1];
         elasticConfig.activeIndices[0] = indexInfo;
+        elasticConfig.esCommunicationThroughIBus = false;
 
         elastic = new ElasticsearchNodeFactoryBean();
         elastic.init(elasticConfig);
