@@ -433,7 +433,6 @@ public class IngridCrawlNutchProcess extends NutchProcess {
 
         // update central index with iPlug information
         IndexInfo info = new IndexInfo();
-        info.setComponentIdentifier(config.communicationProxyUrl);
         info.setToAlias(instanceIndexName);
         info.setToIndex(instanceIndexName);
         info.setToType("default");
