@@ -25,10 +25,8 @@ package de.ingrid.iplug.se.nutchController;
 import de.ingrid.admin.Config;
 import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.service.PlugDescriptionService;
-import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
 import de.ingrid.elasticsearch.IIndexManager;
 import de.ingrid.elasticsearch.IndexInfo;
-import de.ingrid.elasticsearch.IndexManager;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
 import de.ingrid.iplug.se.nutchController.StatusProvider.Classification;
@@ -51,7 +49,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.Arrays;
@@ -69,7 +66,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
 
     public enum STATES {
         START, DELETE_BEFORE_CRAWL, INJECT_START, INJECT_BW, CLEANUP_HADOOP, FINISHED, DEDUPLICATE, INDEX, FILTER_LINKDB, UPDATE_LINKDB, FILTER_WEBGRAPH, UPDATE_WEBGRAPH, FILTER_SEGMENT, MERGE_SEGMENT, INJECT_META, FILTER_CRAWLDB, GENERATE, FETCH, UPDATE_CRAWLDB, UPDATE_MD, CREATE_HOST_STATISTICS, GENERATE_ZERO_URLS, CRAWL_CLEANUP, CLEAN_DUPLICATES, CREATE_STARTURL_REPORT, CREATE_URL_ERROR_REPORT
-    };
+    }
 
     public Integer depth = 1;
 
@@ -429,8 +426,6 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             throwCrawlError("Error during Execution of: org.apache.nutch.indexer.IndexingJob");
         }
 
-        Config config = JettyStarter.baseConfig;
-
         // update central index with iPlug information
         IndexInfo info = new IndexInfo();
         info.setToAlias(instanceIndexName);
@@ -545,12 +540,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
     private String getCurrentSegment(String path) {
 
         File file = new File(path);
-        String[] segments = file.list(new FilenameFilter() {
-            @Override
-            public boolean accept(File current, String name) {
-                return new File(current, name).isDirectory();
-            }
-        });
+        String[] segments = file.list((current, name) -> new File(current, name).isDirectory());
         Arrays.sort(segments);
 
         return segments[segments.length - 1];
