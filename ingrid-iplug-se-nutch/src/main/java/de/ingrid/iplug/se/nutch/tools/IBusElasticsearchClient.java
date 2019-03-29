@@ -84,7 +84,13 @@ public class IBusElasticsearchClient {
     }
 
     public void deleteDoc(String key) {
-        iBusIndexManager.delete(indexInfo, key, false);
+        if (key == null) {
+            LOG.warn("Document ID for deletion is null");
+            return;
+        }
+        // TODO: activate again after we found out how this exception occurred after flush
+        //       -> ActionRequestValidationException: Validation Failed: 1: id is missing;
+        // iBusIndexManager.delete(indexInfo, key, false);
     }
 
     public void close() throws Exception {
