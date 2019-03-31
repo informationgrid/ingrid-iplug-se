@@ -80,11 +80,6 @@ public class ElasticIndexWriter implements IndexWriter {
                 }
                 source.put(fieldName, doc.getField(fieldName).getValues());
 
-                // also add mapped index field for topics (used for facets in central index)
-                if (fieldName.equals("measure") || fieldName.equals("service")) {
-                    source.put("topic", doc.getField(fieldName).getValues());
-                }
-
                 // Loop through the values to keep track of the size of this
                 // document
                 for (Object value : doc.getField(fieldName).getValues()) {
@@ -106,6 +101,8 @@ public class ElasticIndexWriter implements IndexWriter {
         // dynamically add fields depending on other fields
         requestLength += addDependentFields( source );
 
+        // facet search requires looks for other fields, which we need to map
+        mapTopicFieldValues(source, doc);
 
         if (useIBusCommunication) {
             clientiBus.update(source);
@@ -119,6 +116,22 @@ public class ElasticIndexWriter implements IndexWriter {
             client.addRequest(request, requestLength);
 
         }
+    }
+
+    // also add mapped index field for topics (used for facets in central index)
+    private void mapTopicFieldValues(Map<String, Object> source, NutchDocument doc) {
+
+        String[] types = new String[] {"measure", "service"};
+        for (String type : types) {
+            if (doc.getField(type) != null) {
+                if (doc.getField(type).getValues().size() > 1) {
+                    source.put("topic", doc.getField(type).getValues());
+                } else {
+                    source.put("topic", doc.getFieldValue(type));
+                }
+            }
+        }
+
     }
 
     /**
