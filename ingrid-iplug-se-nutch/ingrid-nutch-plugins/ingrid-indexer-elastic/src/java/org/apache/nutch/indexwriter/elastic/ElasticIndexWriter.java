@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -121,17 +122,26 @@ public class ElasticIndexWriter implements IndexWriter {
     // also add mapped index field for topics (used for facets in central index)
     private void mapTopicFieldValues(Map<String, Object> source, NutchDocument doc) {
 
-        String[] types = new String[] {"measure", "service"};
+        List<Object> values = new ArrayList<>();
+
+        String[] types = new String[] {"topic", "measure", "service"};
         for (String type : types) {
             if (doc.getField(type) != null) {
                 if (doc.getField(type).getValues().size() > 1) {
-                    source.put("topic", doc.getField(type).getValues());
+                    values.addAll(doc.getField(type).getValues());
                 } else {
-                    source.put("topic", doc.getFieldValue(type));
+                    values.add(doc.getFieldValue(type));
                 }
             }
         }
 
+        if (values.size() > 0) {
+            if (values.size() == 1) {
+                source.put("topic", values.get(0));
+            } else {
+                source.put("topic", values);
+            }
+        }
     }
 
     /**
