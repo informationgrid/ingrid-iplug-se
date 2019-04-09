@@ -28,8 +28,7 @@ import de.ingrid.admin.Config;
 import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
 import de.ingrid.admin.service.CommunicationService;
-import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
-import de.ingrid.elasticsearch.IndexManager;
+import de.ingrid.elasticsearch.*;
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.StatusProviderService;
@@ -92,8 +91,7 @@ public class RestDataController extends InstanceController {
 	@Autowired
 	private NutchController nutchController;
 
-	@Autowired
-	private IndexManager indexManager;
+	private IIndexManager indexManager;
 
 	@Autowired
 	private Config baseConfig;
@@ -106,6 +104,11 @@ public class RestDataController extends InstanceController {
 
 	@Autowired
     private StatusProviderService statusProviderService;
+
+	@Autowired
+	public RestDataController(IndexManager indexManager, IBusIndexManager iBusIndexManager, ElasticConfig elasticConfig) {
+		this.indexManager = elasticConfig.esCommunicationThroughIBus ? iBusIndexManager : indexManager;
+	}
 
 	@RequestMapping(value = { "/test" }, method = RequestMethod.GET)
 	public String test() {
@@ -461,6 +464,7 @@ public class RestDataController extends InstanceController {
 
         // remove instance index
 		String indexName = baseConfig.index + "_" + name;
+
 		if (indexManager.indexExists( indexName )) {
             indexManager.deleteIndex( indexName );
         }
