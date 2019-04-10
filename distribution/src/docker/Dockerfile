@@ -8,6 +8,7 @@ RUN unzip ingrid-iplug-se*-installer.jar -d /tmp \
     && mkdir -p /opt/ingrid/ingrid-iplug-se \
     && cp -R /tmp/ingrid-iplug-se-*/* /opt/ingrid/ingrid-iplug-se/ \
     && rm -Rf /tmp/* \
+    && sed -i -r 's/(<AppenderRef.*\/>)/\1<AppenderRef ref="Console" \/>/g' /opt/ingrid/ingrid-iplug-se/conf/log4j2.xml \
     && rm ingrid-*.jar
 
 RUN echo jetty.port=80 > /opt/ingrid/ingrid-iplug-se/conf/config.override.properties
