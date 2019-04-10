@@ -24,11 +24,11 @@ Requirements
 Installation
 ------------
 
-Download from https://dev.informationgrid.eu/ingrid-distributions/ingrid-iplug-se/
+Download from https://distributions.informationgrid.eu/ingrid-iplug-se/
  
 or
 
-build from source with `mvn package assembly:single`.
+build from source with `mvn clean package`.
 
 Execute
 
