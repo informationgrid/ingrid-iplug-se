@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <groupId>de.ingrid</groupId>
     <artifactId>ingrid-iplug-se-project</artifactId>
-    <version>5.0.0-SNAPSHOT</version>
+    <version>5.1.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>ingrid-iplug-se-nutch</artifactId>
@@ -246,15 +245,15 @@
             <phase>compile</phase>
             <configuration>
               <tasks>
-                <echo message="Executing original ant build script '${basedir}/build.xml' target=dist."/>
+                <echo message="Executing original ant build script '${basedir}/build.xml' target=dist." />
                 <ant antfile="${basedir}/build.xml" inheritRefs="true">
-                  <property name="maven.version" value="${project.version}"/>
-                  <property name="maven.buildNumber" value="${buildNumber}"/>
-                  <property name="maven.timestamp" value="${timestamp}"/>
-                  <property name="maven.iplugType" value="IPLUG_SE"/>
-                  <property name="apache-nutch-version" value="${apache-nutch-version}"/>
-                  <property name="ingrid-base-webapp.version" value="${ingrid-base-webapp.version}"/>
-                  <target name="dist"/>
+                  <property name="maven.version" value="${project.version}" />
+                  <property name="maven.buildNumber" value="${buildNumber}" />
+                  <property name="maven.timestamp" value="${timestamp}" />
+                  <property name="maven.iplugType" value="IPLUG_SE" />
+                  <property name="apache-nutch-version" value="${apache-nutch-version}" />
+                  <property name="ingrid-base-webapp.version" value="${ingrid-base-webapp.version}" />
+                  <target name="dist" />
                 </ant>
               </tasks>
             </configuration>
