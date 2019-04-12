@@ -39,7 +39,7 @@
     <dependency>
       <groupId>de.ingrid</groupId>
       <artifactId>ingrid-elasticsearch-tools</artifactId>
-      <version>5.0.0-SNAPSHOT</version>
+      <version>5.0.1</version>
     </dependency>
 
     <dependency>

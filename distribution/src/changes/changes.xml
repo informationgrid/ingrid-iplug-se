@@ -29,9 +29,15 @@
   </properties>
   <body>
 
-    <release version="4.7.0-SNAPSHOT" date="2019-xx-xx" description="Release xxxxx">
+    <release version="5.0.0" date="2019-04-12" description="Release 5.0.0">
       <action type="fix" dev="wemove" issue="REDMINE-1289">
         Remove 'PortalU' from admin pages of iPlug SE.
+      </action>
+      <action type="update" dev="wemove" issue="835">
+        Use central index for indexing data.
+      </action>
+      <action type="add" dev="wemove" issue="1684">
+        Add help text for BLP Import and configure visibility.
       </action>
     </release>  
 
