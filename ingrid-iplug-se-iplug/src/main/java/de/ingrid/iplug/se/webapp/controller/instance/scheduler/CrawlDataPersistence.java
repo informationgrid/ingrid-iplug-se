@@ -41,18 +41,21 @@ package de.ingrid.iplug.se.webapp.controller.instance.scheduler;
 import java.io.File;
 import java.io.IOException;
 
+import de.ingrid.iplug.se.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import de.ingrid.iplug.se.SEIPlug;
 
 @Service
 public class CrawlDataPersistence extends Persistence<CrawlData> {
+
+    @Autowired
+    private Configuration seConfig;
 
     public void saveCrawlData(Integer depth, Integer topn, String instanceName) throws IOException {
         CrawlData crawlData = new CrawlData();
         crawlData.setDepth( depth );
         crawlData.setTopn( topn );
-        crawlData.setWorkingDirectory( new File( SEIPlug.conf.getInstancesDir(), instanceName ) );
+        crawlData.setWorkingDirectory( new File( seConfig.getInstancesDir(), instanceName ) );
         makePersistent( crawlData, instanceName );
     }
 

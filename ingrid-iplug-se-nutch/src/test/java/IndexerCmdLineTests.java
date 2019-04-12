@@ -34,10 +34,8 @@ import java.util.Map;
 import java.util.Scanner;
 
 import org.apache.commons.lang.StringUtils;
-import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
-import org.elasticsearch.node.NodeBuilder;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -399,14 +397,18 @@ public class IndexerCmdLineTests {
         call.add("test/segments");
         call.add("-deleteGone");
 
-        Settings settings = ImmutableSettings.settingsBuilder().put("path.data", "test").put("transport.tcp.port", 54346).put("http.port", 54347).build();
-        NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().clusterName("elasticsearch").data(true).settings(settings);
+        Settings settings = Settings.builder()
+                .put("path.data", "test")
+                .put("transport.tcp.port", 54346)
+                .put("http.port", 54347)
+                .build();
+        /*NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().clusterName("elasticsearch").data(true).settings(settings);
         nodeBuilder = nodeBuilder.local(false);
-        Node node = nodeBuilder.node();
+        Node node = nodeBuilder.node();*/
 
         executeCall(call);
 
-        node.close();
+//        node.close();
 
     }
 

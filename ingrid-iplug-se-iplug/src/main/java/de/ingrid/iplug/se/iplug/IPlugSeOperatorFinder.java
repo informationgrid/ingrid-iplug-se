@@ -22,27 +22,26 @@
  */
 package de.ingrid.iplug.se.iplug;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
+import de.ingrid.admin.Config;
+import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
+import de.ingrid.utils.PlugDescription;
+import de.ingrid.utils.metadata.IPlugOperatorFinder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.index.IndexNotFoundException;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.indices.IndexMissingException;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms.Bucket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import de.ingrid.admin.JettyStarter;
-import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
-import de.ingrid.utils.PlugDescription;
-import de.ingrid.utils.metadata.IPlugOperatorFinder;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class IPlugSeOperatorFinder implements IPlugOperatorFinder {
@@ -54,16 +53,19 @@ public class IPlugSeOperatorFinder implements IPlugOperatorFinder {
     @Autowired
     private ElasticsearchNodeFactoryBean elasticSearch;
 
+    @Autowired
+    private Config baseConfig;
+
     public Set<String> findIndexValues(String indexFieldName) throws Exception {
 
-        Client client = elasticSearch.getObject().client();
-        SearchResponse response = client.prepareSearch(JettyStarter.getInstance().config.index).setQuery(QueryBuilders.matchAllQuery()).addAggregation(AggregationBuilders.terms("TermsAggr").field(indexFieldName).size(0)).execute().actionGet();
+        Client client = elasticSearch.getClient();
+        SearchResponse response = client.prepareSearch(baseConfig.index).setQuery(QueryBuilders.matchAllQuery()).addAggregation(AggregationBuilders.terms("TermsAggr").field(indexFieldName).size(0)).execute().actionGet();
 
         Terms terms = response.getAggregations().get("TermsAggr");
-        Collection<Bucket> buckets = terms.getBuckets();
-        Set<String> valueSet = new HashSet<String>();
+        List<? extends Bucket> buckets = terms.getBuckets();
+        Set<String> valueSet = new HashSet<>();
         for (Bucket b : buckets) {
-            valueSet.add(b.getKey());
+            valueSet.add(b.getKeyAsString());
         }
         this.missingIndexExceptionAlreadyThrown = false;
         return valueSet;
@@ -73,12 +75,12 @@ public class IPlugSeOperatorFinder implements IPlugOperatorFinder {
     public Set<String> findPartner() throws IOException {
         try {
             return findIndexValues("partner");
-        } catch (IndexMissingException e) {
+        } catch (IndexNotFoundException e) {
             if (!this.missingIndexExceptionAlreadyThrown) {
                 this.missingIndexExceptionAlreadyThrown = true;
                 LOG.warn( "Index does not exist." );
             }
-            return new HashSet<String>();
+            return new HashSet<>();
         } catch (Exception e) {
             LOG.error("Error obtaining partners from index.", e);
             throw new IOException(e);
@@ -89,12 +91,12 @@ public class IPlugSeOperatorFinder implements IPlugOperatorFinder {
     public Set<String> findProvider() throws IOException {
         try {
             return findIndexValues("provider");
-        } catch (IndexMissingException e) {
+        } catch (IndexNotFoundException e) {
             if (!this.missingIndexExceptionAlreadyThrown) {
                 this.missingIndexExceptionAlreadyThrown = true;
                 LOG.warn( "Index does not exist." );
             }
-            return new HashSet<String>();
+            return new HashSet<>();
         } catch (Exception e) {
             LOG.error("Error obtaining providers from index.", e);
             throw new IOException(e);

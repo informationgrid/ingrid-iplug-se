@@ -59,4 +59,6 @@ fi
 
 JAVA=$JAVA_HOME/bin/java
 
-"$JAVA" $INGRID_OPTS $CLASS $@
+echo "$JAVA" $INGRID_OPTS $@ $CLASS
+
+"$JAVA" $INGRID_OPTS $@ $CLASS

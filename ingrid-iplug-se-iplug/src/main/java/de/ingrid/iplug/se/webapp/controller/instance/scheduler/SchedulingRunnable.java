@@ -40,6 +40,8 @@ package de.ingrid.iplug.se.webapp.controller.instance.scheduler;
 
 import java.io.IOException;
 
+import de.ingrid.admin.service.PlugDescriptionService;
+import de.ingrid.elasticsearch.IndexManager;
 import org.apache.log4j.Logger;
 
 import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
@@ -59,19 +61,25 @@ public class SchedulingRunnable implements Runnable {
 
     private final String _instanceName;
 
+    private final IndexManager indexManager;
+
     private NutchController _nutchController;
 
     private IngridCrawlNutchProcess _process = null;
 
     private IPostCrawlProcessor[] postCrawlProcessors;
-    
+
     private NutchProcessFactory nutchProcessFactory;
 
-    public SchedulingRunnable(String instanceName, CrawlDataPersistence crawlDataPersistence, NutchController nutchController, IPostCrawlProcessor[] postCrawlProcessors, NutchProcessFactory nutchProcessFactory) {
+    private PlugDescriptionService plugDescriptionService;
+
+    public SchedulingRunnable(String instanceName, CrawlDataPersistence crawlDataPersistence, NutchController nutchController, IPostCrawlProcessor[] postCrawlProcessors, NutchProcessFactory nutchProcessFactory, IndexManager indexManager, PlugDescriptionService pds) {
         this._crawlDataPersistence = crawlDataPersistence;
         this._instanceName = instanceName;
         this._nutchController = nutchController;
         this.postCrawlProcessors = postCrawlProcessors;
+        this.indexManager = indexManager;
+        this.plugDescriptionService = pds;
         this.nutchProcessFactory = nutchProcessFactory;
     }
 
@@ -95,13 +103,12 @@ public class SchedulingRunnable implements Runnable {
             try {
                 FileUtils.prepareCrawl(this._instanceName);
             } catch (IOException e) {
-                LOG.error("Files could not be prepared for the crawl!");
-                e.printStackTrace();
+                LOG.error("Files could not be prepared for the crawl!", e);
                 return;
             }
 
             Instance instanceData = InstanceController.getInstanceData(_instanceName);
-            _process = nutchProcessFactory.getIngridCrawlNutchProcess(instanceData, crawlData.getDepth(), crawlData.getTopn(), postCrawlProcessors);
+            _process = nutchProcessFactory.getIngridCrawlNutchProcess(instanceData, crawlData.getDepth(), crawlData.getTopn(), postCrawlProcessors, indexManager, plugDescriptionService);
 
             // run crawl process
             _nutchController.start(instanceData, _process);

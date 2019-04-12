@@ -7,12 +7,12 @@
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
  * EUPL (the "Licence");
- * 
+ *
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl5
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,58 +22,14 @@
  */
 package de.ingrid.iplug.se.webapp.controller.instance;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaDelete;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.elasticsearch.client.Client;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.SessionAttributes;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
+import de.ingrid.admin.Config;
 import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
-import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
+import de.ingrid.admin.service.CommunicationService;
+import de.ingrid.elasticsearch.*;
+import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.StatusProviderService;
 import de.ingrid.iplug.se.conf.UrlMaintenanceSettings;
@@ -87,10 +43,35 @@ import de.ingrid.iplug.se.nutchController.NutchProcessFactory;
 import de.ingrid.iplug.se.nutchController.StatusProvider;
 import de.ingrid.iplug.se.nutchController.StatusProvider.State;
 import de.ingrid.iplug.se.utils.DBUtils;
-import de.ingrid.iplug.se.utils.ElasticSearchUtils;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.utils.UrlErrorPagableFilter;
 import de.ingrid.iplug.se.webapp.container.Instance;
+import de.ingrid.utils.IngridCall;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 @RestController
 @RequestMapping("/") // in web.xml it is dispatched from "/rest/..."!!!
@@ -110,8 +91,24 @@ public class RestDataController extends InstanceController {
 	@Autowired
 	private NutchController nutchController;
 
+	private IIndexManager indexManager;
+
+	@Autowired
+	private Config baseConfig;
+
+	@Autowired
+	private Configuration seConfig;
+
+	@Autowired
+	private CommunicationService _communicationInterface;
+
 	@Autowired
     private StatusProviderService statusProviderService;
+
+	@Autowired
+	public RestDataController(IndexManager indexManager, IBusIndexManager iBusIndexManager, ElasticConfig elasticConfig) {
+		this.indexManager = elasticConfig.esCommunicationThroughIBus ? iBusIndexManager : indexManager;
+	}
 
 	@RequestMapping(value = { "/test" }, method = RequestMethod.GET)
 	public String test() {
@@ -124,21 +121,21 @@ public class RestDataController extends InstanceController {
         EntityManager em = DBManager.INSTANCE.getEntityManager();
         InstanceAdmin admin = em.find(InstanceAdmin.class, id);
 
-        return new ResponseEntity<InstanceAdmin>(admin, admin != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(admin, admin != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
     @RequestMapping(value = { "admin/{instance}" }, method = RequestMethod.POST)
     public ResponseEntity<?> addAdmin(@PathVariable("instance") String name, @RequestBody InstanceAdmin admin, HttpServletRequest request, HttpServletResponse response) {
         DBUtils.addAdmin(admin);
-        return new ResponseEntity<InstanceAdmin>(admin, HttpStatus.OK);
+        return new ResponseEntity<>(admin, HttpStatus.OK);
     }
 
     @RequestMapping(value = { "isduplicateadmin/{instance}/{login}" }, method = RequestMethod.GET)
     public ResponseEntity<String> isDuplicateAdmin(@PathVariable("instance") String name, @PathVariable("login") String login) {
         if (DBUtils.isAdminForInstance(login, name)) {
-            return new ResponseEntity<String>("true", HttpStatus.OK);
+            return new ResponseEntity<>("true", HttpStatus.OK);
         } else {
-            return new ResponseEntity<String>("false", HttpStatus.OK);
+            return new ResponseEntity<>("false", HttpStatus.OK);
         }
     }
 
@@ -150,11 +147,11 @@ public class RestDataController extends InstanceController {
     @RequestMapping(value = { "admins" }, method = RequestMethod.DELETE)
     public ResponseEntity<Map<String, String>> deleteAdmins(@RequestBody Long[] ids) {
         DBUtils.deleteAdmins(ids);
-        Map<String, String> result = new HashMap<String, String>();
+        Map<String, String> result = new HashMap<>();
         result.put("result", "OK");
-        return new ResponseEntity<Map<String, String>>(result, HttpStatus.OK);
-    }
-
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }	
+	
     @SuppressWarnings("unchecked")
     @RequestMapping(value = { "admins/{instance}" }, method = RequestMethod.GET)
     public JSONObject getAdmins(@PathVariable("instance") String name,
@@ -175,7 +172,7 @@ public class RestDataController extends InstanceController {
 
         CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
 
-        List<Predicate> criteria = new ArrayList<Predicate>();
+        List<Predicate> criteria = new ArrayList<>();
 
         // filter by instance
         criteria.add(criteriaBuilder.equal(adminTable.<String> get("instance"), name));
@@ -213,7 +210,7 @@ public class RestDataController extends InstanceController {
 		EntityManager em = DBManager.INSTANCE.getEntityManager();
 		Url url = em.find(Url.class, id);
 
-		return new ResponseEntity<Url>(url, url != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(url, url != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 
 	@RequestMapping(value = { "url" }, method = RequestMethod.POST)
@@ -227,7 +224,7 @@ public class RestDataController extends InstanceController {
 			}
 		} catch (MalformedURLException e) {
 		}
-		List<String> limits = new ArrayList<String>();
+		List<String> limits = new ArrayList<>();
 		for (String limit : url.getLimitUrls()) {
 			try {
 				URL tmpUrl = new URL(limit);
@@ -241,7 +238,7 @@ public class RestDataController extends InstanceController {
 			}
 		}
 		url.setLimitUrls(limits);
-		List<String> excludes = new ArrayList<String>();
+		List<String> excludes = new ArrayList<>();
 		for (String exclude : url.getExcludeUrls()) {
 			try {
 				URL tmpUrl = new URL(exclude);
@@ -257,7 +254,7 @@ public class RestDataController extends InstanceController {
 		url.setExcludeUrls(excludes);
 
 		DBUtils.addUrl(url);
-		return new ResponseEntity<Url>(url, HttpStatus.OK);
+		return new ResponseEntity<>(url, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = { "url/{id}" }, method = RequestMethod.DELETE)
@@ -268,9 +265,9 @@ public class RestDataController extends InstanceController {
 	@RequestMapping(value = { "urls" }, method = RequestMethod.DELETE)
 	public ResponseEntity<Map<String, String>> deleteUrls(@RequestBody Long[] ids) {
 		DBUtils.deleteUrls(ids);
-		Map<String, String> result = new HashMap<String, String>();
+		Map<String, String> result = new HashMap<>();
 		result.put("result", "OK");
-		return new ResponseEntity<Map<String, String>>(result, HttpStatus.OK);
+		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 
     @SuppressWarnings("unchecked")
@@ -296,7 +293,7 @@ public class RestDataController extends InstanceController {
 
 		CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
 
-		List<Predicate> criteria = new ArrayList<Predicate>();
+		List<Predicate> criteria = new ArrayList<>();
 
 		// filter by instance
 		criteria.add(criteriaBuilder.equal(urlTable.<String> get("instance"), name));
@@ -359,7 +356,7 @@ public class RestDataController extends InstanceController {
             response.sendError(HttpStatus.FORBIDDEN.value());
             return null;
         }
-		Path path = Paths.get(SEIPlug.conf.getInstancesDir(), name, "statistic", "url_error_report", "data.json");
+		Path path = Paths.get(seConfig.getInstancesDir(), name, "statistic", "url_error_report", "data.json");
 
 		JSONParser parser = new JSONParser();
 		Reader reader = null;
@@ -417,32 +414,30 @@ public class RestDataController extends InstanceController {
 	@RequestMapping(value = { "instance/{name}/{value}" }, method = RequestMethod.POST)
 	public ResponseEntity<Map<String, String>> toggleInstanceActive(
 	        @ModelAttribute("plugDescription") final PlugdescriptionCommandObject pdCommandObject,
-	        @PathVariable("name") String name, @PathVariable("value") String value, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	        @PathVariable("name") String name, @PathVariable("value") String value, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         if (hasNoAccessToInstance(name, request, response)) {
             response.sendError(HttpStatus.FORBIDDEN.value());
             return null;
         }
 
-		List<String> activeInstances = JettyStarter.getInstance().config.indexSearchInTypes;
-		// always remove type that leads to no result (in case it was set)
-		activeInstances.remove( NO_RESULT_INDEX );
-
-		if ("on".equals(value)) {
-			activeInstances.add(name);
-		} else {
-			activeInstances.remove(name);
-		}
-
-		// add a type which returns no result, if no instance is activated
-		if (activeInstances.size() == 0) {
-		    activeInstances.add( NO_RESULT_INDEX );
-		}
-
-		// write immediately configuration
-		JettyStarter.getInstance().config.writePlugdescriptionToProperties(pdCommandObject);
+        // activate/deactivate instance via iBus
+		toggleIndexInIBus(name, "on".equals(value));
 
 		return generateOkResponse();
+	}
+
+	private void toggleIndexInIBus(String name, boolean activate) throws Exception {
+		IngridCall ingridCall = new IngridCall();
+		ingridCall.setTarget("iBus");
+		ingridCall.setParameter(JettyStarter.baseConfig.uuid + "=>" + JettyStarter.baseConfig.index + "_" + name + ":default");
+
+		if (activate) {
+			ingridCall.setMethod("activateIndex");
+		} else {
+			ingridCall.setMethod("deactivateIndex");
+		}
+		_communicationInterface.getIBus().call(ingridCall);
 	}
 
 	@RequestMapping(value = "/instance/{id}", method = RequestMethod.DELETE)
@@ -458,19 +453,20 @@ public class RestDataController extends InstanceController {
         nutchController.stop( instance );
 
         // remove instance directory
-        String dir = SEIPlug.conf.getInstancesDir();
+        String dir = seConfig.getInstancesDir();
         Path directoryToDelete = Paths.get( dir, name );
         try {
             FileUtils.removeRecursive( directoryToDelete );
         } catch (IOException e) {
-            e.printStackTrace();
-            return new ResponseEntity<String>( HttpStatus.INTERNAL_SERVER_ERROR );
+			LOG.error("Error deleting instance", e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        // remove instance (type) from index
-        Client client = elasticSearch.getObject().client();
-        if (ElasticSearchUtils.typeExists( name, client )) {
-            ElasticSearchUtils.deleteType( name, client );
+        // remove instance index
+		String indexName = baseConfig.index + "_" + name;
+
+		if (indexManager.indexExists( indexName )) {
+            indexManager.deleteIndex( indexName );
         }
 
         // remove url from database belonging to this instance
@@ -499,12 +495,12 @@ public class RestDataController extends InstanceController {
         em.flush();
         em.getTransaction().commit();
 
-        return new ResponseEntity<String>( HttpStatus.OK );
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 	@RequestMapping(value = { "status/{instance}" }, method = RequestMethod.GET)
-	public ResponseEntity<Collection<State>> getStatus(@PathVariable("instance") String name, HttpServletRequest request, HttpServletResponse response) throws IOException {
-
+	public ResponseEntity<Collection<State>> getStatus(@PathVariable("instance") String name, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        
 	    if (hasNoAccessToInstance(name, request, response)) {
             response.sendError(HttpStatus.FORBIDDEN.value());
             return null;
@@ -517,10 +513,10 @@ public class RestDataController extends InstanceController {
 			StatusProvider statusProvider = new StatusProvider(instance.getWorkingDirectory());
 			Collection<State> states = statusProvider.getStates();
 			// HttpStatus needs to be 200 (OK), otherwise IE 11 won't receive any attached data!!!
-			return new ResponseEntity<Collection<State>>(states.isEmpty() ? null : states, HttpStatus.OK);
+			return new ResponseEntity<>(states.isEmpty() ? null : states, HttpStatus.OK);
 		}
 
-		return new ResponseEntity<Collection<State>>(statusProviderService.getStatusProvider(instance.getWorkingDirectory()).getStates(), HttpStatus.OK);
+		return new ResponseEntity<>(nutchProcess.getStatusProvider().getStates(), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = { "status/{instance}/statistic" }, method = RequestMethod.GET)
@@ -530,10 +526,10 @@ public class RestDataController extends InstanceController {
             response.sendError(HttpStatus.FORBIDDEN.value());
             return null;
         }
-		Path path = Paths.get(SEIPlug.conf.getInstancesDir(), name, "statistic", "host", "crawldb");
+		Path path = Paths.get(seConfig.getInstancesDir(), name, "statistic", "host", "crawldb");
 		String content = FileUtils.readFile(path);
 
-		return new ResponseEntity<String>(content, HttpStatus.OK);
+		return new ResponseEntity<>(content, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = { "status/{instance}/hadoop" }, method = RequestMethod.GET)
@@ -543,10 +539,10 @@ public class RestDataController extends InstanceController {
             response.sendError(HttpStatus.FORBIDDEN.value());
             return null;
         }
-		Path path = Paths.get(SEIPlug.conf.getInstancesDir(), name, "logs", "hadoop.log");
+		Path path = Paths.get(seConfig.getInstancesDir(), name, "logs", "hadoop.log");
 		String content = FileUtils.tail(path.toFile(), 1000);
 
-		return new ResponseEntity<String>(content, HttpStatus.OK);
+		return new ResponseEntity<>(content, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = { "status/{instance}/import_log" }, method = RequestMethod.GET)
@@ -579,7 +575,7 @@ public class RestDataController extends InstanceController {
 
 	@RequestMapping(value = { "url/{instance}/check" }, method = RequestMethod.POST)
 	public ResponseEntity<String> checkUrl(@PathVariable("instance") String instanceName, @RequestBody String urlString, HttpServletRequest request, HttpServletResponse response)
-	        throws IOException, InterruptedException {
+			throws Exception {
         if (hasNoAccessToInstance(instanceName, request, response)) {
             response.sendError(HttpStatus.FORBIDDEN.value());
             return null;
@@ -607,13 +603,13 @@ public class RestDataController extends InstanceController {
 			}
 		}
 
-		return new ResponseEntity<String>(result, HttpStatus.OK);
+		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 
 	private ResponseEntity<Map<String, String>> generateOkResponse() {
-		Map<String, String> result = new HashMap<String, String>();
+		Map<String, String> result = new HashMap<>();
 		result.put("result", "OK");
-		return new ResponseEntity<Map<String, String>>(result, HttpStatus.OK);
+		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 
 	public void setElasticSearch(ElasticsearchNodeFactoryBean esBean) {
@@ -626,16 +622,16 @@ public class RestDataController extends InstanceController {
           response.sendError(HttpStatus.FORBIDDEN.value());
           return null;
       }
-      String confFile = SEIPlug.conf.getInstancesDir() + "/" + name + "/conf/urlMaintenance.json";
+      String confFile = seConfig.getInstancesDir() + "/" + name + "/conf/urlMaintenance.json";
 
       // check if json can be converted correctly
       Gson gson = new GsonBuilder().setPrettyPrinting().create();
       UrlMaintenanceSettings settings = gson.fromJson(json, UrlMaintenanceSettings.class);
 
-      Map<String, String> result = new HashMap<String, String>();
+      Map<String, String> result = new HashMap<>();
       // only write then json content to file
       if (settings != null) {
-          // File fos = new File( SEIPlug.conf.getInstancesDir() + "/" + name
+          // File fos = new File( seConfig.getInstancesDir() + "/" + name
           // + "/conf/urlMaintenance.json" );
           // BufferedWriter writer = new BufferedWriter( new FileWriter( fos )
           // );
@@ -645,9 +641,9 @@ public class RestDataController extends InstanceController {
           gson.toJson(settings, out);
           out.close();
           result.put("result", "OK");
-          return new ResponseEntity<Map<String, String>>(result, HttpStatus.OK);
+          return new ResponseEntity<>(result, HttpStatus.OK);
       }
       result.put("result", "Error");
-      return new ResponseEntity<Map<String, String>>(result, HttpStatus.INTERNAL_SERVER_ERROR);
+      return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }

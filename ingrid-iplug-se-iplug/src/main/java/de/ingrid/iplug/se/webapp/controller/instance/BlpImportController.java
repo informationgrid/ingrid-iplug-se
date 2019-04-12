@@ -31,6 +31,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import de.ingrid.iplug.se.StatusProviderService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -59,6 +61,9 @@ import de.ingrid.iplug.se.webapp.controller.AdminViews;
 @Controller
 @SessionAttributes("plugDescription")
 public class BlpImportController extends InstanceController {
+
+    @Autowired
+    StatusProviderService statusProviderService;
     
     @ModelAttribute("partners")
     public Map<String,String> partners(@RequestParam("instance") String name) {
@@ -126,6 +131,7 @@ public class BlpImportController extends InstanceController {
         importer.setPartner( blpImportBean.getPartner() );
         importer.setExcelFileInputStream( file.getInputStream() );
         importer.setExcelFileName( file.getOriginalFilename() );
+        importer.setStatusProviderService(statusProviderService);
         importer.start();
         return redirect( AdminViews.SE_INSTANCE_BLP_IMPORT + ".html?instance=" + name );
     }

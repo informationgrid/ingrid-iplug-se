@@ -19,7 +19,6 @@ package org.apache.nutch.analysis.de;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.AnalyzerWrapper;
-import org.apache.lucene.util.Version;
 
 
 /**
@@ -29,11 +28,13 @@ import org.apache.lucene.util.Version;
 public class GermanAnalyzer extends AnalyzerWrapper {
     
     private final static Analyzer ANALYZER = 
-            new org.apache.lucene.analysis.de.GermanAnalyzer(Version.LUCENE_43);
+            new org.apache.lucene.analysis.de.GermanAnalyzer();
 
     
     /** Creates a new instance of FrenchAnalyzer */
-    public GermanAnalyzer() { }
+    public GermanAnalyzer() {
+        super(Analyzer.GLOBAL_REUSE_STRATEGY);
+    }
 
 
     @Override

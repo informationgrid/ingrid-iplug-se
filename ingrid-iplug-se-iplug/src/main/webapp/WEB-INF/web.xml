@@ -78,7 +78,7 @@
     
     <filter>
         <filter-name>StepFilter</filter-name>
-        <filter-class>de.ingrid.admin.filter.StepFilter</filter-class>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>StepFilter</filter-name>

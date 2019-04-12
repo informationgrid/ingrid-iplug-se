@@ -25,34 +25,12 @@
  */
 package de.ingrid.iplug.se;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.PersistenceException;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-
-import org.apache.log4j.Logger;
-import org.flywaydb.core.Flyway;
-import org.h2.tools.Recover;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.tngtech.configbuilder.ConfigBuilder;
-
 import de.ingrid.admin.JettyStarter;
-import de.ingrid.admin.elasticsearch.IndexImpl;
-import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
+import de.ingrid.elasticsearch.ElasticConfig;
+import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
+import de.ingrid.elasticsearch.IBusIndexManager;
+import de.ingrid.elasticsearch.IndexInfo;
+import de.ingrid.elasticsearch.search.IndexImpl;
 import de.ingrid.iplug.HeartBeatPlug;
 import de.ingrid.iplug.PlugDescriptionFieldFilters;
 import de.ingrid.iplug.se.db.DBManager;
@@ -62,20 +40,40 @@ import de.ingrid.iplug.se.nutchController.NutchController;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
 import de.ingrid.iplug.se.webapp.controller.instance.InstanceController;
-import de.ingrid.utils.IngridCall;
-import de.ingrid.utils.IngridDocument;
-import de.ingrid.utils.IngridHit;
-import de.ingrid.utils.IngridHitDetail;
-import de.ingrid.utils.IngridHits;
-import de.ingrid.utils.PlugDescription;
+import de.ingrid.utils.*;
 import de.ingrid.utils.metadata.IMetadataInjector;
 import de.ingrid.utils.processor.IPostProcessor;
 import de.ingrid.utils.processor.IPreProcessor;
+import de.ingrid.utils.query.ClauseQuery;
+import de.ingrid.utils.query.FieldQuery;
 import de.ingrid.utils.query.IngridQuery;
 import de.ingrid.utils.tool.QueryUtil;
+import org.apache.log4j.Logger;
+import org.flywaydb.core.Flyway;
+import org.h2.tools.Recover;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.PersistenceException;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * TODO Describe your created type (class, etc.) here.
+ * The Search Engine iPlug to crawl websites and prepare for InGrid Portal.
  * 
  * @author joachim@wemove.com
  */
@@ -110,6 +108,14 @@ public class SEIPlug extends HeartBeatPlug {
     @Autowired
     private IndexImpl index;
 
+    @Autowired
+    private ElasticConfig elasticConfig;
+
+    @Autowired
+    private IBusIndexManager iBusIndexManager;
+
+    private Configuration seConfig;
+
     private static ElasticsearchNodeFactoryBean esBean;
 
     private static NutchController nutchController;
@@ -121,11 +127,59 @@ public class SEIPlug extends HeartBeatPlug {
     };
 
     @Autowired
-    public SEIPlug(IMetadataInjector[] injector, IPreProcessor[] preProcessors, IPostProcessor[] postProcessors, 
-            ElasticsearchNodeFactoryBean esBean, NutchController nutchController) {
+    public SEIPlug(IMetadataInjector[] injector, IPreProcessor[] preProcessors, IPostProcessor[] postProcessors,
+                   ElasticsearchNodeFactoryBean esBean, NutchController nutchController, Configuration seConfig) throws SQLException {
         super(30000, new PlugDescriptionFieldFilters(), injector, preProcessors, postProcessors);
         SEIPlug.esBean = esBean;
         SEIPlug.nutchController = nutchController;
+        this.seConfig = seConfig;
+        conf = seConfig;
+
+        init();
+    }
+
+    private void init() throws SQLException {
+        // set the directory of the database to the configured one
+        Map<String, String> properties = new HashMap<String, String>();
+        Path dbDir = Paths.get(seConfig.databaseDir);
+        properties.put("javax.persistence.jdbc.url", "jdbc:h2:" + dbDir.toFile().getAbsolutePath() + "/urls;MVCC=true;AUTO_SERVER=TRUE");
+
+        // get an entity manager instance (initializes properties in the
+        // DBManager)
+        EntityManagerFactory emf = null;
+        // for development use the settings from the persistence.xml
+        if ("iplug-se-dev".equals(seConfig.databaseID)) {
+            emf = Persistence.createEntityManagerFactory(seConfig.databaseID);
+        } else {
+            emf = Persistence.createEntityManagerFactory(seConfig.databaseID, properties);
+        }
+        DBManager.INSTANCE.intialize(emf);
+        em = null;
+        try {
+            em = DBManager.INSTANCE.getEntityManager();
+        } catch( PersistenceException e) {
+            log.error( "Database seems to be corrupt. Starting recovery process ..." );
+            Recover.main( "-dir", dbDir.toString() );
+            log.error( "Done. Please execute SQL file manually." );
+            System.exit( -1 );
+        }
+
+        // apply test-data during development
+        if ("iplug-se-dev".equals(seConfig.databaseID)) {
+            setupTestData(em);
+
+        } else {
+            // do database migrations
+            Flyway flyway = new Flyway();
+            String dbUrl = DBManager.INSTANCE.getProperty("javax.persistence.jdbc.url").toString();
+            flyway.setDataSource(dbUrl, "", "");
+            flyway.setInitOnMigrate( true );
+            try {
+                flyway.migrate();
+            } catch (Exception ex) {
+                log.error( "Error migrating the database:", ex );
+            }
+        }
     }
 
     /**
@@ -148,10 +202,7 @@ public class SEIPlug extends HeartBeatPlug {
     /**
      * @see de.ingrid.utils.IPlug#close()
      */
-    public void close() throws Exception {
-        // TODO Auto-generated method stub
-
-    }
+    public void close() {}
 
     /**
      * @see de.ingrid.utils.ISearcher#search(de.ingrid.utils.query.IngridQuery,
@@ -159,7 +210,7 @@ public class SEIPlug extends HeartBeatPlug {
      */
     public IngridHits search(IngridQuery query, int start, int length) throws Exception {
         if (log.isDebugEnabled()) {
-            log.debug("incomming query : " + query.toString());
+            log.debug("incoming query : " + query.toString());
         }
 
         // check if query is rejected and return 0 hits instead of search within
@@ -171,8 +222,26 @@ public class SEIPlug extends HeartBeatPlug {
         // remove "meta" field from query so search works !
         QueryUtil.removeFieldFromQuery(query, QueryUtil.FIELDNAME_METAINFO);
         QueryUtil.removeFieldFromQuery(query, QueryUtil.FIELDNAME_INCL_META);
+
+        // request iBus directly to get search results from within this iPlug
+        // adapt query to only get results coming from this iPlug and activated in iBus
+        // But when not connected to an iBus then use direct connection to Elasticsearch
+        if (elasticConfig.esCommunicationThroughIBus) {
+
+            ClauseQuery cq = new ClauseQuery(true, false);
+            cq.addField(new FieldQuery(true, false, "iPlugId", elasticConfig.communicationProxyUrl));
+            query.addClause(cq);
+            return this.iBusIndexManager.search(query, start, length);
+        }
+
         
         preProcess(query);
+
+        IndexInfo indexInfo = new IndexInfo();
+        indexInfo.setToAlias(JettyStarter.baseConfig.index + "_*");
+        indexInfo.setToIndex(JettyStarter.baseConfig.index + "_*");
+        indexInfo.setToType("default");
+        elasticConfig.activeIndices = new IndexInfo[] {indexInfo};
 
         return index.search(query, start, length);
 
@@ -185,7 +254,14 @@ public class SEIPlug extends HeartBeatPlug {
     public IngridHitDetail getDetail(IngridHit hit, IngridQuery query, String[] requestedFields) throws Exception {
         
         preProcess(query);
-        
+
+        // request iBus directly to get search results from within this iPlug
+        // adapt query to only get results coming from this iPlug and activated in iBus
+        // But when not connected to an iBus then use direct connection to Elasticsearch
+        if (elasticConfig.esCommunicationThroughIBus) {
+            return this.iBusIndexManager.getDetail(hit, query, requestedFields);
+        }
+
         return index.getDetail(hit, query, requestedFields);
     }
 
@@ -207,50 +283,7 @@ public class SEIPlug extends HeartBeatPlug {
     }
 
     public static void main(String[] args) throws Exception {
-        conf = new ConfigBuilder<Configuration>(Configuration.class).withCommandLineArgs(args).build();
-        new JettyStarter(conf);
-
-        // set the directory of the database to the configured one
-        Map<String, String> properties = new HashMap<String, String>();
-        Path dbDir = Paths.get(conf.databaseDir);
-        properties.put("javax.persistence.jdbc.url", "jdbc:h2:" + dbDir.toFile().getAbsolutePath() + "/urls;MVCC=true;AUTO_SERVER=TRUE");
-
-        // get an entity manager instance (initializes properties in the
-        // DBManager)
-        EntityManagerFactory emf = null;
-        // for development use the settings from the persistence.xml
-        if ("iplug-se-dev".equals(conf.databaseID)) {
-            emf = Persistence.createEntityManagerFactory(conf.databaseID);
-        } else {
-            emf = Persistence.createEntityManagerFactory(conf.databaseID, properties);
-        }
-        DBManager.INSTANCE.intialize(emf);
-        em = null;
-        try {
-            em = DBManager.INSTANCE.getEntityManager();
-        } catch( PersistenceException e) {
-            log.error( "Database seems to be corrupt. Starting recovery process ..." );
-            Recover.main( "-dir", dbDir.toString() );
-            log.error( "Done. Please execute SQL file manually." );
-            System.exit( -1 );
-        }
-        
-        // apply test-data during development
-        if ("iplug-se-dev".equals(conf.databaseID)) {
-            setupTestData(em);
-
-        } else {
-            // do database migrations
-            Flyway flyway = new Flyway();
-            String dbUrl = DBManager.INSTANCE.getProperty("javax.persistence.jdbc.url").toString();
-            flyway.setDataSource(dbUrl, "", "");
-            flyway.setInitOnMigrate( true );
-            try {
-                flyway.migrate();
-            } catch (Exception ex) {
-                log.error( "Error migrating the database:", ex );
-            }
-        }
+        new JettyStarter(Configuration.class);
 
         // normally shutdown the elastic search node and stop all running
         // nutch processes
@@ -266,7 +299,7 @@ public class SEIPlug extends HeartBeatPlug {
                     }
                         
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error("Error shutting down", e);
                 }
             }
         });

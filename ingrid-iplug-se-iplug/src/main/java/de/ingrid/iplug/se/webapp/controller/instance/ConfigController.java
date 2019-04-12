@@ -22,13 +22,27 @@
  */
 package de.ingrid.iplug.se.webapp.controller.instance;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import de.ingrid.admin.command.PlugdescriptionCommandObject;
+import de.ingrid.iplug.se.Configuration;
+import de.ingrid.iplug.se.conf.UrlMaintenanceSettings;
+import de.ingrid.iplug.se.utils.InstanceConfigurationTool;
+import de.ingrid.iplug.se.webapp.controller.AdminViews;
+import de.ingrid.iplug.se.webapp.controller.ConfigurationCommand;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,39 +50,16 @@ import javax.servlet.http.HttpSession;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import de.ingrid.admin.command.PlugdescriptionCommandObject;
-import de.ingrid.iplug.se.SEIPlug;
-import de.ingrid.iplug.se.conf.UrlMaintenanceSettings;
-import de.ingrid.iplug.se.utils.DBUtils;
-import de.ingrid.iplug.se.utils.InstanceConfigurationTool;
-import de.ingrid.iplug.se.webapp.controller.AdminViews;
-import de.ingrid.iplug.se.webapp.controller.ConfigurationCommand;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Control the database parameter page.
@@ -80,13 +71,18 @@ import de.ingrid.iplug.se.webapp.controller.ConfigurationCommand;
 @SessionAttributes("plugDescription")
 public class ConfigController extends InstanceController {
 
+    private static Log log = LogFactory.getLog(ConfigController.class);
+
+    @Autowired
+    private Configuration seConfig;
+
     @RequestMapping(value = { "/iplug-pages/instanceConfig.html" }, method = RequestMethod.GET)
     public String getParameters(final ModelMap modelMap, @ModelAttribute("plugDescription") final PlugdescriptionCommandObject commandObject, @RequestParam("instance") String name, HttpServletRequest request, HttpServletResponse response) {
         if (hasNoAccessToInstance( name, request, response )) {
             return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );
         }
 
-        String dir = SEIPlug.conf.getInstancesDir();
+        String dir = seConfig.getInstancesDir();
         File instanceFolder = new File(dir, name);
         if (!instanceFolder.exists())
             return "redirect:" + AdminViews.SE_LIST_INSTANCES + ".html";
@@ -97,7 +93,7 @@ public class ConfigController extends InstanceController {
 
     @ModelAttribute("configurationCommands")
     public List<ConfigurationCommand> referenceDataConfiguration(@RequestParam("instance") String name) throws Exception {
-        String dir = SEIPlug.conf.getInstancesDir();
+        String dir = seConfig.getInstancesDir();
         File instanceFolder = new File(dir);
         File defaultXml = new File(instanceFolder, name + "/conf/nutch-default.xml");
         File siteXml = new File(instanceFolder, name + "/conf/nutch-site.xml");
@@ -132,7 +128,7 @@ public class ConfigController extends InstanceController {
     @ModelAttribute("metaConfigJson")
     public String getMetadataConfigAsJson(@RequestParam("instance") String name) throws UnsupportedEncodingException {
         String json = null;
-        InstanceConfigurationTool instanceConfig = new InstanceConfigurationTool(Paths.get(SEIPlug.conf.getInstancesDir(), name, "conf", "urlMaintenance.json"));
+        InstanceConfigurationTool instanceConfig = new InstanceConfigurationTool(Paths.get(seConfig.getInstancesDir(), name, "conf", "urlMaintenance.json"));
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         UrlMaintenanceSettings settings = instanceConfig.getSettings();
@@ -177,10 +173,10 @@ public class ConfigController extends InstanceController {
                 list.add(configurationCommand);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error loading configuration command", e);
             list = null;
         } catch (SAXException e) {
-            e.printStackTrace();
+            log.error("Error loading configuration command", e);
             list = null;
         }
         return list;
@@ -193,7 +189,7 @@ public class ConfigController extends InstanceController {
             return new ResponseEntity<String>("Access Denied", HttpStatus.FORBIDDEN);
         }
 
-        String dir = SEIPlug.conf.getInstancesDir();
+        String dir = seConfig.getInstancesDir();
         File instanceFolder = new File(dir);
         File file = new File(instanceFolder, instance + "/conf/nutch-site.xml");
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();

@@ -22,24 +22,18 @@
  */
 package de.ingrid.iplug.se.webapp.controller.instance;
 
-import java.io.File;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import de.ingrid.admin.command.PlugdescriptionCommandObject;
+import de.ingrid.admin.service.CommunicationService;
+import de.ingrid.iplug.se.Configuration;
+import de.ingrid.iplug.se.webapp.controller.AdminViews;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.annotation.*;
 
-import de.ingrid.admin.command.PlugdescriptionCommandObject;
-import de.ingrid.admin.service.CommunicationService;
-import de.ingrid.iplug.se.SEIPlug;
-import de.ingrid.iplug.se.webapp.controller.AdminViews;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 
 /**
  * Control the instance admin page.
@@ -51,11 +45,12 @@ import de.ingrid.iplug.se.webapp.controller.AdminViews;
 @SessionAttributes("plugDescription")
 public class AdminsController extends InstanceController {
 
-    private CommunicationService _communicationInterface;
-    
+    private final Configuration seConfig;
+
     @Autowired
-    public AdminsController(final CommunicationService communicationInterface) throws Exception {
-        _communicationInterface = communicationInterface;
+    public AdminsController(final CommunicationService communicationInterface, Configuration seConfig) {
+        setCommunicationInterface(communicationInterface);
+        this.seConfig = seConfig;
     }
 
     @RequestMapping(value = { AdminViews.SE_INSTANCE_ADMINS }, method = RequestMethod.GET)
@@ -65,7 +60,7 @@ public class AdminsController extends InstanceController {
             return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );
         }
 
-        String dir = SEIPlug.conf.getInstancesDir();
+        String dir = seConfig.getInstancesDir();
         File instanceFolder = new File(dir, name);
         if (!instanceFolder.exists())
             return "redirect:" + AdminViews.SE_LIST_INSTANCES + ".html";

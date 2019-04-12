@@ -16,7 +16,7 @@ pipeline {
         stage('Build-SNAPSHOT') {
             when {
                 not { branch 'master' }
-                not { 
+                not {
                     allOf {
                         branch 'support/*'
                         expression { return !VERSION.endsWith("-SNAPSHOT") }
@@ -24,20 +24,37 @@ pipeline {
                 }
             }
             steps {
-                withMaven(
-                    // Maven installation declared in the Jenkins "Global Tool Configuration"
-                    maven: 'Maven3',
-                    // Maven settings.xml file defined with the Jenkins Config File Provider Plugin
-                    // Maven settings and global settings can also be defined in Jenkins Global Tools Configuration
-                    mavenSettingsConfig: '2529f595-4ac5-44c6-8b4f-f79b5c3f4bae'
-                ) {
 
-                    echo "Project version: $VERSION"
+                script {
+                    /*
+                        Start an elasticsearch cluster in a docker container
+                        Attention: we need to assign the correct network where jenkins was created in
+                                   we also should use the IP mask for the port mapping to only allow
+                                   access to the right containers
+                    */
+                    docker.image('docker.elastic.co/elasticsearch/elasticsearch:5.6.12').withRun('--name "elasticsearch" -e "cluster.name=ingrid" -e "http.host=0.0.0.0" -e "transport.host=0.0.0.0" -e "xpack.security.enabled=false" -e "xpack.monitoring.enabled=false" -e "xpack.ml.enabled=false" --network jenkinsnexussonar_devnet -p 172.20.0.0:9300:9300 -p 172.20.0.0:9200:9200') { c ->
 
-                    // Run the maven build
-                    sh 'mvn clean deploy -PrequireSnapshotVersion,docker,docker-$GIT_BRANCH -Dmaven.test.failure.ignore=true'
+                        withMaven(
+                            // Maven installation declared in the Jenkins "Global Tool Configuration"
+                            maven: 'Maven3',
+                            // Maven settings.xml file defined with the Jenkins Config File Provider Plugin
+                            // Maven settings and global settings can also be defined in Jenkins Global Tools Configuration
+                            mavenSettingsConfig: '2529f595-4ac5-44c6-8b4f-f79b5c3f4bae'
+                        ) {
 
-                } // withMaven will discover the generated Maven artifacts, JUnit Surefire & FailSafe & FindBugs reports...
+                            echo "Project version: $VERSION"
+
+                            /* Wait max 1 minute until elasticsearch service is up */
+                            timeout(1) {
+                                sh script: "wget --retry-connrefused --tries=60 --waitretry=1 -q http://elasticsearch:9200 -O /dev/null", returnStatus: true
+                            }
+
+                            // Run the maven build
+                            sh 'mvn clean deploy -PrequireSnapshotVersion,docker,docker-$GIT_BRANCH -Dmaven.test.failure.ignore=true'
+
+                        } // withMaven will discover the generated Maven artifacts, JUnit Surefire & FailSafe & FindBugs reports...
+                    }
+                }
             }
         }
         // release build if it's the master or the support branch and is not a SNAPSHOT version
@@ -47,16 +64,27 @@ pipeline {
                 expression { return !VERSION.endsWith("-SNAPSHOT") }
             }
             steps {
-                withMaven(
-                    maven: 'Maven3',
-                    mavenSettingsConfig: '2529f595-4ac5-44c6-8b4f-f79b5c3f4bae'
-                ) {
-                    echo "Release: $VERSION"
-                    // check license
-                    // check is release version
-                    // deploy to distribution
-                    // send release email
-                    sh 'mvn clean deploy -Pdocker,release'
+                script {
+                    /*
+                        Start an elasticsearch cluster in a docker container
+                        Attention: we need to assign the correct network where jenkins was created in
+                                   we also should use the IP mask for the port mapping to only allow
+                                   access to the right containers
+                    */
+                    docker.image('docker.elastic.co/elasticsearch/elasticsearch:5.6.12').withRun('--name "elasticsearch" -e "cluster.name=ingrid" -e "http.host=0.0.0.0" -e "transport.host=0.0.0.0" -e "xpack.security.enabled=false" -e "xpack.monitoring.enabled=false" -e "xpack.ml.enabled=false" --network jenkinsnexussonar_devnet -p 172.20.0.0:9300:9300 -p 172.20.0.0:9200:9200') { c ->
+
+                        withMaven(
+                            maven: 'Maven3',
+                            mavenSettingsConfig: '2529f595-4ac5-44c6-8b4f-f79b5c3f4bae'
+                        ) {
+                            echo "Release: $VERSION"
+                            // check license
+                            // check is release version
+                            // deploy to distribution
+                            // send release email
+                            sh 'mvn clean deploy -Pdocker,release'
+                        }
+                    }
                 }
             }
         }

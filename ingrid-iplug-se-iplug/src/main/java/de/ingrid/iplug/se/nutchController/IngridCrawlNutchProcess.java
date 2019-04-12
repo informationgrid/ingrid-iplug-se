@@ -22,36 +22,38 @@
  */
 package de.ingrid.iplug.se.nutchController;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
-
+import de.ingrid.admin.Config;
+import de.ingrid.admin.JettyStarter;
+import de.ingrid.admin.service.PlugDescriptionService;
+import de.ingrid.elasticsearch.IIndexManager;
+import de.ingrid.elasticsearch.IndexInfo;
+import de.ingrid.iplug.se.SEIPlug;
+import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
+import de.ingrid.iplug.se.nutchController.StatusProvider.Classification;
+import de.ingrid.iplug.se.utils.DBUtils;
+import de.ingrid.iplug.se.utils.FileUtils;
+import de.ingrid.iplug.se.webapp.container.Instance;
+import de.ingrid.utils.PlugDescription;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.elasticsearch.client.Client;
+import org.elasticsearch.client.transport.NoNodeAvailableException;
+import org.elasticsearch.common.Strings;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.XContentFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import de.ingrid.admin.service.ElasticsearchNodeFactoryBean;
-import de.ingrid.iplug.se.SEIPlug;
-import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
-import de.ingrid.iplug.se.nutchController.StatusProvider.Classification;
-import de.ingrid.iplug.se.utils.DBUtils;
-import de.ingrid.iplug.se.utils.ElasticSearchUtils;
-import de.ingrid.iplug.se.utils.FileUtils;
-import de.ingrid.iplug.se.webapp.container.Instance;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Wrapper for a ingrid specific nutch process execution. This is too complex to
@@ -62,22 +64,29 @@ public class IngridCrawlNutchProcess extends NutchProcess {
 
     private static Logger log = Logger.getLogger(IngridCrawlNutchProcess.class);
 
-    public static enum STATES {
-        START, DELETE_BEFORE_CRAWL, INJECT_START, INJECT_BW, CLEANUP_HADOOP, FINISHED, DEDUPLICATE, INDEX, FILTER_LINKDB, UPDATE_LINKDB, FILTER_WEBGRAPH, UPDATE_WEBGRAPH, FILTER_SEGMENT, MERGE_SEGMENT, INJECT_META, FILTER_CRAWLDB, GENERATE, FETCH, UPDATE_CRAWLDB, UPDATE_MD, CREATE_HOST_STATISTICS, GENERATE_ZERO_URLS, CRAWL_CLEANUP, CLEAN_DUPLICATES, CREATE_STARTURL_REPORT, CREATE_URL_ERROR_REPORT;
-    };
+    public enum STATES {
+        START, DELETE_BEFORE_CRAWL, INJECT_START, INJECT_BW, CLEANUP_HADOOP, FINISHED, DEDUPLICATE, INDEX, FILTER_LINKDB, UPDATE_LINKDB, FILTER_WEBGRAPH, UPDATE_WEBGRAPH, FILTER_SEGMENT, MERGE_SEGMENT, INJECT_META, FILTER_CRAWLDB, GENERATE, FETCH, UPDATE_CRAWLDB, UPDATE_MD, CREATE_HOST_STATISTICS, GENERATE_ZERO_URLS, CRAWL_CLEANUP, CLEAN_DUPLICATES, CREATE_STARTURL_REPORT, CREATE_URL_ERROR_REPORT
+    }
 
     public Integer depth = 1;
 
-    Integer noUrls = 1;
+    private Integer noUrls = 1;
 
-    IPostCrawlProcessor[] postCrawlProcessors;
+    private IPostCrawlProcessor[] postCrawlProcessors;
 
-    Instance instance;
-    
-    LogFileWatcher logFileWatcher = null;
-    
-    private ElasticsearchNodeFactoryBean elasticSearch;
-      
+    private Instance instance;
+
+    private LogFileWatcher logFileWatcher = null;
+
+    private final IIndexManager indexManager;
+
+    private PlugDescriptionService plugDescriptionService;
+
+
+    public IngridCrawlNutchProcess(IIndexManager indexManager, PlugDescriptionService pds) {
+        this.indexManager = indexManager;
+        this.plugDescriptionService = pds;
+    }
 
     @Override
     public void run() {
@@ -134,6 +143,15 @@ public class IngridCrawlNutchProcess extends NutchProcess {
                 FileUtils.removeRecursive(fs.getPath( statistic ));
                 
                 this.statusProvider.appendToState(STATES.DELETE_BEFORE_CRAWL.name(), " done.");
+            }
+
+            // prepare (central) index for iPlug information
+            try {
+                this.indexManager.checkAndCreateInformationIndex();
+            } catch (NoNodeAvailableException e) {
+                log.error(e);
+                this.statusProvider.addState(NutchProcess.STATES.ERROR.name(), e.getMessage(), Classification.ERROR);
+                throw new IOException(e.getMessage());
             }
 
             this.statusProvider.addState(STATES.INJECT_START.name(), "Inject start urls...");
@@ -340,9 +358,8 @@ public class IngridCrawlNutchProcess extends NutchProcess {
 
             if ("true".equals( nutchConfigTool.getPropertyValue( "ingrid.delete.before.crawl" ) )) {
                 // remove instance (type) from index
-                Client client = elasticSearch.getObject().client();
-                if (ElasticSearchUtils.typeExists( instance.getName(), client )) {
-                    ElasticSearchUtils.deleteType( instance.getName(), client );
+                if (indexManager.indexExists( instance.getInstanceIndexName() )) {
+                    indexManager.deleteIndex( instance.getInstanceIndexName() );
                 }
             }
             writeIndex(crawlDb, linkDb, segments);
@@ -366,7 +383,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
 
                 if (postCrawlProcessors != null) {
                     for (IPostCrawlProcessor postCrawlProcessor : postCrawlProcessors) {
-                        postCrawlProcessor.execute();
+                        postCrawlProcessor.execute(instance);
                     }
                 }
             }
@@ -378,12 +395,9 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             } else {
                 log.error("Process was unexpectably killed.", e);
             }
-        } catch (IOException e) {
+        } catch (Throwable e) {
             status = STATUS.INTERRUPTED;
             log.error("Process exited with errors.", e);
-        } catch (Throwable t) {
-            status = STATUS.INTERRUPTED;
-            log.error("Process exited with errors.", t);
         } finally {
             if (logFileWatcher != null) {
                 logFileWatcher.close();
@@ -397,15 +411,63 @@ public class IngridCrawlNutchProcess extends NutchProcess {
 
     }
     
-    private void writeIndex(String crawlDb, String linkDb, String segments) throws IOException, InterruptedException {
+    private void writeIndex(String crawlDb, String linkDb, String segments) throws IOException, InterruptedException, ExecutionException {
         this.statusProvider.addState(STATES.INDEX.name(), "Create index...");
+
+        String instanceIndexName = instance.getIndexName() + "_" + instance.getName();
+        if (!this.indexManager.indexExists(instanceIndexName)) {
+            String esMapping = indexManager.getDefaultMapping();
+            String esSettings = indexManager.getDefaultSettings();
+            this.indexManager.createIndex(instanceIndexName, "default", esMapping, esSettings);
+        }
+
         int ret = execute("org.apache.nutch.indexer.IndexingJob", crawlDb, "-linkdb", linkDb, "-dir", segments, "-deleteGone", "-noCommit");
         if (ret != 0) {
             throwCrawlError("Error during Execution of: org.apache.nutch.indexer.IndexingJob");
         }
+
+        // update central index with iPlug information
+        IndexInfo info = new IndexInfo();
+        info.setToAlias(instanceIndexName);
+        info.setToIndex(instanceIndexName);
+        info.setToType("default");
+        String plugIdInfo = this.indexManager.getIndexTypeIdentifier(info);
+        this.indexManager.updateIPlugInformation(
+                plugIdInfo,
+                getIPlugInfo( plugIdInfo, instanceIndexName, false, null, null ) );
+
         this.statusProvider.appendToState(STATES.INDEX.name(), " done.");
     }
-    
+
+    private String getIPlugInfo(String infoId, String indexName, boolean running, Integer count, Integer totalCount) throws IOException {
+        Config _config = JettyStarter.baseConfig;
+
+        PlugDescription plugDescription = this.plugDescriptionService.getPlugDescription();
+
+        // @formatter:off
+        XContentBuilder xContentBuilder = XContentFactory.jsonBuilder().startObject()
+                .field("plugId", _config.communicationProxyUrl)
+                .field("indexId", infoId)
+                .field("iPlugName", _config.datasourceName)
+                .field("linkedIndex", indexName)
+                .field("linkedType", "default")
+                .field("adminUrl", _config.guiUrl)
+                .field("lastHeartbeat", new Date())
+                .field("lastIndexed", new Date())
+// TODO:                .field("datatypes", this._plugDescription.getDataTypes())
+// TODO:                .field("fields", this._plugDescription.getFields())
+                .field("plugdescription", plugDescription)
+                .startObject("indexingState")
+                    .field("numProcessed", count)
+                    .field("totalDocs", totalCount)
+                    .field("running", running)
+                    .endObject()
+                .endObject();
+        // @formatter:on
+
+        return Strings.toString(xContentBuilder);
+    }
+
     private void cleanupHadoop() throws IOException {
         this.statusProvider.addState(STATES.CLEANUP_HADOOP.name(), "Clean up ...");
         FileUtils.removeRecursive(Paths.get(workingDirectory.getAbsolutePath(), "hadoop-tmp"));
@@ -445,7 +507,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             log.debug("Call: " + StringUtils.join(cmdLine.toStrings(), " "));
         }
 
-        /**
+        /*
          * FOR WINDOWS DEVELOPMENT TO RUN IN CYGWIN
          */
         if (System.getProperty("runInCygwin") != null) {
@@ -465,7 +527,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             call = call.replaceAll("\\\\", "/");
             cmdLine.addArgument(call);
         }
-        /**
+        /*
          * END
          */
 
@@ -478,12 +540,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
     private String getCurrentSegment(String path) {
 
         File file = new File(path);
-        String[] segments = file.list(new FilenameFilter() {
-            @Override
-            public boolean accept(File current, String name) {
-                return new File(current, name).isDirectory();
-            }
-        });
+        String[] segments = file.list((current, name) -> new File(current, name).isDirectory());
         Arrays.sort(segments);
 
         return segments[segments.length - 1];
@@ -518,8 +575,4 @@ public class IngridCrawlNutchProcess extends NutchProcess {
         this.instance = instance;
     }
 
-    public void setElasticSearch(ElasticsearchNodeFactoryBean esBean) {
-        this.elasticSearch = esBean;
-    }
-    
 }

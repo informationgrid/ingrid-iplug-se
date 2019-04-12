@@ -308,10 +308,10 @@ public class FileUtils {
             String lastLine = sb.reverse().toString();
             return lastLine;
         } catch (java.io.FileNotFoundException e) {
-            e.printStackTrace();
+            log.error("Error finding file", e);
             return null;
         } catch (java.io.IOException e) {
-            e.printStackTrace();
+            log.error("Error by tail command", e);
             return null;
         } finally {
             if (fileHandler != null)

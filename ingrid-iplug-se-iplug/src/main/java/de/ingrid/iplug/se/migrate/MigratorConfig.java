@@ -22,43 +22,45 @@
  */
 package de.ingrid.iplug.se.migrate;
 
-import com.tngtech.configbuilder.annotation.propertyloaderconfiguration.PropertiesFiles;
-import com.tngtech.configbuilder.annotation.propertyloaderconfiguration.PropertyLocations;
-import com.tngtech.configbuilder.annotation.validation.Validation;
-import com.tngtech.configbuilder.annotation.valueextractor.CommandLineValue;
+import org.springframework.beans.factory.annotation.Value;
 
-import de.ingrid.iplug.se.Configuration;
+@org.springframework.context.annotation.Configuration
+public class MigratorConfig {
 
-@PropertiesFiles( {"config"} )
-@PropertyLocations(directories = {"conf"}, fromClassLoader = true)
-public class MigratorConfig extends Configuration {
-
-    @CommandLineValue(shortOpt="u", longOpt="username", hasArg=true)
+    @Value("${username:}")
     public String username;
 
-    @CommandLineValue(shortOpt="p", longOpt="password", hasArg=true)
+    @Value("${password:}")
     public String password;
-    
-    @CommandLineValue(shortOpt="db", longOpt="dbPath", hasArg=true)
+
+    @Value("${dbPath:}")
     public String dbPath;
 
-    @CommandLineValue(shortOpt="web", longOpt="webInstance", hasArg=true)
+    @Value("${webInstance:}")
     public String webInstance;
-    
-    @CommandLineValue(shortOpt="catalog", longOpt="catalogInstance", hasArg=true)
+
+    @Value("${catalogInstance:}")
     public String catalogInstance;
 
-    @CommandLineValue(shortOpt="partner", longOpt="partner", hasArg=true)
+    @Value("${partner:}")
     public String partner;
-    
-    @Validation
-    private void validate() {
-        if (username == null || dbPath == null || webInstance == null || catalogInstance == null) {
+
+    @Value("${db.dir:database}")
+    public String databaseDir;
+
+    @Value("${db.id:iplug-se}")
+    public String databaseID;
+
+    @Value("${dir.instances:instances}")
+    private String dirInstances;
+
+
+    public void validate() {
+        if ("".equals(username) || "".equals(dbPath) || "".equals(webInstance) || "".equals(catalogInstance)) {
             System.out.println( "==================================================================================" );
-            System.out.println( "Usage: migrate.sh -db <db-path> -web <web-instance> -catalog <catalog-instance> -u <username> [-p <password>] [-partner <partner>}" );
-            System.out.println( "or:    migrate.sh -dbPath <db-path> -webInstance <web-instance> -catalogInstance <catalog-instance> -username <username> [-password <password>] [-partner <partner>]" );
+            System.out.println( "Usage: migrate.sh -DdbPath=<db-path> -DwebInstance=<web-instance> -DcatalogInstance=<catalog-instance> -Dusername=<username> [-Dpassword=<password>] [-Dpartner=<partner>]" );
             System.out.println( "----------------------------------" );
-            System.out.println( "e.g.:  migrate.sh -dbPath jdbc:mysql://localhost:3306/iplugse -web my_websites -catalog my_catalog -u root -p 1234 -partner mv" );
+            System.out.println( "e.g.:  migrate.sh -DdbPath=jdbc:mysql://localhost:3306/iplugse -Dweb=my_websites -Dcatalog=my_catalog -Dusername=root -Dpassword=1234 -Dpartner=mv" );
             System.out.println( "==================================================================================" );
             System.out.println( "The web and catalog name can be the same if the two different URL types shall be\n"
                     + "merged together into one instance. The handling of these URLs will not be changed,\n"
@@ -66,5 +68,9 @@ public class MigratorConfig extends Configuration {
                     + "When migrating from Oracle-Database, you have to activate the Oracle driver. Look at migrate.sh script." );
             System.exit( -1 );
         }
+    }
+
+    public String getInstancesDir() {
+        return dirInstances;
     }
 }

@@ -17,11 +17,8 @@
 
 package org.apache.nutch.indexwriter.elastic;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
+import de.ingrid.iplug.se.nutch.tools.IBusElasticsearchClient;
+import de.ingrid.iplug.se.nutch.tools.IngridElasticSearchClient;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.JobConf;
@@ -33,7 +30,11 @@ import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.ingrid.iplug.se.nutch.tools.IngridElasticSearchClient;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  */
@@ -43,21 +44,29 @@ public class ElasticIndexWriter implements IndexWriter {
     private Configuration config;
 
     private IngridElasticSearchClient client = null;
+    private IBusElasticsearchClient clientiBus = null;
 
-    private Map<String, Object> dependingFieldsMap = new HashMap<String, Object>();
+    private Map<String, Object> dependingFieldsMap = new HashMap<>();
+    private boolean useIBusCommunication;
 
     @Override
     public void open(JobConf job, String name) throws IOException {
-
+        if (useIBusCommunication) {
+            try {
+                clientiBus = new IBusElasticsearchClient(job);
+            } catch (Exception e) {
+                LOG.error("Error initializing IBusElasticsearchClient", e);
+                throw new RuntimeException(e);
+            }
+        }
         client = new IngridElasticSearchClient( job );
     }
 
     @Override
     public void write(NutchDocument doc) throws IOException {
         String id = (String) doc.getFieldValue("id");
-        IndexRequestBuilder request = client.prepareIndexRequest(id);
 
-        Map<String, Object> source = new HashMap<String, Object>();
+        Map<String, Object> source = new HashMap<>();
         int requestLength = 0;
 
         // Loop through all fields of this doc
@@ -66,7 +75,12 @@ public class ElasticIndexWriter implements IndexWriter {
                 if (fieldName.equalsIgnoreCase("boost")) {
                     source.put("doc_boost", doc.getField(fieldName).getValues());
                 }
+
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Adding field: " + fieldName + " with value: " + doc.getField(fieldName).getValues());
+                }
                 source.put(fieldName, doc.getField(fieldName).getValues());
+
                 // Loop through the values to keep track of the size of this
                 // document
                 for (Object value : doc.getField(fieldName).getValues()) {
@@ -80,15 +94,54 @@ public class ElasticIndexWriter implements IndexWriter {
                 requestLength += doc.getFieldValue(fieldName).toString().length();
             }
         }
-        
+
+        // add basic information to dataset to identify source for central index
+        source.put("dataSourceName", config.get("iplug.datasource.name", "unknown iPlug"));
+        source.put("iPlugId", config.get("iplug.id", "unknown"));
+
         // dynamically add fields depending on other fields
         requestLength += addDependentFields( source );
-        
-        
-        request.setSource(source);
 
-        // Add this indexing request to a bulk request
-        client.addRequest(request, requestLength);
+        // facet search requires looks for other fields, which we need to map
+        mapTopicFieldValues(source, doc);
+
+        if (useIBusCommunication) {
+            clientiBus.update(source);
+
+        } else {
+
+            IndexRequestBuilder request = client.prepareIndexRequest(id);
+            request.setSource(source);
+
+            // Add this indexing request to a bulk request
+            client.addRequest(request, requestLength);
+
+        }
+    }
+
+    // also add mapped index field for topics (used for facets in central index)
+    private void mapTopicFieldValues(Map<String, Object> source, NutchDocument doc) {
+
+        List<Object> values = new ArrayList<>();
+
+        String[] types = new String[] {"topic", "measure", "service"};
+        for (String type : types) {
+            if (doc.getField(type) != null) {
+                if (doc.getField(type).getValues().size() > 1) {
+                    values.addAll(doc.getField(type).getValues());
+                } else {
+                    values.add(doc.getFieldValue(type));
+                }
+            }
+        }
+
+        if (values.size() > 0) {
+            if (values.size() == 1) {
+                source.put("topic", values.get(0));
+            } else {
+                source.put("topic", values);
+            }
+        }
     }
 
     /**
@@ -159,7 +212,7 @@ public class ElasticIndexWriter implements IndexWriter {
         } else if (sourceValue instanceof ArrayList) {
             ((ArrayList<String>) sourceValue).add( value );
         } else {
-            ArrayList<String> newValues = new ArrayList<String>();
+            ArrayList<String> newValues = new ArrayList<>();
             newValues.add( (String) sourceValue );
             newValues.add( value );
             source.put( key, newValues );
@@ -169,12 +222,18 @@ public class ElasticIndexWriter implements IndexWriter {
 
     @Override
     public void delete(String key) throws IOException {
-        try {
-            DeleteRequestBuilder request = client.prepareDeleteRequest( key );
-            client.addRequest( request, key.length() );
-        } catch (ElasticsearchException e) {
-            throw makeIOException( e );
+
+        if (useIBusCommunication) {
+            clientiBus.deleteDoc(key);
+        } else {
+            try {
+                DeleteRequestBuilder request = client.prepareDeleteRequest(key);
+                client.addRequest(request, key.length());
+            } catch (ElasticsearchException e) {
+                throw makeIOException(e);
+            }
         }
+
     }
 
     public static IOException makeIOException(ElasticsearchException e) {
@@ -190,21 +249,38 @@ public class ElasticIndexWriter implements IndexWriter {
 
     @Override
     public void commit() throws IOException {
-        client.commit();
+
+        if (!useIBusCommunication) {
+            client.commit();
+        }
     }
 
     @Override
     public void close() throws IOException {
-        client.close();
+        if (useIBusCommunication) {
+            try {
+                clientiBus.close();
+            } catch (Exception e) {
+                LOG.error("Error closing iBus connection", e);
+            }
+        } else {
+            client.close();
+        }
     }
 
     @Override
     public String describe() {
-        if (client != null) {
-            return client.describe();
+
+        if (useIBusCommunication) {
+            return "Using iBus communication for Elasticsearch operations";
         } else {
-            return "not initialized yet.";
+            if (client != null) {
+                return client.describe();
+            } else {
+                return "not initialized yet.";
+            }
         }
+
     }
 
     @Override
@@ -231,6 +307,8 @@ public class ElasticIndexWriter implements IndexWriter {
                 dependingFieldsMap.put( keyValue[0], keyValue[1] );
             }
         }
+
+        useIBusCommunication = "true".equals(config.get("use.elastic.with.ibus"));
     }
 
     @Override

@@ -25,47 +25,14 @@
  */
 package de.ingrid.iplug.se;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
-import javax.persistence.PersistenceException;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-
-import org.apache.commons.cli.BasicParser;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.Options;
+import de.ingrid.iplug.se.db.DBManager;
+import de.ingrid.iplug.se.db.model.Metadata;
+import de.ingrid.iplug.se.db.model.Url;
+import de.ingrid.iplug.se.nutchController.StatusProvider;
+import de.ingrid.iplug.se.nutchController.StatusProvider.Classification;
+import de.ingrid.iplug.se.utils.TrustModifier;
+import de.ingrid.iplug.se.webapp.container.Instance;
+import org.apache.commons.cli.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -74,18 +41,22 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import com.tngtech.configbuilder.ConfigBuilder;
-
-import de.ingrid.iplug.se.db.DBManager;
-import de.ingrid.iplug.se.db.model.Metadata;
-import de.ingrid.iplug.se.db.model.Url;
-import de.ingrid.iplug.se.nutchController.StatusProvider;
-import de.ingrid.iplug.se.nutchController.StatusProvider.Classification;
-import de.ingrid.iplug.se.utils.TrustModifier;
-import de.ingrid.iplug.se.webapp.container.Instance;
+import javax.persistence.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * UVP data importer. Imports data from an excel file directly into the url
@@ -129,7 +100,6 @@ import de.ingrid.iplug.se.webapp.container.Instance;
  *
  * @author joachim@wemove.com
  */
-@Service
 public class UVPDataImporter extends Thread {
 
     /**
@@ -161,8 +131,7 @@ public class UVPDataImporter extends Thread {
         try {
             this.startImport();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error("Execption during import", e);
         }
     }
 
@@ -172,7 +141,7 @@ public class UVPDataImporter extends Thread {
 
         String partner = this.partner;
 
-        conf = new ConfigBuilder<Configuration>( Configuration.class ).build();
+        conf = getConfigurationBean();
 
         Path instancePath = Paths.get( instance.getWorkingDirectory() );
 
@@ -465,7 +434,8 @@ public class UVPDataImporter extends Thread {
             uvpDataImporter.excludeMarkerUrls = cmd.getOptionValues( "excludeMarkerUrls" );
         }
 
-        uvpDataImporter.conf = new ConfigBuilder<Configuration>( Configuration.class ).build();
+        uvpDataImporter.conf = getConfigurationBean();
+
 
         instanceName = instanceName.replaceAll( "[:\\\\/*?|<>\\W]", "_" );
         Path instancePath = Paths.get( uvpDataImporter.conf.getInstancesDir() + "/" + instanceName );
@@ -492,6 +462,13 @@ public class UVPDataImporter extends Thread {
         DBManager.INSTANCE.intialize( emf );
 
         uvpDataImporter.startImport();
+    }
+
+    private static Configuration getConfigurationBean() {
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+        ctx.register(Configuration.class);
+        ctx.refresh();
+        return ctx.getBean(Configuration.class);
     }
 
     /**
@@ -1046,7 +1023,6 @@ public class UVPDataImporter extends Thread {
         return sps;
     }
 
-    @Autowired
     public void setStatusProviderService(StatusProviderService statusProviderService) {
         UVPDataImporter.sps = statusProviderService;
     }
