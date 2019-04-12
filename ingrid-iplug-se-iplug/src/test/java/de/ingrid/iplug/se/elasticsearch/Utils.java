@@ -186,6 +186,7 @@ public class Utils {
         qc.setQueryParsers( parsers );
         
         indexManager = new IndexManager( elastic, elasticConfig );
+        indexManager.postConstruct();
         
         index = new IndexImpl( elasticConfig, indexManager, qc, new FacetConverter(qc), new QueryBuilderService());
     }
