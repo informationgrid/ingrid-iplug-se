@@ -159,7 +159,9 @@ public class NutchProcessTest {
 
             Config config = new Config();
             config.plugdescriptionLocation = "conf/plugdescription.xml";
-            IngridCrawlNutchProcess p = new IngridCrawlNutchProcess(new IndexManager(elastic, elasticConfig), new PlugDescriptionService(config));
+            IndexManager indexManager = new IndexManager(elastic, elasticConfig);
+            indexManager.postConstruct();
+            IngridCrawlNutchProcess p = new IngridCrawlNutchProcess(indexManager, new PlugDescriptionService(config));
             p.setWorkingDirectory(workingDir.toString());
 
             Instance instance = new Instance();
