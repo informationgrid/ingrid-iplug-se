@@ -221,7 +221,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>1.9.1</version>
+<!--     <version>1.9.1</version> -->
         <executions>
           <execution>
             <phase>generate-sources</phase>
@@ -236,6 +236,8 @@
                 <source>ingrid-nutch-plugins/ingrid-language-identifier/src/java</source>
                 <source>ingrid-nutch-plugins/ingrid-indexer-elastic/src/java</source>
                 <source>ingrid-nutch-plugins/scoring-ingrid/src/java</source>
+                <source>ingrid-nutch-plugins/ingrid-lib-http/src/java</source>
+                <source>ingrid-nutch-plugins/ingrid-protocol-httpclient/src/java</source>
               </sources>
             </configuration>
           </execution>
