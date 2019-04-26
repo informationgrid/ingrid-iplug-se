@@ -28,9 +28,9 @@
 	<author email="joachim@wemove.com">Joachim Müller</author>
   </properties>
   <body>
-    <release version="4.6.2" date="2019-02-xx" description="Release 4.6.2">
-      <action type="add" dev="wemove" issue="REDMINE-914">
-        UVP: Import von BLP-Referenzen der MetaVer-Partner in das UVP-Gemeinschaftsportal
+    <release version="4.6.4" date="2019-02-xx" description="Release 4.6.4">
+      <action type="add" dev="wemove" issue="1368">
+        Accept invalid SSL certificates in iPlug SE.
       </action>
     </release>  
 
