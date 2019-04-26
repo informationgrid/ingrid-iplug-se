@@ -50,7 +50,7 @@
 
 	<property>
 		<name>plugin.includes</name>
-		<value>protocol-httpclient|urlfilter-regex|parse-(html|tika)|index-(basic|anchor|metadata|more)|ingrid-indexer-elastic|scoring-ingrid|ingrid-language-identifier|urlnormalizer-(pass|regex|basic)|analysis-de
+		<value>ingrid-protocol-httpclient|urlfilter-regex|parse-(html|tika)|index-(basic|anchor|metadata|more)|ingrid-indexer-elastic|scoring-ingrid|ingrid-language-identifier|urlnormalizer-(pass|regex|basic)|analysis-de
 		</value>
 		<description>Regular expression naming plugin directory names to
 			include. Any plugin not matching this expression is excluded.
@@ -369,6 +369,12 @@
         <name>ingrid.delete.before.crawl</name>
         <value>false</value>
         <description>If true all data is removed before each crawl. This should only be used if single URLs are crawled and all URLs should be fetched for every crawl.</description>
+    </property>
+
+    <property>
+        <name>ingrid.accept.invalid.ssl.certificates</name>
+        <value>true</value>
+        <description>If true all SSL certificates are accepted. Use this if the resources use self signed certificates or certificates that are not in the java certstore.</description>
     </property>
 
     <property>
