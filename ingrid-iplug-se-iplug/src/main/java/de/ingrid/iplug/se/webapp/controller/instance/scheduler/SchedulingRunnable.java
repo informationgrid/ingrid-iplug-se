@@ -108,6 +108,7 @@ public class SchedulingRunnable implements Runnable {
             }
 
             Instance instanceData = InstanceController.getInstanceData(_instanceName);
+            LOG.info("Start crawl: " + crawlData  );
             _process = nutchProcessFactory.getIngridCrawlNutchProcess(instanceData, crawlData.getDepth(), crawlData.getTopn(), postCrawlProcessors, indexManager, plugDescriptionService);
 
             // run crawl process
