@@ -68,6 +68,7 @@
         <include>ingrid.auth</include>
         <include>log4j2.xml</include>
         <include>instance-data/urlMaintenance.json</include>
+        <include>default-mapping.json</include>
       </includes>
     </fileSet>
     <fileSet>
