@@ -28,6 +28,11 @@
 	<author email="joachim@wemove.com">Joachim Müller</author>
   </properties>
   <body>
+    <release version="4.2.9" date="2019-05-27" description="Release 4.2.9">
+      <action type="add" dev="wemove" issue="1368">
+        Accept invalid SSL certificates in iPlug SE.
+      </action>
+    </release>
     <release version="4.2.7" date="2018-11-13" description="Release 4.2.7">
       <action type="add" dev="wemove" issue="REDMINE-1189">
         Add new option to exclude urls from import by pattern. Improve import overall.
