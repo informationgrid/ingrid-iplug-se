@@ -176,7 +176,7 @@ public class UVPDataImporterTest {
         Option excludeMarkerUrlsOption = OptionBuilder.withArgName( "exclude urls from marker urls" ).hasArgs().withDescription( "list of url regex patterns that define urls that should be excluded from possible marker urls." ).create( "excludeMarkerUrls" );
         excludeMarkerUrlsOption.setValueSeparator( '|' );
         options.addOption( excludeMarkerUrlsOption );
-        CommandLine cmd = parser.parse( options, new String[] {"", "-exludeMarkerUrls", ".*minden-luebbecke.de/atlasfx/js/.*|.*wemove.com.*"} );
+        CommandLine cmd = parser.parse( options, new String[] {"", "-excludeMarkerUrls", ".*minden-luebbecke.de/atlasfx/js/.*|.*wemove.com.*"} );
 
         String[] excludeMarkerUrls = null;
         if (cmd.hasOption( "excludeMarkerUrls" )) {
