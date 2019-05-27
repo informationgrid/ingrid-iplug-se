@@ -374,13 +374,13 @@
     <property>
         <name>ingrid.accept.invalid.ssl.certificates</name>
         <value>true</value>
-        <description>If true all SSL certificates are accepted. Use this if the resources use self signed certificates or certificates that are not in the java certstore.</description>
+        <description>If true all SSL certificates are accepted. Use this if the resources use self signed certificates or certificates that are not in the java certstore. Needs plugin 'ingrid-protocol-httpclient' instead of 'protocol-httpclient'.</description>
     </property>
 
     <property>
         <name>ingrid.index.no.deduplication</name>
         <value>false</value>
-        <description>If true duplicates will not ne removed from index.</description>
+        <description>If true duplicates will not be removed from index.</description>
     </property>
 
 </configuration>
