@@ -102,7 +102,7 @@ public class SchedulingRunnable implements Runnable {
 
             try {
                 FileUtils.prepareCrawl(this._instanceName);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 LOG.error("Files could not be prepared for the crawl!", e);
                 return;
             }

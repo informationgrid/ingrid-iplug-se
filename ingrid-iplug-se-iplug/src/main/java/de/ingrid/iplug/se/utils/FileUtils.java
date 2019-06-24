@@ -29,8 +29,7 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Writer;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.*;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -40,12 +39,11 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -54,7 +52,6 @@ import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.db.UrlHandler;
 import de.ingrid.iplug.se.db.model.Metadata;
 import de.ingrid.iplug.se.db.model.Url;
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 public class FileUtils {
 
@@ -164,7 +161,7 @@ public class FileUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static void prepareCrawl(String name) throws IOException {
+    public static void prepareCrawl(String name) throws IOException, URISyntaxException {
         String workDir = SEIPlug.conf.getInstancesDir() + "/" + name;
 
         // get all urls belonging to the given instance
@@ -200,7 +197,7 @@ public class FileUtils {
                 metaValues.add(meta.getMetaValue());
             }
 
-            startUrls.put(url.getUrl().trim(), metadata);
+            startUrls.put(url.getUrl(), metadata);
             for (String limit : url.getLimitUrls()) {
                 limitUrls.add(checkForRegularExpressions(limit.trim()));
             }
@@ -211,7 +208,7 @@ public class FileUtils {
 
         // output urls and metadata
         String[] startUrlsValue = startUrls.keySet().toArray(new String[0]);
-        FileUtils.writeToFile(Paths.get(workDir, "urls", "start").toAbsolutePath(), "seed.txt", Arrays.asList(startUrlsValue));
+        FileUtils.writeToFile(Paths.get(workDir, "urls", "start").toAbsolutePath(), "seed.txt", encodeIdnAndUri(Arrays.asList(startUrlsValue)));
 
         List<String> metadataValues = new ArrayList<String>();
         for (String start : startUrlsValue) {
@@ -225,7 +222,6 @@ public class FileUtils {
         }
         
         // TODO: add depending fields to metadata file (REDMINE-94)
-
         FileUtils.writeToFile(Paths.get(workDir, "urls", "metadata").toAbsolutePath(), "seed.txt", metadataValues);
         FileUtils.writeToFile(Paths.get(workDir, "urls", "limit").toAbsolutePath(), "seed.txt", limitUrls);
         FileUtils.writeToFile(Paths.get(workDir, "urls", "exclude").toAbsolutePath(), "seed.txt", excludeUrls);
@@ -338,22 +334,69 @@ public class FileUtils {
         return subDirs;
     }
 
-    private static String checkForRegularExpressions(String urlStr) {
+    /**
+     * Checks for regular expression by testing for leading and trailing '/'.
+     * If no regular expression was found:
+     *
+     * <ul>
+     *  <li>the urls domain is IDN encoded and the</li>
+     *  <li>the path, query and anchor is URI encoded</li>
+     *  <li>all special regular expresseion characters are escaped</li>
+     * </ul>
+     *
+     * @param urlStr
+     * @return
+     */
+    public static String checkForRegularExpressions(String urlStr) {
         if (urlStr.startsWith("/") && urlStr.endsWith("/")) {
             urlStr = urlStr.substring(1, urlStr.length() - 1);
         } else {
             URL uri;
             try {
-                uri = new URL(urlStr);
+                uri = new URL(getIdnUrlWithEncodedPath(urlStr));
                 if (uri.getPath() != null || uri.getQuery() != null) {
-                    Matcher match = REGEXP_SPECIAL_CHARS.matcher((uri.getPath() != null ? uri.getPath() : "") + (uri.getQuery() != null ? "?" + uri.getQuery() : ""));
+                    Matcher match = REGEXP_SPECIAL_CHARS.matcher((uri.getPath() != null ? uri.getPath() : "") + (uri.getQuery() != null ? "?" + uri.getQuery() : "") + (uri.getRef() != null ? "#" + uri.getRef() : ""));
                     urlStr = uri.getProtocol() + "://" + uri.getHost() + (uri.getPort() > 0 ? ":" + uri.getPort() : "") + match.replaceAll("\\\\$1");
                 }
-            } catch (MalformedURLException e) {
+            } catch (MalformedURLException | URISyntaxException e) {
                 log.error("The url pattern: '" + urlStr + "' is not a valid url.");
             }
         }
         return urlStr;
+    }
+
+    /**
+     * @return Returns the URL with
+     *    <ul>
+     *      <li>the urls domain is IDN encoded </li>
+     *      <li>the path, query and anchor is URI encoded</li>
+     *    </ul>
+     * @throws MalformedURLException
+     * @throws URISyntaxException
+     */
+    public static String getIdnUrlWithEncodedPath(String urlStr) throws MalformedURLException, URISyntaxException {
+        URL u = new URL(urlStr);
+        URI uri = new URI(
+                u.getProtocol(),
+                IDN.toASCII(u.getHost()),
+                u.getPath(),
+                u.getQuery(),
+                u.getRef());
+        return uri.toASCIIString();
+    }
+
+    private static List<String> encodeIdnAndUri(List<String> urls) {
+        return urls.stream().map(c -> {
+            try {
+                return getIdnUrlWithEncodedPath(c);
+            } catch (MalformedURLException e) {
+                log.error("Error escaping URL " + c, e);
+                throw new RuntimeException(e);
+            } catch (URISyntaxException e) {
+                log.error("Error escaping URL " + c, e);
+                throw new RuntimeException(e);
+            }
+        }).collect(Collectors.toList());
     }
 
 }
