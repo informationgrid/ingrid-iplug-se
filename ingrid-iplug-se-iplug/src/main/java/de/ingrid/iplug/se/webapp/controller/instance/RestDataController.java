@@ -583,7 +583,7 @@ public class RestDataController extends InstanceController {
 
         Instance instance = getInstanceData(instanceName);
 
-		NutchProcess process = nutchProcessFactory.getUrlTesterProcess(instance, urlString);
+		NutchProcess process = nutchProcessFactory.getUrlTesterProcess(instance, FileUtils.getIdnUrlWithEncodedPath(urlString));
 		process.start();
 
 		long start = System.currentTimeMillis();
