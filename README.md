@@ -63,6 +63,15 @@ and import project into eclipse.
 - add src/test/resources to class path
 - the admin gui starts per default on port 8082, change this with VM argument `-Djetty.port=8083`
 
+### Debug nutch process
+
+Debugging a nutch process can be tricky because the processes are spawned from the main process. Do
+as follows:
+
+- Add -DdebugNutchCall=<TRAILING NUTCH PROCESS>, i.e. BWUpdateDb or see IngridCrawlNutchProcess.java
+- The process will halt there until the remote debugger connects to port 7000
+
+
 Support
 -------
 
