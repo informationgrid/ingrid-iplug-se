@@ -30,6 +30,12 @@
   <body>
 
     <release version="5.1.0" date="2019-xx-xx" description="Release 5.1.0">
+      <action type="add" dev="wemove" issue="270">
+        Encode URLs in url management. Accept umlaut domains AND umlaute in path.
+      </action>
+      <action type="add" dev="wemove" issue="1421">
+        Fix admin gui search: results do not link to indexed page.
+      </action>
       <action type="add" dev="wemove" issue="1368">
         Accept invalid SSL certificates in iPlug SE.
       </action>
