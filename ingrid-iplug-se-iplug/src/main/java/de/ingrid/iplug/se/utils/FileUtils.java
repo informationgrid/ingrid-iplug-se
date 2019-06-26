@@ -22,36 +22,22 @@
  */
 package de.ingrid.iplug.se.utils;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.Writer;
+import de.ingrid.iplug.se.SEIPlug;
+import de.ingrid.iplug.se.db.UrlHandler;
+import de.ingrid.iplug.se.db.model.Metadata;
+import de.ingrid.iplug.se.db.model.Url;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+
+import java.io.*;
 import java.net.*;
-import java.nio.file.FileSystems;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.PathMatcher;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.StandardCopyOption;
+import java.nio.charset.Charset;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-
-import de.ingrid.iplug.se.SEIPlug;
-import de.ingrid.iplug.se.db.UrlHandler;
-import de.ingrid.iplug.se.db.model.Metadata;
-import de.ingrid.iplug.se.db.model.Url;
 
 public class FileUtils {
 
@@ -371,14 +357,26 @@ public class FileUtils {
      *      <li>the urls domain is IDN encoded </li>
      *      <li>the path, query and anchor is URI encoded</li>
      *    </ul>
+     *
+     *    If the url was already encoded, return the URL as is.
+     *
      * @throws MalformedURLException
      * @throws URISyntaxException
      */
     public static String getIdnUrlWithEncodedPath(String urlStr) throws MalformedURLException, URISyntaxException {
+
+        // return if ascii only url
+        // this also returns for already encoded urls
+        if (Charset.forName("US-ASCII").newEncoder().canEncode(urlStr)) {
+            return urlStr;
+        }
+
         URL u = new URL(urlStr);
         URI uri = new URI(
                 u.getProtocol(),
+                null,
                 IDN.toASCII(u.getHost()),
+                u.getPort(),
                 u.getPath(),
                 u.getQuery(),
                 u.getRef());
