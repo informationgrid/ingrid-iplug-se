@@ -26,6 +26,7 @@ import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.db.UrlHandler;
 import de.ingrid.iplug.se.db.model.Metadata;
 import de.ingrid.iplug.se.db.model.Url;
+import de.ingrid.utils.tool.UrlTool;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -325,7 +326,7 @@ public class FileUtils {
      * If no regular expression was found:
      *
      * <ul>
-     *  <li>the urls domain is IDN encoded and the</li>
+     *  <li>the urls domain is IDNA 2008 encoded and the</li>
      *  <li>the path, query and anchor is URI encoded</li>
      *  <li>all special regular expresseion characters are escaped</li>
      * </ul>
@@ -339,7 +340,7 @@ public class FileUtils {
         } else {
             URL uri;
             try {
-                uri = new URL(getIdnUrlWithEncodedPath(urlStr));
+                uri = new URL(UrlTool.getEncodedUnicodeUrl(urlStr));
                 if (uri.getPath() != null || uri.getQuery() != null) {
                     Matcher match = REGEXP_SPECIAL_CHARS.matcher((uri.getPath() != null ? uri.getPath() : "") + (uri.getQuery() != null ? "?" + uri.getQuery() : "") + (uri.getRef() != null ? "#" + uri.getRef() : ""));
                     urlStr = uri.getProtocol() + "://" + uri.getHost() + (uri.getPort() > 0 ? ":" + uri.getPort() : "") + match.replaceAll("\\\\$1");
@@ -351,42 +352,10 @@ public class FileUtils {
         return urlStr;
     }
 
-    /**
-     * @return Returns the URL with
-     *    <ul>
-     *      <li>the urls domain is IDN encoded </li>
-     *      <li>the path, query and anchor is URI encoded</li>
-     *    </ul>
-     *
-     *    If the url was already encoded, return the URL as is.
-     *
-     * @throws MalformedURLException
-     * @throws URISyntaxException
-     */
-    public static String getIdnUrlWithEncodedPath(String urlStr) throws MalformedURLException, URISyntaxException {
-
-        // return if ascii only url
-        // this also returns for already encoded urls
-        if (Charset.forName("US-ASCII").newEncoder().canEncode(urlStr)) {
-            return urlStr;
-        }
-
-        URL u = new URL(urlStr);
-        URI uri = new URI(
-                u.getProtocol(),
-                null,
-                IDN.toASCII(u.getHost()),
-                u.getPort(),
-                u.getPath(),
-                u.getQuery(),
-                u.getRef());
-        return uri.toASCIIString();
-    }
-
     private static List<String> encodeIdnAndUri(List<String> urls) {
         return urls.stream().map(c -> {
             try {
-                return getIdnUrlWithEncodedPath(c);
+                return UrlTool.getEncodedUnicodeUrl(c);
             } catch (MalformedURLException e) {
                 log.error("Error escaping URL " + c, e);
                 throw new RuntimeException(e);
