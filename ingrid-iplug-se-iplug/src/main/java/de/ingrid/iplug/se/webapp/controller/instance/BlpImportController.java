@@ -23,7 +23,8 @@
 package de.ingrid.iplug.se.webapp.controller.instance;
 
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.nio.file.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import de.ingrid.iplug.se.StatusProviderService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -61,6 +64,8 @@ import de.ingrid.iplug.se.webapp.controller.AdminViews;
 @Controller
 @SessionAttributes("plugDescription")
 public class BlpImportController extends InstanceController {
+
+    private static Logger log = LogManager.getLogger(InstanceController.class);
 
     @Autowired
     StatusProviderService statusProviderService;
@@ -114,8 +119,9 @@ public class BlpImportController extends InstanceController {
     /**
      * Upload excel file.
      *
-     * @param uploadBean
+     * @param blpImportBean
      * @param model
+     * @param name
      * @return
      * @throws IOException
      */
@@ -125,6 +131,18 @@ public class BlpImportController extends InstanceController {
         Instance instance = getInstanceData( name );
 
         MultipartFile file = blpImportBean.getFile();
+
+        Path blpBackupDir = Paths.get(instance.getWorkingDirectory(), "blp_backup");
+        try {
+            Files.createDirectories(Paths.get(instance.getWorkingDirectory(), "blp_backup"));
+            try (InputStream in = file.getInputStream()) {
+                Files.copy(in, Paths.get(blpBackupDir.toString(), file.getOriginalFilename()).toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
+            } catch (Exception e) {
+                log.error("Cannot copy file " + file.getName() + " to " + Paths.get(blpBackupDir.toString(), file.getOriginalFilename()).toAbsolutePath(), e);
+            }
+        } catch (Exception e) {
+            log.error("Cannot create backup directory " + blpBackupDir.toAbsolutePath(), e);
+        }
 
         UVPDataImporter importer = new UVPDataImporter();
         importer.setInstance( instance );

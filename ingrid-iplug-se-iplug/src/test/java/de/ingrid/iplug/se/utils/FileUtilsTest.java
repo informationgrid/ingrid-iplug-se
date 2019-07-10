@@ -16,7 +16,7 @@ public class FileUtilsTest {
 
         Assert.assertEquals("http://www.xn--schnheit-p4a.de/", FileUtils.checkForRegularExpressions("http://www.schönheit.de/"));
 
-        Assert.assertEquals("http://www.xn--sss-hoa.de/F%C3%B6n/Frisur\\?mu%C3%9F=ja&preis=gro%C3%9F#Au%C3%9Fz%C3%BCge", FileUtils.checkForRegularExpressions("http://www.süß.de/Fön/Frisur?muß=ja&preis=groß#Außzüge"));
+        Assert.assertEquals("http://www.xn--s-qfa0g.de/F%C3%B6n/Frisur\\?mu%C3%9F=ja&preis=gro%C3%9F#Au%C3%9Fz%C3%BCge", FileUtils.checkForRegularExpressions("http://www.süß.de/Fön/Frisur?muß=ja&preis=groß#Außzüge"));
     }
 
     @Test
