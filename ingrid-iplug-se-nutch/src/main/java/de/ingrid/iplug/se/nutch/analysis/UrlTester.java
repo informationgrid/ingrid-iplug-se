@@ -39,6 +39,7 @@
 
 package de.ingrid.iplug.se.nutch.analysis;
 
+import crawlercommons.robots.BaseRobotRules;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.util.Tool;
@@ -56,9 +57,6 @@ import org.apache.nutch.protocol.ProtocolOutput;
 import org.apache.nutch.scoring.ScoringFilters;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.StringUtil;
-import org.apache.nutch.util.URLUtil;
-
-import crawlercommons.robots.BaseRobotRules;
 
 /**
  * Urls tester, useful for testing urls on crawlability.
@@ -90,7 +88,7 @@ public class UrlTester implements Tool {
                 System.out.println(usage);
                 System.exit(-1);
             } else {
-                url = URLUtil.toASCII(args[i]);
+                url = args[i];
             }
         }
 

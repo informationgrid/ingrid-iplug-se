@@ -188,12 +188,12 @@ public class UVPDataImporter extends Thread {
             sp.addState( "ParsingData", "Parsing and validating data from '" + excelFileName + "'... done." );
             logAndPrint( "" );
 
-            sp.addState( "DeleteExisting", "Deleting existing urls..." );
+            sp.addState( "DeleteExisting", "Deleting existing urls (" + existingUrls.size() + ")" );
             for (int i = 0; i < existingUrls.size(); i++) {
                 Url url = existingUrls.get( i );
                 em.remove( url );
             }
-            sp.addState( "DeleteExisting", "Deleting existing urls... done." );
+            sp.addState( "DeleteExisting", "Deleting existing urls (" + existingUrls.size() + ") done." );
 
             int cntRecords = blpModels.size();
 
@@ -869,7 +869,8 @@ public class UVPDataImporter extends Thread {
     /**
      * Checks if a given URL is shorter than another URL. Ignores the protocol.
      *
-     * @param bm
+     * @param url
+     * @param urlComparedTo
      * @return True if url is shorter than urlComparedTo. False otherwise (url
      *         == NULL; urlComparedTo == NULL; url longer or equal long.);
      * @throws MalformedURLException
@@ -1057,6 +1058,11 @@ public class UVPDataImporter extends Thread {
         return excelFileInputStream;
     }
 
+    /**
+     * Closes the stream!
+     *
+     * @param excelFileInputStream
+     */
     public void setExcelFileInputStream(InputStream excelFileInputStream) {
         this.excelFileInputStream = excelFileInputStream;
     }

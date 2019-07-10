@@ -47,6 +47,7 @@ import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.utils.UrlErrorPagableFilter;
 import de.ingrid.iplug.se.webapp.container.Instance;
 import de.ingrid.utils.IngridCall;
+import de.ingrid.utils.tool.UrlTool;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONObject;
@@ -583,7 +584,7 @@ public class RestDataController extends InstanceController {
 
         Instance instance = getInstanceData(instanceName);
 
-		NutchProcess process = nutchProcessFactory.getUrlTesterProcess(instance, urlString);
+		NutchProcess process = nutchProcessFactory.getUrlTesterProcess(instance, UrlTool.getEncodedUnicodeUrl(urlString));
 		process.start();
 
 		long start = System.currentTimeMillis();
