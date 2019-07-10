@@ -29,6 +29,21 @@
   </properties>
   <body>
 
+    <release version="5.1.0" date="2019-07-10" description="Release 5.1.0">
+      <action type="add" dev="wemove" issue="270">
+        Encode URLs in url management. Accept umlaut domains AND umlaute in path.
+      </action>
+      <action type="add" dev="wemove" issue="1421">
+        Fix admin gui search: results do not link to indexed page.
+      </action>
+      <action type="add" dev="wemove" issue="1368">
+        Accept invalid SSL certificates in iPlug SE.
+      </action>
+      <action type="add" dev="wemove" issue="111">
+        Add support of umlaut urls/domains in iPlug SE
+      </action>
+    </release>
+
     <release version="5.0.0" date="2019-04-12" description="Release 5.0.0">
       <action type="fix" dev="wemove" issue="REDMINE-1289">
         Remove 'PortalU' from admin pages of iPlug SE.

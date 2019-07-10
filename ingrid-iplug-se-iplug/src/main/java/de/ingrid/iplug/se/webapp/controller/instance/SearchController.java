@@ -119,7 +119,7 @@ public class SearchController extends InstanceController {
             modelMap.addAttribute( "totalHitCount", results.length() );
 
             final IngridHit[] hits = results.getHits();
-            final IngridHitDetail[] details = _plug.getDetails( hits, query, new String[] {} );
+            final IngridHitDetail[] details = _plug.getDetails( hits, query, new String[] {"title", "summary", "url"} );
 
             // convert details to map
             // this is necessary because it's not possible to access the
@@ -127,6 +127,9 @@ public class SearchController extends InstanceController {
             final Map<String, IngridHitDetail> detailsMap = new HashMap<String, IngridHitDetail>();
             if (details != null) {
                 for (final IngridHitDetail detail : details) {
+                    if (detail.get("url") != null && detail.get("url") instanceof String[] && ((String[]) detail.get("url")).length > 0) {
+                        detail.put("url", ((String[]) detail.get("url"))[0]);
+                    }
                     detailsMap.put( detail.getDocumentId(), detail );
                 }
             }
