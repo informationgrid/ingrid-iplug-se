@@ -31,7 +31,8 @@ import java.nio.file.StandardCopyOption;
 import org.apache.log4j.Logger;
 
 import de.ingrid.iplug.se.nutchController.IngridCrawlNutchProcess.STATES;
-import de.ingrid.iplug.se.nutchController.StatusProvider.State;
+import de.ingrid.utils.statusprovider.StatusProvider;
+import de.ingrid.utils.statusprovider.StatusProvider.State;
 import de.ingrid.iplug.se.utils.FileUtils;
 
 /**

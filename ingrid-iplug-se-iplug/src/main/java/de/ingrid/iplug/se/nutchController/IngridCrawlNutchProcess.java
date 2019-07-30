@@ -29,7 +29,7 @@ import de.ingrid.elasticsearch.IIndexManager;
 import de.ingrid.elasticsearch.IndexInfo;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
-import de.ingrid.iplug.se.nutchController.StatusProvider.Classification;
+import de.ingrid.utils.statusprovider.StatusProvider.Classification;
 import de.ingrid.iplug.se.utils.DBUtils;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
