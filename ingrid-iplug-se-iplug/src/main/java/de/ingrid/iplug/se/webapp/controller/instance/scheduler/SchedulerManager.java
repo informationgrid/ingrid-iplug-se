@@ -50,10 +50,8 @@ public class SchedulerManager {
 
     private NutchController nutchController;
 
-    @Autowired
     private IPostCrawlProcessor[] postCrawlProcessors;
-    
-    @Autowired
+
     private NutchProcessFactory nutchProcessFactory;
     
     private class Runner {
@@ -79,10 +77,12 @@ public class SchedulerManager {
      * @throws Exception
      */
     @Autowired
-    public SchedulerManager(PatternPersistence patternPers, CrawlDataPersistence crawlDataPers, NutchController nutchController, IndexManager indexManager) throws Exception {
+    public SchedulerManager(PatternPersistence patternPers, CrawlDataPersistence crawlDataPers, NutchController nutchController, IndexManager indexManager, NutchProcessFactory nutchProcessFactory, IPostCrawlProcessor[] postCrawlProcessors) throws Exception {
         this.patternService = patternPers;
         this.crawlDataPers = crawlDataPers;
         this.nutchController = nutchController;
+        this.nutchProcessFactory = nutchProcessFactory;
+        this.postCrawlProcessors = postCrawlProcessors;
 
         // create for each instance a scheduler
         for (File instance : getInstances()) {
