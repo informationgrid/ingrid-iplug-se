@@ -31,6 +31,8 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.input.TailerListenerAdapter;
 
+import de.ingrid.utils.statusprovider.StatusProvider;
+
 /**
  * 
  * @author joachim

@@ -56,6 +56,7 @@ import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
+import de.ingrid.utils.statusprovider.StatusProvider;
 
 @RunWith(PowerMockRunner.class)
 // @PrepareForTest(JettyStarter.class)

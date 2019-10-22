@@ -29,7 +29,8 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import de.ingrid.iplug.se.StatusProviderService;
+import de.ingrid.utils.statusprovider.StatusProvider;
+import de.ingrid.utils.statusprovider.StatusProviderService;
 import de.ingrid.iplug.se.webapp.container.Instance;
 
 @Service

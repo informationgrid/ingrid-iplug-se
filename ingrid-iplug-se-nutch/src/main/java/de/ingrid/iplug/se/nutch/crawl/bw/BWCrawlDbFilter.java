@@ -279,7 +279,11 @@ public class BWCrawlDbFilter extends Configured implements Tool {
                             if (LOG.isDebugEnabled()) {
                                 LOG.debug("Create delete request for elastic search: " + url);
                             }
-                            esClient.addRequest(esClient.prepareDeleteRequest(url), url.length());
+                            try {
+                                esClient.addRequest(esClient.prepareDeleteRequest(url), url.length());
+                            } catch (Exception e) {
+                                LOG.error("Error adding request to elasticsearch client.", e);
+                            }
                         }
                     }
                 }
@@ -298,7 +302,11 @@ public class BWCrawlDbFilter extends Configured implements Tool {
 
         public void close() throws IOException {
             if (esClient != null) {
-                esClient.close();
+                try {
+                    esClient.close();
+                } catch (Exception e) {
+                    LOG.error("Error closing elasticsearch client.", e);
+                }
             }
         }
 

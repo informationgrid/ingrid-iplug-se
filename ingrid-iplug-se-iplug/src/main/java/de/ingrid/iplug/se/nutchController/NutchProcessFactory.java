@@ -28,7 +28,7 @@ import de.ingrid.elasticsearch.ElasticConfig;
 import de.ingrid.elasticsearch.IBusIndexManager;
 import de.ingrid.elasticsearch.IndexManager;
 import de.ingrid.iplug.se.SEIPlug;
-import de.ingrid.iplug.se.StatusProviderService;
+import de.ingrid.utils.statusprovider.StatusProviderService;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
 import de.ingrid.iplug.se.webapp.container.Instance;

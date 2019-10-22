@@ -32,7 +32,8 @@ import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.log4j.Logger;
 
-import de.ingrid.iplug.se.nutchController.StatusProvider.Classification;
+import de.ingrid.utils.statusprovider.StatusProvider;
+import de.ingrid.utils.statusprovider.StatusProvider.Classification;
 
 /**
  * Wrapper for a nutch process execution. A NutchProcess can contain multiple

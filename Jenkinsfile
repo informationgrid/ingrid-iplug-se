@@ -32,7 +32,7 @@ pipeline {
                                    we also should use the IP mask for the port mapping to only allow
                                    access to the right containers
                     */
-                    docker.image('docker-registry.wemove.com/ingrid-elasticsearch-with-decompound:6.4.2').withRun('--name "elasticsearch" -e "cluster.name=ingrid" -e "http.host=0.0.0.0" -e "transport.host=0.0.0.0" -e "xpack.security.enabled=false" -e "xpack.monitoring.enabled=false" -e "xpack.ml.enabled=false" --network jenkinsnexussonar_devnet -p 172.20.0.0:9300:9300 -p 172.20.0.0:9200:9200') { c ->
+                    docker.image('docker-registry.wemove.com/ingrid-elasticsearch-with-decompound:6.4.2').withRun('--name "elasticsearch" -e "cluster.name=ingrid" -e "http.host=0.0.0.0" -e "transport.host=0.0.0.0" -e "xpack.security.enabled=false" -e "xpack.monitoring.enabled=false" -e "xpack.ml.enabled=false" --network jenkinsnexussonar_devnet -p 127.0.0.1:9300:9300 -p 127.0.0.1:9200:9200') { c ->
 
                         withMaven(
                             // Maven installation declared in the Jenkins "Global Tool Configuration"
@@ -71,7 +71,7 @@ pipeline {
                                    we also should use the IP mask for the port mapping to only allow
                                    access to the right containers
                     */
-                    docker.image('docker-registry.wemove.com/ingrid-elasticsearch-with-decompound:6.4.2').withRun('--name "elasticsearch" -e "cluster.name=ingrid" -e "http.host=0.0.0.0" -e "transport.host=0.0.0.0" -e "xpack.security.enabled=false" -e "xpack.monitoring.enabled=false" -e "xpack.ml.enabled=false" --network jenkinsnexussonar_devnet -p 172.20.0.0:9300:9300 -p 172.20.0.0:9200:9200') { c ->
+                    docker.image('docker-registry.wemove.com/ingrid-elasticsearch-with-decompound:6.4.2').withRun('--name "elasticsearch" -e "cluster.name=ingrid" -e "http.host=0.0.0.0" -e "transport.host=0.0.0.0" -e "xpack.security.enabled=false" -e "xpack.monitoring.enabled=false" -e "xpack.ml.enabled=false" --network jenkinsnexussonar_devnet -p 127.0.0.1:9300:9300 -p 127.0.0.1:9200:9200') { c ->
 
                         withMaven(
                             maven: 'Maven3',
