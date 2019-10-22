@@ -29,9 +29,12 @@
   </properties>
   <body>
 
-    <release version="5.2.0-SNAPSHOT" date="2019-xx-xx" description="Release 5.2.0">
+    <release version="5.2.0" date="2019-10-22" description="Release 5.2.0">
       <action type="add" dev="wemove" issue="1476">
         Crawl cleanup fails if the corresponding index does not exist in the connected elastic search instance.
+      </action>
+      <action type="fix" dev="wemove" issue="1466">
+        Fix spring initialization problem.
       </action>
     </release>
 
