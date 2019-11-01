@@ -29,7 +29,7 @@
   </properties>
   <body>
 
-    <release version="5.1.1-SNAPSHOT" date="2019-xx-xx" description="Release 5.1.1">
+    <release version="5.1.1" date="2019-11-01" description="Release 5.1.1">
       <action type="add" dev="wemove" issue="1476">
         Crawl cleanup fails if the corresponding index does not exist in the connected elastic search instance.
       </action>
