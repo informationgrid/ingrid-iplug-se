@@ -10,6 +10,11 @@
     "doc_boost": {
       "type": "float"
     },
+    "summary": {
+      "analyzer": "german",
+      "type": "text",
+      "store": true
+    },
     "content": {
       "analyzer": "german",
       "type": "text",
@@ -61,10 +66,16 @@
       "store": true
     },
     "partner": {
-      "type": "keyword"
+      "type": "keyword",
+      "store": true
     },
     "provider": {
-      "type": "keyword"
+      "type": "keyword",
+      "store": true
+    },
+    "datatype": {
+      "type": "keyword",
+      "store": true
     },
     "x1": {
       "type": "double"
