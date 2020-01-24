@@ -11,13 +11,15 @@
       "type": "float"
     },
     "summary": {
-      "analyzer": "german",
       "type": "text",
+      "analyzer": "decomp",
+      "search_analyzer": "no_decomp",
       "store": true
     },
     "content": {
-      "analyzer": "german",
       "type": "text",
+      "analyzer": "decomp",
+      "search_analyzer": "no_decomp",
       "store": true
     },
     "contentLength": {
@@ -46,9 +48,9 @@
       "type": "text"
     },
     "title": {
-      "analyzer": "german",
       "type": "text",
-      "boost": 1.1,
+      "analyzer": "decomp",
+      "search_analyzer": "no_decomp",
       "store": true
     },
     "topic": {
