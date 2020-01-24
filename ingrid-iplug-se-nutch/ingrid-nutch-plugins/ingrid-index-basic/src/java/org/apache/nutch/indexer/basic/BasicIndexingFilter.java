@@ -104,7 +104,8 @@ public class BasicIndexingFilter implements IndexingFilter {
     if (MAX_CONTENT_LENGTH > -1 && content.length() > MAX_CONTENT_LENGTH) {
       content = content.substring(0, MAX_CONTENT_LENGTH);
     }
-    doc.add("content", StringUtil.cleanField(content));
+    // use field summary instead of content for InGrid
+    doc.add("summary", StringUtil.cleanField(content));
 
     // title
     String title = parse.getData().getTitle();

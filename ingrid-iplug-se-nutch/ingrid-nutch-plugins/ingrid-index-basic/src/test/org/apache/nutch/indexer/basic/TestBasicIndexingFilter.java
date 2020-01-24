@@ -83,7 +83,8 @@ public class TestBasicIndexingFilter {
     Assert.assertEquals("test host, expect \"nutch.apache.org\"", "nutch.apache.org", doc.getField("host").getValues().get(0));
     Assert.assertEquals("test url, expect \"http://nutch.apache.org/index.html\"", "http://nutch.apache.org/index.html", 
       doc.getField("url").getValues().get(0));
-    Assert.assertEquals("test content", "this is a sample foo", doc.getField("content").getValues().get(0));
+    // use field summary instead of content for InGrid
+    Assert.assertEquals("test summary", "this is a sample foo", doc.getField("summary").getValues().get(0));
     Assert.assertEquals("test fetch time", new Date(100L), (Date)doc.getField("tstamp").getValues().get(0));
   }
 }
