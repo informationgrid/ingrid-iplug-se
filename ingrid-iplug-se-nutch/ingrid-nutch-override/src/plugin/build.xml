@@ -28,12 +28,13 @@
 	<target name="deploy">
 		<ant dir="indexer-ingrid" target="deploy" />
 		<ant dir="analysis-de" target="deploy" />
-    <ant dir="analysis-fr" target="deploy" />
-    <ant dir="ingrid-language-identifier" target="deploy" />
-    <ant dir="ingrid-indexer-elastic" target="deploy" />
-    <ant dir="scoring-ingrid" target="deploy" />
-    <ant dir="ingrid-lib-http" target="deploy" />
-    <ant dir="ingrid-protocol-httpclient" target="deploy" />
+		<ant dir="analysis-fr" target="deploy" />
+		<ant dir="ingrid-language-identifier" target="deploy" />
+		<ant dir="ingrid-indexer-elastic" target="deploy" />
+		<ant dir="scoring-ingrid" target="deploy" />
+		<ant dir="ingrid-lib-http" target="deploy" />
+		<ant dir="ingrid-protocol-httpclient" target="deploy" />
+		<ant dir="ingrid-index-basic" target="deploy" />
 
 		<!-- default nutch plugins -->
 		<ant dir="creativecommons" target="deploy" />
