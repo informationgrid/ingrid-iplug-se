@@ -29,7 +29,7 @@
   </properties>
   <body>
 
-    <release version="5.3.2" date="2020-xx-xx" description="Release 5.3.2">
+    <release version="5.3.2" date="2020-01-24" description="Release 5.3.2">
       <action type="fix" dev="wemove" issue="1669">
         Results from iPlug-SE do not show provider nor abstract.
       </action>
