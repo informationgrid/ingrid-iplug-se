@@ -29,6 +29,9 @@
   </properties>
   <body>
     <release version="5.4.0" date="2020-xx-xx" description="Release 5.4.0">
+      <action type="fix" dev="wemove" issue="1747">
+        Index Settings werden ignoriert.
+      </action>
       <action type="fix" dev="wemove" issue="1670">
         Fix highlight summary by search query.
       </action>
