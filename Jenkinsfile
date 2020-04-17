@@ -32,7 +32,7 @@ pipeline {
                                    we also should use the IP mask for the port mapping to only allow
                                    access to the right containers
                     */
-                    docker.image('docker-registry.wemove.com/ingrid-elasticsearch-with-decompound:6.4.2').withRun('--name "elasticsearch" -e "cluster.name=ingrid" -e "http.host=0.0.0.0" -e "transport.host=0.0.0.0" -e "xpack.security.enabled=false" -e "xpack.monitoring.enabled=false" -e "xpack.ml.enabled=false" --network jenkinsnexussonar_devnet -p 127.0.0.1:9300:9300 -p 127.0.0.1:9200:9200') { c ->
+                    docker.image('docker-registry.wemove.com/ingrid-elasticsearch-with-decompound:6.4.2').withRun('--name "elasticsearch_iplug-se_test" -e "cluster.name=ingrid" -e "http.host=0.0.0.0" -e "transport.host=0.0.0.0" -e "xpack.security.enabled=false" -e "xpack.monitoring.enabled=false" -e "xpack.ml.enabled=false" --network jenkinsnexussonar_devnet -p 127.0.0.1:18325:9300 -p 127.0.0.1:18326:9200') { c ->
 
                         withMaven(
                             // Maven installation declared in the Jenkins "Global Tool Configuration"
@@ -46,7 +46,7 @@ pipeline {
 
                             /* Wait max 1 minute until elasticsearch service is up */
                             timeout(1) {
-                                sh script: "wget --retry-connrefused --tries=60 --waitretry=1 -q http://elasticsearch:9200 -O /dev/null", returnStatus: true
+                                sh script: "wget --retry-connrefused --tries=60 --waitretry=1 -q http://elasticsearch_iplug-se_test:9200 -O /dev/null", returnStatus: true
                             }
 
                             // Run the maven build
@@ -71,7 +71,7 @@ pipeline {
                                    we also should use the IP mask for the port mapping to only allow
                                    access to the right containers
                     */
-                    docker.image('docker-registry.wemove.com/ingrid-elasticsearch-with-decompound:6.4.2').withRun('--name "elasticsearch" -e "cluster.name=ingrid" -e "http.host=0.0.0.0" -e "transport.host=0.0.0.0" -e "xpack.security.enabled=false" -e "xpack.monitoring.enabled=false" -e "xpack.ml.enabled=false" --network jenkinsnexussonar_devnet -p 127.0.0.1:9300:9300 -p 127.0.0.1:9200:9200') { c ->
+                    docker.image('docker-registry.wemove.com/ingrid-elasticsearch-with-decompound:6.4.2').withRun('--name "elasticsearch_iplug-se_test" -e "cluster.name=ingrid" -e "http.host=0.0.0.0" -e "transport.host=0.0.0.0" -e "xpack.security.enabled=false" -e "xpack.monitoring.enabled=false" -e "xpack.ml.enabled=false" --network jenkinsnexussonar_devnet -p 127.0.0.1:18325:9300 -p 127.0.0.1:18326:9200') { c ->
 
                         withMaven(
                             maven: 'Maven3',
