@@ -1,33 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  **************************************************-
-  ingrid-iplug-se-iplug
-  ==================================================
-  Copyright (C) 2014 wemove digital solutions GmbH
-  ==================================================
-  Licensed under the EUPL, Version 1.1 or – as soon they will be
-  approved by the European Commission - subsequent versions of the
-  EUPL (the "Licence");
-
-  You may not use this work except in compliance with the Licence.
-  You may obtain a copy of the Licence at:
-
-  http://ec.europa.eu/idabc/eupl5
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the Licence is distributed on an "AS IS" basis,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the Licence for the specific language governing permissions and
-  limitations under the Licence.
-  **************************************************#
-  -->
-
 <document>
   <properties>
-	<title>Changes Ingrid iPlug-SE</title>
-	<author email="joachim@wemove.com">Joachim Müller</author>
+    <title>Changes Ingrid iPlug-SE</title>
+    <author email="joachim@wemove.com">Joachim Müller</author>
   </properties>
   <body>
+    <release version="5.4.0" date="2020-17-04" description="Release 5.4.0">
+      <action type="fix" dev="wemove" issue="1747">
+        Index Settings werden ignoriert.
+      </action>
+      <action type="fix" dev="wemove" issue="1670">
+        Fix highlight summary by search query.
+      </action>
+    </release>
 
     <release version="5.3.2" date="2020-01-24" description="Release 5.3.2">
       <action type="fix" dev="wemove" issue="1669">

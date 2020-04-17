@@ -69,6 +69,7 @@
         <include>log4j2.xml</include>
         <include>instance-data/urlMaintenance.json</include>
         <include>default-mapping.json</include>
+        <include>default-settings.json</include>
       </includes>
     </fileSet>
     <fileSet>
