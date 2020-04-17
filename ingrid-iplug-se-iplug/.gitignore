@@ -6,3 +6,6 @@
 /conf
 /createDDL.jdbc
 /database/
+data/elasticsearch
+last_status.xml
+log.log
