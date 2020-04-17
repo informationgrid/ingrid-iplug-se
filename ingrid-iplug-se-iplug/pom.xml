@@ -28,16 +28,6 @@
         <artifactId>jetty</artifactId>
         <version>6.1.26</version>
       </dependency>
-      <!--<dependency>
-        <groupId>org.elasticsearch</groupId>
-        <artifactId>elasticsearch</artifactId>
-        <version>5.6.11</version>
-      </dependency>
-      <dependency>
-        <groupId>org.elasticsearch.client</groupId>
-        <artifactId>transport</artifactId>
-        <version>5.6.11</version>
-      </dependency>-->
     </dependencies>
   </dependencyManagement>
 
@@ -70,7 +60,7 @@
     <dependency>
       <groupId>de.ingrid</groupId>
       <artifactId>ingrid-utils</artifactId>
-      <version>5.3.0</version>
+      <version>5.4.0</version>
     </dependency>
     <dependency>
       <groupId>de.ingrid</groupId>
