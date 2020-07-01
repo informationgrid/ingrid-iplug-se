@@ -83,7 +83,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>2.9.6</version>
+      <version>2.11.1</version>
     </dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>
@@ -93,7 +93,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.10.0.pr1</version>
+      <version>2.11.1</version>
     </dependency>
     <dependency>
       <groupId>commons-lang</groupId>
