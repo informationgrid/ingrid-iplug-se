@@ -136,29 +136,6 @@
       <artifactId>commons-fileupload</artifactId>
       <version>1.3.3</version>
     </dependency>
-    <!--<dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      &lt;!&ndash; <version>1.5.6</version> &ndash;&gt;
-      &lt;!&ndash; <scope>test</scope>&ndash;&gt;
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      &lt;!&ndash; <version>1.5.6</version> &ndash;&gt;
-      &lt;!&ndash; <scope>test</scope>&ndash;&gt;
-    </dependency>-->
-    <!-- Library used for the migration of old database to new one -->
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.33</version>
-    </dependency>
-    <dependency>
-      <groupId>ojdbc</groupId>
-      <artifactId>ojdbc</artifactId>
-      <version>14</version>
-    </dependency>
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi</artifactId>
