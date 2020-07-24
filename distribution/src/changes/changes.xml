@@ -5,7 +5,7 @@
     <author email="joachim@wemove.com">Joachim Müller</author>
   </properties>
   <body>
-    <release version="5.5.0-SNAPSHOT" date="2020-xx-xx" description="Release 5.5.0">
+    <release version="5.5.0" date="2020-07-24" description="Release 5.5.0">
       <action type="add" dev="wemove" issue="1898">
         Change the docker container’s privilege to a non-root user.
       </action>
