@@ -1,18 +1,21 @@
-FROM docker-registry.wemove.com/ingrid-java
-ENV INGRID_USER=root
+FROM alpine AS builder
+
+COPY ingrid-iplug-se*-installer.jar /
+RUN unzip ingrid-iplug-se*-installer.jar -d /tmp \
+    && export INSTALL_DIR=`ls -d1 /tmp/ingrid-iplug-se-*` \
+    && sed -i -r 's/(<AppenderRef.*\/>)/\1<AppenderRef ref="Console" \/>/g' $INSTALL_DIR/conf/log4j2.xml \
+    && echo jetty.port=8080 > $INSTALL_DIR/conf/config.override.properties
+
+FROM docker-registry.wemove.com/ingrid-java:jre-8-alpine
+ENV INGRID_USER=ingrid
 ENV RUN_DIRECTLY=true
 
-ADD ingrid-iplug-se*-installer.jar /
+# user, group ingrid (1000:1000) is created in base image
+COPY --chown=1000:1000 --from=builder /tmp/ingrid-iplug-se-* /opt/ingrid/ingrid-iplug-se/
 
-RUN unzip ingrid-iplug-se*-installer.jar -d /tmp \
-    && mkdir -p /opt/ingrid/ingrid-iplug-se \
-    && cp -R /tmp/ingrid-iplug-se-*/* /opt/ingrid/ingrid-iplug-se/ \
-    && rm -Rf /tmp/* \
-    && sed -i -r 's/(<AppenderRef.*\/>)/\1<AppenderRef ref="Console" \/>/g' /opt/ingrid/ingrid-iplug-se/conf/log4j2.xml \
-    && rm ingrid-*.jar
+USER ingrid
 
-RUN echo jetty.port=80 > /opt/ingrid/ingrid-iplug-se/conf/config.override.properties
 WORKDIR /opt/ingrid/ingrid-iplug-se
-EXPOSE 80
+EXPOSE 8080
 
 CMD /bin/sh start.sh start
