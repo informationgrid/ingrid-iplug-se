@@ -48,6 +48,21 @@
           "edge_ngram",
           "unique"
         ]
+      },
+      "ngram_phrase": {
+        "type": "custom",
+        "tokenizer": "keyword",
+        "filter": [
+          "lowercase",
+          "ngram"
+        ]
+      },
+      "phrase": {
+        "type": "custom",
+        "tokenizer": "keyword",
+        "filter": [
+          "lowercase"
+        ]
       }
     }
   }
