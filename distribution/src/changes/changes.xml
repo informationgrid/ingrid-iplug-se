@@ -5,12 +5,18 @@
     <author email="joachim@wemove.com">Joachim Müller</author>
   </properties>
   <body>
+    <release version="5.10.0" date="2021-10-21" description="Release 5.10.0">
+      <action type="add" dev="wemove" issue="2085">
+        Improve InGrid Search - Add ngram Analyzer and additional sort hash.
+      </action>
+    </release>
+
     <release version="5.7.0" date="2021-01-18" description="Release 5.7.0">
       <action type="add" dev="wemove" issue="2211">
         Fix Redmine issue link generation for changes.
       </action>
     </release>
-	
+
     <release version="5.5.0" date="2020-07-24" description="Release 5.5.0">
       <action type="add" dev="wemove" issue="1898">
         Change the docker container’s privilege to a non-root user.
@@ -65,7 +71,7 @@
       <action type="add" dev="wemove" issue="1684">
         Add help text for BLP Import and configure visibility.
       </action>
-    </release>  
+    </release>
 
     <release version="4.6.0" date="2019-01-16" description="Release 4.6.0">
       <action type="add" dev="wemove" issue="REDMINE-1189">

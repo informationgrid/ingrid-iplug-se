@@ -33,6 +33,9 @@
             },
             "provider": {
                 "type": "keyword"
+            },
+            "sort_hash": {
+                "type": "keyword"
             }
         }
     }

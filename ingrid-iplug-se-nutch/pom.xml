@@ -3,7 +3,7 @@
   <parent>
     <groupId>de.ingrid</groupId>
     <artifactId>ingrid-iplug-se-project</artifactId>
-    <version>5.7.0</version>
+    <version>5.10.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>ingrid-iplug-se-nutch</artifactId>
@@ -38,7 +38,7 @@
     <dependency>
       <groupId>de.ingrid</groupId>
       <artifactId>ingrid-elasticsearch-tools</artifactId>
-      <version>5.4.0</version>
+      <version>5.10.0</version>
     </dependency>
 
     <dependency>
@@ -218,7 +218,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-<!--     <version>1.9.1</version> -->
+        <version>3.0.0</version>
         <executions>
           <execution>
             <phase>generate-sources</phase>
