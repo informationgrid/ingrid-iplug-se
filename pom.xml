@@ -35,7 +35,7 @@
     <apache-nutch-version>apache-nutch-1.9</apache-nutch-version>
     <ingrid-base-webapp.version>5.4.0</ingrid-base-webapp.version>
     <elasticsearch.version>6.4.0</elasticsearch.version>
-    <log4j2.version>2.8.2</log4j2.version>
+    <log4j2.version>2.15.0</log4j2.version>
   </properties>
 
   <modules>
