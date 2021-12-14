@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        jdk 'jdk8'
+    }
+
     options {
         // each branch has 1 job running at a time, since tests conflict with elasticsearch port otherwise
         disableConcurrentBuilds()
