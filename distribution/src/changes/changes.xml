@@ -5,6 +5,9 @@
     <author email="joachim@wemove.com">Joachim Müller</author>
   </properties>
   <body>
+    <release version="5.12.0-SNAPSHOT" date="2021-xx-xx" description="Release 5.12.0-SNAPSHOT">
+    </release>
+
     <release version="5.11.0" date="2021-01-18" description="Release 5.11.0">
       <action type="fix" dev="wemove" issue="3292">
         Kritische Sicherheitslücke Log4Shell in der weitverbreiteten Java-Logging-Bibliothek log4j
