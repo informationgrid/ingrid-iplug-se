@@ -325,7 +325,7 @@ public class FileUtils {
      * <ul>
      *  <li>the urls domain is IDNA 2008 encoded and the</li>
      *  <li>the path, query and anchor is URI encoded</li>
-     *  <li>all special regular expresseion characters are escaped</li>
+     *  <li>all special regular expression characters are escaped</li>
      * </ul>
      *
      * @param urlStr
