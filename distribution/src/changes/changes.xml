@@ -5,12 +5,15 @@
     <author email="joachim@wemove.com">Joachim Müller</author>
   </properties>
   <body>
-    <release version="5.12.0-SNAPSHOT" date="2021-xx-xx" description="Release 5.12.0-SNAPSHOT">
+    <release version="5.12.0" date="2021-04-12" description="Release 5.12.0">
       <action type="fix" dev="wemove" issue="3596">
         IT-Sicherheitsmängel in Docker Basis Images beseitigen
       </action>
       <action type="fix" dev="wemove" issue="3492">
         Reduce elasticsearch memoryusage - Change Phrase Analyzer
+      </action>
+      <action type="update" dev="wemove">
+        Update xerces
       </action>
     </release>
 
