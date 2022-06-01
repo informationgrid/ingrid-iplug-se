@@ -99,8 +99,8 @@ public class NutchControllerTest {
         Path logs = Paths.get( SEIPlug.conf.getInstancesDir(), "test", "logs" ).toAbsolutePath();
         Files.createDirectories( logs );
 
-        FileUtils.copyDirectories(Paths.get("apache-nutch-runtime/runtime/local/conf").toAbsolutePath(), conf);
-        
+        FileUtils.copyDirectories(Paths.get("../ingrid-iplug-se-nutch/src/test/resources/conf").toAbsolutePath(), conf);
+
         NutchConfigTool nct = new NutchConfigTool(Paths.get(conf.toAbsolutePath().toString(), "nutch-site.xml"));
         nct.addOrUpdateProperty("elastic.host", elasticNetworkHost,"");
         nct.addOrUpdateProperty("elastic.port", "9300", "");
@@ -126,10 +126,12 @@ public class NutchControllerTest {
         long start = System.currentTimeMillis();
         Thread.sleep( 500 );
         assertEquals( "Status is RUNNING", NutchProcess.STATUS.RUNNING, nutchController.getNutchProcess( instance ).getStatus() );
-        while ((System.currentTimeMillis() - start) < 360000) {
+        while ((System.currentTimeMillis() - start) < 6660000) {
             Thread.sleep( 1000 );
             if (nutchController.getNutchProcess( instance ).getStatus() != NutchProcess.STATUS.RUNNING) {
                 break;
+            } else {
+                System.out.println(nutchController.getNutchProcess( instance ).getConsoleOutput());
             }
         }
         if (nutchController.getNutchProcess( instance ).getStatus() == NutchProcess.STATUS.RUNNING) {

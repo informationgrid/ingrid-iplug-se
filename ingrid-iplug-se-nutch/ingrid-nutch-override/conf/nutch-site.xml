@@ -27,7 +27,7 @@
 
 	<property>
 		<name>plugin.includes</name>
-		<value>ingrid-protocol-httpclient|urlfilter-regex|parse-(html|tika)|index-(basic|anchor|metadata|more)|ingrid-indexer-elastic|scoring-ingrid|ingrid-language-identifier|urlnormalizer-(pass|regex|basic)|analysis-de
+		<value>protocol-httpclient|urlfilter-(regex|validator)|parse-(html|tika)|index-(basic|anchor|metadata|more)|ingrid-indexer-elastic|scoring-ingrid|ingrid-language-identifier|urlnormalizer-(pass|regex|basic)|analysis-de
 		</value>
 		<description>Regular expression naming plugin directory names to
 			include. Any plugin not matching this expression is excluded.

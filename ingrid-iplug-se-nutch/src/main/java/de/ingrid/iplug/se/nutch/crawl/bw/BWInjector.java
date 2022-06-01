@@ -20,7 +20,7 @@
  * limitations under the Licence.
  * **************************************************#
  */
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -42,7 +42,6 @@ package de.ingrid.iplug.se.nutch.crawl.bw;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
@@ -55,21 +54,20 @@ import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.WritableComparable;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.MapFileOutputFormat;
-import org.apache.hadoop.mapred.Mapper;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reducer;
-import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.SequenceFileInputFormat;
-import org.apache.hadoop.mapred.SequenceFileOutputFormat;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.MapFileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.util.StringUtils;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.apache.nutch.crawl.CrawlDb;
 import org.apache.nutch.net.URLNormalizers;
+import org.apache.nutch.util.LockUtil;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
 
@@ -98,37 +96,35 @@ public class BWInjector extends Configured implements Tool {
      * Creates {@link HostTypeKey} - {@link BWPatterns} tuples from each text
      * line.
      */
-    public static class BWInjectMapper implements Mapper<WritableComparable<Object>, Text, HostTypeKey, BWPatterns> {
+    public static class BWInjectMapper extends Mapper<WritableComparable<Object>, Text, HostTypeKey, BWPatterns> {
 
         private URLNormalizers _urlNormalizers;
-
-        private JobConf jobConf;
 
         private boolean _prohibited;
         private boolean _normalize;
         private boolean _acceptHttpAndHttps;
 
-        public void configure(JobConf job) {
-            this.jobConf = job;
-            _urlNormalizers = new URLNormalizers(jobConf, URLNormalizers.SCOPE_INJECT);
-            _prohibited = jobConf.getBoolean(PROHIBITED, true);
-            _normalize = jobConf.getBoolean(NORMALIZE, true);
-            _normalize = jobConf.getBoolean(NORMALIZE, true);
-            _acceptHttpAndHttps = jobConf.getBoolean(ACCEPT_HTTP_AND_HTTPS, false);
-        }
+        @Override
+        protected void setup(Mapper<WritableComparable<Object>, Text, HostTypeKey, BWPatterns>.Context context) throws IOException, InterruptedException {
+            super.setup(context);
 
-        public void close() {
+            Configuration conf = context.getConfiguration();
+            _urlNormalizers = new URLNormalizers(conf, URLNormalizers.SCOPE_INJECT);
+            _prohibited = conf.getBoolean(PROHIBITED, true);
+            _normalize = conf.getBoolean(NORMALIZE, true);
+            _normalize = conf.getBoolean(NORMALIZE, true);
+            _acceptHttpAndHttps = conf.getBoolean(ACCEPT_HTTP_AND_HTTPS, false);
         }
 
         @Override
-        public void map(WritableComparable<Object> key, Text val, OutputCollector<HostTypeKey, BWPatterns> output, Reporter reporter) throws IOException {
+        public void map(WritableComparable<Object> key, Text val, Mapper<WritableComparable<Object>, Text, HostTypeKey, BWPatterns>.Context context) throws IOException, InterruptedException {
 
             String url = val.toString();
             if (_normalize) {
                 try {
                     url = _urlNormalizers.normalize(url, "bw"); // normalize
                 } catch (Exception e) {
-                    LOG.warn("Skipping " + url + ":" + e.toString());
+                    LOG.warn("Skipping " + url + ":" + e);
                     url = null;
                 }
             }
@@ -137,7 +133,7 @@ public class BWInjector extends Configured implements Tool {
                 try {
                     host = new URL(url).getHost();
                 } catch (Exception e) {
-                    LOG.warn("unable to get host from: " + url + " : " + e.toString());
+                    LOG.warn("unable to get host from: " + url + " : " + e);
                     return;
                 }
                 if (_acceptHttpAndHttps) {
@@ -150,7 +146,7 @@ public class BWInjector extends Configured implements Tool {
                 } else {
                     patterns = new BWPatterns(new Text[] { new Text(url) }, new Text[0]);
                 }
-                output.collect(new HostTypeKey(host, HostTypeKey.PATTERN_TYPE), patterns);
+                context.write(new HostTypeKey(host, HostTypeKey.PATTERN_TYPE), patterns);
             }
         }
 
@@ -159,32 +155,26 @@ public class BWInjector extends Configured implements Tool {
     /**
      * Reduces {@link HostTypeKey} - {@link BWPatterns} tuples
      */
-    public static class BWInjectReducer implements Reducer<HostTypeKey, BWPatterns, HostTypeKey, BWPatterns> {
-        public void configure(JobConf job) {
-        }
-
-        public void close() {
-        }
+    public static class BWInjectReducer extends Reducer<HostTypeKey, BWPatterns, HostTypeKey, BWPatterns> {
 
         @Override
-        public void reduce(HostTypeKey key, Iterator<BWPatterns> values, OutputCollector<HostTypeKey, BWPatterns> output, Reporter reporter) throws IOException {
-            Set<Text> pos = new HashSet<Text>();
-            Set<Text> neg = new HashSet<Text>();
+        public void reduce(HostTypeKey key, Iterable<BWPatterns> values, Reducer<HostTypeKey, BWPatterns, HostTypeKey, BWPatterns>.Context context) throws IOException, InterruptedException {
+            Set<Text> pos = new HashSet<>();
+            Set<Text> neg = new HashSet<>();
 
-            while (values.hasNext()) {
-                BWPatterns value = values.next();
+            for (BWPatterns value : values) {
                 pos.addAll(value.getPositive());
                 neg.addAll(value.getNegative());
             }
 
-            Text[] negative = neg.toArray(new Text[neg.size()]);
-            Text[] positive = pos.toArray(new Text[pos.size()]);
+            Text[] negative = neg.toArray(new Text[0]);
+            Text[] positive = pos.toArray(new Text[0]);
 
-            output.collect(key, new BWPatterns(positive, negative));
+            context.write(key, new BWPatterns(positive, negative));
         }
     }
 
-    public void inject(Path bwDb, Path urlDir, boolean prohibited) throws IOException {
+    public void inject(Path bwDb, Path urlDir, boolean prohibited) throws IOException, InterruptedException, ClassNotFoundException {
 
         LOG.info("BWInjector: starting");
         if (prohibited) {
@@ -200,43 +190,77 @@ public class BWInjector extends Configured implements Tool {
         name = "/bw-inject-temp-" + name;
         Path tempDir = new Path(getConf().get("mapred.temp.dir", ".") + name);
 
-        JobConf sortJob = new NutchJob(getConf());
+        Job sortJob = NutchJob.getInstance(getConf());
+        Configuration sortJobConf = sortJob.getConfiguration();
+        FileSystem fs = FileSystem.get(sortJobConf);
+
         sortJob.setJobName("bw-inject " + urlDir);
         FileInputFormat.addInputPath(sortJob, urlDir);
         sortJob.setMapperClass(BWInjectMapper.class);
 
-        sortJob.setBoolean(PROHIBITED, prohibited);
+        sortJobConf.setBoolean(PROHIBITED, prohibited);
 
         FileOutputFormat.setOutputPath(sortJob, tempDir);
-        sortJob.setOutputFormat(SequenceFileOutputFormat.class);
+        sortJob.setOutputFormatClass(SequenceFileOutputFormat.class);
         sortJob.setOutputKeyClass(HostTypeKey.class);
         sortJob.setOutputValueClass(BWPatterns.class);
-        JobClient.runJob(sortJob);
+        Path lock;
+        lock = CrawlDb.lock(getConf(), urlDir, false);
+        try {
+            boolean success = sortJob.waitForCompletion(true);
+            if (!success) {
+                String message = "Job did not succeed, job status:"
+                        + sortJob.getStatus().getState() + ", reason: "
+                        + sortJob.getStatus().getFailureInfo();
+                LOG.error(message);
+                throw new RuntimeException(message);
+            }
+        } catch (IOException | InterruptedException | ClassNotFoundException e) {
+            LOG.error("Job failed: {}", e);
+            throw e;
+        } finally {
+            LockUtil.removeLockFile(fs, lock);
+        }
 
         // merge with existing bw db
         LOG.info("BWInjector: Merging injected urls into bwDb.");
         String newDbName = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
         Path newDb = new Path(bwDb, newDbName);
 
-        JobConf job = new NutchJob(getConf());
+        Job job = NutchJob.getInstance(getConf());
+        Configuration jobConf = job.getConfiguration();
+        fs = FileSystem.get(jobConf);
         job.setJobName("merge bwDb " + bwDb);
-
         Path current = new Path(bwDb, "current");
-        if (FileSystem.get(job).exists(current)) {
+        if (FileSystem.get(jobConf).exists(current)) {
             FileInputFormat.addInputPath(job, current);
         }
         FileInputFormat.addInputPath(job, tempDir);
-        job.setInputFormat(SequenceFileInputFormat.class);
+        job.setInputFormatClass(SequenceFileInputFormat.class);
 
         job.setReducerClass(BWInjectReducer.class);
         FileOutputFormat.setOutputPath(job, newDb);
-        job.setOutputFormat(MapFileOutputFormat.class);
+        job.setOutputFormatClass(MapFileOutputFormat.class);
         job.setOutputKeyClass(HostTypeKey.class);
         job.setOutputValueClass(BWPatterns.class);
-        JobClient.runJob(job);
+        lock = CrawlDb.lock(getConf(), current, false);
+        try {
+            boolean success = job.waitForCompletion(true);
+            if (!success) {
+                String message = "Job did not succeed, job status:"
+                        + job.getStatus().getState() + ", reason: "
+                        + job.getStatus().getFailureInfo();
+                LOG.error(message);
+                throw new RuntimeException(message);
+            }
+        } catch (IOException | InterruptedException | ClassNotFoundException e) {
+            LOG.error("Job failed: {}", e);
+            throw e;
+        } finally {
+            NutchJob.cleanupAfterFailure(tempDir, lock, fs);
+        }
 
         LOG.info("rename bwdb");
-        FileSystem fs = new JobClient(job).getFs();
         Path old = new Path(bwDb, "old");
         fs.delete(old, true);
         if (fs.exists(current)) {
@@ -245,8 +269,6 @@ public class BWInjector extends Configured implements Tool {
         fs.rename(newDb, current);
         fs.delete(old, true);
 
-        // clean up
-        fs.delete(tempDir, true);
         LOG.info("BWInjector: done");
     }
 

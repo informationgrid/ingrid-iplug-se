@@ -137,7 +137,7 @@ public class IndexerCmdLineTests {
         // inject start urls
         List<String> call = new ArrayList<String>();
         call.addAll(setUpBaseCall());
-        call.add("de.ingrid.iplug.se.nutch.fetcher.Fetcher");
+        call.add(org.apache.nutch.fetcher.Fetcher.class.getName());
         call.add("test/segments/" + directories[directories.length - 1]);
 
         executeCall(call);
@@ -478,7 +478,7 @@ public class IndexerCmdLineTests {
 
     private List<String> setUpBaseCall() {
 
-        String[] classPath = new String[] { "src/test/resources/conf", "build/apache-nutch-1.9/runtime/local", "build/apache-nutch-1.9/runtime/local/lib/*" };
+        String[] classPath = new String[] { "src/test/resources/conf", "build/apache-nutch-1.18/runtime/local", "build/apache-nutch-1.9/runtime/local/lib/*" };
 
         String cp = StringUtils.join(classPath, File.pathSeparator);
 

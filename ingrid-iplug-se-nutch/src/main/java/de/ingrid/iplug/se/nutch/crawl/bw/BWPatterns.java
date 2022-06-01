@@ -20,7 +20,7 @@
  * limitations under the Licence.
  * **************************************************#
  */
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -64,13 +64,13 @@ public class BWPatterns implements Writable {
 
     private List<Text> _negative;
 
-    private List<Pattern> _posPattern = new ArrayList<Pattern>();
+    private final List<Pattern> _posPattern = new ArrayList<>();
 
-    private List<Pattern> _negPattern = new ArrayList<Pattern>();
+    private final List<Pattern> _negPattern = new ArrayList<>();
 
     public BWPatterns(Text[] positivePatterns, Text[] negativePatterns) {
-        _positive = new ArrayList<Text>(Arrays.asList(positivePatterns));
-        _negative = new ArrayList<Text>(Arrays.asList(negativePatterns));
+        _positive = new ArrayList<>(Arrays.asList(positivePatterns));
+        _negative = new ArrayList<>(Arrays.asList(negativePatterns));
         syncPosPattern();
         syncNegPattern();
     }
@@ -124,7 +124,7 @@ public class BWPatterns implements Writable {
 
     public void readFields(DataInput in) throws IOException {
         int count = in.readInt();
-        _positive = new ArrayList<Text>(count);
+        _positive = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
             Text text = new Text();
             text.readFields(in);
@@ -132,7 +132,7 @@ public class BWPatterns implements Writable {
         }
         syncPosPattern();
         count = in.readInt();
-        _negative = new ArrayList<Text>(count);
+        _negative = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
             Text text = new Text();
             text.readFields(in);
@@ -142,7 +142,7 @@ public class BWPatterns implements Writable {
     }
 
     public boolean willPassBlackList(String url) {
-        if (_negPattern == null || _negPattern.size() == 0) {
+        if (_negPattern.size() == 0) {
             // there is no negative list, so every url will be accepted
             return true;
         }
@@ -157,8 +157,8 @@ public class BWPatterns implements Writable {
     }
 
     /**
-     * Returns <code>true</code> if <code>url</code> passes all positive
-     * patterns or if no positive pattern has been defined.
+     * Returns <code>true</code> if <code>url</code> passes any positive
+     * patterns.
      * 
      * A positive pattern MUST exist! Otherwise all BW entries with only
      * negative patterns will result in crawling outside the BW url space. (As a
@@ -166,11 +166,11 @@ public class BWPatterns implements Writable {
      * by negative bw patterns ;-).)
      * 
      * 
-     * @param url
-     * @return
+     * @param url An url.
+     * @return True or False
      */
     public boolean willPassWhiteList(String url) {
-        if (_posPattern == null || _posPattern.size() == 0) {
+        if (_posPattern.size() == 0) {
             // there is no positive list, so every url will be accepted
             if (LOG.isWarnEnabled()) {
                 // this should not be possible, see below
@@ -190,12 +190,12 @@ public class BWPatterns implements Writable {
     }
 
     /**
-     * Returns <code>true</code> if <code>url</code> passes all positive
-     * patterns AND does NOT pass all negative patterns OR if no positive
+     * Returns <code>true</code> if <code>url</code> passes any positive
+     * patterns AND does NOT pass any negative patterns AND positive
      * pattern has been defined.
      * 
-     * @param url
-     * @return
+     * @param url An URL.
+     * @return True or False
      */
     public boolean willPassBWLists(String url) {
         boolean ret = (willPassWhiteList(url) && willPassBlackList(url));
@@ -206,12 +206,12 @@ public class BWPatterns implements Writable {
     }
 
     private void dumpPatternsToLog() {
-        if (_posPattern != null && _posPattern.size() > 0) {
+        if (_posPattern.size() > 0) {
             for (Pattern pattern : _posPattern) {
                 LOG.info("BWPatterns: positive pattern: " + pattern.pattern());
             }
         }
-        if (_negPattern != null && _negPattern.size() > 0) {
+        if (_negPattern.size() > 0) {
             for (Pattern pattern : _negPattern) {
                 LOG.info("BWPatterns: negative pattern: " + pattern.pattern());
             }

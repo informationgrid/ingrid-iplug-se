@@ -27,6 +27,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -95,6 +97,15 @@ public class GenericNutchProcess extends NutchProcess {
 
         String[] nutchCall = new String[] { "-cp", cp };
         nutchCall = arrayConcat(nutchCall, javaOptions);
+        // Debug specific call
+        String debugOption = System.getProperty("debugNutchCall");
+        if (debugOption != null) {
+            Pattern pattern = Pattern.compile(debugOption);
+            Matcher matcher = pattern.matcher(commandAndOptions[0]);
+            if (matcher.find()) {
+                nutchCall = arrayConcat(nutchCall, new String[] { "-agentlib:jdwp=transport=dt_socket,address=7000,server=y,suspend=y" });
+            }
+        }
         nutchCall = arrayConcat(nutchCall, commandAndOptions);
 
         CommandLine cmdLine = new CommandLine(executable);

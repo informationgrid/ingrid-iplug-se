@@ -80,7 +80,8 @@ Adapt the file `ingrid-iplug-se-iplug/src/test/resources/elasticsearch.propertie
 Debugging a nutch process can be tricky because the processes are spawned from the main process. Do
 as follows:
 
-- Add -DdebugNutchCall=<TRAILING NUTCH PROCESS>, i.e. BWUpdateDb or see IngridCrawlNutchProcess.java
+- Add -DdebugNutchCall=\<REGEXP MATCHING THE NAME OF NUTCH PROCESS\>, i.e. "BWUpdateDb" or 
+  see IngridCrawlNutchProcess.java
 - The process will halt there until the remote debugger connects to port 7000
 
 

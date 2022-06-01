@@ -41,6 +41,7 @@ package de.ingrid.iplug.se.nutch.analysis;
 
 import crawlercommons.robots.BaseRobotRules;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
@@ -58,13 +59,16 @@ import org.apache.nutch.scoring.ScoringFilters;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.StringUtil;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Urls tester, useful for testing urls on crawlability.
  * 
  * @author joachim@wemove.com
  */
 
-public class UrlTester implements Tool {
+public class UrlTester extends Configured implements Tool {
 
     private Configuration conf;
 
@@ -98,7 +102,8 @@ public class UrlTester implements Tool {
         ProtocolFactory factory = new ProtocolFactory(conf);
         Protocol protocol = factory.getProtocol(url);
         Text turl = new Text(url);
-        BaseRobotRules rules = protocol.getRobotRules(turl, cd);
+        List<Content> robotsTxtContent = new ArrayList<Content>();
+        BaseRobotRules rules = protocol.getRobotRules(turl, cd, robotsTxtContent);
         long maxCrawlDelay = conf.getInt("fetcher.max.crawl.delay", 30) * 1000;
         if (!rules.isAllowed(turl.toString())) {
             System.out.println("Denied by robots.txt.");

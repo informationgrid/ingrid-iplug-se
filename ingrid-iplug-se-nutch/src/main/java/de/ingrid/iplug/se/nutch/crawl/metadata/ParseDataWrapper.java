@@ -20,7 +20,7 @@
  * limitations under the Licence.
  * **************************************************#
  */
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -48,18 +48,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.MapFileOutputFormat;
-import org.apache.hadoop.mapred.Mapper;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.SequenceFileInputFormat;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.MapFileOutputFormat;
 import org.apache.nutch.parse.ParseData;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
@@ -112,53 +110,57 @@ public class ParseDataWrapper extends Configured {
 
     }
 
-    public static class ParseDataWrapperMapper implements Mapper<Text, ParseData, HostType, UrlParseDataContainer> {
+    public static class ParseDataWrapperMapper extends Mapper<Text, ParseData, HostType, UrlParseDataContainer> {
 
         @Override
-        public void map(Text key, ParseData value, OutputCollector<HostType, UrlParseDataContainer> collector,
-                Reporter reporter) throws IOException {
+        public void map(Text key, ParseData value, Mapper<Text, ParseData, HostType, UrlParseDataContainer>.Context context) throws IOException, InterruptedException {
             String url = key.toString();
             String host = new URL(url).getHost();
             UrlParseDataContainer container = new UrlParseDataContainer(new Text(url), value);
             HostType hostType = new HostType(new Text(host), HostType.URL_PARSEDATA_CONTAINER);
-            collector.collect(hostType, container);
+            context.write(hostType, container);
         }
-
-        @Override
-        public void configure(JobConf arg0) {
-
-        }
-
-        @Override
-        public void close() throws IOException {
-
-        }
-
     }
 
     public ParseDataWrapper(Configuration conf) {
         super(conf);
     }
 
-    public void wrap(Path segment, Path out) throws IOException {
+    public void wrap(Path segment, Path out) throws IOException, InterruptedException, ClassNotFoundException {
 
-        JobConf job = new NutchJob(getConf());
+        Configuration conf = getConf();
+        FileSystem fs = FileSystem.get(conf);
+
+        Job job = NutchJob.getInstance(conf);
         job.setJobName("wrap parse data from segment: " + segment);
 
-        job.setInputFormat(SequenceFileInputFormat.class);
+        job.setInputFormatClass(SequenceFileInputFormat.class);
 
         FileInputFormat.addInputPath(job, new Path(segment, ParseData.DIR_NAME));
 
         job.setMapperClass(ParseDataWrapperMapper.class);
 
         FileOutputFormat.setOutputPath(job, out);
-        job.setOutputFormat(MapFileOutputFormat.class);
+        job.setOutputFormatClass(MapFileOutputFormat.class);
         job.setOutputKeyClass(HostType.class);
         job.setOutputValueClass(UrlParseDataContainer.class);
-        JobClient.runJob(job);
+        try {
+            boolean success = job.waitForCompletion(true);
+            if (!success) {
+                String message = "Job did not succeed, job status:"
+                        + job.getStatus().getState() + ", reason: "
+                        + job.getStatus().getFailureInfo();
+                LOG.error(message);
+                throw new RuntimeException(message);
+            }
+        } catch (IOException | InterruptedException | ClassNotFoundException e) {
+            LOG.error("Job failed: {}", e);
+            fs.delete(out, true);
+            throw e;
+        }
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
         Configuration configuration = NutchConfiguration.create();
         ParseDataWrapper wrapper = new ParseDataWrapper(configuration);
         wrapper.wrap(new Path(args[0]), new Path(args[1]));

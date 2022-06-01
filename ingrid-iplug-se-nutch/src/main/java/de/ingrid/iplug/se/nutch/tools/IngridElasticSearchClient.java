@@ -24,6 +24,7 @@ package de.ingrid.iplug.se.nutch.tools;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.nutch.indexer.IndexWriterParams;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
@@ -41,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.*;
 
 public class IngridElasticSearchClient {
 
@@ -51,8 +53,6 @@ public class IngridElasticSearchClient {
 
     private Client client;
     private String instanceIndex;
-
-    private Configuration config;
 
     private BulkRequestBuilder bulk;
     private ActionFuture<BulkResponse> execute = null;
@@ -66,28 +66,47 @@ public class IngridElasticSearchClient {
     private int bulkLength = 0;
     private boolean createNewBulk = false;
 
-    private String type = "default";
+    private final String type = "default";
+
+    private IndexWriterParams params = null;
+
 
     public IngridElasticSearchClient(Configuration conf) throws IOException {
-        this.config = conf;
 
-        clusterName = config.get(ElasticConstants.CLUSTER);
+        this.params = new IndexWriterParams(new HashMap<>());
+
+        Iterator<Map.Entry<String, String>> it = conf.iterator();
+
+        while(it.hasNext()) {
+            Map.Entry<String, String> entry = it.next();
+            this.params.put(entry.getKey(), entry.getValue());
+        }
+
+        init(this.params);
+    }
+
+    public IngridElasticSearchClient(IndexWriterParams parameters ) throws IOException {
+        if (this.params == null) {
+            init(parameters);
+        }
+    }
+
+
+    private void init( IndexWriterParams parameters ) throws IOException {
+        this.clusterName = parameters.get(ElasticConstants.CLUSTER);
         if (clusterName == null) LOG.warn( "No cluster name specified! If node cannot be found, then we might search in the wrong cluster." );
 
-        host = config.get(ElasticConstants.HOST);
-        port = config.getInt(ElasticConstants.PORT, 9300);
+        this.host = parameters.get(ElasticConstants.HOST);
+        this.port = parameters.getInt(ElasticConstants.PORT, 9300);
 
-//        type = config.get(ElasticConstants.TYPE, "default");
-
-        Settings.Builder settingsBuilder = Settings.builder(); // .loadFromPath()classLoader(Settings.class.getClassLoader());
-
-        BufferedReader reader = new BufferedReader(config.getConfResourceAsReader("elasticsearch.conf"));
+        Settings.Builder settingsBuilder = Settings.builder();
+        BufferedReader reader = new BufferedReader(new Configuration().getConfResourceAsReader("elasticsearch.conf"));
         String line;
-        String parts[];
+        String[] parts;
 
         while ((line = reader.readLine()) != null) {
             if (StringUtils.isNotBlank(line) && !line.startsWith("#")) {
-                line.trim();
+                line = line.trim();
                 parts = line.split("=");
 
                 if (parts.length == 2) {
@@ -112,9 +131,10 @@ public class IngridElasticSearchClient {
         }
 
         bulk = client.prepareBulk();
-        instanceIndex = config.get(ElasticConstants.INDEX, "nutch");
-        maxBulkDocs = config.getInt(ElasticConstants.MAX_BULK_DOCS, DEFAULT_MAX_BULK_DOCS);
-        maxBulkLength = config.getInt(ElasticConstants.MAX_BULK_LENGTH, DEFAULT_MAX_BULK_LENGTH);
+
+        instanceIndex = parameters.get(ElasticConstants.INDEX, "nutch");
+        maxBulkDocs = parameters.getInt(ElasticConstants.MAX_BULK_DOCS, DEFAULT_MAX_BULK_DOCS);
+        maxBulkLength = parameters.getInt(ElasticConstants.MAX_BULK_LENGTH, DEFAULT_MAX_BULK_LENGTH);
     }
 
     public void addRequest(IndexRequestBuilder request, int size) throws IOException {
@@ -184,7 +204,7 @@ public class IngridElasticSearchClient {
         client.close();
     }
 
-    private void checkNewBulk() throws IOException {
+    private void checkNewBulk() {
         indexedDocs++;
         bulkDocs++;
 
@@ -195,15 +215,23 @@ public class IngridElasticSearchClient {
         }
     }
 
-    public String describe() {
-        StringBuffer sb = new StringBuffer("ElasticIndexWriter\n");
-        sb.append("\t").append(ElasticConstants.CLUSTER).append(" : elastic prefix cluster\n");
-        sb.append("\t").append(ElasticConstants.HOST).append(" : " + host + "\n");
-        sb.append("\t").append(ElasticConstants.PORT).append(" : " + port + "\n");
-        sb.append("\t").append(ElasticConstants.INDEX).append(" : " + instanceIndex + "\n");
-        sb.append("\t").append(ElasticConstants.MAX_BULK_DOCS).append(" : " + maxBulkDocs + " (default 250) \n");
-        sb.append("\t").append(ElasticConstants.MAX_BULK_LENGTH).append(" : " + maxBulkLength + " (default 2500500 ~2.5MB)\n");
-        return sb.toString();
+    public Map<String, Map.Entry<String, Object>> describe() {
+        Map<String, Map.Entry<String, Object>> properties = new LinkedHashMap<>();
+
+        properties.put(ElasticConstants.CLUSTER,
+                new AbstractMap.SimpleEntry<>("elastic prefix cluster.", clusterName));
+        properties.put(ElasticConstants.HOST,
+                new AbstractMap.SimpleEntry<>("Name of ElasticSearch host.",host));
+        properties.put(ElasticConstants.PORT,
+                new AbstractMap.SimpleEntry<>("The port to connect to elastic server.",port));
+        properties.put(ElasticConstants.INDEX,
+                new AbstractMap.SimpleEntry<>("Default index to send documents to.",instanceIndex));
+        properties.put(ElasticConstants.MAX_BULK_DOCS,
+                new AbstractMap.SimpleEntry<>("Maximum size of the bulk in number of documents (default 250).",maxBulkDocs));
+        properties.put(ElasticConstants.MAX_BULK_LENGTH,
+                new AbstractMap.SimpleEntry<>("Maximum size of the bulk in bytes. (default 2500500 ~2.5MB).",maxBulkLength));
+
+        return properties;
     }
 
 }

@@ -20,7 +20,7 @@
  * limitations under the Licence.
  * **************************************************#
  */
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -45,7 +45,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -58,18 +57,11 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.ObjectWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.MapFileOutputFormat;
-import org.apache.hadoop.mapred.Mapper;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.RecordWriter;
-import org.apache.hadoop.mapred.Reducer;
-import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.SequenceFileInputFormat;
-import org.apache.hadoop.util.Progressable;
+import org.apache.hadoop.mapreduce.*;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.MapFileOutputFormat;
 import org.apache.hadoop.util.StringUtils;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
@@ -91,22 +83,12 @@ public class BWUpdateDb extends Configured implements Tool {
 
     public static final Log LOG = LogFactory.getLog(BWUpdateDb.class);
 
-    public static class ObjectWritableMapper implements Mapper<HostTypeKey, Writable, HostTypeKey, ObjectWritable> {
+    public static class ObjectWritableMapper extends Mapper<HostTypeKey, Writable, HostTypeKey, ObjectWritable> {
 
         @Override
-        public void map(HostTypeKey key, Writable value, OutputCollector<HostTypeKey, ObjectWritable> collector, Reporter reporter) throws IOException {
+        public void map(HostTypeKey key, Writable value, Mapper<HostTypeKey, Writable, HostTypeKey, ObjectWritable>.Context context) throws IOException, InterruptedException {
             ObjectWritable objectWritable = new ObjectWritable(value);
-            collector.collect(key, objectWritable);
-        }
-
-        @Override
-        public void configure(JobConf jobConf) {
-
-        }
-
-        @Override
-        public void close() throws IOException {
-
+            context.write(key, objectWritable);
         }
 
     }
@@ -151,7 +133,7 @@ public class BWUpdateDb extends Configured implements Tool {
      * Wraps url and crawlDatum into Entry wrapper and assiociate it with a
      * {@link HostTypeKey}
      */
-    public static class BWMapper implements Mapper<Text, CrawlDatum, HostTypeKey, Entry> {
+    public static class BWMapper extends Mapper<Text, CrawlDatum, HostTypeKey, Entry> {
 
         public static final String URL_FILTERING = "bwupdatedb.url.filters";
 
@@ -170,7 +152,7 @@ public class BWUpdateDb extends Configured implements Tool {
         private String scope;
 
         @Override
-        public void map(Text key, CrawlDatum value, OutputCollector<HostTypeKey, Entry> out, Reporter rep) throws IOException {
+        public void map(Text key, CrawlDatum value, Mapper<Text, CrawlDatum, HostTypeKey, Entry>.Context context) throws IOException, InterruptedException {
 
             String url = key.toString();
             if (urlNormalizers) {
@@ -193,23 +175,23 @@ public class BWUpdateDb extends Configured implements Tool {
             if (url != null) { // if it passes
                 String host = new URL(url).getHost();
                 Entry entry = new Entry(key, value);
-                out.collect(new HostTypeKey(host, HostTypeKey.CRAWL_DATUM_TYPE), entry);
+                context.write(new HostTypeKey(host, HostTypeKey.CRAWL_DATUM_TYPE), entry);
             }
         }
 
-        public void configure(JobConf job) {
-            urlFiltering = job.getBoolean(URL_FILTERING, false);
-            urlNormalizers = job.getBoolean(URL_NORMALIZING, false);
+        @Override
+        protected void setup(Mapper<Text, CrawlDatum, HostTypeKey, Entry>.Context context) throws IOException, InterruptedException {
+            super.setup(context);
+            Configuration conf = context.getConfiguration();
+            urlFiltering = conf.getBoolean(URL_FILTERING, false);
+            urlNormalizers = conf.getBoolean(URL_NORMALIZING, false);
             if (urlFiltering) {
-                filters = new URLFilters(job);
+                filters = new URLFilters(conf);
             }
             if (urlNormalizers) {
-                scope = job.get(URL_NORMALIZING_SCOPE, InGridURLNormalizers.SCOPE_BWDB);
-                normalizers = new URLNormalizers(job, scope);
+                scope = conf.get(URL_NORMALIZING_SCOPE, InGridURLNormalizers.SCOPE_BWDB);
+                normalizers = new URLNormalizers(conf, scope);
             }
-        }
-
-        public void close() throws IOException {
         }
 
     }
@@ -218,20 +200,21 @@ public class BWUpdateDb extends Configured implements Tool {
      * Collects only entries that match a white list entry and no black list
      * entry
      */
-    public static class BwReducer implements Reducer<HostTypeKey, ObjectWritable, HostTypeKey, ObjectWritable> {
+    public static class BwReducer extends Reducer<HostTypeKey, ObjectWritable, HostTypeKey, ObjectWritable> {
 
         private BWPatterns _patterns;
 
-        public void reduce(HostTypeKey key, Iterator<ObjectWritable> values, OutputCollector<HostTypeKey, ObjectWritable> out, Reporter report) throws IOException {
+        @Override
+        public void reduce(HostTypeKey key, Iterable<ObjectWritable> values, Reducer<HostTypeKey, ObjectWritable, HostTypeKey, ObjectWritable>.Context context) throws IOException, InterruptedException {
 
-            while (values.hasNext()) {
-                ObjectWritable objectWritable = (ObjectWritable) values.next();
+            for (ObjectWritable objectWritable : values) {
                 Object value = objectWritable.get(); // unwrap
 
                 if (value instanceof BWPatterns) {
                     _patterns = (BWPatterns) value;
                     // next values should be a list of entries
-                    return;
+                    //return;
+                    continue;
                 }
 
                 if (_patterns == null) {
@@ -249,7 +232,7 @@ public class BWUpdateDb extends Configured implements Tool {
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("BW patterns passed for url: " + (((Entry) value)._url).toString() + " for HostTypeKey: " + key.toString());
                     }
-                    out.collect(key, objectWritable);
+                    context.write(key, objectWritable);
                 } else {
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("BW patterns NOT passed for url: " + (((Entry) value)._url).toString() + " for HostTypeKey: " + key.toString());
@@ -259,12 +242,6 @@ public class BWUpdateDb extends Configured implements Tool {
             }
         }
 
-        public void configure(JobConf arg0) {
-        }
-
-        public void close() throws IOException {
-        }
-
     }
 
     /**
@@ -272,32 +249,37 @@ public class BWUpdateDb extends Configured implements Tool {
      * does not support, different key:values between mapper and reducer in the
      * same job
      */
-    public static class FormatConverter implements Mapper<HostTypeKey, ObjectWritable, Text, CrawlDatum> {
+    public static class FormatConverter extends Mapper<HostTypeKey, ObjectWritable, Text, CrawlDatum> {
 
-        public void map(HostTypeKey key, ObjectWritable value, OutputCollector<Text, CrawlDatum> out, Reporter rep) throws IOException {
+        public void map(HostTypeKey key, ObjectWritable value, Mapper<HostTypeKey, ObjectWritable, Text, CrawlDatum>.Context context) throws IOException, InterruptedException {
             Entry entry = (Entry) value.get();
-            out.collect(entry._url, entry._crawlDatum);
-        }
-
-        public void configure(JobConf job) {
-        }
-
-        public void close() throws IOException {
+            context.write(entry._url, entry._crawlDatum);
         }
     }
 
     public static class BWDbCsvOutputFormat extends FileOutputFormat<HostTypeKey, BWPatterns> {
-        protected static class LineRecordWriter implements RecordWriter<HostTypeKey, BWPatterns> {
-            private DataOutputStream out;
+        @Override
+        public RecordWriter<HostTypeKey, BWPatterns> getRecordWriter(TaskAttemptContext taskAttemptContext) throws IOException, InterruptedException {
+            Path dir = FileOutputFormat.getOutputPath(taskAttemptContext);
+            FileSystem fs = FileSystem.get(taskAttemptContext.getConfiguration());
+
+            DataOutputStream fileOut = fs.create(new Path(dir.toString(), taskAttemptContext.getJobName()), taskAttemptContext);
+            return new LineRecordWriter(fileOut);
+        }
+
+        protected static class LineRecordWriter extends RecordWriter<HostTypeKey, BWPatterns> {
+            private final DataOutputStream out;
 
             public LineRecordWriter(DataOutputStream out) {
                 this.out = out;
                 try {
                     out.writeBytes("Black/White list database dump\n");
                 } catch (IOException e) {
+                    LOG.error("Error opening output stream", e);
                 }
             }
 
+            @Override
             public synchronized void write(HostTypeKey key, BWPatterns value) throws IOException {
                 out.writeByte('"');
                 out.writeBytes(key.toString());
@@ -318,20 +300,11 @@ public class BWUpdateDb extends Configured implements Tool {
                 out.writeByte('\n');
             }
 
-            public synchronized void close(Reporter reporter) throws IOException {
+            @Override
+            public synchronized void close(TaskAttemptContext ctx) throws IOException {
                 out.close();
             }
         }
-
-        public RecordWriter<HostTypeKey, BWPatterns> getRecordWriter(FileSystem fs, JobConf job, String name, Progressable progress) throws IOException {
-            Path dir = FileOutputFormat.getOutputPath(job);
-            DataOutputStream fileOut = fs.create(new Path(dir, name), progress);
-            return new LineRecordWriter(fileOut);
-        }
-    }
-
-    public BWUpdateDb(Configuration conf) {
-        super(conf);
     }
 
     public BWUpdateDb() {
@@ -339,7 +312,7 @@ public class BWUpdateDb extends Configured implements Tool {
 
     // TODO use normalize and filter inside the bw-job? and not only in the
     // crawldb-job.
-    public void update(Path crawlDb, Path bwdb, Path[] segments, boolean normalize, boolean filter) throws IOException {
+    public void update(Path crawlDb, Path bwdb, Path[] segments, boolean normalize, boolean filter) throws IOException, InterruptedException, ClassNotFoundException {
         LOG.info("bw update: starting");
         LOG.info("bw update: db: " + crawlDb);
         LOG.info("bw update: bwdb: " + bwdb);
@@ -347,71 +320,125 @@ public class BWUpdateDb extends Configured implements Tool {
 
         // wrapping
         LOG.info("bw update: wrapping started.");
+        Configuration conf = getConf();
+        FileSystem fs = FileSystem.get(conf);
+
         String name = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
         Path wrappedSegOutput = new Path(crawlDb, name);
 
-        JobConf job = new NutchJob(getConf());
+        Job job = NutchJob.getInstance(conf);
+        Configuration jobConf = job.getConfiguration();
         job.setJobName("bw update: wrap segment: " + Arrays.asList(segments));
 
-        job.setInputFormat(SequenceFileInputFormat.class);
+        job.setInputFormatClass(SequenceFileInputFormat.class);
 
         for (Path segment : segments) {
-            FileInputFormat.addInputPath(job, new Path(segment, CrawlDatum.FETCH_DIR_NAME));
-            FileInputFormat.addInputPath(job, new Path(segment, CrawlDatum.PARSE_DIR_NAME));
+            FileSystem sfs = segment.getFileSystem(conf);
+            Path fetch = new Path(segment, CrawlDatum.FETCH_DIR_NAME);
+            Path parse = new Path(segment, CrawlDatum.PARSE_DIR_NAME);
+            if (sfs.exists(fetch)) {
+                FileInputFormat.addInputPath(job, fetch);
+                if (sfs.exists(parse)) {
+                    FileInputFormat.addInputPath(job, parse);
+                } else {
+                    LOG.info(" - adding fetched but unparsed segment " + segment);
+                }
+            } else {
+                LOG.info(" - skipping invalid segment " + segment);
+            }
         }
 
         job.setMapperClass(BWMapper.class);
 
         FileOutputFormat.setOutputPath(job, wrappedSegOutput);
-        job.setOutputFormat(MapFileOutputFormat.class);
+        job.setOutputFormatClass(MapFileOutputFormat.class);
         job.setOutputKeyClass(HostTypeKey.class);
         job.setOutputValueClass(Entry.class);
-        job.setBoolean(BWMapper.URL_FILTERING, filter);
-        job.setBoolean(BWMapper.URL_NORMALIZING, normalize);
-        JobClient.runJob(job);
+        jobConf.setBoolean(BWMapper.URL_FILTERING, filter);
+        jobConf.setBoolean(BWMapper.URL_NORMALIZING, normalize);
+        try {
+            boolean success = job.waitForCompletion(true);
+            if (!success) {
+                String message = "Job did not succeed, job status:"
+                        + job.getStatus().getState() + ", reason: "
+                        + job.getStatus().getFailureInfo();
+                LOG.error(message);
+                throw new RuntimeException(message);
+            }
+        } catch (IOException | InterruptedException | ClassNotFoundException e) {
+            LOG.error("Job failed: {}", e);
+            fs.delete(wrappedSegOutput, true);
+            throw e;
+        }
 
         // filtering
         LOG.info("bw update: filtering started.");
         name = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
         Path tmpMergedDb = new Path(crawlDb, name);
-        JobConf filterJob = new NutchJob(getConf());
+        Job filterJob = NutchJob.getInstance(conf);
         filterJob.setJobName("filtering: " + wrappedSegOutput + bwdb);
-        filterJob.setInputFormat(SequenceFileInputFormat.class);
+        filterJob.setInputFormatClass(SequenceFileInputFormat.class);
 
         FileInputFormat.addInputPath(filterJob, wrappedSegOutput);
-        FileInputFormat.addInputPath(filterJob, new Path(bwdb, "current"));
+        Path current = new Path(bwdb, "current");
+        FileInputFormat.addInputPath(filterJob, current);
         FileOutputFormat.setOutputPath(filterJob, tmpMergedDb);
         filterJob.setMapperClass(ObjectWritableMapper.class);
         filterJob.setReducerClass(BwReducer.class);
-        filterJob.setOutputFormat(MapFileOutputFormat.class);
+        filterJob.setOutputFormatClass(MapFileOutputFormat.class);
         filterJob.setOutputKeyClass(HostTypeKey.class);
         filterJob.setOutputValueClass(ObjectWritable.class);
-        JobClient.runJob(filterJob);
-
-        // remove wrappedSegOutput
-        FileSystem.get(job).delete(wrappedSegOutput, true);
+        Path lock = CrawlDb.lock(conf, current, false);
+        try {
+            boolean success = filterJob.waitForCompletion(true);
+            if (!success) {
+                String message = "Job did not succeed, job status:"
+                        + filterJob.getStatus().getState() + ", reason: "
+                        + filterJob.getStatus().getFailureInfo();
+                LOG.error(message);
+                throw new RuntimeException(message);
+            }
+        } catch (IOException | InterruptedException | ClassNotFoundException e) {
+            LOG.error("Job failed: {}", e);
+            throw e;
+        } finally {
+            NutchJob.cleanupAfterFailure(wrappedSegOutput, lock, fs);
+        }
 
         // convert formats
         LOG.info("bw update: converting started.");
         name = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
         Path tmpFormatOut = new Path(crawlDb, name);
-        JobConf convertJob = new NutchJob(getConf());
+        Job convertJob = NutchJob.getInstance(conf);
         convertJob.setJobName("format converting: " + tmpMergedDb);
         FileInputFormat.addInputPath(convertJob, tmpMergedDb);
-        convertJob.setInputFormat(SequenceFileInputFormat.class);
+        convertJob.setInputFormatClass(SequenceFileInputFormat.class);
         convertJob.setMapperClass(FormatConverter.class);
         FileOutputFormat.setOutputPath(convertJob, tmpFormatOut);
-        convertJob.setOutputFormat(MapFileOutputFormat.class);
+        convertJob.setOutputFormatClass(MapFileOutputFormat.class);
         convertJob.setOutputKeyClass(Text.class);
         convertJob.setOutputValueClass(CrawlDatum.class);
-        JobClient.runJob(convertJob);
+        lock = CrawlDb.lock(conf, tmpMergedDb, false);
+        try {
+            boolean success = convertJob.waitForCompletion(true);
+            if (!success) {
+                String message = "Job did not succeed, job status:"
+                        + convertJob.getStatus().getState() + ", reason: "
+                        + convertJob.getStatus().getFailureInfo();
+                LOG.error(message);
+                throw new RuntimeException(message);
+            }
+        } catch (IOException | InterruptedException | ClassNotFoundException e) {
+            LOG.error("Job failed: {}", e);
+            throw e;
+        } finally {
+            NutchJob.cleanupAfterFailure(tmpMergedDb, lock, fs);
+        }
 
         //
-        FileSystem.get(job).delete(tmpMergedDb, true);
-
-        JobConf updateJob = CrawlDb.createJob(getConf(), crawlDb);
-        boolean additionsAllowed = getConf().getBoolean(CrawlDb.CRAWLDB_ADDITIONS_ALLOWED, true);
-        updateJob.setBoolean(CrawlDb.CRAWLDB_ADDITIONS_ALLOWED, additionsAllowed);
+        Job updateJob = CrawlDb.createJob(conf, crawlDb);
+        boolean additionsAllowed = conf.getBoolean(CrawlDb.CRAWLDB_ADDITIONS_ALLOWED, true);
+        updateJob.getConfiguration().setBoolean(CrawlDb.CRAWLDB_ADDITIONS_ALLOWED, additionsAllowed);
         // do not filter/normalize URLs from crawl db again. Presume all
         // urls in crawldb are filtered/normalized
         // joachim@wemove.com at 27.05.2010
@@ -420,8 +447,22 @@ public class BWUpdateDb extends Configured implements Tool {
 
         FileInputFormat.addInputPath(updateJob, tmpFormatOut);
         LOG.info("bw update: Merging bw filtered segment data into db.");
-        JobClient.runJob(updateJob);
-        FileSystem.get(job).delete(tmpFormatOut, true);
+        lock = CrawlDb.lock(conf, crawlDb, false);
+        try {
+            boolean success = updateJob.waitForCompletion(true);
+            if (!success) {
+                String message = "Job did not succeed, job status:"
+                        + updateJob.getStatus().getState() + ", reason: "
+                        + updateJob.getStatus().getFailureInfo();
+                LOG.error(message);
+                throw new RuntimeException(message);
+            }
+        } catch (IOException | InterruptedException | ClassNotFoundException e) {
+            LOG.error("Job failed: {}", e);
+            throw e;
+        } finally {
+            NutchJob.cleanupAfterFailure(tmpFormatOut, lock, fs);
+        }
 
         LOG.info("install crawldb");
         CrawlDb.install(updateJob, crawlDb);
@@ -429,7 +470,7 @@ public class BWUpdateDb extends Configured implements Tool {
 
     }
 
-    public void processDumpJob(String bwDb, String output, Configuration config) throws IOException {
+    public void processDumpJob(String bwDb, String output, Configuration config) throws IOException, InterruptedException, ClassNotFoundException {
 
         if (LOG.isInfoEnabled()) {
             LOG.info("BWDb dump: starting");
@@ -438,18 +479,31 @@ public class BWUpdateDb extends Configured implements Tool {
 
         Path outFolder = new Path(output);
 
-        JobConf job = new NutchJob(config);
+        Job job = NutchJob.getInstance(config);
         job.setJobName("dump " + bwDb);
 
         FileInputFormat.addInputPath(job, new Path(bwDb, CrawlDb.CURRENT_NAME));
-        job.setInputFormat(SequenceFileInputFormat.class);
+        job.setInputFormatClass(SequenceFileInputFormat.class);
 
         FileOutputFormat.setOutputPath(job, outFolder);
-        job.setOutputFormat(BWDbCsvOutputFormat.class);
+        job.setOutputFormatClass(BWDbCsvOutputFormat.class);
         job.setOutputKeyClass(HostTypeKey.class);
         job.setOutputValueClass(BWPatterns.class);
 
-        JobClient.runJob(job);
+        try {
+            boolean success = job.waitForCompletion(true);
+            if (!success) {
+                String message = "Job did not succeed, job status:"
+                        + job.getStatus().getState() + ", reason: "
+                        + job.getStatus().getFailureInfo();
+                LOG.error(message);
+                throw new RuntimeException(message);
+            }
+        } catch (IOException | InterruptedException | ClassNotFoundException e) {
+            LOG.error("Job failed: {}", e);
+            throw e;
+        }
+
         if (LOG.isInfoEnabled()) {
             LOG.info("BWDb dump: done");
         }
@@ -472,7 +526,7 @@ public class BWUpdateDb extends Configured implements Tool {
             if (args[1].equals("-dump")) {
                 processDumpJob(args[0], args[2], getConf());
             } else {
-                update(new Path(args[0]), new Path(args[1]), new Path[] { new Path(args[2]) }, Boolean.valueOf(args[3]), Boolean.valueOf(args[4]));
+                update(new Path(args[0]), new Path(args[1]), new Path[] { new Path(args[2]) }, Boolean.parseBoolean(args[3]), Boolean.parseBoolean(args[4]));
             }
 
             return 0;

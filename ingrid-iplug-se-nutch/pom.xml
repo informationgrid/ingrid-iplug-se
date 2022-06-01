@@ -15,19 +15,33 @@
     <dependencies>
       <dependency>
         <groupId>org.apache.hadoop</groupId>
-        <artifactId>hadoop-core</artifactId>
-        <version>1.2.1</version>
+        <artifactId>hadoop-common</artifactId>
+        <version>3.1.3</version>
       </dependency>
       <dependency>
         <groupId>org.apache.hadoop</groupId>
-        <artifactId>hadoop-test</artifactId>
-        <version>1.2.1</version>
+        <artifactId>hadoop-hdfs</artifactId>
+        <version>3.1.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.hadoop</groupId>
+        <artifactId>hadoop-mapreduce-client-core</artifactId>
+        <version>3.1.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.hadoop</groupId>
+        <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+        <version>3.1.3</version>
+      </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-all</artifactId>
+        <version>4.1.32.Final</version>
       </dependency>
       <dependency>
         <groupId>xerces</groupId>
         <artifactId>xercesImpl</artifactId>
-        <version>2.12.0</version>
-        <scope>compile</scope>
+        <version>2.12.1</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -44,7 +58,7 @@
     <dependency>
       <groupId>org.apache.nutch</groupId>
       <artifactId>nutch</artifactId>
-      <version>1.9</version>
+      <version>1.18</version>
       <!-- O <exclusions><exclusion><groupId>xerces</groupId><artifactId>xercesImpl</artifactId></exclusion></exclusions>-->
     </dependency>
     <!-- nutch plugin dependencies -->
@@ -68,9 +82,9 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
-      <version>3.2.2</version>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-collections4</artifactId>
+      <version>4.4</version>
       <optional>true</optional>
     </dependency>
     <dependency>
@@ -82,12 +96,12 @@
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
-      <version>1.6</version>
+      <version>1.15</version>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-core</artifactId>
+      <artifactId>hadoop-common</artifactId>
       <optional>true</optional>
       <exclusions>
         <exclusion>
@@ -102,18 +116,57 @@
           <groupId>javax.xml.stream</groupId>
           <artifactId>stax-api</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>hsqldb</groupId>
+          <artifactId>hsqldb</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>net.sf.kosmosfs</groupId>
+          <artifactId>kfs</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>net.java.dev.jets3t</groupId>
+          <artifactId>jets3t</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.eclipse.jdt</groupId>
+          <artifactId>core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.mortbay.jetty</groupId>
+          <artifactId>jsp-*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>ant</groupId>
+          <artifactId>ant</artifactId>
+        </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-hdfs</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-mapreduce-client-core</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-core</artifactId>
-      <version>1.22</version>
+      <version>1.25</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>com.ibm.icu</groupId>
       <artifactId>icu4j</artifactId>
-      <version>4.0.1</version>
+      <version>68.2</version>
       <scope>compile</scope>
     </dependency>
     <!-- <dependency><groupId>xerces</groupId><artifactId>xercesImpl</artifactId><version>2.12.0</version><scope>compile</scope></dependency><dependency><groupId>xerces</groupId><artifactId>xmlParserAPIs</artifactId><version>2.6.2</version><scope>compile</scope></dependency>-->
@@ -126,24 +179,19 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>11.0.2</version>
+      <version>30.1-jre</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>com.google.code.crawler-commons</groupId>
+      <groupId>com.github.crawler-commons</groupId>
       <artifactId>crawler-commons</artifactId>
-      <version>0.4</version>
+      <version>1.1</version>
       <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-test</artifactId>
-      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.mortbay.jetty</groupId>
       <artifactId>jetty-client</artifactId>
-      <version>6.1.22</version>
+      <version>6.1.26</version>
       <optional>true</optional>
       <exclusions>
         <exclusion>
@@ -229,12 +277,9 @@
               <sources>
                 <source>ingrid-nutch-plugins/analysis-de/src/java</source>
                 <source>ingrid-nutch-plugins/analysis-fr/src/java</source>
-                <source>ingrid-nutch-plugins/indexer-ingrid/src/java</source>
                 <source>ingrid-nutch-plugins/ingrid-language-identifier/src/java</source>
                 <source>ingrid-nutch-plugins/ingrid-indexer-elastic/src/java</source>
                 <source>ingrid-nutch-plugins/scoring-ingrid/src/java</source>
-                <source>ingrid-nutch-plugins/ingrid-lib-http/src/java</source>
-                <source>ingrid-nutch-plugins/ingrid-protocol-httpclient/src/java</source>
               </sources>
             </configuration>
           </execution>

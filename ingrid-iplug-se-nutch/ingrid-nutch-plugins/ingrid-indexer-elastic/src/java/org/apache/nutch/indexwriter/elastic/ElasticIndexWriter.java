@@ -21,8 +21,8 @@ import de.ingrid.iplug.se.nutch.tools.IBusElasticsearchClient;
 import de.ingrid.iplug.se.nutch.tools.IngridElasticSearchClient;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.mapred.JobConf;
 import org.apache.nutch.indexer.IndexWriter;
+import org.apache.nutch.indexer.IndexWriterParams;
 import org.apache.nutch.indexer.NutchDocument;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
@@ -31,10 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  */
@@ -46,20 +43,33 @@ public class ElasticIndexWriter implements IndexWriter {
     private IngridElasticSearchClient client = null;
     private IBusElasticsearchClient clientiBus = null;
 
-    private Map<String, Object> dependingFieldsMap = new HashMap<>();
+    private final Map<String, Object> dependingFieldsMap = new HashMap<>();
     private boolean useIBusCommunication;
 
     @Override
-    public void open(JobConf job, String name) throws IOException {
+    public void open(Configuration conf, String name) throws IOException {
         if (useIBusCommunication) {
             try {
-                clientiBus = new IBusElasticsearchClient(job);
+                clientiBus = new IBusElasticsearchClient(conf);
             } catch (Exception e) {
                 LOG.error("Error initializing IBusElasticsearchClient", e);
                 throw new RuntimeException(e);
             }
         }
-        client = new IngridElasticSearchClient( job );
+        client = new IngridElasticSearchClient( conf );
+    }
+
+    /**
+     * Initializes the internal variables from a given index writer configuration.
+     *
+     * @param parameters
+     *          Params from the index writer configuration.
+     * @throws IOException
+     *           Some exception thrown by writer.
+     */
+    @Override
+    public void open(IndexWriterParams parameters) throws IOException {
+        // unused
     }
 
     @Override
@@ -90,8 +100,12 @@ public class ElasticIndexWriter implements IndexWriter {
                 if (fieldName.equalsIgnoreCase("boost")) {
                     source.put("doc_boost", doc.getField(fieldName).getValues());
                 }
-                source.put(fieldName, doc.getFieldValue(fieldName));
-                requestLength += doc.getFieldValue(fieldName).toString().length();
+
+                Object val = doc.getFieldValue(fieldName);
+                if (val != null) {
+                    source.put(fieldName, doc.getFieldValue(fieldName));
+                    requestLength += doc.getFieldValue(fieldName).toString().length();
+                }
             }
         }
 
@@ -237,9 +251,7 @@ public class ElasticIndexWriter implements IndexWriter {
     }
 
     public static IOException makeIOException(ElasticsearchException e) {
-        final IOException ioe = new IOException();
-        ioe.initCause( e );
-        return ioe;
+        return new IOException(e);
     }
 
     @Override
@@ -269,19 +281,27 @@ public class ElasticIndexWriter implements IndexWriter {
     }
 
     @Override
-    public String describe() {
+    public Map<String, Map.Entry<String, Object>> describe() {
+        Map<String, Map.Entry<String, Object>> properties = new LinkedHashMap<>();
 
         if (useIBusCommunication) {
-            return "Using iBus communication for Elasticsearch operations";
+            properties.put("description",
+                    new AbstractMap.SimpleEntry<>(
+                            "Using iBus communication for Elasticsearch operations.",
+                            ""));
         } else {
             if (client != null) {
                 return client.describe();
             } else {
-                return "not initialized yet.";
+                properties.put("description",
+                        new AbstractMap.SimpleEntry<>(
+                                "not initialized yet.",
+                                ""));
             }
         }
-
+        return properties;
     }
+
 
     @Override
     public void setConf(Configuration conf) {

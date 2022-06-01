@@ -39,10 +39,12 @@ import org.apache.hadoop.util.ToolRunner;
 import org.apache.nutch.crawl.Generator;
 import org.apache.nutch.crawl.Injector;
 import org.apache.nutch.crawl.LinkDb;
+import org.apache.nutch.fetcher.Fetcher;
 import org.apache.nutch.indexer.IndexingJob;
 import org.apache.nutch.scoring.webgraph.LinkRank;
 import org.apache.nutch.scoring.webgraph.ScoreUpdater;
 import org.apache.nutch.scoring.webgraph.WebGraph;
+import org.apache.nutch.segment.SegmentMerger;
 import org.apache.nutch.util.NutchConfiguration;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
@@ -57,9 +59,6 @@ import de.ingrid.iplug.se.nutch.crawl.bw.BWUpdateDb;
 import de.ingrid.iplug.se.nutch.crawl.bw.BWWebgraphFilter;
 import de.ingrid.iplug.se.nutch.crawl.metadata.MetadataInjector;
 import de.ingrid.iplug.se.nutch.crawl.metadata.ParseDataUpdater;
-import de.ingrid.iplug.se.nutch.fetcher.Fetcher;
-import de.ingrid.iplug.se.nutch.segment.SegmentFilter;
-import de.ingrid.iplug.se.nutch.segment.SegmentMerger;
 import de.ingrid.iplug.se.nutch.statistics.HostStatistic;
 import de.ingrid.iplug.se.nutch.statistics.StartUrlStatusReport;
 import de.ingrid.iplug.se.nutch.statistics.UrlErrorReport;
@@ -286,17 +285,6 @@ public class IndexerTests {
     }
 
     @Test
-    public void test15SegmentFilter() throws Exception {
-
-        ToolRunner.run(NutchConfiguration.create(), new SegmentFilter(), new String[] { "test/filtered_segment", "test/crawldb", "-dir", "test/segments" });
-        FileSystem fs = FileSystems.getDefault();
-        if (fs.getPath("test/filtered_segment").toFile().exists()) {
-            delete(fs.getPath("test/segments").toFile());
-            Files.move(fs.getPath("test/filtered_segment"), fs.getPath("test/segments"), StandardCopyOption.REPLACE_EXISTING);
-        }
-    }
-
-    @Test
     public void test16InvertLinks() throws Exception {
 
         ToolRunner.run(NutchConfiguration.create(), new LinkDb(), new String[] { "test/linkdb", "-dir", "test/segments", "-noNormalize", "-noFilter" });
@@ -392,7 +380,7 @@ public class IndexerTests {
 
     private List<String> setUpBaseCall() {
 
-        String[] classPath = new String[] { "src/test/resources/conf", "build/apache-nutch-1.9/runtime/local", "build/apache-nutch-1.9/runtime/local/lib/*" };
+        String[] classPath = new String[] { "src/test/resources/conf", "build/apache-nutch-1.18/runtime/local", "build/apache-nutch-1.9/runtime/local/lib/*" };
 
         String cp = StringUtils.join(classPath, File.pathSeparator);
 

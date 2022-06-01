@@ -20,7 +20,7 @@
  * limitations under the Licence.
  * **************************************************#
  */
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -53,9 +53,9 @@ public class HostType implements WritableComparable<HostType> {
 
   public static final int URL_PARSEDATA_CONTAINER = 2;
 
-  private Text _host = new Text();
+  private final Text _host = new Text();
 
-  private IntWritable _type = new IntWritable();
+  private final IntWritable _type = new IntWritable();
 
   public HostType() {
   }
@@ -84,8 +84,7 @@ public class HostType implements WritableComparable<HostType> {
       // in case host is identically make sure that METADATA_CONTAINER is
       // passing a
       // reducer first
-      i = ((_type.get() < that._type.get() ? -1 : (_type.get() == that._type
-          .get()) ? 0 : 1));
+      i = ((Integer.compare(_type.get(), that._type.get())));
     }
     return i;
   }
@@ -101,13 +100,17 @@ public class HostType implements WritableComparable<HostType> {
 
   @Override
   public boolean equals(Object obj) {
-    HostType other = (HostType) obj;
-    return _host.equals(other._host) && _type.equals(other._type);
+    if (obj instanceof HostType) {
+      HostType other = (HostType) obj;
+      return _host.equals(other._host) && _type.equals(other._type);
+    } else {
+      throw new IllegalArgumentException("Object not of type HostType!");
+    }
   }
 
   @Override
   public String toString() {
-    return _host.toString() + " (" + _type + ")";
+    return _host + " (" + _type + ")";
   }
 
 }
