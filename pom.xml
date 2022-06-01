@@ -3,12 +3,12 @@
   <parent>
     <groupId>de.ingrid</groupId>
     <artifactId>ingrid-releases-pom</artifactId>
-    <version>5.11.0-SNAPSHOT</version>
+    <version>5.11.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>ingrid-iplug-se-project</artifactId>
   <packaging>pom</packaging>
-  <version>5.11.0.132-SNAPSHOT</version>
+  <version>5.13.0.132-SNAPSHOT</version>
   <name>InGrid iPlug SE</name>
   <description>This iPlug indexes documents from websites and can be queried by the iBus.</description>
 
@@ -33,9 +33,9 @@
   <!-- ==================== PROPERTIES ==================== -->
   <properties>
     <apache-nutch-version>apache-nutch-1.18</apache-nutch-version>
-    <ingrid-base-webapp.version>5.10.0</ingrid-base-webapp.version>
-    <elasticsearch.version>6.8.4</elasticsearch.version>
-    <log4j2.version>2.17.0</log4j2.version>
+    <ingrid-base-webapp.version>5.12.0</ingrid-base-webapp.version>
+    <elasticsearch.version>6.8.17</elasticsearch.version>
+    <log4j2.version>2.17.1</log4j2.version>
   </properties>
 
   <modules>
@@ -110,7 +110,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.11</version>
+      <version>4.13.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -128,13 +128,13 @@
     <dependency>
       <groupId>org.powermock</groupId>
       <artifactId>powermock-module-junit4</artifactId>
-      <version>1.5.6</version>
+      <version>1.6.6</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.powermock</groupId>
       <artifactId>powermock-api-mockito</artifactId>
-      <version>1.5.6</version>
+      <version>1.6.6</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
