@@ -466,9 +466,14 @@ public class RestDataController extends InstanceController {
         // remove instance index
 		String indexName = baseConfig.index + "_" + name;
 
-		if (indexManager.indexExists( indexName )) {
-            indexManager.deleteIndex( indexName );
-        }
+		try {
+			if (indexManager.indexExists(indexName)) {
+				indexManager.deleteIndex(indexName);
+			}
+		} catch (Exception e) {
+			LOG.error("Error removing index: " + indexName, e);
+		}
+
 
         // remove url from database belonging to this instance
         EntityManager em = DBManager.INSTANCE.getEntityManager();
@@ -558,21 +563,6 @@ public class RestDataController extends InstanceController {
 
 		return new ResponseEntity<String>(content, HttpStatus.OK);
 	}
-
-	@RequestMapping(value = { "status/{instance}/blpimport" }, method = RequestMethod.GET)
-    public ResponseEntity<Collection<State>> getStatusBlpImport(@PathVariable("instance") String name, HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-        if (hasNoAccessToInstance(name, request, response)) {
-            response.sendError(HttpStatus.FORBIDDEN.value());
-            return null;
-        }
-
-        Instance instance = getInstanceData(name);
-
-        List<State> states = statusProviderService.getStatusProvider(instance.getWorkingDirectory(), "import_status.xml").getStates();
-
-        return new ResponseEntity<Collection<State>>(states, HttpStatus.OK);
-    }
 
 	@RequestMapping(value = { "url/{instance}/check" }, method = RequestMethod.POST)
 	public ResponseEntity<String> checkUrl(@PathVariable("instance") String instanceName, @RequestBody String urlString, HttpServletRequest request, HttpServletResponse response)

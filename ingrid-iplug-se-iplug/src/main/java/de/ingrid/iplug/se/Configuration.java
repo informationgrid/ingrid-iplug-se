@@ -64,9 +64,6 @@ public class Configuration implements IConfig {
     @Value("${db.dir:database}")
     public String databaseDir;
 
-    @Value("${enable.blpImport:false")
-    public String enableBlpImport;
-
     @Value("${transport.tcp.port:9300}")
     public String esTransportTcpPort;
 
@@ -132,7 +129,6 @@ public class Configuration implements IConfig {
     public void setPropertiesFromPlugdescription(Properties props, PlugdescriptionCommandObject pd) {
         props.setProperty("db.dir", this.databaseDir);
         props.setProperty("dir.instances", this.dirInstances);
-        props.setProperty("enable.blpImport", this.enableBlpImport);
     }
 
     public String getInstancesDir() {
@@ -141,10 +137,6 @@ public class Configuration implements IConfig {
 
     public void setInstancesDir(String dir) {
         this.dirInstances = dir;
-    }
-
-    public boolean isBlpImportEnabled() {
-        return !this.enableBlpImport.toLowerCase().equals( "false" );
     }
 
     @Value("${facetMapping:air->measure:air,radiation->measure:radiation,water->measure:water,misc->measure:misc,press->service:press,publication->service:publication,event->service:event}")

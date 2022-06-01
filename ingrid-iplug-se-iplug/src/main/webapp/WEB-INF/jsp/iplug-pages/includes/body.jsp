@@ -62,9 +62,6 @@
 <% if (request.isUserInRole( "admin" )) { %>
             <li class='tab<c:if test="${activeTab == '7'}"> active</c:if>'><a<c:if test="${activeTab != '7'}"> href="instanceAdmins.html?instance=${instance.name}"</c:if>>Administratoren</a></li>
 <% } %>
-<% if (de.ingrid.iplug.se.SEIPlug.conf.isBlpImportEnabled()) {%>
-            <li class='tab<c:if test="${activeTab == '8'}"> active</c:if>'><a<c:if test="${activeTab != '8'}"> href="instanceBlpImport.html?instance=${instance.name}"</c:if>>BLP Import</a></li>
-<% } %>
         </ul>
         <div class="panel-container">
             <div>
@@ -75,7 +72,6 @@
                 <c:if test="${activeTab == '5'}"><c:import url="includes/search.jsp"></c:import></c:if>
                 <c:if test="${activeTab == '6'}"><c:import url="includes/reports.jsp"></c:import></c:if>
                 <c:if test="${activeTab == '7'}"><c:import url="includes/admins.jsp"></c:import></c:if>
-                <c:if test="${activeTab == '8'}"><c:import url="includes/blp_import.jsp"></c:import></c:if>
             </div>
         </div>
     </div>
