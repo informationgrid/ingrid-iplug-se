@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class IBusElasticsearchClient {
@@ -50,9 +51,9 @@ public class IBusElasticsearchClient {
 
     public IBusElasticsearchClient(Configuration conf) throws Exception {
         IndexWriterParams params = new IndexWriterParams(new HashMap<>());
-
-        while(conf.iterator().hasNext()) {
-            Map.Entry<String, String> entry = conf.iterator().next();
+        Iterator<Map.Entry<String, String>> it = conf.iterator();
+        while(it.hasNext()) {
+            Map.Entry<String, String> entry = it.next();
             params.put(entry.getKey(), entry.getValue());
         }
 

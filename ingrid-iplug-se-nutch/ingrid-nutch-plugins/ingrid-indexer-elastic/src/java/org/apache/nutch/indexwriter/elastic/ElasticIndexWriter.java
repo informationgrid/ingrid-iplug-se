@@ -287,8 +287,8 @@ public class ElasticIndexWriter implements IndexWriter {
         if (useIBusCommunication) {
             properties.put("description",
                     new AbstractMap.SimpleEntry<>(
-                            "Using iBus communication for Elasticsearch operations.",
-                            ""));
+                            "connection to elastic search cluster",
+                            "Using iBus communication for Elasticsearch operations."));
         } else {
             if (client != null) {
                 return client.describe();
@@ -296,7 +296,7 @@ public class ElasticIndexWriter implements IndexWriter {
                 properties.put("description",
                         new AbstractMap.SimpleEntry<>(
                                 "not initialized yet.",
-                                ""));
+                                "not initialized yet."));
             }
         }
         return properties;
