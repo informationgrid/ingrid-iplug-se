@@ -17,7 +17,11 @@
 	</target>
 
 	<target name="copy-nutch">
-		<unzip src="${nutch-version}-src.zip" dest="build/" />
+		<unzip src="${nutch-version}-src.zip" dest="build/">
+			<patternset>
+				<exclude name="**/log4j.properties"/>
+			</patternset>
+		</unzip>
 	</target>
 
 	<target name="copy-ingrid-se-plugins">
