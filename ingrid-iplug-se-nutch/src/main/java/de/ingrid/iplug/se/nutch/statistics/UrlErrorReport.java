@@ -26,26 +26,23 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.Mapper;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.SequenceFileInputFormat;
-import org.apache.hadoop.mapred.SequenceFileOutputFormat;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.util.StringUtils;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
@@ -68,25 +65,19 @@ public class UrlErrorReport extends Configured implements Tool {
 
 	private static final Log LOG = LogFactory.getLog(UrlErrorReport.class.getName());
 
-	public static class UrlErrorStatusReportMapper implements Mapper<Text, CrawlDatum, Text, ProtocolStatus> {
+	public static class UrlErrorStatusReportMapper extends Mapper<Text, CrawlDatum, Text, ProtocolStatus> {
 
-		public void configure(JobConf job) {
-		}
-
-		public void close() {
-		}
-
-		public void map(Text key, CrawlDatum value, OutputCollector<Text, ProtocolStatus> output, Reporter reporter)
-		        throws IOException {
+		@Override
+		public void map(Text key, CrawlDatum value, Mapper<Text, CrawlDatum, Text, ProtocolStatus>.Context context)
+				throws IOException, InterruptedException {
 
 			final Writable w = value.getMetaData().get(Nutch.WRITABLE_PROTO_STATUS_KEY);
 
-			if (w != null && w instanceof ProtocolStatus) {
+			if (w instanceof ProtocolStatus) {
 				final ProtocolStatus pStatus = (ProtocolStatus) w;
 				int code = pStatus.getCode();
 				switch (code) {
 				case ProtocolStatus.ACCESS_DENIED:
-				case ProtocolStatus.BLOCKED:
 				case ProtocolStatus.EXCEPTION:
 				case ProtocolStatus.FAILED:
 				case ProtocolStatus.GONE:
@@ -95,25 +86,19 @@ public class UrlErrorReport extends Configured implements Tool {
 				case ProtocolStatus.PROTO_NOT_FOUND:
 				case ProtocolStatus.ROBOTS_DENIED:
 				case ProtocolStatus.REDIR_EXCEEDED:
-				case ProtocolStatus.WOULDBLOCK:
-					output.collect(key, pStatus);
+					context.write(key, pStatus);
 					break;
 				default:
 					break;
 				}
-				return;
 			}
 		}
-	}
-
-	public UrlErrorReport(Configuration configuration) {
-		super(configuration);
 	}
 
 	public UrlErrorReport() {
 	}
 
-	public void startUrlErrorReport(Path crawldb, Path outputDir) throws IOException {
+	public void startUrlErrorReport(Path crawldb, Path outputDir) throws IOException, InterruptedException, ClassNotFoundException {
 
 		Path out = new Path(outputDir, "statistic/url_error_report");
 
@@ -125,14 +110,14 @@ public class UrlErrorReport extends Configured implements Tool {
 		LOG.info("Start url error report.");
 
 		// filter out crawldb entries that match starturls
-		JobConf job = new NutchJob(getConf());
+		Job job = NutchJob.getInstance(getConf());
 		job.setJobName("starturlreport");
 
 		FileInputFormat.addInputPath(job, new Path(crawldb, CrawlDb.CURRENT_NAME));
-		job.setInputFormat(SequenceFileInputFormat.class);
+		job.setInputFormatClass(SequenceFileInputFormat.class);
 
 		job.setMapperClass(UrlErrorStatusReportMapper.class);
-		job.setOutputFormat(SequenceFileOutputFormat.class);
+		job.setOutputFormatClass(SequenceFileOutputFormat.class);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(ProtocolStatus.class);
 
@@ -141,19 +126,32 @@ public class UrlErrorReport extends Configured implements Tool {
 		Path urlErrorReportEntries = new Path(getConf().get("hadoop.temp.dir", "."), name);
 		FileOutputFormat.setOutputPath(job, urlErrorReportEntries);
 
-		JobClient.runJob(job);
+		try {
+			boolean success = job.waitForCompletion(true);
+			if (!success) {
+				String message = "Job did not succeed, job status:"
+						+ job.getStatus().getState() + ", reason: "
+						+ job.getStatus().getFailureInfo();
+				LOG.error(message);
+				throw new RuntimeException(message);
+			}
+		} catch (IOException | InterruptedException | ClassNotFoundException e) {
+			LOG.error("Job failed: {}", e);
+			throw e;
+		}
 
 		SequenceFile.Reader reader = null;
 		BufferedWriter br = null;
 		try {
 
-			reader = new SequenceFile.Reader(fs, new Path(urlErrorReportEntries, "part-00000"), getConf());
+			reader = new SequenceFile.Reader(getConf(), SequenceFile.Reader.file(new Path(urlErrorReportEntries, "part-r-00000")));
+
 			Text key = new Text();
 			ProtocolStatus value = new ProtocolStatus();
 
 			Path file = new Path(out, "data.json");
 			OutputStream os = fs.create(file);
-			br = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+			br = new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
 			JSONArray array = new JSONArray();
 			while (reader.next(key, value)) {
 
@@ -162,7 +160,7 @@ public class UrlErrorReport extends Configured implements Tool {
 				jsn.put("status", value.getCode());
 				String msg = value.getName();
 				if (value.getMessage() != null) {
-					msg.concat(": " +  value.getMessage());
+					msg = msg.concat(": " +  value.getMessage());
 				}
 				jsn.put("msg", msg);
 				array.put(jsn);

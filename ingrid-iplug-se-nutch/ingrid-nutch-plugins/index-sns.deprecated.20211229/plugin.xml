@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin class="de.ingrid.iplug.sns.nutch.IPlugSNSPlugin" id="index-sns" name="SNS Indexing Filter" provider-name="media-style.com" version="1.0.0">
+	<runtime>
+		<library name="index-sns.jar">
+			<export name="*"/>
+		</library>
+
+	</runtime>
+	<requires>
+		<import plugin="nutch-extensionpoints"/>
+	</requires>
+	
+	<extension id="de.ingrid.iplug.sns.nutch.index" name="Ingrid SNS Indexing Filter" point="org.apache.nutch.indexer.IndexingFilter">
+		<implementation class="de.ingrid.iplug.sns.nutch.index.SnsIndexingFilter" id="SnsIndexingFilter"/>
+	</extension>
+	
+	<extension id="de.ingrid.iplug.sns.nutch.query" name="Ingrid SNS Query Filter" point="de.ingrid.nutch.searcher.QueryFilter">
+		<implementation class="de.ingrid.iplug.sns.nutch.query.SnsQueryFilter" id="SnsQueryFilter">
+	        <parameter name="fields" value="t0,t1,t2,x1,x2,y1,y2,time,coord,buzzword,code,areaid,incl_meta,location"/>
+		</implementation>
+	</extension>
+	
+	<extension-point
+      id="de.ingrid.nutch.searcher.QueryFilter"
+      name="Nutch Query Filter"/>
+	
+	
+</plugin>

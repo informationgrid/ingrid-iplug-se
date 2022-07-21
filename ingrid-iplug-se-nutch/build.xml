@@ -1,6 +1,6 @@
 <project default="dist" xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:ac="antlib:net.sf.antcontrib">
 
-    <condition property="apache-nutch-version" value="apache-nutch-1.9">
+    <condition property="apache-nutch-version" value="apache-nutch-1.18">
        <not>
           <isset property="apache-nutch-version"/>
        </not>
@@ -17,7 +17,11 @@
 	</target>
 
 	<target name="copy-nutch">
-		<unzip src="${nutch-version}-src.zip" dest="build/" />
+		<unzip src="${nutch-version}-src.zip" dest="build/">
+			<patternset>
+				<exclude name="**/log4j.properties"/>
+			</patternset>
+		</unzip>
 	</target>
 
 	<target name="copy-ingrid-se-plugins">
@@ -81,7 +85,7 @@
 	<target name="create-pom">
 		<typedef uri="antlib:org.apache.ivy.ant" onerror="fail" loaderRef="ivyLoader">
 			<classpath>
-				<pathelement location="./ivy/ivy-2.2.0.jar" />
+				<pathelement location="./ivy/ivy-2.5.0.jar" />
 			</classpath>
 		</typedef>
 		<fail>

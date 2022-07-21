@@ -128,7 +128,7 @@
      srcdir="${src.dir}"
      includes="**/*.java"
      destdir="${build.classes}"
-     debug="true"
+     debug="${javac.debug}"
      optimize="${javac.optimize}"
      target="${javac.version}"
      source="${javac.version}"
@@ -212,7 +212,7 @@
       <sysproperty key="test.input" value="${root}/data"/>
       <sysproperty key="javax.xml.parsers.DocumentBuilderFactory" value="com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl"/> 
       <classpath refid="test.classpath"/>
-      <formatter type="plain" />
+      <formatter type="${test.junit.output.format}" />
       <batchtest todir="${build.test}" unless="testcase">
         <fileset dir="${src.test}"
                  includes="**/Test*.java" excludes="**/${test.exclude}.java" />
@@ -235,6 +235,16 @@
   <target name="resolve-test" depends="clean-lib" description="resolve and retrieve dependencies with ivy">
     <ivy:resolve file="ivy.xml" conf="test" log="download-only"/>
     <ivy:retrieve pattern="${build.test.lib}/[artifact]-[revision].[ext]" symlink="false" log="quiet"/>
+  </target>
+
+  <target name="report" depends="resolve-test" description="--> generates a report of dependencies">
+    <ivy:report todir="${build.dir}" xml="true"/>
+  </target>
+
+  <!-- target: 3rd-party licenses report  =============================== -->
+  <target name="report-licenses" depends="resolve-default" description="--> generates a report of licenses of dependencies">
+    <ivy:report todir="${build.dir}" xml="false" graph="false" xslfile="${nutch.root}/ivy/ivy-report-license.xsl"
+                outputpattern="[organisation]-[module]-[conf]-3rd-party-licenses.tsv"/>
   </target>
 
   <!-- ================================================================== -->

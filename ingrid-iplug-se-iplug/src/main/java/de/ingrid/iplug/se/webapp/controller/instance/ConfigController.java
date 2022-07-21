@@ -47,6 +47,7 @@ import org.xml.sax.SAXException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -140,6 +141,11 @@ public class ConfigController extends InstanceController {
     private List<ConfigurationCommand> loadConfigurationCommands(File file) throws ParserConfigurationException {
         List<ConfigurationCommand> list = null;
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        documentBuilderFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        documentBuilderFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+        documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
         try {
             Document document = documentBuilder.parse(file);

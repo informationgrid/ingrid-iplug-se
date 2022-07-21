@@ -31,32 +31,44 @@ import de.ingrid.utils.ElasticDocument;
 import net.weta.components.communication.ICommunication;
 import net.weta.components.communication.tcp.StartCommunication;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.nutch.indexer.IndexWriterParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class IBusElasticsearchClient {
 
     public static Logger LOG = LoggerFactory.getLogger(IBusElasticsearchClient.class);
 
-    private final IBusIndexManager iBusIndexManager;
-    private final IndexInfo indexInfo;
-    private final BusClient busClient;
-
-    private String instanceIndex;
-
-    private Configuration config;
+    private IBusIndexManager iBusIndexManager;
+    private IndexInfo indexInfo;
+    private BusClient busClient;
 
     public IBusElasticsearchClient(Configuration conf) throws Exception {
-        this.config = conf;
+        IndexWriterParams params = new IndexWriterParams(new HashMap<>());
+        Iterator<Map.Entry<String, String>> it = conf.iterator();
+        while(it.hasNext()) {
+            Map.Entry<String, String> entry = it.next();
+            params.put(entry.getKey(), entry.getValue());
+        }
 
-        instanceIndex = config.get(ElasticConstants.INDEX, "nutch");
+        init(params);
+    }
+
+    public IBusElasticsearchClient(IndexWriterParams parameters ) throws Exception {
+        init(parameters);
+    }
+
+    private void init(IndexWriterParams parameters) throws Exception {
+        String instanceIndex = parameters.get(ElasticConstants.INDEX, "nutch");
 
         ElasticConfig elasticConfig = new ElasticConfig();
-        elasticConfig.communicationProxyUrl = config.get("iplug.id");
+        elasticConfig.communicationProxyUrl = parameters.get("iplug.id");
         iBusIndexManager = new IBusIndexManager(elasticConfig);
 
         indexInfo = new IndexInfo();
@@ -66,7 +78,7 @@ public class IBusElasticsearchClient {
         indexInfo.setDocIdField("id");
 
         // get communication file and load it
-        File file = new File(conf.get("communication.file"));
+        File file = new File(parameters.get("communication.file"));
         ICommunication communication = StartCommunication.create(new FileInputStream(file));
 
         // also change peer name for a temporary connection
@@ -75,7 +87,6 @@ public class IBusElasticsearchClient {
         LOG.info("Create communication for indexing");
         busClient = BusClientFactory.createBusClient(communication);
         communication.startup();
-        // busClient.start();
     }
 
     public void update(Map<String, Object> document) {

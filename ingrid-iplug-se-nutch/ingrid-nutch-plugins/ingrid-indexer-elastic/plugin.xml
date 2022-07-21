@@ -23,7 +23,7 @@
       <export name="*" />
     </library>
     
-    <library name="elasticsearch-6.4.0.jar"/>
+    <library name="elasticsearch-6.8.17.jar"/>
     <library name="lucene-analyzers-common-4.7.0.jar"/>
     <library name="lucene-codecs-4.7.0.jar"/>
     <library name="lucene-core-4.7.0.jar"/>

@@ -20,7 +20,7 @@
  * limitations under the Licence.
  * **************************************************#
  */
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -41,20 +41,20 @@ package de.ingrid.iplug.se.nutch.crawl.metadata;
 
 import java.io.IOException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.ObjectWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.MapFileOutputFormat;
-import org.apache.hadoop.mapred.Mapper;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.SequenceFileInputFormat;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.MapFileOutputFormat;
 import org.apache.nutch.parse.ParseData;
 import org.apache.nutch.util.NutchJob;
 
@@ -62,44 +62,51 @@ import de.ingrid.iplug.se.nutch.crawl.metadata.ParseDataWrapper.UrlParseDataCont
 
 public class ParseDataUnwrapper extends Configured {
 
-  public static class ParseDataUnwrapperMapper implements
-      Mapper<HostType, ObjectWritable, Text, ParseData> {
+  private static final Log LOG = LogFactory.getLog(ParseDataUnwrapper.class);
+
+  public static class ParseDataUnwrapperMapper extends Mapper<HostType, ObjectWritable, Text, ParseData> {
 
     @Override
-    public void map(HostType key, ObjectWritable value,
-        OutputCollector<Text, ParseData> out, Reporter reporter)
-        throws IOException {
+    public void map(HostType key, ObjectWritable value, Mapper<HostType, ObjectWritable, Text, ParseData>.Context context) throws IOException, InterruptedException {
       UrlParseDataContainer container = (UrlParseDataContainer) value.get();
       Text url = container.getUrl();
       ParseData parseData = container.getParseData();
-      out.collect(url, parseData);
+      context.write(url, parseData);
     }
-
-    @Override
-    public void configure(JobConf arg0) {
-    }
-
-    @Override
-    public void close() throws IOException {
-    }
-
   }
 
   public ParseDataUnwrapper(Configuration configuration) {
     super(configuration);
   }
 
-  public void unwrap(Path wrappedParseData, Path out) throws IOException {
-    JobConf convertJob = new NutchJob(getConf());
+  public void unwrap(Path wrappedParseData, Path out) throws IOException, InterruptedException, ClassNotFoundException {
+
+    Configuration conf = getConf();
+    FileSystem fs = FileSystem.get(conf);
+
+    Job convertJob = NutchJob.getInstance(conf);
     convertJob.setJobName("format converting: " + wrappedParseData);
     FileInputFormat.addInputPath(convertJob, wrappedParseData);
-    convertJob.setInputFormat(SequenceFileInputFormat.class);
+    convertJob.setInputFormatClass(SequenceFileInputFormat.class);
     convertJob.setMapperClass(ParseDataUnwrapperMapper.class);
     FileOutputFormat.setOutputPath(convertJob, out);
     FileOutputFormat.setCompressOutput(convertJob, true);
-    convertJob.setOutputFormat(MapFileOutputFormat.class);
+    convertJob.setOutputFormatClass(MapFileOutputFormat.class);
     convertJob.setOutputKeyClass(Text.class);
     convertJob.setOutputValueClass(ParseData.class);
-    JobClient.runJob(convertJob);
+    try {
+      boolean success = convertJob.waitForCompletion(true);
+      if (!success) {
+        String message = "Job did not succeed, job status:"
+                + convertJob.getStatus().getState() + ", reason: "
+                + convertJob.getStatus().getFailureInfo();
+        LOG.error(message);
+        throw new RuntimeException(message);
+      }
+    } catch (IOException | InterruptedException | ClassNotFoundException e) {
+      LOG.error("Job failed: {}", e);
+      fs.delete(out, true);
+      throw e;
+    }
   }
 }

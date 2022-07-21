@@ -54,6 +54,8 @@ import java.nio.file.*;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Wrapper for a ingrid specific nutch process execution. This is too complex to
@@ -231,7 +233,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
                 this.statusProvider.addState(STATES.FETCH.name() + i, "Fetching " + "[" + (i + 1) + "/" + depth + "] ...");
                 this.statusProvider.setStateProperty(STATES.FETCH.name(), "i", Integer.toString(i));
                 logFileWatcher = LogFileWatcherFactory.getFetchLogfileWatcher(Paths.get(instance.getWorkingDirectory(), "logs", "hadoop.log").toFile(), statusProvider, STATES.FETCH.name() + i);
-                ret = execute("de.ingrid.iplug.se.nutch.fetcher.Fetcher", currentSegment);
+                ret = execute("org.apache.nutch.fetcher.Fetcher", currentSegment);
                 if (ret != 0) {
                     throwCrawlError("Error during Execution of: org.apache.nutch.fetcher.Fetcher");
                 }
@@ -297,7 +299,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             this.statusProvider.appendToState(STATES.CREATE_URL_ERROR_REPORT.name() + 1, " done.");
             
             this.statusProvider.addState(STATES.MERGE_SEGMENT.name(), "Merge segments...");
-            ret = execute("de.ingrid.iplug.se.nutch.segment.SegmentMerger", mergedSegments, "-dir", segments);
+            ret = execute("org.apache.nutch.segment.SegmentMerger", mergedSegments, "-dir", segments);
             if (ret != 0) {
                 throwCrawlError("Error during Execution of: org.apache.nutch.segment.SegmentMerger");
             }
@@ -317,7 +319,6 @@ public class IngridCrawlNutchProcess extends NutchProcess {
                 Files.move(fs.getPath(filteredSegments), fs.getPath(segments), StandardCopyOption.REPLACE_EXISTING);
             }
             this.statusProvider.appendToState(STATES.FILTER_SEGMENT.name(), " done.");
-
             this.statusProvider.addState(STATES.UPDATE_WEBGRAPH.name(), "Update web graph with new urls...");
             if (Files.exists(Paths.get(webgraph))) {
                 FileUtils.removeRecursive(Paths.get(webgraph));
@@ -486,8 +487,12 @@ public class IngridCrawlNutchProcess extends NutchProcess {
         nutchCall = arrayConcat(nutchCall, javaOptions);
         // Debug specific call
         String debugOption = System.getProperty("debugNutchCall");
-        if (debugOption != null && commandAndOptions[0].endsWith(debugOption)) {
-            nutchCall = arrayConcat(nutchCall, new String[] { "-agentlib:jdwp=transport=dt_socket,address=7000,server=y,suspend=y" });
+        if (debugOption != null) {
+            Pattern pattern = Pattern.compile(debugOption);
+            Matcher matcher = pattern.matcher(commandAndOptions[0]);
+            if (matcher.find()) {
+                nutchCall = arrayConcat(nutchCall, new String[] { "-agentlib:jdwp=transport=dt_socket,address=7000,server=y,suspend=y" });
+            }
         }
         nutchCall = arrayConcat(nutchCall, commandAndOptions);
 

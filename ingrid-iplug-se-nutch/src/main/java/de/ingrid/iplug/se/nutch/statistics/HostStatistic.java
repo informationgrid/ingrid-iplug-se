@@ -29,8 +29,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
-import java.util.Iterator;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
@@ -48,23 +49,21 @@ import org.apache.hadoop.io.SequenceFile.Sorter;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.WritableComparable;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.MapFileOutputFormat;
-import org.apache.hadoop.mapred.Mapper;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reducer;
-import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.SequenceFileInputFormat;
-import org.apache.hadoop.mapred.SequenceFileOutputFormat;
-import org.apache.hadoop.mapred.lib.InverseMapper;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
+import org.apache.hadoop.mapreduce.lib.map.InverseMapper;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.MapFileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.util.StringUtils;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.crawl.CrawlDb;
+import org.apache.nutch.util.LockUtil;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
 import org.codehaus.jettison.json.JSONArray;
@@ -77,11 +76,11 @@ public class HostStatistic extends Configured implements Tool {
 
     public static class StatisticWritable implements WritableComparable<StatisticWritable> {
 
-        private BooleanWritable _isFetched = new BooleanWritable();
+        private final BooleanWritable _isFetched = new BooleanWritable();
 
-        private LongWritable _overallCount = new LongWritable(1);
+        private final LongWritable _overallCount = new LongWritable(1);
 
-        private LongWritable _fetchSuccessCount = new LongWritable(1);
+        private final LongWritable _fetchSuccessCount = new LongWritable(1);
 
         @Override
         public void readFields(DataInput in) throws IOException {
@@ -119,70 +118,60 @@ public class HostStatistic extends Configured implements Tool {
 
     }
 
-    public static class StatisticWritableCounter implements Mapper<Text, Writable, Text, StatisticWritable>, Reducer<Text, StatisticWritable, Text, StatisticWritable> {
+    public static class StatisticWritableCounterMapper extends Mapper<Text, Writable, Text, StatisticWritable> {
 
-        private StatisticWritable _one = new StatisticWritable();
-
-        private StatisticWritable _sum = new StatisticWritable();
+        private final StatisticWritable _one = new StatisticWritable();
 
         @Override
-        public void map(Text key, Writable value, OutputCollector<Text, StatisticWritable> collector, Reporter reporter) throws IOException {
+        public void map(Text key, Writable value, Mapper<Text, Writable, Text, StatisticWritable>.Context context) throws IOException, InterruptedException {
             CrawlDatum crawlDatum = (CrawlDatum) value;
-            Text utf8 = (Text) key;
-            String urlString = utf8.toString();
+            String urlString = key.toString();
             URL url = new URL(urlString);
             String host = url.getHost();
             _one._isFetched.set(false);
 
-            collector.collect(new Text(host), _one);
-            collector.collect(new Text("Overall"), _one);
+            context.write(new Text(host), _one);
+            context.write(new Text("Overall"), _one);
             if ((crawlDatum.getStatus() == CrawlDatum.STATUS_DB_FETCHED) || crawlDatum.getStatus() == CrawlDatum.STATUS_FETCH_SUCCESS || crawlDatum.getStatus() == CrawlDatum.STATUS_DB_NOTMODIFIED) {
                 _one._isFetched.set(true);
-                collector.collect(new Text(host), _one);
-                collector.collect(new Text("Overall"), _one);
+                context.write(new Text(host), _one);
+                context.write(new Text("Overall"), _one);
             }
         }
-
-        @Override
-        public void reduce(Text key, Iterator<StatisticWritable> values, OutputCollector<Text, StatisticWritable> collector, Reporter reporter) throws IOException {
-            long overallCounter = 0;
-            long fetchSuccesCounter = 0;
-
-            while (values.hasNext()) {
-                StatisticWritable statisticWritable = (StatisticWritable) values.next();
-                if (statisticWritable._isFetched.get()) {
-                    fetchSuccesCounter = fetchSuccesCounter + statisticWritable._fetchSuccessCount.get();
-                } else {
-                    overallCounter = overallCounter + statisticWritable._overallCount.get();
-                }
-            }
-            _sum._fetchSuccessCount.set(fetchSuccesCounter);
-            _sum._overallCount.set(overallCounter);
-            collector.collect(key, _sum);
-        }
-
-        @Override
-        public void configure(JobConf jobConf) {
-        }
-
-        @Override
-        public void close() throws IOException {
-        }
-
     }
 
-    public HostStatistic(Configuration configuration) {
-        super(configuration);
+    public static class StatisticWritableCounterReducer extends Reducer<Text, StatisticWritable, Text, StatisticWritable> {
+
+        private final StatisticWritable _sum = new StatisticWritable();
+
+        @Override
+        public void reduce(Text key, Iterable<StatisticWritable> values, Reducer<Text, StatisticWritable, Text, StatisticWritable>.Context context) throws IOException, InterruptedException {
+            AtomicLong overallCounter = new AtomicLong();
+            AtomicLong fetchSuccesCounter = new AtomicLong();
+
+            values.forEach(statisticWritable -> {
+                if (statisticWritable._isFetched.get()) {
+                    fetchSuccesCounter.set(fetchSuccesCounter.get() + statisticWritable._fetchSuccessCount.get());
+                } else {
+                    overallCounter.set(overallCounter.get() + statisticWritable._overallCount.get());
+                }
+            });
+
+            _sum._fetchSuccessCount.set(fetchSuccesCounter.get());
+            _sum._overallCount.set(overallCounter.get());
+            context.write(key, _sum);
+        }
     }
 
     public HostStatistic() {
     }
 
-    public void statistic(Path crawldb, Path outputDir) throws IOException {
+    public void statistic(Path crawldb, Path outputDir) throws IOException, InterruptedException, ClassNotFoundException {
 
         Path out = new Path(outputDir, "statistic/host");
 
-        FileSystem fs = FileSystem.get(getConf());
+        Configuration conf = getConf();
+        FileSystem fs = FileSystem.get(conf);
         fs.delete(out, true);
 
         LOG.info("START CRAWLDB STATISTIC");
@@ -190,15 +179,45 @@ public class HostStatistic extends Configured implements Tool {
 
         String name = "crawldb-statistic-temp-" + id;
         Path tempCrawldb = new Path(getConf().get("hadoop.temp.dir", "."), name);
-        JobConf countJob = createCountJob(crawldb, tempCrawldb);
-        JobClient.runJob(countJob);
+
+        Job countJob = createCountJob(crawldb, tempCrawldb, conf);
+        Path lock = CrawlDb.lock(conf, crawldb, false);
+        try {
+            boolean success = countJob.waitForCompletion(true);
+            if (!success) {
+                String message = "Job did not succeed, job status:"
+                        + countJob.getStatus().getState() + ", reason: "
+                        + countJob.getStatus().getFailureInfo();
+                LOG.error(message);
+                throw new RuntimeException(message);
+            }
+        } catch (IOException | InterruptedException | ClassNotFoundException e) {
+            LOG.error("Job failed: {}", e);
+            fs.delete(tempCrawldb, true);
+            throw e;
+        } finally {
+            LockUtil.removeLockFile(fs, lock);
+        }
 
         name = "crawldb-sequence-temp-" + id;
         Path tempSequenceCrawldb = new Path(getConf().get("hadoop.temp.dir", "."), name);
-        JobConf sequenceCrawldbJob = createSequenceFileJob(tempCrawldb, tempSequenceCrawldb);
-        JobClient.runJob(sequenceCrawldbJob);
-
-        fs.delete(tempCrawldb, true);
+        Job sequenceCrawldbJob = createSequenceFileJob(tempCrawldb, tempSequenceCrawldb, conf);
+        try {
+            boolean success = sequenceCrawldbJob.waitForCompletion(true);
+            if (!success) {
+                String message = "Job did not succeed, job status:"
+                        + sequenceCrawldbJob.getStatus().getState() + ", reason: "
+                        + sequenceCrawldbJob.getStatus().getFailureInfo();
+                LOG.error(message);
+                throw new RuntimeException(message);
+            }
+        } catch (IOException | InterruptedException | ClassNotFoundException e) {
+            LOG.error("Job failed: {}", e);
+            fs.delete(tempSequenceCrawldb, true);
+            throw e;
+        } finally {
+            fs.delete(tempCrawldb, true);
+        }
 
         // sort the output files into one file
         name = "crawldb-sorted-temp-" + id;
@@ -212,8 +231,7 @@ public class HostStatistic extends Configured implements Tool {
         Reader reader = null;
         BufferedWriter br = null;
         try {
-
-            reader = new SequenceFile.Reader(fs, tempSortedCrawldb, getConf());
+            reader = new SequenceFile.Reader(conf, Reader.file(tempSortedCrawldb));
             StatisticWritable key = new StatisticWritable();
             Text value = new Text();
 
@@ -222,12 +240,12 @@ public class HostStatistic extends Configured implements Tool {
                 fs.delete(file, true);
             }
             OutputStream os = fs.create(file);
-            br = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            br = new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
             JSONArray array = new JSONArray();
             while (reader.next(key, value)) {
 
                 JSONObject jsn = new JSONObject();
-                jsn.put("host", new String( value.toString() ));
+                jsn.put("host", value.toString());
                 jsn.put("fetched", key.getFetchSuccessCount());
                 jsn.put("known", key.getOverallCount());
                 float ratio = 0; 
@@ -266,36 +284,36 @@ public class HostStatistic extends Configured implements Tool {
         return paths;
     }
 
-    private JobConf createCountJob(Path in, Path out) {
+    private Job createCountJob(Path in, Path out, Configuration conf) throws IOException {
         Path inputDir = new Path(in, CrawlDb.CURRENT_NAME);
 
-        JobConf job = new NutchJob(getConf());
+        Job job = NutchJob.getInstance(conf);
         job.setJobName("host_count " + inputDir);
 
         FileInputFormat.addInputPath(job, inputDir);
-        job.setInputFormat(SequenceFileInputFormat.class);
+        job.setInputFormatClass(SequenceFileInputFormat.class);
 
-        job.setReducerClass(StatisticWritableCounter.class);
-        job.setMapperClass(StatisticWritableCounter.class);
+        job.setReducerClass(StatisticWritableCounterReducer.class);
+        job.setMapperClass(StatisticWritableCounterMapper.class);
 
         FileOutputFormat.setOutputPath(job, out);
-        job.setOutputFormat(MapFileOutputFormat.class);
+        job.setOutputFormatClass(MapFileOutputFormat.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(StatisticWritable.class);
         return job;
     }
 
-    private JobConf createSequenceFileJob(Path in, Path out) {
-        JobConf sortJob = new NutchJob(getConf());
+    private Job createSequenceFileJob(Path in, Path out, Configuration conf) throws IOException {
+        Job sortJob = NutchJob.getInstance(conf);
         sortJob.setJobName("sort_host_count " + in);
         FileInputFormat.addInputPath(sortJob, in);
 
-        sortJob.setInputFormat(SequenceFileInputFormat.class);
+        sortJob.setInputFormatClass(SequenceFileInputFormat.class);
 
         sortJob.setMapperClass(InverseMapper.class);
 
         FileOutputFormat.setOutputPath(sortJob, out);
-        sortJob.setOutputFormat(SequenceFileOutputFormat.class);
+        sortJob.setOutputFormatClass(SequenceFileOutputFormat.class);
         sortJob.setOutputKeyClass(StatisticWritable.class);
         sortJob.setOutputValueClass(Text.class);
         return sortJob;

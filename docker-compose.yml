@@ -3,7 +3,7 @@ version: '3'
 services:
 
   elastic:
-    image: docker-registry.wemove.com/ingrid-elasticsearch-with-decompound:6.4.2
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.8.17
     environment:
       - cluster.name=ingrid
       - http.host=0.0.0.0
@@ -11,16 +11,20 @@ services:
       - http.cors.enabled=true
       - http.cors.allow-origin=*
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - xpack.security.enabled=false
-      - xpack.monitoring.enabled=false
-      - xpack.ml.enabled=false
-    # volumes:
-    #  - esdata1:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
       - 9300:9300
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana-oss:6.8.17
+    environment:
+      - "ELASTICSEARCH_URL=http://elastic:9200"
+    ports:
+      - 5601:5601
+    depends_on:
+      - elastic
+
   ibus:
     image: docker-registry.wemove.com/ingrid-ibus
     ports:
       - 9900:9900
-

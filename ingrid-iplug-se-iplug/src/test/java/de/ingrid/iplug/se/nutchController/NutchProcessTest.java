@@ -89,7 +89,6 @@ public class NutchProcessTest {
         Path urls = fs.getPath("test", "urls").toAbsolutePath();
         Path logs = fs.getPath("test", "logs").toAbsolutePath();
         Files.createDirectories(logs);
-
         FileUtils.copyDirectories(fs.getPath("../ingrid-iplug-se-nutch/src/test/resources/conf").toAbsolutePath(), conf);
         FileUtils.copyDirectories(fs.getPath("../ingrid-iplug-se-nutch/src/test/resources/urls").toAbsolutePath(), urls);
 
@@ -97,10 +96,10 @@ public class NutchProcessTest {
         p.setStatusProvider(new StatusProvider(workingDir.toString()));
         p.setWorkingDirectory(workingDir.toString());
         p.addClassPath(conf.toString());
-        p.addClassPath("../../ingrid-iplug-se-nutch/build/apache-nutch-1.9/runtime/local");
-        p.addClassPath("../../ingrid-iplug-se-nutch/build/apache-nutch-1.9/runtime/local/lib/*");
+        p.addClassPath(Paths.get("apache-nutch-runtime/runtime/local").toAbsolutePath().toString());
+        p.addClassPath(Paths.get("apache-nutch-runtime/runtime/local/lib/*").toAbsolutePath().toString());
         p.addJavaOptions(new String[] { "-Xmx512m", "-Dhadoop.log.dir=" + logs, "-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8" });
-        p.addCommand("org.apache.nutch.crawl.Injector", "crawldb", "../../ingrid-iplug-se-nutch/src/test/resources/urls/start");
+        p.addCommand("org.apache.nutch.crawl.Injector", "crawldb", Paths.get("../ingrid-iplug-se-nutch/src/test/resources/urls/start").toAbsolutePath().toString());
         NutchController controller = new NutchController();
         Instance instance = new Instance();
         instance.setName("test");
@@ -171,8 +170,8 @@ public class NutchProcessTest {
 
             p.setInstance(instance);
             p.addClassPath(conf.toString());
-            p.addClassPath("../../ingrid-iplug-se-nutch/build/apache-nutch-1.9/runtime/local");
-            p.addClassPath("../../ingrid-iplug-se-nutch/build/apache-nutch-1.9/runtime/local/lib/*");
+            p.addClassPath(Paths.get("apache-nutch-runtime/runtime/local").toAbsolutePath().toString());
+            p.addClassPath(Paths.get("apache-nutch-runtime/runtime/local/lib/*").toAbsolutePath().toString());
             p.addJavaOptions(new String[] { "-Xmx512m", "-Dhadoop.log.dir=" + logs, "-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8" });
             p.setDepth(1);
             p.setNoUrls(10);
@@ -191,16 +190,15 @@ public class NutchProcessTest {
             long start = System.currentTimeMillis();
             Thread.sleep(500);
             assertEquals("Status is RUNNING", NutchProcess.STATUS.RUNNING, p.getStatus());
-            while ((System.currentTimeMillis() - start) < 300000) {
+            while ((System.currentTimeMillis() - start) < 600000) {
                 Thread.sleep(1000);
                 if (p.getStatus() != NutchProcess.STATUS.RUNNING) {
                     break;
                 }
             }
             if (p.getStatus() == NutchProcess.STATUS.RUNNING) {
-                node.close();
                 p.stopExecution();
-                fail("Crawl took more than 5 min.");
+                fail("Crawl took more than 10 min.");
             }
             assertEquals("Status is FINISHED", NutchProcess.STATUS.FINISHED, p.getStatus());
 

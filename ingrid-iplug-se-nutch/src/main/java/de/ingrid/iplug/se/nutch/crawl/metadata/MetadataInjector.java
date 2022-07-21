@@ -20,7 +20,7 @@
  * limitations under the Licence.
  * **************************************************#
  */
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -42,12 +42,17 @@ package de.ingrid.iplug.se.nutch.crawl.metadata;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import de.ingrid.utils.tool.UrlTool;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -58,22 +63,21 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.WritableComparable;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.MapFileOutputFormat;
-import org.apache.hadoop.mapred.Mapper;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reducer;
-import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.SequenceFileInputFormat;
-import org.apache.hadoop.mapred.SequenceFileOutputFormat;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.MapFileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.util.StringUtils;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.apache.nutch.crawl.CrawlDb;
 import org.apache.nutch.metadata.Metadata;
 import org.apache.nutch.net.URLNormalizers;
+import org.apache.nutch.util.LockUtil;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
 
@@ -83,15 +87,13 @@ public class MetadataInjector extends Configured implements Tool {
 
     public static class MetadataContainer implements Writable {
 
-        private Set<Metadata> _metadatas = new HashSet<Metadata>();
+        private final Set<Metadata> _metadatas = new HashSet<>();
 
         public MetadataContainer() {
         }
 
         public MetadataContainer(Metadata... metadatas) {
-            for (Metadata metadata : metadatas) {
-                _metadatas.add(metadata);
-            }
+            Collections.addAll(_metadatas, metadatas);
         }
 
         public void addMetadata(Metadata metadata) {
@@ -123,12 +125,12 @@ public class MetadataInjector extends Configured implements Tool {
 
         @Override
         public String toString() {
-            String s = "";
+            StringBuilder s = new StringBuilder();
             for (Metadata metadata : _metadatas) {
-                s += "\r\n";
-                s += metadata;
+                s.append("\r\n");
+                s.append(metadata);
             }
-            return s;
+            return s.toString();
         }
 
         @Override
@@ -138,14 +140,14 @@ public class MetadataInjector extends Configured implements Tool {
 
         @Override
         public boolean equals(Object obj) {
-            MetadataContainer container = (MetadataContainer) obj;
-            return _metadatas.equals(container._metadatas);
+            if (obj instanceof MetadataContainer) {
+                MetadataContainer container = (MetadataContainer) obj;
+                return _metadatas.equals(container._metadatas);
+            } else {
+                throw new IllegalArgumentException("Object is no instance of MetadataContainer.");
+            }
         }
 
-    }
-
-    public MetadataInjector(Configuration conf) {
-        super(conf);
     }
 
     public MetadataInjector() {
@@ -155,19 +157,19 @@ public class MetadataInjector extends Configured implements Tool {
      * Creates {@link HostType} - {@link MetadataContainer} tuples from each
      * text line.
      */
-    public static class MetadataInjectMapper implements Mapper<WritableComparable<Object>, Text, HostType, MetadataContainer> {
+    public static class MetadataInjectMapper extends Mapper<WritableComparable<Object>, Text, HostType, MetadataContainer> {
 
         private URLNormalizers _urlNormalizers;
 
-        public void configure(JobConf job) {
-            _urlNormalizers = new URLNormalizers(job, URLNormalizers.SCOPE_INJECT);
-        }
-
-        public void close() {
+        @Override
+        protected void setup(Mapper<WritableComparable<Object>, Text, HostType, MetadataContainer>.Context context) throws IOException, InterruptedException {
+            super.setup(context);
+            Configuration conf = context.getConfiguration();
+            _urlNormalizers = new URLNormalizers(conf, URLNormalizers.SCOPE_INJECT);
         }
 
         @Override
-        public void map(WritableComparable<Object> key, Text val, OutputCollector<HostType, MetadataContainer> output, Reporter reporter) throws IOException {
+        public void map(WritableComparable<Object> key, Text val, Mapper<WritableComparable<Object>, Text, HostType, MetadataContainer>.Context context) throws IOException, InterruptedException {
 
             String line = val.toString();
             String[] splits = line.split("\t");
@@ -184,24 +186,20 @@ public class MetadataInjector extends Configured implements Tool {
                 metadata.add(meteKey, split);
             }
 
-            try {
-                url = _urlNormalizers.normalize(url, "metadata"); // normalize
-            } catch (Exception e) {
-                LOG.warn("Skipping " + url + ":" + e.toString());
-                url = null;
-            }
             if (url != null) {
-                String host;
+                String hostStr = null;
                 try {
-                    host = new URL(url).getHost();
+                    hostStr = new URL(url).getHost();
                 } catch (Exception e) {
-                    LOG.warn("unable to get host from: " + url + " : " + e.toString());
+                    LOG.warn("unable to get host from: " + url + " : " + e);
                     return;
                 }
 
-                HostType hostType = new HostType(new Text(host), HostType.METADATA_CONTAINER);
-                MetadataContainer metadataContainer = new MetadataContainer(metadata);
-                output.collect(hostType, metadataContainer);
+                if (hostStr != null) {
+                    HostType hostType = new HostType(new Text(hostStr), HostType.METADATA_CONTAINER);
+                    MetadataContainer metadataContainer = new MetadataContainer(metadata);
+                    context.write(hostType, metadataContainer);
+                }
             }
         }
 
@@ -210,72 +208,97 @@ public class MetadataInjector extends Configured implements Tool {
     /**
      * Reduces {@link HostType} - {@link MetadataContainer} tuples
      */
-    public static class MetadataInjectReducer implements Reducer<HostType, MetadataContainer, HostType, MetadataContainer> {
-        public void configure(JobConf job) {
-        }
-
-        public void close() {
-        }
+    public static class MetadataInjectReducer extends Reducer<HostType, MetadataContainer, HostType, MetadataContainer> {
 
         @Override
-        public void reduce(HostType key, Iterator<MetadataContainer> values, OutputCollector<HostType, MetadataContainer> output, Reporter reporter) throws IOException {
+        public void reduce(HostType key, Iterable<MetadataContainer> values, Reducer<HostType, MetadataContainer, HostType, MetadataContainer>.Context context) throws IOException, InterruptedException {
             MetadataContainer metadataContainer = new MetadataContainer();
-            while (values.hasNext()) {
-                MetadataContainer next = values.next();
+            for (MetadataContainer next: values) {
                 Set<Metadata> nextMetadatas = next.getMetadatas();
                 for (Metadata nextMetadata : nextMetadatas) {
                     metadataContainer.addMetadata(nextMetadata);
                 }
-
-            }
-            output.collect(key, metadataContainer);
+            };
+            context.write(key, metadataContainer);
         }
     }
 
-    public void inject(Path metadataDb, Path urlDir) throws IOException {
+    public void inject(Path metadataDb, Path urlDir) throws IOException, InterruptedException, ClassNotFoundException {
 
         LOG.info("MetadataInjector: starting");
         LOG.info("MetadataInjector: metadataDb: " + metadataDb);
         LOG.info("MetadataInjector: urlDir: " + urlDir);
 
+        Configuration conf = getConf();
+        FileSystem fs = FileSystem.get(conf);
+
         String name = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
         name = "/metadata-inject-temp-" + name;
         Path tempDir = new Path(getConf().get("mapred.temp.dir", ".") + name);
 
-        JobConf sortJob = new NutchJob(getConf());
+        Job sortJob = NutchJob.getInstance(conf);
         sortJob.setJobName("metadata-inject " + urlDir);
         FileInputFormat.addInputPath(sortJob, urlDir);
         sortJob.setMapperClass(MetadataInjectMapper.class);
 
         FileOutputFormat.setOutputPath(sortJob, tempDir);
-        sortJob.setOutputFormat(SequenceFileOutputFormat.class);
+        sortJob.setOutputFormatClass(SequenceFileOutputFormat.class);
         sortJob.setOutputKeyClass(HostType.class);
         sortJob.setOutputValueClass(MetadataContainer.class);
-        JobClient.runJob(sortJob);
+        try {
+            boolean success = sortJob.waitForCompletion(true);
+            if (!success) {
+                String message = "Job did not succeed, job status:"
+                        + sortJob.getStatus().getState() + ", reason: "
+                        + sortJob.getStatus().getFailureInfo();
+                LOG.error(message);
+                throw new RuntimeException(message);
+            }
+        } catch (IOException | InterruptedException | ClassNotFoundException e) {
+            LOG.error("Job failed: {}", e);
+            fs.delete(tempDir, true);
+            throw e;
+        }
 
         LOG.info("MetadataInjector: Merging injected urls into metadataDb.");
         String newDbName = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
         Path newDb = new Path(metadataDb, newDbName);
 
-        JobConf job = new NutchJob(getConf());
+        Job job = NutchJob.getInstance(conf);
         job.setJobName("merge metadata " + metadataDb);
 
         Path current = new Path(metadataDb, "current");
-        if (FileSystem.get(job).exists(current)) {
+        if (fs.exists(current)) {
             FileInputFormat.addInputPath(job, current);
         }
         FileInputFormat.addInputPath(job, tempDir);
-        job.setInputFormat(SequenceFileInputFormat.class);
+        job.setInputFormatClass(SequenceFileInputFormat.class);
 
         job.setReducerClass(MetadataInjectReducer.class);
         FileOutputFormat.setOutputPath(job, newDb);
-        job.setOutputFormat(MapFileOutputFormat.class);
+        job.setOutputFormatClass(MapFileOutputFormat.class);
         job.setOutputKeyClass(HostType.class);
         job.setOutputValueClass(MetadataContainer.class);
-        JobClient.runJob(job);
+        Path lock = CrawlDb.lock(conf, current, false);
+        try {
+            boolean success = job.waitForCompletion(true);
+            if (!success) {
+                String message = "Job did not succeed, job status:"
+                        + job.getStatus().getState() + ", reason: "
+                        + job.getStatus().getFailureInfo();
+                LOG.error(message);
+                throw new RuntimeException(message);
+            }
+        } catch (IOException | InterruptedException | ClassNotFoundException e) {
+            LOG.error("Job failed: {}", e);
+            fs.delete(newDb, true);
+            throw e;
+        } finally {
+            LockUtil.removeLockFile(fs, lock);
+            fs.delete(tempDir, true);
+        }
 
         LOG.info("rename metadataDb");
-        FileSystem fs = new JobClient(job).getFs();
         Path old = new Path(metadataDb, "old");
         fs.delete(old, true);
         if (fs.exists(current)) {
@@ -284,8 +307,6 @@ public class MetadataInjector extends Configured implements Tool {
         fs.rename(newDb, current);
         fs.delete(old, true);
 
-        // clean up
-        fs.delete(tempDir, true);
         LOG.info("MetadataInjector: done");
     }
 

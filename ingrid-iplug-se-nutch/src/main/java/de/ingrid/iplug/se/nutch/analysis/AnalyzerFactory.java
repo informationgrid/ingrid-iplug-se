@@ -64,10 +64,10 @@ public class AnalyzerFactory {
 
     public final static Log LOG = LogFactory.getLog(KEY);
 
-    private Analyzer DEFAULT_ANALYZER;
+    private final Analyzer DEFAULT_ANALYZER;
 
-    private ExtensionPoint extensionPoint;
-    private Configuration conf;
+    private final ExtensionPoint extensionPoint;
+    private final Configuration conf;
 
     public AnalyzerFactory(Configuration conf) {
         DEFAULT_ANALYZER = new StandardAnalyzer();
@@ -104,7 +104,7 @@ public class AnalyzerFactory {
             try {
                 analyzer = (Analyzer) extension.getExtensionInstance();
             } catch (PluginRuntimeException pre) {
-                analyzer = DEFAULT_ANALYZER;
+                LOG.warn("Could not get analyzer, proceed with default analyzer.");
             }
         }
         return analyzer;

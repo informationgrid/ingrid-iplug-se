@@ -165,7 +165,7 @@
                     	}
                     	var parser = document.createElement('a');
                     	parser.href = innerUrl;
-                        if (innerUrl.indexOf(parser.host+"/")  == -1 ) {
+                        if (innerUrl.indexOf(parser.host+"/")  == -1 && parser.host.indexOf("xn--") == -1 ) {
                         	localValid = false;
                         }
                     }

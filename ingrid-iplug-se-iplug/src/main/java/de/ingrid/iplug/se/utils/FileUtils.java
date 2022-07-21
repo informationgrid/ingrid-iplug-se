@@ -153,9 +153,11 @@ public class FileUtils {
 
         // get all urls belonging to the given instance
         List<Url> urls = UrlHandler.getUrlsByInstance(name);
-        Map<String, Map<String, List<String>>> startUrls = new HashMap<String, Map<String, List<String>>>();
+        Map<String, Map<String, List<String>>> metadataEntries = new HashMap<String, Map<String, List<String>>>();
+        List<String> startUrls = new ArrayList<String>();
         List<String> limitUrls = new ArrayList<String>();
         List<String> excludeUrls = new ArrayList<String>();
+
 
         for (Url url : urls) {
 
@@ -184,31 +186,26 @@ public class FileUtils {
                 metaValues.add(meta.getMetaValue());
             }
 
-            startUrls.put(url.getUrl(), metadata);
+            startUrls.add(FileUtils.encodeIdnAndUri(url.getUrl()));
+
             for (String limit : url.getLimitUrls()) {
-                limitUrls.add(checkForRegularExpressions(limit.trim()));
+                String limitPattern = checkForRegularExpressions(limit.trim());
+                limitUrls.add(limitPattern);
+                metadataEntries.put(limitPattern, metadata);
             }
             for (String exclude : url.getExcludeUrls()) {
                 excludeUrls.add(checkForRegularExpressions(exclude.trim()));
             }
         }
 
-        // output urls and metadata
-        String[] startUrlsValue = startUrls.keySet().toArray(new String[0]);
-        FileUtils.writeToFile(Paths.get(workDir, "urls", "start").toAbsolutePath(), "seed.txt", encodeIdnAndUri(Arrays.asList(startUrlsValue)));
-
         List<String> metadataValues = new ArrayList<String>();
-        for (String start : startUrlsValue) {
-            Map<String, List<String>> metas = startUrls.get(start);
+        metadataEntries.forEach((limitPattern, metaValues) -> {
+            metaValues.forEach((key, value) -> {
+                metadataValues.add(limitPattern + "\t" + key + ":\t" + StringUtils.join(value, "\t"));
+            });
+        });
 
-            String metasConcat = checkForRegularExpressions(start);
-            for (String key : metas.keySet()) {
-                metasConcat += "\t" + key + ":\t" + StringUtils.join(metas.get(key), "\t");
-            }
-            metadataValues.add(metasConcat);
-        }
-        
-        // TODO: add depending fields to metadata file (REDMINE-94)
+        FileUtils.writeToFile(Paths.get(workDir, "urls", "start").toAbsolutePath(), "seed.txt", startUrls);
         FileUtils.writeToFile(Paths.get(workDir, "urls", "metadata").toAbsolutePath(), "seed.txt", metadataValues);
         FileUtils.writeToFile(Paths.get(workDir, "urls", "limit").toAbsolutePath(), "seed.txt", limitUrls);
         FileUtils.writeToFile(Paths.get(workDir, "urls", "exclude").toAbsolutePath(), "seed.txt", excludeUrls);
@@ -328,42 +325,60 @@ public class FileUtils {
      * <ul>
      *  <li>the urls domain is IDNA 2008 encoded and the</li>
      *  <li>the path, query and anchor is URI encoded</li>
-     *  <li>all special regular expresseion characters are escaped</li>
+     *  <li>all special regular expression characters are escaped</li>
      * </ul>
+     *
+     * if a regular expression is found, replace umlaut domain part with punicode representation.
      *
      * @param urlStr
      * @return
      */
     public static String checkForRegularExpressions(String urlStr) {
-        if (urlStr.startsWith("/") && urlStr.endsWith("/")) {
-            urlStr = urlStr.substring(1, urlStr.length() - 1);
-        } else {
-            URL uri;
-            try {
-                uri = new URL(UrlTool.getEncodedUnicodeUrl(urlStr));
+        String result = urlStr;
+        try {
+            if (result.startsWith("/") && result.endsWith("/")) {
+                result = result.substring(1, result.length() - 1);
+                // get domain, replace with punicode (umlaut encoding), if exists
+                Pattern pattern = Pattern.compile("([a-z]+://.*?)/");
+                Matcher matcher = pattern.matcher(result);
+                if (matcher.find()) {
+                    String domainStr = matcher.group(1);
+                    URL uri = new URL(UrlTool.getEncodedUnicodeUrl(domainStr));
+                    String parsedDomain = uri.getProtocol() + "://" +uri.getHost();
+                    if (!parsedDomain.equalsIgnoreCase(domainStr)) {
+                        result = result.replace(domainStr, parsedDomain);
+                    }
+                }
+            } else {
+                URL uri = new URL(UrlTool.getEncodedUnicodeUrl(result));
                 if (uri.getPath() != null || uri.getQuery() != null) {
                     Matcher match = REGEXP_SPECIAL_CHARS.matcher((uri.getPath() != null ? uri.getPath() : "") + (uri.getQuery() != null ? "?" + uri.getQuery() : "") + (uri.getRef() != null ? "#" + uri.getRef() : ""));
-                    urlStr = uri.getProtocol() + "://" + uri.getHost() + (uri.getPort() > 0 ? ":" + uri.getPort() : "") + match.replaceAll("\\\\$1");
+                    result = uri.getProtocol() + "://" + uri.getHost() + (uri.getPort() > 0 ? ":" + uri.getPort() : "") + match.replaceAll("\\\\$1");
                 }
-            } catch (MalformedURLException | URISyntaxException e) {
-                log.error("The url pattern: '" + urlStr + "' is not a valid url.");
             }
+        } catch (MalformedURLException | URISyntaxException e) {
+            log.error("The url pattern: '" + urlStr + "' is not a valid url.");
         }
-        return urlStr;
+        return result;
     }
 
     private static List<String> encodeIdnAndUri(List<String> urls) {
         return urls.stream().map(c -> {
-            try {
-                return UrlTool.getEncodedUnicodeUrl(c);
-            } catch (MalformedURLException e) {
-                log.error("Error escaping URL " + c, e);
-                throw new RuntimeException(e);
-            } catch (URISyntaxException e) {
-                log.error("Error escaping URL " + c, e);
-                throw new RuntimeException(e);
-            }
+            return encodeIdnAndUri(c);
         }).collect(Collectors.toList());
     }
+
+    private static String encodeIdnAndUri(String url) {
+        try {
+            return UrlTool.getEncodedUnicodeUrl(url);
+        } catch (MalformedURLException e) {
+            log.error("Error escaping URL " + url, e);
+            throw new RuntimeException(e);
+        } catch (URISyntaxException e) {
+            log.error("Error escaping URL " + url, e);
+            throw new RuntimeException(e);
+        }
+    }
+
 
 }

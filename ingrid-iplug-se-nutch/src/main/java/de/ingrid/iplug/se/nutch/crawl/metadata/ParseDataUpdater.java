@@ -20,7 +20,7 @@
  * limitations under the Licence.
  * **************************************************#
  */
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -44,7 +44,6 @@ import java.util.Random;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -58,14 +57,10 @@ public class ParseDataUpdater extends Configured implements Tool {
 
     public static final Log LOG = LogFactory.getLog(ParseDataUpdater.class);
 
-    public ParseDataUpdater(Configuration configuration) {
-        super(configuration);
-    }
-
     public ParseDataUpdater() {
     }
 
-    public void update(Path metadataDb, Path segment) throws IOException {
+    public void update(Path metadataDb, Path segment) throws IOException, InterruptedException, ClassNotFoundException {
         LOG.info("metadata update: starting");
         LOG.info("metadata update: db: " + metadataDb);
         LOG.info("metadata update: segment: " + segment);

@@ -52,7 +52,7 @@ import de.ingrid.iplug.se.nutch.crawl.bw.BWUpdateDb.Entry;
 /**
  * Holds a host and a type used as key for {@link BWPatterns} and {@link Entry}
  */
-public class HostTypeKey implements WritableComparable<HostTypeKey> {
+public class HostTypeKey extends Text {
 
   public static final long PATTERN_TYPE = 1;
 

@@ -20,7 +20,7 @@
  * limitations under the Licence.
  * **************************************************#
  */
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -57,24 +57,23 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.ObjectWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.MapFileOutputFormat;
-import org.apache.hadoop.mapred.Mapper;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reducer;
-import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.SequenceFileInputFormat;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.MapFileOutputFormat;
 import org.apache.hadoop.util.StringUtils;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.apache.nutch.crawl.CrawlDb;
 import org.apache.nutch.crawl.Inlink;
 import org.apache.nutch.crawl.Inlinks;
 import org.apache.nutch.crawl.LinkDb;
 import org.apache.nutch.net.URLFilters;
 import org.apache.nutch.net.URLNormalizers;
+import org.apache.nutch.util.LockUtil;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
 
@@ -92,22 +91,12 @@ public class BWLinkDbFilter extends Configured implements Tool {
 
     public static final String CURRENT_NAME = "current";
 
-    public static class ObjectWritableMapper implements Mapper<HostTypeKey, Writable, HostTypeKey, ObjectWritable> {
+    public static class ObjectWritableMapper extends Mapper<HostTypeKey, Writable, HostTypeKey, ObjectWritable> {
 
         @Override
-        public void map(HostTypeKey key, Writable value, OutputCollector<HostTypeKey, ObjectWritable> collector, Reporter reporter) throws IOException {
+        public void map(HostTypeKey key, Writable value, Mapper<HostTypeKey, Writable, HostTypeKey, ObjectWritable>.Context context) throws IOException, InterruptedException {
             ObjectWritable objectWritable = new ObjectWritable(value);
-            collector.collect(key, objectWritable);
-        }
-
-        @Override
-        public void configure(JobConf jobConf) {
-
-        }
-
-        @Override
-        public void close() throws IOException {
-
+            context.write(key, objectWritable);
         }
 
     }
@@ -123,9 +112,6 @@ public class BWLinkDbFilter extends Configured implements Tool {
         private Text _url;
 
         private Inlink _inlink;
-
-        public InlinkEntry() {
-        }
 
         public InlinkEntry(Text url, Inlink inlink) {
             _url = url;
@@ -161,9 +147,6 @@ public class BWLinkDbFilter extends Configured implements Tool {
 
         private Inlinks _inlinks;
 
-        public InlinksEntry() {
-        }
-
         public InlinksEntry(Text url, Inlinks inlinks) {
             _url = url;
             _inlinks = inlinks;
@@ -192,7 +175,7 @@ public class BWLinkDbFilter extends Configured implements Tool {
      * and associates it with a {@link HostTypeKey}. Standard Url-Filtering and
      * normalization can be applied optional.
      */
-    public static class InlinkMapper implements Mapper<Text, Inlinks, HostTypeKey, InlinkEntry> {
+    public static class InlinkMapper extends Mapper<Text, Inlinks, HostTypeKey, InlinkEntry> {
 
         public static final String URL_FILTERING = "bwupdatedb.url.filters";
 
@@ -211,7 +194,7 @@ public class BWLinkDbFilter extends Configured implements Tool {
         private String scope;
 
         @Override
-        public void map(Text key, Inlinks value, OutputCollector<HostTypeKey, InlinkEntry> out, Reporter rep) throws IOException {
+        public void map(Text key, Inlinks value, Mapper<Text, Inlinks, HostTypeKey, InlinkEntry>.Context context) throws IOException, InterruptedException {
 
             String url = key.toString();
             if (urlNormalizers) {
@@ -233,30 +216,30 @@ public class BWLinkDbFilter extends Configured implements Tool {
             }
             if (url != null) { // if it passes
                 Iterator<Inlink> it = value.iterator();
-                String fromUrl = null;
+                String fromUrl;
                 while (it.hasNext()) {
                     Inlink inlink = it.next();
                     fromUrl = inlink.getFromUrl();
                     String host = new URL(fromUrl).getHost();
                     InlinkEntry linkEntry = new InlinkEntry(key, inlink);
-                    out.collect(new HostTypeKey(host, HostTypeKey.INLINK_TYPE), linkEntry);
+                    context.write(new HostTypeKey(host, HostTypeKey.INLINK_TYPE), linkEntry);
                 }
             }
         }
 
-        public void configure(JobConf job) {
-            urlFiltering = job.getBoolean(URL_FILTERING, false);
-            urlNormalizers = job.getBoolean(URL_NORMALIZING, false);
+        @Override
+        protected void setup(Mapper<Text, Inlinks, HostTypeKey, InlinkEntry>.Context context) throws IOException, InterruptedException {
+            super.setup(context);
+            Configuration conf = context.getConfiguration();
+            urlFiltering = conf.getBoolean(URL_FILTERING, false);
+            urlNormalizers = conf.getBoolean(URL_NORMALIZING, false);
             if (urlFiltering) {
-                filters = new URLFilters(job);
+                filters = new URLFilters(conf);
             }
             if (urlNormalizers) {
-                scope = job.get(URL_NORMALIZING_SCOPE, InGridURLNormalizers.SCOPE_BWDB);
-                normalizers = new URLNormalizers(job, scope);
+                scope = conf.get(URL_NORMALIZING_SCOPE, InGridURLNormalizers.SCOPE_BWDB);
+                normalizers = new URLNormalizers(conf, scope);
             }
-        }
-
-        public void close() throws IOException {
         }
 
     }
@@ -266,7 +249,7 @@ public class BWLinkDbFilter extends Configured implements Tool {
      * and associates it with a {@link HostTypeKey}. Standard Url-Filtering and
      * normalization can be applied optional.
      */
-    public static class InlinksMapper implements Mapper<Text, Inlinks, HostTypeKey, InlinksEntry> {
+    public static class InlinksMapper extends Mapper<Text, Inlinks, HostTypeKey, InlinksEntry> {
 
         public static final String URL_FILTERING = "bwupdatedb.url.filters";
 
@@ -285,7 +268,7 @@ public class BWLinkDbFilter extends Configured implements Tool {
         private String scope;
 
         @Override
-        public void map(Text key, Inlinks value, OutputCollector<HostTypeKey, InlinksEntry> out, Reporter rep) throws IOException {
+        public void map(Text key, Inlinks value, Mapper<Text, Inlinks, HostTypeKey, InlinksEntry>.Context context) throws IOException, InterruptedException {
 
             String url = key.toString();
             if (urlNormalizers) {
@@ -308,25 +291,24 @@ public class BWLinkDbFilter extends Configured implements Tool {
             if (url != null) { // if it passes
                 String host = new URL(url).getHost();
                 InlinksEntry linkEntry = new InlinksEntry(key, value);
-                out.collect(new HostTypeKey(host, HostTypeKey.INLINKS_TYPE), linkEntry);
+                context.write(new HostTypeKey(host, HostTypeKey.INLINKS_TYPE), linkEntry);
             }
         }
 
-        public void configure(JobConf job) {
-            urlFiltering = job.getBoolean(URL_FILTERING, false);
-            urlNormalizers = job.getBoolean(URL_NORMALIZING, false);
+        @Override
+        protected void setup(Mapper<Text, Inlinks, HostTypeKey, InlinksEntry>.Context context) throws IOException, InterruptedException {
+            super.setup(context);
+            Configuration conf = context.getConfiguration();
+            urlFiltering = conf.getBoolean(URL_FILTERING, false);
+            urlNormalizers = conf.getBoolean(URL_NORMALIZING, false);
             if (urlFiltering) {
-                filters = new URLFilters(job);
+                filters = new URLFilters(conf);
             }
             if (urlNormalizers) {
-                scope = job.get(URL_NORMALIZING_SCOPE, InGridURLNormalizers.SCOPE_BWDB);
-                normalizers = new URLNormalizers(job, scope);
+                scope = conf.get(URL_NORMALIZING_SCOPE, InGridURLNormalizers.SCOPE_BWDB);
+                normalizers = new URLNormalizers(conf, scope);
             }
         }
-
-        public void close() throws IOException {
-        }
-
     }
 
     /**
@@ -335,14 +317,14 @@ public class BWLinkDbFilter extends Configured implements Tool {
      * {@link InlinkEntry} entries takes place. Base of the filtering is the BW
      * DB.
      */
-    public static class BwReducer implements Reducer<HostTypeKey, ObjectWritable, HostTypeKey, ObjectWritable> {
+    public static class BwReducer extends Reducer<HostTypeKey, ObjectWritable, HostTypeKey, ObjectWritable> {
 
         private BWPatterns _patterns;
 
-        public void reduce(HostTypeKey key, Iterator<ObjectWritable> values, OutputCollector<HostTypeKey, ObjectWritable> out, Reporter report) throws IOException {
+        @Override
+        public void reduce(HostTypeKey key, Iterable<ObjectWritable> values, Reducer<HostTypeKey, ObjectWritable, HostTypeKey, ObjectWritable>.Context context) throws IOException, InterruptedException {
 
-            while (values.hasNext()) {
-                ObjectWritable objectWritable = (ObjectWritable) values.next();
+            for (ObjectWritable objectWritable : values) {
                 Object value = objectWritable.get(); // unwrap
 
                 if (value instanceof BWPatterns) {
@@ -367,21 +349,21 @@ public class BWLinkDbFilter extends Configured implements Tool {
                         if (LOG.isDebugEnabled()) {
                             LOG.debug("BW patterns passed for url: " + (((InlinksEntry) value)._url).toString() + " for HostTypeKey: " + key.toString());
                         }
-                        out.collect(key, objectWritable);
+                        context.write(key, objectWritable);
                     } else {
                         if (LOG.isDebugEnabled()) {
                             LOG.debug("InlinksEntry does not pass BW patterns, remove it: " + (((InlinksEntry) value)._url).toString() + " for HostTypeKey: " + key.toString());
                         }
                     }
                 } else if (value instanceof InlinkEntry) {
-                    String url = (((InlinkEntry) value)._inlink.getFromUrl()).toString();
+                    String url = (((InlinkEntry) value)._inlink.getFromUrl());
                     if (_patterns.willPassBWLists(url)) {
                         // url is outside the black list and matches the white
                         // list
                         if (LOG.isDebugEnabled()) {
                             LOG.debug("BW patterns passed for url: " + (((InlinkEntry) value)._url).toString() + " for HostTypeKey: " + key.toString());
                         }
-                        out.collect(key, objectWritable);
+                        context.write(key, objectWritable);
                     } else {
                         if (LOG.isDebugEnabled()) {
                             LOG.debug("InlinkEntry does not pass BW patterns, remove it: " + (((InlinkEntry) value)._url).toString() + " for HostTypeKey: " + key.toString());
@@ -391,11 +373,32 @@ public class BWLinkDbFilter extends Configured implements Tool {
 
             }
         }
+    }
 
-        public void configure(JobConf arg0) {
-        }
+    /**
+     * This converter transforms the {@link InlinkEntry} and
+     * {@link InlinksEntry} objects that are sorted by the host names back to a
+     * collection of {@link Inlinks} objects that are associated with an url.
+     *
+     * This process transforms the {@link HostTypeKey} based data back into a
+     * link db structure.
+     */
+    public static class LinkDbFormatConverterMapper extends Mapper<HostTypeKey, ObjectWritable, Text, ObjectWritable> {
 
-        public void close() throws IOException {
+        @Override
+        public void map(HostTypeKey key, ObjectWritable value, Mapper<HostTypeKey, ObjectWritable, Text, ObjectWritable>.Context context) throws IOException, InterruptedException {
+
+            Object entry = value.get();
+
+            if (entry instanceof InlinksEntry) {
+                InlinksEntry inlinksEntry = (InlinksEntry) entry;
+                context.write(inlinksEntry._url, value);
+            } else if (entry instanceof InlinkEntry) {
+                InlinkEntry inlinkEntry = (InlinkEntry) entry;
+                context.write(inlinkEntry._url, value);
+            } else {
+                LOG.error("Error mapping, unknown type for  " + entry);
+            }
         }
 
     }
@@ -403,47 +406,25 @@ public class BWLinkDbFilter extends Configured implements Tool {
     /**
      * This converter transforms the {@link InlinkEntry} and
      * {@link InlinksEntry} objects that are sorted by the host names back to a
-     * collection of {@link Inlinks} objects that are associated with a url.
+     * collection of {@link Inlinks} objects that are associated with an url.
      * 
      * This process transforms the {@link HostTypeKey} based data back into a
      * link db structure.
      */
-    public static class LinkDbFormatConverter implements Reducer<Text, ObjectWritable, Text, Inlinks>, Mapper<HostTypeKey, ObjectWritable, Text, ObjectWritable> {
-
-        public void configure(JobConf job) {
-        }
-
-        public void close() throws IOException {
-        }
+    public static class LinkDbFormatConverterReducer extends Reducer<Text, ObjectWritable, Text, Inlinks> {
 
         @Override
-        public void map(HostTypeKey key, ObjectWritable value, OutputCollector<Text, ObjectWritable> out, Reporter rep) throws IOException {
-
-            Object entry = value.get();
-
-            if (entry instanceof InlinksEntry) {
-                InlinksEntry inlinksEntry = (InlinksEntry) entry;
-                out.collect(inlinksEntry._url, value);
-            } else if (entry instanceof InlinkEntry) {
-                InlinkEntry inlinkEntry = (InlinkEntry) entry;
-                out.collect(inlinkEntry._url, value);
-            } else {
-                LOG.error("Error mapping, unknown type for  " + entry);
-            }
-        }
-
-        @Override
-        public void reduce(Text key, Iterator<ObjectWritable> values, OutputCollector<Text, Inlinks> out, Reporter rep) throws IOException {
+        public void reduce(Text key, Iterable<ObjectWritable> values, Reducer<Text, ObjectWritable, Text, Inlinks>.Context context) throws IOException, InterruptedException {
             Inlinks _inlinks = null;
-            List<Inlink> inLinkEntries = new ArrayList<Inlink>();
+            List<Inlink> inLinkEntries = new ArrayList<>();
             Object entry = null;
-            while (values.hasNext()) {
-                entry = values.next().get(); // unwrap
+
+            while (values.iterator().hasNext()) {
+                entry = values.iterator().next().get(); // unwrap
 
                 if (entry instanceof InlinksEntry) {
                     _inlinks = ((InlinksEntry) entry)._inlinks;
                     _inlinks.clear();
-                    continue;
                 } else if (entry instanceof InlinkEntry) {
                     inLinkEntries.add(((InlinkEntry) entry)._inlink);
                 }
@@ -455,20 +436,16 @@ public class BWLinkDbFilter extends Configured implements Tool {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Collect " + key + " : " + _inlinks);
                 }
-                out.collect(key, _inlinks);
+                context.write(key, _inlinks);
             }
         }
 
     }
 
-    public BWLinkDbFilter(Configuration conf) {
-        super(conf);
-    }
-
     public BWLinkDbFilter() {
     }
 
-    public void update(Path linkDb, Path bwdb, boolean normalize, boolean filter, boolean replaceLinkDb) throws IOException {
+    public void update(Path linkDb, Path bwdb, boolean normalize, boolean filter, boolean replaceLinkDb) throws IOException, InterruptedException, ClassNotFoundException {
 
         String name = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
         Path outputLinkDb = new Path(linkDb, name);
@@ -495,58 +472,92 @@ public class BWLinkDbFilter extends Configured implements Tool {
         name = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
         Path wrappedInlinksDbOutput = new Path(linkDb, name);
 
-        JobConf job = new NutchJob(getConf());
+        Job job = NutchJob.getInstance(getConf());
+        Configuration jobConf = job.getConfiguration();
         job.setJobName("filter linkdb against bwdb: wrap INLINKS objects from: " + linkDb);
 
-        job.setInputFormat(SequenceFileInputFormat.class);
+        job.setInputFormatClass(SequenceFileInputFormat.class);
 
         Path current = new Path(linkDb, CURRENT_NAME);
-        if (FileSystem.get(job).exists(current)) {
+        if (fs.exists(current)) {
             FileInputFormat.addInputPath(job, current);
         }
 
         job.setMapperClass(InlinksMapper.class);
 
         FileOutputFormat.setOutputPath(job, wrappedInlinksDbOutput);
-        job.setOutputFormat(MapFileOutputFormat.class);
+        job.setOutputFormatClass(MapFileOutputFormat.class);
         job.setOutputKeyClass(HostTypeKey.class);
         job.setOutputValueClass(InlinksEntry.class);
-        job.setBoolean(InlinksMapper.URL_FILTERING, filter);
-        job.setBoolean(InlinksMapper.URL_NORMALIZING, normalize);
-        JobClient.runJob(job);
+        jobConf.setBoolean(InlinksMapper.URL_FILTERING, filter);
+        jobConf.setBoolean(InlinksMapper.URL_NORMALIZING, normalize);
+        Path lock = CrawlDb.lock(getConf(), current, false);
+        try {
+            boolean success = job.waitForCompletion(true);
+            if (!success) {
+                String message = "Job did not succeed, job status:"
+                        + job.getStatus().getState() + ", reason: "
+                        + job.getStatus().getFailureInfo();
+                LOG.error(message);
+                throw new RuntimeException(message);
+            }
+        } catch (IOException | InterruptedException | ClassNotFoundException e) {
+            LOG.error("Job failed: {}", e);
+            throw e;
+        } finally {
+            LockUtil.removeLockFile(fs, lock);
+        }
 
         // wrapping inlink objects
         LOG.info("filter linkdb against bwdb: wrapping INLINK(!) objects started.");
         name = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
         Path wrappedInlinkDbOutput = new Path(linkDb, name);
 
-        job = new NutchJob(getConf());
+        job = NutchJob.getInstance(getConf());
+        jobConf = job.getConfiguration();
         job.setJobName("filter linkdb against bwdb: wrap INLINK(!) objects from: " + linkDb);
 
-        job.setInputFormat(SequenceFileInputFormat.class);
+        job.setInputFormatClass(SequenceFileInputFormat.class);
 
         current = new Path(linkDb, CURRENT_NAME);
-        if (FileSystem.get(job).exists(current)) {
+        if (fs.exists(current)) {
             FileInputFormat.addInputPath(job, current);
         }
 
         job.setMapperClass(InlinkMapper.class);
 
         FileOutputFormat.setOutputPath(job, wrappedInlinkDbOutput);
-        job.setOutputFormat(MapFileOutputFormat.class);
+        job.setOutputFormatClass(MapFileOutputFormat.class);
         job.setOutputKeyClass(HostTypeKey.class);
         job.setOutputValueClass(InlinkEntry.class);
-        job.setBoolean(InlinkMapper.URL_FILTERING, filter);
-        job.setBoolean(InlinkMapper.URL_NORMALIZING, normalize);
-        JobClient.runJob(job);
+        jobConf.setBoolean(InlinkMapper.URL_FILTERING, filter);
+        jobConf.setBoolean(InlinkMapper.URL_NORMALIZING, normalize);
+        lock = CrawlDb.lock(getConf(), current, false);
+        try {
+            boolean success = job.waitForCompletion(true);
+            if (!success) {
+                String message = "Job did not succeed, job status:"
+                        + job.getStatus().getState() + ", reason: "
+                        + job.getStatus().getFailureInfo();
+                LOG.error(message);
+                throw new RuntimeException(message);
+            }
+        } catch (IOException | InterruptedException | ClassNotFoundException e) {
+            LOG.error("Job failed: {}", e);
+            throw e;
+        } finally {
+            LockUtil.removeLockFile(fs, lock);
+        }
 
         // filtering
         LOG.info("filter linkdb against bwdb: filtering started.");
         name = Integer.toString(new Random().nextInt(Integer.MAX_VALUE));
         Path tmpMergedDb = new Path(linkDb, name);
-        JobConf filterJob = new NutchJob(getConf());
+
+        Job filterJob = NutchJob.getInstance(getConf());
+
         filterJob.setJobName("filtering: " + wrappedInlinksDbOutput + wrappedInlinkDbOutput + bwdb);
-        filterJob.setInputFormat(SequenceFileInputFormat.class);
+        filterJob.setInputFormatClass(SequenceFileInputFormat.class);
 
         FileInputFormat.addInputPath(filterJob, wrappedInlinksDbOutput);
         FileInputFormat.addInputPath(filterJob, wrappedInlinkDbOutput);
@@ -554,33 +565,61 @@ public class BWLinkDbFilter extends Configured implements Tool {
         FileOutputFormat.setOutputPath(filterJob, tmpMergedDb);
         filterJob.setMapperClass(ObjectWritableMapper.class);
         filterJob.setReducerClass(BwReducer.class);
-        filterJob.setOutputFormat(MapFileOutputFormat.class);
+        filterJob.setOutputFormatClass(MapFileOutputFormat.class);
         filterJob.setOutputKeyClass(HostTypeKey.class);
         filterJob.setOutputValueClass(ObjectWritable.class);
-        JobClient.runJob(filterJob);
 
-        // remove wrappedSegOutput
-        FileSystem.get(job).delete(wrappedInlinksDbOutput, true);
-        FileSystem.get(job).delete(wrappedInlinkDbOutput, true);
+        Path wrappedInlinksDbOutputLock = CrawlDb.lock(getConf(), wrappedInlinksDbOutput, false);
+        Path wrappedInlinkDbOutputLock = CrawlDb.lock(getConf(), wrappedInlinkDbOutput, false);
+        try {
+            boolean success = filterJob.waitForCompletion(true);
+            if (!success) {
+                String message = "Job did not succeed, job status:"
+                        + filterJob.getStatus().getState() + ", reason: "
+                        + filterJob.getStatus().getFailureInfo();
+                LOG.error(message);
+                throw new RuntimeException(message);
+            }
+        } catch (IOException | InterruptedException | ClassNotFoundException e) {
+            LOG.error("Job failed: {}", e);
+            throw e;
+        } finally {
+            NutchJob.cleanupAfterFailure(wrappedInlinksDbOutput, wrappedInlinksDbOutputLock, fs);
+            NutchJob.cleanupAfterFailure(wrappedInlinkDbOutput, wrappedInlinkDbOutputLock, fs);
+        }
 
         // convert formats
         LOG.info("filter linkdb against bwdb: converting started.");
-        JobConf convertJob = new NutchJob(getConf());
+
+        Job convertJob = NutchJob.getInstance(getConf());
+
         convertJob.setJobName("format converting: " + tmpMergedDb);
         FileInputFormat.addInputPath(convertJob, tmpMergedDb);
-        convertJob.setInputFormat(SequenceFileInputFormat.class);
+        convertJob.setInputFormatClass(SequenceFileInputFormat.class);
         convertJob.setMapOutputKeyClass(Text.class);
         convertJob.setMapOutputValueClass(ObjectWritable.class);
-        convertJob.setMapperClass(LinkDbFormatConverter.class);
-        convertJob.setReducerClass(LinkDbFormatConverter.class);
+        convertJob.setMapperClass(LinkDbFormatConverterMapper.class);
+        convertJob.setReducerClass(LinkDbFormatConverterReducer.class);
         FileOutputFormat.setOutputPath(convertJob, outputLinkDb);
-        convertJob.setOutputFormat(MapFileOutputFormat.class);
+        convertJob.setOutputFormatClass(MapFileOutputFormat.class);
         convertJob.setOutputKeyClass(Text.class);
         convertJob.setOutputValueClass(Inlinks.class);
-        JobClient.runJob(convertJob);
-
-        //
-        FileSystem.get(job).delete(tmpMergedDb, true);
+        lock = CrawlDb.lock(getConf(), tmpMergedDb, false);
+        try {
+            boolean success = convertJob.waitForCompletion(true);
+            if (!success) {
+                String message = "Job did not succeed, job status:"
+                        + convertJob.getStatus().getState() + ", reason: "
+                        + convertJob.getStatus().getFailureInfo();
+                LOG.error(message);
+                throw new RuntimeException(message);
+            }
+        } catch (IOException | InterruptedException | ClassNotFoundException e) {
+            LOG.error("Job failed: {}", e);
+            throw e;
+        } finally {
+            NutchJob.cleanupAfterFailure(tmpMergedDb, lock, fs);
+        }
 
         if (replaceLinkDb) {
             LOG.info("filter linkdb against bwdb: replace current linkdb");
@@ -603,7 +642,7 @@ public class BWLinkDbFilter extends Configured implements Tool {
         }
         try {
 
-            update(new Path(args[0]), new Path(args[1]), Boolean.valueOf(args[2]), Boolean.valueOf(args[3]), Boolean.valueOf(args[4]));
+            update(new Path(args[0]), new Path(args[1]), Boolean.parseBoolean(args[2]), Boolean.parseBoolean(args[3]), Boolean.parseBoolean(args[4]));
 
             return 0;
         } catch (Exception e) {
