@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="5.14.0-SNAPSHOT" date="2021-xx-xx" description="Release 5.14.0-SNAPSHOT">
+      <action type="fix" dev="wemove" issue="4262">
+        Fix problems with crawl if only redirected URLs exist in url management.
+      </action>
     </release>
 
     <release version="5.13.0" date="2022-07-21" description="Release 5.13.0">
