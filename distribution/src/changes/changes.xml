@@ -6,6 +6,9 @@
   </properties>
   <body>
     <release version="5.14.0-SNAPSHOT" date="2021-xx-xx" description="Release 5.14.0-SNAPSHOT">
+      <action type="fix" dev="wemove" issue="1749">
+        Disable transfer from Elasticsearch fields to PD if indexing is routed via an iBus connection.
+      </action>
       <action type="fix" dev="wemove" issue="4262">
         Fix problems with crawl if only redirected URLs exist in url management.
       </action>
