@@ -68,29 +68,32 @@ public class IPlugSEPostCrawlProcessor implements IPostCrawlProcessor {
         try {
             PlugDescription pd = plugDescriptionService.getPlugDescription();
 
-            Client client = elasticSearch.getClient();
-            ClusterState clusterState = client.admin().cluster().prepareState().execute().actionGet().getState();
-            IndexMetaData inMetaData = clusterState.getMetaData().index( instance.getInstanceIndexName() );
-
-            ImmutableOpenMap<String, MappingMetaData> metad = inMetaData.getMappings();
             List<Object> fields = pd.getArrayList(PlugDescription.FIELDS);
             if (fields == null) {
                 fields = new ArrayList<>();
                 pd.put(PlugDescription.FIELDS, fields);
             }
 
-            for (Iterator<MappingMetaData> i = metad.valuesIt(); i.hasNext();) {
-                MappingMetaData mmd = i.next();
-                @SuppressWarnings("unchecked")
-                Map<String, Object> src = (Map<String, Object>) mmd.getSourceAsMap().get("properties");
-                for (String f : src.keySet()) {
-                    if (!fields.contains(f)) {
-                        pd.addField(f);
+            Client client = elasticSearch.getClient();
+            if (client != null) {
+                ClusterState clusterState = client.admin().cluster().prepareState().execute().actionGet().getState();
+                IndexMetaData inMetaData = clusterState.getMetaData().index(instance.getInstanceIndexName());
+                ImmutableOpenMap<String, MappingMetaData> metad = inMetaData.getMappings();
+                for (Iterator<MappingMetaData> i = metad.valuesIt(); i.hasNext(); ) {
+                    MappingMetaData mmd = i.next();
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> src = (Map<String, Object>) mmd.getSourceAsMap().get("properties");
+                    for (String f : src.keySet()) {
+                        if (!fields.contains(f)) {
+                            pd.addField(f);
+                        }
                     }
                 }
-            }
-            if (!fields.contains("site")) {
-                pd.addField("site");
+                if (!fields.contains("site")) {
+                    pd.addField("site");
+                }
+            } else {
+                LOG.warn("Unable to add fields from Elasticsearch index mapping to plugdescription. No Elasticsearch client found.");
             }
 
             plugDescriptionService.savePlugDescription(pd);

@@ -5,6 +5,18 @@
     <author email="joachim@wemove.com">Joachim Müller</author>
   </properties>
   <body>
+    <release version="5.14.0" date="2022-10-04" description="Release 5.14.0">
+      <action type="fix" dev="wemove" issue="1749">
+        Disable transfer from Elasticsearch fields to PD if indexing is routed via an iBus connection.
+      </action>
+      <action type="fix" dev="wemove" issue="4262">
+        Fix problems with crawl if only redirected URLs exist in url management.
+      </action>
+      <action type="fix" dev="wemove" issue="4027">
+        Fix iplug filtering
+      </action>
+    </release>
+
     <release version="5.13.0" date="2022-07-21" description="Release 5.13.0">
       <action type="update" dev="wemove" issue="132">
         Upgrade iPlug-SE to current apache nutch version

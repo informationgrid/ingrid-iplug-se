@@ -368,7 +368,13 @@
     <property>
         <name>ingrid.index.no.deduplication</name>
         <value>false</value>
-        <description>If true duplicates will not ne removed from index.</description>
+        <description>If true duplicates will not be removed from index.</description>
     </property>
+
+	<property>
+		<name>http.redirect.max</name>
+		<value>5</value>
+	</property>
+
 
 </configuration>

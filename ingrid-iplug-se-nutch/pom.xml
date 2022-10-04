@@ -3,7 +3,7 @@
   <parent>
     <groupId>de.ingrid</groupId>
     <artifactId>ingrid-iplug-se-project</artifactId>
-    <version>5.13.0</version>
+    <version>5.14.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>ingrid-iplug-se-nutch</artifactId>
@@ -53,7 +53,7 @@
     <dependency>
       <groupId>de.ingrid</groupId>
       <artifactId>ingrid-elasticsearch-tools</artifactId>
-      <version>5.12.0</version>
+      <version>5.14.0</version>
     </dependency>
 
     <dependency>
