@@ -25,7 +25,6 @@ package de.ingrid.iplug.se.webapp.controller.instance;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import de.ingrid.admin.Config;
-import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
 import de.ingrid.admin.service.CommunicationService;
 import de.ingrid.elasticsearch.*;
@@ -431,7 +430,7 @@ public class RestDataController extends InstanceController {
 	private void toggleIndexInIBus(String name, boolean activate) throws Exception {
 		IngridCall ingridCall = new IngridCall();
 		ingridCall.setTarget("iBus");
-		ingridCall.setParameter(JettyStarter.baseConfig.uuid + "=>" + JettyStarter.baseConfig.index + "_" + name + ":default");
+		ingridCall.setParameter(SEIPlug.baseConfig.uuid + "=>" + SEIPlug.baseConfig.index + "_" + name + ":default");
 
 		if (activate) {
 			ingridCall.setMethod("activateIndex");

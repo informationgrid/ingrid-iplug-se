@@ -38,7 +38,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import de.ingrid.admin.Config;
-import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.service.PlugDescriptionService;
 import de.ingrid.elasticsearch.IndexManager;
 import de.ingrid.iplug.se.elasticsearch.Utils;
@@ -66,11 +65,11 @@ public class NutchProcessTest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        JettyStarter.baseConfig = new Config();
-        JettyStarter.baseConfig.index = "test";
+        SEIPlug.baseConfig = new Config();
+        SEIPlug.baseConfig.index = "test";
 //        JettyStarter.baseConfig.indexWithAutoId = true;
         // JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<>();
-        JettyStarter.baseConfig.communicationProxyUrl = "/ingrid-group:unit-tests";
+        SEIPlug.baseConfig.communicationProxyUrl = "/ingrid-group:unit-tests";
         Utils.setupES();
     }
 

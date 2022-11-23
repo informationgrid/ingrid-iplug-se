@@ -1,7 +1,7 @@
 FROM alpine AS builder
 
 COPY ingrid-iplug-se*-installer.jar /
-RUN unzip ingrid-iplug-se*-installer.jar -d /tmp \
+RUN unzip -q ingrid-iplug-se*-installer.jar -d /tmp \
     && export INSTALL_DIR=`ls -d1 /tmp/ingrid-iplug-se-*` \
     && sed -i -r 's/(<AppenderRef.*\/>)/\1<AppenderRef ref="Console" \/>/g' $INSTALL_DIR/conf/log4j2.xml \
     && echo jetty.port=8080 > $INSTALL_DIR/conf/config.override.properties

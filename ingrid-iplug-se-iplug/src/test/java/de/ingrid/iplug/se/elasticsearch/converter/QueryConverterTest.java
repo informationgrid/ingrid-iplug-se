@@ -22,7 +22,6 @@
  */
 package de.ingrid.iplug.se.elasticsearch.converter;
 
-import de.ingrid.admin.JettyStarter;
 import de.ingrid.elasticsearch.ElasticConfig;
 import de.ingrid.elasticsearch.IndexInfo;
 import de.ingrid.elasticsearch.search.IQueryParsers;
@@ -46,7 +45,6 @@ public class QueryConverterTest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        new JettyStarter( false );
         queryConverter = new QueryConverter();
         List<IQueryParsers> parsers = new ArrayList<>();
         parsers.add( new MatchAllQueryConverter() );

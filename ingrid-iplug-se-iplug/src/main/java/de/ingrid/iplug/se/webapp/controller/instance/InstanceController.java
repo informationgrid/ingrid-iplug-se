@@ -22,9 +22,7 @@
  */
 package de.ingrid.iplug.se.webapp.controller.instance;
 
-import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.controller.AbstractController;
-import de.ingrid.admin.security.IngridPrincipal;
 import de.ingrid.admin.service.CommunicationService;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.utils.DBUtils;
@@ -56,12 +54,12 @@ public class InstanceController extends AbstractController {
         instance.setName( name );
         instance.setWorkingDirectory( workPath.toString() );
         instance.setClusterName( SEIPlug.conf.clusterName );
-        instance.setIndexName( JettyStarter.baseConfig.index );
+        instance.setIndexName( SEIPlug.baseConfig.index );
 
         HashSet<String> activeIndices = getActiveIndices();
 
         if (activeIndices != null) {
-            String iBusIndexId = JettyStarter.baseConfig.uuid + "=>" + instance.getInstanceIndexName() + ":default";
+            String iBusIndexId = SEIPlug.baseConfig.uuid + "=>" + instance.getInstanceIndexName() + ":default";
             if (activeIndices.contains(iBusIndexId)) {
                 instance.setIsActive(true);
 
@@ -106,11 +104,13 @@ public class InstanceController extends AbstractController {
      */
     public boolean hasNoAccessToInstance(String instanceName, HttpServletRequest request, HttpServletResponse response) {
         String user = request.getUserPrincipal().getName();
-        if (!(request.getUserPrincipal() instanceof IngridPrincipal.SuperAdmin) && request.isUserInRole( "instanceAdmin" ) && !DBUtils.isAdminForInstance( user, instanceName )) {
+        // TODO: !!!
+        return true;
+        /*if (!(request.getUserPrincipal() instanceof IngridPrincipal.SuperAdmin) && request.isUserInRole( "instanceAdmin" ) && !DBUtils.isAdminForInstance( user, instanceName )) {
             return true;
         } else {
             return false;
-        }
+        }*/
         
     }
 

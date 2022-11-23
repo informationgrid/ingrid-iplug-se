@@ -24,7 +24,6 @@ package de.ingrid.iplug.se.webapp.controller;
 
 import de.ingrid.admin.Config;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
-import de.ingrid.admin.security.IngridPrincipal;
 import de.ingrid.elasticsearch.IndexManager;
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.db.model.Url;
@@ -118,10 +117,11 @@ public class ListInstancesController extends InstanceController {
             }
         }*/
         
-        if (!(request.getUserPrincipal() instanceof IngridPrincipal.SuperAdmin) && request.isUserInRole( "instanceAdmin" )) {
+        // TODO: !!!
+        /*if (!(request.getUserPrincipal() instanceof IngridPrincipal.SuperAdmin) && request.isUserInRole( "instanceAdmin" )) {
             String user = request.getUserPrincipal().getName();
             instances.removeIf(instance -> !DBUtils.isAdminForInstance( user, instance.getName() ));
-        }
+        }*/
         
         modelMap.put( "instances", instances );
         return AdminViews.SE_LIST_INSTANCES;
@@ -139,10 +139,11 @@ public class ListInstancesController extends InstanceController {
             @RequestParam("instance") String name,
             @RequestParam(value = "duplicateFrom", required = false) String from, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        if (!(request.getUserPrincipal() instanceof IngridPrincipal.SuperAdmin) && request.isUserInRole( "instanceAdmin" )) {
+        // TODO: !!!
+        /*if (!(request.getUserPrincipal() instanceof IngridPrincipal.SuperAdmin) && request.isUserInRole( "instanceAdmin" )) {
             response.sendError(HttpStatus.FORBIDDEN.value());
             return null;
-        }
+        }*/
         
         if (name == null || name.isEmpty()) {
             modelMap.put( "instances", getInstances() );

@@ -3,12 +3,12 @@
   <parent>
     <groupId>de.ingrid</groupId>
     <artifactId>ingrid-releases-pom</artifactId>
-    <version>5.11.0</version>
+    <version>5.15.0.3324-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>ingrid-iplug-se-project</artifactId>
   <packaging>pom</packaging>
-  <version>5.15.0-SNAPSHOT</version>
+  <version>5.15.0.3324-SNAPSHOT</version>
   <name>InGrid iPlug SE</name>
   <description>This iPlug indexes documents from websites and can be queried by the iBus.</description>
 
@@ -33,9 +33,9 @@
   <!-- ==================== PROPERTIES ==================== -->
   <properties>
     <apache-nutch-version>apache-nutch-1.18</apache-nutch-version>
-    <ingrid-base-webapp.version>5.12.0</ingrid-base-webapp.version>
+    <ingrid-base-webapp.version>5.15.0.3324-SNAPSHOT</ingrid-base-webapp.version>
     <elasticsearch.version>6.8.17</elasticsearch.version>
-    <log4j2.version>2.17.1</log4j2.version>
+    <log4j2.version>2.19.0</log4j2.version>
   </properties>
 
   <modules>
@@ -58,11 +58,6 @@
         <version>1.7.30</version>
       </dependency>
       <dependency>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>jetty</artifactId>
-        <version>6.1.26</version>
-      </dependency>
-      <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-1.2-api</artifactId>
         <version>${log4j2.version}</version>
@@ -70,6 +65,11 @@
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-api</artifactId>
+        <version>${log4j2.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
         <version>${log4j2.version}</version>
       </dependency>
       <dependency>
@@ -151,8 +151,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.1</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <source>17</source>
+          <target>17</target>
         </configuration>
       </plugin>
       <plugin>
@@ -164,6 +164,7 @@
           <!-- following is needed since this plugin mixes up the JAVA_HOME directory
                         a bit. This dependency is necessary to be able to call javac ant task in
                         a multi module maven project setup. -->
+<!--
           <dependency>
             <groupId>com.sun</groupId>
             <artifactId>tools</artifactId>
@@ -171,6 +172,7 @@
             <scope>system</scope>
             <systemPath>${java.home}/../lib/tools.jar</systemPath>
           </dependency>
+-->
         </dependencies>
       </plugin>
       <!--

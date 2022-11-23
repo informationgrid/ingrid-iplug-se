@@ -302,9 +302,8 @@ public class Migrator {
             } else {
                 emf = Persistence.createEntityManagerFactory(migratorConfig.databaseID, properties);
                 // do database migrations
-                Flyway flyway = new Flyway();
                 String dbUrl = "jdbc:h2:" + dbDir.toFile().getAbsolutePath() + "/urls;MVCC=true";
-                flyway.setDataSource(dbUrl, "", "");
+                Flyway flyway = new Flyway(Flyway.configure().dataSource(dbUrl, "", ""));
                 flyway.migrate();
             }
             

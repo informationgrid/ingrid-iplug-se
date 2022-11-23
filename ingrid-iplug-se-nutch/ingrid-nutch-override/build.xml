@@ -91,7 +91,7 @@
     <mkdir dir="${test.build.classes}"/>
     <mkdir dir="${test.build.lib.dir}"/>
 
-    <touch datetime="01/25/1971 2:00 pm">
+    <touch>
       <fileset dir="${conf.dir}" includes="**/*.template"/>
     </touch>
 
