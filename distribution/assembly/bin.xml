@@ -69,6 +69,8 @@
         <include>instance-data/urlMaintenance.json</include>
         <include>default-mapping.json</include>
         <include>default-settings.json</include>
+        <include>application.properties</include>
+        <include>springapp-servlet.xml</include>
       </includes>
     </fileSet>
     <fileSet>
@@ -83,9 +85,6 @@
     <fileSet>
       <directory>../ingrid-iplug-se-iplug/src/main/webapp</directory>
       <outputDirectory>${project.build.finalName}/public</outputDirectory>
-      <excludes>
-        <exclude>**/WEB-INF/jetty-web.xml</exclude>
-      </excludes>
     </fileSet>
     <fileSet>
       <directory>../ingrid-iplug-se-iplug/target/base-webapp</directory>
