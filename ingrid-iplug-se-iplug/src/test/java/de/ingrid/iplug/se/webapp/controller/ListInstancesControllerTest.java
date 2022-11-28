@@ -54,7 +54,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.ui.ModelMap;
 
-import de.ingrid.admin.JettyStarter;
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.utils.ElasticSearchUtils;
@@ -80,7 +79,7 @@ public class ListInstancesControllerTest extends Mockito {
     
     @Before
     public void initTest() throws Exception {
-        JettyStarter.baseConfig = new Config();
+        SEIPlug.baseConfig = new Config();
         // JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<>();
         MockitoAnnotations.initMocks( this );
         PowerMockito.mockStatic( ElasticSearchUtils.class );
@@ -88,7 +87,7 @@ public class ListInstancesControllerTest extends Mockito {
         Settings.Builder builder = Settings.builder();
         TransportClient transportClient = new PreBuiltTransportClient(builder.build());
         Mockito.when( esBean.getClient() ).thenReturn( transportClient );
-        Mockito.when( ElasticSearchUtils.typeExists( Mockito.anyString(), (Client) Mockito.anyObject() ) ).thenReturn( false );
+        Mockito.when( ElasticSearchUtils.typeExists( Mockito.anyString(), (Client) Mockito.any() ) ).thenReturn( false );
 
         InstanceController.setCommunicationInterface(commInterfaceMock);
         when(commInterfaceMock.getIBus()).thenReturn(iBusMock);
