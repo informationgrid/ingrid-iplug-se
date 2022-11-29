@@ -28,7 +28,7 @@
     <div id="language">
         <a href="../base/auth/logout.html"><fmt:message key="DatabaseConfig.main.logout" /></a>
     </div>
-    </security:authorize>>
+    </security:authorize>
 </div>
 <div id="help">
     <a href="#">[?]</a>

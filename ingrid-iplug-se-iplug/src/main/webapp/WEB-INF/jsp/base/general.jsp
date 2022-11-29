@@ -82,7 +82,7 @@
 		<h1>Konfiguration</h1>
 		<security:authorize access="isAuthenticated()">
 			<div id="language"><a href="../base/auth/logout.html">Logout</a></div>
-		</security:authorize>>
+		</security:authorize>
 	</div>
 	
 	<div id="help"><a href="#">[?]</a></div>

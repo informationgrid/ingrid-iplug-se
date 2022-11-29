@@ -173,7 +173,7 @@ public class SEIPlug extends HeartBeatPlug {
         // set the directory of the database to the configured one
         Map<String, String> properties = new HashMap<String, String>();
         Path dbDir = Paths.get(seConfig.databaseDir);
-        properties.put("javax.persistence.jdbc.url", "jdbc:h2:" + dbDir.toFile().getAbsolutePath() + "/urls;AUTO_SERVER=TRUE");
+        properties.put("javax.persistence.jdbc.url", "jdbc:h2:" + dbDir.toFile().getAbsolutePath() + "/urls;MVCC=true;AUTO_SERVER=TRUE");
 
         // get an entity manager instance (initializes properties in the
         // DBManager)
@@ -201,10 +201,10 @@ public class SEIPlug extends HeartBeatPlug {
 
         } else {
             // do database migrations
+            Flyway flyway = new Flyway();
             String dbUrl = DBManager.INSTANCE.getProperty("javax.persistence.jdbc.url").toString();
-            Flyway flyway = new Flyway(Flyway.configure()
-                    .dataSource(dbUrl, "", "")
-                    .baselineOnMigrate(true));
+            flyway.setDataSource(dbUrl, "", "");
+            flyway.setInitOnMigrate( true );
             try {
                 flyway.migrate();
             } catch (Exception ex) {
