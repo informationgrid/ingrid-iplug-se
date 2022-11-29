@@ -118,6 +118,16 @@
         <artifactId>spring-core</artifactId>
         <version>${spring.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.lucene</groupId>
+        <artifactId>lucene-core</artifactId>
+        <version>6.4.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.lucene</groupId>
+        <artifactId>lucene-analyzers-common</artifactId>
+        <version>6.4.1</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 

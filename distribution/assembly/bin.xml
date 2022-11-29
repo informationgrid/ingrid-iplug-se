@@ -71,6 +71,7 @@
         <include>default-settings.json</include>
         <include>application.properties</include>
         <include>springapp-servlet.xml</include>
+        <include>messages.properties</include>
       </includes>
     </fileSet>
     <fileSet>

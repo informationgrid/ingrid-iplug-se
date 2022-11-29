@@ -133,9 +133,9 @@ public class SEIPlug extends HeartBeatPlug {
 
     private Configuration seConfig;
 
-    private static ElasticsearchNodeFactoryBean esBean;
+//    private static ElasticsearchNodeFactoryBean esBean;
 
-    private static NutchController nutchController;
+//    private static NutchController nutchController;
 
     private static EntityManager em;
 
@@ -147,10 +147,10 @@ public class SEIPlug extends HeartBeatPlug {
 
     @Autowired
     public SEIPlug(IMetadataInjector[] injector, IPreProcessor[] preProcessors, IPostProcessor[] postProcessors,
-                   ElasticsearchNodeFactoryBean esBean, NutchController nutchController, Configuration seConfig, Config baseConfig) throws SQLException {
+                   Configuration seConfig, Config baseConfig) throws SQLException {
         super(30000, new PlugDescriptionFieldFilters(), injector, preProcessors, postProcessors);
-        SEIPlug.esBean = esBean;
-        SEIPlug.nutchController = nutchController;
+//        SEIPlug.esBean = esBean;
+//        SEIPlug.nutchController = nutchController;
         this.seConfig = seConfig;
         conf = seConfig;
         
@@ -318,7 +318,7 @@ public class SEIPlug extends HeartBeatPlug {
 
         // normally shutdown the elastic search node and stop all running
         // nutch processes
-        Runtime.getRuntime().addShutdownHook(new Thread() {
+/*        Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 try {
                     esBean.destroy();
@@ -333,7 +333,7 @@ public class SEIPlug extends HeartBeatPlug {
                     log.error("Error shutting down", e);
                 }
             }
-        });
+        })*/;
     }
 
     private static void setupTestData(EntityManager em) {
