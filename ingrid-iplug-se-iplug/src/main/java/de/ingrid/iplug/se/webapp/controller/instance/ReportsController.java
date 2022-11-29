@@ -62,11 +62,10 @@ public class ReportsController extends AbstractController {
 	@RequestMapping(value = { "/iplug-pages/instanceReports.html" }, method = RequestMethod.GET)
 	public String showReports(final ModelMap modelMap, @RequestParam("instance") String name, HttpServletRequest request, HttpServletResponse response) throws IOException {
         String user = request.getUserPrincipal().getName();
-		// TODO: !!!
-        /*if (!(request.getUserPrincipal() instanceof IngridPrincipal.SuperAdmin) && request.isUserInRole( "instanceAdmin" ) && !DBUtils.isAdminForInstance( user, name )) {
+        if (request.isUserInRole( "instanceAdmin" ) && !DBUtils.isAdminForInstance( user, name )) {
             response.sendError(HttpStatus.FORBIDDEN.value());
             return null;
-        }*/
+        }
 
         Instance instance = InstanceController.getInstanceData(name);
 

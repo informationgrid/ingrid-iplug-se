@@ -117,11 +117,10 @@ public class ListInstancesController extends InstanceController {
             }
         }*/
         
-        // TODO: !!!
-        /*if (!(request.getUserPrincipal() instanceof IngridPrincipal.SuperAdmin) && request.isUserInRole( "instanceAdmin" )) {
+        if (request.isUserInRole( "instanceAdmin" )) {
             String user = request.getUserPrincipal().getName();
             instances.removeIf(instance -> !DBUtils.isAdminForInstance( user, instance.getName() ));
-        }*/
+        }
         
         modelMap.put( "instances", instances );
         return AdminViews.SE_LIST_INSTANCES;
@@ -139,11 +138,10 @@ public class ListInstancesController extends InstanceController {
             @RequestParam("instance") String name,
             @RequestParam(value = "duplicateFrom", required = false) String from, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        // TODO: !!!
-        /*if (!(request.getUserPrincipal() instanceof IngridPrincipal.SuperAdmin) && request.isUserInRole( "instanceAdmin" )) {
+        if (request.isUserInRole( "instanceAdmin" )) {
             response.sendError(HttpStatus.FORBIDDEN.value());
             return null;
-        }*/
+        }
         
         if (name == null || name.isEmpty()) {
             modelMap.put( "instances", getInstances() );

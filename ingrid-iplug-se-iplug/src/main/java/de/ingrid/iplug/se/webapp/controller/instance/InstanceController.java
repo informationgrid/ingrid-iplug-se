@@ -104,13 +104,11 @@ public class InstanceController extends AbstractController {
      */
     public boolean hasNoAccessToInstance(String instanceName, HttpServletRequest request, HttpServletResponse response) {
         String user = request.getUserPrincipal().getName();
-        // TODO: !!!
-        return true;
-        /*if (!(request.getUserPrincipal() instanceof IngridPrincipal.SuperAdmin) && request.isUserInRole( "instanceAdmin" ) && !DBUtils.isAdminForInstance( user, instanceName )) {
+        if (request.isUserInRole( "instanceAdmin" ) && !DBUtils.isAdminForInstance( user, instanceName )) {
             return true;
         } else {
             return false;
-        }*/
+        }
         
     }
 

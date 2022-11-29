@@ -107,7 +107,7 @@ public class DBUtils {
             CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
             CriteriaQuery<InstanceAdmin> createQuery = criteriaBuilder.createQuery( InstanceAdmin.class );
             Root<InstanceAdmin> adminTable = createQuery.from( InstanceAdmin.class );
-            List<Predicate> criteria = new ArrayList<Predicate>();
+            List<Predicate> criteria = new ArrayList<>();
             criteria.add( criteriaBuilder.equal( adminTable.get( "login" ), login ) );
             criteria.add( criteriaBuilder.equal( adminTable.get( "instance" ), instance ) );
             createQuery.select( adminTable ).where( criteriaBuilder.and( criteria.toArray( new Predicate[0] ) ) );

@@ -74,7 +74,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 @RestController
-@RequestMapping("/") // in web.xml it is dispatched from "/rest/..."!!!
+@RequestMapping("/rest") // in web.xml it is dispatched from "/rest/..."!!!
 @SessionAttributes("plugDescription")
 public class RestDataController extends InstanceController {
 

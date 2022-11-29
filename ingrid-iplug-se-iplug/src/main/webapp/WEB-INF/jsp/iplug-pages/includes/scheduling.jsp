@@ -55,7 +55,7 @@
                 <div class="panel-container">
                     <div id="tab1">
                         <p>
-                            <form:form action="daily.html" method="post" commandName="clockCommand">
+                            <form:form action="daily.html" method="post" modelAttribute="clockCommand">
                                 <input type="hidden" name="instance" value="${instance.name}" />
                                 <fieldset>
                                     <legend>
@@ -104,7 +104,7 @@
                     <div id="tab2">
                         <p>
 
-                            <form:form action="weekly.html" method="post" commandName="weeklyCommand">
+                            <form:form action="weekly.html" method="post" modelAttribute="weeklyCommand">
                                 <input type="hidden" name="instance" value="${instance.name}" />
                                 <fieldset>
                                     <legend>
@@ -162,7 +162,7 @@
                     </div>
                     <div id="tab3">
                         <p>
-                            <form:form action="monthly.html" method="post" commandName="monthlyCommand">
+                            <form:form action="monthly.html" method="post" modelAttribute="monthlyCommand">
                                 <input type="hidden" name="instance" value="${instance.name}" />
                                 <fieldset>
                                     <legend>
@@ -222,7 +222,7 @@
                     </div>
                     <div id="tab4">
                         <p>
-                            <form:form action="advanced.html" method="post" commandName="advancedCommand">
+                            <form:form action="advanced.html" method="post" modelAttribute="advancedCommand">
                                 <input type="hidden" name="instance" value="${instance.name}" />
                                 <fieldset>
                                     <legend>

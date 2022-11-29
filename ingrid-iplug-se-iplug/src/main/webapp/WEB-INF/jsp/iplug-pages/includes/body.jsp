@@ -18,23 +18,17 @@
   **************************************************#
   --%>
 <%@ include file="/WEB-INF/jsp/base/include.jsp"%>
-<%@page import="de.ingrid.admin.security.IngridPrincipal"%>
 
 <div id="header">
     <img src="../images/base/logo.gif" width="168" height="60" alt="InGrid" />
     <h1>
         <fmt:message key="DatabaseConfig.main.configuration" />
     </h1>
-    <%
-        java.security.Principal principal = request.getUserPrincipal();
-        if (principal != null && !(principal instanceof IngridPrincipal.SuperAdmin)) {
-    %>
+    <security:authorize access="isAuthenticated()">
     <div id="language">
         <a href="../base/auth/logout.html"><fmt:message key="DatabaseConfig.main.logout" /></a>
     </div>
-    <%
-        }
-    %>
+    </security:authorize>>
 </div>
 <div id="help">
     <a href="#">[?]</a>

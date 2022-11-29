@@ -53,7 +53,7 @@ public class AdminsController extends InstanceController {
         this.seConfig = seConfig;
     }
 
-    @RequestMapping(value = { AdminViews.SE_INSTANCE_ADMINS }, method = RequestMethod.GET)
+    @RequestMapping(value = { AdminViews.SE_INSTANCE_ADMINS + ".html" }, method = RequestMethod.GET)
     public String getParameters(final ModelMap modelMap, @ModelAttribute("plugDescription") final PlugdescriptionCommandObject commandObject, @RequestParam("instance") String name, HttpServletRequest request, HttpServletResponse response) {
 
         if (hasNoAccessToInstance(name, request, response)) {
