@@ -34,7 +34,7 @@
   <properties>
     <apache-nutch-version>apache-nutch-1.18</apache-nutch-version>
     <ingrid-base-webapp.version>5.15.0.3324-SNAPSHOT</ingrid-base-webapp.version>
-    <elasticsearch.version>7.17.6</elasticsearch.version>
+    <elasticsearch.version>6.8.17</elasticsearch.version>
     <log4j2.version>2.19.0</log4j2.version>
     <spring.version>5.3.23</spring.version>
   </properties>
@@ -118,7 +118,7 @@
         <artifactId>spring-core</artifactId>
         <version>${spring.version}</version>
       </dependency>
-      <dependency>
+      <!--<dependency>
         <groupId>org.apache.lucene</groupId>
         <artifactId>lucene-core</artifactId>
         <version>6.4.1</version>
@@ -127,7 +127,7 @@
         <groupId>org.apache.lucene</groupId>
         <artifactId>lucene-analyzers-common</artifactId>
         <version>6.4.1</version>
-      </dependency>
+      </dependency>-->
     </dependencies>
   </dependencyManagement>
 

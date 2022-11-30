@@ -50,11 +50,11 @@
   <!-- ==================== DEPENDENCIES ==================== -->
   <dependencies>
 
-    <dependency>
+    <!--<dependency>
       <groupId>de.ingrid</groupId>
       <artifactId>ingrid-elasticsearch-tools</artifactId>
       <version>5.15.0.3324-SNAPSHOT</version>
-    </dependency>
+    </dependency>-->
 
     <dependency>
       <groupId>org.apache.nutch</groupId>
