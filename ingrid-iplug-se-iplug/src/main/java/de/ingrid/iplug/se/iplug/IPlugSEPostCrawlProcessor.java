@@ -31,8 +31,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.cluster.ClusterState;
-import org.elasticsearch.cluster.metadata.IndexMetaData;
-import org.elasticsearch.cluster.metadata.MappingMetaData;
+import org.elasticsearch.cluster.metadata.IndexMetadata;
+import org.elasticsearch.cluster.metadata.MappingMetadata;
 import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -77,10 +77,10 @@ public class IPlugSEPostCrawlProcessor implements IPostCrawlProcessor {
             Client client = elasticSearch.getClient();
             if (client != null) {
                 ClusterState clusterState = client.admin().cluster().prepareState().execute().actionGet().getState();
-                IndexMetaData inMetaData = clusterState.getMetaData().index(instance.getInstanceIndexName());
-                ImmutableOpenMap<String, MappingMetaData> metad = inMetaData.getMappings();
-                for (Iterator<MappingMetaData> i = metad.valuesIt(); i.hasNext(); ) {
-                    MappingMetaData mmd = i.next();
+                IndexMetadata inMetaData = clusterState.getMetadata().index(instance.getInstanceIndexName());
+                ImmutableOpenMap<String, MappingMetadata> metad = inMetaData.getMappings();
+                for (Iterator<MappingMetadata> i = metad.valuesIt(); i.hasNext(); ) {
+                    MappingMetadata mmd = i.next();
                     @SuppressWarnings("unchecked")
                     Map<String, Object> src = (Map<String, Object>) mmd.getSourceAsMap().get("properties");
                     for (String f : src.keySet()) {

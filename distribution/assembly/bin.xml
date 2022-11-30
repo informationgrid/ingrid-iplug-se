@@ -65,11 +65,13 @@
       <includes>
         <include>config.properties</include>
         <include>elasticsearch.properties</include>
-        <include>ingrid.auth</include>
         <include>log4j2.xml</include>
         <include>instance-data/urlMaintenance.json</include>
         <include>default-mapping.json</include>
         <include>default-settings.json</include>
+        <include>application.properties</include>
+        <include>springapp-servlet.xml</include>
+        <include>messages.properties</include>
       </includes>
     </fileSet>
     <fileSet>
@@ -83,14 +85,11 @@
     </fileSet>
     <fileSet>
       <directory>../ingrid-iplug-se-iplug/src/main/webapp</directory>
-      <outputDirectory>${project.build.finalName}/webapp</outputDirectory>
-      <excludes>
-        <exclude>**/WEB-INF/jetty-web.xml</exclude>
-      </excludes>
+      <outputDirectory>${project.build.finalName}/public</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>../ingrid-iplug-se-iplug/target/base-webapp</directory>
-      <outputDirectory>${project.build.finalName}/webapp</outputDirectory>
+      <outputDirectory>${project.build.finalName}/public</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>../target/installer</directory>
@@ -106,11 +105,4 @@
       <outputDirectory>${project.build.finalName}/doc</outputDirectory>
     </fileSet>
   </fileSets>
-  <files>
-    <file>
-      <source>release/jetty/jetty-web.xml</source>
-      <outputDirectory>${project.build.finalName}/webapp/WEB-INF</outputDirectory>
-      <filtered>true</filtered>
-    </file>
-  </files>
 </assembly>

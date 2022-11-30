@@ -81,6 +81,8 @@ public class SchedulingController extends InstanceController {
             return "redirect:" + AdminViews.SE_LIST_INSTANCES + ".html";
 
         modelMap.put( "instance", getInstanceData( name ) );
+//        modelMap.put( "command", new ClockCommand() );
+//        modelMap.put( "advancedCommand", new AdvancedCommand() );
 
         return AdminViews.SE_INSTANCE_SCHEDULER;
     }

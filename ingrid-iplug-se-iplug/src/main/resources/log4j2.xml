@@ -16,7 +16,7 @@
         <Logger name="de.ingrid" level="info" additivity="false">
             <AppenderRef ref="LogFile" />
         </Logger>
-        <Logger name="org" level="warn" additivity="false">
+        <Logger name="org" level="info" additivity="false">
             <AppenderRef ref="LogFile" />
         </Logger>
         <Logger name="net.meta" level="info" additivity="false">

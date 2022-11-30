@@ -33,14 +33,12 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import de.ingrid.admin.security.AbstractLoginModule;
-import de.ingrid.admin.security.IngridPrincipal;
 import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.db.model.InstanceAdmin;
 
-public class InstanceAdminLoginModule extends AbstractLoginModule {
+public class InstanceAdminLoginModule {// extends AbstractLoginModule {
 
-    @Override
+    /*@Override
     protected IngridPrincipal authenticate(String userName, String password) {
 
         IngridPrincipal ingridPrincipal = null;
@@ -66,6 +64,6 @@ public class InstanceAdminLoginModule extends AbstractLoginModule {
         }
 
         return ingridPrincipal;
-    }
+    }*/
 
 }

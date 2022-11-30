@@ -23,7 +23,6 @@
 package de.ingrid.iplug.se.nutchController;
 
 import de.ingrid.admin.Config;
-import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.service.PlugDescriptionService;
 import de.ingrid.elasticsearch.IndexManager;
 import de.ingrid.iplug.se.Configuration;
@@ -55,14 +54,14 @@ public class NutchControllerTest {
     @Before
     public void beforeTest() throws Exception {
         FileUtils.removeRecursive(Paths.get("test-instances"));
-        JettyStarter.baseConfig = new Config();
-        JettyStarter.baseConfig.index = "se-test";
+        SEIPlug.baseConfig = new Config();
+        SEIPlug.baseConfig.index = "se-test";
         // JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<String>();
         // JettyStarter.baseConfig.indexSearchInTypes.add( "test" );
         // Attention: this config property is used in ElasticConfig and Config!
         // During runtime both classes will read the config file and be initialized correctly
-        JettyStarter.baseConfig.communicationProxyUrl = "/ingrid-group:unit-tests";
-        JettyStarter.baseConfig.communicationLocation = "conf/communication.xml";
+        SEIPlug.baseConfig.communicationProxyUrl = "/ingrid-group:unit-tests";
+        SEIPlug.baseConfig.communicationLocation = "conf/communication.xml";
         Utils.setupES();
     }
 
@@ -77,7 +76,7 @@ public class NutchControllerTest {
         Configuration configuration = new Configuration();
         configuration.setInstancesDir( "test-instances" );
         configuration.databaseID = "iplug-se-dev";
-        configuration.dependingFields = new ArrayList<String>();
+        configuration.dependingFields = new ArrayList<>();
         configuration.nutchCallJavaOptions = java.util.Arrays.asList( "-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8" );
         SEIPlug.conf = configuration;
         Properties elasticProperties = Utils.getElasticProperties();
@@ -153,7 +152,7 @@ public class NutchControllerTest {
         Configuration configuration = new Configuration();
         configuration.setInstancesDir( "test-instances" );
         configuration.databaseID = "iplug-se-dev";
-        configuration.dependingFields = new ArrayList<String>();
+        configuration.dependingFields = new ArrayList<>();
         configuration.nutchCallJavaOptions = java.util.Arrays.asList( "-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8" );
         SEIPlug.conf = configuration;
 
