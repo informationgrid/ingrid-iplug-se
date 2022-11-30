@@ -39,22 +39,6 @@
 
 package de.ingrid.iplug.se.nutch.crawl.metadata;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import de.ingrid.utils.tool.UrlTool;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -80,10 +64,21 @@ import org.apache.nutch.net.URLNormalizers;
 import org.apache.nutch.util.LockUtil;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 public class MetadataInjector extends Configured implements Tool {
 
-    private static final Log LOG = LogFactory.getLog(MetadataInjector.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MetadataInjector.class);
 
     public static class MetadataContainer implements Writable {
 

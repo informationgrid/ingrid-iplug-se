@@ -22,15 +22,6 @@
  */
 package de.ingrid.iplug.se.nutch.statistics;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
-import java.util.Random;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -54,6 +45,15 @@ import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.Random;
 
 /**
  * @author joachim
@@ -63,7 +63,7 @@ import org.codehaus.jettison.json.JSONObject;
  */
 public class UrlErrorReport extends Configured implements Tool {
 
-	private static final Log LOG = LogFactory.getLog(UrlErrorReport.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(UrlErrorReport.class.getName());
 
 	public static class UrlErrorStatusReportMapper extends Mapper<Text, CrawlDatum, Text, ProtocolStatus> {
 

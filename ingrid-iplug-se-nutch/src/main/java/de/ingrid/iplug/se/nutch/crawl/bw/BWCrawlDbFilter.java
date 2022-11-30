@@ -41,8 +41,6 @@ package de.ingrid.iplug.se.nutch.crawl.bw;
 
 import de.ingrid.iplug.se.nutch.net.InGridURLNormalizers;
 import de.ingrid.iplug.se.nutch.tools.IngridElasticSearchClient;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -63,12 +61,13 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.crawl.CrawlDb;
-import org.apache.nutch.crawl.CrawlDbFilter;
 import org.apache.nutch.net.URLFilters;
 import org.apache.nutch.net.URLNormalizers;
 import org.apache.nutch.util.LockUtil;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -83,7 +82,7 @@ import java.util.Random;
  */
 public class BWCrawlDbFilter extends Configured implements Tool {
 
-    public static final Log LOG = LogFactory.getLog(BWCrawlDbFilter.class);
+    public static final Logger LOG = LoggerFactory.getLogger(BWCrawlDbFilter.class);
 
     public static final String CURRENT_NAME = "current";
 

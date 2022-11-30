@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
 import org.junit.FixMethodOrder;
@@ -478,7 +478,7 @@ public class IndexerCmdLineTests {
 
     private List<String> setUpBaseCall() {
 
-        String[] classPath = new String[] { "src/test/resources/conf", "build/apache-nutch-1.18/runtime/local", "build/apache-nutch-1.9/runtime/local/lib/*" };
+        String[] classPath = new String[] { "src/test/resources/conf", "build/apache-nutch-1.19/runtime/local", "build/apache-nutch-1.19/runtime/local/lib/*" };
 
         String cp = StringUtils.join(classPath, File.pathSeparator);
 

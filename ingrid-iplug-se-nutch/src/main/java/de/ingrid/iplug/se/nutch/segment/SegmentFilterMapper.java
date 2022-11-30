@@ -38,15 +38,14 @@
  */
 package de.ingrid.iplug.se.nutch.segment;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.io.ObjectWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.nutch.metadata.MetaWrapper;
 import org.apache.nutch.net.URLFilters;
 import org.apache.nutch.net.URLNormalizers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -58,7 +57,7 @@ import java.io.IOException;
  */
 public class SegmentFilterMapper extends Mapper<Text, MetaWrapper, Text, MetaWrapper> {
 
-    private static final Log LOG = LogFactory.getLog(SegmentFilterMapper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SegmentFilterMapper.class);
 
     private URLFilters filters = null;
     private URLNormalizers normalizers = null;

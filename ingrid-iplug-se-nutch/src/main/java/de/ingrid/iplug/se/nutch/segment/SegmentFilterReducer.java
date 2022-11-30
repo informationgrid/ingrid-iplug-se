@@ -38,8 +38,6 @@
  */
 package de.ingrid.iplug.se.nutch.segment;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -62,6 +60,8 @@ import org.apache.nutch.parse.ParseData;
 import org.apache.nutch.parse.ParseText;
 import org.apache.nutch.protocol.Content;
 import org.apache.nutch.segment.SegmentPart;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -76,7 +76,7 @@ import java.util.Iterator;
  * @author Joachim Müller
  */
 public class SegmentFilterReducer extends Reducer<Text, MetaWrapper, Text, MetaWrapper> {
-    private static final Log LOG = LogFactory.getLog(SegmentFilterReducer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SegmentFilterReducer.class);
 
     private static final String SEGMENT_PART_KEY = "part";
     private static final String SEGMENT_SLICE_KEY = "slice";

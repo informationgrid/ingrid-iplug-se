@@ -1,28 +1,5 @@
 <?xml version="1.0"?>
 <!--
-  **************************************************-
-  ingrid-iplug-se-nutch
-  ==================================================
-  Copyright (C) 2014 wemove digital solutions GmbH
-  ==================================================
-  Licensed under the EUPL, Version 1.1 or – as soon they will be
-  approved by the European Commission - subsequent versions of the
-  EUPL (the "Licence");
-  
-  You may not use this work except in compliance with the Licence.
-  You may obtain a copy of the Licence at:
-  
-  http://ec.europa.eu/idabc/eupl5
-  
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the Licence is distributed on an "AS IS" basis,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the Licence for the specific language governing permissions and
-  limitations under the Licence.
-  **************************************************#
-  -->
-
-<!--
  Licensed to the Apache Software Foundation (ASF) under one or more
  contributor license agreements.  See the NOTICE file distributed with
  this work for additional information regarding copyright ownership.
@@ -40,7 +17,8 @@
 -->
 <!-- This is the configuration file for the RegexUrlNormalize Class.
      This is intended so that users can specify substitutions to be
-     done on URLs. The regex engine that is used is Perl5 compatible.
+     done on URLs using the Java regex syntax, see
+     https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html
      The rules are applied to URLs in the order they occur in this file.  -->
 
 <!-- WATCH OUT: an xml parser reads this file an ampersands must be
@@ -86,7 +64,15 @@
   <substitution></substitution>
 </regex>
 
-<!-- removes duplicate slashes -->
+<!-- normalize file:/// protocol prefix: -->
+<!--  keep one single slash (NUTCH-1483) -->
+<regex>
+  <pattern>^file://+</pattern>
+  <substitution>file:/</substitution>
+</regex>
+
+<!-- removes duplicate slashes but -->
+<!-- * allow 2 slashes after colon ':' (indicating protocol) -->
 <regex>
   <pattern>(?&lt;!:)/{2,}</pattern>
   <substitution>/</substitution>

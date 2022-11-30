@@ -1,28 +1,5 @@
 <?xml version="1.0"?>
 <!--
-  **************************************************-
-  ingrid-iplug-se-nutch
-  ==================================================
-  Copyright (C) 2014 - 2022 wemove digital solutions GmbH
-  ==================================================
-  Licensed under the EUPL, Version 1.1 or – as soon they will be
-  approved by the European Commission - subsequent versions of the
-  EUPL (the "Licence");
-  
-  You may not use this work except in compliance with the Licence.
-  You may obtain a copy of the Licence at:
-  
-  http://ec.europa.eu/idabc/eupl5
-  
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the Licence is distributed on an "AS IS" basis,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the Licence for the specific language governing permissions and
-  limitations under the Licence.
-  **************************************************#
-  -->
-
-<!--
  Licensed to the Apache Software Foundation (ASF) under one or more
  contributor license agreements.  See the NOTICE file distributed with
  this work for additional information regarding copyright ownership.
@@ -42,20 +19,39 @@
 <xsl:output method="html"/>
 <xsl:template match="configuration">
 <html>
+ <head>
+  <title>Nutch Configuration Properties</title>
+  <meta charset="utf-8"/>
+  <style>
+    table { width: 100%; table-layout: fixed; }
+    th,td { padding: 0.2em 0.5em; }
+    td { overflow:hidden; vertical-align:top; }
+    th { background-color: #e0e0e0; }
+    tr { background-color: #f0f0f0; }
+    tr:nth-child(odd) { background-color: #fcfcfc; }
+    th.name { width: 20% }
+    th.value { width: 30% }
+    th.description { width: 50% }
+  </style>
+ </head>
 <body>
-<table border="1">
-<tr>
- <td>name</td>
- <td>value</td>
- <td>description</td>
-</tr>
+<table>
+ <thead>
+  <tr>
+   <th class="name">Nutch Property Name</th>
+   <th class="value">Default Value</th>
+   <th class="description">Description</th>
+  </tr>
+ </thead>
+ <tbody>
 <xsl:for-each select="property">
-<tr>
-  <td><a name="{name}"><xsl:value-of select="name"/></a></td>
-  <td><xsl:value-of select="value"/></td>
-  <td><xsl:value-of select="description"/></td>
-</tr>
+  <tr>
+   <td><a name="{name}"><xsl:value-of select="name"/></a></td>
+   <td><xsl:value-of select="value"/></td>
+   <td><xsl:value-of select="description"/></td>
+  </tr>
 </xsl:for-each>
+ </tbody>
 </table>
 </body>
 </html>

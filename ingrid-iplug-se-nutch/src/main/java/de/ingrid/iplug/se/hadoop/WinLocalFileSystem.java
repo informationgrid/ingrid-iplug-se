@@ -24,11 +24,11 @@ package de.ingrid.iplug.se.hadoop;
 
 import java.io.IOException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Fix for running Hadoop 1.0.3 on Windows according to the following
@@ -44,7 +44,7 @@ import org.apache.hadoop.fs.permission.FsPermission;
 public class WinLocalFileSystem extends LocalFileSystem {
 
     
-    public final static Log log = LogFactory.getLog(WinLocalFileSystem.class);
+    public final static Logger log = LoggerFactory.getLogger(WinLocalFileSystem.class);
     /**
          *
          *

@@ -48,17 +48,17 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Black and white url prefix patterns container.
  */
 public class BWPatterns implements Writable {
 
-    private static final Log LOG = LogFactory.getLog(BWPatterns.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BWPatterns.class);
 
     private List<Text> _positive;
 
@@ -67,6 +67,9 @@ public class BWPatterns implements Writable {
     private final List<Pattern> _posPattern = new ArrayList<>();
 
     private final List<Pattern> _negPattern = new ArrayList<>();
+
+    public BWPatterns() {
+    }
 
     public BWPatterns(Text[] positivePatterns, Text[] negativePatterns) {
         _positive = new ArrayList<>(Arrays.asList(positivePatterns));
@@ -88,9 +91,6 @@ public class BWPatterns implements Writable {
         for (Text text : regExpressions) {
             patterns.add(Pattern.compile(text.toString()));
         }
-    }
-
-    public BWPatterns() {
     }
 
     public List<Text> getPositive() {

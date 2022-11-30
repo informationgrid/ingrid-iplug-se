@@ -20,6 +20,7 @@
  * limitations under the Licence.
  * **************************************************#
  */
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.nutch.util.NutchConfiguration;
 import org.junit.FixMethodOrder;
@@ -41,27 +42,37 @@ public class UrlTesterTests {
 
     @Test
     public void testExistingUrl() throws Exception {
-        ToolRunner.run(NutchConfiguration.create(), new UrlTester(), new String[] { "http://www.google.de/" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new UrlTester(), new String[] { "https://www.google.de/" });
     }
 
 
     @Test
     public void testRedirectUrl() throws Exception {
-        ToolRunner.run(NutchConfiguration.create(), new UrlTester(), new String[] { "http://www.wemove.com/" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new UrlTester(), new String[] { "https://www.wemove.com/" });
     }
 
     @Test
     public void testUnknownUrl() throws Exception {
-        ToolRunner.run(NutchConfiguration.create(), new UrlTester(), new String[] { "http://www.wemove.com/unknown_url" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new UrlTester(), new String[] { "https://www.wemove.com/unknown_url" });
     }
 
     @Test
     public void testUnknownHost() throws Exception {
-        ToolRunner.run(NutchConfiguration.create(), new UrlTester(), new String[] { "http://www.qiwueqwewmwcueiwocq.com/" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new UrlTester(), new String[] { "https://www.qiwueqwewmwcueiwocq.com/" });
     }
 
     @Test
     public void testCrawlDelayHost() throws Exception {
-        ToolRunner.run(NutchConfiguration.create(), new UrlTester(), new String[] { "http://www.umweltbundesamt.de/" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new UrlTester(), new String[] { "https://www.umweltbundesamt.de/" });
     }
 }

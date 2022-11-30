@@ -20,14 +20,14 @@
 <ivy-module version="1.0">
   <info organisation="org.apache.nutch" module="${ant.project.name}">
     <license name="Apache 2.0"/>
-    <ivyauthor name="Apache Nutch Team" url="http://nutch.apache.org"/>
+    <ivyauthor name="Apache Nutch Team" url="https://nutch.apache.org/"/>
     <description>
         Apache Nutch
     </description>
   </info>
 
   <configurations>
-    <include file="../../..//ivy/ivy-configurations.xml"/>
+    <include file="../../../ivy/ivy-configurations.xml"/>
   </configurations>
 
   <publications>
@@ -36,6 +36,13 @@
   </publications>
 
   <dependencies>
+    <dependency org="org.apache.tika" name="tika-langdetect-optimaize" rev="2.3.0" conf="*->default">
+      <!-- exclusions of dependencies provided in Nutch core (ivy/ivy.xml) -->
+      <exclude org="org.apache.tika" name="tika-core" />
+      <exclude org="com.google.guava" name="guava" />
+      <exclude org="org.slf4j" name="slf4j-api" />
+      <!-- exclusions of dependencies provided in Nutch core (ivy/ivy.xml) -->
+    </dependency>
   </dependencies>
   
 </ivy-module>

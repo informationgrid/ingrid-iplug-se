@@ -1,153 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN" monitorInterval="5">
+<!-- Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<Configuration status="INFO" name="Nutch" packages="">
+  <Properties>
+    <!-- default values that can be overridden by system properties:
+           Note: the script bin/nutch sets these properties from the environment variables
+                     NUTCH_LOG_DIR and NUTCH_LOGFILE -->
+    <Property name="hadoop.log.dir">${sys:hadoop.log.dir:-./logs}</Property>
+    <Property name="hadoop.log.file">${sys:hadoop.log.file:-hadoop.log}</Property>
+  </Properties>
   <Appenders>
-    <Console name="Console" target="SYSTEM_OUT">
-      <PatternLayout pattern="%-5p [%d{yyyy-MM-dd HH:mm:ss}] (%F:%L) - %m%n" />
-    </Console>
-    <RollingFile name="LogFile" fileName="logs/hadoop.log" filePattern="logs/hadoop.log.%i">
-      <PatternLayout pattern="%5p [%d{yyyy-MM-dd HH:mm:ss}] (%F:%L) - %m%n" />
-      <Policies>
-        <SizeBasedTriggeringPolicy size="10 MB" />
-      </Policies>
-      <DefaultRolloverStrategy max="9" />
+    <RollingFile name="RollingFile" fileName="${hadoop.log.dir}/${hadoop.log.file}"
+      filePattern="${hadoop.log.dir}/$${date:yyyy-MM}/nutch-%d{yyyy-MM-dd}.log.gz">
+      <PatternLayout pattern="%d %p %c{1.} [%t] %m%n" />
+      <CronTriggeringPolicy schedule="0 0 0 * * ?" evaluateOnStartup="true" />
+      <DefaultRolloverStrategy>
+        <Delete basePath="${hadoop.log.dir}" maxDepth="2">
+          <IfFileName glob="*/nutch-*.log.gz" />
+          <IfLastModified age="60d" />
+        </Delete>
+      </DefaultRolloverStrategy>
     </RollingFile>
+    <Console name="STDOUT" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d %p %c{1.} [%t] %m%n" />
+    </Console>
   </Appenders>
   <Loggers>
-    <Logger name="de.ingrid" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.crawl.Crawl" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.crawl.Injector" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.crawl.Generator" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.fetcher.Fetcher" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.parse.ParseSegment" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.crawl.CrawlDbReader" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.crawl.CrawlDbMerger" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.crawl.LinkDbReader" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.segment.SegmentReader" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.segment.SegmentMerger" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.crawl.CrawlDb" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.crawl.LinkDb" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.crawl.LinkDbMerger" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.indexer.IndexingJob" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.indexer.solr.SolrIndexer" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.indexer.solr.SolrWriter" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.indexer.solr.SolrDeleteDuplicates" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.indexer.solr.SolrClean" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.scoring.webgraph.WebGraph" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.scoring.webgraph.LinkRank" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.scoring.webgraph.Loops" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.scoring.webgraph.ScoreUpdater" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.util.hostdb.HostDb" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.util.hostdb.DumpHostDb" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.parse.ParserChecker" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.indexer.IndexingFiltersChecker" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.tools.FreeGenerator" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.util.domain.DomainStatistics" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.tools.CrawlDBScanner" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch.plugin.PluginRepository" level="warn" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.nutch" level="info" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Logger name="org.apache.hadoop" level="warn" additivity="false">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
-    </Logger>
-    <Root level="info">
-      <AppenderRef ref="Console" />
-      <AppenderRef ref="LogFile" />
+    <Root level="INFO" additivity="false">
+      <AppenderRef ref="RollingFile"/>
+      <AppenderRef ref="STDOUT"/>
     </Root>
+    <Logger name="org.apache.hadoop" level="WARN" additivity="false">
+      <Appender-ref ref="RollingFile" level="WARN" />
+    </Logger>
+    <Logger name="org.apache.hadoop.mapreduce.Job" level="INFO" additivity="false">
+      <Appender-ref ref="RollingFile" level="INFO" />
+    </Logger>
   </Loggers>
 </Configuration>

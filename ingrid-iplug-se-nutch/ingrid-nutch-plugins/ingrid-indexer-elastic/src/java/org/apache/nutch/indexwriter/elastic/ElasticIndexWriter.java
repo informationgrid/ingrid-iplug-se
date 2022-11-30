@@ -19,7 +19,7 @@ package org.apache.nutch.indexwriter.elastic;
 
 import de.ingrid.iplug.se.nutch.tools.IBusElasticsearchClient;
 import de.ingrid.iplug.se.nutch.tools.IngridElasticSearchClient;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.nutch.indexer.IndexWriter;
 import org.apache.nutch.indexer.IndexWriterParams;

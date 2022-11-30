@@ -39,13 +39,6 @@
 
 package de.ingrid.iplug.se.nutch.crawl.metadata;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.net.URL;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -61,10 +54,17 @@ import org.apache.hadoop.mapreduce.lib.output.MapFileOutputFormat;
 import org.apache.nutch.parse.ParseData;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.net.URL;
 
 public class ParseDataWrapper extends Configured {
 
-    public static final Log LOG = LogFactory.getLog(ParseDataWrapper.class);
+    public static final Logger LOG = LoggerFactory.getLogger(ParseDataWrapper.class);
 
     public static class UrlParseDataContainer implements Writable {
 

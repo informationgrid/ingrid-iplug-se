@@ -40,8 +40,6 @@ package de.ingrid.iplug.se.nutch.analysis;
 
 // Commons Logging imports
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -50,6 +48,9 @@ import org.apache.nutch.plugin.ExtensionPoint;
 import org.apache.nutch.plugin.PluginRepository;
 import org.apache.nutch.plugin.PluginRuntimeException;
 import org.apache.nutch.util.ObjectCache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 // Nutch imports
 
@@ -62,7 +63,7 @@ public class AnalyzerFactory {
 
     private final static String KEY = AnalyzerFactory.class.getName();
 
-    public final static Log LOG = LogFactory.getLog(KEY);
+    public final static Logger LOG = LoggerFactory.getLogger(KEY);
 
     private final Analyzer DEFAULT_ANALYZER;
 

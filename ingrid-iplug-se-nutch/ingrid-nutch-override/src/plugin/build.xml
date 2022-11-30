@@ -72,13 +72,13 @@
     <ant dir="parse-html" target="deploy"/>
     <ant dir="parse-js" target="deploy"/>
     <ant dir="parse-metatags" target="deploy"/>
-    <ant dir="parse-swf" target="deploy"/>
     <ant dir="parse-tika" target="deploy"/>
     <ant dir="parse-zip" target="deploy"/>
     <ant dir="parsefilter-debug" target="deploy"/>
     <ant dir="parsefilter-naivebayes" target="deploy"/>
     <ant dir="parsefilter-regex" target="deploy"/>
     <ant dir="protocol-file" target="deploy"/>
+    <ant dir="protocol-foo" target="deploy" />
     <ant dir="protocol-ftp" target="deploy"/>
     <ant dir="protocol-htmlunit" target="deploy" />
     <ant dir="protocol-http" target="deploy"/>
@@ -92,6 +92,7 @@
     <ant dir="scoring-opic" target="deploy"/>
     <ant dir="scoring-orphan" target="deploy"/>
     <ant dir="scoring-similarity" target="deploy"/>
+    <ant dir="scoring-metadata"  target="deploy"/>
     <ant dir="subcollection" target="deploy"/>
     <ant dir="tld" target="deploy"/>
     <ant dir="urlfilter-automaton" target="deploy"/>
@@ -141,7 +142,6 @@
      <ant dir="parse-html" target="test"/>
      <ant dir="parse-js" target="test"/>
      <ant dir="parse-metatags" target="test"/>
-     <ant dir="parse-swf" target="test"/>
      <ant dir="parse-tika" target="test"/>
      <ant dir="parse-zip" target="test"/>
      <ant dir="parsefilter-regex" target="test"/>
@@ -150,6 +150,7 @@
      <ant dir="protocol-httpclient" target="test"/>
      <ant dir="protocol-okhttp" target="test"/>
      <ant dir="scoring-orphan" target="test"/>
+     <ant dir="scoring-metadata" target="test"/>
      <ant dir="subcollection" target="test"/>
      <ant dir="urlfilter-automaton" target="test"/>
      <ant dir="urlfilter-domain" target="test"/>
@@ -218,13 +219,13 @@
     <ant dir="parse-html" target="clean"/>
     <ant dir="parse-js" target="clean"/>
     <ant dir="parse-metatags" target="clean"/>
-    <ant dir="parse-swf" target="clean"/>
     <ant dir="parse-tika" target="clean"/>
     <ant dir="parse-zip" target="clean"/>
     <ant dir="parsefilter-debug" target="clean" />
     <ant dir="parsefilter-naivebayes" target="clean" />
     <ant dir="parsefilter-regex" target="clean"/>
     <ant dir="protocol-file" target="clean"/>
+    <ant dir="protocol-foo" target="clean" />
     <ant dir="protocol-ftp" target="clean"/>
     <ant dir="protocol-htmlunit" target="clean" />
     <ant dir="protocol-http" target="clean"/>
@@ -238,6 +239,7 @@
     <ant dir="scoring-opic" target="clean"/>
     <ant dir="scoring-orphan" target="clean"/>
     <ant dir="scoring-similarity" target="clean"/>
+    <ant dir="scoring-metadata" target="clean"/>
     <ant dir="subcollection" target="clean"/>
     <ant dir="tld" target="clean"/>
     <ant dir="urlfilter-automaton" target="clean"/>

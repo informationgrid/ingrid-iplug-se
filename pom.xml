@@ -32,10 +32,10 @@
 
   <!-- ==================== PROPERTIES ==================== -->
   <properties>
-    <apache-nutch-version>apache-nutch-1.18</apache-nutch-version>
+    <apache-nutch-version>apache-nutch-1.19</apache-nutch-version>
     <ingrid-base-webapp.version>5.12.0</ingrid-base-webapp.version>
     <elasticsearch.version>6.8.17</elasticsearch.version>
-    <log4j2.version>2.17.1</log4j2.version>
+    <log4j2.version>2.18.0</log4j2.version>
   </properties>
 
   <modules>
@@ -48,14 +48,14 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-log4j12</artifactId>
-        <version>1.7.30</version>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-slf4j-impl</artifactId>
+        <version>${log4j2.version}</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.7.30</version>
+        <version>1.7.36</version>
       </dependency>
       <dependency>
         <groupId>org.mortbay.jetty</groupId>
@@ -64,12 +64,12 @@
       </dependency>
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-1.2-api</artifactId>
+        <artifactId>log4j-api</artifactId>
         <version>${log4j2.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-api</artifactId>
+        <artifactId>log4j-core</artifactId>
         <version>${log4j2.version}</version>
       </dependency>
       <dependency>
@@ -113,24 +113,6 @@
       <version>4.13.1</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-library</artifactId>
-      <version>1.3</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.powermock</groupId>
-      <artifactId>powermock-module-junit4</artifactId>
-      <version>1.6.6</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.powermock</groupId>
-      <artifactId>powermock-api-mockito</artifactId>
-      <version>1.6.6</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <!-- ==================== Build Configuration ==================== -->
@@ -151,8 +133,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.1</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <source>11</source>
+          <target>11</target>
         </configuration>
       </plugin>
       <plugin>
@@ -160,10 +142,10 @@
         <artifactId>maven-antrun-plugin</artifactId>
         <!-- the inherited plugin extracts the installer which must not be done by sub-modules -->
         <inherited>false</inherited>
-        <dependencies>
-          <!-- following is needed since this plugin mixes up the JAVA_HOME directory
+<!--        <dependencies>
+          <!- following is needed since this plugin mixes up the JAVA_HOME directory
                         a bit. This dependency is necessary to be able to call javac ant task in
-                        a multi module maven project setup. -->
+                        a multi module maven project setup. ->
           <dependency>
             <groupId>com.sun</groupId>
             <artifactId>tools</artifactId>
@@ -172,6 +154,7 @@
             <systemPath>${java.home}/../lib/tools.jar</systemPath>
           </dependency>
         </dependencies>
+      -->
       </plugin>
       <!--
         This plugin configures the git-flow for this project

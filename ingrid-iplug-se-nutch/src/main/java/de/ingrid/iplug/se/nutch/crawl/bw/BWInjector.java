@@ -45,8 +45,6 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -70,6 +68,8 @@ import org.apache.nutch.net.URLNormalizers;
 import org.apache.nutch.util.LockUtil;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Injects black- or white list urls into a database. Urls will be normalized
@@ -78,7 +78,7 @@ import org.apache.nutch.util.NutchJob;
  */
 public class BWInjector extends Configured implements Tool {
 
-    private static final Log LOG = LogFactory.getLog(BWInjector.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BWInjector.class);
 
     private static final String PROHIBITED = "prohibited";
     private static final String NORMALIZE = "normalize";

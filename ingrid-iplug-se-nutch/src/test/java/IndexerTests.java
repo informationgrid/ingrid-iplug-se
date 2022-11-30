@@ -34,7 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.nutch.crawl.Generator;
 import org.apache.nutch.crawl.Injector;
@@ -81,40 +82,39 @@ public class IndexerTests {
 
     @Test
     public void test01InjectStartURLs() throws Exception {
-        ToolRunner.run(NutchConfiguration.create(), new Injector(), new String[] { "test/crawldb", "src/test/resources/urls/start" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new Injector(), new String[] { "test/crawldb", "src/test/resources/urls/start" });
     }
 
     @Test
     public void test02InjectBWURLs() throws Exception {
-        ToolRunner.run(NutchConfiguration.create(), new BWInjector(), new String[] { "test/bwdb", "src/test/resources/urls/limit", "src/test/resources/urls/exclude" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new BWInjector(), new String[] { "test/bwdb", "src/test/resources/urls/limit", "src/test/resources/urls/exclude" });
     }
 
     @Test
     public void test03InjectMetadata() throws Exception {
-        ToolRunner.run(NutchConfiguration.create(), new MetadataInjector(), new String[] { "test/metadatadb", "src/test/resources/urls/metadata" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new MetadataInjector(), new String[] { "test/metadatadb", "src/test/resources/urls/metadata" });
     }
 
     @Test
     public void test04FilterCrawlDB() throws Exception {
 
-        Settings settings = Settings.builder()
-                .put("path.data", "test")
-                .put("transport.tcp.port", 54346)
-                .put("http.port", 54347)
-                .build();
-        /*NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().clusterName("elasticsearch").data(true).settings(settings);
-        nodeBuilder = nodeBuilder.local(false);
-        Node node = nodeBuilder.node();*/
-
-        ToolRunner.run(NutchConfiguration.create(), new BWCrawlDbFilter(), new String[] { "test/crawldb", "test/bwdb", "false", "false", "true" });
-
-//        node.close();
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new BWCrawlDbFilter(), new String[] { "test/crawldb", "test/bwdb", "false", "false", "true" });
     }
 
     @Test
     public void test05_1Generate() throws Exception {
 
-        ToolRunner.run(NutchConfiguration.create(), new Generator(), new String[] { "test/crawldb", "test/segments", "-topN", "10" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new Generator(), new String[] { "test/crawldb", "test/segments", "-topN", "10" });
     }
 
     @Test
@@ -131,7 +131,9 @@ public class IndexerTests {
         
         Arrays.sort(directories);
 
-        ToolRunner.run(NutchConfiguration.create(), new Fetcher(), new String[] { "test/segments/" + directories[directories.length - 1] });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new Fetcher(), new String[] { "test/segments/" + directories[directories.length - 1] });
     }
 
     @Test
@@ -148,7 +150,9 @@ public class IndexerTests {
         
         Arrays.sort(directories);
 
-        ToolRunner.run(NutchConfiguration.create(), new BWUpdateDb(), new String[] { "test/crawldb", "test/bwdb", "test/segments/" + directories[directories.length - 1], "true", "true" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new BWUpdateDb(), new String[] { "test/crawldb", "test/bwdb", "test/segments/" + directories[directories.length - 1], "true", "true" });
     }
 
     @Test
@@ -165,13 +169,17 @@ public class IndexerTests {
         
         Arrays.sort(directories);
 
-        ToolRunner.run(NutchConfiguration.create(), new ParseDataUpdater(), new String[] { "test/metadatadb", "test/segments/" + directories[directories.length - 1] });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new ParseDataUpdater(), new String[] { "test/metadatadb", "test/segments/" + directories[directories.length - 1] });
     }
 
     @Test
     public void test06_01Generate() throws Exception {
 
-        ToolRunner.run(NutchConfiguration.create(), new Generator(), new String[] { "test/crawldb", "test/segments", "-topN", "10" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new Generator(), new String[] { "test/crawldb", "test/segments", "-topN", "10" });
     }
 
     @Test
@@ -188,7 +196,9 @@ public class IndexerTests {
         
         Arrays.sort(directories);
 
-        ToolRunner.run(NutchConfiguration.create(), new Fetcher(), new String[] { "test/segments/" + directories[directories.length - 1] });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new Fetcher(), new String[] { "test/segments/" + directories[directories.length - 1] });
     }
 
     @Test
@@ -203,7 +213,9 @@ public class IndexerTests {
             }
         });
 
-        ToolRunner.run(NutchConfiguration.create(), new BWUpdateDb(), new String[] { "test/crawldb", "test/bwdb", "test/segments/" + directories[directories.length - 1], "true", "true" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new BWUpdateDb(), new String[] { "test/crawldb", "test/bwdb", "test/segments/" + directories[directories.length - 1], "true", "true" });
     }
 
     @Test
@@ -218,50 +230,66 @@ public class IndexerTests {
             }
         });
 
-        ToolRunner.run(NutchConfiguration.create(), new ParseDataUpdater(), new String[] { "test/metadatadb", "test/segments/" + directories[directories.length - 1] });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new ParseDataUpdater(), new String[] { "test/metadatadb", "test/segments/" + directories[directories.length - 1] });
     }    
     
     
     @Test
     public void test09_1HostStatistics() throws Exception {
 
-        ToolRunner.run(NutchConfiguration.create(), new HostStatistic(), new String[] { "test/crawldb", "test" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new HostStatistic(), new String[] { "test/crawldb", "test" });
     }
 
     @Test
     public void test09_2StartUrlReport() throws Exception {
 
-        ToolRunner.run(NutchConfiguration.create(), new StartUrlStatusReport(), new String[] { "test/crawldb", "src/test/resources/urls/start", "test" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new StartUrlStatusReport(), new String[] { "test/crawldb", "src/test/resources/urls/start", "test" });
     }
 
     @Test
     public void test09_3UrlErrorReport() throws Exception {
 
-        ToolRunner.run(NutchConfiguration.create(), new UrlErrorReport(), new String[] { "test/crawldb", "test" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new UrlErrorReport(), new String[] { "test/crawldb", "test" });
     }
     
     @Test
     public void test10WebgraphCreate() throws Exception {
 
-        ToolRunner.run(NutchConfiguration.create(), new WebGraph(), new String[] { "-webgraphdb", "test/webgraph", "-segmentDir", "test/segments" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new WebGraph(), new String[] { "-webgraphdb", "test/webgraph", "-segmentDir", "test/segments" });
     }
 
     @Test
     public void test11LinkRank() throws Exception {
 
-        ToolRunner.run(NutchConfiguration.create(), new LinkRank(), new String[] { "-webgraphdb", "test/webgraph" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new LinkRank(), new String[] { "-webgraphdb", "test/webgraph" });
     }
 
     @Test
     public void test12ScoreUpdater() throws Exception {
 
-        ToolRunner.run(NutchConfiguration.create(), new ScoreUpdater(), new String[] { "-webgraphdb", "test/webgraph", "-crawldb", "test/crawldb" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new ScoreUpdater(), new String[] { "-webgraphdb", "test/webgraph", "-crawldb", "test/crawldb" });
     }
 
     @Test
     public void test13WebgraphFilter() throws Exception {
 
-        ToolRunner.run(NutchConfiguration.create(), new BWWebgraphFilter(), new String[] { "test/webgraph", "test/bwdb", "false", "false", "true" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new BWWebgraphFilter(), new String[] { "test/webgraph", "test/bwdb", "false", "false", "true" });
     }
 
     @Test
@@ -277,7 +305,11 @@ public class IndexerTests {
         });
 
         if (directories.length > 1) {
-            SegmentMerger.main(new String[] { "test/merged_segment", "-dir", "test/segments" });
+
+            Configuration c = NutchConfiguration.create();
+            c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+            ToolRunner.run(c, new SegmentMerger(), new String[] { "test/merged_segment", "-dir", "test/segments" });
+//            SegmentMerger.main(new String[] { "test/merged_segment", "-dir", "test/segments" });
             FileSystem fs = FileSystems.getDefault();
             delete(fs.getPath("test/segments").toFile());
             Files.move(fs.getPath("test/merged_segment"), fs.getPath("test/segments"), StandardCopyOption.REPLACE_EXISTING);
@@ -287,113 +319,34 @@ public class IndexerTests {
     @Test
     public void test16InvertLinks() throws Exception {
 
-        ToolRunner.run(NutchConfiguration.create(), new LinkDb(), new String[] { "test/linkdb", "-dir", "test/segments", "-noNormalize", "-noFilter" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new LinkDb(), new String[] { "test/linkdb", "-dir", "test/segments", "-noNormalize", "-noFilter" });
     }
 
     @Test
     public void test17FilterLinkdb() throws Exception {
 
-        ToolRunner.run(NutchConfiguration.create(), new BWLinkDbFilter(), new String[] { "test/linkdb", "test/bwdb", "false", "false", "true" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new BWLinkDbFilter(), new String[] { "test/linkdb", "test/bwdb", "false", "false", "true" });
     }
 
     @Test
     public void test17_5DeleteDuplicates() throws Exception {
 
-        ToolRunner.run(NutchConfiguration.create(), new BWLinkDbFilter(), new String[] { "test/linkdb", "test/bwdb", "false", "false", "true" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new BWLinkDbFilter(), new String[] { "test/linkdb", "test/bwdb", "false", "false", "true" });
     }
 
     
     @Test
     public void test18Index() throws Exception {
 
-        Settings settings = Settings.builder()
-                .put("path.data", "test")
-                .put("transport.tcp.port", 54346)
-                .put("http.port", 54347)
-                .build();
-        /*NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder().clusterName("elasticsearch").data(true).settings(settings);
-        nodeBuilder = nodeBuilder.local(false);
-        Node node = nodeBuilder.node();*/
-
-        ToolRunner.run(NutchConfiguration.create(), new IndexingJob(), new String[] { "test/crawldb", "-linkdb", "test/linkdb", "-dir", "test/segments", "-deleteGone" });
-
-//        node.close();
-    }
-
-    /*
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
-     * // fetch File file = new File("test/segments"); String[] directories =
-     * file.list(new FilenameFilter() {
-     * 
-     * @Override public boolean accept(File current, String name) { return new
-     * File(current, name).isDirectory(); } });
-     * 
-     * List<String> fetchCall = new ArrayList<String>();
-     * fetchCall.addAll(baseCall);
-     * fetchCall.add("org.apache.nutch.fetcher.Fetcher");
-     * fetchCall.add("test/segments/" + directories[0]);
-     * 
-     * System.out.println(StringUtils.join(fetchCall, " ")); pb = new
-     * ProcessBuilder(fetchCall); pb.directory(new File("."));
-     * pb.redirectErrorStream(true); process = pb.start();
-     * 
-     * s = new Scanner( process.getInputStream() ).useDelimiter( "\\Z" ); while
-     * (s.hasNextLine()) { System.out.println( s.nextLine() ); } s.close();
-     * System.out.println("Exited with code " + process.waitFor());
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
-     * }
-     */
-
-    private void executeCall(List<String> injectCall) throws IOException, InterruptedException {
-        System.out.println(StringUtils.join(injectCall, " "));
-        ProcessBuilder pb = new ProcessBuilder(injectCall);
-        Map<String, String> localEnvMap = System.getenv();
-        Map<String, String> env = pb.environment();
-        for (String key : localEnvMap.keySet()) {
-            env.put(key, localEnvMap.get(key));
-        }
-        pb.directory(new File("."));
-        pb.redirectErrorStream(true);
-        Process process = pb.start();
-
-        Scanner s = new Scanner(process.getInputStream());
-        while (s.hasNextLine()) {
-            System.out.println(s.nextLine());
-        }
-        s.close();
-        System.out.println("Exited with code " + process.waitFor());
-    }
-
-    private List<String> setUpBaseCall() {
-
-        String[] classPath = new String[] { "src/test/resources/conf", "build/apache-nutch-1.18/runtime/local", "build/apache-nutch-1.9/runtime/local/lib/*" };
-
-        String cp = StringUtils.join(classPath, File.pathSeparator);
-
-        List<String> baseCall = new ArrayList<String>();
-        baseCall.add("java");
-        baseCall.add("-cp");
-        baseCall.add(cp);
-        baseCall.add("-Xmx512m");
-        baseCall.add("-Dhadoop.log.dir=logs");
-        baseCall.add("-Dhadoop.log.file=hadoop.log");
-
-        return baseCall;
-
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new IndexingJob(), new String[] { "test/crawldb", "-linkdb", "test/linkdb", "-dir", "test/segments", "-deleteGone" });
     }
 
     void delete(File f) throws IOException {

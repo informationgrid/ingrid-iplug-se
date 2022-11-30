@@ -48,8 +48,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -73,6 +71,8 @@ import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
 
 import de.ingrid.iplug.se.nutch.net.InGridURLNormalizers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * CrawlDb update tool that only updates urls that passing a white-black list
@@ -81,7 +81,7 @@ import de.ingrid.iplug.se.nutch.net.InGridURLNormalizers;
  */
 public class BWUpdateDb extends Configured implements Tool {
 
-    public static final Log LOG = LogFactory.getLog(BWUpdateDb.class);
+    public static final Logger LOG = LoggerFactory.getLogger(BWUpdateDb.class);
 
     public static class ObjectWritableMapper extends Mapper<HostTypeKey, Writable, HostTypeKey, ObjectWritable> {
 

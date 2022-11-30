@@ -22,7 +22,7 @@
  */
 package de.ingrid.iplug.se.nutch.tools;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.nutch.indexer.IndexWriterParams;
 import org.elasticsearch.action.ActionFuture;
