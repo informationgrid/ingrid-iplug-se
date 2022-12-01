@@ -24,8 +24,6 @@ package de.ingrid.iplug.se.nutchController;
 
 import static de.ingrid.iplug.se.elasticsearch.Utils.elastic;
 import static de.ingrid.iplug.se.elasticsearch.Utils.elasticConfig;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -45,10 +43,6 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
@@ -56,14 +50,18 @@ import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
 import de.ingrid.utils.statusprovider.StatusProvider;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
-@RunWith(PowerMockRunner.class)
-// @PrepareForTest(JettyStarter.class)
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
+import static org.junit.jupiter.api.Assertions.fail;
+
 public class NutchProcessTest {
 
     // @Mock JettyStarter jettyStarter;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpBeforeClass() throws Exception {
         SEIPlug.baseConfig = new Config();
         SEIPlug.baseConfig.index = "test";
@@ -105,9 +103,9 @@ public class NutchProcessTest {
         instance.setWorkingDirectory("test");
         controller.start(instance, p);
         Thread.sleep(500);
-        assertEquals("Status is RUNNING", NutchProcess.STATUS.RUNNING, p.getStatus());
+        assertThat("Status is RUNNING", p.getStatus(), is(NutchProcess.STATUS.RUNNING));
         Thread.sleep(5000);
-        assertEquals("Status is FINISHED", NutchProcess.STATUS.FINISHED, p.getStatus());
+        assertThat("Status is FINISHED", p.getStatus(), is(NutchProcess.STATUS.FINISHED));
     }
 
     @Test
@@ -188,7 +186,7 @@ public class NutchProcessTest {
 
             long start = System.currentTimeMillis();
             Thread.sleep(500);
-            assertEquals("Status is RUNNING", NutchProcess.STATUS.RUNNING, p.getStatus());
+            assertThat("Status is RUNNING", p.getStatus(), is(NutchProcess.STATUS.RUNNING));
             while ((System.currentTimeMillis() - start) < 600000) {
                 Thread.sleep(1000);
                 if (p.getStatus() != NutchProcess.STATUS.RUNNING) {
@@ -199,7 +197,7 @@ public class NutchProcessTest {
                 p.stopExecution();
                 fail("Crawl took more than 10 min.");
             }
-            assertEquals("Status is FINISHED", NutchProcess.STATUS.FINISHED, p.getStatus());
+            assertThat("Status is FINISHED", p.getStatus(), is(NutchProcess.STATUS.FINISHED));
 
         } finally {
             if (node != null)

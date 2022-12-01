@@ -23,11 +23,11 @@
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.nutch.util.NutchConfiguration;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
 
 import de.ingrid.iplug.se.nutch.analysis.UrlTester;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 /**
  * 
@@ -37,7 +37,7 @@ import de.ingrid.iplug.se.nutch.analysis.UrlTester;
  * @author joachim
  * 
  */
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class UrlTesterTests {
 
     @Test

@@ -22,20 +22,19 @@
  */
 package de.ingrid.iplug.se.nutchController;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.junit.Test;
-
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
+import org.junit.jupiter.api.Test;
+
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
 
 public class NutchUrlTesterTest {
 
@@ -65,16 +64,16 @@ public class NutchUrlTesterTest {
 
         long start = System.currentTimeMillis();
         Thread.sleep(100);
-        assertEquals("Status is RUNNING", NutchProcess.STATUS.RUNNING, process.getStatus());
+        assertThat("Status is RUNNING", process.getStatus(), is(NutchProcess.STATUS.RUNNING));
         while ((System.currentTimeMillis() - start) < 300000) {
             Thread.sleep(1000);
             if (process.getStatus() != NutchProcess.STATUS.RUNNING) {
                 break;
             }
         }
-        assertEquals("Status is FINISHED", NutchProcess.STATUS.FINISHED, process.getStatus());
+        assertThat("Status is FINISHED", process.getStatus(), is(NutchProcess.STATUS.FINISHED));
         System.out.println(process.getConsoleOutput());
-        assertTrue("Console Output is not empty", process.getConsoleOutput().length() > 0);
+        assertThat("Console Output is not empty", process.getConsoleOutput().length() > 0, is(true));
 
         FileUtils.removeRecursive(Paths.get("test-instances"));
     }

@@ -46,7 +46,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.*;
 
 public class Utils {
     public static final long MAX_RESULTS = 11;
