@@ -26,22 +26,17 @@ import de.ingrid.admin.Config;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.utils.IngridHits;
 import de.ingrid.utils.query.IngridQuery;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.*;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(SEIPlug.class)
 public class LocationSearchTest {
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpBeforeClass() throws Exception {
         SEIPlug.baseConfig = new Config();
         SEIPlug.baseConfig.index = "test";
@@ -50,13 +45,13 @@ public class LocationSearchTest {
         Utils.setupES();
     }
 
-    @Before
+    @BeforeEach
     public void initTest() throws Exception {
         Utils.initIndex();
         Utils.indexManager.switchAlias("ingrid_test", SEIPlug.baseConfig.index, "test_1");
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDown() throws Exception {
         Utils.index.close();
         Utils.elastic.destroy();

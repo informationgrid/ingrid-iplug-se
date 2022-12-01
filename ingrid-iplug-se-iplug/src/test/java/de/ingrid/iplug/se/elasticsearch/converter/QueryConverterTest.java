@@ -30,20 +30,20 @@ import de.ingrid.elasticsearch.search.converter.MatchAllQueryConverter;
 import de.ingrid.elasticsearch.search.converter.QueryConverter;
 import de.ingrid.iplug.se.elasticsearch.Utils;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.*;
 
 public class QueryConverterTest {
 
     private static QueryConverter queryConverter;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpBeforeClass() throws Exception {
         queryConverter = new QueryConverter();
         List<IQueryParsers> parsers = new ArrayList<>();

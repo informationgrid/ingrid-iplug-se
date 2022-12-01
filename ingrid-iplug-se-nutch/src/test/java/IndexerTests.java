@@ -48,9 +48,6 @@ import org.apache.nutch.segment.SegmentMerger;
 import org.apache.nutch.util.NutchConfiguration;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
 
 import de.ingrid.iplug.se.nutch.crawl.bw.BWCrawlDbFilter;
 import de.ingrid.iplug.se.nutch.crawl.bw.BWInjector;
@@ -62,6 +59,9 @@ import de.ingrid.iplug.se.nutch.crawl.metadata.ParseDataUpdater;
 import de.ingrid.iplug.se.nutch.statistics.HostStatistic;
 import de.ingrid.iplug.se.nutch.statistics.StartUrlStatusReport;
 import de.ingrid.iplug.se.nutch.statistics.UrlErrorReport;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 /**
  * 
@@ -71,7 +71,7 @@ import de.ingrid.iplug.se.nutch.statistics.UrlErrorReport;
  * @author joachim
  * 
  */
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class IndexerTests {
 
     @Test
@@ -380,7 +380,7 @@ public class IndexerTests {
 
     private List<String> setUpBaseCall() {
 
-        String[] classPath = new String[] { "src/test/resources/conf", "build/apache-nutch-1.18/runtime/local", "build/apache-nutch-1.9/runtime/local/lib/*" };
+        String[] classPath = new String[] { "src/test/resources/conf", "build/apache-nutch-1.18/runtime/local", "build/apache-nutch-1.18/runtime/local/lib/*" };
 
         String cp = StringUtils.join(classPath, File.pathSeparator);
 

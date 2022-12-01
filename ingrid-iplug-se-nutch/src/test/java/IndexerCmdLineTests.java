@@ -35,10 +35,9 @@ import java.util.Scanner;
 
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.node.Node;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 /**
  * 
@@ -48,7 +47,7 @@ import org.junit.runners.MethodSorters;
  * @author joachim
  * 
  */
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class IndexerCmdLineTests {
 
     @Test
@@ -57,7 +56,7 @@ public class IndexerCmdLineTests {
         delete(new File("test"));
 
         // inject start urls
-        List<String> call = new ArrayList<String>();
+        List<String> call = new ArrayList<>();
         call.addAll(setUpBaseCall());
         call.add("org.apache.nutch.crawl.Injector");
         call.add("test/crawldb");
@@ -70,7 +69,7 @@ public class IndexerCmdLineTests {
     public void test02InjectBWURLs() throws IOException, InterruptedException {
 
         // inject start urls
-        List<String> call = new ArrayList<String>();
+        List<String> call = new ArrayList<>();
         call.addAll(setUpBaseCall());
         call.add("de.ingrid.iplug.se.nutch.crawl.bw.BWInjector");
         call.add("test/bwdb");
@@ -84,7 +83,7 @@ public class IndexerCmdLineTests {
     public void test03InjectMetadata() throws Exception {
 
         // inject start urls
-        List<String> call = new ArrayList<String>();
+        List<String> call = new ArrayList<>();
         call.addAll(setUpBaseCall());
         call.add("de.ingrid.iplug.se.nutch.crawl.metadata.MetadataInjector");
         call.add("test/metadatadb");
@@ -97,7 +96,7 @@ public class IndexerCmdLineTests {
     public void test04FilterCrawlDB() throws IOException, InterruptedException {
 
         // inject start urls
-        List<String> call = new ArrayList<String>();
+        List<String> call = new ArrayList<>();
         call.addAll(setUpBaseCall());
         call.add("de.ingrid.iplug.se.nutch.crawl.bw.BWCrawlDbFilter");
         call.add("test/crawldb");
@@ -113,7 +112,7 @@ public class IndexerCmdLineTests {
     public void test05Generate() throws IOException, InterruptedException {
 
         // inject start urls
-        List<String> call = new ArrayList<String>();
+        List<String> call = new ArrayList<>();
         call.addAll(setUpBaseCall());
         call.add("org.apache.nutch.crawl.Generator");
         call.add("test/crawldb");
@@ -135,7 +134,7 @@ public class IndexerCmdLineTests {
         });
 
         // inject start urls
-        List<String> call = new ArrayList<String>();
+        List<String> call = new ArrayList<>();
         call.addAll(setUpBaseCall());
         call.add(org.apache.nutch.fetcher.Fetcher.class.getName());
         call.add("test/segments/" + directories[directories.length - 1]);
@@ -156,7 +155,7 @@ public class IndexerCmdLineTests {
         });
 
         // inject start urls
-        List<String> call = new ArrayList<String>();
+        List<String> call = new ArrayList<>();
         call.addAll(setUpBaseCall());
         call.add("de.ingrid.iplug.se.nutch.crawl.bw.BWUpdateDb");
         call.add("test/crawldb");
@@ -181,7 +180,7 @@ public class IndexerCmdLineTests {
         });
 
         // inject start urls
-        List<String> call = new ArrayList<String>();
+        List<String> call = new ArrayList<>();
         call.addAll(setUpBaseCall());
         call.add("de.ingrid.iplug.se.nutch.crawl.metadata.ParseDataUpdater");
         call.add("test/metadatadb");
@@ -194,7 +193,7 @@ public class IndexerCmdLineTests {
     public void test09_1HostStatistics() throws IOException, InterruptedException {
 
         // create statistics
-        List<String> call = new ArrayList<String>();
+        List<String> call = new ArrayList<>();
         call.addAll(setUpBaseCall());
         call.add("de.ingrid.iplug.se.nutch.statistics.HostStatistic");
         call.add("test/crawldb");
@@ -207,7 +206,7 @@ public class IndexerCmdLineTests {
     public void test09_2StartUrlStatusReport() throws IOException, InterruptedException {
 
         // create statistics
-        List<String> call = new ArrayList<String>();
+        List<String> call = new ArrayList<>();
         call.addAll(setUpBaseCall());
         call.add("de.ingrid.iplug.se.nutch.statistics.StartUrlStatusReport");
         call.add("test/crawldb");
@@ -222,7 +221,7 @@ public class IndexerCmdLineTests {
     public void test09_3UrlErrorReport() throws IOException, InterruptedException {
 
         // create statistics
-        List<String> call = new ArrayList<String>();
+        List<String> call = new ArrayList<>();
         call.addAll(setUpBaseCall());
         call.add("de.ingrid.iplug.se.nutch.statistics.UrlErrorReport");
         call.add("test/crawldb");
@@ -245,7 +244,7 @@ public class IndexerCmdLineTests {
         });
 
         // inject start urls
-        List<String> call = new ArrayList<String>();
+        List<String> call = new ArrayList<>();
         call.addAll(setUpBaseCall());
         call.add("org.apache.nutch.scoring.webgraph.WebGraph");
         call.add("-webgraphdb");
@@ -260,7 +259,7 @@ public class IndexerCmdLineTests {
     public void test11LinkRank() throws Exception {
 
         // inject start urls
-        List<String> call = new ArrayList<String>();
+        List<String> call = new ArrayList<>();
         call.addAll(setUpBaseCall());
         call.add("org.apache.nutch.scoring.webgraph.LinkRank");
         call.add("-webgraphdb");
@@ -273,7 +272,7 @@ public class IndexerCmdLineTests {
     public void test12ScoreUpdater() throws Exception {
 
         // inject start urls
-        List<String> call = new ArrayList<String>();
+        List<String> call = new ArrayList<>();
         call.addAll(setUpBaseCall());
         call.add("org.apache.nutch.scoring.webgraph.ScoreUpdater");
         call.add("-webgraphdb");
@@ -288,7 +287,7 @@ public class IndexerCmdLineTests {
     public void test13WebgraphFilter() throws IOException, InterruptedException {
 
         // inject start urls
-        List<String> call = new ArrayList<String>();
+        List<String> call = new ArrayList<>();
         call.addAll(setUpBaseCall());
         call.add("de.ingrid.iplug.se.nutch.crawl.bw.BWWebgraphFilter");
         call.add("test/webgraph");
@@ -314,7 +313,7 @@ public class IndexerCmdLineTests {
 
         if (directories.length > 1) {
             // inject start urls
-            List<String> call = new ArrayList<String>();
+            List<String> call = new ArrayList<>();
             call.addAll(setUpBaseCall());
             call.add("de.ingrid.iplug.se.nutch.segment.SegmentMerger");
             call.add("test/merged_segment");
@@ -334,7 +333,7 @@ public class IndexerCmdLineTests {
     public void test15SegmentFilter() throws Exception {
 
         // inject start urls
-        List<String> call = new ArrayList<String>();
+        List<String> call = new ArrayList<>();
         call.addAll(setUpBaseCall());
         call.add("de.ingrid.iplug.se.nutch.segment.SegmentFilter");
         call.add("test/filtered_segment");
@@ -355,7 +354,7 @@ public class IndexerCmdLineTests {
     public void test16InvertLinks() throws Exception {
 
         // inject start urls
-        List<String> call = new ArrayList<String>();
+        List<String> call = new ArrayList<>();
         call.addAll(setUpBaseCall());
         call.add("org.apache.nutch.crawl.LinkDb");
         call.add("test/linkdb");
@@ -371,7 +370,7 @@ public class IndexerCmdLineTests {
     public void test17FilterLinkdb() throws Exception {
 
         // inject start urls
-        List<String> call = new ArrayList<String>();
+        List<String> call = new ArrayList<>();
         call.addAll(setUpBaseCall());
         call.add("de.ingrid.iplug.se.nutch.crawl.bw.BWLinkDbFilter");
         call.add("test/linkdb");
@@ -387,7 +386,7 @@ public class IndexerCmdLineTests {
     public void test18Index() throws Exception {
 
         // inject start urls
-        List<String> call = new ArrayList<String>();
+        List<String> call = new ArrayList<>();
         call.addAll(setUpBaseCall());
         call.add("org.apache.nutch.indexer.IndexingJob");
         call.add("test/crawldb");
@@ -478,11 +477,11 @@ public class IndexerCmdLineTests {
 
     private List<String> setUpBaseCall() {
 
-        String[] classPath = new String[] { "src/test/resources/conf", "build/apache-nutch-1.18/runtime/local", "build/apache-nutch-1.9/runtime/local/lib/*" };
+        String[] classPath = new String[] { "src/test/resources/conf", "build/apache-nutch-1.18/runtime/local", "build/apache-nutch-1.18/runtime/local/lib/*" };
 
         String cp = StringUtils.join(classPath, File.pathSeparator);
 
-        List<String> baseCall = new ArrayList<String>();
+        List<String> baseCall = new ArrayList<>();
         baseCall.add("java");
         baseCall.add("-cp");
         baseCall.add(cp);

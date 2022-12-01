@@ -32,9 +32,10 @@ import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.elasticsearch.Utils;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -46,12 +47,14 @@ import java.util.Properties;
 
 import static de.ingrid.iplug.se.elasticsearch.Utils.elastic;
 import static de.ingrid.iplug.se.elasticsearch.Utils.elasticConfig;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.*;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class NutchControllerTest {
 
-    @Before
+    @BeforeEach
     public void beforeTest() throws Exception {
         FileUtils.removeRecursive(Paths.get("test-instances"));
         SEIPlug.baseConfig = new Config();
@@ -65,7 +68,7 @@ public class NutchControllerTest {
         Utils.setupES();
     }
 
-    @After
+    @AfterEach
     public void afterTest() throws Exception {
         elastic.getClient().close();
     }
@@ -124,7 +127,7 @@ public class NutchControllerTest {
 
         long start = System.currentTimeMillis();
         Thread.sleep( 500 );
-        assertEquals( "Status is RUNNING", NutchProcess.STATUS.RUNNING, nutchController.getNutchProcess( instance ).getStatus() );
+        assertThat( "Status is RUNNING", nutchController.getNutchProcess( instance ).getStatus(), is(NutchProcess.STATUS.RUNNING) );
         while ((System.currentTimeMillis() - start) < 6660000) {
             Thread.sleep( 1000 );
             if (nutchController.getNutchProcess( instance ).getStatus() != NutchProcess.STATUS.RUNNING) {
@@ -137,7 +140,7 @@ public class NutchControllerTest {
             nutchController.stop( instance );
             fail( "Crawl took more than 6 min." );
         }
-        assertEquals( "Status is FINISHED", NutchProcess.STATUS.FINISHED, nutchController.getNutchProcess( instance ).getStatus() );
+        assertThat( "Status is FINISHED", nutchController.getNutchProcess( instance ).getStatus(), is(NutchProcess.STATUS.FINISHED) );
 
         System.out.println( nutchController.getNutchProcess( instance ).getStatusProvider().toString() );
 
@@ -190,10 +193,10 @@ public class NutchControllerTest {
         nutchController.start( instance, process );
 
         Thread.sleep( 5000 );
-        assertEquals( "Status is RUNNING", NutchProcess.STATUS.RUNNING, nutchController.getNutchProcess( instance ).getStatus() );
+        assertThat( "Status is RUNNING", nutchController.getNutchProcess( instance ).getStatus(), is(NutchProcess.STATUS.RUNNING) );
         nutchController.stop( instance );
         Thread.sleep( 500 );
-        assertEquals( "Status is CANCELLED", NutchProcess.STATUS.INTERRUPTED, nutchController.getNutchProcess( instance ).getStatus() );
+        assertThat( "Status is CANCELLED", nutchController.getNutchProcess( instance ).getStatus(), is(NutchProcess.STATUS.INTERRUPTED) );
 
         System.out.println( nutchController.getNutchProcess( instance ).getStatusProvider().toString() );
 
