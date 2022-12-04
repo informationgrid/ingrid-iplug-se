@@ -25,13 +25,13 @@
  */
 package de.ingrid.iplug.se.nutchController;
 
-import java.io.File;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import de.ingrid.utils.statusprovider.StatusProvider;
 import org.apache.commons.io.input.TailerListenerAdapter;
 
-import de.ingrid.utils.statusprovider.StatusProvider;
+import java.io.File;
+import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 
@@ -60,12 +60,15 @@ public class LogFileWatcherFactory {
     private static class FetchTailerListener extends TailerListenerAdapter {
 
         private StatusProvider statusProvider = null;
-        private String statusKey = null;
+        private String statusKey;
+        private int totalQueued;
         private String oldMessage = null;
+        private Date startTime = null;
+        // 2022-12-03 15:03:56,173 INFO o.a.n.f.QueueFeeder [QueueFeeder] 	67	SUCCESSFULLY_QUEUED
+        final Pattern pTotalQueued = Pattern.compile(".*\\s(\\d+)\\s+SUCCESSFULLY_QUEUED.*");
 
-        // 10 threads (2 waiting), 11 queues, 493 URLs queued, 5693 pages, 135
-        // errors, 7.03 pages/s (3 last sec), 6011 kbits/s (18810 last sec)
-        final Pattern p = Pattern.compile(".*queued, (\\d+) pages, (\\d+) errors, ([\\d\\.,]+) pages/s.*");
+        // 2022-12-03 15:03:58,356 INFO o.a.n.f.Fetcher [LocalJobRunner Map Task Executor #0] -activeThreads=10, spinWaiting=10, fetchQueues.totalSize=66, fetchQueues.getQueueCount=1
+        final Pattern pQueued = Pattern.compile(".*fetchQueues.totalSize=(\\d+),.*");
 
         public FetchTailerListener(StatusProvider statusProvider, String statusKey) {
             this.statusProvider = statusProvider;
@@ -74,21 +77,31 @@ public class LogFileWatcherFactory {
         }
 
         public void handle(String line) {
-            final Matcher m = p.matcher(line);
-            if (m.matches()) {
+            final Matcher mTotalQueued = pTotalQueued.matcher(line);
+            if (mTotalQueued.matches()) {
+                this.totalQueued = Integer.parseInt(mTotalQueued.group(1));
+                this.startTime = new Date();
+            }
+            final Matcher mQueued = pQueued.matcher(line);
+            if (mQueued.matches()) {
                 StringBuilder msg = new StringBuilder();
+                int pQueued = Integer.parseInt(mQueued.group(1));
+                int pFetched = (this.totalQueued - pQueued);
+                if (pFetched > this.totalQueued)  {
+                    pFetched = this.totalQueued;
+                }
+                float pps = (float) pFetched / ( (new Date().getTime() - this.startTime.getTime() ) / 1000);
                 msg.append(" ( ");
-                msg.append(m.group(1));
-                msg.append(" pages, ");
-                msg.append(m.group(2));
-                msg.append(" errors, ");
-                msg.append(m.group(3));
-                msg.append(" pages/s )");
+                msg.append(pFetched);
+                msg.append(" / ");
+                msg.append(totalQueued);
+                msg.append(" pages fetched. " + pps + " pages/sec. )");
                 statusProvider.addState(statusKey, oldMessage.concat(msg.toString()));
             }
+
         }
     }
-    
+
     private static class DeduplicationTailerListener extends TailerListenerAdapter {
 
         private StatusProvider statusProvider = null;
@@ -149,8 +162,8 @@ public class LogFileWatcherFactory {
         private String statusKey = null;
         private String oldMessage = null;
 
-        // webgraph.LinkRank - Analysis: Starting iteration 10 of 10
-        final Pattern p = Pattern.compile(".*webgraph\\.LinkRank - Analysis: Starting iteration (\\d+) of (\\d+).*");
+        // 2022-12-03 16:10:23,483 INFO o.a.n.s.w.LinkRank [main] Analysis: Starting iteration 10 of 10
+        final Pattern p = Pattern.compile(".*LinkRank.*Analysis: Starting iteration (\\d+) of (\\d+).*");
 
         public WebgraphTailerListener(StatusProvider statusProvider, String statusKey) {
             this.statusProvider = statusProvider;
