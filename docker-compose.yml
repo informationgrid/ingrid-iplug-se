@@ -26,5 +26,7 @@ services:
 
   ibus:
     image: docker-registry.wemove.com/ingrid-ibus
+    environment:
+      - ELASTIC_HOSTS=elastic:9300
     ports:
       - 9900:9900
