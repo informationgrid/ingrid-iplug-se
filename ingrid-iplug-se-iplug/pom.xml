@@ -23,7 +23,6 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-
       <dependency>
         <groupId>xerces</groupId>
         <artifactId>xercesImpl</artifactId>
@@ -101,11 +100,6 @@
       <version>2.14.0</version>
     </dependency>
     <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-      <version>2.6</version>
-    </dependency>
-    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-exec</artifactId>
       <version>1.2</version>
@@ -113,7 +107,7 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.7</version>
+      <version>2.11.0</version>
     </dependency>
     <!-- The following two libs are needed for geo_shape based search! see:
             http://www.elasticsearch.org/guide/en/elasticsearch/client/java-api/current/query-dsl-filters.html -->
