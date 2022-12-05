@@ -44,7 +44,7 @@ public class UrlTesterTests {
     public void testExistingUrl() throws Exception {
         Configuration c = NutchConfiguration.create();
         c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
-        ToolRunner.run(c, new UrlTester(), new String[] { "https://www.google.de/" });
+        ToolRunner.run(c, new UrlTester(), new String[]{"https://www.google.de/"});
     }
 
 
