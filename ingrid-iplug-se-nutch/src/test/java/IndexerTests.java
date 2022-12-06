@@ -20,21 +20,13 @@
  * limitations under the Licence.
  * **************************************************#
  */
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
 
-import org.apache.commons.lang3.StringUtils;
+import de.ingrid.iplug.se.nutch.crawl.bw.*;
+import de.ingrid.iplug.se.nutch.crawl.metadata.MetadataInjector;
+import de.ingrid.iplug.se.nutch.crawl.metadata.ParseDataUpdater;
+import de.ingrid.iplug.se.nutch.statistics.HostStatistic;
+import de.ingrid.iplug.se.nutch.statistics.StartUrlStatusReport;
+import de.ingrid.iplug.se.nutch.statistics.UrlErrorReport;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.nutch.crawl.Generator;
@@ -47,22 +39,17 @@ import org.apache.nutch.scoring.webgraph.ScoreUpdater;
 import org.apache.nutch.scoring.webgraph.WebGraph;
 import org.apache.nutch.segment.SegmentMerger;
 import org.apache.nutch.util.NutchConfiguration;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.node.Node;
-
-import de.ingrid.iplug.se.nutch.crawl.bw.BWCrawlDbFilter;
-import de.ingrid.iplug.se.nutch.crawl.bw.BWInjector;
-import de.ingrid.iplug.se.nutch.crawl.bw.BWLinkDbFilter;
-import de.ingrid.iplug.se.nutch.crawl.bw.BWUpdateDb;
-import de.ingrid.iplug.se.nutch.crawl.bw.BWWebgraphFilter;
-import de.ingrid.iplug.se.nutch.crawl.metadata.MetadataInjector;
-import de.ingrid.iplug.se.nutch.crawl.metadata.ParseDataUpdater;
-import de.ingrid.iplug.se.nutch.statistics.HostStatistic;
-import de.ingrid.iplug.se.nutch.statistics.StartUrlStatusReport;
-import de.ingrid.iplug.se.nutch.statistics.UrlErrorReport;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.nio.file.*;
+import java.util.Arrays;
+import java.util.Comparator;
 
 /**
  * 
@@ -350,12 +337,15 @@ public class IndexerTests {
     }
 
     void delete(File f) throws IOException {
-        if (f.isDirectory()) {
-            for (File c : f.listFiles())
-                delete(c);
+        if (Files.exists(f.toPath())) {
+            Files.walk(f.toPath())
+                    .sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
         }
-        if (!f.delete())
+        if (Files.exists(f.toPath())) {
             throw new FileNotFoundException("Failed to delete file: " + f);
+        }
     }
 
 }
