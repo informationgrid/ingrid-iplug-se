@@ -38,7 +38,7 @@
     <log4j2.version>2.19.0</log4j2.version>
     <spring.version>5.3.23</spring.version>
     <jetty.version>9.4.49.v20220914</jetty.version>
-    <netty.version>4.1.84</netty.version>
+    <netty.version>4.1.77</netty.version>
   </properties>
 
   <modules>
