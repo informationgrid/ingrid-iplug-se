@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.ingrid.iplug.se.SEIPlug;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
@@ -48,7 +49,18 @@ public class GenericNutchProcess extends NutchProcess {
     private static Logger log = Logger.getLogger(GenericNutchProcess.class);
 
     private List<String[]> commands = new ArrayList<String[]>();
-    
+
+    public GenericNutchProcess() {
+
+        // if the configuration is used outside spring
+        // this property could be null
+        if (SEIPlug.conf.nutchCallJavaExecutable == null) {
+            this.setExecutable("java");
+        } else {
+            this.setExecutable(SEIPlug.conf.nutchCallJavaExecutable);
+        }
+    }
+
     @Override
     public void run() {
         status = STATUS.RUNNING;
