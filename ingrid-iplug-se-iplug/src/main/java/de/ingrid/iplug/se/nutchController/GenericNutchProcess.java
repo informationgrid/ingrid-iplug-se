@@ -51,7 +51,14 @@ public class GenericNutchProcess extends NutchProcess {
     private List<String[]> commands = new ArrayList<String[]>();
 
     public GenericNutchProcess() {
-        this.setExecutable(SEIPlug.conf.nutchCallJavaExecutable);
+
+        // if the configuration is used outside spring
+        // this property could be null
+        if (SEIPlug.conf.nutchCallJavaExecutable == null) {
+            this.setExecutable("java");
+        } else {
+            this.setExecutable(SEIPlug.conf.nutchCallJavaExecutable);
+        }
     }
 
     @Override
