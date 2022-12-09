@@ -85,6 +85,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
     public IngridCrawlNutchProcess(IIndexManager indexManager, PlugDescriptionService pds) {
         this.indexManager = indexManager;
         this.plugDescriptionService = pds;
+        this.setExecutable(SEIPlug.conf.nutchCallJavaExecutable);
     }
 
     @Override
