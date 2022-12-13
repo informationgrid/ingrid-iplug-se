@@ -6,7 +6,7 @@ RUN unzip -q ingrid-iplug-se*-installer.jar -d /tmp \
     && sed -i -r 's/(<AppenderRef.*\/>)/\1<AppenderRef ref="Console" \/>/g' $INSTALL_DIR/conf/log4j2.xml \
     && echo jetty.port=8080 > $INSTALL_DIR/conf/config.override.properties
 
-FROM docker-registry.wemove.com/ingrid-java:jre-11
+FROM docker-registry.wemove.com/ingrid-java:jre-17
 ENV INGRID_USER=ingrid
 ENV RUN_DIRECTLY=true
 
