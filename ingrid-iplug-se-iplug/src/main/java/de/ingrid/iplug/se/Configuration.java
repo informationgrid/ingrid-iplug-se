@@ -76,7 +76,7 @@ public class Configuration implements IConfig {
     @Value("#{'${nutch.call.java.options:-Dhadoop.log.file=hadoop.log -Dfile.encoding=UTF-8}'.split(' ')}")
     public List<String> nutchCallJavaOptions;
 
-    @Value("{'${nutch.call.java.executable:java}")
+    @Value("${nutch.call.java.executable:java}")
     public String nutchCallJavaExecutable;
 
     @Value("${plugdescription.fields:}")
