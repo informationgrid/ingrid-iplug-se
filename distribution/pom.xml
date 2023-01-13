@@ -61,6 +61,9 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <version>3.4.2</version>
         <inherited>true</inherited>
+        <configuration>
+          <skipAssembly>false</skipAssembly>
+        </configuration>
         <executions>
           <execution>
             <id>make-installer</id>
