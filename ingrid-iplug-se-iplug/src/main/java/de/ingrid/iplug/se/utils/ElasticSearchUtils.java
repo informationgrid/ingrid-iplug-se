@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
- * Copyright (C) 2014 - 2022 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2023 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -27,23 +27,23 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
+import de.ingrid.iplug.se.SEIPlug;
 import org.elasticsearch.action.admin.indices.exists.types.TypesExistsRequest;
 import org.elasticsearch.client.Client;
 import org.springframework.core.io.ClassPathResource;
 
-import de.ingrid.admin.JettyStarter;
 
 @Deprecated
 public class ElasticSearchUtils {
 
     public static boolean typeExists(String type, Client client) {
-        TypesExistsRequest typeRequest = new TypesExistsRequest( new String[]{ JettyStarter.baseConfig.index }, type );
+        TypesExistsRequest typeRequest = new TypesExistsRequest( new String[]{ SEIPlug.baseConfig.index }, type );
         boolean typeExists = client.admin().indices().typesExists( typeRequest ).actionGet().isExists();
         return typeExists;
     }
     
     public static void createIndexType(String type, Client client) throws Exception {
-        String indexName = JettyStarter.baseConfig.index;
+        String indexName = SEIPlug.baseConfig.index;
         client.admin().indices().preparePutMapping().setIndices( indexName )
             .setType( type )
             .setSource( getMappingSource() )

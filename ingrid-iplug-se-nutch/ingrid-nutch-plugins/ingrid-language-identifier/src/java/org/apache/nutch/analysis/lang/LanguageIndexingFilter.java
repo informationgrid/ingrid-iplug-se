@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,7 +16,6 @@
  */
 package org.apache.nutch.analysis.lang;
 
-// Nutch imports
 import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.crawl.Inlinks;
 import org.apache.nutch.indexer.IndexingFilter;
@@ -27,11 +26,13 @@ import org.apache.nutch.parse.Parse;
 import org.apache.nutch.metadata.Metadata;
 import org.apache.nutch.net.protocols.Response;
 
-// Hadoop imports
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.hadoop.conf.Configuration;
 
 /**
- * An {@link org.apache.nutch.indexer.IndexingFilter} that add a
+ * An {@link IndexingFilter} that add a
  * <code>lang</code> (language) field to the document.
  * 
  * It tries to find the language of the document by:
@@ -48,48 +49,58 @@ import org.apache.hadoop.conf.Configuration;
  */
 public class LanguageIndexingFilter implements IndexingFilter {
 
-    private Configuration conf;
+  private Configuration conf;
+  private Set<String> indexLangs;
 
-    /**
-     * Constructs a new Language Indexing Filter.
-     */
-    public LanguageIndexingFilter() {
+  /**
+   * Constructs a new Language Indexing Filter.
+   */
+  public LanguageIndexingFilter() {
 
+  }
+
+  // Inherited JavaDoc
+  @Override
+  public NutchDocument filter(NutchDocument doc, Parse parse, Text url,
+      CrawlDatum datum, Inlinks inlinks) throws IndexingException {
+
+    // check if LANGUAGE found, possibly put there by HTMLLanguageParser
+    String lang = parse.getData().getParseMeta().get(Metadata.LANGUAGE);
+
+    // check if HTTP-header tels us the language
+    if (lang == null) {
+      lang = parse.getData().getContentMeta().get(Response.CONTENT_LANGUAGE);
     }
 
-    // Inherited JavaDoc
-    public NutchDocument filter(NutchDocument doc, Parse parse, Text url, CrawlDatum datum, Inlinks inlinks) throws IndexingException {
-
-        // check if LANGUAGE found, possibly put there by HTMLLanguageParser
-        String lang = parse.getData().getParseMeta().get(Metadata.LANGUAGE);
-
-        // check if HTTP-header tels us the language
-        if (lang == null) {
-            lang = parse.getData().getContentMeta().get(Response.CONTENT_LANGUAGE);
-        }
-
-        // use language configured in url-maintenance
-        // languages will be put according to the host of the administered URLs
-        // (see MetadataMerger)
-        if (lang == null || conf.getBoolean("ingrid.lang.analyze.override.with.metadata", false)) {
-            lang = parse.getData().getParseMeta().get("lang");
-        }
-
-        if (lang == null || lang.length() == 0) {
-            lang = "unknown";
-        }
-
-        doc.add("lang", lang);
-
-        return doc;
+    // INGRID: use language configured in url-maintenance
+    // languages will be put according to the host of the administered URLs
+    // (see MetadataMerger)
+    if (lang == null || conf.getBoolean("ingrid.lang.analyze.override.with.metadata", false)) {
+      lang = parse.getData().getParseMeta().get("lang");
     }
 
-    public void setConf(Configuration conf) {
-        this.conf = conf;
+    if (lang == null || lang.length() == 0) {
+      lang = "unknown";
     }
 
-    public Configuration getConf() {
-        return this.conf;
+    if (!indexLangs.isEmpty() && !indexLangs.contains(lang)) {
+    	return null;
     }
+    
+    doc.add("lang", lang);
+
+    return doc;
+  }
+
+  @Override
+  public void setConf(Configuration conf) {
+    this.conf = conf;
+    indexLangs = new HashSet<>(conf.getStringCollection("lang.index.languages"));
+  }
+
+  @Override
+  public Configuration getConf() {
+    return this.conf;
+  }
 
 }

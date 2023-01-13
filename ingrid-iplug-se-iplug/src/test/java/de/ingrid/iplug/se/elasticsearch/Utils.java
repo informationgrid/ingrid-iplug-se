@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
- * Copyright (C) 2014 - 2022 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2023 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -22,12 +22,12 @@
  */
 package de.ingrid.iplug.se.elasticsearch;
 
-import de.ingrid.admin.JettyStarter;
 import de.ingrid.elasticsearch.*;
 import de.ingrid.elasticsearch.search.FacetConverter;
 import de.ingrid.elasticsearch.search.IQueryParsers;
 import de.ingrid.elasticsearch.search.IndexImpl;
 import de.ingrid.elasticsearch.search.converter.*;
+import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.utils.IngridDocument;
 import de.ingrid.utils.IngridHit;
 import de.ingrid.utils.query.IngridQuery;
@@ -35,7 +35,7 @@ import de.ingrid.utils.queryparser.ParseException;
 import de.ingrid.utils.queryparser.QueryStringParser;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.xcontent.XContentType;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -46,7 +46,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.*;
 
 public class Utils {
     public static final long MAX_RESULTS = 11;
@@ -91,7 +91,7 @@ public class Utils {
 //        configuration.esBoostMode = "sum";
 //        SEIPlug.conf = configuration;
 
-        JettyStarter.baseConfig.docProducerIndices = new String[] {"test"};
+        SEIPlug.baseConfig.docProducerIndices = new String[] {"test"};
         
         // setMapping( elastic, "test_1","web" );
         prepareIndex( elastic );
@@ -167,14 +167,7 @@ public class Utils {
     }
 
 
-    public static void initIndex(JettyStarter jettyStarter) throws Exception {
-        //PowerMockito.mockStatic( JettyStarter.class );
-        //Mockito.when(JettyStarter.getInstance()).thenReturn( jettyStarter );
-        
-//        Config config = new Config();
-//        config.communicationProxyUrl = "/ingrid-group:iplug-se-test";
-//        jettyStarter.config = config;
-        
+    public static void initIndex() {
         QueryConverter qc = new QueryConverter();
         List<IQueryParsers> parsers = new ArrayList<>();
         parsers.add( new DefaultFieldsQueryConverter(elasticConfig) );

@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
- * Copyright (C) 2014 - 2022 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2023 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -40,7 +40,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import de.ingrid.admin.controller.AbstractController;
-import de.ingrid.admin.security.IngridPrincipal;
 import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
 import de.ingrid.iplug.se.nutchController.NutchController;
 import de.ingrid.iplug.se.utils.DBUtils;
@@ -63,7 +62,7 @@ public class ReportsController extends AbstractController {
 	@RequestMapping(value = { "/iplug-pages/instanceReports.html" }, method = RequestMethod.GET)
 	public String showReports(final ModelMap modelMap, @RequestParam("instance") String name, HttpServletRequest request, HttpServletResponse response) throws IOException {
         String user = request.getUserPrincipal().getName();
-        if (!(request.getUserPrincipal() instanceof IngridPrincipal.SuperAdmin) && request.isUserInRole( "instanceAdmin" ) && !DBUtils.isAdminForInstance( user, name )) {
+        if (request.isUserInRole( "instanceAdmin" ) && !DBUtils.isAdminForInstance( user, name )) {
             response.sendError(HttpStatus.FORBIDDEN.value());
             return null;
         }

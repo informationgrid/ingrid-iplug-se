@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
- * Copyright (C) 2014 - 2022 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2023 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -24,7 +24,6 @@ package de.ingrid.iplug.se.webapp.controller;
 
 import de.ingrid.admin.Config;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
-import de.ingrid.admin.security.IngridPrincipal;
 import de.ingrid.elasticsearch.IndexManager;
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.db.model.Url;
@@ -118,7 +117,7 @@ public class ListInstancesController extends InstanceController {
             }
         }*/
         
-        if (!(request.getUserPrincipal() instanceof IngridPrincipal.SuperAdmin) && request.isUserInRole( "instanceAdmin" )) {
+        if (request.isUserInRole( "instanceAdmin" )) {
             String user = request.getUserPrincipal().getName();
             instances.removeIf(instance -> !DBUtils.isAdminForInstance( user, instance.getName() ));
         }
@@ -139,7 +138,7 @@ public class ListInstancesController extends InstanceController {
             @RequestParam("instance") String name,
             @RequestParam(value = "duplicateFrom", required = false) String from, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        if (!(request.getUserPrincipal() instanceof IngridPrincipal.SuperAdmin) && request.isUserInRole( "instanceAdmin" )) {
+        if (request.isUserInRole( "instanceAdmin" )) {
             response.sendError(HttpStatus.FORBIDDEN.value());
             return null;
         }

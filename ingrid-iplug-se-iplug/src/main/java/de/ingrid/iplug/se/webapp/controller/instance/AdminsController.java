@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
- * Copyright (C) 2014 - 2022 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2023 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -53,7 +53,7 @@ public class AdminsController extends InstanceController {
         this.seConfig = seConfig;
     }
 
-    @RequestMapping(value = { AdminViews.SE_INSTANCE_ADMINS }, method = RequestMethod.GET)
+    @RequestMapping(value = { AdminViews.SE_INSTANCE_ADMINS + ".html" }, method = RequestMethod.GET)
     public String getParameters(final ModelMap modelMap, @ModelAttribute("plugDescription") final PlugdescriptionCommandObject commandObject, @RequestParam("instance") String name, HttpServletRequest request, HttpServletResponse response) {
 
         if (hasNoAccessToInstance(name, request, response)) {

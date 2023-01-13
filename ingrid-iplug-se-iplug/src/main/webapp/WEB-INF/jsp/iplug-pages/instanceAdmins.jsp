@@ -2,7 +2,7 @@
   **************************************************-
   ingrid-iplug-se-iplug
   ==================================================
-  Copyright (C) 2014 - 2022 wemove digital solutions GmbH
+  Copyright (C) 2014 - 2023 wemove digital solutions GmbH
   ==================================================
   Licensed under the EUPL, Version 1.1 or – as soon they will be
   approved by the European Commission - subsequent versions of the
@@ -416,15 +416,6 @@
 
     var actionButtonTemplate =
         '<div class="actionButtons">' +
-            // '<div>' +
-            //     '<button class="btnUrl">Bearbeiten</button>' +
-            //     '<button class="select">Weitere Optionen</button>' +
-            // '</div>' +
-            // '<ul style="position:absolute; padding-left: 0; min-width: 180px; z-index: 100; display: none;">' +
-            //     '<li action="delete">Löschen</li>' +
-            //     '<li action="test">Testen</li>' +
-            //     '<li action="createNewFromTemplate">Als Template verwenden ...</li>' +
-            // '</ul>' +
             '<span class="ui-state-default ui-corner-all" onclick="adminMaintenance.actionHandler(\'edit\', event.target)"><span class="btnUrl ui-icon ui-icon-pencil" title="Bearbeiten"></span></span>' +
         '</div>';
         

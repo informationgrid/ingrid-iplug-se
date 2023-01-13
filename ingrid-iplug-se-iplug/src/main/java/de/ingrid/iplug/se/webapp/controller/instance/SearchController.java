@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
- * Copyright (C) 2014 - 2022 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2023 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -28,9 +28,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import de.ingrid.admin.JettyStarter;
 import de.ingrid.elasticsearch.ElasticConfig;
 import de.ingrid.elasticsearch.IndexInfo;
+import de.ingrid.iplug.se.SEIPlug;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -110,8 +110,8 @@ public class SearchController extends InstanceController {
             // add instance information into query which is understood by this
             // iPlug
             IndexInfo indexInfo = new IndexInfo();
-            indexInfo.setToAlias(JettyStarter.baseConfig.index + "_" + instance);
-            indexInfo.setToIndex(JettyStarter.baseConfig.index + "_" + instance);
+            indexInfo.setToAlias(SEIPlug.baseConfig.index + "_" + instance);
+            indexInfo.setToIndex(SEIPlug.baseConfig.index + "_" + instance);
             indexInfo.setToType("default");
             elasticConfig.activeIndices = new IndexInfo[] {indexInfo};
 

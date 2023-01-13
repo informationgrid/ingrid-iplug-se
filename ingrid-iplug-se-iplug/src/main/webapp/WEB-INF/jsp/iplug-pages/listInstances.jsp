@@ -2,7 +2,7 @@
   **************************************************-
   ingrid-iplug-se-iplug
   ==================================================
-  Copyright (C) 2014 - 2022 wemove digital solutions GmbH
+  Copyright (C) 2014 - 2023 wemove digital solutions GmbH
   ==================================================
   Licensed under the EUPL, Version 1.1 or – as soon they will be
   approved by the European Commission - subsequent versions of the
@@ -22,7 +22,6 @@
   --%>
 <%@ include file="/WEB-INF/jsp/base/include.jsp"%><%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<%@ page import="de.ingrid.admin.security.IngridPrincipal"%>
 <%@ page contentType="text/html; charset=UTF-8" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de">
@@ -160,17 +159,11 @@
         <h1>
             <fmt:message key="DatabaseConfig.main.configuration" />
         </h1>
-        <%
-            java.security.Principal principal = request.getUserPrincipal();
-            if (principal != null && !(principal instanceof IngridPrincipal.SuperAdmin)) {
-        %>
-        <div id="language">
-            <a href="../base/auth/logout.html"><fmt:message
-                    key="DatabaseConfig.main.logout" /></a>
-        </div>
-        <%
-            }
-        %>
+        <security:authorize access="isAuthenticated()">
+            <div id="language">
+                <a href="../base/auth/logout.html"><fmt:message key="DatabaseConfig.main.logout" /></a>
+            </div>
+        </security:authorize>
     </div>
     <div id="help">
         <a href="#">[?]</a>

@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-nutch
  * ==================================================
- * Copyright (C) 2014 - 2022 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2023 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -45,8 +45,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Random;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -75,6 +73,8 @@ import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
 
 import de.ingrid.iplug.se.nutch.net.InGridURLNormalizers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Webgraph filter tool that filters urls in outlinks that do not pass a
@@ -85,7 +85,7 @@ import de.ingrid.iplug.se.nutch.net.InGridURLNormalizers;
  */
 public class BWWebgraphFilter extends Configured implements Tool {
 
-    public static final Log LOG = LogFactory.getLog(BWWebgraphFilter.class);
+    public static final Logger LOG = LoggerFactory.getLogger(BWWebgraphFilter.class);
 
     public static final String CURRENT_NAME = "current";
 
@@ -110,6 +110,9 @@ public class BWWebgraphFilter extends Configured implements Tool {
         private Text _url;
 
         private LinkDatum _linkDatum;
+
+        public LinkDatumEntry() {
+        }
 
         public LinkDatumEntry(Text url, LinkDatum linkDatum) {
             _url = url;
@@ -145,6 +148,9 @@ public class BWWebgraphFilter extends Configured implements Tool {
         private Text _url;
 
         private Node _node;
+
+        public NodeEntry() {
+        }
 
         public NodeEntry(Text url, Node node) {
             _url = url;

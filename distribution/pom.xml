@@ -3,7 +3,7 @@
   <parent>
     <groupId>de.ingrid</groupId>
     <artifactId>ingrid-iplug-se-project</artifactId>
-    <version>5.14.0</version>
+    <version>6.0.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>ingrid-iplug-se</artifactId>
@@ -22,6 +22,7 @@
     Dependency Management must be the same as in iplug-module, otherwise the wrong version of
     dependencies will be loaded!
   -->
+<!--
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -35,17 +36,13 @@
         <version>2.7.2</version>
       </dependency>
       <dependency>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>jetty</artifactId>
-        <version>6.1.26</version>
-      </dependency>
-      <dependency>
         <groupId>io.netty</groupId>
         <artifactId>netty-all</artifactId>
         <version>4.1.32.Final</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
+-->
 
   <!-- ==================== DEPENDENCIES ==================== -->
   <dependencies>
@@ -62,8 +59,11 @@
     <plugins>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.5.3</version>
+        <version>3.4.2</version>
         <inherited>true</inherited>
+        <configuration>
+          <skipAssembly>false</skipAssembly>
+        </configuration>
         <executions>
           <execution>
             <id>make-installer</id>
@@ -117,26 +117,6 @@
             <configuration>
               <skip>false</skip>
             </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-changes-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>changes-report</id>
-                <phase>deploy</phase>
-                <goals>
-                  <goal>changes-report</goal>
-                </goals>
-              </execution>
-              <execution>
-                <id>changes-announcement-mail</id>
-                <phase>deploy</phase>
-                <goals>
-                  <goal>announcement-mail</goal>
-                </goals>
-              </execution>
-            </executions>
           </plugin>
         </plugins>
       </build>

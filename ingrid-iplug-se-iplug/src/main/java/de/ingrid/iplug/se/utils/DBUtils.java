@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
- * Copyright (C) 2014 - 2022 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2023 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -107,7 +107,7 @@ public class DBUtils {
             CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
             CriteriaQuery<InstanceAdmin> createQuery = criteriaBuilder.createQuery( InstanceAdmin.class );
             Root<InstanceAdmin> adminTable = createQuery.from( InstanceAdmin.class );
-            List<Predicate> criteria = new ArrayList<Predicate>();
+            List<Predicate> criteria = new ArrayList<>();
             criteria.add( criteriaBuilder.equal( adminTable.get( "login" ), login ) );
             criteria.add( criteriaBuilder.equal( adminTable.get( "instance" ), instance ) );
             createQuery.select( adminTable ).where( criteriaBuilder.and( criteria.toArray( new Predicate[0] ) ) );

@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
- * Copyright (C) 2014 - 2022 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2023 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -22,7 +22,6 @@
  */
 package de.ingrid.iplug.se.elasticsearch.converter;
 
-import de.ingrid.admin.JettyStarter;
 import de.ingrid.elasticsearch.ElasticConfig;
 import de.ingrid.elasticsearch.IndexInfo;
 import de.ingrid.elasticsearch.search.IQueryParsers;
@@ -31,22 +30,21 @@ import de.ingrid.elasticsearch.search.converter.MatchAllQueryConverter;
 import de.ingrid.elasticsearch.search.converter.QueryConverter;
 import de.ingrid.iplug.se.elasticsearch.Utils;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.*;
 
 public class QueryConverterTest {
 
     private static QueryConverter queryConverter;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpBeforeClass() throws Exception {
-        new JettyStarter( false );
         queryConverter = new QueryConverter();
         List<IQueryParsers> parsers = new ArrayList<>();
         parsers.add( new MatchAllQueryConverter() );

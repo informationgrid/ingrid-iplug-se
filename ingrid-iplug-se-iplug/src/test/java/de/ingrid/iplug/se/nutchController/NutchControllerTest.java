@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
- * Copyright (C) 2014 - 2022 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2023 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -23,7 +23,6 @@
 package de.ingrid.iplug.se.nutchController;
 
 import de.ingrid.admin.Config;
-import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.service.PlugDescriptionService;
 import de.ingrid.elasticsearch.IndexManager;
 import de.ingrid.iplug.se.Configuration;
@@ -33,9 +32,10 @@ import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.elasticsearch.Utils;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -47,26 +47,28 @@ import java.util.Properties;
 
 import static de.ingrid.iplug.se.elasticsearch.Utils.elastic;
 import static de.ingrid.iplug.se.elasticsearch.Utils.elasticConfig;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.*;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class NutchControllerTest {
 
-    @Before
+    @BeforeEach
     public void beforeTest() throws Exception {
         FileUtils.removeRecursive(Paths.get("test-instances"));
-        JettyStarter.baseConfig = new Config();
-        JettyStarter.baseConfig.index = "se-test";
+        SEIPlug.baseConfig = new Config();
+        SEIPlug.baseConfig.index = "se-test";
         // JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<String>();
         // JettyStarter.baseConfig.indexSearchInTypes.add( "test" );
         // Attention: this config property is used in ElasticConfig and Config!
         // During runtime both classes will read the config file and be initialized correctly
-        JettyStarter.baseConfig.communicationProxyUrl = "/ingrid-group:unit-tests";
-        JettyStarter.baseConfig.communicationLocation = "conf/communication.xml";
+        SEIPlug.baseConfig.communicationProxyUrl = "/ingrid-group:unit-tests";
+        SEIPlug.baseConfig.communicationLocation = "conf/communication.xml";
         Utils.setupES();
     }
 
-    @After
+    @AfterEach
     public void afterTest() throws Exception {
         elastic.getClient().close();
     }
@@ -77,7 +79,7 @@ public class NutchControllerTest {
         Configuration configuration = new Configuration();
         configuration.setInstancesDir( "test-instances" );
         configuration.databaseID = "iplug-se-dev";
-        configuration.dependingFields = new ArrayList<String>();
+        configuration.dependingFields = new ArrayList<>();
         configuration.nutchCallJavaOptions = java.util.Arrays.asList( "-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8" );
         SEIPlug.conf = configuration;
         Properties elasticProperties = Utils.getElasticProperties();
@@ -125,7 +127,7 @@ public class NutchControllerTest {
 
         long start = System.currentTimeMillis();
         Thread.sleep( 500 );
-        assertEquals( "Status is RUNNING", NutchProcess.STATUS.RUNNING, nutchController.getNutchProcess( instance ).getStatus() );
+        assertThat( "Status is RUNNING", nutchController.getNutchProcess( instance ).getStatus(), is(NutchProcess.STATUS.RUNNING) );
         while ((System.currentTimeMillis() - start) < 6660000) {
             Thread.sleep( 1000 );
             if (nutchController.getNutchProcess( instance ).getStatus() != NutchProcess.STATUS.RUNNING) {
@@ -138,7 +140,7 @@ public class NutchControllerTest {
             nutchController.stop( instance );
             fail( "Crawl took more than 6 min." );
         }
-        assertEquals( "Status is FINISHED", NutchProcess.STATUS.FINISHED, nutchController.getNutchProcess( instance ).getStatus() );
+        assertThat( "Status is FINISHED", nutchController.getNutchProcess( instance ).getStatus(), is(NutchProcess.STATUS.FINISHED) );
 
         System.out.println( nutchController.getNutchProcess( instance ).getStatusProvider().toString() );
 
@@ -153,7 +155,7 @@ public class NutchControllerTest {
         Configuration configuration = new Configuration();
         configuration.setInstancesDir( "test-instances" );
         configuration.databaseID = "iplug-se-dev";
-        configuration.dependingFields = new ArrayList<String>();
+        configuration.dependingFields = new ArrayList<>();
         configuration.nutchCallJavaOptions = java.util.Arrays.asList( "-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8" );
         SEIPlug.conf = configuration;
 
@@ -191,10 +193,10 @@ public class NutchControllerTest {
         nutchController.start( instance, process );
 
         Thread.sleep( 5000 );
-        assertEquals( "Status is RUNNING", NutchProcess.STATUS.RUNNING, nutchController.getNutchProcess( instance ).getStatus() );
+        assertThat( "Status is RUNNING", nutchController.getNutchProcess( instance ).getStatus(), is(NutchProcess.STATUS.RUNNING) );
         nutchController.stop( instance );
         Thread.sleep( 500 );
-        assertEquals( "Status is CANCELLED", NutchProcess.STATUS.INTERRUPTED, nutchController.getNutchProcess( instance ).getStatus() );
+        assertThat( "Status is CANCELLED", nutchController.getNutchProcess( instance ).getStatus(), is(NutchProcess.STATUS.INTERRUPTED) );
 
         System.out.println( nutchController.getNutchProcess( instance ).getStatusProvider().toString() );
 

@@ -5,8 +5,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.io.IntWritable;
@@ -43,7 +45,7 @@ import org.apache.nutch.scoring.ScoringFilterException;
  * </p>
  */
 public class IngridScoringFilter extends Configured implements ScoringFilter {
-    private static final Log LOG = LogFactory.getLog(IngridScoringFilter.class);
+    private static final Logger LOG = LogManager.getLogger(IngridScoringFilter.class);
 
     public static final String DEPTH_KEY = "_depth_";
     public static final Text DEPTH_KEY_W = new Text(DEPTH_KEY);

@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-nutch
  * ==================================================
- * Copyright (C) 2014 - 2022 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2023 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -22,18 +22,6 @@
  */
 package de.ingrid.iplug.se.nutch.statistics;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Random;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -57,6 +45,18 @@ import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Random;
 
 /**
  * @author joachim
@@ -66,7 +66,7 @@ import org.codehaus.jettison.json.JSONObject;
  */
 public class StartUrlStatusReport extends Configured implements Tool {
 
-    private static final Log LOG = LogFactory.getLog(StartUrlStatusReport.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(StartUrlStatusReport.class.getName());
 
     public static class StartUrlMapper extends Mapper<WritableComparable<?>, Text, Text, CrawlDatum> {
 

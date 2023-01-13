@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
- * Copyright (C) 2014 - 2022 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2023 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -25,7 +25,6 @@ package de.ingrid.iplug.se.webapp.controller.instance;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import de.ingrid.admin.Config;
-import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.command.PlugdescriptionCommandObject;
 import de.ingrid.admin.service.CommunicationService;
 import de.ingrid.elasticsearch.*;
@@ -56,6 +55,10 @@ import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
@@ -75,7 +78,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 @RestController
-@RequestMapping("/") // in web.xml it is dispatched from "/rest/..."!!!
+@RequestMapping("/rest") // in web.xml it is dispatched from "/rest/..."!!!
 @SessionAttributes("plugDescription")
 public class RestDataController extends InstanceController {
 
@@ -100,6 +103,8 @@ public class RestDataController extends InstanceController {
 	@Autowired
 	private Configuration seConfig;
 
+	private final InMemoryUserDetailsManager userDetailsManager;
+
 	@Autowired
 	private CommunicationService _communicationInterface;
 
@@ -107,8 +112,26 @@ public class RestDataController extends InstanceController {
     private StatusProviderService statusProviderService;
 
 	@Autowired
-	public RestDataController(IndexManager indexManager, IBusIndexManager iBusIndexManager, ElasticConfig elasticConfig) {
+	public RestDataController(IndexManager indexManager, IBusIndexManager iBusIndexManager, ElasticConfig elasticConfig, InMemoryUserDetailsManager userDetailsManager) {
 		this.indexManager = elasticConfig.esCommunicationThroughIBus ? iBusIndexManager : indexManager;
+		this.userDetailsManager = userDetailsManager;
+		addAdminUsers();
+	}
+
+	private void addAdminUsers() {
+		Map<String, Object> adminsFromDatabase = getAdminsFromDatabase(null, 0, 1000, null);
+		List<InstanceAdmin> hits = (List<InstanceAdmin>) adminsFromDatabase.get("hits");
+		hits.forEach(hit -> {
+			String pw_hash = BCrypt.hashpw(hit.getPassword(), BCrypt.gensalt());
+			userDetailsManager.createUser(createUserDetails(hit.getLogin(), pw_hash));
+		});
+	}
+
+	private static UserDetails createUserDetails(String login, String pw_hash) {
+		return User.withUsername(login)
+				.password(pw_hash)
+				.roles("instanceAdmin")
+				.build();
 	}
 
 	@RequestMapping(value = { "/test" }, method = RequestMethod.GET)
@@ -119,15 +142,21 @@ public class RestDataController extends InstanceController {
 
     @RequestMapping(value = { "admin/{id}" }, method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<InstanceAdmin> getInstanceAdmin(@PathVariable("id") Long id) {
-        EntityManager em = DBManager.INSTANCE.getEntityManager();
-        InstanceAdmin admin = em.find(InstanceAdmin.class, id);
+        InstanceAdmin admin = getUserFromDatabase(id);
 
         return new ResponseEntity<>(admin, admin != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
+	
+	private InstanceAdmin getUserFromDatabase(Long id) {
+		EntityManager em = DBManager.INSTANCE.getEntityManager();
+		return em.find(InstanceAdmin.class, id);
+	}
 
     @RequestMapping(value = { "admin/{instance}" }, method = RequestMethod.POST)
     public ResponseEntity<?> addAdmin(@PathVariable("instance") String name, @RequestBody InstanceAdmin admin, HttpServletRequest request, HttpServletResponse response) {
         DBUtils.addAdmin(admin);
+		String pw_hash = BCrypt.hashpw(admin.getPassword(), BCrypt.gensalt());
+		userDetailsManager.createUser(createUserDetails(admin.getLogin(), pw_hash));
         return new ResponseEntity<>(admin, HttpStatus.OK);
     }
 
@@ -147,6 +176,10 @@ public class RestDataController extends InstanceController {
 
     @RequestMapping(value = { "admins" }, method = RequestMethod.DELETE)
     public ResponseEntity<Map<String, String>> deleteAdmins(@RequestBody Long[] ids) {
+		for (Long id : ids) {
+			InstanceAdmin user = getUserFromDatabase(id);
+			userDetailsManager.deleteUser(user.getLogin());
+		}
         DBUtils.deleteAdmins(ids);
         Map<String, String> result = new HashMap<>();
         result.put("result", "OK");
@@ -165,46 +198,55 @@ public class RestDataController extends InstanceController {
             response.sendError(HttpStatus.FORBIDDEN.value());
             return null;
         }
-        EntityManager em = DBManager.INSTANCE.getEntityManager();
-
-        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-        CriteriaQuery<InstanceAdmin> createQuery = criteriaBuilder.createQuery(InstanceAdmin.class);
-        Root<InstanceAdmin> adminTable = createQuery.from(InstanceAdmin.class);
-
-        CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
-
-        List<Predicate> criteria = new ArrayList<>();
-
-        // filter by instance
-        criteria.add(criteriaBuilder.equal(adminTable.<String> get("instance"), name));
-
-        countQuery.select(criteriaBuilder.count(adminTable)).where(
-                criteriaBuilder.and(criteria.toArray(new Predicate[0])));
-        Long count = em.createQuery(countQuery).getSingleResult();
-
-        createQuery.select(adminTable).where(criteriaBuilder.and(criteria.toArray(new Predicate[0])));
-
-        // sort if necessary
-        if (sort.length == 2) {
-            Expression<?> column = getColumnForSortAdminTable(adminTable, sort[0]);
-            if (column != null) {
-                if (sort[1] == 0) {
-                    createQuery.orderBy(criteriaBuilder.desc(column));
-                } else {
-                    createQuery.orderBy(criteriaBuilder.asc(column));
-                }
-            }
-        }
-
-        List<InstanceAdmin> resultList = em.createQuery(createQuery).setFirstResult(page * pageSize).setMaxResults(pageSize)
-                .getResultList();
+        Map<String, Object> resultList = getAdminsFromDatabase(name, page, pageSize, sort);
 
         JSONObject json = new JSONObject();
-        json.put("data", resultList);
-        json.put("totalAdmins", count);
+        json.put("data", resultList.get("hits"));
+        json.put("totalAdmins", resultList.get("count"));
 
         return json;
     }
+	
+	private Map<String, Object> getAdminsFromDatabase(String instanceName, int page, int pageSize, int[] sort) {
+		EntityManager em = DBManager.INSTANCE.getEntityManager();
+
+		CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+		CriteriaQuery<InstanceAdmin> createQuery = criteriaBuilder.createQuery(InstanceAdmin.class);
+		Root<InstanceAdmin> adminTable = createQuery.from(InstanceAdmin.class);
+
+		CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
+
+		List<Predicate> criteria = new ArrayList<>();
+
+		// filter by instance
+		if (instanceName != null) {
+			criteria.add(criteriaBuilder.equal(adminTable.<String>get("instance"), instanceName));
+		}
+
+		countQuery.select(criteriaBuilder.count(adminTable)).where(
+				criteriaBuilder.and(criteria.toArray(new Predicate[0])));
+		Long count = em.createQuery(countQuery).getSingleResult();
+
+		createQuery.select(adminTable).where(criteriaBuilder.and(criteria.toArray(new Predicate[0])));
+
+		// sort if necessary
+		if (sort != null && sort.length == 2) {
+			Expression<?> column = getColumnForSortAdminTable(adminTable, sort[0]);
+			if (column != null) {
+				if (sort[1] == 0) {
+					createQuery.orderBy(criteriaBuilder.desc(column));
+				} else {
+					createQuery.orderBy(criteriaBuilder.asc(column));
+				}
+			}
+		}
+
+		Map<String, Object> result = new HashMap<>();
+		result.put("hits", em.createQuery(createQuery).setFirstResult(page * pageSize).setMaxResults(pageSize)
+				.getResultList());
+		result.put("count", count);
+		return result;
+	}
 
     @RequestMapping(value = { "url/{id}" }, method = RequestMethod.GET, produces = "application/json")
 	public ResponseEntity<Url> getUrl(@PathVariable("id") Long id, HttpServletRequest request, HttpServletResponse response) {
@@ -431,7 +473,7 @@ public class RestDataController extends InstanceController {
 	private void toggleIndexInIBus(String name, boolean activate) throws Exception {
 		IngridCall ingridCall = new IngridCall();
 		ingridCall.setTarget("iBus");
-		ingridCall.setParameter(JettyStarter.baseConfig.uuid + "=>" + JettyStarter.baseConfig.index + "_" + name + ":default");
+		ingridCall.setParameter(SEIPlug.baseConfig.uuid + "=>" + SEIPlug.baseConfig.index + "_" + name + ":default");
 
 		if (activate) {
 			ingridCall.setMethod("activateIndex");
@@ -561,7 +603,7 @@ public class RestDataController extends InstanceController {
 		Path path = Paths.get(SEIPlug.conf.getInstancesDir(), name, "logs", "import.log");
 		String content = FileUtils.tail(path.toFile(), 1000);
 
-		return new ResponseEntity<String>(content, HttpStatus.OK);
+		return new ResponseEntity<>(content, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = { "url/{instance}/check" }, method = RequestMethod.POST)

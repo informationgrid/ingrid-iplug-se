@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
- * Copyright (C) 2014 - 2022 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2023 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -25,7 +25,7 @@
  */
 package de.ingrid.iplug.se;
 
-import de.ingrid.admin.JettyStarter;
+import de.ingrid.admin.Config;
 import de.ingrid.elasticsearch.ElasticConfig;
 import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
 import de.ingrid.elasticsearch.IBusIndexManager;
@@ -53,6 +53,11 @@ import org.flywaydb.core.Flyway;
 import org.h2.tools.Recover;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
@@ -64,6 +69,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
@@ -77,7 +83,18 @@ import java.util.Map;
  * 
  * @author joachim@wemove.com
  */
-@Service
+@ImportResource({"/springapp-servlet.xml", "/override/*.xml"})
+@SpringBootApplication(scanBasePackages = "de.ingrid")
+@ComponentScan(
+        basePackages = "de.ingrid",
+        excludeFilters = {
+                @ComponentScan.Filter(type = FilterType.REGEX, pattern = "de.ingrid.admin.object.DefaultDataType"),
+                @ComponentScan.Filter(type = FilterType.REGEX, pattern = "de.ingrid.admin.object.BasePlug"),
+                @ComponentScan.Filter(type = FilterType.REGEX, pattern = "de.ingrid.admin.BaseWebappApplication"),
+                @ComponentScan.Filter(type = FilterType.REGEX, pattern = "de.ingrid.admin.controller.RedirectController"),
+                @ComponentScan.Filter(type = FilterType.REGEX, pattern = "de.ingrid.admin.controller.SchedulingController"),
+                @ComponentScan.Filter(type = FilterType.REGEX, pattern = "de.ingrid.admin.metadata.DefaultIPlugOperatorInjectorAdapter"),
+        })
 public class SEIPlug extends HeartBeatPlug {
 
     /**
@@ -116,24 +133,38 @@ public class SEIPlug extends HeartBeatPlug {
 
     private Configuration seConfig;
 
-    private static ElasticsearchNodeFactoryBean esBean;
+//    private static ElasticsearchNodeFactoryBean esBean;
 
-    private static NutchController nutchController;
+//    private static NutchController nutchController;
 
     private static EntityManager em;
 
+    public static Config baseConfig;
+    
     public SEIPlug() {
         super(30000, null, null, null, null);
     };
 
     @Autowired
     public SEIPlug(IMetadataInjector[] injector, IPreProcessor[] preProcessors, IPostProcessor[] postProcessors,
-                   ElasticsearchNodeFactoryBean esBean, NutchController nutchController, Configuration seConfig) throws SQLException {
+                   Configuration seConfig, Config baseConfig) throws SQLException {
         super(30000, new PlugDescriptionFieldFilters(), injector, preProcessors, postProcessors);
-        SEIPlug.esBean = esBean;
-        SEIPlug.nutchController = nutchController;
+//        SEIPlug.esBean = esBean;
+//        SEIPlug.nutchController = nutchController;
         this.seConfig = seConfig;
         conf = seConfig;
+        
+        SEIPlug.baseConfig = baseConfig;
+        try {
+            baseConfig.initialize();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        if (seConfig != null) {
+            seConfig.initialize();
+        } else {
+            log.info("No external configuration found.");
+        }
 
         init();
     }
@@ -238,8 +269,8 @@ public class SEIPlug extends HeartBeatPlug {
         preProcess(query);
 
         IndexInfo indexInfo = new IndexInfo();
-        indexInfo.setToAlias(JettyStarter.baseConfig.index + "_*");
-        indexInfo.setToIndex(JettyStarter.baseConfig.index + "_*");
+        indexInfo.setToAlias(baseConfig.index + "_*");
+        indexInfo.setToIndex(baseConfig.index + "_*");
         indexInfo.setToType("default");
         elasticConfig.activeIndices = new IndexInfo[] {indexInfo};
 
@@ -283,11 +314,11 @@ public class SEIPlug extends HeartBeatPlug {
     }
 
     public static void main(String[] args) throws Exception {
-        new JettyStarter(Configuration.class);
+        SpringApplication.run(SEIPlug.class, args);
 
         // normally shutdown the elastic search node and stop all running
         // nutch processes
-        Runtime.getRuntime().addShutdownHook(new Thread() {
+/*        Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 try {
                     esBean.destroy();
@@ -302,7 +333,7 @@ public class SEIPlug extends HeartBeatPlug {
                     log.error("Error shutting down", e);
                 }
             }
-        });
+        })*/;
     }
 
     private static void setupTestData(EntityManager em) {

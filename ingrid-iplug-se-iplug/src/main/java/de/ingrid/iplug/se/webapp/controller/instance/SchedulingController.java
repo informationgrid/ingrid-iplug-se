@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
- * Copyright (C) 2014 - 2022 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2023 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -81,6 +81,8 @@ public class SchedulingController extends InstanceController {
             return "redirect:" + AdminViews.SE_LIST_INSTANCES + ".html";
 
         modelMap.put( "instance", getInstanceData( name ) );
+//        modelMap.put( "command", new ClockCommand() );
+//        modelMap.put( "advancedCommand", new AdvancedCommand() );
 
         return AdminViews.SE_INSTANCE_SCHEDULER;
     }

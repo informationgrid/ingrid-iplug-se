@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
- * Copyright (C) 2014 - 2022 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2023 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -22,18 +22,16 @@
  */
 package de.ingrid.iplug.se.nutchController;
 
-import de.ingrid.admin.Config;
-import de.ingrid.admin.JettyStarter;
 import de.ingrid.admin.service.PlugDescriptionService;
 import de.ingrid.elasticsearch.IIndexManager;
 import de.ingrid.elasticsearch.IndexInfo;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.iplug.IPostCrawlProcessor;
-import de.ingrid.utils.statusprovider.StatusProvider.Classification;
 import de.ingrid.iplug.se.utils.DBUtils;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
 import de.ingrid.utils.PlugDescription;
+import de.ingrid.utils.statusprovider.StatusProvider.Classification;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
@@ -42,8 +40,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.common.Strings;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
+import org.elasticsearch.xcontent.XContentBuilder;
+import org.elasticsearch.xcontent.XContentFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -60,7 +58,6 @@ import java.util.regex.Pattern;
 /**
  * Wrapper for a ingrid specific nutch process execution. This is too complex to
  * execute this with a {@link GenericNutchProcess}.
- * 
  */
 public class IngridCrawlNutchProcess extends NutchProcess {
 
@@ -88,6 +85,13 @@ public class IngridCrawlNutchProcess extends NutchProcess {
     public IngridCrawlNutchProcess(IIndexManager indexManager, PlugDescriptionService pds) {
         this.indexManager = indexManager;
         this.plugDescriptionService = pds;
+        // if the configuration is used outside spring
+        // this property could be null
+        if (SEIPlug.conf.nutchCallJavaExecutable == null) {
+            this.setExecutable("java");
+        } else {
+            this.setExecutable(SEIPlug.conf.nutchCallJavaExecutable);
+        }
     }
 
     @Override
@@ -130,20 +134,20 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             String segments = fs.getPath(workingDirectory.getAbsolutePath(), "segments").toString();
             String mergedSegments = fs.getPath(workingDirectory.getAbsolutePath(), "segments_merged").toString();
             String filteredSegments = fs.getPath(workingDirectory.getAbsolutePath(), "segments_filtered").toString();
-            
+
             NutchConfigTool nutchConfigTool = new NutchConfigTool(Paths.get(instance.getWorkingDirectory(), "conf", "nutch-site.xml"));
-            if ("true".equals( nutchConfigTool.getPropertyValue( "ingrid.delete.before.crawl" ) )) {
+            if ("true".equals(nutchConfigTool.getPropertyValue("ingrid.delete.before.crawl"))) {
                 this.statusProvider.addState(STATES.DELETE_BEFORE_CRAWL.name(), "Delete instance crawl data...");
-                FileUtils.removeRecursive(fs.getPath( crawlDb ));
-                FileUtils.removeRecursive(fs.getPath( bwDb ));
-                FileUtils.removeRecursive(fs.getPath( mddb ));
-                FileUtils.removeRecursive(fs.getPath( webgraph ));
-                FileUtils.removeRecursive(fs.getPath( linkDb ));
-                FileUtils.removeRecursive(fs.getPath( segments ));
-                FileUtils.removeRecursive(fs.getPath( mergedSegments ));
-                FileUtils.removeRecursive(fs.getPath( filteredSegments ));
-                FileUtils.removeRecursive(fs.getPath( statistic ));
-                
+                FileUtils.removeRecursive(fs.getPath(crawlDb));
+                FileUtils.removeRecursive(fs.getPath(bwDb));
+                FileUtils.removeRecursive(fs.getPath(mddb));
+                FileUtils.removeRecursive(fs.getPath(webgraph));
+                FileUtils.removeRecursive(fs.getPath(linkDb));
+                FileUtils.removeRecursive(fs.getPath(segments));
+                FileUtils.removeRecursive(fs.getPath(mergedSegments));
+                FileUtils.removeRecursive(fs.getPath(filteredSegments));
+                FileUtils.removeRecursive(fs.getPath(statistic));
+
                 this.statusProvider.appendToState(STATES.DELETE_BEFORE_CRAWL.name(), " done.");
             }
 
@@ -199,7 +203,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
                 throwCrawlError("Error during Execution of: de.ingrid.iplug.se.nutch.statistics.UrlErrorReport");
             }
             this.statusProvider.appendToState(STATES.CREATE_URL_ERROR_REPORT.name(), " done.");
-            
+
             for (int i = 0; i < depth; i++) {
                 this.statusProvider.addState(STATES.GENERATE.name() + i, "Generate up to " + noUrls.toString() + " urls for fetching " + "[" + (i + 1) + "/" + depth + "] ...");
                 this.statusProvider.setStateProperty(STATES.GENERATE.name(), "i", Integer.toString(i));
@@ -297,7 +301,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
                 throwCrawlError("Error during Execution of: de.ingrid.iplug.se.nutch.statistics.UrlErrorReport");
             }
             this.statusProvider.appendToState(STATES.CREATE_URL_ERROR_REPORT.name() + 1, " done.");
-            
+
             this.statusProvider.addState(STATES.MERGE_SEGMENT.name(), "Merge segments...");
             ret = execute("org.apache.nutch.segment.SegmentMerger", mergedSegments, "-dir", segments);
             if (ret != 0) {
@@ -346,7 +350,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             }
             this.statusProvider.appendToState(STATES.UPDATE_LINKDB.name(), " done.");
 
-            if (!("true".equals( nutchConfigTool.getPropertyValue( "ingrid.index.no.deduplication" ) ))) {
+            if (!("true".equals(nutchConfigTool.getPropertyValue("ingrid.index.no.deduplication")))) {
                 this.statusProvider.addState(STATES.DEDUPLICATE.name(), "Deduplication...");
                 logFileWatcher = LogFileWatcherFactory.getDeduplicationLogfileWatcher(Paths.get(instance.getWorkingDirectory(), "logs", "hadoop.log").toFile(), statusProvider, STATES.DEDUPLICATE.name());
                 ret = execute("org.apache.nutch.crawl.DeduplicationJob", crawlDb);
@@ -357,15 +361,15 @@ public class IngridCrawlNutchProcess extends NutchProcess {
                 this.statusProvider.appendToState(STATES.DEDUPLICATE.name(), " done.");
             }
 
-            if ("true".equals( nutchConfigTool.getPropertyValue( "ingrid.delete.before.crawl" ) )) {
+            if ("true".equals(nutchConfigTool.getPropertyValue("ingrid.delete.before.crawl"))) {
                 // remove instance (type) from index
-                if (indexManager.indexExists( instance.getInstanceIndexName() )) {
-                    indexManager.deleteIndex( instance.getInstanceIndexName() );
+                if (indexManager.indexExists(instance.getInstanceIndexName())) {
+                    indexManager.deleteIndex(instance.getInstanceIndexName());
                 }
             }
             writeIndex(crawlDb, linkDb, segments);
 
-            if (!("true".equals( nutchConfigTool.getPropertyValue( "ingrid.index.no.deduplication" ) ))) {
+            if (!("true".equals(nutchConfigTool.getPropertyValue("ingrid.index.no.deduplication")))) {
                 this.statusProvider.addState(STATES.CLEAN_DUPLICATES.name(), "Clean up duplicates in index...");
                 logFileWatcher = LogFileWatcherFactory.getCleaningJobLogfileWatcher(Paths.get(instance.getWorkingDirectory(), "logs", "hadoop.log").toFile(), statusProvider, STATES.CLEAN_DUPLICATES.name());
                 ret = execute("org.apache.nutch.indexer.CleaningJob", crawlDb);
@@ -411,7 +415,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
         }
 
     }
-    
+
     private void writeIndex(String crawlDb, String linkDb, String segments) throws IOException, InterruptedException, ExecutionException {
         this.statusProvider.addState(STATES.INDEX.name(), "Create index...");
 
@@ -435,34 +439,33 @@ public class IngridCrawlNutchProcess extends NutchProcess {
         String plugIdInfo = this.indexManager.getIndexTypeIdentifier(info);
         this.indexManager.updateIPlugInformation(
                 plugIdInfo,
-                getIPlugInfo( plugIdInfo, instanceIndexName, false, null, null ) );
+                getIPlugInfo(plugIdInfo, instanceIndexName, false, null, null));
 
         this.statusProvider.appendToState(STATES.INDEX.name(), " done.");
     }
 
     private String getIPlugInfo(String infoId, String indexName, boolean running, Integer count, Integer totalCount) throws IOException {
-        Config _config = JettyStarter.baseConfig;
 
         PlugDescription plugDescription = this.plugDescriptionService.getPlugDescription();
 
         // @formatter:off
         XContentBuilder xContentBuilder = XContentFactory.jsonBuilder().startObject()
-                .field("plugId", _config.communicationProxyUrl)
+                .field("plugId", SEIPlug.baseConfig.communicationProxyUrl)
                 .field("indexId", infoId)
-                .field("iPlugName", _config.datasourceName)
+                .field("iPlugName", SEIPlug.baseConfig.datasourceName)
                 .field("linkedIndex", indexName)
                 .field("linkedType", "default")
-                .field("adminUrl", _config.guiUrl)
+                .field("adminUrl", SEIPlug.baseConfig.guiUrl)
                 .field("lastHeartbeat", new Date())
                 .field("lastIndexed", new Date())
 // TODO:                .field("datatypes", this._plugDescription.getDataTypes())
 // TODO:                .field("fields", this._plugDescription.getFields())
                 .field("plugdescription", plugDescription)
                 .startObject("indexingState")
-                    .field("numProcessed", count)
-                    .field("totalDocs", totalCount)
-                    .field("running", running)
-                    .endObject()
+                .field("numProcessed", count)
+                .field("totalDocs", totalCount)
+                .field("running", running)
+                .endObject()
                 .endObject();
         // @formatter:on
 
@@ -483,7 +486,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
     private int execute(String... commandAndOptions) throws IOException, InterruptedException {
         String cp = StringUtils.join(classPath, File.pathSeparator);
 
-        String[] nutchCall = new String[] { "-cp", cp };
+        String[] nutchCall = new String[]{"-cp", cp};
         nutchCall = arrayConcat(nutchCall, javaOptions);
         // Debug specific call
         String debugOption = System.getProperty("debugNutchCall");
@@ -491,7 +494,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             Pattern pattern = Pattern.compile(debugOption);
             Matcher matcher = pattern.matcher(commandAndOptions[0]);
             if (matcher.find()) {
-                nutchCall = arrayConcat(nutchCall, new String[] { "-agentlib:jdwp=transport=dt_socket,address=7000,server=y,suspend=y" });
+                nutchCall = arrayConcat(nutchCall, new String[]{"-agentlib:jdwp=transport=dt_socket,address=7000,server=y,suspend=y"});
             }
         }
         nutchCall = arrayConcat(nutchCall, commandAndOptions);

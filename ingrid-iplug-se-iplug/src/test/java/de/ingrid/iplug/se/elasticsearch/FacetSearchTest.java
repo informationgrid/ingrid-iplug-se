@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
- * Copyright (C) 2014 - 2022 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2023 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -22,87 +22,75 @@
  */
 package de.ingrid.iplug.se.elasticsearch;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
-
-import java.util.ArrayList;
-
 import de.ingrid.admin.Config;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-
-import de.ingrid.admin.JettyStarter;
+import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.utils.IngridDocument;
 import de.ingrid.utils.IngridHits;
 import de.ingrid.utils.query.IngridQuery;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(JettyStarter.class)
-public class FacetSearchTest  {
 
-    @Mock JettyStarter jettyStarter;
-    
-    @BeforeClass
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
+
+public class FacetSearchTest {
+
+    @BeforeAll
     public static void setUpBeforeClass() throws Exception {
-        JettyStarter.baseConfig = new Config();
-        JettyStarter.baseConfig.index = "test";
+        SEIPlug.baseConfig = new Config();
+        SEIPlug.baseConfig.index = "test";
 //        JettyStarter.baseConfig.indexWithAutoId = true;
         // JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<String>();
         Utils.setupES();
     }
-    
-    @Before
+
+    @BeforeEach
     public void initTest() throws Exception {
-        Utils.initIndex( jettyStarter );
-        Utils.indexManager.switchAlias( "ingrid_test", JettyStarter.baseConfig.index, "test_1" );
+        Utils.initIndex();
+        Utils.indexManager.switchAlias("ingrid_test", SEIPlug.baseConfig.index, "test_1");
     }
-    
-    @AfterClass
+
+    @AfterAll
     public static void tearDown() throws Exception {
         Utils.index.close();
         Utils.elastic.destroy();
     }
-    
+
     @Test
     public void facetteSearchAll() {
-        IngridQuery ingridQuery = Utils.getIngridQuery( "" );
-        Utils.addDefaultFacets( ingridQuery );
-        IngridHits search = Utils.index.search( ingridQuery , 0, 10 );
-        assertThat( search, not( is( nullValue() ) ) );
-        assertThat( search.length(), is( Utils.MAX_RESULTS ) );
-        
+        IngridQuery ingridQuery = Utils.getIngridQuery("");
+        Utils.addDefaultFacets(ingridQuery);
+        IngridHits search = Utils.index.search(ingridQuery, 0, 10);
+        assertThat(search, not(is(nullValue())));
+        assertThat(search.length(), is(Utils.MAX_RESULTS));
+
         IngridDocument facets = (IngridDocument) search.get("FACETS");
-        assertThat( facets.size(), is( 6 ) );
-        assertThat( facets.getLong( "partner:bund" ), is( 6l ) );
-        assertThat( facets.getLong( "partner:bw" ), is( 3l ) );
-        assertThat( facets.getLong( "partner:bb" ), is( 1l ) );
-        assertThat( facets.getLong( "partner:th" ), is( 1l ) );
-        assertThat( facets.getLong( "after:April2014" ), is( 2l ) );
-        assertThat( facets.getLong( "datatype:bundPDFs" ), is( 1l ) );
+        assertThat(facets.size(), is(6));
+        assertThat(facets.getLong("partner:bund"), is(6l));
+        assertThat(facets.getLong("partner:bw"), is(3l));
+        assertThat(facets.getLong("partner:bb"), is(1l));
+        assertThat(facets.getLong("partner:th"), is(1l));
+        assertThat(facets.getLong("after:April2014"), is(2l));
+        assertThat(facets.getLong("datatype:bundPDFs"), is(1l));
     }
-    
+
     @Test
     public void facetteSearchTerm() {
-        IngridQuery ingridQuery = Utils.getIngridQuery( "wemove" );
-        Utils.addDefaultFacets( ingridQuery );
-        IngridHits search = Utils.index.search( ingridQuery , 0, 10 );
-        assertThat( search, not( is( nullValue() ) ) );
-        assertThat( search.getHits().length, is( 4 ) );
-        
+        IngridQuery ingridQuery = Utils.getIngridQuery("wemove");
+        Utils.addDefaultFacets(ingridQuery);
+        IngridHits search = Utils.index.search(ingridQuery, 0, 10);
+        assertThat(search, not(is(nullValue())));
+        assertThat(search.getHits().length, is(4));
+
         IngridDocument facets = (IngridDocument) search.get("FACETS");
-        assertThat( facets.size(), is( 5 ) );
-        assertThat( facets.getLong( "partner:bund" ), is( 2l ) );
-        assertThat( facets.getLong( "partner:bb" ), is( 1l ) );
-        assertThat( facets.getLong( "partner:th" ), is( 1l ) );
-        assertThat( facets.getLong( "after:April2014" ), is( 1l ) );
-        assertThat( facets.getLong( "datatype:bundPDFs" ), is( 1l ) );
+        assertThat(facets.size(), is(5));
+        assertThat(facets.getLong("partner:bund"), is(2l));
+        assertThat(facets.getLong("partner:bb"), is(1l));
+        assertThat(facets.getLong("partner:th"), is(1l));
+        assertThat(facets.getLong("after:April2014"), is(1l));
+        assertThat(facets.getLong("datatype:bundPDFs"), is(1l));
     }
 }

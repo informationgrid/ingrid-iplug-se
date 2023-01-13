@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-nutch
  * ==================================================
- * Copyright (C) 2014 - 2022 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2023 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -39,10 +39,7 @@
 
 package de.ingrid.iplug.se.nutch.crawl.metadata;
 
-import java.io.IOException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import de.ingrid.iplug.se.nutch.crawl.metadata.ParseDataWrapper.UrlParseDataContainer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -57,12 +54,14 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.MapFileOutputFormat;
 import org.apache.nutch.parse.ParseData;
 import org.apache.nutch.util.NutchJob;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import de.ingrid.iplug.se.nutch.crawl.metadata.ParseDataWrapper.UrlParseDataContainer;
+import java.io.IOException;
 
 public class ParseDataUnwrapper extends Configured {
 
-  private static final Log LOG = LogFactory.getLog(ParseDataUnwrapper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ParseDataUnwrapper.class);
 
   public static class ParseDataUnwrapperMapper extends Mapper<HostType, ObjectWritable, Text, ParseData> {
 

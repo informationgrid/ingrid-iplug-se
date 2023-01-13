@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-nutch
  * ==================================================
- * Copyright (C) 2014 - 2022 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2023 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -20,13 +20,14 @@
  * limitations under the Licence.
  * **************************************************#
  */
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.nutch.util.NutchConfiguration;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
 
 import de.ingrid.iplug.se.nutch.analysis.UrlTester;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 /**
  * 
@@ -36,32 +37,42 @@ import de.ingrid.iplug.se.nutch.analysis.UrlTester;
  * @author joachim
  * 
  */
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class UrlTesterTests {
 
     @Test
     public void testExistingUrl() throws Exception {
-        ToolRunner.run(NutchConfiguration.create(), new UrlTester(), new String[] { "http://www.google.de/" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new UrlTester(), new String[]{"https://www.google.de/"});
     }
 
 
     @Test
     public void testRedirectUrl() throws Exception {
-        ToolRunner.run(NutchConfiguration.create(), new UrlTester(), new String[] { "http://www.wemove.com/" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new UrlTester(), new String[] { "https://www.wemove.com/" });
     }
 
     @Test
     public void testUnknownUrl() throws Exception {
-        ToolRunner.run(NutchConfiguration.create(), new UrlTester(), new String[] { "http://www.wemove.com/unknown_url" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new UrlTester(), new String[] { "https://www.wemove.com/unknown_url" });
     }
 
     @Test
     public void testUnknownHost() throws Exception {
-        ToolRunner.run(NutchConfiguration.create(), new UrlTester(), new String[] { "http://www.qiwueqwewmwcueiwocq.com/" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new UrlTester(), new String[] { "https://www.qiwueqwewmwcueiwocq.com/" });
     }
 
     @Test
     public void testCrawlDelayHost() throws Exception {
-        ToolRunner.run(NutchConfiguration.create(), new UrlTester(), new String[] { "http://www.umweltbundesamt.de/" });
+        Configuration c = NutchConfiguration.create();
+        c.set("plugin.folders", "build/apache-nutch-1.19/runtime/local/plugins");
+        ToolRunner.run(c, new UrlTester(), new String[] { "https://www.umweltbundesamt.de/" });
     }
 }

@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-iplug
  * ==================================================
- * Copyright (C) 2014 - 2022 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2023 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -22,7 +22,6 @@
  */
 package de.ingrid.iplug.se.webapp.controller;
 
-import static org.junit.Assert.assertTrue;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -42,28 +41,22 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.ui.ModelMap;
 
-import de.ingrid.admin.JettyStarter;
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
 import de.ingrid.iplug.se.utils.ElasticSearchUtils;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.controller.instance.scheduler.SchedulerManager;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(ElasticSearchUtils.class)
-@PowerMockIgnore("javax.management.*")
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class ListInstancesControllerTest extends Mockito {
 
     @Mock
@@ -78,17 +71,19 @@ public class ListInstancesControllerTest extends Mockito {
     @Mock
     IBus iBusMock;
     
-    @Before
+    @BeforeEach
     public void initTest() throws Exception {
-        JettyStarter.baseConfig = new Config();
+        SEIPlug.baseConfig = new Config();
         // JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<>();
         MockitoAnnotations.initMocks( this );
-        PowerMockito.mockStatic( ElasticSearchUtils.class );
+        try (MockedStatic<ElasticSearchUtils> mocked = mockStatic(ElasticSearchUtils.class)) {
+            mocked.when(() -> ElasticSearchUtils.typeExists(anyString(), any())).thenReturn(false);
+        }
         // InternalNode node = new InternalNode();
         Settings.Builder builder = Settings.builder();
         TransportClient transportClient = new PreBuiltTransportClient(builder.build());
         Mockito.when( esBean.getClient() ).thenReturn( transportClient );
-        Mockito.when( ElasticSearchUtils.typeExists( Mockito.anyString(), (Client) Mockito.anyObject() ) ).thenReturn( false );
+//        Mockito.when( ElasticSearchUtils.typeExists( Mockito.anyString(), (Client) Mockito.any() ) ).thenReturn( false );
 
         InstanceController.setCommunicationInterface(commInterfaceMock);
         when(commInterfaceMock.getIBus()).thenReturn(iBusMock);
@@ -118,10 +113,9 @@ public class ListInstancesControllerTest extends Mockito {
         HttpServletResponse httpResponse = mock(HttpServletResponse.class);
         lic.addInstance( new ModelMap(), "test", null, httpRequest, httpResponse );
 
-        assertTrue( "Instance path was not created", Files.exists( Paths.get( "test-instances", "test" ) ) );
-        assertTrue( "Instance configuration path was not created", Files.exists( Paths.get( "test-instances", "test", "conf" ) ) );
-        assertTrue( "Instance nutch configuration path was not created",
-                Files.exists( Paths.get( "test-instances", "test", "conf", "nutch-default.xml" ) ) );
+        assertTrue( Files.exists( Paths.get( "test-instances", "test" ) ), "Instance path was not created" );
+        assertTrue( Files.exists( Paths.get( "test-instances", "test", "conf" ) ), "Instance configuration path was not created" );
+        assertTrue( Files.exists( Paths.get( "test-instances", "test", "conf", "nutch-default.xml" ) ), "Instance nutch configuration path was not created" );
 
         FileUtils.removeRecursive( Paths.get( "test-instances" ) );
 

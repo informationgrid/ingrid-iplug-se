@@ -2,7 +2,7 @@
  * **************************************************-
  * ingrid-iplug-se-nutch
  * ==================================================
- * Copyright (C) 2014 - 2022 wemove digital solutions GmbH
+ * Copyright (C) 2014 - 2023 wemove digital solutions GmbH
  * ==================================================
  * Licensed under the EUPL, Version 1.1 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
@@ -39,15 +39,8 @@
 
 package de.ingrid.iplug.se.nutch.crawl.metadata;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import de.ingrid.iplug.se.nutch.crawl.metadata.MetadataInjector.MetadataContainer;
+import de.ingrid.iplug.se.nutch.crawl.metadata.ParseDataWrapper.UrlParseDataContainer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -67,13 +60,18 @@ import org.apache.nutch.metadata.Metadata;
 import org.apache.nutch.parse.ParseData;
 import org.apache.nutch.util.LockUtil;
 import org.apache.nutch.util.NutchJob;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import de.ingrid.iplug.se.nutch.crawl.metadata.MetadataInjector.MetadataContainer;
-import de.ingrid.iplug.se.nutch.crawl.metadata.ParseDataWrapper.UrlParseDataContainer;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MetadataMerger extends Configured {
 
-  public static final Log LOG = LogFactory.getLog(MetadataMerger.class);
+  public static final Logger LOG = LoggerFactory.getLogger(MetadataMerger.class);
 
   public static class ObjectWritableMapper extends Mapper<HostType, Writable, HostType, ObjectWritable> {
 
