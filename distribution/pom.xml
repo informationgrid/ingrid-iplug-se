@@ -115,26 +115,6 @@
               <skip>false</skip>
             </configuration>
           </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-changes-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>changes-report</id>
-                <phase>deploy</phase>
-                <goals>
-                  <goal>changes-report</goal>
-                </goals>
-              </execution>
-              <execution>
-                <id>changes-announcement-mail</id>
-                <phase>deploy</phase>
-                <goals>
-                  <goal>announcement-mail</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
         </plugins>
       </build>
     </profile>
