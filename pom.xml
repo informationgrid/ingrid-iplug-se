@@ -8,7 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>ingrid-iplug-se-project</artifactId>
   <packaging>pom</packaging>
-  <version>6.0.0</version>
+  <version>6.1.0</version>
   <name>InGrid iPlug SE</name>
   <description>This iPlug indexes documents from websites and can be queried by the iBus.</description>
 
@@ -33,7 +33,7 @@
   <!-- ==================== PROPERTIES ==================== -->
   <properties>
     <apache-nutch-version>apache-nutch-1.19</apache-nutch-version>
-    <ingrid-base-webapp.version>6.0.0</ingrid-base-webapp.version>
+    <ingrid-base-webapp.version>6.1.0</ingrid-base-webapp.version>
     <elasticsearch.version>6.8.17</elasticsearch.version>
     <log4j2.version>2.19.0</log4j2.version>
     <spring.version>5.3.23</spring.version>
