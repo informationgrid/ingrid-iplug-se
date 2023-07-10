@@ -1,4 +1,14 @@
 
+## 6.2.0 (10.07.2023)
+
+### Features
+
+* Reduzierung Memory Verbrauch (Anpassung der Garbage Collection Settings in JAVA) (#5117)
+
+
+
+
+    
 ## 6.1.0 (14.04.2023)
 
 
