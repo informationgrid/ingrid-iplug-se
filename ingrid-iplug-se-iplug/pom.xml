@@ -70,7 +70,7 @@
     <dependency>
       <groupId>de.ingrid</groupId>
       <artifactId>ingrid-utils</artifactId>
-      <version>6.0.0</version>
+      <version>6.3.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>de.ingrid</groupId>
