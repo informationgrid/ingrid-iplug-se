@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <groupId>de.ingrid</groupId>
     <artifactId>ingrid-releases-pom</artifactId>
-    <version>6.2.0</version>
+    <version>7.0.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>ingrid-iplug-se-project</artifactId>
   <packaging>pom</packaging>
-  <version>6.3.0</version>
+  <version>7.0.0</version>
   <name>InGrid iPlug SE</name>
   <description>This iPlug indexes documents from websites and can be queried by the iBus.</description>
 
@@ -33,9 +33,9 @@
   <!-- ==================== PROPERTIES ==================== -->
   <properties>
     <apache-nutch-version>apache-nutch-1.19</apache-nutch-version>
-    <ingrid-base-webapp.version>6.3.0</ingrid-base-webapp.version>
+    <ingrid-base-webapp.version>7.0.0</ingrid-base-webapp.version>
     <elasticsearch.version>6.8.17</elasticsearch.version>
-    <log4j2.version>2.19.0</log4j2.version>
+    <log4j2.version>2.22.1</log4j2.version>
     <spring.version>5.3.23</spring.version>
     <jetty.version>9.4.49.v20220914</jetty.version>
     <netty.version>4.1.77</netty.version>
@@ -384,6 +384,13 @@
           <defaultOriginUrl>https://github.com/informationgrid/ingrid-iplug-se</defaultOriginUrl>
           <noDeploy>true</noDeploy>
           <autoVersionSubmodules>true</autoVersionSubmodules>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <configuration>
+          <licenseResolver>${project.baseUri}/license</licenseResolver>
         </configuration>
       </plugin>
     </plugins>
