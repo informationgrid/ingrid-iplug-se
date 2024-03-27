@@ -33,7 +33,7 @@
   <!-- ==================== PROPERTIES ==================== -->
   <properties>
     <apache-nutch-version>apache-nutch-1.19</apache-nutch-version>
-    <ingrid-base-webapp.version>7.0.0</ingrid-base-webapp.version>
+    <ingrid-base-webapp.version>7.1.0-SNAPSHOT</ingrid-base-webapp.version>
     <elasticsearch.version>6.8.17</elasticsearch.version>
     <log4j2.version>2.22.1</log4j2.version>
     <spring.version>5.3.23</spring.version>
