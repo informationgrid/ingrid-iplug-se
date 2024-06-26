@@ -7,12 +7,12 @@
  * Licensed under the EUPL, Version 1.2 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
  * EUPL (the "Licence");
- * 
+ *
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * https://joinup.ec.europa.eu/software/page/eupl
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -66,15 +66,13 @@ public class InstanceTest {
      */
     @Test
     public void searchForAll() throws Exception {
-        Utils.prepareIndex(Utils.elastic, "data/webUrls1_b.json", "test_catalog", "default");
+        Utils.prepareIndex(Utils.elastic, "data/webUrls1_b.json", "test_catalog");
 
         // assertThat( baseConfig.indexSearchInTypes.size(), is( 0 ) );
         IndexInfo indexInfo = new IndexInfo();
         indexInfo.setToIndex("test_1");
-        indexInfo.setToType("web");
         IndexInfo indexInfo2 = new IndexInfo();
         indexInfo2.setToIndex("test_catalog");
-        indexInfo2.setToType("default");
 
         Utils.elasticConfig.activeIndices = new IndexInfo[]{indexInfo, indexInfo2};
         IngridQuery q = Utils.getIngridQuery("");

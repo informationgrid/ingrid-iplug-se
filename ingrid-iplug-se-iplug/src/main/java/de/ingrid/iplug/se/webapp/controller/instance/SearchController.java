@@ -7,12 +7,12 @@
  * Licensed under the EUPL, Version 1.2 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
  * EUPL (the "Licence");
- * 
+ *
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * https://joinup.ec.europa.eu/software/page/eupl
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -52,9 +52,9 @@ import de.ingrid.utils.queryparser.TokenMgrError;
 
 /**
  * Control the database parameter page.
- * 
+ *
  * @author joachim@wemove.com
- * 
+ *
  */
 @Controller
 @SessionAttributes("plugDescription")
@@ -97,7 +97,7 @@ public class SearchController extends InstanceController {
         }
 
         modelMap.addAttribute( "instance", InstanceController.getInstanceData( instance ) );
-        
+
         if (queryString != null) {
             modelMap.addAttribute( "query", queryString );
             IngridQuery query = null;
@@ -112,7 +112,6 @@ public class SearchController extends InstanceController {
             IndexInfo indexInfo = new IndexInfo();
             indexInfo.setToAlias(SEIPlug.baseConfig.index + "_" + instance);
             indexInfo.setToIndex(SEIPlug.baseConfig.index + "_" + instance);
-            indexInfo.setToType("default");
             elasticConfig.activeIndices = new IndexInfo[] {indexInfo};
 
             final IngridHits results = _plug.search( query, 0, 20 );

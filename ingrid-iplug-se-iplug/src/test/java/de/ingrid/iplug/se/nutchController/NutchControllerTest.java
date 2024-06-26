@@ -82,7 +82,7 @@ public class NutchControllerTest {
         configuration.nutchCallJavaOptions = java.util.Arrays.asList( "-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8" );
         SEIPlug.conf = configuration;
         Properties elasticProperties = Utils.getElasticProperties();
-        String elasticNetworkHost = (String) elasticProperties.get("network.host");
+        String[] elasticNetworkHost = elasticProperties.get("elastic.remoteHosts").toString().split(":");
 
         // get an entity manager instance (initializes properties in the
         // DBManager)
@@ -103,8 +103,8 @@ public class NutchControllerTest {
         FileUtils.copyDirectories(Paths.get("../ingrid-iplug-se-nutch/src/test/resources/conf").toAbsolutePath(), conf);
 
         NutchConfigTool nct = new NutchConfigTool(Paths.get(conf.toAbsolutePath().toString(), "nutch-site.xml"));
-        nct.addOrUpdateProperty("elastic.host", elasticNetworkHost,"");
-        nct.addOrUpdateProperty("elastic.port", "9200", "");
+        nct.addOrUpdateProperty("elastic.host", elasticNetworkHost[0],"");
+        nct.addOrUpdateProperty("elastic.port", elasticNetworkHost[1], "");
         nct.addOrUpdateProperty("elastic.cluster", "ingrid", "");
         nct.write();
 

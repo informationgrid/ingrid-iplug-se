@@ -1,22 +1,23 @@
-{ "index" : { "_index" : "test_1", "_type" : "web", "_id" : "1" } }
+
+{ "index" : { "_index" : "test_1", "_id" : "1" } }
 { "url" : "http://www.wemove.com", "title": "wemove", "partner": "bund", "datatype": "pdf", "content": "Die beste IT-Firma auf der Welt!", "doc_boost": "0.3", "fetched": "2014-06-03", "t0": "2014-06-03", "iPlugId": "testIPlug" }
-{ "index" : { "_index" : "test_1", "_type" : "web", "_id" : "2" } }
+{ "index" : { "_index" : "test_1", "_id" : "2" } }
 { "url" : "http://www.heise.de", "title": "Heise", "partner": "bund", "datatype": "www", "content": "Informationen über IT stets aktuell. Like fox news", "doc_boost": "0.0", "fetched": "2014-04-13", "t1": "2014-04-01", "t2": "2014-04-15", "x1": 9.89, "y1": 51.89, "x2": 11.15, "y2": 52.70, "iPlugId": "testIPlug"  }
-{ "index" : { "_index" : "test_1", "_type" : "web", "_id" : "3" } }
+{ "index" : { "_index" : "test_1", "_id" : "3" } }
 { "url" : "http://www.spiegel.de", "title": "Spiegel", "partner": "bw", "datatype": "www", "content": "Nachrichten von heute mit genialen Beiträgen", "doc_boost": "0.0", "fetched": "2014-05-22", "t0": "2014-08-11", "iPlugId": "testIPlug" }
-{ "index" : { "_index" : "test_1", "_type" : "web", "_id" : "4" } }
+{ "index" : { "_index" : "test_1", "_id" : "4" } }
 { "url" : "http://www.golem.de", "title": "golem computer news", "partner": "bund", "datatype": "www", "content": "Neuigkeiten aus der Welt der Computer", "doc_boost": "0.0", "fetched": "2014-03-14", "t0": "2014-03-11", "iPlugId": "testIPlug" }
-{ "index" : { "_index" : "test_1", "_type" : "web", "_id" : "5" } }
+{ "index" : { "_index" : "test_1", "_id" : "5" } }
 { "url" : "http://www.golem.de/special", "title": "golem computer news", "partner": "bund", "datatype": "www", "content": "Die besten Artikel", "doc_boost": "0.0", "fetched": "2014-03-16", "t1": "2014-02-01", "t2": "2014-04-09", "iPlugId": "testIPlug" }
-{ "index" : { "_index" : "test_1", "_type" : "web", "_id" : "6" } }
+{ "index" : { "_index" : "test_1", "_id" : "6" } }
 { "url" : "http://www.wemove.com/about.html", "title": "wemove - about", "partner": "bb", "datatype": "www", "content": "Über uns und unsere Entstehung", "doc_boost": "0.0", "fetched": "2013-02-08", "iPlugId": "testIPlug" }
-{ "index" : { "_index" : "test_1", "_type" : "web", "_id" : "7" } }
+{ "index" : { "_index" : "test_1", "_id" : "7" } }
 { "url" : "http://www.wemove.com/contact", "title": "wemove - contact", "partner": "bund", "datatype": "xml", "content": "Hier können Sie uns erreichen. Sie können uns auch faxen", "doc_boost": "0.0", "fetched": "2014-08-01", "t0": "2014-04-04", "iPlugId": "testIPlug" }
-{ "index" : { "_index" : "test_1", "_type" : "web", "_id" : "8" } }
+{ "index" : { "_index" : "test_1", "_id" : "8" } }
 { "url" : "http://www.wemove.com/jobs", "title": "wemove - jobs", "partner": "th", "datatype": "pdf", "content": "Diese Stellen haben wir für Sie", "doc_boost": "0.0", "fetched": "2014-04-24", "t1": "2014-01-01", "t2": "2014-07-15", "iPlugId": "testIPlug" }
-{ "index" : { "_index" : "test_1", "_type" : "web", "_id" : "9" } }
+{ "index" : { "_index" : "test_1", "_id" : "9" } }
 { "url" : "http://www.spiegel.de/ausland", "title": "Ausland", "partner": "bund", "datatype": "www", "content": "Was geht ab außerhalb von Deutschland? Auch per Fax.", "doc_boost": "0.0", "fetched": "2014-05-18", "t1": "2014-01-21", "t2": "2014-02-09", "iPlugId": "testIPlug" }
-{ "index" : { "_index" : "test_1", "_type" : "web", "_id" : "10" } }
+{ "index" : { "_index" : "test_1", "_id" : "10" } }
 { "url" : "http://www.spiegel.de/wirtschaft", "title": "Wirtschaft", "partner": "bw", "datatype": "pdf", "content": "Neues aus der Wirtschaft", "doc_boost": "0.0", "fetched": "2014-03-11", "t0": "2014-01-25", "iPlugId": "testIPlug" }
-{ "index" : { "_index" : "test_1", "_type" : "web", "_id" : "11" } }
+{ "index" : { "_index" : "test_1", "_id" : "11" } }
 { "url" : "http://www.spiegel.de/reise", "title": "Reisen", "partner": "bw", "datatype": "xml", "content": "Wohin in den Urlaub, wenn man die Welt bereisen will? Warum überhaupt ins Ausland und dann ohne Computer?", "doc_boost": "0.2", "fetched": "2014-01-09", "iPlugId": "testIPlug" }

@@ -7,12 +7,12 @@
  * Licensed under the EUPL, Version 1.2 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
  * EUPL (the "Licence");
- * 
+ *
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * https://joinup.ec.europa.eu/software/page/eupl
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -80,7 +80,7 @@ import java.util.Map;
 
 /**
  * The Search Engine iPlug to crawl websites and prepare for InGrid Portal.
- * 
+ *
  * @author joachim@wemove.com
  */
 @ImportResource({"/springapp-servlet.xml", "/override/*.xml"})
@@ -140,7 +140,7 @@ public class SEIPlug extends HeartBeatPlug {
     private static EntityManager em;
 
     public static Config baseConfig;
-    
+
     public SEIPlug() {
         super(30000, null, null, null, null);
     };
@@ -153,7 +153,7 @@ public class SEIPlug extends HeartBeatPlug {
 //        SEIPlug.nutchController = nutchController;
         this.seConfig = seConfig;
         conf = seConfig;
-        
+
         SEIPlug.baseConfig = baseConfig;
         try {
             baseConfig.initialize();
@@ -265,13 +265,12 @@ public class SEIPlug extends HeartBeatPlug {
             return this.iBusIndexManager.search(query, start, length);
         }
 
-        
+
         preProcess(query);
 
         IndexInfo indexInfo = new IndexInfo();
         indexInfo.setToAlias(baseConfig.index + "_*");
         indexInfo.setToIndex(baseConfig.index + "_*");
-        indexInfo.setToType("default");
         elasticConfig.activeIndices = new IndexInfo[] {indexInfo};
 
         return index.search(query, start, length);
@@ -283,7 +282,7 @@ public class SEIPlug extends HeartBeatPlug {
      *      de.ingrid.utils.query.IngridQuery, java.lang.String[])
      */
     public IngridHitDetail getDetail(IngridHit hit, IngridQuery query, String[] requestedFields) throws Exception {
-        
+
         preProcess(query);
 
         // request iBus directly to get search results from within this iPlug
@@ -301,9 +300,9 @@ public class SEIPlug extends HeartBeatPlug {
      *      de.ingrid.utils.query.IngridQuery, java.lang.String[])
      */
     public IngridHitDetail[] getDetails(IngridHit[] hits, IngridQuery query, String[] requestedFields) throws Exception {
-        
+
         preProcess(query);
-        
+
         IngridHitDetail[] detailHits = new IngridHitDetail[hits.length];
 
         for (int i = 0; i < hits.length; i++) {
@@ -328,7 +327,7 @@ public class SEIPlug extends HeartBeatPlug {
                         nutchController.stop( instance );
                         em.close();
                     }
-                        
+
                 } catch (Exception e) {
                     log.error("Error shutting down", e);
                 }
@@ -338,20 +337,20 @@ public class SEIPlug extends HeartBeatPlug {
 
     private static void setupTestData(EntityManager em) {
         em.getTransaction().begin();
-        
+
         // check first if test data already has been added
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Url> criteria = cb.createQuery( Url.class );
         Root<Url> urlTable = criteria.from(Url.class);
         Predicate instanceCriteria = cb.equal( urlTable.get("instance"), "catalog" );
-        
+
         criteria.from( Url.class );
         criteria.where( instanceCriteria );
-        
+
         int size = em.createQuery( criteria ).getResultList().size();
-        
+
         if (size == 0) {
-        
+
             Url url = new Url("catalog");
             url.setStatus("200");
             url.setUrl("http://www.wemove.com/");
@@ -383,40 +382,40 @@ public class SEIPlug extends HeartBeatPlug {
             List<String> excludeUrls = new ArrayList<String>();
             excludeUrls.add("http://www.wemove.com/about");
             url.setExcludeUrls(excludeUrls);
-    
+
             em.persist(url);
-    
+
             String[] urls = new String[] { "http://www.spiegel.de", "http://www.heise.de", "http://www.apple.com", "http://www.engadget.com", "http://www.tagesschau.de", "http://www.home-mag.com/", "http://www.ultramusicfestival.com/",
                     "http://www.ebook.de/de/", "http://www.audible.de", "http://www.amazon.com", "http://www.powerint.com/", "http://www.tanzkongress.de/", "http://www.thesourcecode.de/", "http://werk-x.at/", "http://keinundapel.com/",
                     "http://www.ta-trung.com/", "http://www.attac.de/", "http://www.altana-kulturstiftung.de/", "http://www.lemagazinedouble.com/", "http://www.montessori-muehlheim.de/", "http://missy-magazine.de/",
                     "http://www.eh-darmstadt.de/", "http://herbert.de/", "http://www.mousonturm.de/", "http://www.zeit.de/", "https://read2burn.com/" };
-    
+
             metadata = new ArrayList<Metadata>();
             Metadata md = new Metadata();
             md.setMetaKey("lang");
             md.setMetaValue("de");
             metadata.add(md);
-    
+
             md = new Metadata();
             md.setMetaKey("partner");
             md.setMetaValue("bund");
             metadata.add(md);
-    
+
             md = new Metadata();
             md.setMetaKey("provider");
             md.setMetaValue("bu_bmu");
             metadata.add(md);
-    
+
             md = new Metadata();
             md.setMetaKey("datatype");
             md.setMetaValue("www");
             metadata.add(md);
-    
+
             md = new Metadata();
             md.setMetaKey("datatype");
             md.setMetaValue("default");
             metadata.add(md);
-    
+
             for (String uri : urls) {
                 url = new Url("catalog");
                 url.setStatus("400");
@@ -427,7 +426,7 @@ public class SEIPlug extends HeartBeatPlug {
                 url.setMetadata(metadata);
                 em.persist(url);
             }
-    
+
             url = new Url("other");
             url.setStatus("200");
             url.setUrl("http://de.wikipedia.org/");
@@ -436,7 +435,7 @@ public class SEIPlug extends HeartBeatPlug {
             url.setLimitUrls(limit);
             em.persist(url);
         }
-        
+
         em.getTransaction().commit();
     }
 

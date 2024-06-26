@@ -68,10 +68,9 @@ public class Utils {
         elasticConfig.communicationProxyUrl = "/ingrid-group:unit-tests";
         elasticConfig.indexSearchDefaultFields = new String[]{"title", "content"};
         elasticConfig.additionalSearchDetailFields = new String[0];
-        elasticConfig.remoteHosts = new String[] { elasticProperties.get("network.host") + ":9200"};
+        elasticConfig.remoteHosts = new String[] { elasticProperties.get("elastic.remoteHosts").toString()};
         IndexInfo indexInfo = new IndexInfo();
         indexInfo.setToIndex("test_1");
-        indexInfo.setToType("web");
         indexInfo.setToAlias("ingrid_test");
         elasticConfig.activeIndices = new IndexInfo[1];
         elasticConfig.activeIndices[0] = indexInfo;
@@ -104,7 +103,7 @@ public class Utils {
             // check for elastic search settings in classpath, which works
             // during development
             // and production
-            Resource resource = new ClassPathResource("/elasticsearch.properties");
+            Resource resource = new ClassPathResource("/config.properties");
             if (resource.exists()) {
                 p.load(resource.getInputStream());
             }
@@ -114,11 +113,11 @@ public class Utils {
         return p;
     }
 
-    public static void prepareIndex(ElasticsearchNodeFactoryBean elastic, String fileData, String index, String type) throws Exception {
+    public static void prepareIndex(ElasticsearchNodeFactoryBean elastic, String fileData, String index) throws Exception {
         ElasticsearchClient client = elastic.getClient();
         ClassPathResource resource = new ClassPathResource( fileData );
 
-        setMapping(elastic, index, type);
+        setMapping(elastic, index);
 
         byte[] urlsData = Files.readAllBytes( Paths.get( resource.getURI() ) );
 
@@ -136,10 +135,10 @@ public class Utils {
     }
 
     static void prepareIndex(ElasticsearchNodeFactoryBean elastic) throws Exception {
-        prepareIndex( elastic, "data/webUrls.json", "test_1", "web" );
+        prepareIndex(elastic, "data/webUrls.json", "test_1");
     }
 
-    public static void setMapping(ElasticsearchNodeFactoryBean elastic, String index, String type) {
+    public static void setMapping(ElasticsearchNodeFactoryBean elastic, String index) {
         String mappingSource = "";
         try {
             ElasticsearchClient client = elastic.getClient();
@@ -151,7 +150,6 @@ public class Utils {
             }
 
             System.out.println(mappingSource);
-            mappingSource = mappingSource.replace("\"web\"", "\"" + type + "\"");
 
             if (client.indices().exists(ex -> ex.index(index)).value()) {
                 client.indices().delete(d -> d.index(index));

@@ -432,7 +432,6 @@ public class IngridCrawlNutchProcess extends NutchProcess {
         IndexInfo info = new IndexInfo();
         info.setToAlias(instanceIndexName);
         info.setToIndex(instanceIndexName);
-        info.setToType("default");
         String plugIdInfo = this.indexManager.getIndexTypeIdentifier(info);
         this.indexManager.updateIPlugInformation(
                 plugIdInfo,
