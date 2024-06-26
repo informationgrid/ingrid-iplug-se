@@ -7,12 +7,12 @@
  * Licensed under the EUPL, Version 1.2 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
  * EUPL (the "Licence");
- * 
+ *
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * https://joinup.ec.europa.eu/software/page/eupl
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,6 +22,7 @@
  */
 package de.ingrid.iplug.se.elasticsearch.converter;
 
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import de.ingrid.elasticsearch.ElasticConfig;
 import de.ingrid.elasticsearch.IndexInfo;
 import de.ingrid.elasticsearch.search.IQueryParsers;
@@ -29,7 +30,6 @@ import de.ingrid.elasticsearch.search.converter.DefaultFieldsQueryConverter;
 import de.ingrid.elasticsearch.search.converter.MatchAllQueryConverter;
 import de.ingrid.elasticsearch.search.converter.QueryConverter;
 import de.ingrid.iplug.se.elasticsearch.Utils;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -53,7 +53,7 @@ public class QueryConverterTest {
         elasticConfig.isEnabled = true;
         elasticConfig.indexSearchDefaultFields = new String[]{"title", "content"};
         elasticConfig.additionalSearchDetailFields = new String[0];
-        elasticConfig.remoteHosts = new String[] {"localhost:9300"};
+        elasticConfig.remoteHosts = new String[] {"localhost:9200"};
         IndexInfo indexInfo = new IndexInfo();
         indexInfo.setToIndex("test_1");
         indexInfo.setToAlias("ingrid_test");
@@ -66,13 +66,13 @@ public class QueryConverterTest {
 
     @Test
     public void matchAll() {
-        QueryBuilder result = queryConverter.convert( Utils.getIngridQuery( "" ) );
+        BoolQuery.Builder result = queryConverter.convert( Utils.getIngridQuery( "" ) );
         assertThat( strip( result.toString() ), containsString("\"match_all\":{") );
     }
-    
+
     @Test
     public void matchTerm() {
-        QueryBuilder result = queryConverter.convert( Utils.getIngridQuery( "wasser" ) );
+        BoolQuery.Builder result = queryConverter.convert( Utils.getIngridQuery( "wasser" ) );
         assertThat( strip( result.toString() ), containsString("\"query\":\"wasser\""));
         assertThat( strip( result.toString() ), containsString("\"title"));
         assertThat( strip( result.toString() ), containsString("\"content"));
@@ -81,30 +81,30 @@ public class QueryConverterTest {
 
     @Test
     public void matchTermsAND() {
-        QueryBuilder result = queryConverter.convert( Utils.getIngridQuery( "wasser wald" ) );
+        BoolQuery.Builder result = queryConverter.convert( Utils.getIngridQuery( "wasser wald" ) );
         assertThat( strip( result.toString() ), containsString("\"query\":\"wasserwald\"") );
         assertThat( strip( result.toString() ), containsString("\"operator\":\"AND\"") );
     }
 
     @Test
     public void matchTermsOR() {
-        QueryBuilder result = queryConverter.convert( Utils.getIngridQuery( "wemove OR Deutschland" ) );
+        BoolQuery.Builder result = queryConverter.convert( Utils.getIngridQuery( "wemove OR Deutschland" ) );
         assertThat( strip( result.toString() ), containsString("\"query\":\"wemoveDeutschland\""));
         assertThat( strip( result.toString() ), containsString("\"operator\":\"OR\"") );
     }
 
     @Test
     public void matchTermsANDOR() {
-        QueryBuilder result = queryConverter.convert( Utils.getIngridQuery( "boden AND wasser OR wald" ) );
+        BoolQuery.Builder result = queryConverter.convert( Utils.getIngridQuery( "boden AND wasser OR wald" ) );
         assertThat( strip( result.toString() ), containsString("\"query\":\"bodenwasser\""));
         assertThat( strip( result.toString() ), containsString("\"query\":\"wald\""));
         assertThat( strip( result.toString() ), containsString("\"operator\":\"AND\"") );
         assertThat( strip( result.toString() ), containsString("\"operator\":\"OR\"") );
     }
-    
+
     @Test
     public void matchTermsANDORParentheses() {
-        QueryBuilder result = queryConverter.convert( Utils.getIngridQuery( "Ausland AND (wemove OR Deutschland)" ) );
+        BoolQuery.Builder result = queryConverter.convert( Utils.getIngridQuery( "Ausland AND (wemove OR Deutschland)" ) );
         assertThat( strip( result.toString() ), containsString("\"query\":\"wemoveDeutschland\""));
         assertThat( strip( result.toString() ), containsString("\"query\":\"Ausland\""));
     }

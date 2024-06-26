@@ -7,12 +7,12 @@
  * Licensed under the EUPL, Version 1.2 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
  * EUPL (the "Licence");
- * 
+ *
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * https://joinup.ec.europa.eu/software/page/eupl
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,7 +32,6 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
@@ -97,7 +96,7 @@ public class IngridElasticSearchClient {
         if (clusterName == null) LOG.warn( "No cluster name specified! If node cannot be found, then we might search in the wrong cluster." );
 
         this.host = parameters.get(ElasticConstants.HOST);
-        this.port = parameters.getInt(ElasticConstants.PORT, 9300);
+        this.port = parameters.getInt(ElasticConstants.PORT, 9200);
 
         Settings.Builder settingsBuilder = Settings.builder();
         BufferedReader reader = new BufferedReader(new Configuration().getConfResourceAsReader("elasticsearch.conf"));
@@ -151,11 +150,11 @@ public class IngridElasticSearchClient {
         checkNewBulk();
     }
 
-    public IndexRequestBuilder prepareIndexRequest(@Nullable String id) {
+    public IndexRequestBuilder prepareIndexRequest(String id) {
         return client.prepareIndex(instanceIndex, type, id);
     }
 
-    public DeleteRequestBuilder prepareDeleteRequest(@Nullable String id) {
+    public DeleteRequestBuilder prepareDeleteRequest(String id) {
         return client.prepareDelete(instanceIndex, type, id);
     }
 

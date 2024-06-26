@@ -7,12 +7,12 @@
  * Licensed under the EUPL, Version 1.2 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
  * EUPL (the "Licence");
- * 
+ *
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * https://joinup.ec.europa.eu/software/page/eupl
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,6 +22,7 @@
  */
 package de.ingrid.iplug.se.nutchController;
 
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 import de.ingrid.admin.service.PlugDescriptionService;
 import de.ingrid.elasticsearch.IIndexManager;
 import de.ingrid.elasticsearch.IndexInfo;
@@ -38,10 +39,6 @@ import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.elasticsearch.client.transport.NoNodeAvailableException;
-import org.elasticsearch.common.Strings;
-import org.elasticsearch.xcontent.XContentBuilder;
-import org.elasticsearch.xcontent.XContentFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -154,7 +151,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
             // prepare (central) index for iPlug information
             try {
                 this.indexManager.checkAndCreateInformationIndex();
-            } catch (NoNodeAvailableException e) {
+            } catch (Exception e) {
                 log.error(e);
                 this.statusProvider.addState(NutchProcess.STATES.ERROR.name(), e.getMessage(), Classification.ERROR);
                 throw new IOException(e.getMessage());
@@ -423,7 +420,7 @@ public class IngridCrawlNutchProcess extends NutchProcess {
         if (!this.indexManager.indexExists(instanceIndexName)) {
             String esMapping = indexManager.getDefaultMapping();
             String esSettings = indexManager.getDefaultSettings();
-            this.indexManager.createIndex(instanceIndexName, "default", esMapping, esSettings);
+            this.indexManager.createIndex(instanceIndexName, esMapping, esSettings);
         }
 
         int ret = execute("org.apache.nutch.indexer.IndexingJob", crawlDb, "-linkdb", linkDb, "-dir", segments, "-deleteGone", "-noCommit");
@@ -444,32 +441,26 @@ public class IngridCrawlNutchProcess extends NutchProcess {
         this.statusProvider.appendToState(STATES.INDEX.name(), " done.");
     }
 
-    private String getIPlugInfo(String infoId, String indexName, boolean running, Integer count, Integer totalCount) throws IOException {
+    private JSONObject getIPlugInfo(String infoId, String indexName, boolean running, Integer count, Integer totalCount) throws IOException {
 
         PlugDescription plugDescription = this.plugDescriptionService.getPlugDescription();
 
-        // @formatter:off
-        XContentBuilder xContentBuilder = XContentFactory.jsonBuilder().startObject()
-                .field("plugId", SEIPlug.baseConfig.communicationProxyUrl)
-                .field("indexId", infoId)
-                .field("iPlugName", SEIPlug.baseConfig.datasourceName)
-                .field("linkedIndex", indexName)
-                .field("linkedType", "default")
-                .field("adminUrl", SEIPlug.baseConfig.guiUrl)
-                .field("lastHeartbeat", new Date())
-                .field("lastIndexed", new Date())
-// TODO:                .field("datatypes", this._plugDescription.getDataTypes())
-// TODO:                .field("fields", this._plugDescription.getFields())
-                .field("plugdescription", plugDescription)
-                .startObject("indexingState")
-                .field("numProcessed", count)
-                .field("totalDocs", totalCount)
-                .field("running", running)
-                .endObject()
-                .endObject();
-        // @formatter:on
+        JSONObject json = new JSONObject();
+        json.put("plugId", SEIPlug.baseConfig.communicationProxyUrl);
+        json.put("indexId", infoId);
+        json.put("iPlugName", SEIPlug.baseConfig.datasourceName);
+        json.put("linkedIndex", indexName);
+        json.put("adminUrl", SEIPlug.baseConfig.guiUrl);
+        json.put("lastHeartbeat", new StdDateFormat().format(new Date()));
+        json.put("lastIndexed", new StdDateFormat().format(new Date()));
+        json.put("plugdescription", plugDescription);
+        JSONObject indexingState = new JSONObject();
+        indexingState.put("numProcessed", count);
+        indexingState.put("totalDocs", totalCount);
+        indexingState.put("running", running);
+        json.put("indexingState", indexingState);
 
-        return Strings.toString(xContentBuilder);
+        return json;
     }
 
     private void cleanupHadoop() throws IOException {

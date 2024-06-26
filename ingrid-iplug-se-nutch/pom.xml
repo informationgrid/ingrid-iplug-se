@@ -72,10 +72,10 @@
       <version>1.19</version>
     </dependency>
     <!-- nutch plugin dependencies -->
-    <dependency>
+    <!--<dependency>
       <groupId>org.elasticsearch</groupId>
       <artifactId>elasticsearch</artifactId>
-      <version>${elasticsearch.version}</version>
+      <version>${elastic.version}</version>
       <optional>true</optional>
       <exclusions>
         <exclusion>
@@ -99,7 +99,7 @@
           <artifactId>commons-logging</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
+    </dependency>-->
     <!-- nutch dependencies -->
     <dependency>
       <groupId>commons-lang</groupId>

@@ -7,12 +7,12 @@
  * Licensed under the EUPL, Version 1.2 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
  * EUPL (the "Licence");
- * 
+ *
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * https://joinup.ec.europa.eu/software/page/eupl
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,7 +33,6 @@ import de.ingrid.iplug.se.elasticsearch.Utils;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -70,7 +69,7 @@ public class NutchControllerTest {
 
     @AfterEach
     public void afterTest() throws Exception {
-        elastic.getClient().close();
+        elastic.getClient().shutdown();
     }
 
     @Test
@@ -105,7 +104,7 @@ public class NutchControllerTest {
 
         NutchConfigTool nct = new NutchConfigTool(Paths.get(conf.toAbsolutePath().toString(), "nutch-site.xml"));
         nct.addOrUpdateProperty("elastic.host", elasticNetworkHost,"");
-        nct.addOrUpdateProperty("elastic.port", "9300", "");
+        nct.addOrUpdateProperty("elastic.port", "9200", "");
         nct.addOrUpdateProperty("elastic.cluster", "ingrid", "");
         nct.write();
 
@@ -119,7 +118,7 @@ public class NutchControllerTest {
         Config config = new Config();
         config.plugdescriptionLocation = "conf/plugdescription.xml";
         IndexManager indexManager = new IndexManager(elastic, elasticConfig);
-        indexManager.postConstruct();
+        indexManager.init();
         IngridCrawlNutchProcess process = npf.getIngridCrawlNutchProcess(instance, 2, 10, null, indexManager, new PlugDescriptionService(config));
 
         NutchController nutchController = new NutchController();
@@ -186,7 +185,7 @@ public class NutchControllerTest {
         Config config = new Config();
         config.plugdescriptionLocation = "conf/plugdescription.xml";
         IndexManager indexManager = new IndexManager(elastic, elasticConfig);
-        indexManager.postConstruct();
+        indexManager.init();
         IngridCrawlNutchProcess process = npf.getIngridCrawlNutchProcess(instance, 1, 100, null, indexManager, new PlugDescriptionService(config));
 
         NutchController nutchController = new NutchController();
