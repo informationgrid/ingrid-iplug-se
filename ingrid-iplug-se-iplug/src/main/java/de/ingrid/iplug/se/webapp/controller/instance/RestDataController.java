@@ -7,12 +7,12 @@
  * Licensed under the EUPL, Version 1.2 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
  * EUPL (the "Licence");
- * 
+ *
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * https://joinup.ec.europa.eu/software/page/eupl
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -146,7 +146,7 @@ public class RestDataController extends InstanceController {
 
         return new ResponseEntity<>(admin, admin != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
-	
+
 	private InstanceAdmin getUserFromDatabase(Long id) {
 		EntityManager em = DBManager.INSTANCE.getEntityManager();
 		return em.find(InstanceAdmin.class, id);
@@ -184,8 +184,8 @@ public class RestDataController extends InstanceController {
         Map<String, String> result = new HashMap<>();
         result.put("result", "OK");
         return new ResponseEntity<>(result, HttpStatus.OK);
-    }	
-	
+    }
+
     @SuppressWarnings("unchecked")
     @RequestMapping(value = { "admins/{instance}" }, method = RequestMethod.GET)
     public JSONObject getAdmins(@PathVariable("instance") String name,
@@ -206,7 +206,7 @@ public class RestDataController extends InstanceController {
 
         return json;
     }
-	
+
 	private Map<String, Object> getAdminsFromDatabase(String instanceName, int page, int pageSize, int[] sort) {
 		EntityManager em = DBManager.INSTANCE.getEntityManager();
 
@@ -473,7 +473,7 @@ public class RestDataController extends InstanceController {
 	private void toggleIndexInIBus(String name, boolean activate) throws Exception {
 		IngridCall ingridCall = new IngridCall();
 		ingridCall.setTarget("iBus");
-		ingridCall.setParameter(SEIPlug.baseConfig.uuid + "=>" + SEIPlug.baseConfig.index + "_" + name + ":default");
+		ingridCall.setParameter(SEIPlug.baseConfig.uuid + "=>" + SEIPlug.baseConfig.index + "_" + name);
 
 		if (activate) {
 			ingridCall.setMethod("activateIndex");
@@ -548,7 +548,7 @@ public class RestDataController extends InstanceController {
 
 	@RequestMapping(value = { "status/{instance}" }, method = RequestMethod.GET)
 	public ResponseEntity<Collection<State>> getStatus(@PathVariable("instance") String name, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        
+
 	    if (hasNoAccessToInstance(name, request, response)) {
             response.sendError(HttpStatus.FORBIDDEN.value());
             return null;
