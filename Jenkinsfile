@@ -1,6 +1,6 @@
 pipeline {
     agent any
-    
+
     tools {
         jdk 'jdk17'
     }
@@ -36,7 +36,7 @@ pipeline {
                                    we also should use the IP mask for the port mapping to only allow
                                    access to the right containers
                     */
-                    docker.image('docker.elastic.co/elasticsearch/elasticsearch:7.17.6').withRun('--name "elasticsearch_iplug-se_test" -e "ES_JAVA_OPTS=-Xms1536m -Xmx1536m -Dlog4j2.formatMsgNoLookups=true" -e "cluster.name=ingrid" -e "discovery.type=single-node" -e "ingest.geoip.downloader.enabled=false" -e "http.host=0.0.0.0" -e "transport.host=0.0.0.0" -e "xpack.security.enabled=false" -e "xpack.monitoring.enabled=false" -e "xpack.ml.enabled=false" --network jenkins-nexus-sonar_devnet -p 127.0.0.1:18325:9300 -p 127.0.0.1:18326:9200') { c ->
+                    docker.image('docker.elastic.co/elasticsearch/elasticsearch:7.17.6').withRun('--name "elasticsearch_iplug-se_test" -e "ES_JAVA_OPTS=-Xms1536m -Xmx1536m -Dlog4j2.formatMsgNoLookups=true" -e "cluster.name=ingrid" -e "discovery.type=single-node" -e "ingest.geoip.downloader.enabled=false" -e "http.host=0.0.0.0" -e "transport.host=0.0.0.0" -e "xpack.security.enabled=false" -e "xpack.monitoring.enabled=false" -e "xpack.ml.enabled=false" --network jenkins-nexus-sonar_devnet -p 127.0.0.1:18326:9200') { c ->
 
                         withMaven(
                             // Maven installation declared in the Jenkins "Global Tool Configuration"
@@ -75,7 +75,7 @@ pipeline {
                                    we also should use the IP mask for the port mapping to only allow
                                    access to the right containers
                     */
-                    docker.image('docker.elastic.co/elasticsearch/elasticsearch:7.17.6').withRun('--name "elasticsearch_iplug-se_test" -e "ES_JAVA_OPTS=-Xms1536m -Xmx1536m -Dlog4j2.formatMsgNoLookups=true" -e "cluster.name=ingrid" -e "discovery.type=single-node" -e "ingest.geoip.downloader.enabled=false" -e "http.host=0.0.0.0" -e "transport.host=0.0.0.0" -e "xpack.security.enabled=false" -e "xpack.monitoring.enabled=false" -e "xpack.ml.enabled=false" --network jenkins-nexus-sonar_devnet -p 127.0.0.1:18325:9300 -p 127.0.0.1:18326:9200') { c ->
+                    docker.image('docker.elastic.co/elasticsearch/elasticsearch:7.17.6').withRun('--name "elasticsearch_iplug-se_test" -e "ES_JAVA_OPTS=-Xms1536m -Xmx1536m -Dlog4j2.formatMsgNoLookups=true" -e "cluster.name=ingrid" -e "discovery.type=single-node" -e "ingest.geoip.downloader.enabled=false" -e "http.host=0.0.0.0" -e "transport.host=0.0.0.0" -e "xpack.security.enabled=false" -e "xpack.monitoring.enabled=false" -e "xpack.ml.enabled=false" --network jenkins-nexus-sonar_devnet -p 127.0.0.1:18326:9200') { c ->
 
                         withMaven(
                             maven: 'Maven3',
@@ -108,7 +108,7 @@ pipeline {
     post {
         changed {
             // send Email with Jenkins' default configuration
-            script { 
+            script {
                 emailext (
                     body: '${DEFAULT_CONTENT}',
                     subject: '${DEFAULT_SUBJECT}',
