@@ -22,26 +22,36 @@
  */
 package de.ingrid.iplug.se.nutch.tools;
 
-import org.apache.commons.lang3.StringUtils;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._helpers.bulk.BulkIngester;
+import co.elastic.clients.elasticsearch._helpers.bulk.BulkListener;
+import co.elastic.clients.elasticsearch.core.BulkRequest;
+import co.elastic.clients.elasticsearch.core.BulkResponse;
+import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
+import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
+import co.elastic.clients.elasticsearch.core.bulk.DeleteOperation;
+import co.elastic.clients.elasticsearch.core.bulk.IndexOperation;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.ElasticsearchTransport;
+import co.elastic.clients.transport.TransportUtils;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.nutch.indexer.IndexWriterParams;
-import org.elasticsearch.action.ActionFuture;
-import org.elasticsearch.action.bulk.BulkItemResponse;
-import org.elasticsearch.action.bulk.BulkRequestBuilder;
-import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.delete.DeleteRequestBuilder;
-import org.elasticsearch.action.index.IndexRequestBuilder;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.TransportAddress;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
+import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
+import javax.net.ssl.SSLContext;
 import java.io.IOException;
-import java.net.InetAddress;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class IngridElasticSearchClient {
 
@@ -50,11 +60,10 @@ public class IngridElasticSearchClient {
     private static final int DEFAULT_MAX_BULK_DOCS = 250;
     private static final int DEFAULT_MAX_BULK_LENGTH = 2500500;
 
-    private Client client;
+    private ElasticsearchClient client;
     private String instanceIndex;
 
-    private BulkRequestBuilder bulk;
-    private ActionFuture<BulkResponse> execute = null;
+    private BulkIngester<String> bulk;
     private int port = -1;
     private String host = null;
     private String clusterName = null;
@@ -63,9 +72,6 @@ public class IngridElasticSearchClient {
     private long indexedDocs = 0;
     private int bulkDocs = 0;
     private int bulkLength = 0;
-    private boolean createNewBulk = false;
-
-    private final String type = "default";
 
     private IndexWriterParams params = null;
 
@@ -97,69 +103,130 @@ public class IngridElasticSearchClient {
 
         this.host = parameters.get(ElasticConstants.HOST);
         this.port = parameters.getInt(ElasticConstants.PORT, 9200);
+        String username = parameters.get(ElasticConstants.USERNAME);
+        String password = parameters.get(ElasticConstants.PASSWORD);
+        boolean ssl = parameters.getBoolean(ElasticConstants.SSL, false);
 
-        Settings.Builder settingsBuilder = Settings.builder();
-        BufferedReader reader = new BufferedReader(new Configuration().getConfResourceAsReader("elasticsearch.conf"));
-        String line;
-        String[] parts;
-
-        while ((line = reader.readLine()) != null) {
-            if (StringUtils.isNotBlank(line) && !line.startsWith("#")) {
-                line = line.trim();
-                parts = line.split("=");
-
-                if (parts.length == 2) {
-                    settingsBuilder.put(parts[0].trim(), parts[1].trim());
-                }
-            }
-        }
-
-        if (StringUtils.isNotBlank(clusterName))
-            settingsBuilder.put("cluster.name", clusterName);
-
-        // Set the cluster name and build the settings
-        Settings settings = settingsBuilder.build();
+        String[] remoteHosts = new String[]{host + ":" + port};
 
         // Prefer TransportClient
         if (host != null && port > 1) {
-            client = new PreBuiltTransportClient(settings)
-                    .addTransportAddress(new TransportAddress(  InetAddress.getByName( host ), port) );
-
+            client = createTransportClient(remoteHosts, username, password, ssl);
         } else if (clusterName != null) {
             throw new RuntimeException("TransportClient not created since host and/or port not defined.");
         }
 
-        bulk = client.prepareBulk();
+        bulk = BulkIngester.of(bi -> bi
+                .client(client)
+                .listener(getBulkProcessorListener())
+                .flushInterval(5L, TimeUnit.SECONDS));
 
         instanceIndex = parameters.get(ElasticConstants.INDEX, "nutch");
         maxBulkDocs = parameters.getInt(ElasticConstants.MAX_BULK_DOCS, DEFAULT_MAX_BULK_DOCS);
         maxBulkLength = parameters.getInt(ElasticConstants.MAX_BULK_LENGTH, DEFAULT_MAX_BULK_LENGTH);
     }
 
-    public void addRequest(IndexRequestBuilder request, int size) throws IOException {
+    private BulkListener<String> getBulkProcessorListener() {
+        return new BulkListener<>() {
+
+            @Override
+            public void beforeBulk(long executionId, BulkRequest request, List<String> contexts) {
+            }
+
+            @Override
+            public void afterBulk(long executionId, BulkRequest request, List<String> contexts, BulkResponse response) {
+                // The request was accepted, but may contain failed items.
+                // The "context" list gives the file name for each bulk item.
+                for (int i = 0; i < contexts.size(); i++) {
+                    BulkResponseItem item = response.items().get(i);
+                    if (item.error() != null) {
+                        // Inspect the failure cause
+                        LOG.error("Failed to index file " + contexts.get(i) + " - " + item.error().reason());
+                    }
+                }
+            }
+
+            @Override
+            public void afterBulk(long executionId, BulkRequest request, List<String> contexts, Throwable failure) {
+                // The request could not be sent
+                LOG.error("Bulk request " + executionId + " failed", failure);
+            }
+        };
+    }
+
+    public ElasticsearchClient createTransportClient(String[] remoteHosts, String username, String password, Boolean ssl) throws IOException {
+        if (this.client != null) {
+            client.shutdown();
+        }
+
+        List<HttpHost> hosts = new ArrayList<>();
+        for (String host : remoteHosts) {
+            hosts.add(HttpHost.create(host));
+        }
+
+        final CredentialsProvider credentialsProvider = getCredentialsProvider(username, password);
+
+        SSLContext sslContext;
+        if (ssl) {
+            Path caCertificatePath = Paths.get("elasticsearch-ca.pem");
+            sslContext = TransportUtils.sslContextFromHttpCaCrt(caCertificatePath.toFile());
+        } else {
+            sslContext = null;
+        }
+
+        // Create the low-level client
+        SSLContext finalSslContext = sslContext;
+        RestClient restClient = RestClient
+                .builder(hosts.toArray(new HttpHost[0]))
+                .setHttpClientConfigCallback(httpClientBuilder -> {
+                            httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+                            httpClientBuilder.setSSLContext(finalSslContext);
+                            return httpClientBuilder;
+                        }
+                )
+                .build();
+
+        // Create the transport with a Jackson mapper
+        ElasticsearchTransport transport = new RestClientTransport(
+                restClient, new JacksonJsonpMapper());
+
+        // And create the API client
+        return new ElasticsearchClient(transport);
+    }
+
+    private static CredentialsProvider getCredentialsProvider(String username, String password) {
+        if (username != null && !username.isEmpty() && password != null && !password.isEmpty()) {
+            final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+            credentialsProvider.setCredentials(AuthScope.ANY,
+                    new UsernamePasswordCredentials(username, password));
+            return credentialsProvider;
+        } else return null;
+    }
+
+    public void addRequest(BulkOperation request) throws IOException {
         // Add this indexing request to a bulk request
-        bulkLength += size;
         bulk.add(request);
         checkNewBulk();
     }
 
-    public void addRequest(DeleteRequestBuilder request, int size) throws IOException {
-        // Add this indexing request to a bulk request
-        bulkLength += size;
-        bulk.add(request);
-        checkNewBulk();
+    public BulkOperation prepareIndexRequest(String id, Map source) {
+        IndexOperation.Builder<Map> operation = new IndexOperation.Builder<Map>()
+                .index(instanceIndex)
+                .id(id)
+                .document(source);
+
+        return BulkOperation.of(b -> b.index(operation.build()));
     }
 
-    public IndexRequestBuilder prepareIndexRequest(String id) {
-        return client.prepareIndex(instanceIndex, type, id);
-    }
-
-    public DeleteRequestBuilder prepareDeleteRequest(String id) {
-        return client.prepareDelete(instanceIndex, type, id);
+    public BulkOperation prepareDeleteRequest(String id) {
+        return BulkOperation.of(bulk -> bulk
+                .delete(DeleteOperation.of(x -> x.index(instanceIndex).id(id)))
+        );
     }
 
     public void commit() {
-        if (execute != null) {
+        bulk.flush();
+        /*if (execute != null) {
             // wait for previous to finish
             long beforeWait = System.currentTimeMillis();
             BulkResponse actionGet = execute.actionGet();
@@ -186,21 +253,19 @@ public class IngridElasticSearchClient {
             bulk = client.prepareBulk();
             bulkDocs = 0;
             bulkLength = 0;
-        }
+        }*/
     }
 
     public void close() {
         // Flush pending requests
         LOG.info("Processing remaining requests [docs = " + bulkDocs + ", length = " + bulkLength + ", total docs = " + indexedDocs + "]");
-        createNewBulk = false;
-        commit();
+//        commit();
         // flush one more time to finalize the last bulk
         LOG.info("Processing to finalize last execute");
-        createNewBulk = false;
         commit();
 
         // Close
-        client.close();
+        client.shutdown();
     }
 
     private void checkNewBulk() {
@@ -209,7 +274,7 @@ public class IngridElasticSearchClient {
 
         if (bulkDocs >= maxBulkDocs || bulkLength >= maxBulkLength) {
             // Flush the bulk of indexing requests
-            createNewBulk = true;
+//            createNewBulk = true;
             commit();
         }
     }
