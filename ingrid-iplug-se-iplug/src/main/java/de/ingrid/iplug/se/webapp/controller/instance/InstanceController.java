@@ -7,12 +7,12 @@
  * Licensed under the EUPL, Version 1.2 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
  * EUPL (the "Licence");
- * 
+ *
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * https://joinup.ec.europa.eu/software/page/eupl
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -49,7 +49,7 @@ public class InstanceController extends AbstractController {
         // first check if the path really exists, in case we called an URL with a wrong parameter
         Path workPath = Paths.get(SEIPlug.conf.getInstancesDir(), name );
         if (!workPath.toFile().exists()) return null;
-        
+
         Instance instance = new Instance();
         instance.setName( name );
         instance.setWorkingDirectory( workPath.toString() );
@@ -59,19 +59,14 @@ public class InstanceController extends AbstractController {
         HashSet<String> activeIndices = getActiveIndices();
 
         if (activeIndices != null) {
-            String iBusIndexId = SEIPlug.baseConfig.uuid + "=>" + instance.getInstanceIndexName() + ":default";
-            if (activeIndices.contains(iBusIndexId)) {
-                instance.setIsActive(true);
-
-            } else {
-                instance.setIsActive(false);
-            }
+            String iBusIndexId = SEIPlug.baseConfig.uuid + "=>" + instance.getInstanceIndexName();
+            instance.setIsActive(activeIndices.contains(iBusIndexId));
         }
 
         instance.setEsTransportTcpPort(SEIPlug.conf.esTransportTcpPort);
         instance.setEsHttpHost(SEIPlug.conf.esHttpHost);
-        
-    
+
+
         return instance;
     }
 
@@ -83,7 +78,7 @@ public class InstanceController extends AbstractController {
         IngridCall call = new IngridCall();
         call.setTarget("iBus");
         call.setMethod("getActiveIndices");
-        IngridDocument result = null;
+        IngridDocument result;
         try {
             result = iBus.call(call);
         } catch (Exception e) {
@@ -96,20 +91,11 @@ public class InstanceController extends AbstractController {
 
     /**
      * Returns true if the user has role 'instanceAdmin' and has NO ACCESS to the given instance.
-     * 
-     * @param instanceName
-     * @param request
-     * @param response
-     * @return
      */
     public boolean hasNoAccessToInstance(String instanceName, HttpServletRequest request, HttpServletResponse response) {
         String user = request.getUserPrincipal().getName();
-        if (request.isUserInRole( "instanceAdmin" ) && !DBUtils.isAdminForInstance( user, instanceName )) {
-            return true;
-        } else {
-            return false;
-        }
-        
+        return request.isUserInRole("instanceAdmin") && !DBUtils.isAdminForInstance(user, instanceName);
+
     }
 
     public static void setCommunicationInterface(CommunicationService communicationInterface) {
