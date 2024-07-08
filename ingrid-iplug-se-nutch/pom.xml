@@ -93,7 +93,7 @@
     <dependency>
       <groupId>de.ingrid</groupId>
       <artifactId>ingrid-elasticsearch-tools</artifactId>
-      <version>7.2.0-SNAPSHOT</version>
+      <version>7.2.0</version>
       <exclusions>
         <exclusion>
           <groupId>org.apache.logging.log4j</groupId>
