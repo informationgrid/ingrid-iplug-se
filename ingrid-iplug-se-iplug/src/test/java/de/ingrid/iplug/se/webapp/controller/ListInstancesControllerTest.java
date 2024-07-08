@@ -7,12 +7,12 @@
  * Licensed under the EUPL, Version 1.2 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
  * EUPL (the "Licence");
- * 
+ *
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * https://joinup.ec.europa.eu/software/page/eupl
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,27 +31,27 @@ import java.util.HashSet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.ElasticsearchTransport;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
 import de.ingrid.admin.Config;
 import de.ingrid.admin.service.CommunicationService;
 import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
 import de.ingrid.iplug.se.webapp.controller.instance.InstanceController;
 import de.ingrid.utils.IBus;
 import de.ingrid.utils.IngridDocument;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
+import org.apache.http.HttpHost;
+import org.elasticsearch.client.RestClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.ui.ModelMap;
 
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
-import de.ingrid.iplug.se.utils.ElasticSearchUtils;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.controller.instance.scheduler.SchedulerManager;
 
@@ -61,7 +61,7 @@ public class ListInstancesControllerTest extends Mockito {
 
     @Mock
     SchedulerManager manager;
-    
+
     @Mock
     ElasticsearchNodeFactoryBean esBean;
 
@@ -70,18 +70,18 @@ public class ListInstancesControllerTest extends Mockito {
 
     @Mock
     IBus iBusMock;
-    
+
     @BeforeEach
     public void initTest() throws Exception {
         SEIPlug.baseConfig = new Config();
         // JettyStarter.baseConfig.indexSearchInTypes = new ArrayList<>();
         MockitoAnnotations.initMocks( this );
-        try (MockedStatic<ElasticSearchUtils> mocked = mockStatic(ElasticSearchUtils.class)) {
-            mocked.when(() -> ElasticSearchUtils.typeExists(anyString(), any())).thenReturn(false);
-        }
+//        try (MockedStatic<ElasticSearchUtils> mocked = mockStatic(ElasticSearchUtils.class)) {
+//            mocked.when(() -> ElasticSearchUtils.typeExists(anyString(), any())).thenReturn(false);
+//        }
         // InternalNode node = new InternalNode();
-        Settings.Builder builder = Settings.builder();
-        TransportClient transportClient = new PreBuiltTransportClient(builder.build());
+        RestClient restClient = RestClient.builder(HttpHost.create("localhost:9200")).build();
+        ElasticsearchClient transportClient = new ElasticsearchClient(new RestClientTransport(restClient, new JacksonJsonpMapper()));
         Mockito.when( esBean.getClient() ).thenReturn( transportClient );
 //        Mockito.when( ElasticSearchUtils.typeExists( Mockito.anyString(), (Client) Mockito.any() ) ).thenReturn( false );
 

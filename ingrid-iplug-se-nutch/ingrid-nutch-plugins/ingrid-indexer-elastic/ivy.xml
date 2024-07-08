@@ -36,8 +36,10 @@
   </publications>
 
   <dependencies>
-        <dependency org="org.elasticsearch" name="elasticsearch" rev="6.8.4"
+        <dependency org="org.elasticsearch" name="elasticsearch" rev="8.14.1"
+                    conf="default"/>
+        <dependency org="co.elastic.clients" name="elasticsearch-java" rev="8.14.1"
                     conf="default"/>
   </dependencies>
-  
+
 </ivy-module>

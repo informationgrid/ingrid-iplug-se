@@ -1,6 +1,7 @@
 pipeline {
     agent any
-    
+    triggers{ cron( getCronParams() ) }
+
     tools {
         jdk 'jdk17'
     }
@@ -19,6 +20,7 @@ pipeline {
         // normal build if it's not the master branch and not the support branch, except if it's a SNAPSHOT-version
         stage('Build-SNAPSHOT') {
             when {
+                not { buildingTag() }
                 not { branch 'master' }
                 not {
                     allOf {
@@ -36,7 +38,7 @@ pipeline {
                                    we also should use the IP mask for the port mapping to only allow
                                    access to the right containers
                     */
-                    docker.image('docker.elastic.co/elasticsearch/elasticsearch:7.17.6').withRun('--name "elasticsearch_iplug-se_test" -e "ES_JAVA_OPTS=-Xms1536m -Xmx1536m -Dlog4j2.formatMsgNoLookups=true" -e "cluster.name=ingrid" -e "discovery.type=single-node" -e "ingest.geoip.downloader.enabled=false" -e "http.host=0.0.0.0" -e "transport.host=0.0.0.0" -e "xpack.security.enabled=false" -e "xpack.monitoring.enabled=false" -e "xpack.ml.enabled=false" --network jenkins-nexus-sonar_devnet -p 127.0.0.1:18325:9300 -p 127.0.0.1:18326:9200') { c ->
+                    docker.image('docker.elastic.co/elasticsearch/elasticsearch:8.14.1').withRun('--name "elasticsearch_iplug-se_test" -e "ES_JAVA_OPTS=-Xms1536m -Xmx1536m" -e "cluster.name=ingrid" -e "discovery.type=single-node" -e "http.host=0.0.0.0" -e "transport.host=0.0.0.0" -e "xpack.security.enabled=false" --network jenkins-nexus-sonar_devnet -p 127.0.0.1:18326:9200') { c ->
 
                         withMaven(
                             // Maven installation declared in the Jenkins "Global Tool Configuration"
@@ -61,9 +63,11 @@ pipeline {
                 }
             }
         }
+
         // release build if it's the master or the support branch and is not a SNAPSHOT version
         stage ('Build-Release') {
             when {
+                not { buildingTag() }
                 anyOf { branch 'master'; branch 'support/*' }
                 expression { return !VERSION.endsWith("-SNAPSHOT") }
             }
@@ -75,7 +79,7 @@ pipeline {
                                    we also should use the IP mask for the port mapping to only allow
                                    access to the right containers
                     */
-                    docker.image('docker.elastic.co/elasticsearch/elasticsearch:7.17.6').withRun('--name "elasticsearch_iplug-se_test" -e "ES_JAVA_OPTS=-Xms1536m -Xmx1536m -Dlog4j2.formatMsgNoLookups=true" -e "cluster.name=ingrid" -e "discovery.type=single-node" -e "ingest.geoip.downloader.enabled=false" -e "http.host=0.0.0.0" -e "transport.host=0.0.0.0" -e "xpack.security.enabled=false" -e "xpack.monitoring.enabled=false" -e "xpack.ml.enabled=false" --network jenkins-nexus-sonar_devnet -p 127.0.0.1:18325:9300 -p 127.0.0.1:18326:9200') { c ->
+                    docker.image('docker.elastic.co/elasticsearch/elasticsearch:8.14.1').withRun('--name "elasticsearch_iplug-se_test" -e "ES_JAVA_OPTS=-Xms1536m -Xmx1536m" -e "cluster.name=ingrid" -e "discovery.type=single-node" -e "http.host=0.0.0.0" -e "transport.host=0.0.0.0" -e "xpack.security.enabled=false" --network jenkins-nexus-sonar_devnet -p 127.0.0.1:18326:9200') { c ->
 
                         withMaven(
                             maven: 'Maven3',
@@ -92,7 +96,31 @@ pipeline {
                 }
             }
         }
+
+        stage('Stage Tag Building') {
+            when { buildingTag() }
+            steps {
+                script {
+                    if (env.BUILD_NUMBER == '1') {
+                        env.EXTRA_TAG = "${env.TAG_NAME}-release"
+                    } else {
+                        env.EXTRA_TAG = "${env.TAG_NAME}"
+                    }
+                }
+                withMaven(
+                    maven: 'Maven3',
+                    mavenSettingsConfig: '2529f595-4ac5-44c6-8b4f-f79b5c3f4bae'
+                ) {
+                    echo "Scheduled Release: $VERSION"
+                    // only build and create docker image
+                    // use release tag if build number == 1
+                    sh "mvn package docker:build -DpushImageTag -DdockerImageTags=${env.EXTRA_TAG} -Pdocker -DskipTests"
+                }
+            }
+        }
+
         stage ('SonarQube Analysis'){
+            when { branch 'develop' }
             steps {
                 withMaven(
                     maven: 'Maven3',
@@ -108,12 +136,32 @@ pipeline {
     post {
         changed {
             // send Email with Jenkins' default configuration
-            script { 
+            script {
                 emailext (
                     body: '${DEFAULT_CONTENT}',
                     subject: '${DEFAULT_SUBJECT}',
                     to: '${DEFAULT_RECIPIENTS}')
             }
         }
+    }
+}
+
+
+def getCronParams() {
+    String tagTimestamp = env.TAG_TIMESTAMP
+    long diffInDays = 0
+    if (tagTimestamp != null) {
+        long diff = "${currentBuild.startTimeInMillis}".toLong() - "${tagTimestamp}".toLong()
+        diffInDays = diff / (1000 * 60 * 60 * 24)
+        echo "Days since release: ${diffInDays}"
+    }
+
+    def versionMatcher = /\d\.\d\.\d(.\d)?/
+    if( env.TAG_NAME ==~ versionMatcher && diffInDays < 180) {
+        // every Sunday between midnight and 6am
+        return 'H H(0-6) * * 0'
+    }
+    else {
+        return ''
     }
 }

@@ -13,7 +13,6 @@ services:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ports:
       - 9200:9200
-      - 9300:9300
 
   kibana:
 #    image: docker.elastic.co/kibana/kibana-oss:6.8.17
@@ -29,6 +28,6 @@ services:
   ibus:
     image: docker-registry.wemove.com/ingrid-ibus
     environment:
-      - ELASTIC_HOSTS=elastic:9300
+      - ELASTIC_HOSTS=elastic:9200
     ports:
       - 9900:9900

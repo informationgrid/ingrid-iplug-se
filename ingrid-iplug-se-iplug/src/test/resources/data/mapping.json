@@ -1,42 +1,38 @@
 {
-    "web": {
-        "properties": {
-            "iPlugId": {
-                "type": "keyword",
-                "store": true
-            },
-            "fetched": {
-                "format": "dateOptionalTime",
-                "type": "date"
-            },
-            "title": {
-                "analyzer": "german",
-                "type": "text",
-                "boost": 1.1
-            },
-            "content": {
-                "analyzer": "german",
-                "type": "text"
-            },
-            "id": {
-                "type": "keyword"
-            },
-            "url": {
-                "type": "keyword"
-            },
-            "boost": {
-                "type": "float",
-                "null_value" : "0.0"
-            },
-            "partner": {
-                "type": "keyword"
-            },
-            "provider": {
-                "type": "keyword"
-            },
-            "sort_hash": {
-                "type": "keyword"
-            }
+    "properties": {
+        "iPlugId": {
+            "type": "keyword",
+            "store": true
+        },
+        "fetched": {
+            "type": "date"
+        },
+        "title": {
+            "analyzer": "german",
+            "type": "text"
+        },
+        "content": {
+            "analyzer": "german",
+            "type": "text"
+        },
+        "id": {
+            "type": "keyword"
+        },
+        "url": {
+            "type": "keyword"
+        },
+        "boost": {
+            "type": "float",
+            "null_value" : "0.0"
+        },
+        "partner": {
+            "type": "keyword"
+        },
+        "provider": {
+            "type": "keyword"
+        },
+        "sort_hash": {
+            "type": "keyword"
         }
     }
 }

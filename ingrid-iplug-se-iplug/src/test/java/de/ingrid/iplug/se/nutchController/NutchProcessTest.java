@@ -7,12 +7,12 @@
  * Licensed under the EUPL, Version 1.2 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
  * EUPL (the "Licence");
- * 
+ *
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * https://joinup.ec.europa.eu/software/page/eupl
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,19 +30,19 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Properties;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
 import de.ingrid.admin.Config;
 import de.ingrid.admin.service.PlugDescriptionService;
 import de.ingrid.elasticsearch.IndexManager;
 import de.ingrid.iplug.se.elasticsearch.Utils;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.node.Node;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.SEIPlug;
@@ -50,6 +50,8 @@ import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
 import de.ingrid.utils.statusprovider.StatusProvider;
+import org.apache.http.HttpHost;
+import org.elasticsearch.client.RestClient;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -111,8 +113,7 @@ public class NutchProcessTest {
     @Test
     public void testIngridCrawlNutchProcessor() throws Exception {
 
-        Node node = null;
-
+        ElasticsearchClient transportClient = null;
         try {
 
             FileSystem fs = FileSystems.getDefault();
@@ -132,14 +133,14 @@ public class NutchProcessTest {
             Configuration configuration = new Configuration();
             configuration.setInstancesDir(".");
             configuration.databaseID = "iplug-se-dev";
-            configuration.nutchCallJavaOptions = java.util.Arrays.asList("-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8");
+            configuration.nutchCallJavaOptions = Arrays.asList("-Dhadoop.log.file=hadoop.log", "-Dfile.encoding=UTF-8");
             SEIPlug.conf = configuration;
             Properties elasticProperties = Utils.getElasticProperties();
-            String elasticNetworkHost = (String) elasticProperties.get("network.host");
+            String[] elasticNetworkHost = elasticProperties.get("elastic.remoteHosts").toString().split(":");
 
             // get an entity manager instance (initializes properties in the
             // DBManager)
-            EntityManagerFactory emf = null;
+            EntityManagerFactory emf;
             // for development use the settings from the persistence.xml
             emf = Persistence.createEntityManagerFactory(configuration.databaseID);
             DBManager.INSTANCE.intialize(emf);
@@ -147,8 +148,8 @@ public class NutchProcessTest {
             FileUtils.copyDirectories(fs.getPath("../ingrid-iplug-se-nutch/src/test/resources/conf").toAbsolutePath(), conf);
 
             NutchConfigTool nct = new NutchConfigTool(Paths.get(conf.toAbsolutePath().toString(), "nutch-site.xml"));
-            nct.addOrUpdateProperty("elastic.host", elasticNetworkHost,"");
-            nct.addOrUpdateProperty("elastic.port", "9300", "");
+            nct.addOrUpdateProperty("elastic.host", elasticNetworkHost[0],"");
+            nct.addOrUpdateProperty("elastic.port", elasticNetworkHost[1], "");
             nct.addOrUpdateProperty("elastic.cluster", "ingrid", "");
             nct.write();
 
@@ -157,7 +158,7 @@ public class NutchProcessTest {
             Config config = new Config();
             config.plugdescriptionLocation = "conf/plugdescription.xml";
             IndexManager indexManager = new IndexManager(elastic, elasticConfig);
-            indexManager.postConstruct();
+            indexManager.init();
             IngridCrawlNutchProcess p = new IngridCrawlNutchProcess(indexManager, new PlugDescriptionService(config));
             p.setWorkingDirectory(workingDir.toString());
 
@@ -175,14 +176,8 @@ public class NutchProcessTest {
             p.setStatusProvider(new StatusProvider(workingDir.toString()));
             p.start();
 
-
-            Settings settings = Settings.builder()
-                    .put("path.data", SEIPlug.conf.getInstancesDir() + "/test")
-                    .put("transport.tcp.port", 9300)
-                    .put("cluster.name", "ingrid")
-                    .put("network.host", elasticNetworkHost)
-                    .put("http.port", 9200).build();
-            TransportClient transportClient = new PreBuiltTransportClient(settings);
+            RestClient restClient = RestClient.builder(HttpHost.create("localhost:9200")).build();
+            transportClient = new ElasticsearchClient(new RestClientTransport(restClient, new JacksonJsonpMapper()));
 
             long start = System.currentTimeMillis();
             Thread.sleep(500);
@@ -200,8 +195,8 @@ public class NutchProcessTest {
             assertThat("Status is FINISHED", p.getStatus(), is(NutchProcess.STATUS.FINISHED));
 
         } finally {
-            if (node != null)
-                node.close();
+            if (transportClient != null)
+                transportClient.shutdown();
 
         }
     }

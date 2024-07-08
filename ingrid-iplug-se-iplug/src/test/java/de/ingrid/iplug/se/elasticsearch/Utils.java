@@ -7,12 +7,12 @@
  * Licensed under the EUPL, Version 1.2 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
  * EUPL (the "Licence");
- * 
+ *
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * https://joinup.ec.europa.eu/software/page/eupl
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,6 +22,9 @@
  */
 package de.ingrid.iplug.se.elasticsearch;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.util.BinaryData;
+import co.elastic.clients.util.ContentType;
 import de.ingrid.elasticsearch.*;
 import de.ingrid.elasticsearch.search.FacetConverter;
 import de.ingrid.elasticsearch.search.IQueryParsers;
@@ -33,13 +36,11 @@ import de.ingrid.utils.IngridHit;
 import de.ingrid.utils.query.IngridQuery;
 import de.ingrid.utils.queryparser.ParseException;
 import de.ingrid.utils.queryparser.QueryStringParser;
-import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.xcontent.XContentType;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -50,11 +51,11 @@ import static org.hamcrest.MatcherAssert.*;
 
 public class Utils {
     public static final long MAX_RESULTS = 11;
-    
+
     public static IndexImpl index = null;
 
     public static ElasticsearchNodeFactoryBean elastic;
-    
+
     public static IndexManager indexManager;
     public static ElasticConfig elasticConfig;
 
@@ -67,10 +68,9 @@ public class Utils {
         elasticConfig.communicationProxyUrl = "/ingrid-group:unit-tests";
         elasticConfig.indexSearchDefaultFields = new String[]{"title", "content"};
         elasticConfig.additionalSearchDetailFields = new String[0];
-        elasticConfig.remoteHosts = new String[] { elasticProperties.get("network.host") + ":9300"};
+        elasticConfig.remoteHosts = new String[] { elasticProperties.get("elastic.remoteHosts").toString()};
         IndexInfo indexInfo = new IndexInfo();
         indexInfo.setToIndex("test_1");
-        indexInfo.setToType("web");
         indexInfo.setToAlias("ingrid_test");
         elasticConfig.activeIndices = new IndexInfo[1];
         elasticConfig.activeIndices[0] = indexInfo;
@@ -79,7 +79,7 @@ public class Utils {
         elastic = new ElasticsearchNodeFactoryBean();
         elastic.init(elasticConfig);
         elastic.afterPropertiesSet();
-        
+
         // set necessary configurations for startup
 //        Configuration configuration = new Configuration();
 //        configuration.searchType = SearchType.DFS_QUERY_THEN_FETCH;
@@ -92,7 +92,7 @@ public class Utils {
 //        SEIPlug.conf = configuration;
 
         SEIPlug.baseConfig.docProducerIndices = new String[] {"test"};
-        
+
         // setMapping( elastic, "test_1","web" );
         prepareIndex( elastic );
     }
@@ -103,7 +103,7 @@ public class Utils {
             // check for elastic search settings in classpath, which works
             // during development
             // and production
-            Resource resource = new ClassPathResource("/elasticsearch.properties");
+            Resource resource = new ClassPathResource("/config.properties");
             if (resource.exists()) {
                 p.load(resource.getInputStream());
             }
@@ -113,31 +113,35 @@ public class Utils {
         return p;
     }
 
-    public static void prepareIndex(ElasticsearchNodeFactoryBean elastic, String fileData, String index, String type) throws Exception {
-        Client client = elastic.getClient();
+    public static void prepareIndex(ElasticsearchNodeFactoryBean elastic, String fileData, String index) throws Exception {
+        ElasticsearchClient client = elastic.getClient();
         ClassPathResource resource = new ClassPathResource( fileData );
 
-        setMapping(elastic, index, type);
+        setMapping(elastic, index);
 
         byte[] urlsData = Files.readAllBytes( Paths.get( resource.getURI() ) );
 
-        client.prepareBulk().add( urlsData, 0, urlsData.length, XContentType.JSON )
-                .execute()
-                .actionGet();
+        BinaryData data = BinaryData.of(urlsData, ContentType.APPLICATION_JSON);
+
+        client.bulk(builder -> builder.operations(op -> op
+                        .index(idx -> idx
+                                .index(index)
+                                .document(data))
+                )
+        );
 
         // make sure the indexed data is available immediately during search!
-        RefreshRequest refreshRequest = new RefreshRequest( index );
-        client.admin().indices().refresh( refreshRequest ).actionGet();
-    }
-    
-    static void prepareIndex(ElasticsearchNodeFactoryBean elastic) throws Exception {
-        prepareIndex( elastic, "data/webUrls.json", "test_1", "web" );
+        client.indices().refresh(r -> r.index(index));
     }
 
-    public static void setMapping(ElasticsearchNodeFactoryBean elastic, String index, String type) {
+    static void prepareIndex(ElasticsearchNodeFactoryBean elastic) throws Exception {
+        prepareIndex(elastic, "data/webUrls.json", "test_1");
+    }
+
+    public static void setMapping(ElasticsearchNodeFactoryBean elastic, String index) {
         String mappingSource = "";
         try {
-            Client client = elastic.getClient();
+            ElasticsearchClient client = elastic.getClient();
             ClassPathResource resource = new ClassPathResource( "data/mapping.json" );
 
             List<String> urlsData = Files.readAllLines( Paths.get( resource.getURI() ), Charset.defaultCharset() );
@@ -146,20 +150,12 @@ public class Utils {
             }
 
             System.out.println(mappingSource);
-            mappingSource = mappingSource.replace("\"web\"", "\"" + type + "\"");
 
-            if (client.admin().indices().prepareExists(index).execute().actionGet().isExists()) {
-                client.admin().indices().prepareDelete(index).execute().actionGet();
+            if (client.indices().exists(ex -> ex.index(index)).value()) {
+                client.indices().delete(d -> d.index(index));
             }
-            client.admin().indices().prepareCreate(index).execute().actionGet();
-            
-            client.admin().indices().preparePutMapping().setIndices( index )
-                    .setType(type)
-                    .setSource( mappingSource, XContentType.JSON )
-                    .execute()
-                    .actionGet();
-            
-            
+            String finalMappingSource = mappingSource;
+            client.indices().create(ci -> ci.index(index).mappings(m -> m.withJson(new StringReader(finalMappingSource))));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -177,13 +173,13 @@ public class Utils {
         parsers.add( new DatatypePartnerProviderQueryConverter() );
         parsers.add( new MatchAllQueryConverter() );
         qc.setQueryParsers( parsers );
-        
+
         indexManager = new IndexManager( elastic, elasticConfig );
-        indexManager.postConstruct();
-        
+        indexManager.init();
+
         index = new IndexImpl( elasticConfig, indexManager, qc, new FacetConverter(qc), new QueryBuilderService());
     }
-    
+
     public static IngridQuery getIngridQuery( String term ) {
         try {
             return QueryStringParser.parse( term );
@@ -193,7 +189,7 @@ public class Utils {
         }
         return null;
     }
-    
+
     public static void checkHitsForIDs(IngridHit[] hits, int... ids) {
         for (int id : ids) {
             boolean found = false;
@@ -204,9 +200,9 @@ public class Utils {
                 }
             }
             assertThat("The following ID was not found in the results: " + id, found, is(true));
-        }        
+        }
     }
-    
+
     public static void addDefaultFacets(IngridQuery ingridQuery) {
         IngridDocument f1 = new IngridDocument();
         f1.put("id", "partner");

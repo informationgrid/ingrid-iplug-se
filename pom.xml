@@ -8,7 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>ingrid-iplug-se-project</artifactId>
   <packaging>pom</packaging>
-  <version>7.1.0</version>
+  <version>7.2.0</version>
   <name>InGrid iPlug SE</name>
   <description>This iPlug indexes documents from websites and can be queried by the iBus.</description>
 
@@ -33,8 +33,9 @@
   <!-- ==================== PROPERTIES ==================== -->
   <properties>
     <apache-nutch-version>apache-nutch-1.19</apache-nutch-version>
-    <ingrid-base-webapp.version>7.1.0</ingrid-base-webapp.version>
-    <elasticsearch.version>6.8.17</elasticsearch.version>
+    <ingrid-base-webapp.version>7.2.0</ingrid-base-webapp.version>
+    <jackson.version>2.17.1</jackson.version>
+    <elastic.version>8.14.1</elastic.version>
     <log4j2.version>2.22.1</log4j2.version>
     <spring.version>5.3.23</spring.version>
     <jetty.version>9.4.49.v20220914</jetty.version>
@@ -265,6 +266,16 @@
         <artifactId>spring-core</artifactId>
         <version>${spring.version}</version>
       </dependency>
+      <dependency>
+        <groupId>com.h2database</groupId>
+        <artifactId>h2</artifactId>
+        <version>1.4.190</version>
+      </dependency>
+      <dependency>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-core</artifactId>
+        <version>3.0</version>
+      </dependency>
       <!--<dependency>
         <groupId>org.apache.lucene</groupId>
         <artifactId>lucene-core</artifactId>
@@ -275,6 +286,16 @@
         <artifactId>lucene-analyzers-common</artifactId>
         <version>6.4.1</version>
       </dependency>-->
+      <dependency>
+        <!-- Import dependency management from Spring Boot -->
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>2.7.18</version>
+        <!-- <relativePath />-->
+        <!-- lookup parent from repository -->
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
