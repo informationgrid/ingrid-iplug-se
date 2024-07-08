@@ -1,4 +1,12 @@
 
+## 7.2.0 (08.07.2024)
+
+### Features
+
+* Regelmäßiges Update der Docker Images (#6300)
+* Upgrade Elasticsearch auf Version 8.x. (#6119)
+
+    
 ## 7.0.0 (05.01.2024)
 
 ### Features
