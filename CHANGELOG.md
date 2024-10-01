@@ -1,4 +1,12 @@
 
+## 7.3.0 (01.10.2024)
+
+
+### Bugfixes
+
+* getRecord-Anfrage im iBus nicht eindeutig (#6637)
+* IPlug-SE log4j doppelte libraries (#6524)
+    
 ## 7.2.0 (08.07.2024)
 
 ### Features
