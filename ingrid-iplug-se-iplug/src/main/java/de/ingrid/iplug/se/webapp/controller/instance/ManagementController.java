@@ -7,12 +7,12 @@
  * Licensed under the EUPL, Version 1.2 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
  * EUPL (the "Licence");
- * 
+ *
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * https://joinup.ec.europa.eu/software/page/eupl
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,6 +32,8 @@ import de.ingrid.iplug.se.nutchController.NutchProcessFactory;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
 import de.ingrid.iplug.se.webapp.controller.AdminViews;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -40,14 +42,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 /**
  * Control the database parameter page.
- * 
+ *
  * @author joachim@wemove.com
- * 
+ *
  */
 @Controller
 @SessionAttributes("plugDescription")
@@ -92,14 +91,14 @@ public class ManagementController extends InstanceController {
 
     @RequestMapping(value = { "/iplug-pages/instanceManagement.html" }, method = RequestMethod.POST, params = "start")
     public String startCrawl(@RequestParam("instance") String name, @RequestParam("depth") int depth, @RequestParam("num") int numUrls, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        
+
         if (hasNoAccessToInstance(name, request, response)) {
             return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );
         }
 
         FileUtils.prepareCrawl( name );
-        
-        // configure crawl process        
+
+        // configure crawl process
         Instance instance = InstanceController.getInstanceData( name );
 
         IngridCrawlNutchProcess process = nutchProcessFactory.getIngridCrawlNutchProcess(instance, depth, numUrls, postCrawlProcessors, indexManager, plugDescriptionService);
@@ -108,13 +107,13 @@ public class ManagementController extends InstanceController {
         nutchController.start(instance, process);
         return redirect(AdminViews.SE_INSTANCE_MANAGEMENT + ".html?instance=" + name);
     }
-    
+
     @RequestMapping(value = { "/iplug-pages/instanceManagement.html" }, method = RequestMethod.POST, params = "stop")
     public String stopCrawl(@RequestParam("instance") String name, HttpServletRequest request, HttpServletResponse response) throws Exception {
         if (hasNoAccessToInstance(name, request, response)) {
             return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );
         }
-        
+
         Instance instance = InstanceController.getInstanceData( name );
         nutchController.stop( instance );
         return redirect(AdminViews.SE_INSTANCE_MANAGEMENT + ".html?instance=" + name);

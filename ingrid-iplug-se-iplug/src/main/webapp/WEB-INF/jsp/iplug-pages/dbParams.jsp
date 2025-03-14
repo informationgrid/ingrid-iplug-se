@@ -7,12 +7,12 @@
   Licensed under the EUPL, Version 1.2 or – as soon they will be
   approved by the European Commission - subsequent versions of the
   EUPL (the "Licence");
-  
+
   You may not use this work except in compliance with the Licence.
   You may obtain a copy of the Licence at:
-  
+
   https://joinup.ec.europa.eu/software/page/eupl
-  
+
   Unless required by applicable law or agreed to in writing, software
   distributed under the Licence is distributed on an "AS IS" basis,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,7 +41,7 @@
         <h1><fmt:message key="DatabaseConfig.main.configuration"/></h1>
         <security:authorize access="isAuthenticated()">
             <div id="language"><a href="../base/auth/logout.html"><fmt:message key="DatabaseConfig.main.logout"/></a></div>
-        </security:authorize>>
+        </security:authorize>
     </div>
     <div id="help"><a href="#">[?]</a></div>
 

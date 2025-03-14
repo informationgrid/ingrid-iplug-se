@@ -7,12 +7,12 @@
  * Licensed under the EUPL, Version 1.2 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
  * EUPL (the "Licence");
- * 
+ *
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * https://joinup.ec.europa.eu/software/page/eupl
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,6 +33,8 @@ import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
 import de.ingrid.iplug.se.webapp.controller.instance.InstanceController;
 import de.ingrid.iplug.se.webapp.controller.instance.scheduler.SchedulerManager;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -41,8 +43,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -53,14 +53,14 @@ import java.util.List;
 
 /**
  * Control the database parameter page.
- * 
+ *
  * @author joachim@wemove.com
- * 
+ *
  */
 @Controller
 @SessionAttributes("plugDescription")
 public class ListInstancesController extends InstanceController {
-    
+
     private static Logger log = Logger.getLogger( ListInstancesController.class );
 
     private Configuration seConfig;
@@ -70,7 +70,7 @@ public class ListInstancesController extends InstanceController {
 
     @Autowired
     private NutchController nutchController;
-    
+
     @Autowired
     private IndexManager indexManager;
 
@@ -96,7 +96,7 @@ public class ListInstancesController extends InstanceController {
 
     @RequestMapping(value = { "/iplug-pages/listInstances.html" }, method = RequestMethod.GET)
     public String getParameters(final ModelMap modelMap, HttpServletRequest request) throws Exception {
-        
+
         List<Instance> instances = getInstances();
 
         // check for invalid instances and remove them from the active ones
@@ -111,17 +111,17 @@ public class ListInstancesController extends InstanceController {
                     break;
                 }
             }
-            
+
             if (!found) {
                 activeInstancesIt.remove();
             }
         }*/
-        
+
         if (request.isUserInRole( "instanceAdmin" )) {
             String user = request.getUserPrincipal().getName();
             instances.removeIf(instance -> !DBUtils.isAdminForInstance( user, instance.getName() ));
         }
-        
+
         modelMap.put( "instances", instances );
         return AdminViews.SE_LIST_INSTANCES;
     }
@@ -142,7 +142,7 @@ public class ListInstancesController extends InstanceController {
             response.sendError(HttpStatus.FORBIDDEN.value());
             return null;
         }
-        
+
         if (name == null || name.isEmpty()) {
             modelMap.put( "instances", getInstances() );
             return AdminViews.SE_LIST_INSTANCES;
@@ -157,11 +157,11 @@ public class ListInstancesController extends InstanceController {
         boolean success = true;
         if (from == null) {
             success = initializeInstanceDir( dir + "/" + name );
-            
+
         } else {
             success = success && copyUrlsFromInstanceTo( from, name ) && copyInstanceDir( dir + "/" + from, dir + "/" + name );
         }
-        
+
         if (success) {
             schedulerManager.addInstance( name );
             modelMap.put( "instances", getInstances() );
@@ -183,23 +183,23 @@ public class ListInstancesController extends InstanceController {
     }
 
     private boolean copyUrlsFromInstanceTo(String from, String name) {
-        
+
         try {
             List<Url> fromUrls = DBUtils.getAllUrlsFromInstance( from );
             log.debug( "Copy Urls: " + fromUrls.size() );
-            
+
             // reset the IDs and set the name of the new instance
             for (Url url : fromUrls) {
                 url.setId( null );
                 url.setInstance( name );
             }
-            
+
             DBUtils.addUrls( fromUrls );
-        } catch (Exception e) { 
+        } catch (Exception e) {
             log.error( "Error during duplication of URLs", e );
             return false;
         }
-        
+
         return true;
     }
 
@@ -239,17 +239,17 @@ public class ListInstancesController extends InstanceController {
 
         return result;
     }
-    
+
     private boolean copyInstanceDir(String from, String to) {
         Path sourceDir = Paths.get( from, "conf" );
         Path destDir = Paths.get( to, "conf" );
-        
+
         try {
             final Path newInstanceDir = Files.createDirectories( destDir );
             if (newInstanceDir == null) {
                 throw new RuntimeException( "Directory could not be created: " + destDir );
             }
-            
+
             FileUtils.copyDirectories( sourceDir, destDir );
         } catch (IOException e) {
             log.error("Error when copying instance dir", e);
@@ -258,8 +258,8 @@ public class ListInstancesController extends InstanceController {
         return true;
     }
 
-    
-    
+
+
     public void setSchedulerManager(SchedulerManager schedulerManager) {
         this.schedulerManager = schedulerManager;
     }
