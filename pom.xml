@@ -33,7 +33,7 @@
   <!-- ==================== PROPERTIES ==================== -->
   <properties>
     <apache-nutch-version>apache-nutch-1.19</apache-nutch-version>
-    <ingrid-base-webapp.version>7.5.0-SNAPSHOT</ingrid-base-webapp.version>
+    <ingrid-base-webapp.version>7.5.0</ingrid-base-webapp.version>
     <jackson.version>2.17.1</jackson.version>
     <elastic.version>8.14.1</elastic.version>
     <log4j2.version>2.22.1</log4j2.version>
