@@ -8,7 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>ingrid-iplug-se-project</artifactId>
   <packaging>pom</packaging>
-  <version>7.4.0</version>
+  <version>7.5.0</version>
   <name>InGrid iPlug SE</name>
   <description>This iPlug indexes documents from websites and can be queried by the iBus.</description>
 
@@ -33,12 +33,12 @@
   <!-- ==================== PROPERTIES ==================== -->
   <properties>
     <apache-nutch-version>apache-nutch-1.19</apache-nutch-version>
-    <ingrid-base-webapp.version>7.3.0</ingrid-base-webapp.version>
+    <ingrid-base-webapp.version>7.5.0</ingrid-base-webapp.version>
     <jackson.version>2.17.1</jackson.version>
     <elastic.version>8.14.1</elastic.version>
     <log4j2.version>2.22.1</log4j2.version>
-    <spring.version>5.3.23</spring.version>
-    <jetty.version>9.4.49.v20220914</jetty.version>
+<!--    <spring.version>5.3.23</spring.version>-->
+<!--    <jetty.version>9.4.49.v20220914</jetty.version>-->
     <netty.version>4.1.77</netty.version>
   </properties>
 
@@ -51,7 +51,7 @@
   <!-- ==================== DEPENDENCY MANAGEMENT ==================== -->
   <dependencyManagement>
     <dependencies>
-      <dependency>
+      <!--<dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-slf4j-impl</artifactId>
         <version>${log4j2.version}</version>
@@ -71,12 +71,13 @@
         <artifactId>log4j-api</artifactId>
         <version>${log4j2.version}</version>
       </dependency>
+      -->
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-core</artifactId>
         <version>${log4j2.version}</version>
       </dependency>
-      <dependency>
+      <!--<dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-compress</artifactId>
         <version>1.21</version>
@@ -90,13 +91,13 @@
         <groupId>commons-lang</groupId>
         <artifactId>commons-lang</artifactId>
         <version>2.6</version>
-      </dependency>
-      <dependency>
+      </dependency>-->
+      <!--<dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-core</artifactId>
-        <version>2.13.3</version>
-      </dependency>
-      <dependency>
+        <version>${jackson.version}</version>
+      </dependency>-->
+      <!--<dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-annotations</artifactId>
         <version>2.13.3</version>
@@ -160,8 +161,8 @@
         <groupId>com.fasterxml.jackson.jaxrs</groupId>
         <artifactId>jackson-jaxrs-base</artifactId>
         <version>2.13.3</version>
-      </dependency>
-      <dependency>
+      </dependency>-->
+     <!-- <dependency>
         <groupId>jakarta.activation</groupId>
         <artifactId>jakarta.activation-api</artifactId>
         <version>1.2.2</version>
@@ -175,8 +176,8 @@
         <groupId>org.ow2.asm</groupId>
         <artifactId>asm</artifactId>
         <version>9.3</version>
-      </dependency>
-      <dependency>
+      </dependency>-->
+      <!--<dependency>
         <groupId>org.eclipse.jetty.websocket</groupId>
         <artifactId>websocket-client</artifactId>
         <version>${jetty.version}</version>
@@ -210,8 +211,8 @@
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>apache-jstl</artifactId>
         <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
+      </dependency>-->
+      <!--<dependency>
         <groupId>io.netty</groupId>
         <artifactId>netty-all</artifactId>
         <version>${netty.version}</version>
@@ -250,8 +251,8 @@
         <groupId>io.netty</groupId>
         <artifactId>netty-transport</artifactId>
         <version>${netty.version}.Final</version>
-      </dependency>
-      <dependency>
+      </dependency>-->
+<!--      <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-beans</artifactId>
         <version>${spring.version}</version>
@@ -265,7 +266,7 @@
         <groupId>org.springframework</groupId>
         <artifactId>spring-core</artifactId>
         <version>${spring.version}</version>
-      </dependency>
+      </dependency>-->
       <dependency>
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
@@ -286,16 +287,18 @@
         <artifactId>lucene-analyzers-common</artifactId>
         <version>6.4.1</version>
       </dependency>-->
+<!--
       <dependency>
-        <!-- Import dependency management from Spring Boot -->
+        &lt;!&ndash; Import dependency management from Spring Boot &ndash;&gt;
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
         <version>2.7.18</version>
-        <!-- <relativePath />-->
-        <!-- lookup parent from repository -->
+        &lt;!&ndash; <relativePath />&ndash;&gt;
+        &lt;!&ndash; lookup parent from repository &ndash;&gt;
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+-->
     </dependencies>
   </dependencyManagement>
 

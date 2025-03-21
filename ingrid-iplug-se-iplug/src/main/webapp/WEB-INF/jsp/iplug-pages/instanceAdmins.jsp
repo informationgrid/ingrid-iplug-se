@@ -7,12 +7,12 @@
   Licensed under the EUPL, Version 1.2 or – as soon they will be
   approved by the European Commission - subsequent versions of the
   EUPL (the "Licence");
-  
+
   You may not use this work except in compliance with the Licence.
   You may obtain a copy of the Licence at:
-  
+
   https://joinup.ec.europa.eu/software/page/eupl
-  
+
   Unless required by applicable law or agreed to in writing, software
   distributed under the Licence is distributed on an "AS IS" basis,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -113,7 +113,7 @@
         function isValidLogin( login ) {
             return (/^[A-Za-z0-9_-]*$/i.test( login ));
         }
-        
+
         function isValidPassword( password ) {
             return password.length > 3;
         }
@@ -131,25 +131,25 @@
                 $(".error.login.format").show();
                 valid = false;
             }
-            
+
             data.password = $("#password").val();
             // check if login is valid
             if ( !isValidPassword( data.password ) ) {
                 $(".error.password").show();
                 valid = false;
             }
-            
+
             if ( valid ) {
             	  $("#waitScreen").show();
                 $.ajax({
                     type: "GET",
-                    url: "../rest/isduplicateadmin/${instance.name}/" + data.login + "/",
+                    url: "../rest/isduplicateadmin/${instance.name}/" + data.login,
                     success: function(result) {
-                    	// disable duplicate test for updates                    	
+                    	// disable duplicate test for updates
                       if (result === "false" || dialog.data("isNew") === false ) {
                          $.ajax({
                              type: "POST",
-                             url: "../rest/admin/${instance.name}/",
+                             url: "../rest/admin/${instance.name}",
                              contentType: 'application/json',
                              data: JSON.stringify( data ),
                              success: function(data) {
@@ -172,11 +172,11 @@
                         console.error(text, error);
                         $("#waitScreen").hide();
                     }
-                });            	              	
+                });
             }
             return valid;
         }
-        
+
 
         function getButtonTemplate(type) {
             var button = null;
@@ -368,7 +368,7 @@
         });
 
         var updateBrowserHistory = function() {
-        	
+
             // avoid problem with missing functionality in IE9
             if (window.history.pushState)  {
                 window.history.pushState(null, null, location.pathname + "?instance=${instance.name}");
@@ -418,7 +418,7 @@
         '<div class="actionButtons">' +
             '<span class="ui-state-default ui-corner-all" onclick="adminMaintenance.actionHandler(\'edit\', event.target)"><span class="btnUrl ui-icon ui-icon-pencil" title="Bearbeiten"></span></span>' +
         '</div>';
-        
+
         function nl2br (str, is_xhtml) {
             var breakTag = (is_xhtml || typeof is_xhtml === 'undefined') ? '<br />' : '<br>';
             return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2');

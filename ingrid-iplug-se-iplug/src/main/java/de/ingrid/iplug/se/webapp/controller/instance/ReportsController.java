@@ -7,12 +7,12 @@
  * Licensed under the EUPL, Version 1.2 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
  * EUPL (the "Licence");
- * 
+ *
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * https://joinup.ec.europa.eu/software/page/eupl
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,9 +26,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -48,9 +47,9 @@ import de.ingrid.iplug.se.webapp.controller.AdminViews;
 
 /**
  * Control the database parameter page.
- * 
+ *
  * @author joachim@wemove.com
- * 
+ *
  */
 @Controller
 @SessionAttributes("plugDescription")
@@ -76,22 +75,22 @@ public class ReportsController extends AbstractController {
 			return AdminViews.SE_INSTANCE_REPORTS;
 		}
 	}
-	
+
     @ModelAttribute("statusCodes")
     public List<String[]> getStatusCodes() {
-    	
+
     	List<String[]> statusCodes = new ArrayList<String[]>();
     	statusCodes.add(new String[] {"17", "ACCESS_DENIED"});
     	statusCodes.add(new String[] {"16", "EXCEPTION"});
     	statusCodes.add(new String[] {"11", "GONE"});
     	statusCodes.add(new String[] {"14", "NOTFOUND"});
     	statusCodes.add(new String[] {"18", "ROBOTS_DENIED"});
-    	
+
     	return statusCodes;
-    	
+
     }
 
-	
-	
+
+
 
 }

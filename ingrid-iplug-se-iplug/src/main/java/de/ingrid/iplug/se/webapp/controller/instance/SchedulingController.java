@@ -7,12 +7,12 @@
  * Licensed under the EUPL, Version 1.2 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
  * EUPL (the "Licence");
- * 
+ *
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * https://joinup.ec.europa.eu/software/page/eupl
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,31 +28,31 @@ import de.ingrid.iplug.se.webapp.controller.AdminViews;
 import de.ingrid.iplug.se.webapp.controller.instance.scheduler.*;
 import de.ingrid.iplug.se.webapp.controller.instance.scheduler.ClockCommand.Period;
 import de.ingrid.iplug.se.webapp.controller.instance.scheduler.WeeklyCommand.Day;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 /**
  * Control the database parameter page.
- * 
+ *
  * @author joachim@wemove.com
- * 
+ *
  */
 @Controller
 @SessionAttributes("plugDescription")
 public class SchedulingController extends InstanceController {
-    
+
     private final PatternPersistence _patternPersistence;
     private final CrawlDataPersistence _crawlDataPersistence;
-    
+
     @Autowired
     private SchedulerManager _schedulerManager;
 
@@ -68,8 +68,8 @@ public class SchedulingController extends InstanceController {
 
     @RequestMapping(value = { "/iplug-pages/instanceScheduling.html" }, method = RequestMethod.GET)
     public String getParameters(final ModelMap modelMap,
-            @ModelAttribute("plugDescription") final PlugdescriptionCommandObject commandObject,
-            @RequestParam("instance") String name, HttpServletRequest request, HttpServletResponse response) {
+                                @ModelAttribute("plugDescription") final PlugdescriptionCommandObject commandObject,
+                                @RequestParam("instance") String name, HttpServletRequest request, HttpServletResponse response) {
 
         if (hasNoAccessToInstance(name, request, response)) {
             return redirect( AdminViews.SE_LIST_INSTANCES + ".html" );
@@ -154,14 +154,14 @@ public class SchedulingController extends InstanceController {
         }
         return month;
     }
-    
+
     private void saveAndSchedule(String name, String pattern, Integer depth, Integer topn) throws IOException {
         // persist scheduling
         _patternPersistence.savePattern(pattern, name);
 
         // persist crawldata
         _crawlDataPersistence.saveCrawlData(depth, topn, name);
-        
+
         _schedulerManager.schedule( name );
     }
 
@@ -185,7 +185,7 @@ public class SchedulingController extends InstanceController {
         Period period = clockCommand.getPeriod();
         hour = period == Period.PM ? hour + 12 : hour;
         String pattern = minute + " " + hour + " " + "* * 0-6";
-        
+
         saveAndSchedule( name, pattern, clockCommand.getDepth(), clockCommand.getTopn() );
         return "redirect:" + AdminViews.SE_INSTANCE_SCHEDULER + ".html?instance=" + name;
     }
@@ -238,7 +238,7 @@ public class SchedulingController extends InstanceController {
         String tabId = "#tab3";
         map.put( "instance", getInstanceData( name ) );
         map.put( "selectedTab", tabId );
-        
+
         // validate and return to page on error
         validate( errors, monthlyCommand );
         if (errors.hasErrors()) {
@@ -261,7 +261,7 @@ public class SchedulingController extends InstanceController {
             counter++;
         }
         String pattern = minute + " " + hour + " " + dayPattern + " * *";
-        
+
         saveAndSchedule( name, pattern, monthlyCommand.getDepth(), monthlyCommand.getTopn() );
         return "redirect:" + AdminViews.SE_INSTANCE_SCHEDULER + ".html?instance=" + name + tabId;
     }
@@ -275,7 +275,7 @@ public class SchedulingController extends InstanceController {
         String tabId = "#tab4";
         map.put( "instance", getInstanceData( name ) );
         map.put( "selectedTab", tabId );
-        
+
         // validate and return to page on error
         validate( errors, advancedCommand );
         if (errors.hasErrors()) {

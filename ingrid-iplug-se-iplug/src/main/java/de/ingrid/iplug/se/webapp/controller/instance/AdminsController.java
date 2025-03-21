@@ -7,12 +7,12 @@
  * Licensed under the EUPL, Version 1.2 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
  * EUPL (the "Licence");
- * 
+ *
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * https://joinup.ec.europa.eu/software/page/eupl
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,20 +26,20 @@ import de.ingrid.admin.command.PlugdescriptionCommandObject;
 import de.ingrid.admin.service.CommunicationService;
 import de.ingrid.iplug.se.Configuration;
 import de.ingrid.iplug.se.webapp.controller.AdminViews;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 
 /**
  * Control the instance admin page.
- * 
+ *
  * @author joachim@wemove.com
- * 
+ *
  */
 @Controller
 @SessionAttributes("plugDescription")
@@ -69,7 +69,7 @@ public class AdminsController extends InstanceController {
 
         return AdminViews.SE_INSTANCE_ADMINS;
     }
-    
+
     @ModelAttribute("filterOptions")
     public String[] getFilterOption(@RequestParam(value = "filter", required = false, defaultValue = "") String filter) {
         return filter.split(",");
@@ -80,6 +80,6 @@ public class AdminsController extends InstanceController {
         // }
         // return false;
     }
-    
+
 
 }
