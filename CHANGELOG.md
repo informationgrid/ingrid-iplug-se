@@ -1,4 +1,12 @@
 
+## 7.5.0 (21.03.2025)
+
+
+### Bugfixes
+
+* Sicherheitslücke in GeoTools und Commons Collection Bibliothek (#7326)
+* Aktualisierung des Spring-Frameworks (#7313)
+    
 ## 7.3.0 (01.10.2024)
 
 
