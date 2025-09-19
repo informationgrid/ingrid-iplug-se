@@ -1,5 +1,9 @@
 {
   "properties": {
+    "collection.name": {
+      "type": "keyword",
+      "store": true
+    },
     "iPlugId": {
       "type": "keyword",
       "store": true
