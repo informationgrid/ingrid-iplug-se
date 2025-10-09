@@ -1,5 +1,21 @@
 {
   "properties": {
+    "collection.id": {
+      "type": "keyword",
+      "store": true
+    },
+    "collection.name": {
+      "type": "keyword",
+      "store": true
+    },
+    "spatial": {
+      "type": "nested",
+      "properties": {
+        "geometries": {
+          "type": "geo_shape"
+        }
+      }
+    },
     "iPlugId": {
       "type": "keyword",
       "store": true
