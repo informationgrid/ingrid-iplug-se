@@ -7,12 +7,12 @@
   Licensed under the EUPL, Version 1.2 or – as soon they will be
   approved by the European Commission - subsequent versions of the
   EUPL (the "Licence");
-  
+
   You may not use this work except in compliance with the Licence.
   You may obtain a copy of the Licence at:
-  
+
   https://joinup.ec.europa.eu/software/page/eupl
-  
+
   Unless required by applicable law or agreed to in writing, software
   distributed under the Licence is distributed on an "AS IS" basis,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,7 +50,7 @@
         checkState();
         $("#crawlStop").hide();
         $("#allInfo").hide();
-        
+
         $("#formManagement").validate({
             //errorLabelContainer: $("#formManagement div.error"),
             highlight: function(element, errorClass, validClass) {
@@ -63,7 +63,7 @@
                 error.insertAfter( element.parent() );
             }
         });
-        
+
         dialog = $("#dialog-hadoop").dialog({
             autoOpen : false,
             height : 750,
@@ -76,7 +76,7 @@
             }
         });
     });
-    
+
     function setLog(data) {
         var formatTime = function(ts) {
             var date = new Date(ts);
@@ -86,7 +86,7 @@
             var time = date.toTimeString().substring(0, 8);
             return '' + y + '-' + (m<=9 ? '0' + m : m) + '-' + (d <= 9 ? '0' + d : d) + ' ' + time;
         };
-        
+
         // fill div with data from content
         var content = "";
         for (var i=0; i < data.length; i++) {
@@ -98,7 +98,7 @@
 
         $("#status").html( content );
     }
-    
+
     function checkState() {
         $.ajax( "../rest/status/${ instance.name }", {
             type: "GET",
@@ -123,18 +123,20 @@
                 $("#crawlStart").hide();
                 $("#moreInfo").hide();
                 $("#crawlStop").show();
-                
+
                 setLog( data );
                 $("#allInfo").show();
                 statisticIsUpdated = true;
-                
+
                 // repeat execution every 5s until finished
                 setTimeout( checkState, 5000 );
             },
             error: function(jqXHR, text, error) {
                 // if it's not a real error, but just saying, that no process is running
                 $("#crawlInfo").html( "Es trat ein Fehler beim Laden des Logs auf. " );
-                console.error( error, jqXHR );                  
+                console.error( error, jqXHR );
+                // repeat execution after 10s in case a crawl has been started meanwhile
+                setTimeout( checkState, 10000 );
             }
         });
     }
@@ -151,8 +153,8 @@
         });
 
     }
-    
-    
+
+
 </script>
 
 </head>
