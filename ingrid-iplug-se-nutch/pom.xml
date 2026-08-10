@@ -118,6 +118,11 @@
       <version>1.19</version>
     </dependency>
     <!-- nutch plugin dependencies -->
+      <dependency>
+          <groupId>org.codehaus.jackson</groupId>
+          <artifactId>jackson-mapper-asl</artifactId>
+          <version>1.9.2</version>
+      </dependency>
     <!--<dependency>
       <groupId>org.elasticsearch</groupId>
       <artifactId>elasticsearch</artifactId>
