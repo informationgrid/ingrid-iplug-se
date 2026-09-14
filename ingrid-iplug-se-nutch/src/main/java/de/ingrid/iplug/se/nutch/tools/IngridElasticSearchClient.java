@@ -7,12 +7,12 @@
  * Licensed under the EUPL, Version 1.2 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
  * EUPL (the "Licence");
- * 
+ *
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * https://joinup.ec.europa.eu/software/page/eupl
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,20 +34,22 @@ import co.elastic.clients.elasticsearch.core.bulk.IndexOperation;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.TransportUtils;
-import co.elastic.clients.transport.rest_client.RestClientTransport;
+import co.elastic.clients.transport.rest5_client.Rest5ClientTransport;
+import co.elastic.clients.transport.rest5_client.low_level.Rest5Client;
+import co.elastic.clients.transport.rest5_client.low_level.Rest5ClientBuilder;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.CredentialsProvider;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.core5.http.HttpHost;
 import org.apache.nutch.indexer.IndexWriterParams;
-import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -156,18 +158,26 @@ public class IngridElasticSearchClient {
 
     public ElasticsearchClient createTransportClient(String[] remoteHosts, String username, String password, Boolean ssl) throws IOException {
         if (this.client != null) {
-            client.shutdown();
+            try {
+                this.client.close();
+            } catch (Exception e) {
+                LOG.error("Error closing previous client", e);
+            }
         }
 
         List<HttpHost> hosts = new ArrayList<>();
         for (String host : remoteHosts) {
-            hosts.add(HttpHost.create(host));
+            try {
+                hosts.add(HttpHost.create(host));
+            } catch (URISyntaxException e) {
+                throw new IOException("Invalid host syntax: " + host, e);
+            }
         }
 
         final CredentialsProvider credentialsProvider = getCredentialsProvider(username, password);
 
         SSLContext sslContext;
-        if (ssl) {
+        if (ssl != null && ssl) {
             Path caCertificatePath = Paths.get("elasticsearch-ca.pem");
             sslContext = TransportUtils.sslContextFromHttpCaCrt(caCertificatePath.toFile());
         } else {
@@ -175,19 +185,21 @@ public class IngridElasticSearchClient {
         }
 
         // Create the low-level client
-        SSLContext finalSslContext = sslContext;
-        RestClient restClient = RestClient
-                .builder(hosts.toArray(new HttpHost[0]))
-                .setHttpClientConfigCallback(httpClientBuilder -> {
-                            httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
-                            httpClientBuilder.setSSLContext(finalSslContext);
-                            return httpClientBuilder;
-                        }
-                )
-                .build();
+        Rest5ClientBuilder restClientBuilder = Rest5Client.builder(hosts.toArray(new HttpHost[0]));
+        if (credentialsProvider != null) {
+            restClientBuilder.setHttpClientConfigCallback(httpClientBuilder -> {
+                httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+            });
+        }
+
+        if (sslContext != null) {
+            restClientBuilder.setSSLContext(sslContext);
+        }
+
+        Rest5Client restClient = restClientBuilder.build();
 
         // Create the transport with a Jackson mapper
-        ElasticsearchTransport transport = new RestClientTransport(
+        ElasticsearchTransport transport = new Rest5ClientTransport(
                 restClient, new JacksonJsonpMapper());
 
         // And create the API client
@@ -196,9 +208,9 @@ public class IngridElasticSearchClient {
 
     private static CredentialsProvider getCredentialsProvider(String username, String password) {
         if (username != null && !username.isEmpty() && password != null && !password.isEmpty()) {
-            final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-            credentialsProvider.setCredentials(AuthScope.ANY,
-                    new UsernamePasswordCredentials(username, password));
+            final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+            credentialsProvider.setCredentials(new AuthScope((String) null, -1),
+                    new UsernamePasswordCredentials(username, password.toCharArray()));
             return credentialsProvider;
         } else return null;
     }
@@ -265,7 +277,16 @@ public class IngridElasticSearchClient {
         commit();
 
         // Close
-        client.shutdown();
+        try {
+            if (bulk != null) {
+                bulk.close();
+            }
+            if (client != null) {
+                client.close();
+            }
+        } catch (Exception e) {
+            LOG.error("Error closing Elasticsearch client: ", e);
+        }
     }
 
     private void checkNewBulk() {

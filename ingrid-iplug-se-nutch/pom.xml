@@ -44,7 +44,7 @@
         <version>2.12.2</version>
         <scope>compile</scope>
       </dependency>
-      <dependency>
+      <!--<dependency>
         <groupId>org.elasticsearch.client</groupId>
         <artifactId>elasticsearch-rest-client</artifactId>
         <version>${elastic.version}</version>
@@ -78,7 +78,7 @@
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
         <version>${jackson.version}</version>
-      </dependency>
+      </dependency>-->
       <dependency>
         <groupId>jakarta.json</groupId>
         <artifactId>jakarta.json-api</artifactId>
@@ -93,7 +93,7 @@
     <dependency>
       <groupId>de.ingrid</groupId>
       <artifactId>ingrid-elasticsearch-tools</artifactId>
-      <version>8.2.0</version>
+      <version>8.5.0-SNAPSHOT</version>
       <exclusions>
         <exclusion>
           <groupId>org.apache.logging.log4j</groupId>
@@ -109,7 +109,7 @@
     <dependency>
       <groupId>org.elasticsearch</groupId>
       <artifactId>elasticsearch</artifactId>
-      <version>8.14.1</version>
+      <version>9.3.0</version>
     </dependency>
 
     <dependency>
