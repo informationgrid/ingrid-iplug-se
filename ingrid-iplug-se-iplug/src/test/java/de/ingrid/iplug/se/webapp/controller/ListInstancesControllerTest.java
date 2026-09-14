@@ -30,7 +30,8 @@ import java.util.HashSet;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
-import co.elastic.clients.transport.rest_client.RestClientTransport;
+import co.elastic.clients.transport.rest5_client.Rest5ClientTransport;
+import co.elastic.clients.transport.rest5_client.low_level.Rest5Client;
 import de.ingrid.admin.Config;
 import de.ingrid.admin.service.CommunicationService;
 import de.ingrid.elasticsearch.ElasticsearchNodeFactoryBean;
@@ -39,8 +40,7 @@ import de.ingrid.utils.IBus;
 import de.ingrid.utils.IngridDocument;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.http.HttpHost;
-import org.elasticsearch.client.RestClient;
+import org.apache.hc.core5.http.HttpHost;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -78,8 +78,8 @@ public class ListInstancesControllerTest extends Mockito {
 //            mocked.when(() -> ElasticSearchUtils.typeExists(anyString(), any())).thenReturn(false);
 //        }
         // InternalNode node = new InternalNode();
-        RestClient restClient = RestClient.builder(HttpHost.create("localhost:9200")).build();
-        ElasticsearchClient transportClient = new ElasticsearchClient(new RestClientTransport(restClient, new JacksonJsonpMapper()));
+        Rest5Client restClient = Rest5Client.builder(HttpHost.create("localhost:9200")).build();
+        ElasticsearchClient transportClient = new ElasticsearchClient(new Rest5ClientTransport(restClient, new JacksonJsonpMapper()));
         Mockito.when( esBean.getClient() ).thenReturn( transportClient );
 //        Mockito.when( ElasticSearchUtils.typeExists( Mockito.anyString(), (Client) Mockito.any() ) ).thenReturn( false );
 
