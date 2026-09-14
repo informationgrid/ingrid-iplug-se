@@ -38,7 +38,7 @@
     <spring-boot.version>4.1.1</spring-boot.version>
 <!--    <jackson.version>2.19.2</jackson.version>-->
 <!--    <elastic.version>8.14.1</elastic.version>-->
-    <log4j2.version>2.26.1</log4j2.version>
+    <log4j2.version>2.25.5</log4j2.version>
 <!--    <spring.version>5.3.23</spring.version>-->
     <jetty.version>12.1.12</jetty.version>
     <netty.version>4.1.77</netty.version>
@@ -73,11 +73,6 @@
         <version>${jetty.version}</version>
         <type>pom</type>
         <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-core</artifactId>
-        <version>${log4j2.version}</version>
       </dependency>
       <dependency>
         <groupId>com.h2database</groupId>
