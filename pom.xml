@@ -33,13 +33,14 @@
   <!-- ==================== PROPERTIES ==================== -->
   <properties>
     <apache-nutch-version>apache-nutch-1.19</apache-nutch-version>
-    <ingrid-base-webapp.version>8.1.0</ingrid-base-webapp.version>
+    <ingrid-base-webapp.version>8.5.0-SNAPSHOT</ingrid-base-webapp.version>
     <ingrid-utils.version>8.1.0</ingrid-utils.version>
-    <jackson.version>2.19.2</jackson.version>
-    <elastic.version>8.14.1</elastic.version>
-    <log4j2.version>2.22.1</log4j2.version>
+    <spring-boot.version>4.1.1</spring-boot.version>
+<!--    <jackson.version>2.19.2</jackson.version>-->
+<!--    <elastic.version>8.14.1</elastic.version>-->
+    <log4j2.version>2.25.5</log4j2.version>
 <!--    <spring.version>5.3.23</spring.version>-->
-<!--    <jetty.version>9.4.49.v20220914</jetty.version>-->
+    <jetty.version>12.1.12</jetty.version>
     <netty.version>4.1.77</netty.version>
   </properties>
 
@@ -53,9 +54,25 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-core</artifactId>
-        <version>${log4j2.version}</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${spring-boot.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-bom</artifactId>
+        <version>${jetty.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty.ee11</groupId>
+        <artifactId>jetty-ee11-bom</artifactId>
+        <version>${jetty.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.h2database</groupId>
@@ -85,7 +102,6 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
-      <version>5.9.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -111,7 +127,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.22.2</version>
+        <version>3.2.5</version>
         <configuration>
           <skip>false</skip>
           <reuseForks>false</reuseForks>

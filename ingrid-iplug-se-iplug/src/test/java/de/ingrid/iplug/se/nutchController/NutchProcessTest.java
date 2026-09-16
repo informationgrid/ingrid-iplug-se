@@ -38,7 +38,8 @@ import javax.persistence.Persistence;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
-import co.elastic.clients.transport.rest_client.RestClientTransport;
+import co.elastic.clients.transport.rest5_client.Rest5ClientTransport;
+import co.elastic.clients.transport.rest5_client.low_level.Rest5Client;
 import de.ingrid.admin.Config;
 import de.ingrid.admin.service.PlugDescriptionService;
 import de.ingrid.elasticsearch.IndexManager;
@@ -50,8 +51,7 @@ import de.ingrid.iplug.se.db.DBManager;
 import de.ingrid.iplug.se.utils.FileUtils;
 import de.ingrid.iplug.se.webapp.container.Instance;
 import de.ingrid.utils.statusprovider.StatusProvider;
-import org.apache.http.HttpHost;
-import org.elasticsearch.client.RestClient;
+import org.apache.hc.core5.http.HttpHost;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -176,8 +176,8 @@ public class NutchProcessTest {
             p.setStatusProvider(new StatusProvider(workingDir.toString()));
             p.start();
 
-            RestClient restClient = RestClient.builder(HttpHost.create("localhost:9200")).build();
-            transportClient = new ElasticsearchClient(new RestClientTransport(restClient, new JacksonJsonpMapper()));
+            Rest5Client restClient = Rest5Client.builder(HttpHost.create("localhost:9200")).build();
+            transportClient = new ElasticsearchClient(new Rest5ClientTransport(restClient, new JacksonJsonpMapper()));
 
             long start = System.currentTimeMillis();
             Thread.sleep(500);
@@ -196,7 +196,7 @@ public class NutchProcessTest {
 
         } finally {
             if (transportClient != null)
-                transportClient.shutdown();
+                transportClient.close();
 
         }
     }
