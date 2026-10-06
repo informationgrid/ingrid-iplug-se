@@ -1,4 +1,14 @@
 
+## 8.5.0 (06.10.2026)
+
+### Features
+
+* Update Java 17 LTS auf Java 25 LTS (#8697)
+
+### Bugfixes
+
+* Log wird nach Fehlerfall nicht erneut geladen (#9397)
+    
 ## 8.1.0 (09.10.2025)
 
 ### Features

@@ -36,9 +36,9 @@
 	</publications>
 
 	<dependencies>
-		<dependency org="org.apache.logging.log4j" name="log4j-api" rev="2.22.1" conf="*->master" />
-		<dependency org="org.apache.logging.log4j" name="log4j-core" rev="2.22.1" conf="*->master" />
-		<dependency org="org.apache.logging.log4j" name="log4j-slf4j-impl" rev="2.22.1" conf="*->master" />
+		<dependency org="org.apache.logging.log4j" name="log4j-api" rev="2.25.5" conf="*->master" />
+		<dependency org="org.apache.logging.log4j" name="log4j-core" rev="2.25.5" conf="*->master" />
+		<dependency org="org.apache.logging.log4j" name="log4j-slf4j2-impl" rev="2.25.5" conf="*->master" />
 
 		<dependency org="org.apache.commons" name="commons-lang3" rev="3.12.0" conf="*->default" />
 		<dependency org="org.apache.commons" name="commons-collections4" rev="4.4" conf="*->master" />
@@ -49,7 +49,7 @@
 		<dependency org="com.tdunning" name="t-digest" rev="3.3" />
 
 		<!-- Hadoop Dependencies -->
-		<dependency org="org.apache.hadoop" name="hadoop-common" rev="3.3.4" conf="*->default">
+		<dependency org="org.apache.hadoop" name="hadoop-common" rev="3.4.3" conf="*->default">
 			<exclude org="hsqldb" name="hsqldb" />
 			<exclude org="net.sf.kosmosfs" name="kfs" />
 			<exclude org="net.java.dev.jets3t" name="jets3t" />
@@ -57,9 +57,9 @@
 			<exclude org="org.mortbay.jetty" name="*" />
 			<exclude org="ant" name="ant" />
 		</dependency>
-		<dependency org="org.apache.hadoop" name="hadoop-hdfs" rev="3.3.4" conf="*->default" />
-		<dependency org="org.apache.hadoop" name="hadoop-mapreduce-client-core" rev="3.3.4" conf="*->default" />
-		<dependency org="org.apache.hadoop" name="hadoop-mapreduce-client-jobclient" rev="3.3.4" conf="*->default" />
+		<dependency org="org.apache.hadoop" name="hadoop-hdfs" rev="3.4.3" conf="*->default" />
+		<dependency org="org.apache.hadoop" name="hadoop-mapreduce-client-core" rev="3.4.3" conf="*->default" />
+		<dependency org="org.apache.hadoop" name="hadoop-mapreduce-client-jobclient" rev="3.4.3" conf="*->default" />
 		<!-- End of Hadoop Dependencies -->
 
 		<dependency org="org.apache.tika" name="tika-core" rev="2.3.0" />
@@ -116,6 +116,7 @@
 
 		<!--Added Because of Elasticsearch JEST client-->
 		<!--TODO refactor these to indexer-elastic-rest plugin somehow, currently doesn't resolve correctly-->
+		<dependency org="org.apache.httpcomponents" name="httpasyncclient" rev="4.1.4" />
 		<dependency org="org.apache.httpcomponents" name="httpcore-nio" rev="4.4.14" />
 		<dependency org="org.apache.httpcomponents" name="httpcore" rev="4.4.14" />
 
