@@ -7,12 +7,12 @@
  * Licensed under the EUPL, Version 1.2 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
  * EUPL (the "Licence");
- * 
+ *
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * https://joinup.ec.europa.eu/software/page/eupl
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -103,24 +103,24 @@ public class DateSearchTest {
         IngridQuery q = Utils.getIngridQuery("t1:2014-03-30 t2:2014-04-30 time:intersect");
         IngridHits search = Utils.index.search(q, 0, 10);
         assertThat(search, not(is(nullValue())));
-        assertThat(search.getHits().length, is(3));
-        Utils.checkHitsForIDs(search.getHits(), 2, 5, 7);
+        assertThat(search.getHits().length, is(4));
+        Utils.checkHitsForIDs(search.getHits(), 2, 5, 7, 8);
 
         // intersect two time ranges (with intersection above t1!) and a date
         q = Utils.getIngridQuery("t1:2014-03-30 t2:2014-04-10 time:intersect");
         search = Utils.index.search(q, 0, 10);
         assertThat(search, not(is(nullValue())));
-        assertThat(search.getHits().length, is(3));
-        Utils.checkHitsForIDs(search.getHits(), 2, 5, 7);
+        assertThat(search.getHits().length, is(4));
+        Utils.checkHitsForIDs(search.getHits(), 2, 5, 7, 8);
 
-        // all docs containing a given date as a start/end date 
+        // all docs containing a given date as a start/end date
         q = Utils.getIngridQuery("t0:2014-04-07 time:intersect");
         search = Utils.index.search(q, 0, 10);
         assertThat(search, not(is(nullValue())));
         assertThat(search.getHits().length, is(0));
 
         // all docs containing a given date as a start/end date
-        // -> this will find a document with a single date 
+        // -> this will find a document with a single date
         q = Utils.getIngridQuery("t0:2014-04-04 time:intersect");
         search = Utils.index.search(q, 0, 10);
         assertThat(search, not(is(nullValue())));
@@ -128,7 +128,7 @@ public class DateSearchTest {
         Utils.checkHitsForIDs(search.getHits(), 7);
 
         // all docs containing a given date as a start/end date
-        // -> this will find a document with a starting date 
+        // -> this will find a document with a starting date
         q = Utils.getIngridQuery("t0:2014-04-01 time:intersect");
         search = Utils.index.search(q, 0, 10);
         assertThat(search, not(is(nullValue())));
@@ -136,7 +136,7 @@ public class DateSearchTest {
         Utils.checkHitsForIDs(search.getHits(), 2);
 
         // all docs containing a given date as a start/end date
-        // -> this will find a document with an end date 
+        // -> this will find a document with an end date
         q = Utils.getIngridQuery("t0:2014-04-15 time:intersect");
         search = Utils.index.search(q, 0, 10);
         assertThat(search, not(is(nullValue())));
@@ -153,7 +153,7 @@ public class DateSearchTest {
         // document 5 is only intersecting and so not in the results!!!
         Utils.checkHitsForIDs(search.getHits(), 2, 7, 8);
 
-        // all docs intersecting one date 
+        // all docs intersecting one date
         q = Utils.getIngridQuery("t0:2014-04-07 time:include");
         search = Utils.index.search(q, 0, 10);
         assertThat(search, not(is(nullValue())));
