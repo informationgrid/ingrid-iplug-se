@@ -7,12 +7,12 @@
  * Licensed under the EUPL, Version 1.2 or – as soon they will be
  * approved by the European Commission - subsequent versions of the
  * EUPL (the "Licence");
- * 
+ *
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * https://joinup.ec.europa.eu/software/page/eupl
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -124,6 +124,8 @@ public class NutchProcessFactory {
         nutchConfigTool.addOrUpdateProperty("elastic.index", instance.getIndexName() + "_" + instance.getName(), "Default index to send documents to.");
         nutchConfigTool.addOrUpdateProperty("elastic.port", instance.getEsTransportTcpPort(), "The port to connect to using TransportClient.");
         nutchConfigTool.addOrUpdateProperty("elastic.host", instance.getEsHttpHost(), "The hostname to send documents to using TransportClient. Either host\n" + "  and port must be defined or cluster.");
+        nutchConfigTool.addOrUpdateProperty("elastic.username", String.valueOf(elasticConfig.username), "The username to send documents to using TransportClient. Either host\n" + "  and port must be defined or cluster.");
+        nutchConfigTool.addOrUpdateProperty("elastic.password", String.valueOf(elasticConfig.password), "The password to send documents to using TransportClient. Either host\n" + "  and port must be defined or cluster.");
         nutchConfigTool.addOrUpdateProperty("iplug.datasource.name", SEIPlug.baseConfig.datasourceName, "The name of the iPlug which will be added to each indexed document.");
         nutchConfigTool.addOrUpdateProperty("iplug.id", SEIPlug.baseConfig.communicationProxyUrl, "The id of the iPlug which will be added to each indexed document.");
         nutchConfigTool.addOrUpdateProperty("use.elastic.with.ibus", String.valueOf(elasticConfig.esCommunicationThroughIBus), "Whether to use iBus for communication to Elasticsearch.");
